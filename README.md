@@ -1,16 +1,14 @@
-## Hi there 👋
+# Otakumori Website
 
-<!--
-**Otakumori/Otakumori** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+**Otakumori** is an e-commerce platform designed to provide a unique shopping experience for anime and gaming enthusiasts. The website will feature customizable merchandise, interactive elements, and personalized user profiles.
 
-Here are some ideas to get you started:
+## Features
+- Customizable anime/gaming-themed merchandise (t-shirts, accessories, etc.)
+- User login and profiles powered by Firebase
+- Integrated with Printify for product management
+- Gamified user experience with Easter eggs and interactive elements
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## Current Status
+This project is in the early stages of development. We are using Jekyll for the site’s framework and GitHub Pages for hosting.
+
+Stay tuned for more updates!
