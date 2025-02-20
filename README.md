@@ -1,4 +1,4 @@
-# 🌸 Otakumori - The Ultimate Anime & Gaming Hub.. hopefully! I'm a student, worker, cosplayer, and a new...coder? I'm just following my passions...
+# 🌸 Otakumori - E-commerce Super Shop : Anime & Gaming Hub
 
 
 ![Screenshot 2024-05-25 131107](https://github.com/user-attachments/assets/bda65d2e-09eb-4468-979a-6c8ac873cf4b)
