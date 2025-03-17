@@ -1,10 +1,10 @@
-import Header from "./components/Header";
+import CherryBlossomEffect from "./CherryBlossomEffect";
 
-export default function Layout({ children }) {
+export default function Hero() {
   return (
     <div>
-      <Header />
-      <main>{children}</main>
+      <CherryBlossomEffect />
+      <h1>Welcome to OtakuMori 🌸</h1>
     </div>
   );
 }
