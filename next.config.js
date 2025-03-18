@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Moved outputFileTracingRoot outside experimental (as required)
-  outputFileTracingRoot: __dirname,
-  output: 'standalone', // Helps Vercel generate a clean output
+  outputFileTracingRoot: __dirname,  // ensures correct file tracing
+  output: 'standalone',              // for Vercel packaging
   images: {
-    // Use remotePatterns instead of deprecated images.domains
     remotePatterns: [
       {
         protocol: 'https',
@@ -15,7 +13,6 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Fallbacks for Node built-in modules that are not available on the client
       config.resolve.fallback = {
         fs: false,
         path: false,
