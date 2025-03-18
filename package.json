@@ -16,11 +16,10 @@
     "dotenv": "^16.4.7",
     "framer-motion": "^12.5.0",
     "next": "^15.2.2",
-    "next-auth": "^4.24.11",
     "react": "latest",
     "react-dom": "latest",
     "react-icons": "^5.5.0",
-    "stripe": "^17.7.0",
+    "stripe": "^17.6.0",
     "typescript": "latest"
   },
   "devDependencies": {
@@ -29,6 +28,6 @@
     "@types/react-dom": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
-    "rimraf": "^6.0.1"
+    "rimraf": "^5.0.0"
   }
 }
