@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
-import CherryBlossomEffect from "./CherryBlossomEffect"; // Import the proper Sakura animation
+import CherryBlossomEffect from "./CherryBlossomEffect";
 
-// Supabase setup
+// Setup Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -33,27 +33,27 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero-container relative w-full h-screen overflow-hidden flex justify-center items-center">
+    <section className="relative w-full h-screen overflow-hidden flex justify-center items-center">
       {/* Background Image */}
       <Image
         src="/assets/cherry.jpg"
         alt="Cherry Blossom"
-        layout="fill"
-        objectFit="cover"
+        fill
+        style={{ objectFit: "cover" }}
         className="z-0"
       />
 
-      {/* Sakura Petal Effect */}
+      {/* Petal Animation */}
       <CherryBlossomEffect />
 
-      {/* Community Bar */}
+      {/* Petal Count Bar */}
       <div className="absolute bottom-10 bg-black/80 text-white p-3 rounded-lg shadow-lg">
-        🌸 Community Petals Collected: {collected} / 10000
+        Community Petals Collected: {collected} / 10000
       </div>
 
       {/* CTA */}
       <div className="absolute top-10 text-white text-3xl animate-pulse">
-        Click the petals to collect rewards! 
+        Click the petals to collect rewards!
       </div>
     </section>
   );

@@ -1,13 +1,10 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{js,jsx}"],
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}"
+  ],
   theme: {
-    extend: {
-      colors: {
-        pink: {
-          DEFAULT: '#ec4899',
-        },
-      dark: '#121212'
-    }
+    extend: {}
   },
-  plugins: [],
+  plugins: []
 };
