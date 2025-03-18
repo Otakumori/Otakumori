@@ -1,4 +1,4 @@
-import CherryBlossomEffect from "./CherryBlossomEffect";
+import CherryBlossomEffect from '../../app/components/CherryBlossomEffect';
 
 export default function Hero() {
   return (
