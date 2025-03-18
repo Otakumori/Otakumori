@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Image from "next/image";
+import CherryBlossomEffect from "./CherryBlossomEffect"; // Import the proper Sakura animation
 
 // Supabase setup
 const supabase = createClient(
@@ -42,12 +43,12 @@ export default function Hero() {
         className="z-0"
       />
 
-      {/* Cherry Blossom Effect */}
+      {/* Sakura Petal Effect */}
       <CherryBlossomEffect />
 
       {/* Community Bar */}
       <div className="absolute bottom-10 bg-black/80 text-white p-3 rounded-lg shadow-lg">
-        Community Petals Collected: {collected} / 10000
+        🌸 Community Petals Collected: {collected} / 10000
       </div>
 
       {/* CTA */}
