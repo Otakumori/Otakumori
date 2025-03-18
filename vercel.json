@@ -1,4 +1,6 @@
 {
   "version": 2,
-  "rewrites": [{ "source": "/(.*)", "destination": "/"}]
+  "builds": [
+    { "src": "next.config.js", "use": "@vercel/next" }
+  ]
 }
