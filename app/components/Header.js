@@ -18,21 +18,21 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all ${
-        scrolled ? "bg-black/80 backdrop-blur-md shadow-lg" : "bg-transparent"
+        scrolled ? "bg-black/90 backdrop-blur-lg shadow-lg py-3" : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between px-6">
         {/* Logo */}
         <Link href="/">
           <div className="flex items-center space-x-3 cursor-pointer">
             <Image
               src="/assets/circlelogo.png"
               alt="Otakumori Logo"
-              width={50}
-              height={50}
-              className="rounded-full border-2 border-white"
+              width={60}
+              height={60}
+              className="rounded-full border-2 border-white shadow-md"
             />
-            <span className="text-white text-2xl font-bold">Otakumori</span>
+            <span className="text-white text-2xl font-bold tracking-wider">Otakumori</span>
           </div>
         </Link>
 
@@ -43,13 +43,13 @@ export default function Header() {
           {/* Shop Dropdown */}
           <div className="relative group">
             <button className="focus:outline-none">Shop ⬇️</button>
-            <div className="absolute left-0 mt-2 w-52 bg-black/90 p-2 rounded-lg shadow-lg hidden group-hover:block">
-              <Link href="/shop" className="block py-1 px-3 hover:bg-gray-800">Shop All</Link>
+            <div className="absolute left-0 mt-2 w-56 bg-black/90 p-2 rounded-lg shadow-lg hidden group-hover:block">
+              <Link href="/shop" className="block py-2 px-4 hover:bg-gray-800">Shop All</Link>
               <div className="border-b border-gray-600 my-1"></div>
-              <Link href="/shop/apparel" className="block py-1 px-3 hover:bg-gray-800">Apparel</Link>
-              <Link href="/shop/homedecor" className="block py-1 px-3 hover:bg-gray-800">Home Decor</Link>
-              <Link href="/shop/accessories" className="block py-1 px-3 hover:bg-gray-800">Accessories</Link>
-              <Link href="/shop/theabyss" className="block py-1 px-3 text-red-500 hover:bg-red-700">The Abyss 🔞</Link>
+              <Link href="/shop/apparel" className="block py-2 px-4 hover:bg-gray-800">Apparel</Link>
+              <Link href="/shop/homedecor" className="block py-2 px-4 hover:bg-gray-800">Home Decor</Link>
+              <Link href="/shop/accessories" className="block py-2 px-4 hover:bg-gray-800">Accessories</Link>
+              <Link href="/shop/theabyss" className="block py-2 px-4 text-red-500 hover:bg-red-700">The Abyss 🔞</Link>
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export default function Header() {
             <input
               type="text"
               placeholder="Whattya buyin? 👀"
-              className="w-48 p-2 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none"
+              className="w-52 p-2 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none"
             />
           </div>
 
@@ -74,4 +74,3 @@ export default function Header() {
     </header>
   );
 }
-
