@@ -1,6 +1,6 @@
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
-
+import ContactForm from '../../app/components/ContactForm';  // Adjust based on actual location
 export default function Home() {
   return (
     <Layout>
@@ -22,7 +22,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
           >
-            Dive into an otaku-gasmic experience—shop exclusive drops, unlock seductive achievements, and indulge your nostalgia.
+            Dive into an otaku experience—shop exclusive drops, unlock seductive achievements, and indulge your nostalgia.
           </motion.p>
           <motion.a href="/shop" 
             whileHover={{ scale: 1.1 }}
