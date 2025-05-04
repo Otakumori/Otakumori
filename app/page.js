@@ -1,19 +1,33 @@
 "use client";
-import Header from "./components/Header";
-import Hero from "./components/Hero";
+import HeroSection from './components/HeroSection'
+import Header from './components/Header'
 
-export default function HomePage() {
+export default function Home() {
   return (
-    <div className="relative min-h-screen bg-gray-900">
+    <main className="relative min-h-screen bg-pink-50">
       <Header />
-      <Hero />
-
-      <section className="p-8 text-white">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Otakumori!</h1>
-        <p className="text-lg">
-          Explore our shop, read our blog, play minigames, and collect petals to unlock achievements!
-        </p>
+      <HeroSection />
+      {/* Petal Collection Bar Placeholder */}
+      <section className="flex flex-col items-center justify-center mt-8">
+        <div className="w-full max-w-xl bg-white/80 rounded-lg shadow p-4 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-pink-700">Seasonal Petal Progress</span>
+            <span className="text-sm text-pink-500">Spring: 12,345 / 25,000</span>
+          </div>
+          <div className="w-full bg-pink-200 rounded-full h-4">
+            <div className="bg-pink-500 h-4 rounded-full" style={{ width: '49%' }}></div>
+          </div>
+        </div>
+        {/* Leaderboard Placeholder */}
+        <div className="w-full max-w-xl bg-white/80 rounded-lg shadow p-4">
+          <h2 className="font-semibold text-pink-700 mb-2">Top Petal Collectors</h2>
+          <ol className="list-decimal pl-6 text-pink-900">
+            <li>CommanderA - 2,500 petals</li>
+            <li>SakuraQueen - 2,100 petals</li>
+            <li>PixelRonin - 1,950 petals</li>
+          </ol>
+        </div>
       </section>
-    </div>
-  );
+    </main>
+  )
 }

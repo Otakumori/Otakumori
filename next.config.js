@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  outputFileTracingRoot: __dirname,  // ensures correct file tracing
   output: 'standalone',              // for Vercel packaging
   images: {
     remotePatterns: [
