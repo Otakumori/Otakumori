@@ -1,0 +1,28 @@
+.petalOverlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.petalOverlay::before,
+.petalOverlay::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: url('/petals-loop.gif'); /* Replace with your seamless petals gif or use a CSS animation */
+  background-size: cover;
+  background-repeat: repeat;
+  opacity: 0.7;
+  animation: petalsFloat 18s linear infinite;
+}
+
+@keyframes petalsFloat {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+} 
