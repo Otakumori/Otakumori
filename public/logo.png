@@ -1,1 +1,10 @@
- 
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="58" fill="#fdf2f8" stroke="#e11d48" stroke-width="4"/>
+  <g>
+    <ellipse cx="60" cy="60" rx="32" ry="32" fill="#f9a8d4"/>
+    <ellipse cx="60" cy="60" rx="24" ry="24" fill="#f472b6"/>
+    <ellipse cx="60" cy="60" rx="16" ry="16" fill="#be185d"/>
+    <ellipse cx="60" cy="60" rx="8" ry="8" fill="#fff"/>
+  </g>
+  <text x="60" y="110" text-anchor="middle" fill="#e11d48" font-size="18" font-family="'Roboto Condensed', Arial, sans-serif">Otakumori</text>
+</svg> 
