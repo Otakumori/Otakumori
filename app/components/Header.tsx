@@ -28,7 +28,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-3">
             <Link href="/" className="flex items-center">
-              <Image src="/logo.png" alt="Otaku-mori Logo" width={44} height={44} className="rounded-full bg-pink-100" />
+              <Image src="/logo.svg" alt="Otaku-mori Logo" width={44} height={44} className="rounded-full bg-pink-100" />
               <span className="ml-2 text-2xl font-bold text-pink-200 drop-shadow">Otaku-mori</span>
             </Link>
           </div>
