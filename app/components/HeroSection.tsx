@@ -5,7 +5,7 @@ export default function HeroSection() {
   return (
     <section className="relative w-full flex items-center justify-center min-h-[60vh] md:min-h-[70vh] overflow-hidden rounded-b-3xl shadow-xl">
       <Image
-        src="/cherry-hero.jpg"
+        src="/cherry-hero.svg"
         alt="Cherry Blossom Forest"
         fill
         priority
