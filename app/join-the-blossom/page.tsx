@@ -1,3 +1,5 @@
+'use client'; // 👈 THIS IS THE FIX
+
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabaseClient'
