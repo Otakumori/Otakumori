@@ -1,12 +1,14 @@
 "use client";
-import HeroSection from './components/HeroSection'
+import PetalGameImage from './components/PetalGameImage'
 import Header from './components/Header'
 
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-pink-50">
       <Header />
-      <HeroSection />
+      <section className="flex flex-col items-center justify-center pt-24 pb-12">
+        <PetalGameImage />
+      </section>
       {/* Petal Collection Bar Placeholder */}
       <section className="flex flex-col items-center justify-center mt-8">
         <div className="w-full max-w-xl bg-white/80 rounded-lg shadow p-4 mb-6">

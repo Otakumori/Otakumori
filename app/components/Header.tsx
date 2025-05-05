@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -20,21 +20,30 @@ export default function Header() {
   const { data: session } = useSession()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   return (
-    <header className="fixed top-0 w-full bg-gradient-to-br from-pink-800/90 to-purple-900/90 backdrop-blur-sm z-50 shadow-lg transition-none">
+    <header className="fixed top-0 w-full z-50 shadow-lg bg-black transition-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-3">
+        <div className="flex items-center justify-between h-16 gap-4">
+          <div className="flex items-center space-x-3 min-w-[180px]">
             <Link href="/" className="flex items-center">
-              <Image src="/logo.svg" alt="Otaku-mori Logo" width={44} height={44} className="rounded-full bg-pink-100" />
+              <Image src="/assets/logo.png" alt="Otaku-mori Logo" width={44} height={44} className="rounded-full bg-pink-100" />
               <span className="ml-2 text-2xl font-bold text-pink-200 drop-shadow">Otaku-mori</span>
             </Link>
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 flex-1 justify-center">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -46,9 +55,19 @@ export default function Header() {
             ))}
           </nav>
 
+          {/* Search Bar */}
+          <div className="hidden md:flex items-center min-w-[120px] justify-end">
+            <input
+              type="text"
+              placeholder="What're ya buyin'"
+              className="w-32 px-2 py-1 rounded-lg bg-gray-800 text-white placeholder-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm text-base"
+              style={{ height: '2.25rem' }}
+            />
+          </div>
+
           {/* Mobile Hamburger */}
           <button
-            className="md:hidden text-pink-100 hover:text-pink-300 focus:outline-none"
+            className="md:hidden text-pink-100 hover:text-pink-300 focus:outline-none ml-2"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Open menu"
           >
@@ -63,7 +82,6 @@ export default function Header() {
               className="text-pink-100 hover:text-pink-300"
             >
               <span className="sr-only">Search</span>
-              {/* No icon here, just the button for accessibility */}
             </button>
             {session ? (
               <Link href="/profile" className="text-pink-100 hover:text-pink-300">
@@ -100,7 +118,7 @@ export default function Header() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="md:hidden absolute left-0 right-0 bg-gradient-to-br from-pink-800/95 to-purple-900/95 shadow-lg rounded-b-2xl z-40 flex flex-col items-center py-6 space-y-4"
+              className="md:hidden absolute left-0 right-0 bg-gray-900 shadow-lg rounded-b-2xl z-40 flex flex-col items-center py-6 space-y-4"
             >
               {navLinks.map((link) => (
                 <Link
@@ -126,7 +144,7 @@ export default function Header() {
             <input
               type="text"
               placeholder="Whattrya buying?"
-              className="w-full px-4 py-2 rounded-lg bg-pink-900/80 text-white placeholder-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-lg"
+              className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white placeholder-pink-300 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-lg"
             />
           </motion.div>
         )}

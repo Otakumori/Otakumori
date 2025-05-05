@@ -2,7 +2,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'react-hot-toast'
-import Footer from './components/Footer'
+import Footer, { BottomLogoAndSocials } from './components/Footer'
+import FloatingSoapstoneComments from './components/FloatingSoapstoneComments'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,6 +23,8 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster position="bottom-right" />
+          <FloatingSoapstoneComments />
+          <BottomLogoAndSocials />
           <Footer />
         </Providers>
       </body>

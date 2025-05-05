@@ -41,7 +41,7 @@ export default function Header() {
 
           {/* Shop Dropdown */}
           <div className="relative group">
-            <button className="focus:outline-none">Shop ⬇️</button>
+            <button className="focus:outline-none">Shop</button>
             <div className="absolute left-0 mt-2 w-52 bg-black/90 p-2 rounded-lg shadow-lg hidden group-hover:block">
               <Link href="/shop" className="block py-1 px-3 hover:bg-gray-800">
                 Shop All
@@ -72,7 +72,7 @@ export default function Header() {
           <div className="relative">
             <input
               type="text"
-              placeholder="Whattya buyin? 👀"
+              placeholder="Whattrya buying?"
               className="w-48 p-2 rounded-lg bg-gray-900 text-white placeholder-gray-400 focus:outline-none"
             />
           </div>
