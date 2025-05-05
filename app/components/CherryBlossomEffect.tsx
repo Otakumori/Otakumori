@@ -17,7 +17,7 @@ export default function CherryBlossomEffect() {
   const containerRef = useRef<HTMLDivElement>(null)
   const [petals, setPetals] = useState<Petal[]>([])
   const controls = useAnimation()
-  const { addPetals, petals: totalPetals } = usePetalContext()
+  const petalContext = usePetalContext()
 
   useEffect(() => {
     const createPetal = () => {
@@ -42,7 +42,6 @@ export default function CherryBlossomEffect() {
 
   const handlePetalClick = (id: number) => {
     setPetals((prev) => prev.filter((p) => p.id !== id))
-    addPetals(1)
     controls.start({
       scale: [1, 1.2, 1],
       transition: { duration: 0.3 },
@@ -99,8 +98,8 @@ export default function CherryBlossomEffect() {
         className="fixed bottom-4 right-4 bg-black/50 text-white px-4 py-2 rounded-lg"
         animate={controls}
       >
-        Petals: {totalPetals}
+        Petals: {petals.length}
       </motion.div>
     </div>
   )
-} 
+}

@@ -61,9 +61,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 
 // Context providers for the stores
-const PetalContext = createContext<ReturnType<typeof usePetalStore> | null>(null)
-const OverlordContext = createContext<ReturnType<typeof useOverlordStore> | null>(null)
-
+const PetalContext = createContext<typeof usePetalStore | null>(null)
+const OverlordContext = createContext<typeof useOverlordStore | null>(null)
 export function PetalProvider({ children }: { children: React.ReactNode }) {
   const store = useRef(usePetalStore)
   return (

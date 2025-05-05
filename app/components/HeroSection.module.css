@@ -6,8 +6,7 @@
   overflow: hidden;
 }
 
-.petalOverlay::before,
-.petalOverlay::after {
+.petalOverlay::before {
   content: '';
   position: absolute;
   width: 100%;
@@ -15,7 +14,7 @@
   top: 0;
   left: 0;
   pointer-events: none;
-  background-image: url('/petals-loop.gif'); /* Replace with your seamless petals gif or use a CSS animation */
+  background-image: url('/assets/petals-loop.gif'); /* Replace with your seamless petals gif or use a CSS animation */
   background-size: cover;
   background-repeat: repeat;
   opacity: 0.7;
