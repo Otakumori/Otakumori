@@ -1,12 +1,13 @@
 'use client'; // 👈 THIS IS THE FIX
+export const dynamic = "force-dynamic";
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabaseClient'
 
-export default function JoinTheBlossomPage() {
+function JoinTheBlossomContent() {
   const searchParams = useSearchParams()
-  const initialEmail = searchParams.get('email') || ''
+  const initialEmail = searchParams ? searchParams.get('email') || '' : ''
   const [email, setEmail] = useState(initialEmail)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
@@ -66,5 +67,13 @@ export default function JoinTheBlossomPage() {
         )}
       </div>
     </main>
+  )
+}
+
+export default function JoinTheBlossomPage() {
+  return (
+    <Suspense>
+      <JoinTheBlossomContent />
+    </Suspense>
   )
 } 

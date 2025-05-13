@@ -6,6 +6,12 @@
       "use": "@vercel/next"
     }
   ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
   "build": {
     "env": {
       "NPM_CONFIG_LEGACY_PEER_DEPS": "true"

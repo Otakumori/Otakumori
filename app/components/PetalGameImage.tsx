@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import Particles from 'react-tsparticles'
+import { loadFull } from 'tsparticles'
 
-const PETAL_COUNT = 5
 const GLOBAL_PETAL_KEY = 'global_petals'
 const USER_PETAL_KEY = 'user_petals'
 const USER_PETAL_DATE_KEY = 'user_petals_date'
@@ -9,72 +10,15 @@ const GUEST_LIMIT = 50
 const USER_LIMIT = 2500
 const ACHIEVEMENTS = [10, 50, 100, 500, 1000, 2500]
 
-function randomX() {
-  return Math.random() * 80 + 10 // 10% to 90% left
-}
-function randomDelay() {
-  return Math.random() * 4 // 0-4s
-}
+const petalSvg = `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C18.5 7 27 10 27 18C27 24 21 30 16 30C11 30 5 24 5 18C5 10 13.5 7 16 2Z" fill="#FFB6C1" stroke="#E75480" stroke-width="2"/></svg>`
 
 export default function PetalGameImage() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [petals, setPetals] = useState(
-    Array.from({ length: PETAL_COUNT }, (_, i) => ({
-      id: i,
-      x: randomX(),
-      delay: randomDelay(),
-      clicked: false,
-    }))
-  )
   const [userPetals, setUserPetals] = useState(0)
   const [globalPetals, setGlobalPetals] = useState(0)
   const [lastCollectDate, setLastCollectDate] = useState('')
   const [limitReached, setLimitReached] = useState(false)
   const [achievement, setAchievement] = useState<string | null>(null)
-
-  useEffect(() => {
-    let sakuraInstance: any
-    if (containerRef.current) {
-      import('sakura-js').then((mod) => {
-        console.log('Sakura import:', mod)
-        const SakuraConstructor = mod?.default || mod?.Sakura || mod
-        if (typeof SakuraConstructor !== 'function') {
-          console.error('Sakura import did not yield a constructor:', mod)
-          return
-        }
-        sakuraInstance = new SakuraConstructor(containerRef.current, {
-          // You can customize petal speed, size, colors, etc. here
-        })
-      })
-      // Make petals clickable
-      const clickHandler = (e: any) => {
-        if (e.target.classList.contains('sakura')) {
-          if (userPetals >= GUEST_LIMIT) {
-            setLimitReached(true)
-            return
-          }
-          setPetals((prev) =>
-            prev.map((p) => (p.id === e.target.dataset.id ? { ...p, clicked: true } : p))
-          )
-          setUserPetals((count) => {
-            const newCount = count + 1
-            localStorage.setItem(USER_PETAL_KEY, String(newCount))
-            if (ACHIEVEMENTS.includes(newCount)) {
-              setAchievement(`Achievement unlocked: ${newCount} petals!`)
-              setTimeout(() => setAchievement(null), 2500)
-            }
-            return newCount
-          })
-          e.target.style.opacity = 0
-        }
-      }
-      containerRef.current.addEventListener('click', clickHandler)
-      return () => {
-        if (sakuraInstance && sakuraInstance.stop) sakuraInstance.stop()
-        containerRef.current?.removeEventListener('click', clickHandler)
-      }
-    }
-  }, [userPetals])
 
   // Daily reset logic
   useEffect(() => {
@@ -93,7 +37,6 @@ export default function PetalGameImage() {
 
   // Fetch global and user petal counts
   useEffect(() => {
-    // Fetch global petals from Supabase
     const fetchGlobal = async () => {
       const { data } = await supabase
         .from('petal_counters')
@@ -104,6 +47,69 @@ export default function PetalGameImage() {
     }
     fetchGlobal()
   }, [])
+
+  // Particle click handler
+  const handlePetalClick = useCallback((event: any) => {
+    if (userPetals >= GUEST_LIMIT) {
+      setLimitReached(true)
+      return
+    }
+    setUserPetals((count) => {
+      const newCount = count + 1
+      localStorage.setItem(USER_PETAL_KEY, String(newCount))
+      if (ACHIEVEMENTS.includes(newCount)) {
+        setAchievement(`Achievement unlocked: ${newCount} petals!`)
+        setTimeout(() => setAchievement(null), 2500)
+      }
+      return newCount
+    })
+  }, [userPetals])
+
+  // Particle options
+  const particlesInit = useCallback(async (engine: any) => {
+    await loadFull(engine)
+  }, [])
+
+  const particlesOptions = {
+    fullScreen: false,
+    background: { color: 'transparent' },
+    particles: {
+      number: { value: 24, density: { enable: true, area: 800 } },
+      color: { value: '#FFB6C1' },
+      shape: {
+        type: 'image',
+        image: [
+          {
+            src: 'data:image/svg+xml;base64,' + btoa(petalSvg),
+            width: 32,
+            height: 32,
+          },
+        ],
+      },
+      opacity: { value: 0.85 },
+      size: { value: 24, random: { enable: true, minimumValue: 16 } },
+      move: {
+        enable: true,
+        speed: 1.5,
+        direction: "bottom" as const,
+        random: true,
+        straight: false,
+        outModes: { default: "out" as const },
+      },
+    },
+    detectRetina: true,
+    interactivity: {
+      events: {
+        onClick: { enable: true, mode: 'repulse' },
+        onHover: { enable: true, mode: 'bubble' },
+      },
+      modes: {
+        repulse: { distance: 80, duration: 0.4 },
+        bubble: { distance: 60, duration: 0.3, size: 32, opacity: 1 },
+      },
+    },
+    emitters: [],
+  }
 
   return (
     <div
@@ -117,37 +123,26 @@ export default function PetalGameImage() {
         className="absolute inset-0 w-full h-full object-cover object-center select-none pointer-events-none"
         draggable={false}
       />
-      {/* Clickable petals overlay */}
-      {petals.map(
-        (petal) =>
-          !petal.clicked && (
-            <div
-              key={petal.id}
-              className="sakura absolute top-0"
-              data-id={petal.id}
-              style={{
-                left: `${petal.x}%`,
-                top: 0,
-                animationDelay: `${petal.delay}s`,
-                width: '32px',
-                height: '32px',
-                pointerEvents: 'auto',
-                zIndex: 2,
-              }}
-            />
-          )
-      )}
+      {/* Petal Particles Overlay */}
+      <Particles
+        id="petalParticles"
+        init={particlesInit}
+        options={particlesOptions}
+        className="absolute inset-0 w-full h-full z-10 pointer-events-auto"
+        style={{ pointerEvents: 'auto' }}
+        canvasClassName="pointer-events-auto"
+      />
       {/* User petal counter */}
-      <div className="absolute top-2 right-4 z-10 bg-pink-900/80 text-white px-4 py-1 rounded-full shadow-lg text-lg font-bold">
+      <div className="absolute top-2 right-4 z-20 bg-pink-900/80 text-white px-4 py-1 rounded-full shadow-lg text-lg font-bold">
         Your Petals: {userPetals} / {GUEST_LIMIT}
       </div>
       {/* Global petal counter */}
-      <div className="absolute top-2 left-4 z-10 bg-pink-700/80 text-white px-4 py-1 rounded-full shadow-lg text-lg font-bold">
+      <div className="absolute top-2 left-4 z-20 bg-pink-700/80 text-white px-4 py-1 rounded-full shadow-lg text-lg font-bold">
         Community Petals: {globalPetals}
       </div>
       {/* Limit reached error */}
       {limitReached && (
-        <div className="absolute inset-0 flex items-center justify-center z-20">
+        <div className="absolute inset-0 flex items-center justify-center z-30">
           <div className="bg-pink-800/90 text-white px-8 py-4 rounded-2xl shadow-xl text-xl font-bold animate-bounce">
             Daily petal limit reached!
           </div>
@@ -155,7 +150,7 @@ export default function PetalGameImage() {
       )}
       {/* Achievement popup */}
       {achievement && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-pink-600/90 text-white px-6 py-3 rounded-xl shadow-lg text-lg font-bold animate-pulse">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-pink-600/90 text-white px-6 py-3 rounded-xl shadow-lg text-lg font-bold animate-pulse">
           {achievement}
         </div>
       )}
