@@ -1,4 +1,4 @@
-import { initPlasmicLoader, registerComponent } from "@plasmicapp/loader-nextjs";
+import { initPlasmicLoader } from "@plasmicapp/loader-nextjs";
 import PlasmicButton from "./src/components/plasmic/PlasmicButton";
 
 export const PLASMIC = initPlasmicLoader({
@@ -12,7 +12,7 @@ export const PLASMIC = initPlasmicLoader({
 });
 
 // Register a custom button for use in Plasmic Studio
-registerComponent(PlasmicButton, {
+PLASMIC.registerComponent(PlasmicButton, {
   name: "PlasmicButton",
   props: {
     children: "slot"
