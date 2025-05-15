@@ -4,12 +4,22 @@
     {
       "src": "next.config.js",
       "use": "@vercel/next"
+    },
+    {
+      "src": "scripts/cron.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
       "dest": "/$1"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 * * * *"
     }
   ],
   "build": {
