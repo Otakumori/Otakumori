@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { usePathname } fromG'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import { UserButton, SignInButton, SignedIn, SignedOut } from '@clerk/clerk-react'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -17,7 +17,6 @@ const navLinks = [
 ]
 
 export default function Header() {
-  const { data: session } = useSession()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -76,6 +75,7 @@ export default function Header() {
             </svg>
           </button>
 
+          {/* Clerk AuthBar */}
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -83,31 +83,25 @@ export default function Header() {
             >
               <span className="sr-only">Search</span>
             </button>
-            {session ? (
-              <Link href="/profile" className="text-pink-100 hover:text-pink-300">
-                <span className="sr-only">Profile</span>
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </Link>
-            ) : (
-              <Link
-                href="/api/auth/signin"
-                className="text-pink-100 hover:text-pink-300"
-              >
-                Login
-              </Link>
-            )}
+            <SignedIn>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: 'ring-2 ring-pink-400 hover:ring-pink-500 transition-all',
+                    userButtonPopoverCard: 'bg-black/90 border-pink-400',
+                    userButtonPopoverActionButton: 'text-pink-400 hover:bg-pink-900/30',
+                  },
+                }}
+                afterSignOutUrl="/"
+              />
+            </SignedIn>
+            <SignedOut>
+              <SignInButton>
+                <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg shadow-glow hover:scale-105 transition-all">
+                  Sign In / Register
+                </button>
+              </SignInButton>
+            </SignedOut>
           </div>
         </div>
 
@@ -130,6 +124,27 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+              <div className="mt-4">
+                <SignedIn>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: 'ring-2 ring-pink-400 hover:ring-pink-500 transition-all',
+                        userButtonPopoverCard: 'bg-black/90 border-pink-400',
+                        userButtonPopoverActionButton: 'text-pink-400 hover:bg-pink-900/30',
+                      },
+                    }}
+                    afterSignOutUrl="/"
+                  />
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton>
+                    <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold rounded-lg shadow-glow hover:scale-105 transition-all">
+                      Sign In / Register
+                    </button>
+                  </SignInButton>
+                </SignedOut>
+              </div>
             </motion.nav>
           )}
         </AnimatePresence>

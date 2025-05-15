@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Medieval';
+  src: url('/Cormorant_Garamond/CormorantGaramond-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Medieval';
+  src: url('/Cormorant_Garamond/CormorantGaramond-Bold.ttf') format('truetype');
+  font-weight: bold;
+}
+
+.font-medieval {
+  font-family: 'Medieval', serif;
+}
+
+/* Dark Souls message animations */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+}
+
+.text-yellow-400 {
+  animation: glow 2s infinite;
+}
+
 /* Custom global styles */
 body {
   background: #fdf2f8;
