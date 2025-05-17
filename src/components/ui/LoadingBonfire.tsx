@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
+import { motion } from 'framer-motion';
 
 export default function LoadingBonfire() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900">
       <motion.div
         className="relative"
         animate={{
@@ -14,17 +14,17 @@ export default function LoadingBonfire() {
         transition={{
           duration: 2,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
       >
         {/* Bonfire Base */}
-        <div className="w-24 h-24 bg-gradient-to-b from-orange-500 to-red-800 rounded-full shadow-lg shadow-orange-500/50" />
-        
+        <div className="h-24 w-24 rounded-full bg-gradient-to-b from-orange-500 to-red-800 shadow-lg shadow-orange-500/50" />
+
         {/* Flames */}
         {[...Array(5)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-4 h-8 bg-gradient-to-t from-pink-500 to-yellow-300 rounded-full"
+            className="absolute h-8 w-4 rounded-full bg-gradient-to-t from-pink-500 to-yellow-300"
             style={{
               left: `${20 + i * 16}px`,
               bottom: '40px',
@@ -40,10 +40,10 @@ export default function LoadingBonfire() {
             }}
           />
         ))}
-        
+
         {/* Sword */}
         <motion.div
-          className="absolute w-2 h-16 bg-gray-300 rounded-full"
+          className="absolute h-16 w-2 rounded-full bg-gray-300"
           style={{
             left: '50%',
             bottom: '60px',
@@ -55,13 +55,13 @@ export default function LoadingBonfire() {
           transition={{
             duration: 3,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: 'easeInOut',
           }}
         />
       </motion.div>
-      
+
       <motion.p
-        className="mt-8 text-pink-400 font-medium"
+        className="mt-8 font-medium text-pink-400"
         animate={{
           opacity: [0.5, 1, 0.5],
         }}
@@ -73,5 +73,5 @@ export default function LoadingBonfire() {
         Kindling the bonfire...
       </motion.p>
     </div>
-  )
-} 
+  );
+}

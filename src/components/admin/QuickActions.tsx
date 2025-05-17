@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
-import { motion } from 'framer-motion'
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { motion } from 'framer-motion';
 
 interface QuickAction {
-  id: string
-  title: string
-  description: string
-  icon: string
-  action: () => Promise<void>
-  color: string
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  action: () => Promise<void>;
+  color: string;
 }
 
 export default function QuickActions() {
-  const [isLoading, setIsLoading] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const quickActions: QuickAction[] = [
     {
@@ -24,35 +24,30 @@ export default function QuickActions() {
       icon: '🗑️',
       color: 'bg-red-500/20 hover:bg-red-500/30',
       action: async () => {
-        setIsLoading('clear-messages')
+        setIsLoading('clear-messages');
         try {
-          const { error } = await supabase
-            .from('soapstone_messages')
-            .delete()
-            .lt('rating', 3)
-          if (error) throw error
+          const { error } = await supabase.from('soapstone_messages').delete().lt('rating', 3);
+          if (error) throw error;
         } finally {
-          setIsLoading(null)
+          setIsLoading(null);
         }
-      }
+      },
     },
     {
       id: 'reset-petals',
       title: 'Reset Petal Economy',
-      description: 'Set all users\' petal counts to 0',
+      description: "Set all users' petal counts to 0",
       icon: '🌸',
       color: 'bg-pink-500/20 hover:bg-pink-500/30',
       action: async () => {
-        setIsLoading('reset-petals')
+        setIsLoading('reset-petals');
         try {
-          const { error } = await supabase
-            .from('users')
-            .update({ petal_count: 0 })
-          if (error) throw error
+          const { error } = await supabase.from('users').update({ petal_count: 0 });
+          if (error) throw error;
         } finally {
-          setIsLoading(null)
+          setIsLoading(null);
         }
-      }
+      },
     },
     {
       id: 'backup-data',
@@ -61,25 +56,23 @@ export default function QuickActions() {
       icon: '💾',
       color: 'bg-blue-500/20 hover:bg-blue-500/30',
       action: async () => {
-        setIsLoading('backup-data')
+        setIsLoading('backup-data');
         try {
-          const { data, error } = await supabase
-            .from('users')
-            .select('*')
-          if (error) throw error
-          
+          const { data, error } = await supabase.from('users').select('*');
+          if (error) throw error;
+
           // Convert to CSV
-          const csv = data.map(row => Object.values(row).join(',')).join('\n')
-          const blob = new Blob([csv], { type: 'text/csv' })
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = 'otaku-mori-backup.csv'
-          a.click()
+          const csv = data.map(row => Object.values(row).join(',')).join('\n');
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'otaku-mori-backup.csv';
+          a.click();
         } finally {
-          setIsLoading(null)
+          setIsLoading(null);
         }
-      }
+      },
     },
     {
       id: 'toggle-maintenance',
@@ -88,25 +81,25 @@ export default function QuickActions() {
       icon: '🔧',
       color: 'bg-yellow-500/20 hover:bg-yellow-500/30',
       action: async () => {
-        setIsLoading('toggle-maintenance')
+        setIsLoading('toggle-maintenance');
         try {
           // TODO: Implement maintenance mode toggle
-          alert('Maintenance mode toggle coming soon!')
+          alert('Maintenance mode toggle coming soon!');
         } finally {
-          setIsLoading(null)
+          setIsLoading(null);
         }
-      }
-    }
-  ]
+      },
+    },
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {quickActions.map((action) => (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {quickActions.map(action => (
         <motion.button
           key={action.id}
           onClick={action.action}
           disabled={isLoading === action.id}
-          className={`p-4 rounded-lg border border-gray-700 ${action.color} transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`rounded-lg border border-gray-700 p-4 ${action.color} transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -119,11 +112,11 @@ export default function QuickActions() {
           </div>
           {isLoading === action.id && (
             <div className="mt-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mx-auto"></div>
+              <div className="mx-auto h-4 w-4 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
             </div>
           )}
         </motion.button>
       ))}
     </div>
-  )
-} 
+  );
+}

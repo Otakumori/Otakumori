@@ -1,6 +1,11 @@
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 12px rgba(236, 72, 153, 0.7); }
-  50% { box-shadow: 0 0 18px rgba(236, 72, 153, 0.8); }
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(236, 72, 153, 0.8);
+  }
 }
 
 .pulse-glow {

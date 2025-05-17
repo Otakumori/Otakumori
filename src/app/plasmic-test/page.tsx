@@ -3,4 +3,4 @@ import { PLASMIC } from '../../../plasmic-init';
 
 export default function PlasmicTestPage() {
   return <PlasmicComponent component="Admin Panel" />;
-} 
+}

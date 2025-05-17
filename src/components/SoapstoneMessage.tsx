@@ -1,34 +1,34 @@
-'use client'
+'use client';
 
-import { motion } from 'framer-motion'
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface SoapstoneMessageProps {
   message: {
-    id: string
-    content: string
-    author: string
-    created_at: string
-    rating: number
-  }
-  onRate?: (id: string, rating: number) => void
+    id: string;
+    content: string;
+    author: string;
+    created_at: string;
+    rating: number;
+  };
+  onRate?: (id: string, rating: number) => void;
 }
 
 export default function SoapstoneMessage({ message, onRate }: SoapstoneMessageProps) {
-  const [isHovered, setIsHovered] = useState(false)
-  const [rating, setRating] = useState(message.rating)
+  const [isHovered, setIsHovered] = useState(false);
+  const [rating, setRating] = useState(message.rating);
 
   const handleRate = async (newRating: number) => {
     if (onRate) {
-      onRate(message.id, newRating)
-      setRating(newRating)
+      onRate(message.id, newRating);
+      setRating(newRating);
     }
-  }
+  };
 
   return (
     <motion.div
-      className="relative bg-gray-800/80 p-4 rounded-lg border border-pink-500/30 shadow-lg"
+      className="relative rounded-lg border border-pink-500/30 bg-gray-800/80 p-4 shadow-lg"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02 }}
@@ -36,10 +36,8 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
       onHoverEnd={() => setIsHovered(false)}
     >
       {/* Message Content */}
-      <div className="text-pink-200 font-medium mb-2">
-        {message.content}
-      </div>
-      
+      <div className="mb-2 font-medium text-pink-200">{message.content}</div>
+
       {/* Author and Time */}
       <div className="flex items-center justify-between text-sm text-gray-400">
         <span>By {message.author}</span>
@@ -48,12 +46,8 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
 
       {/* Rating System */}
       <div className="mt-2 flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            onClick={() => handleRate(star)}
-            className="text-xl"
-          >
+        {[1, 2, 3, 4, 5].map(star => (
+          <button key={star} onClick={() => handleRate(star)} className="text-xl">
             {star <= rating ? '⭐' : '☆'}
           </button>
         ))}
@@ -62,7 +56,7 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
       {/* Kawaii Effects */}
       {isHovered && (
         <motion.div
-          className="absolute -top-2 -right-2"
+          className="absolute -right-2 -top-2"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
@@ -71,5 +65,5 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
         </motion.div>
       )}
     </motion.div>
-  )
-} 
+  );
+}

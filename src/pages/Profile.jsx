@@ -26,11 +26,13 @@ export default function Profile() {
 
   return (
     <Layout>
-      <div className="text-white text-center p-8 bg-gray-800 rounded-xl">
-        <img src={avatar} alt="Profile Avatar" className="w-40 h-40 rounded-full mx-auto" />
-        <h2 className="text-4xl mt-4">Commander {user?.email || 'Loading...'}</h2>
+      <div className="rounded-xl bg-gray-800 p-8 text-center text-white">
+        <img src={avatar} alt="Profile Avatar" className="mx-auto h-40 w-40 rounded-full" />
+        <h2 className="mt-4 text-4xl">Commander {user?.email || 'Loading...'}</h2>
         <p className="mt-2">Petals Collected: 🌸 {petals}</p>
-        <button className="mt-4 px-4 py-2 bg-pink-500 rounded-lg hover:bg-pink-600 transition">Edit Profile</button>
+        <button className="mt-4 rounded-lg bg-pink-500 px-4 py-2 transition hover:bg-pink-600">
+          Edit Profile
+        </button>
       </div>
     </Layout>
   );

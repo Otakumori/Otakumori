@@ -1,63 +1,63 @@
-'use client'
+'use client';
 
-import { useEffect, useRef, useState } from 'react'
-import { motion, useAnimation } from 'framer-motion'
-import { usePetalContext } from '../providers'
+import { useEffect, useRef, useState } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { usePetalContext } from '../providers';
 
 interface Petal {
-  id: number
-  x: number
-  y: number
-  rotation: number
-  scale: number
-  opacity: number
+  id: number;
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+  opacity: number;
 }
 
 export default function CherryBlossomEffect() {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [petals, setPetals] = useState<Petal[]>([])
-  const controls = useAnimation()
-  const petalContext = usePetalContext()
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [petals, setPetals] = useState<Petal[]>([]);
+  const controls = useAnimation();
+  const petalContext = usePetalContext();
 
   useEffect(() => {
     const createPetal = () => {
-      const id = Date.now() + Math.random()
-      const x = Math.random() * window.innerWidth
-      const y = -50
-      const rotation = Math.random() * 360
-      const scale = Math.random() * 0.5 + 0.5
-      const opacity = Math.random() * 0.5 + 0.5
+      const id = Date.now() + Math.random();
+      const x = Math.random() * window.innerWidth;
+      const y = -50;
+      const rotation = Math.random() * 360;
+      const scale = Math.random() * 0.5 + 0.5;
+      const opacity = Math.random() * 0.5 + 0.5;
 
-      return { id, x, y, rotation, scale, opacity }
-    }
+      return { id, x, y, rotation, scale, opacity };
+    };
 
     const interval = setInterval(() => {
       if (petals.length < 20) {
-        setPetals((prev) => [...prev, createPetal()])
+        setPetals(prev => [...prev, createPetal()]);
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [petals.length])
+    return () => clearInterval(interval);
+  }, [petals.length]);
 
   const handlePetalClick = (id: number) => {
-    setPetals((prev) => prev.filter((p) => p.id !== id))
+    setPetals(prev => prev.filter(p => p.id !== id));
     controls.start({
       scale: [1, 1.2, 1],
       transition: { duration: 0.3 },
-    })
-  }
+    });
+  };
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 pointer-events-none z-0"
+      className="pointer-events-none fixed inset-0 z-0"
       style={{ overflow: 'hidden' }}
     >
-      {petals.map((petal) => (
+      {petals.map(petal => (
         <motion.div
           key={petal.id}
-          className="absolute cursor-pointer pointer-events-auto"
+          className="pointer-events-auto absolute cursor-pointer"
           style={{
             x: petal.x,
             y: petal.y,
@@ -95,11 +95,11 @@ export default function CherryBlossomEffect() {
         </motion.div>
       ))}
       <motion.div
-        className="fixed bottom-4 right-4 bg-black/50 text-white px-4 py-2 rounded-lg"
+        className="fixed bottom-4 right-4 rounded-lg bg-black/50 px-4 py-2 text-white"
         animate={controls}
       >
         Petals: {petals.length}
       </motion.div>
     </div>
-  )
+  );
 }

@@ -3,7 +3,32 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-const runicSymbols = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛟ', 'ᛞ'];
+const runicSymbols = [
+  'ᚠ',
+  'ᚢ',
+  'ᚦ',
+  'ᚨ',
+  'ᚱ',
+  'ᚲ',
+  'ᚷ',
+  'ᚹ',
+  'ᚺ',
+  'ᚾ',
+  'ᛁ',
+  'ᛃ',
+  'ᛇ',
+  'ᛈ',
+  'ᛉ',
+  'ᛊ',
+  'ᛏ',
+  'ᛒ',
+  'ᛖ',
+  'ᛗ',
+  'ᛚ',
+  'ᛜ',
+  'ᛟ',
+  'ᛞ',
+];
 
 export default function DarkSoulsMessage({ message, duration = 5000, onComplete }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -13,8 +38,9 @@ export default function DarkSoulsMessage({ message, duration = 5000, onComplete 
     // Generate random runic symbols
     const generateSymbols = () => {
       const count = Math.floor(Math.random() * 3) + 2; // 2-4 symbols
-      return Array.from({ length: count }, () => 
-        runicSymbols[Math.floor(Math.random() * runicSymbols.length)]
+      return Array.from(
+        { length: count },
+        () => runicSymbols[Math.floor(Math.random() * runicSymbols.length)]
       );
     };
 
@@ -35,18 +61,18 @@ export default function DarkSoulsMessage({ message, duration = 5000, onComplete 
           initial={{ opacity: 0, y: 20, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.8 }}
-          className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50"
+          className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 transform"
         >
           <div className="relative">
             {/* Runic symbols above */}
-            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <div className="absolute -top-8 left-1/2 flex -translate-x-1/2 transform space-x-2">
               {symbols.map((symbol, index) => (
                 <motion.span
                   key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="text-yellow-400 text-xl"
+                  className="text-xl text-yellow-400"
                 >
                   {symbol}
                 </motion.span>
@@ -54,19 +80,19 @@ export default function DarkSoulsMessage({ message, duration = 5000, onComplete 
             </div>
 
             {/* Message box */}
-            <div className="bg-black/80 border-2 border-yellow-400/50 rounded-lg p-4 text-center">
-              <p className="text-yellow-400 font-medieval text-lg">{message}</p>
+            <div className="rounded-lg border-2 border-yellow-400/50 bg-black/80 p-4 text-center">
+              <p className="font-medieval text-lg text-yellow-400">{message}</p>
             </div>
 
             {/* Runic symbols below */}
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <div className="absolute -bottom-8 left-1/2 flex -translate-x-1/2 transform space-x-2">
               {symbols.map((symbol, index) => (
                 <motion.span
                   key={index}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="text-yellow-400 text-xl"
+                  className="text-xl text-yellow-400"
                 >
                   {symbol}
                 </motion.span>
@@ -77,4 +103,4 @@ export default function DarkSoulsMessage({ message, duration = 5000, onComplete 
       )}
     </AnimatePresence>
   );
-} 
+}
