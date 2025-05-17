@@ -1,41 +1,67 @@
 'use client';
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import DarkSoulsMessage from '../components/DarkSoulsMessage';
 
 const MessageContext = createContext();
 
 export function MessageProvider({ children }) {
   const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const showMessage = (message, duration = 5000) => {
-    const id = Date.now();
-    setMessages((prev) => [...prev, { id, message, duration }]);
+  useEffect(() => {
+    // Load initial messages
+    const loadMessages = async () => {
+      try {
+        const response = await fetch('/api/messages');
+        const data = await response.json();
+        setMessages(data);
+      } catch (error) {
+        console.error('Error loading messages:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, []);
+
+  const addMessage = async message => {
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add message');
+      }
+
+      const newMessage = await response.json();
+      setMessages(prev => [...prev, newMessage]);
+      return newMessage;
+    } catch (error) {
+      console.error('Error adding message:', error);
+      throw error;
+    }
   };
 
-  const removeMessage = (id) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== id));
+  const value = {
+    messages,
+    isLoading,
+    addMessage,
   };
 
-  return (
-    <MessageContext.Provider value={{ showMessage }}>
-      {children}
-      {messages.map(({ id, message, duration }) => (
-        <DarkSoulsMessage
-          key={id}
-          message={message}
-          duration={duration}
-          onComplete={() => removeMessage(id)}
-        />
-      ))}
-    </MessageContext.Provider>
-  );
+  return <MessageContext.Provider value={value}>{children}</MessageContext.Provider>;
 }
 
-export function useMessage() {
+export function useMessages() {
   const context = useContext(MessageContext);
-  if (!context) {
-    throw new Error('useMessage must be used within a MessageProvider');
+  if (context === undefined) {
+    throw new Error('useMessages must be used within a MessageProvider');
   }
   return context;
-} 
+}

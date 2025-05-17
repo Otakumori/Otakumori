@@ -2,93 +2,123 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function AbyssShop() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
-    // Fetch R18 products from Printify API
+    const checkAccess = async () => {
+      if (status === 'authenticated' && session?.user) {
+        const { data: preferences } = await supabase
+          .from('user_preferences')
+          .select('abyss_verified')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (!preferences?.abyss_verified) {
+          router.push('/abyss');
+          return;
+        }
+      } else {
+        router.push('/auth/signin');
+        return;
+      }
+    };
+
+    checkAccess();
+  }, [status, session, router, supabase]);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // TODO: Implement Printify API integration for R18 products
-        // For now, using mock data
-        setProducts([
-          {
-            id: 1,
-            name: 'Exclusive R18 Poster',
-            price: 29.99,
-            image: '/abyss/products/poster1.jpg',
-            description: 'Limited edition R18 artwork poster'
-          },
-          {
-            id: 2,
-            name: 'Collector\'s Pin Set',
-            price: 19.99,
-            image: '/abyss/products/pins1.jpg',
-            description: 'Set of 5 exclusive R18 enamel pins'
-          },
-          // Add more products as needed
-        ]);
-        setLoading(false);
+        const { data, error } = await supabase
+          .from('abyss_products')
+          .select('*')
+          .eq('is_active', true);
+
+        if (error) throw error;
+        setProducts(data || []);
       } catch (error) {
         console.error('Error fetching products:', error);
-        setLoading(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [supabase]);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-pink-500"></div>
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="h-16 w-16 rounded-full border-4 border-pink-500 border-t-transparent"
+        />
       </div>
     );
   }
 
   return (
-    <div className="py-8">
-      <h1 className="text-4xl font-bold text-pink-500 mb-8">Abyss Shop</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-800 rounded-lg overflow-hidden shadow-xl"
-          >
-            <div className="relative h-64">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-pink-500 mb-2">{product.name}</h2>
-              <p className="text-gray-400 mb-4">{product.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold text-white">${product.price}</span>
-                <button className="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg">
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+    <div className="min-h-screen bg-black text-white">
+      <div className="container mx-auto px-4 py-8">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 text-4xl font-bold text-pink-500"
+        >
+          Abyss Shop
+        </motion.h1>
 
-      {/* Age Verification Notice */}
-      <div className="mt-8 p-4 bg-gray-800 rounded-lg">
-        <p className="text-gray-400 text-sm">
-          All products in the Abyss Shop are intended for adults only. By purchasing, you confirm that you are 18 or older.
-        </p>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
+          {products.map(product => (
+            <motion.div
+              key={product.id}
+              whileHover={{ scale: 1.02 }}
+              className="overflow-hidden rounded-lg bg-gray-900 shadow-xl"
+            >
+              <div className="relative aspect-square">
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                />
+                {product.is_new && (
+                  <div className="absolute right-2 top-2 rounded-full bg-pink-500 px-2 py-1 text-sm text-white">
+                    New
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <h3 className="mb-2 text-xl font-bold text-pink-500">{product.name}</h3>
+                <p className="mb-4 line-clamp-2 text-gray-400">{product.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold">${product.price}</span>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="rounded bg-pink-600 px-4 py-2 font-bold text-white hover:bg-pink-700"
+                  >
+                    Add to Cart
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );
-} 
+}

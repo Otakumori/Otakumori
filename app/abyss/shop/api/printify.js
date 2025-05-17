@@ -23,27 +23,24 @@ export async function getAbyssProducts() {
     if (cachedProducts?.length > 0) {
       const lastUpdate = new Date(cachedProducts[0].updated_at);
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      
+
       if (lastUpdate > oneHourAgo) {
         return cachedProducts;
       }
     }
 
     // Fetch fresh products from Printify
-    const response = await fetch(
-      `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products.json`,
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await fetch(`${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products.json`, {
+      headers: {
+        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) throw new Error('Failed to fetch products from Printify');
 
     const products = await response.json();
-    
+
     // Filter and transform products for Abyss section
     const abyssProducts = products.data
       .filter(product => product.tags.includes('abyss') || product.tags.includes('r18'))
@@ -56,14 +53,12 @@ export async function getAbyssProducts() {
         tags: product.tags,
         is_active: true,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       }));
 
     // Update Supabase cache
     if (abyssProducts.length > 0) {
-      const { error: updateError } = await supabase
-        .from('abyss_products')
-        .upsert(abyssProducts);
+      const { error: updateError } = await supabase.from('abyss_products').upsert(abyssProducts);
 
       if (updateError) throw updateError;
     }
@@ -81,9 +76,9 @@ export async function getProductDetails(productId) {
       `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products/${productId}.json`,
       {
         headers: {
-          'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
       }
     );
 
@@ -99,26 +94,25 @@ export async function getProductDetails(productId) {
 
 export async function createOrder(productId, variantId, quantity, shippingAddress) {
   try {
-    const response = await fetch(
-      `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/orders.json`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          external_id: `abyss-${Date.now()}`,
-          line_items: [{
+    const response = await fetch(`${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/orders.json`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        external_id: `abyss-${Date.now()}`,
+        line_items: [
+          {
             blueprint_id: productId,
             variant_id: variantId,
-            quantity: quantity
-          }],
-          shipping_method: 1,
-          shipping_address: shippingAddress
-        })
-      }
-    );
+            quantity: quantity,
+          },
+        ],
+        shipping_method: 1,
+        shipping_address: shippingAddress,
+      }),
+    });
 
     if (!response.ok) throw new Error('Failed to create order');
 
@@ -128,4 +122,4 @@ export async function createOrder(productId, variantId, quantity, shippingAddres
     console.error('Error creating order:', error);
     throw error;
   }
-} 
+}

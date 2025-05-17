@@ -16,10 +16,10 @@ const logFile = path.join(logsDir, 'cron.log');
 function log(message, type = 'INFO') {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] [${type}] ${message}\n`;
-  
+
   // Log to console
   console.log(logMessage.trim());
-  
+
   // Log to file
   fs.appendFileSync(logFile, logMessage);
 }
@@ -27,9 +27,9 @@ function log(message, type = 'INFO') {
 // Run every hour
 cron.schedule('0 * * * *', () => {
   log('Starting scheduled Printify product update...');
-  
+
   const scriptPath = path.join(__dirname, 'updatePrintifyProducts.js');
-  
+
   exec(`node ${scriptPath}`, (error, stdout, stderr) => {
     if (error) {
       log(`Error executing update script: ${error}`, 'ERROR');
@@ -57,4 +57,4 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   log('Received SIGINT signal. Shutting down...');
   process.exit(0);
-}); 
+});

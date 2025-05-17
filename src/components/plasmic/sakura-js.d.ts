@@ -1,1 +1,1 @@
-declare module 'sakura-js'; 
+declare module 'sakura-js';

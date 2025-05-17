@@ -1,89 +1,128 @@
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function CherryBlossomEffect() {
-  const [petals, setPetals] = useState([]);
+export default function CherryBlossomEffect({ isActive, containerRef }) {
+  const canvasRef = useRef(null);
+  const particlesRef = useRef([]);
+  const animationFrameRef = useRef(null);
 
   useEffect(() => {
-    // Load external sakura.js for natural sakura effects if desired
-    const script = document.createElement("script");
-    script.src = "https://jhammann.github.io/sakura/sakura.js";
-    script.async = true;
-    document.body.appendChild(script);
+    if (!isActive || !containerRef?.current) return;
 
-    // Create interactive petals on a set interval
-    const interval = setInterval(() => {
-      const newPetal = {
-        id: Math.random().toString(36).substring(2, 9),
-        left: Math.random() * 100 + "vw",
-        delay: (Math.random() * 5 + 3) + "s", // Fall duration between 3s and 8s
-        fading: false,
-      };
-      setPetals(prev => [...prev, newPetal]);
-    }, 3000);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const container = containerRef.current;
+    const containerRect = container.getBoundingClientRect();
+
+    const resizeCanvas = () => {
+      canvas.width = containerRect.width;
+      canvas.height = containerRect.height;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Enhanced particle properties for more natural movement
+    const createParticle = () => ({
+      x: Math.random() * canvas.width,
+      y: -10,
+      size: Math.random() * 4 + 3, // Larger petals
+      speed: Math.random() * 1.5 + 0.5, // Slower fall speed
+      angle: Math.random() * Math.PI * 2,
+      rotation: Math.random() * 0.1 - 0.05, // Gentler rotation
+      opacity: Math.random() * 0.3 + 0.7, // More visible
+      sway: Math.random() * 0.8 - 0.4, // More pronounced sway
+      swaySpeed: Math.random() * 0.015 + 0.005, // Slower sway
+      swayAngle: Math.random() * Math.PI * 2,
+      color: `rgba(255, ${Math.floor(Math.random() * 50 + 150)}, ${Math.floor(Math.random() * 50 + 150)}, `, // Varied pink shades
+      scale: Math.random() * 0.5 + 0.75, // Random size variation
+    });
+
+    // Initialize particles
+    particlesRef.current = Array.from({ length: 40 }, createParticle);
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particlesRef.current.forEach((particle, index) => {
+        // Update position with enhanced swaying motion
+        particle.y += particle.speed;
+        particle.swayAngle += particle.swaySpeed;
+        particle.x += Math.sin(particle.swayAngle) * particle.sway;
+        particle.angle += particle.rotation;
+
+        // Draw petal with more natural shape and gradient
+        ctx.save();
+        ctx.translate(particle.x, particle.y);
+        ctx.rotate(particle.angle);
+        ctx.scale(particle.scale, particle.scale);
+
+        // Create gradient for each petal
+        const gradient = ctx.createLinearGradient(0, -particle.size, 0, particle.size);
+        gradient.addColorStop(0, `${particle.color}0.9)`);
+        gradient.addColorStop(1, `${particle.color}0.5)`);
+        ctx.fillStyle = gradient;
+
+        // Draw more natural petal shape
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(
+          -particle.size,
+          -particle.size * 0.3,
+          -particle.size * 0.7,
+          particle.size * 0.8,
+          0,
+          particle.size * 1.2
+        );
+        ctx.bezierCurveTo(
+          particle.size * 0.7,
+          particle.size * 0.8,
+          particle.size,
+          -particle.size * 0.3,
+          0,
+          0
+        );
+        ctx.fill();
+
+        // Add subtle shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        ctx.restore();
+
+        // Reset particle if it goes off screen
+        if (particle.y > canvas.height) {
+          particlesRef.current[index] = createParticle();
+        }
+      });
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
 
     return () => {
-      clearInterval(interval);
-      document.body.removeChild(script);
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, []);
-
-  // When a petal is clicked, mark it as fading
-  const handleClick = (id) => {
-    setPetals(prev =>
-      prev.map(p => p.id === id ? { ...p, fading: true } : p)
-    );
-    // TODO: Insert your Supabase update logic here if needed (e.g., update achievements)
-  };
-
-  // Once fade-out is complete, remove the petal
-  const handleAnimationEnd = (id) => {
-    setPetals(prev => prev.filter(p => p.id !== id));
-  };
+  }, [isActive, containerRef]);
 
   return (
-    <>
-      {petals.map((petal) => (
-        <div
-          key={petal.id}
-          onClick={() => handleClick(petal.id)}
-          onAnimationEnd={() => {
-            if (petal.fading) handleAnimationEnd(petal.id);
-          }}
-          className={`absolute text-pink-400 cursor-pointer transition-transform transform hover:scale-125 ${petal.fading ? 'fade-out' : ''}`}
-          style={{
-            top: "-10%",
-            left: petal.left,
-            animation: `fall ${petal.delay} linear forwards`,
-            zIndex: 10,
-          }}
+    <AnimatePresence>
+      {isActive && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="pointer-events-none absolute inset-0"
         >
-          🌸
-        </div>
-      ))}
-      <style jsx>{`
-        @keyframes fall {
-          from {
-            transform: translateY(-100px) rotate(0deg);
-          }
-          to {
-            transform: translateY(100vh) rotate(360deg);
-          }
-        }
-        .fade-out {
-          animation: fadeOut 0.5s forwards;
-          /* Override the fall animation when fading */
-          animation-delay: 0s !important;
-        }
-        @keyframes fadeOut {
-          from {
-            opacity: 1;
-          }
-          to {
-            opacity: 0;
-          }
-        }
-      `}</style>
-    </>
+          <canvas ref={canvasRef} className="h-full w-full" />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, createContext } from 'react';
 import supabase from '../utils/supabaseClient';
 
@@ -16,9 +18,5 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ session }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>;
 };

@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 interface Achievement {
-  id: string
-  title: string
-  description: string
-  icon: string
-  progress: number
-  maxProgress: number
-  unlocked: boolean
-  reward: string
-  category: 'petals' | 'crafting' | 'trading' | 'gaming' | 'social'
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  progress: number;
+  maxProgress: number;
+  unlocked: boolean;
+  reward: string;
+  category: 'petals' | 'crafting' | 'trading' | 'gaming' | 'social';
 }
 
 export default function Achievements() {
@@ -24,7 +24,7 @@ export default function Achievements() {
       maxProgress: 100,
       unlocked: false,
       reward: 'Golden Petal Skin',
-      category: 'petals'
+      category: 'petals',
     },
     {
       id: 'combo_king',
@@ -35,7 +35,7 @@ export default function Achievements() {
       maxProgress: 20,
       unlocked: false,
       reward: 'Special Particle Effect',
-      category: 'petals'
+      category: 'petals',
     },
     {
       id: 'power_collector',
@@ -46,7 +46,7 @@ export default function Achievements() {
       maxProgress: 50,
       unlocked: false,
       reward: 'Extended Power-up Duration',
-      category: 'petals'
+      category: 'petals',
     },
     // Dark Souls Themed Achievements
     {
@@ -58,7 +58,7 @@ export default function Achievements() {
       maxProgress: 100,
       unlocked: false,
       reward: 'Dark Souls Emote Pack',
-      category: 'gaming'
+      category: 'gaming',
     },
     {
       id: 'sun_praise',
@@ -69,7 +69,7 @@ export default function Achievements() {
       maxProgress: 10,
       unlocked: false,
       reward: 'Sun Bro Badge',
-      category: 'social'
+      category: 'social',
     },
     // Kawaii Themed Achievements
     {
@@ -81,7 +81,7 @@ export default function Achievements() {
       maxProgress: 50,
       unlocked: false,
       reward: 'Special Kawaii Theme',
-      category: 'crafting'
+      category: 'crafting',
     },
     {
       id: 'senpai_noticed',
@@ -92,7 +92,7 @@ export default function Achievements() {
       maxProgress: 100,
       unlocked: false,
       reward: 'Special Profile Badge',
-      category: 'social'
+      category: 'social',
     },
     // Trading Achievements
     {
@@ -104,7 +104,7 @@ export default function Achievements() {
       maxProgress: 50,
       unlocked: false,
       reward: 'Special Trading Badge',
-      category: 'trading'
+      category: 'trading',
     },
     {
       id: 'rare_collector',
@@ -115,7 +115,7 @@ export default function Achievements() {
       maxProgress: 10,
       unlocked: false,
       reward: 'Legendary Trader Title',
-      category: 'trading'
+      category: 'trading',
     },
     // Gaming Achievements
     {
@@ -127,7 +127,7 @@ export default function Achievements() {
       maxProgress: 1,
       unlocked: false,
       reward: 'Speed Runner Badge',
-      category: 'gaming'
+      category: 'gaming',
     },
     {
       id: 'completionist',
@@ -138,58 +138,60 @@ export default function Achievements() {
       maxProgress: 1,
       unlocked: false,
       reward: 'Platinum Trophy',
-      category: 'gaming'
-    }
-  ])
+      category: 'gaming',
+    },
+  ]);
 
-  const [showUnlock, setShowUnlock] = useState<string | null>(null)
-  const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [showUnlock, setShowUnlock] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
     // Load achievements from localStorage
-    const savedAchievements = localStorage.getItem('achievements')
+    const savedAchievements = localStorage.getItem('achievements');
     if (savedAchievements) {
-      setAchievements(JSON.parse(savedAchievements))
+      setAchievements(JSON.parse(savedAchievements));
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     // Save achievements to localStorage
-    localStorage.setItem('achievements', JSON.stringify(achievements))
-  }, [achievements])
+    localStorage.setItem('achievements', JSON.stringify(achievements));
+  }, [achievements]);
 
   const updateProgress = (id: string, progress: number) => {
     setAchievements(prev => {
       const updated = prev.map(achievement => {
         if (achievement.id === id) {
-          const newProgress = Math.min(progress, achievement.maxProgress)
-          const unlocked = newProgress >= achievement.maxProgress && !achievement.unlocked
+          const newProgress = Math.min(progress, achievement.maxProgress);
+          const unlocked = newProgress >= achievement.maxProgress && !achievement.unlocked;
           if (unlocked) {
-            setShowUnlock(id)
-            setTimeout(() => setShowUnlock(null), 3000)
+            setShowUnlock(id);
+            setTimeout(() => setShowUnlock(null), 3000);
           }
           return {
             ...achievement,
             progress: newProgress,
-            unlocked: unlocked || achievement.unlocked
-          }
+            unlocked: unlocked || achievement.unlocked,
+          };
         }
-        return achievement
-      })
-      return updated
-    })
-  }
+        return achievement;
+      });
+      return updated;
+    });
+  };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <h2 className="text-3xl font-bold text-pink-400 mb-6 drop-shadow-glow animate-glow">Achievements</h2>
-      
+    <div className="mx-auto w-full max-w-4xl p-6">
+      <h2 className="drop-shadow-glow animate-glow mb-6 text-3xl font-bold text-pink-400">
+        Achievements
+      </h2>
+
       {/* Category Filter */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
         {['all', 'petals', 'crafting', 'trading', 'gaming', 'social'].map(category => (
           <button
             key={category}
-            className={`px-4 py-2 rounded-lg whitespace-nowrap font-bold shadow-glow transition-all ${
+            className={`shadow-glow whitespace-nowrap rounded-lg px-4 py-2 font-bold transition-all ${
               activeCategory === category
                 ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-pink-400/40'
                 : 'bg-black/50 text-pink-300 hover:bg-pink-500/20'
@@ -203,43 +205,47 @@ export default function Achievements() {
 
       {/* Achievement Unlock Notification */}
       {showUnlock && (
-        <div className="fixed top-4 right-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white p-4 rounded-xl shadow-lg animate-bounce drop-shadow-glow">
+        <div className="drop-shadow-glow fixed right-4 top-4 animate-bounce rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 p-4 text-white shadow-lg">
           Achievement Unlocked! 🎉
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {achievements
           .filter(a => activeCategory === 'all' || a.category === activeCategory)
           .map(achievement => (
             <div
               key={achievement.id}
-              className={`p-4 rounded-xl border-2 transition-all duration-300 shadow-glow ${
+              className={`shadow-glow rounded-xl border-2 p-4 transition-all duration-300 ${
                 achievement.unlocked
-                  ? 'bg-gradient-to-r from-pink-500/20 to-purple-600/20 border-pink-400 shadow-pink-400/40'
-                  : 'bg-black/60 border-pink-900'
+                  ? 'border-pink-400 bg-gradient-to-r from-pink-500/20 to-purple-600/20 shadow-pink-400/40'
+                  : 'border-pink-900 bg-black/60'
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="text-3xl font-extrabold drop-shadow-glow animate-glow select-none">
+                <div className="drop-shadow-glow animate-glow select-none text-3xl font-extrabold">
                   {achievement.icon}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-pink-400 drop-shadow-glow animate-glow">{achievement.title}</h3>
-                  <p className="text-pink-200 text-sm italic">{achievement.description}</p>
+                  <h3 className="drop-shadow-glow animate-glow text-xl font-bold text-pink-400">
+                    {achievement.title}
+                  </h3>
+                  <p className="text-sm italic text-pink-200">{achievement.description}</p>
                   <div className="mt-2">
-                    <div className="h-2 bg-pink-900/50 rounded-full overflow-hidden">
+                    <div className="h-2 overflow-hidden rounded-full bg-pink-900/50">
                       <div
-                        className="h-full bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300 shadow-glow"
-                        style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
+                        className="shadow-glow h-full bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-300"
+                        style={{
+                          width: `${(achievement.progress / achievement.maxProgress) * 100}%`,
+                        }}
                       />
                     </div>
-                    <div className="text-xs text-pink-300 mt-1">
+                    <div className="mt-1 text-xs text-pink-300">
                       {achievement.progress} / {achievement.maxProgress}
                     </div>
                   </div>
                   {achievement.unlocked && (
-                    <div className="mt-2 text-sm text-pink-300 font-bold animate-glow">
+                    <div className="animate-glow mt-2 text-sm font-bold text-pink-300">
                       Reward: {achievement.reward}
                     </div>
                   )}
@@ -253,17 +259,31 @@ export default function Achievements() {
           filter: drop-shadow(0 0 8px #ff2ab8cc) drop-shadow(0 0 2px #fff3);
         }
         .shadow-glow {
-          box-shadow: 0 0 16px 2px #ff2ab8cc, 0 0 2px #fff3;
+          box-shadow:
+            0 0 16px 2px #ff2ab8cc,
+            0 0 2px #fff3;
         }
         @keyframes glow {
-          0% { text-shadow: 0 0 8px #ff2ab8, 0 0 2px #fff3; }
-          50% { text-shadow: 0 0 16px #ff2ab8, 0 0 4px #fff6; }
-          100% { text-shadow: 0 0 8px #ff2ab8, 0 0 2px #fff3; }
+          0% {
+            text-shadow:
+              0 0 8px #ff2ab8,
+              0 0 2px #fff3;
+          }
+          50% {
+            text-shadow:
+              0 0 16px #ff2ab8,
+              0 0 4px #fff6;
+          }
+          100% {
+            text-shadow:
+              0 0 8px #ff2ab8,
+              0 0 2px #fff3;
+          }
         }
         .animate-glow {
           animation: glow 2s infinite alternate;
         }
       `}</style>
     </div>
-  )
-} 
+  );
+}

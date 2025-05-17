@@ -10,7 +10,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error("Missing Supabase environment variables.");
+  console.error('Missing Supabase environment variables.');
   process.exit(1);
 }
 
@@ -32,7 +32,7 @@ console.log(`Reading CSV file from ${csvFilePath}...`);
 // Read and parse the CSV file
 fs.createReadStream(csvFilePath)
   .pipe(csv())
-  .on('data', (data) => {
+  .on('data', data => {
     // Debug: log each row as it comes in (optional, comment out if too verbose)
     console.log('Row:', data);
 
@@ -42,14 +42,14 @@ fs.createReadStream(csvFilePath)
     }
     products.push(data);
   })
-  .on('error', (err) => {
+  .on('error', err => {
     console.error('Error reading CSV file:', err);
   })
   .on('end', async () => {
     console.log(`Parsed ${products.length} products from CSV.`);
 
     if (products.length === 0) {
-      console.error("No products parsed. Please check the CSV file headers and content.");
+      console.error('No products parsed. Please check the CSV file headers and content.');
       process.exit(1);
     }
 

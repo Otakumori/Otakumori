@@ -14,17 +14,18 @@ export async function GET() {
       environment: process.env.NODE_ENV,
       cron: {
         lastRun: null,
-        status: 'unknown'
+        status: 'unknown',
       },
       update: {
         lastRun: null,
-        status: 'unknown'
-      }
+        status: 'unknown',
+      },
     };
 
     // Check cron API logs
     if (fs.existsSync(cronLogFile)) {
-      const cronLogs = fs.readFileSync(cronLogFile, 'utf-8')
+      const cronLogs = fs
+        .readFileSync(cronLogFile, 'utf-8')
         .split('\n')
         .filter(Boolean)
         .map(line => JSON.parse(line));
@@ -41,7 +42,8 @@ export async function GET() {
 
     // Check update script logs
     if (fs.existsSync(updateLogFile)) {
-      const updateLogs = fs.readFileSync(updateLogFile, 'utf-8')
+      const updateLogs = fs
+        .readFileSync(updateLogFile, 'utf-8')
         .split('\n')
         .filter(Boolean)
         .map(line => JSON.parse(line));
@@ -71,10 +73,13 @@ export async function GET() {
     return NextResponse.json(health);
   } catch (error) {
     console.error('Health check error:', error);
-    return NextResponse.json({
-      status: 'error',
-      timestamp: new Date().toISOString(),
-      error: error.message
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        status: 'error',
+        timestamp: new Date().toISOString(),
+        error: error.message,
+      },
+      { status: 500 }
+    );
   }
-} 
+}

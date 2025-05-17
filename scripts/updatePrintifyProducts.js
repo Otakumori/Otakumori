@@ -11,7 +11,7 @@ const requiredEnvVars = {
   PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
   PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 };
 
 // Check for missing environment variables
@@ -52,9 +52,9 @@ async function fetchPrintifyProducts() {
     `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`,
     {
       headers: {
-        'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
+        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
     }
   );
 
@@ -68,10 +68,10 @@ async function fetchPrintifyProducts() {
 async function updatePrintifyProducts() {
   try {
     console.log('Starting Printify product update...');
-    
+
     // Fetch products with retry logic
     const products = await withRetry(fetchPrintifyProducts);
-    
+
     // Filter and transform products for Abyss section
     const abyssProducts = products.data
       .filter(product => product.tags.includes('abyss') || product.tags.includes('r18'))
@@ -84,7 +84,7 @@ async function updatePrintifyProducts() {
         tags: product.tags,
         is_active: true,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       }));
 
     console.log(`Found ${abyssProducts.length} Abyss products`);
@@ -92,9 +92,7 @@ async function updatePrintifyProducts() {
     // Update Supabase cache with retry logic
     if (abyssProducts.length > 0) {
       await withRetry(async () => {
-        const { error: updateError } = await supabase
-          .from('abyss_products')
-          .upsert(abyssProducts);
+        const { error: updateError } = await supabase.from('abyss_products').upsert(abyssProducts);
 
         if (updateError) throw updateError;
         console.log('Successfully updated products in Supabase');
@@ -114,7 +112,7 @@ updatePrintifyProducts()
     console.log('Product update completed successfully');
     process.exit(0);
   })
-  .catch((error) => {
+  .catch(error => {
     console.error('Product update failed:', error);
     process.exit(1);
-  }); 
+  });

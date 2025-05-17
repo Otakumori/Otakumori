@@ -1,4 +1,4 @@
-const Sakura = function(selector, options) {
+const Sakura = function (selector, options) {
   if (typeof selector === 'undefined') {
     throw new Error('No selector present. Define an element.');
   }
@@ -24,7 +24,7 @@ const Sakura = function(selector, options) {
   };
 
   // Merge defaults with user options.
-  const extend = function(originalObj, newObj) {
+  const extend = function (originalObj, newObj) {
     Object.keys(originalObj).forEach(key => {
       if (newObj && Object.prototype.hasOwnProperty.call(newObj, key)) {
         const origin = originalObj;
@@ -42,8 +42,7 @@ const Sakura = function(selector, options) {
 
   // Every sec check petals for remove (by lifeTime)
   setInterval(() => {
-    if (!this.settings.lifeTime)
-      return;
+    if (!this.settings.lifeTime) return;
 
     const keysForRemove = [];
     const stamp = Date.now();
@@ -94,8 +93,7 @@ const Sakura = function(selector, options) {
     return (
       rect.top >= 0 &&
       rect.left >= 0 &&
-      rect.bottom <=
-        (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
       rect.right <= (window.innerWidth || document.documentElement.clientWidth)
     );
   }
@@ -132,16 +130,15 @@ const Sakura = function(selector, options) {
     const blowAnimation = randomArrayElem(animationNames.blowAnimations);
     const swayAnimation = randomArrayElem(animationNames.swayAnimations);
     const fallTime =
-      (document.documentElement.clientHeight * 0.007 +
-        Math.round(Math.random() * 5)) *
+      (document.documentElement.clientHeight * 0.007 + Math.round(Math.random() * 5)) *
       this.settings.fallSpeed;
 
     // Create animations
     const animationsArr = [
       `fall ${fallTime}s linear 0s 1`,
-      `${blowAnimation} ${(fallTime > 30 ? fallTime : 30) -
-        20 +
-        randomInt(0, 20)}s linear 0s infinite`,
+      `${blowAnimation} ${
+        (fallTime > 30 ? fallTime : 30) - 20 + randomInt(0, 20)
+      }s linear 0s infinite`,
       `${swayAnimation} ${randomInt(2, 4)}s linear 0s infinite`,
     ];
     const animations = animationsArr.join(', ');
@@ -160,11 +157,10 @@ const Sakura = function(selector, options) {
     petal.style.animation = animations;
     petal.style.borderRadius = `${randomInt(
       this.settings.maxSize,
-      this.settings.maxSize + Math.floor(Math.random() * 10),
+      this.settings.maxSize + Math.floor(Math.random() * 10)
     )}px ${randomInt(1, Math.floor(width / 4))}px`;
     petal.style.height = `${height}px`;
-    petal.style.left = `${Math.random() * document.documentElement.clientWidth -
-      100}px`;
+    petal.style.left = `${Math.random() * document.documentElement.clientWidth - 100}px`;
     petal.style.marginTop = `${-(Math.floor(Math.random() * 20) + 15)}px`;
     petal.style.width = `${width}px`;
 
@@ -189,25 +185,19 @@ const Sakura = function(selector, options) {
     this.el.appendChild(petal);
   };
 
-  this.el.setAttribute(
-    'data-sakura-anim-id',
-    window.requestAnimationFrame(this.createPetal),
-  );
+  this.el.setAttribute('data-sakura-anim-id', window.requestAnimationFrame(this.createPetal));
 };
 
-Sakura.prototype.start = function() {
+Sakura.prototype.start = function () {
   const animId = this.el.dataset.sakuraAnimId;
   if (!animId) {
-    this.el.setAttribute(
-      'data-sakura-anim-id',
-      window.requestAnimationFrame(this.createPetal),
-    );
+    this.el.setAttribute('data-sakura-anim-id', window.requestAnimationFrame(this.createPetal));
   } else {
     throw new Error('Sakura is already running.');
   }
 };
 
-Sakura.prototype.stop = function(graceful = false) {
+Sakura.prototype.stop = function (graceful = false) {
   const animId = this.el.dataset.sakuraAnimId;
   if (animId) {
     window.cancelAnimationFrame(animId);

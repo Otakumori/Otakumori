@@ -9,14 +9,16 @@ export async function getChatMessages(limit = 50) {
   try {
     const { data: messages, error } = await supabase
       .from('abyss_chat_messages')
-      .select(`
+      .select(
+        `
         *,
         author:author_id (
           id,
           username,
           avatar_url
         )
-      `)
+      `
+      )
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -38,8 +40,8 @@ export async function sendChatMessage(userId, content, rating = 'r18') {
           author_id: userId,
           content,
           rating,
-          is_active: true
-        }
+          is_active: true,
+        },
       ])
       .select()
       .single();
@@ -61,20 +63,22 @@ export function subscribeToChatMessages(callback) {
         event: 'INSERT',
         schema: 'public',
         table: 'abyss_chat_messages',
-        filter: 'is_active=eq.true'
+        filter: 'is_active=eq.true',
       },
-      async (payload) => {
+      async payload => {
         // Fetch the full message with author details
         const { data: message, error } = await supabase
           .from('abyss_chat_messages')
-          .select(`
+          .select(
+            `
             *,
             author:author_id (
               id,
               username,
               avatar_url
             )
-          `)
+          `
+          )
           .eq('id', payload.new.id)
           .single();
 
@@ -116,17 +120,15 @@ export async function deleteChatMessage(messageId, userId) {
 
 export async function reportChatMessage(messageId, userId, reason) {
   try {
-    const { error } = await supabase
-      .from('abyss_reports')
-      .insert([
-        {
-          reporter_id: userId,
-          content_type: 'chat_message',
-          content_id: messageId,
-          reason,
-          status: 'pending'
-        }
-      ]);
+    const { error } = await supabase.from('abyss_reports').insert([
+      {
+        reporter_id: userId,
+        content_type: 'chat_message',
+        content_id: messageId,
+        reason,
+        status: 'pending',
+      },
+    ]);
 
     if (error) throw error;
     return true;
@@ -141,36 +143,29 @@ export async function moderateChatMessage(messageId, action, moderatorId) {
   try {
     switch (action) {
       case 'delete':
-        await supabase
-          .from('abyss_chat_messages')
-          .update({ is_active: false })
-          .eq('id', messageId);
+        await supabase.from('abyss_chat_messages').update({ is_active: false }).eq('id', messageId);
         break;
       case 'warn':
         // Add warning to user's record
-        await supabase
-          .from('abyss_user_warnings')
-          .insert([
-            {
-              user_id: messageId,
-              moderator_id: moderatorId,
-              reason: 'Inappropriate chat message',
-              severity: 'low'
-            }
-          ]);
+        await supabase.from('abyss_user_warnings').insert([
+          {
+            user_id: messageId,
+            moderator_id: moderatorId,
+            reason: 'Inappropriate chat message',
+            severity: 'low',
+          },
+        ]);
         break;
       case 'ban':
         // Ban user from chat
-        await supabase
-          .from('abyss_user_bans')
-          .insert([
-            {
-              user_id: messageId,
-              moderator_id: moderatorId,
-              reason: 'Severe chat violation',
-              duration: '7 days'
-            }
-          ]);
+        await supabase.from('abyss_user_bans').insert([
+          {
+            user_id: messageId,
+            moderator_id: moderatorId,
+            reason: 'Severe chat violation',
+            duration: '7 days',
+          },
+        ]);
         break;
       default:
         throw new Error('Invalid moderation action');
@@ -181,4 +176,4 @@ export async function moderateChatMessage(messageId, action, moderatorId) {
     console.error('Error moderating chat message:', error);
     throw error;
   }
-} 
+}

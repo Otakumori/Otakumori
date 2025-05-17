@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useState, useContext } from 'react';
 
 const GameCubeContext = createContext();
@@ -5,14 +7,12 @@ const GameCubeContext = createContext();
 export function GameCubeProvider({ children }) {
   const [unlocks, setUnlocks] = useState([]);
 
-  const unlockItem = (item) => {
+  const unlockItem = item => {
     setUnlocks([...unlocks, item]);
   };
 
   return (
-    <GameCubeContext.Provider value={{ unlocks, unlockItem }}>
-      {children}
-    </GameCubeContext.Provider>
+    <GameCubeContext.Provider value={{ unlocks, unlockItem }}>{children}</GameCubeContext.Provider>
   );
 }
 
