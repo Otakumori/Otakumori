@@ -1,0 +1,27 @@
+-- Enable necessary extensions
+CREATE EXTENSION IF NOT EXISTS "pg_net";
+
+-- Create the exec_sql function
+CREATE OR REPLACE FUNCTION exec_sql(query text)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    EXECUTE query;
+END;
+$$;
+
+-- Grant execute permission to service_role
+GRANT EXECUTE ON FUNCTION exec_sql(text) TO service_role;
+
+-- Create a table to track migrations
+CREATE TABLE IF NOT EXISTS migrations (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    applied_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Insert the initial migration record
+INSERT INTO migrations (name) VALUES ('20240119000000_setup_exec_sql.sql')
+ON CONFLICT (name) DO NOTHING; 
