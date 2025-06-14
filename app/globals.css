@@ -2,40 +2,155 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Medieval';
-  src: url('/Cormorant_Garamond/CormorantGaramond-Regular.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Medieval';
-  src: url('/Cormorant_Garamond/CormorantGaramond-Bold.ttf') format('truetype');
-  font-weight: bold;
-}
-
-.font-medieval {
-  font-family: 'Medieval', serif;
-}
-
-/* Dark Souls message animations */
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
   }
-  50% {
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-  }
-  100% {
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
-.text-yellow-400 {
-  animation: glow 2s infinite;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Custom global styles */
+@keyframes scanline-flicker {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.12; }
+}
+
+@keyframes logo-fade-in {
+  0% { opacity: 0; transform: scale(0.8); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+@keyframes flash-pink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 88, 28, 135;
+  --background-end-rgb: 219, 39, 119;
+}
+
 body {
-  background: #fdf2f8;
-  font-family: 'Inter', sans-serif;
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn-primary {
+    @apply rounded-lg bg-pink-500 px-4 py-2 text-white hover:bg-pink-600 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors;
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-pink-500 focus:ring-1 focus:ring-pink-500;
+  }
+
+  .card {
+    @apply rounded-lg bg-white p-6 shadow-md;
+  }
+
+  .font-medieval {
+    font-family: 'Medieval', serif;
+  }
+
+  /* Dark Souls message animations */
+  @keyframes glow {
+    0% {
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+    100% {
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+  }
+
+  .text-yellow-400 {
+    animation: glow 2s infinite;
+  }
+
+  /* Custom global styles */
+  body {
+    background: #fdf2f8;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(219, 39, 119, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(219, 39, 119, 0.7);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Custom focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-purple-900;
 }

@@ -119,25 +119,25 @@ ALTER TABLE abyss_likes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE abyss_comments ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for authenticated users
-CREATE POLICY "Users can view active Abyss products"
-    ON abyss_products FOR SELECT
-    USING (is_active = true);
+DROP POLICY IF EXISTS "Users can view active Abyss products" ON abyss_products;
+CREATE POLICY "Users can view active Abyss products" ON abyss_products
+    FOR SELECT USING (is_active = true);
 
-CREATE POLICY "Users can view active Abyss artwork"
-    ON abyss_artwork FOR SELECT
-    USING (is_active = true);
+DROP POLICY IF EXISTS "Users can view active Abyss artwork" ON abyss_artwork;
+CREATE POLICY "Users can view active Abyss artwork" ON abyss_artwork
+    FOR SELECT USING (is_active = true);
 
-CREATE POLICY "Users can view active Abyss forums"
-    ON abyss_forums FOR SELECT
-    USING (is_active = true);
+DROP POLICY IF EXISTS "Users can view active Abyss forums" ON abyss_forums;
+CREATE POLICY "Users can view active Abyss forums" ON abyss_forums
+    FOR SELECT USING (is_active = true);
 
-CREATE POLICY "Users can view active Abyss forum posts"
-    ON abyss_forum_posts FOR SELECT
-    USING (is_active = true);
+DROP POLICY IF EXISTS "Users can view active Abyss forum posts" ON abyss_forum_posts;
+CREATE POLICY "Users can view active Abyss forum posts" ON abyss_forum_posts
+    FOR SELECT USING (is_active = true);
 
-CREATE POLICY "Users can view active Abyss chat messages"
-    ON abyss_chat_messages FOR SELECT
-    USING (is_active = true);
+DROP POLICY IF EXISTS "Users can view active Abyss chat messages" ON abyss_chat_messages;
+CREATE POLICY "Users can view active Abyss chat messages" ON abyss_chat_messages
+    FOR SELECT USING (is_active = true);
 
 -- Create indexes for better performance
 CREATE INDEX idx_abyss_products_rating ON abyss_products(rating);

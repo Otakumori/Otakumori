@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
-const PRINTIFY_SHOP_ID = process.env.PRINTIFY_SHOP_ID;
+const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID;
 
 // Initialize Supabase client
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  env.NEXT_PUBLIC_SUPABASE_URL,
+  env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
 export async function getAbyssProducts() {
@@ -32,7 +32,7 @@ export async function getAbyssProducts() {
     // Fetch fresh products from Printify
     const response = await fetch(`${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products.json`, {
       headers: {
-        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
         'Content-Type': 'application/json',
       },
     });
@@ -76,7 +76,7 @@ export async function getProductDetails(productId) {
       `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products/${productId}.json`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
@@ -97,7 +97,7 @@ export async function createOrder(productId, variantId, quantity, shippingAddres
     const response = await fetch(`${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/orders.json`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

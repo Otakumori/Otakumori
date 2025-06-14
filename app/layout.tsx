@@ -1,21 +1,36 @@
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ClerkProvider } from '@clerk/nextjs';
+import { CartProvider } from '@/components/cart/CartProvider';
+import { AchievementProvider } from '@/components/achievements/AchievementProvider';
+import Navbar from '@/components/layout/Navbar';
+import { medievalFont } from './fonts';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: 'Otaku-mori - Anime E-commerce & Community Hub',
-  description:
-    'The ultimate online e-commerce playground and community hub for anime enthusiasts, gamers, and pop-culture aficionados.',
+export const metadata: Metadata = {
+  title: 'Otakumori - Your Anime Community',
+  description: 'Join Otakumori, your ultimate destination for anime merchandise, manga, and otaku culture.',
+  keywords: 'anime, manga, otaku, community, merchandise, figures, art prints',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={`${inter.className} ${medievalFont.variable}`}>
+      <body className="font-medieval">
+        <CartProvider>
+          <AchievementProvider>
+            <Navbar />
+            <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900">
+              {children}
+            </div>
+          </AchievementProvider>
+        </CartProvider>
+      </body>
+    </html>
   );
 }

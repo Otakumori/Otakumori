@@ -16,25 +16,16 @@ CREATE TABLE IF NOT EXISTS abyss_products (
 ALTER TABLE abyss_products ENABLE ROW LEVEL SECURITY;
 
 -- Only allow authenticated users to view products
-CREATE POLICY "Authenticated users can view products"
-    ON abyss_products FOR SELECT
-    USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Authenticated users can view products" ON abyss_products;
+CREATE POLICY "Authenticated users can view products" ON abyss_products
+    FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Only allow admins to modify products
-CREATE POLICY "Admins can modify products"
-    ON abyss_products FOR ALL
-    USING (auth.uid() IN (
+DROP POLICY IF EXISTS "Admins can modify products" ON abyss_products;
+CREATE POLICY "Admins can modify products" ON abyss_products
+    FOR ALL USING (auth.uid() IN (
         SELECT user_id FROM user_roles WHERE role = 'admin'
     ));
-
--- Create function to handle updated_at
-CREATE OR REPLACE FUNCTION handle_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
 
 -- Create trigger for updated_at
 CREATE TRIGGER set_updated_at
