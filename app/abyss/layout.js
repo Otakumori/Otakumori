@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { redirect } from 'next/navigation';
+import { usePetalContext } from '../providers';
 
 const navItems = [
   { path: '/abyss', label: 'Home' },
@@ -16,87 +17,81 @@ const navItems = [
 
 export default function AbyssLayout({ children }) {
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const [isVerified, setIsVerified] = useState(false);
-  const supabase = createClientComponentClient();
+  const { data: session, status } = useSession();
+  const { petals } = usePetalContext();
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const checkVerification = async () => {
-      if (session?.user) {
-        const { data: preferences } = await supabase
-          .from('user_preferences')
-          .select('abyss_verified')
-          .eq('user_id', session.user.id)
-          .single();
-
-        setIsVerified(preferences?.abyss_verified || false);
-      }
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
     };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    checkVerification();
-  }, [session, supabase]);
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    redirect('/auth/signin');
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Navigation */}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900">
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="border-b border-pink-500/20 bg-gray-900/80 backdrop-blur-md"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? 'bg-black/80 backdrop-blur-sm' : 'bg-transparent'
+        }`}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/abyss" className="text-2xl font-bold text-pink-500">
-              The Abyss
-            </Link>
-            <div className="flex space-x-4">
-              {navItems.map(item => (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={`rounded-lg px-4 py-2 transition-colors ${
-                    pathname === item.path
-                      ? 'bg-pink-600 text-white'
-                      : 'text-gray-400 hover:text-pink-500'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-8">
+              <Link href="/abyss" className="text-pink-500 font-bold text-xl">
+                The Abyss
+              </Link>
+              <div className="hidden md:flex space-x-6">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`text-sm font-medium transition-colors ${
+                      pathname === item.path
+                        ? 'text-pink-500'
+                        : 'text-gray-300 hover:text-pink-400'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              {session ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-400">{session.user.name || session.user.email}</span>
-                  {isVerified && (
-                    <span className="rounded-full bg-pink-500/20 px-2 py-1 text-sm text-pink-500">
-                      Verified
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  href="/auth/signin"
-                  className="rounded-lg bg-pink-600 px-4 py-2 text-white transition-colors hover:bg-pink-700"
-                >
-                  Sign In
-                </Link>
-              )}
+              <div className="flex items-center space-x-2">
+                <span className="text-pink-500">🌸</span>
+                <span className="text-gray-300">{petals}</span>
+              </div>
+              <Link
+                href="/"
+                className="text-sm font-medium text-gray-300 hover:text-pink-400"
+              >
+                Return to Surface
+              </Link>
             </div>
           </div>
         </div>
       </motion.nav>
 
-      {/* Main Content */}
-      <main className="relative">
-        {/* Background Effects */}
-        <div className="pointer-events-none fixed inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-pink-500/5 to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-pink-500/10 via-transparent to-transparent" />
+      <main className="pt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
         </div>
-
-        {/* Content */}
-        <div className="relative z-10">{children}</div>
       </main>
     </div>
   );

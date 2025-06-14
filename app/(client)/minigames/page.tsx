@@ -5,6 +5,8 @@ import Image from 'next/image';
 import PetalCollector from '../../components/PetalCollector';
 import Achievements from '../../components/Achievements';
 import TradeCraft from '../../components/TradeCraft';
+import { motion, AnimatePresence } from 'framer-motion';
+import GameCubeBoot from '../../components/GameCubeBoot';
 
 const MENU_ITEMS = [
   {
@@ -40,6 +42,8 @@ const MENU_ITEMS = [
 ];
 
 export default function MiniGamesPage() {
+  const [bootComplete, setBootComplete] = useState(false);
+  const [showCube, setShowCube] = useState(false);
   const [bootDone, setBootDone] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [activeFace, setActiveFace] = useState('hub');
@@ -82,6 +86,13 @@ export default function MiniGamesPage() {
       );
     }, 3400);
 
+    // Check if boot animation has played this session
+    const hasBootPlayed = sessionStorage.getItem('bootPlayed');
+    if (hasBootPlayed) {
+      setBootComplete(true);
+      setShowCube(true);
+    }
+
     return () => {
       audioRef.current?.pause();
       hoverSoundRef.current?.pause();
@@ -104,9 +115,95 @@ export default function MiniGamesPage() {
     hoverSoundRef.current?.play();
   };
 
+  const handleBootComplete = () => {
+    sessionStorage.setItem('bootPlayed', 'true');
+    setBootComplete(true);
+    setTimeout(() => setShowCube(true), 500);
+  };
+
   return (
     <main className="min-h-screen bg-black">
       <Header />
+      <AnimatePresence mode="wait">
+        {!bootComplete && <GameCubeBoot onBootComplete={handleBootComplete} />}
+      </AnimatePresence>
+
+      {showCube && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="relative h-[calc(100vh-4rem)]"
+        >
+          {/* Cube Interface */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              initial={{ scale: 0, rotate: 0 }}
+              animate={{ scale: 1, rotate: 360 }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              className="relative h-64 w-64"
+            >
+              {/* Cube Faces */}
+              <div className="absolute inset-0 transform-gpu preserve-3d">
+                {/* Front Face */}
+                <motion.div
+                  whileHover={{ scale: 1.1, z: 50 }}
+                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                >
+                  <button
+                    onClick={() => window.location.href = '/'}
+                    className="text-white font-bold"
+                  >
+                    Main Menu
+                  </button>
+                </motion.div>
+
+                {/* Right Face */}
+                <motion.div
+                  whileHover={{ scale: 1.1, z: 50 }}
+                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  style={{ transform: 'rotateY(90deg) translateZ(128px)' }}
+                >
+                  <button
+                    onClick={() => window.location.href = '/minigames'}
+                    className="text-white font-bold"
+                  >
+                    Mini Games
+                  </button>
+                </motion.div>
+
+                {/* Back Face */}
+                <motion.div
+                  whileHover={{ scale: 1.1, z: 50 }}
+                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  style={{ transform: 'rotateY(180deg) translateZ(128px)' }}
+                >
+                  <button
+                    onClick={() => window.location.href = '/achievements'}
+                    className="text-white font-bold"
+                  >
+                    Achievements
+                  </button>
+                </motion.div>
+
+                {/* Left Face */}
+                <motion.div
+                  whileHover={{ scale: 1.1, z: 50 }}
+                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  style={{ transform: 'rotateY(-90deg) translateZ(128px)' }}
+                >
+                  <button
+                    onClick={() => window.location.href = '/savefiles'}
+                    className="text-white font-bold"
+                  >
+                    Save Files
+                  </button>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
+
       {/* GameCube Boot Overlay */}
       {!bootDone && (
         <div

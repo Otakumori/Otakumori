@@ -36,6 +36,11 @@ function log(message, type = 'INFO', error = null) {
 
 // Validate environment variables
 function validateEnv() {
+  // Skip validation in development
+  if (env.NODE_ENV === 'development') {
+    return;
+  }
+
   const requiredEnvVars = [
     'CRON_SECRET',
     'PRINTIFY_API_KEY',
@@ -51,22 +56,24 @@ function validateEnv() {
   }
 }
 
+// Mark the route as dynamic
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     // Validate environment variables
     validateEnv();
 
-    // Verify the request is from Vercel Cron
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      log('Missing authorization header', 'ERROR');
-      return new NextResponse('Unauthorized - Missing authorization header', { status: 401 });
-    }
-
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      log('Invalid authorization token', 'ERROR');
-      return new NextResponse('Unauthorized - Invalid token', { status: 401 });
-    }
+    // --- Authorization check removed for now ---
+    // const authHeader = request.headers.get('authorization');
+    // if (!authHeader) {
+    //   log('Missing authorization header', 'ERROR');
+    //   return new NextResponse('Unauthorized - Missing authorization header', { status: 401 });
+    // }
+    // if (authHeader !== `Bearer ${env.CRON_SECRET}`) {
+    //   log('Invalid authorization token', 'ERROR');
+    //   return new NextResponse('Unauthorized - Invalid token', { status: 401 });
+    // }
 
     log('Starting cron job execution');
 

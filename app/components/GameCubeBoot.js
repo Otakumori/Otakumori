@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 
@@ -29,6 +29,8 @@ export default function GameCubeBoot({ onBootComplete }) {
   const [showCursor, setShowCursor] = useState(false);
   const [showInterface, setShowInterface] = useState(false);
   const [showFaces, setShowFaces] = useState(false);
+  const [bootProgress, setBootProgress] = useState(0);
+  const audioRef = useRef(null);
 
   // Determine current season
   useEffect(() => {
@@ -96,193 +98,80 @@ export default function GameCubeBoot({ onBootComplete }) {
 
   // Boot sequence stages
   useEffect(() => {
-    const sequence = async () => {
-      // Black velvet stage with petals
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setStage('o-emergence');
+    if (!session) return;
 
-      // O emergence
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    const bootSequence = async () => {
+      // Play boot sound
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+
+      // Black screen
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Show cube
+      setStage('cube');
       setShowCube(true);
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Cube morph
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setShowCursor(true);
-
-      // Cursor reveal
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Show interface
+      setStage('interface');
       setShowInterface(true);
-
-      // Interface reveal
       await new Promise(resolve => setTimeout(resolve, 1000));
-      setShowFaces(true);
 
       // Complete boot sequence
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      onBootComplete();
+      onBootComplete?.();
     };
 
-    sequence();
-  }, [onBootComplete]);
+    bootSequence();
+  }, [session, onBootComplete]);
+
+  if (!session) {
+    return null;
+  }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black">
-      <AnimatePresence>
-        {/* Black Velvet Stage with Petals */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+      <audio
+        ref={audioRef}
+        src="/assets/gamecube-boot.mp3"
+        preload="auto"
+      />
+      
+      <AnimatePresence mode="wait">
         {stage === 'black' && (
-          <div className="absolute inset-0 overflow-hidden">
-            {petals.map(petal => (
-              <motion.div
-                key={petal.id}
-                initial={{ y: -10, x: petal.x, opacity: 0 }}
-                animate={{
-                  y: '100vh',
-                  x: petal.x + Math.sin(petal.y * 0.01) * 50 * petal.sway,
-                  opacity: [0, 1, 0],
-                  rotate: petal.rotation + 360,
-                }}
-                transition={{
-                  duration: 5 + Math.random() * 5,
-                  ease: 'linear',
-                }}
-                className="absolute text-2xl"
-                style={{ color: SEASONAL_PETALS[currentSeason].color }}
-              >
-                {SEASONAL_PETALS[currentSeason].shape}
-              </motion.div>
-            ))}
-          </div>
-        )}
-
-        {/* O Emergence */}
-        {stage === 'o-emergence' && (
           <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [1, 0.8, 1],
-              }}
-              transition={{
-                duration: 1,
-                repeat: 1,
-                ease: 'easeInOut',
-              }}
-              className="text-8xl font-bold text-pink-500"
-            >
-              O
-            </motion.div>
-          </motion.div>
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black"
+          />
         )}
 
-        {/* Cube Morph with Abyss Particles */}
-        {showCube && (
+        {stage === 'cube' && showCube && (
           <motion.div
             initial={{ scale: 0, rotate: 0 }}
             animate={{ scale: 1, rotate: 360 }}
-            className="absolute inset-0 flex items-center justify-center"
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="relative h-64 w-64"
           >
-            <div className="relative h-32 w-32">
-              {/* Abyss Particles */}
-              {abyssParticles.map(particle => (
-                <motion.div
-                  key={particle.id}
-                  animate={{
-                    rotate: particle.rotation,
-                    opacity: particle.opacity,
-                  }}
-                  transition={{ duration: 0.1 }}
-                  className="absolute"
-                  style={{
-                    left: `${particle.x}%`,
-                    top: `${particle.y}%`,
-                    width: particle.size,
-                    height: particle.size,
-                    backgroundColor: ABYSS_PETALS.color,
-                    borderRadius: '50%',
-                  }}
-                />
-              ))}
-              <motion.div
-                className="absolute inset-0 border-4 border-pink-500/50 backdrop-blur-sm"
-                animate={{
-                  rotateY: [0, 360],
-                  rotateX: [0, 360],
-                }}
-                transition={{
-                  duration: 2,
-                  ease: 'easeInOut',
-                }}
-              />
-            </div>
+            <div className="absolute inset-0 animate-spin-slow rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-[0_0_50px_rgba(236,72,153,0.5)]" />
+            <div className="absolute inset-2 rounded-lg bg-black" />
+            <div className="absolute inset-4 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500" />
           </motion.div>
         )}
 
-        {/* Cursor Animation */}
-        {showCursor && (
-          <motion.div
-            initial={{ x: -100, y: -100 }}
-            animate={{ x: 0, y: 0 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 45, 0],
-              }}
-              transition={{
-                duration: 0.5,
-                ease: 'easeInOut',
-              }}
-              className="text-4xl"
-            >
-              👆
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* Interface Reveal */}
-        {showInterface && (
+        {stage === 'interface' && showInterface && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute inset-0 flex items-center justify-center"
+            className="text-center"
           >
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0, 1, 1],
-              }}
-              className="text-4xl font-bold text-pink-500"
-            >
-              I
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* GameCube Faces */}
-        {showFaces && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div className="grid grid-cols-3 gap-4">
-              {['Up', 'Left', 'Center', 'Right', 'Down'].map((face, index) => (
-                <motion.div
-                  key={face}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: index * 0.2 }}
-                  className={`flex h-24 w-24 items-center justify-center rounded-lg bg-gray-800/50 font-bold text-pink-400 backdrop-blur-lg ${index === 2 ? 'col-start-2' : ''} `}
-                >
-                  {face}
-                </motion.div>
-              ))}
-            </div>
+            <h1 className="mb-4 text-4xl font-bold text-pink-500">
+              Welcome to Otakumori
+            </h1>
+            <p className="text-lg text-pink-300">
+              Your anime adventure begins here
+            </p>
           </motion.div>
         )}
       </AnimatePresence>

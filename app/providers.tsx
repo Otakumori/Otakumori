@@ -1,8 +1,9 @@
 'use client';
 
+import { ClerkProvider } from '@clerk/nextjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
-import { createStore } from 'zustand';
+import { create } from 'zustand';
 import { createContext, useContext, useRef } from 'react';
 
 interface PetalState {
@@ -27,40 +28,29 @@ interface OverlordState {
 }
 
 // Create a store for the petal system
-const usePetalStore = createStore<PetalState>(set => ({
+const usePetalStore = create<PetalState>((set) => ({
   petals: 0,
   dailyLimit: 50,
-  addPetals: amount => set(state => ({ petals: state.petals + amount })),
+  addPetals: (amount) => set((state) => ({ petals: state.petals + amount })),
   resetDailyLimit: () => set({ petals: 0 }),
 }));
 
 // Create a store for the AI Overlord
-const useOverlordStore = createStore<OverlordState>(set => ({
+const useOverlordStore = create<OverlordState>((set) => ({
   isActive: false,
   lastInteraction: null,
   quests: [],
   activate: () => set({ isActive: true }),
   deactivate: () => set({ isActive: false }),
-  addQuest: quest => set(state => ({ quests: [...state.quests, quest] })),
+  addQuest: (quest) => set((state) => ({ quests: [...state.quests, quest] })),
 }));
 
 const queryClient = new QueryClient();
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <PetalProvider>
-          <OverlordProvider>{children}</OverlordProvider>
-        </PetalProvider>
-      </SessionProvider>
-    </QueryClientProvider>
-  );
-}
-
 // Context providers for the stores
 const PetalContext = createContext<typeof usePetalStore | null>(null);
 const OverlordContext = createContext<typeof useOverlordStore | null>(null);
+
 export function PetalProvider({ children }: { children: React.ReactNode }) {
   const store = useRef(usePetalStore);
   return <PetalContext.Provider value={store.current}>{children}</PetalContext.Provider>;
@@ -86,3 +76,17 @@ export const useOverlordContext = () => {
   }
   return context;
 };
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ClerkProvider>
+      <SessionProvider>
+        <QueryClientProvider client={queryClient}>
+          <PetalProvider>
+            <OverlordProvider>{children}</OverlordProvider>
+          </PetalProvider>
+        </QueryClientProvider>
+      </SessionProvider>
+    </ClerkProvider>
+  );
+}

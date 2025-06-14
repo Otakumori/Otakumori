@@ -72,34 +72,38 @@ async function updatePrintifyProducts() {
     // Fetch products with retry logic
     const products = await withRetry(fetchPrintifyProducts);
 
-    // Filter and transform products for Abyss section
-    const abyssProducts = products.data
-      .filter(product => product.tags.includes('abyss') || product.tags.includes('r18'))
-      .map(product => ({
-        id: product.id,
-        name: product.title,
-        description: product.description,
-        price: product.variants[0].price,
-        image: product.images[0].src,
-        tags: product.tags,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }));
+    // Transform products for database
+    const transformedProducts = products.data.map(product => ({
+      printify_id: product.id,
+      title: product.title,
+      description: product.description,
+      images: product.images.map(img => img.src),
+      variants: product.variants,
+      tags: product.tags,
+      price: product.variants[0].price / 100, // Convert cents to dollars
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
 
-    console.log(`Found ${abyssProducts.length} Abyss products`);
+    console.log(`Found ${transformedProducts.length} products`);
 
-    // Update Supabase cache with retry logic
-    if (abyssProducts.length > 0) {
+    // Update Supabase with retry logic
+    if (transformedProducts.length > 0) {
       await withRetry(async () => {
-        const { error: updateError } = await supabase.from('abyss_products').upsert(abyssProducts);
+        const { error: updateError } = await supabase
+          .from('products')
+          .upsert(transformedProducts, {
+            onConflict: 'printify_id',
+            ignoreDuplicates: false,
+          });
 
         if (updateError) throw updateError;
         console.log('Successfully updated products in Supabase');
       });
     }
 
-    return abyssProducts;
+    return transformedProducts;
   } catch (error) {
     console.error('Error updating Printify products:', error);
     throw error;

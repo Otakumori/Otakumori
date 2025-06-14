@@ -12,16 +12,19 @@ create table if not exists public.soapstone_messages (
 alter table public.soapstone_messages enable row level security;
 
 -- Create policies
+DROP POLICY IF EXISTS "Anyone can view messages" ON public.soapstone_messages;
 create policy "Anyone can view messages"
   on public.soapstone_messages
   for select
   using (true);
 
+DROP POLICY IF EXISTS "Authenticated users can insert messages" ON public.soapstone_messages;
 create policy "Authenticated users can insert messages"
   on public.soapstone_messages
   for insert
   with check (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "Users can update their own messages" ON public.soapstone_messages;
 create policy "Users can update their own messages"
   on public.soapstone_messages
   for update
