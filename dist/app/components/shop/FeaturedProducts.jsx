@@ -1,0 +1,87 @@
+'use strict';
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
+Object.defineProperty(exports, '__esModule', { value: true });
+exports.FeaturedProducts = FeaturedProducts;
+const react_1 = __importDefault(require('react'));
+const framer_motion_1 = require('framer-motion');
+const link_1 = __importDefault(require('next/link'));
+const image_1 = __importDefault(require('next/image'));
+const AuthContext_1 = require('@/app/contexts/AuthContext');
+function FeaturedProducts() {
+  const { isAgeVerified } = (0, AuthContext_1.useAuth)();
+  const [products, setProducts] = react_1.default.useState([]);
+  const [isLoading, setIsLoading] = react_1.default.useState(true);
+  react_1.default.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products/featured');
+        if (!response.ok) throw new Error('Failed to fetch products');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="animate-pulse rounded-lg bg-gray-800/50 p-4">
+            <div className="mb-4 aspect-square rounded-lg bg-gray-700" />
+            <div className="mb-2 h-6 w-3/4 rounded bg-gray-700" />
+            <div className="h-4 w-1/2 rounded bg-gray-700" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {products
+        .filter(product => !product.isNSFW || isAgeVerified)
+        .map((product, index) => (
+          <framer_motion_1.motion.div
+            key={product.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <link_1.default href={`/shop/${product.id}`}>
+              <div className="group relative overflow-hidden rounded-lg bg-gray-800/50 transition-colors duration-300 hover:bg-gray-800/70">
+                <div className="relative aspect-square">
+                  <image_1.default
+                    src={product.images[0]}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {product.isNSFW && (
+                    <div className="absolute right-2 top-2 rounded-full bg-pink-600 px-2 py-1 text-xs text-white">
+                      NSFW
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="mb-2 text-xl font-bold text-white">{product.name}</h3>
+                  <p className="mb-4 line-clamp-2 text-sm text-gray-300">{product.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-pink-500">${product.price.toFixed(2)}</span>
+                    <span className="text-sm text-white/50">View Details →</span>
+                  </div>
+                </div>
+              </div>
+            </link_1.default>
+          </framer_motion_1.motion.div>
+        ))}
+    </div>
+  );
+}

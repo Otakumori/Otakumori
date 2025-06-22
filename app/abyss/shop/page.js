@@ -17,7 +17,7 @@ export default function ShopPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Shop</h1>
+      <h1 className="mb-6 text-3xl font-bold">Shop</h1>
       <div className="mb-4">
         <p>Your Petals: {petals}</p>
       </div>

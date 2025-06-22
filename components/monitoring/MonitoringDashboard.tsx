@@ -1,6 +1,15 @@
+'use client';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -80,21 +89,18 @@ export function MonitoringDashboard() {
       try {
         const [metricsRes, healthRes] = await Promise.all([
           fetch('/api/metrics'),
-          fetch('/api/health')
+          fetch('/api/health'),
         ]);
 
         if (!metricsRes.ok || !healthRes.ok) {
           throw new Error('Failed to fetch data');
         }
 
-        const [metricsData, healthData] = await Promise.all([
-          metricsRes.json(),
-          healthRes.json()
-        ]);
+        const [metricsData, healthData] = await Promise.all([metricsRes.json(), healthRes.json()]);
 
         setMetrics(metricsData);
         setHealth(healthData);
-        
+
         // Play subtle sound on data update
         playSound('notification');
         vibrate('light');
@@ -119,11 +125,7 @@ export function MonitoringDashboard() {
 
   if (loading) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="space-y-4"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
         <Skeleton className="h-8 w-[200px]" />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -176,7 +178,9 @@ export function MonitoringDashboard() {
               <AlertTitle>System Health</AlertTitle>
               <AlertDescription>
                 <div className="space-y-2">
-                  <p>{health.message} (Last checked: {new Date(health.lastChecked).toLocaleString()})</p>
+                  <p>
+                    {health.message} (Last checked: {new Date(health.lastChecked).toLocaleString()})
+                  </p>
                   <div className="flex gap-4">
                     <Badge variant={getHealthVariant(health.services.database.status)}>
                       Database: {health.services.database.status}
@@ -202,14 +206,11 @@ export function MonitoringDashboard() {
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
       >
         {/* System Metrics Cards */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
               <motion.div
@@ -220,23 +221,24 @@ export function MonitoringDashboard() {
               >
                 {latestMetrics?.activeUsers || 0}
               </motion.div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {latestMetrics?.activeUsers > metrics[metrics.length - 2]?.activeUsers ? '+' : '-'}
-                {Math.abs((latestMetrics?.activeUsers || 0) - (metrics[metrics.length - 2]?.activeUsers || 0))} from last check
+                {Math.abs(
+                  (latestMetrics?.activeUsers || 0) -
+                    (metrics[metrics.length - 2]?.activeUsers || 0)
+                )}{' '}
+                from last check
               </p>
             </CardContent>
           </Card>
         </motion.div>
 
         {/* Response Time Card */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Response Time</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Clock className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
               <motion.div
@@ -247,23 +249,26 @@ export function MonitoringDashboard() {
               >
                 {latestMetrics?.avgResponseTime || 0}ms
               </motion.div>
-              <p className="text-xs text-muted-foreground">
-                {latestMetrics?.avgResponseTime < metrics[metrics.length - 2]?.avgResponseTime ? '+' : '-'}
-                {Math.abs((latestMetrics?.avgResponseTime || 0) - (metrics[metrics.length - 2]?.avgResponseTime || 0))}ms from last check
+              <p className="text-muted-foreground text-xs">
+                {latestMetrics?.avgResponseTime < metrics[metrics.length - 2]?.avgResponseTime
+                  ? '+'
+                  : '-'}
+                {Math.abs(
+                  (latestMetrics?.avgResponseTime || 0) -
+                    (metrics[metrics.length - 2]?.avgResponseTime || 0)
+                )}
+                ms from last check
               </p>
             </CardContent>
           </Card>
         </motion.div>
 
         {/* CPU Usage Card */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">CPU Usage</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
+              <Activity className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
               <motion.div
@@ -274,23 +279,21 @@ export function MonitoringDashboard() {
               >
                 {latestMetrics?.cpu || 0}%
               </motion.div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {latestMetrics?.cpu < metrics[metrics.length - 2]?.cpu ? '+' : '-'}
-                {Math.abs((latestMetrics?.cpu || 0) - (metrics[metrics.length - 2]?.cpu || 0))}% from last check
+                {Math.abs((latestMetrics?.cpu || 0) - (metrics[metrics.length - 2]?.cpu || 0))}%
+                from last check
               </p>
             </CardContent>
           </Card>
         </motion.div>
 
         {/* Memory Usage Card */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Memory Usage</CardTitle>
-              <Server className="h-4 w-4 text-muted-foreground" />
+              <Server className="text-muted-foreground h-4 w-4" />
             </CardHeader>
             <CardContent>
               <motion.div
@@ -301,9 +304,12 @@ export function MonitoringDashboard() {
               >
                 {latestMetrics?.memory || 0}%
               </motion.div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {latestMetrics?.memory < metrics[metrics.length - 2]?.memory ? '+' : '-'}
-                {Math.abs((latestMetrics?.memory || 0) - (metrics[metrics.length - 2]?.memory || 0))}% from last check
+                {Math.abs(
+                  (latestMetrics?.memory || 0) - (metrics[metrics.length - 2]?.memory || 0)
+                )}
+                % from last check
               </p>
             </CardContent>
           </Card>
@@ -328,7 +334,9 @@ export function MonitoringDashboard() {
             >
               <Card>
                 <CardHeader>
-                  <CardTitle>{activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Metrics</CardTitle>
+                  <CardTitle>
+                    {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} Metrics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[400px]">
@@ -337,12 +345,10 @@ export function MonitoringDashboard() {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                           dataKey="timestamp"
-                          tickFormatter={(value) => new Date(value).toLocaleTimeString()}
+                          tickFormatter={value => new Date(value).toLocaleTimeString()}
                         />
                         <YAxis />
-                        <Tooltip
-                          labelFormatter={(value) => new Date(value).toLocaleString()}
-                        />
+                        <Tooltip labelFormatter={value => new Date(value).toLocaleString()} />
                         <Line
                           type="monotone"
                           dataKey="activeUsers"
@@ -355,12 +361,7 @@ export function MonitoringDashboard() {
                           stroke="#82ca9d"
                           name="Response Time (ms)"
                         />
-                        <Line
-                          type="monotone"
-                          dataKey="cpu"
-                          stroke="#ffc658"
-                          name="CPU Usage (%)"
-                        />
+                        <Line type="monotone" dataKey="cpu" stroke="#ffc658" name="CPU Usage (%)" />
                         <Line
                           type="monotone"
                           dataKey="memory"
@@ -378,4 +379,4 @@ export function MonitoringDashboard() {
       </Tabs>
     </motion.div>
   );
-} 
+}

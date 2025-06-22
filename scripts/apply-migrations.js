@@ -15,7 +15,10 @@ Object.keys(envConfig).forEach(key => {
 // Debug logging
 console.log('Environment variables loaded:');
 console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log('POSTGRES_SUPABASE_SERVICE_ROLE_KEY:', process.env.POSTGRES_SUPABASE_SERVICE_ROLE_KEY ? '***' : 'undefined');
+console.log(
+  'POSTGRES_SUPABASE_SERVICE_ROLE_KEY:',
+  process.env.POSTGRES_SUPABASE_SERVICE_ROLE_KEY ? '***' : 'undefined'
+);
 
 // Validate environment variables
 const requiredEnvVars = {
@@ -43,7 +46,7 @@ async function executeSql(sql) {
   try {
     // Use the SQL API to execute SQL
     const { data, error } = await supabase.rpc('exec_sql', { query: sql });
-    
+
     if (error) {
       throw error;
     }
@@ -62,18 +65,16 @@ async function applyMigrations() {
     // Read migrations directory
     const migrationsDir = path.join(__dirname, '..', 'supabase', 'migrations');
     const files = await fs.promises.readdir(migrationsDir);
-    
+
     // Sort files by name (which includes timestamp)
-    const migrationFiles = files
-      .filter(file => file.endsWith('.sql'))
-      .sort();
+    const migrationFiles = files.filter(file => file.endsWith('.sql')).sort();
 
     console.log(`Found ${migrationFiles.length} migration files`);
 
     // Apply each migration
     for (const file of migrationFiles) {
       console.log(`Applying migration: ${file}`);
-      
+
       const filePath = path.join(migrationsDir, file);
       const sql = await fs.promises.readFile(filePath, 'utf8');
 
@@ -111,4 +112,4 @@ applyMigrations()
   .catch(error => {
     console.error('Migration process failed:', error);
     process.exit(1);
-  }); 
+  });

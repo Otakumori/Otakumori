@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { motion } from 'framer-motion';
 
@@ -22,7 +23,7 @@ const BubbleText = ({ text, className = '' }: BubbleTextProps) => {
             duration: 1.5,
             repeat: Infinity,
             delay: index * 0.1,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         >
           {char === ' ' ? '\u00A0' : char}
@@ -32,4 +33,4 @@ const BubbleText = ({ text, className = '' }: BubbleTextProps) => {
   );
 };
 
-export default BubbleText; 
+export default BubbleText;

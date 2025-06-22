@@ -1,38 +1,30 @@
 {
   "version": 2,
+  "name": "otaku-mori",
   "builds": [
     {
-      "src": "next.config.ts",
+      "src": "package.json",
       "use": "@vercel/next"
-    },
-    {
-      "src": "scripts/cron.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/$1",
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept"
-      }
-    }
-  ],
-  "crons": [
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
     {
-      "path": "/api/cron",
-      "schedule": "0 0 * * *"
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ],
-  "build": {
-    "env": {
-      "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
     }
   },
-  "installCommand": "npm install --legacy-peer-deps",
   "headers": [
     {
       "source": "/(.*)",
@@ -48,8 +40,55 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
         }
       ]
     }
-  ]
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "github": {
+    "silent": true
+  }
 }

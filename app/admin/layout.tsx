@@ -12,7 +12,7 @@ import {
   FileText,
   Shield,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 
 const navigation = [
@@ -24,24 +24,18 @@ const navigation = [
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Mobile sidebar */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 lg:hidden',
-          sidebarOpen ? 'block' : 'hidden'
-        )}
-      >
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+      <div className={cn('fixed inset-0 z-40 lg:hidden', sidebarOpen ? 'block' : 'hidden')}>
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4">
             <h1 className="text-xl font-bold">Admin Panel</h1>
@@ -53,7 +47,7 @@ export default function AdminLayout({
             </button>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
+            {navigation.map(item => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -87,7 +81,7 @@ export default function AdminLayout({
             <h1 className="text-xl font-bold">Admin Panel</h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
+            {navigation.map(item => {
               const isActive = pathname === item.href;
               return (
                 <Link
@@ -126,19 +120,17 @@ export default function AdminLayout({
           </button>
           <div className="flex flex-1 justify-between px-4">
             <div className="flex flex-1">
-              <h2 className="text-2xl font-semibold text-gray-900 my-auto">
-                {navigation.find((item) => item.href === pathname)?.name || 'Admin'}
+              <h2 className="my-auto text-2xl font-semibold text-gray-900">
+                {navigation.find(item => item.href === pathname)?.name || 'Admin'}
               </h2>
             </div>
           </div>
         </div>
 
         <main className="py-6">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {children}
-          </div>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{children}</div>
         </main>
       </div>
     </div>
   );
-} 
+}

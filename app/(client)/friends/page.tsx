@@ -1,10 +1,10 @@
 'use client';
 
-import { FriendList } from '@/app/components/FriendList';
-import { Leaderboard } from '@/app/components/Leaderboard';
-import { FriendActivity } from '@/app/components/FriendActivity';
+import { FriendList } from '@/components/FriendList';
+import { Leaderboard } from '@/components/Leaderboard';
+import { FriendActivity } from '@/components/FriendActivity';
+import { AsciiArt } from '@/components/AsciiArt';
 import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
-import { AsciiArt } from '@/app/components/AsciiArt';
 
 export default function FriendsPage() {
   const entries = useLeaderboardStore(state => state.entries);

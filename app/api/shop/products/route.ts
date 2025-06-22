@@ -1,88 +1,85 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { fetchProducts } from '@/utils/printifyAPI';
+import { supabase, handleSupabaseError } from '@/utils/supabase/client';
 
-const PRINTIFY_API_URL = 'https://api.printify.com/v1';
-const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID;
-const PRINTIFY_API_KEY = env.PRINTIFY_API_KEY;
+interface PrintifyImage {
+  src: string;
+  variant_ids: string[];
+  position: string;
+  is_default: boolean;
+}
 
-// Initialize Supabase client
-const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL!,
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+interface PrintifyVariant {
+  id: string;
+  title: string;
+  price: number;
+  is_enabled: boolean;
+  is_default: boolean;
+  sku: string;
+}
+
+interface PrintifyProduct {
+  id: string;
+  title: string;
+  description: string;
+  images: PrintifyImage[];
+  variants: PrintifyVariant[];
+  tags: string[];
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export async function GET() {
   try {
-    // First check if we have cached products in Supabase
-    // Explicitly select columns to potentially help with schema caching issues
-    const { data: cachedProducts, error: cacheError } = await supabase
-      .from('products')
-      .select('id, title, description, images, tags, variants, is_active, created_at, updated_at');
+    // Fetch products from Printify
+    const printifyProducts: any = await fetchProducts();
 
-    if (cacheError) throw cacheError;
+    // Type guard: check if printifyProducts has a data property
+    const productsArray = Array.isArray(printifyProducts)
+      ? printifyProducts
+      : printifyProducts && Array.isArray(printifyProducts.data)
+        ? printifyProducts.data
+        : [];
 
-    // If we have cached products and they're less than 1 hour old, return them
-    if (cachedProducts?.length > 0) {
-      // Ensure cachedProducts[0].updated_at is treated as a string for Date constructor
-      const lastUpdate = new Date(cachedProducts[0].updated_at as string);
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-
-      if (lastUpdate > oneHourAgo) {
-        return NextResponse.json({ products: cachedProducts });
-      }
-    }
-
-    // Fetch fresh products from Printify
-    const response = await fetch(`${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products.json`, {
-      headers: {
-        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Printify API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    // Transform products for our use
-    const products = data.data.map((product: any) => ({
+    // Transform and store in Supabase
+    const transformedProducts = productsArray.map((product: PrintifyProduct) => ({
       id: product.id,
       title: product.title,
       description: product.description,
-      images: product.images.map((img: any) => img.src),
+      price: product.variants[0]?.price / 100 || 0,
+      images: product.images.map((img: PrintifyImage) => img.src),
+      variants: product.variants,
+      category: product.tags[0] || 'Other',
       tags: product.tags,
-      variants: product.variants.map((variant: any) => ({
-        id: variant.id,
-        price: variant.price,
-        title: variant.title,
-      })),
-      is_active: true, // Still include is_active when creating/updating in Supabase
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      metadata: {
+        printify_id: product.id,
+        published: product.published,
+        created_at: product.created_at,
+        updated_at: product.updated_at,
+      },
     }));
 
-    // Update Supabase cache
-    if (products.length > 0) {
-      const { error: updateError } = await supabase.from('products').upsert(products);
-      if (updateError) throw updateError;
+    // Upsert products to Supabase
+    const { error } = await supabase.from('products').upsert(transformedProducts, {
+      onConflict: 'id',
+      ignoreDuplicates: false,
+    });
+
+    if (error) {
+      handleSupabaseError(error);
     }
 
-    return NextResponse.json({ products });
+    return NextResponse.json({ products: transformedProducts }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching products:', error);
-    // Provide a more specific error response if it's a database error
-    if (error instanceof Error) {
-       return NextResponse.json(
-        { error: `Database Error: ${error.message}` },
-        { status: 500 }
-      );
-    } else {
-       return NextResponse.json(
-        { error: 'Failed to fetch products' },
-        { status: 500 }
-      );
-    }
+    console.error('Error in /api/shop/products:', error);
+
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
+        timestamp: new Date().toISOString(),
+      },
+      { status: error instanceof Error && error.message.includes('Authentication') ? 401 : 500 }
+    );
   }
-} 
+}

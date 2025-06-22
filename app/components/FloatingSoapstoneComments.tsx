@@ -1,7 +1,8 @@
 'use client';
+'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMessageCircle, FiX } from 'react-icons/fi';
 

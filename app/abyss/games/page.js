@@ -16,20 +16,20 @@ export default function GamesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Games</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <h1 className="mb-6 text-3xl font-bold">Games</h1>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Link
           href="/abyss/games/mini-games"
-          className="p-6 border rounded-lg hover:shadow-lg transition-shadow"
+          className="rounded-lg border p-6 transition-shadow hover:shadow-lg"
         >
-          <h2 className="text-2xl font-semibold mb-2">Mini Games</h2>
+          <h2 className="mb-2 text-2xl font-semibold">Mini Games</h2>
           <p>Play quick and fun mini-games to earn petals!</p>
         </Link>
         <Link
           href="/abyss/games/petal-collection"
-          className="p-6 border rounded-lg hover:shadow-lg transition-shadow"
+          className="rounded-lg border p-6 transition-shadow hover:shadow-lg"
         >
-          <h2 className="text-2xl font-semibold mb-2">Petal Collection</h2>
+          <h2 className="mb-2 text-2xl font-semibold">Petal Collection</h2>
           <p>Collect and manage your petals in this special game.</p>
         </Link>
       </div>

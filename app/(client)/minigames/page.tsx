@@ -1,4 +1,5 @@
 'use client';
+'use client';
 import Header from '../../components/Header';
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
@@ -143,15 +144,15 @@ export default function MiniGamesPage() {
               className="relative h-64 w-64"
             >
               {/* Cube Faces */}
-              <div className="absolute inset-0 transform-gpu preserve-3d">
+              <div className="preserve-3d absolute inset-0 transform-gpu">
                 {/* Front Face */}
                 <motion.div
                   whileHover={{ scale: 1.1, z: 50 }}
-                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  className="absolute inset-0 flex items-center justify-center border-2 border-pink-500/50 bg-pink-500/20 backdrop-blur-sm"
                 >
                   <button
-                    onClick={() => window.location.href = '/'}
-                    className="text-white font-bold"
+                    onClick={() => (window.location.href = '/')}
+                    className="font-bold text-white"
                   >
                     Main Menu
                   </button>
@@ -160,12 +161,12 @@ export default function MiniGamesPage() {
                 {/* Right Face */}
                 <motion.div
                   whileHover={{ scale: 1.1, z: 50 }}
-                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  className="absolute inset-0 flex items-center justify-center border-2 border-pink-500/50 bg-pink-500/20 backdrop-blur-sm"
                   style={{ transform: 'rotateY(90deg) translateZ(128px)' }}
                 >
                   <button
-                    onClick={() => window.location.href = '/minigames'}
-                    className="text-white font-bold"
+                    onClick={() => (window.location.href = '/minigames')}
+                    className="font-bold text-white"
                   >
                     Mini Games
                   </button>
@@ -174,12 +175,12 @@ export default function MiniGamesPage() {
                 {/* Back Face */}
                 <motion.div
                   whileHover={{ scale: 1.1, z: 50 }}
-                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  className="absolute inset-0 flex items-center justify-center border-2 border-pink-500/50 bg-pink-500/20 backdrop-blur-sm"
                   style={{ transform: 'rotateY(180deg) translateZ(128px)' }}
                 >
                   <button
-                    onClick={() => window.location.href = '/achievements'}
-                    className="text-white font-bold"
+                    onClick={() => (window.location.href = '/achievements')}
+                    className="font-bold text-white"
                   >
                     Achievements
                   </button>
@@ -188,12 +189,12 @@ export default function MiniGamesPage() {
                 {/* Left Face */}
                 <motion.div
                   whileHover={{ scale: 1.1, z: 50 }}
-                  className="absolute inset-0 flex items-center justify-center bg-pink-500/20 backdrop-blur-sm border-2 border-pink-500/50"
+                  className="absolute inset-0 flex items-center justify-center border-2 border-pink-500/50 bg-pink-500/20 backdrop-blur-sm"
                   style={{ transform: 'rotateY(-90deg) translateZ(128px)' }}
                 >
                   <button
-                    onClick={() => window.location.href = '/savefiles'}
-                    className="text-white font-bold"
+                    onClick={() => (window.location.href = '/savefiles')}
+                    className="font-bold text-white"
                   >
                     Save Files
                   </button>

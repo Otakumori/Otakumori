@@ -67,5 +67,5 @@ export default function BootCube3D({ textures }: BootCube3DProps) {
     };
   }, [textures]);
 
-  return <div ref={mountRef} className="w-full h-full" />;
-} 
+  return <div ref={mountRef} className="h-full w-full" />;
+}

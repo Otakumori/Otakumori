@@ -20,7 +20,7 @@ async function monitorSystem() {
     errorRate: 5, // 5% error rate
     responseTime: 1000, // 1 second
     dbConnections: 80, // 80% of max connections
-    cacheHitRate: 50 // 50% cache hit rate
+    cacheHitRate: 50, // 50% cache hit rate
   };
 
   async function checkAlerts(metrics) {
@@ -77,10 +77,17 @@ async function monitorSystem() {
     // Trends
     if (lastMetrics) {
       console.log('Trends:');
-      const cpuTrend = metrics.cpu > lastMetrics.cpu ? '↑' : metrics.cpu < lastMetrics.cpu ? '↓' : '→';
-      const memoryTrend = metrics.memory > lastMetrics.memory ? '↑' : metrics.memory < lastMetrics.memory ? '↓' : '→';
-      const errorTrend = metrics.errorRate > lastMetrics.errorRate ? '↑' : metrics.errorRate < lastMetrics.errorRate ? '↓' : '→';
-      
+      const cpuTrend =
+        metrics.cpu > lastMetrics.cpu ? '↑' : metrics.cpu < lastMetrics.cpu ? '↓' : '→';
+      const memoryTrend =
+        metrics.memory > lastMetrics.memory ? '↑' : metrics.memory < lastMetrics.memory ? '↓' : '→';
+      const errorTrend =
+        metrics.errorRate > lastMetrics.errorRate
+          ? '↑'
+          : metrics.errorRate < lastMetrics.errorRate
+            ? '↓'
+            : '→';
+
       console.log(`CPU: ${cpuTrend} (${lastMetrics.cpu}% → ${metrics.cpu}%)`);
       console.log(`Memory: ${memoryTrend} (${lastMetrics.memory}% → ${metrics.memory}%)`);
       console.log(`Error Rate: ${errorTrend} (${lastMetrics.errorRate}% → ${metrics.errorRate}%)`);
@@ -105,7 +112,6 @@ async function monitorSystem() {
         console.error('Error collecting metrics:', error.message);
       }
     }, 5000); // Update every 5 seconds
-
   } catch (error) {
     logger.error('Error in system monitoring:', error);
     console.error('Error in system monitoring:', error.message);
@@ -119,4 +125,4 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-monitorSystem(); 
+monitorSystem();

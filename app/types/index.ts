@@ -69,4 +69,4 @@ export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
-} 
+}

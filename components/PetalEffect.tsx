@@ -1,3 +1,4 @@
+'use client';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { petalFloat } from '@/lib/animations';
 import { useSound } from '@/lib/hooks/useSound';

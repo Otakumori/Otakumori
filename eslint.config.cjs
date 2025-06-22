@@ -1,6 +1,6 @@
-const { FlatCompat } = require("@eslint/eslintrc");
-const tseslint = require("typescript-eslint");
-const drizzle = require("eslint-plugin-drizzle");
+const { FlatCompat } = require('@eslint/eslintrc');
+const tseslint = require('typescript-eslint');
+const drizzle = require('eslint-plugin-drizzle');
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -8,11 +8,11 @@ const compat = new FlatCompat({
 
 module.exports = tseslint.config(
   {
-    ignores: [".next"],
+    ignores: ['.next'],
   },
-  ...compat.extends("next/core-web-vitals"),
+  ...compat.extends('next/core-web-vitals'),
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ['**/*.ts', '**/*.tsx'],
     plugins: {
       drizzle,
     },
@@ -22,29 +22,20 @@ module.exports = tseslint.config(
       ...tseslint.configs.stylisticTypeChecked,
     ],
     rules: {
-      "@typescript-eslint/array-type": "off",
-      "@typescript-eslint/consistent-type-definitions": "off",
-      "@typescript-eslint/consistent-type-imports": [
-        "warn",
-        { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      '@typescript-eslint/array-type': 'off',
+      '@typescript-eslint/consistent-type-definitions': 'off',
+      '@typescript-eslint/consistent-type-imports': [
+        'warn',
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_" },
-      ],
-      "@typescript-eslint/require-await": "off",
-      "@typescript-eslint/no-misused-promises": [
-        "error",
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
         { checksVoidReturn: { attributes: false } },
       ],
-      "drizzle/enforce-delete-with-where": [
-        "error",
-        { drizzleObjectName: ["db", "ctx.db"] },
-      ],
-      "drizzle/enforce-update-with-where": [
-        "error",
-        { drizzleObjectName: ["db", "ctx.db"] },
-      ],
+      'drizzle/enforce-delete-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],
+      'drizzle/enforce-update-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],
     },
   },
   {

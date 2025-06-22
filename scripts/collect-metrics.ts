@@ -6,7 +6,7 @@ async function collectMetrics() {
   try {
     // Collect current metrics
     const metrics = await monitor.collectMetrics();
-    
+
     // Store metrics in Redis with timestamp as score
     await redis.zadd('system:metrics', {
       score: Date.now(),
@@ -27,7 +27,7 @@ async function collectMetrics() {
 setInterval(collectMetrics, 60 * 1000);
 
 // Initial collection
-collectMetrics().catch((error) => {
+collectMetrics().catch(error => {
   logger.error('Failed to collect initial metrics:', error);
   process.exit(1);
-}); 
+});

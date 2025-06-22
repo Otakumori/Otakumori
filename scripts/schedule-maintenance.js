@@ -57,4 +57,4 @@ logger.info('Maintenance scheduler started');
 process.on('SIGINT', () => {
   logger.info('Maintenance scheduler stopped');
   process.exit(0);
-}); 
+});

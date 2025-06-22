@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -51,31 +52,25 @@ export default function Achievements() {
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {achievements.map((achievement) => (
+      {achievements.map(achievement => (
         <motion.div
           key={achievement.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ scale: 1.02 }}
           className={`relative overflow-hidden rounded-lg border p-6 ${
-            achievement.unlocked
-              ? 'border-pink-200 bg-white'
-              : 'border-gray-200 bg-gray-50'
+            achievement.unlocked ? 'border-pink-200 bg-white' : 'border-gray-200 bg-gray-50'
           }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               {achievement.icon === 'trophy' ? (
                 <Trophy
-                  className={`h-6 w-6 ${
-                    achievement.unlocked ? 'text-pink-500' : 'text-gray-400'
-                  }`}
+                  className={`h-6 w-6 ${achievement.unlocked ? 'text-pink-500' : 'text-gray-400'}`}
                 />
               ) : (
                 <Star
-                  className={`h-6 w-6 ${
-                    achievement.unlocked ? 'text-pink-500' : 'text-gray-400'
-                  }`}
+                  className={`h-6 w-6 ${achievement.unlocked ? 'text-pink-500' : 'text-gray-400'}`}
                 />
               )}
               <div>
@@ -83,9 +78,7 @@ export default function Achievements() {
                 <p className="mt-1 text-sm text-gray-500">{achievement.description}</p>
               </div>
             </div>
-            {!achievement.unlocked && (
-              <Lock className="h-5 w-5 text-gray-400" />
-            )}
+            {!achievement.unlocked && <Lock className="h-5 w-5 text-gray-400" />}
           </div>
           {achievement.progress !== undefined && (
             <div className="mt-4">
@@ -95,9 +88,7 @@ export default function Achievements() {
                   style={{ width: `${achievement.progress}%` }}
                 />
               </div>
-              <p className="mt-1 text-right text-sm text-gray-500">
-                {achievement.progress}%
-              </p>
+              <p className="mt-1 text-right text-sm text-gray-500">{achievement.progress}%</p>
             </div>
           )}
         </motion.div>

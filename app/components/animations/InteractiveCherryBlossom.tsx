@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Petal, Progress } from '@/app/types';
+import { Petal } from '@/types';
 
 const InteractiveCherryBlossom: React.FC = () => {
   const [petals, setPetals] = useState<Petal[]>([]);
@@ -51,7 +51,7 @@ const InteractiveCherryBlossom: React.FC = () => {
     const interval = setInterval(() => {
       setPetals(prev => [
         ...prev.filter(p => !p.collected && p.y <= containerSize.height + p.size), // Keep active petals within bounds
-        createPetal()
+        createPetal(),
       ]);
     }, 500); // Add a new petal every 500ms
 
@@ -66,48 +66,48 @@ const InteractiveCherryBlossom: React.FC = () => {
     return () => clearInterval(cleanupInterval);
   }, [containerSize]);
 
-
   return (
-    <div ref={containerRef} className="relative w-full h-screen overflow-hidden">
+    <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/90" />
       <img
         src="/assets/cherry.jpg"
         alt="Cherry Blossom Background"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover"
       />
 
       <AnimatePresence>
-        {petals.map(petal => (
-          !petal.collected && (
-            <motion.div
-              key={petal.id}
-              className="absolute cursor-pointer top-0 left-0"
-              initial={{ x: petal.x, y: petal.y, opacity: 1 }}
-              animate={{
-                y: containerSize.height + petal.size, // Fall to bottom of container
-                x: petal.x + (Math.random() * 200 - 100), // Horizontal drift
-                opacity: 0,
-                rotate: Math.random() * 360 + 180, // Rotate
-              }}
-              transition={{
-                duration: petal.duration,
-                delay: petal.delay,
-                ease: "linear",
-                repeat: Infinity, // Petals keep falling
-                repeatType: "loop",
-              }}
-              style={{
-                width: petal.size,
-                height: petal.size,
-              }}
-            >
-              <div className="w-full h-full bg-pink-300 rounded-full"></div>
-            </motion.div>
-          )
-        ))}
+        {petals.map(
+          petal =>
+            !petal.collected && (
+              <motion.div
+                key={petal.id}
+                className="absolute left-0 top-0 cursor-pointer"
+                initial={{ x: petal.x, y: petal.y, opacity: 1 }}
+                animate={{
+                  y: containerSize.height + petal.size, // Fall to bottom of container
+                  x: petal.x + (Math.random() * 200 - 100), // Horizontal drift
+                  opacity: 0,
+                  rotate: Math.random() * 360 + 180, // Rotate
+                }}
+                transition={{
+                  duration: petal.duration,
+                  delay: petal.delay,
+                  ease: 'linear',
+                  repeat: Infinity, // Petals keep falling
+                  repeatType: 'loop',
+                }}
+                style={{
+                  width: petal.size,
+                  height: petal.size,
+                }}
+              >
+                <div className="h-full w-full rounded-full bg-pink-300"></div>
+              </motion.div>
+            )
+        )}
       </AnimatePresence>
     </div>
   );
 };
 
-export default InteractiveCherryBlossom; 
+export default InteractiveCherryBlossom;

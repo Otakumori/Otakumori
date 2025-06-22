@@ -1,3 +1,4 @@
+'use client';
 import { useEffect, useState } from 'react';
 import { monitor } from '@/lib/monitor';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +26,9 @@ export function FrontendMonitor() {
   useEffect(() => {
     const collectFrontendMetrics = async () => {
       // Get performance metrics
-      const performanceMetrics = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      const performanceMetrics = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
       const memory = (performance as any).memory;
       const domNodes = document.getElementsByTagName('*').length;
       const resourcesLoaded = performance.getEntriesByType('resource').length;
@@ -45,7 +48,7 @@ export function FrontendMonitor() {
           fps = Math.round((frameCount * 1000) / elapsed);
           const expectedFrames = Math.round(elapsed / 16.67); // 60 FPS = 16.67ms per frame
           droppedFrames = Math.max(0, expectedFrames - frameCount);
-          
+
           frameCount = 0;
           lastTime = currentTime;
 
@@ -65,7 +68,8 @@ export function FrontendMonitor() {
 
       const newMetrics: FrontendMetrics = {
         pageLoadTime: performanceMetrics.loadEventEnd - performanceMetrics.startTime,
-        firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
+        firstContentfulPaint:
+          performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0,
         timeToInteractive: performanceMetrics.domInteractive - performanceMetrics.startTime,
         jsHeapSize: memory?.usedJSHeapSize || 0,
         jsHeapSizeLimit: memory?.jsHeapSizeLimit || 0,
@@ -109,4 +113,4 @@ export function FrontendMonitor() {
       )}
     </AnimatePresence>
   );
-} 
+}

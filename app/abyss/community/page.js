@@ -33,29 +33,25 @@ export default function CommunityPage() {
     return <div>Please sign in to access the community</div>;
   }
 
-  const handleLike = (postId) => {
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { ...post, likes: post.likes + 1 }
-        : post
-    ));
+  const handleLike = postId => {
+    setPosts(posts.map(post => (post.id === postId ? { ...post, likes: post.likes + 1 } : post)));
   };
 
-  const handleComment = (postId) => {
+  const handleComment = postId => {
     // Implement comment functionality
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Community</h1>
+      <h1 className="mb-6 text-3xl font-bold">Community</h1>
       <div className="mb-4">
         <p>Your Petals: {petals}</p>
       </div>
       <div className="space-y-4">
         {posts.map(post => (
-          <div key={post.id} className="border p-4 rounded-lg">
-            <div className="flex items-center mb-2">
-              <div className="h-8 w-8 rounded-full bg-gray-300 mr-2" />
+          <div key={post.id} className="rounded-lg border p-4">
+            <div className="mb-2 flex items-center">
+              <div className="mr-2 h-8 w-8 rounded-full bg-gray-300" />
               <span className="font-semibold">{post.author}</span>
             </div>
             <p className="mb-2">{post.content}</p>

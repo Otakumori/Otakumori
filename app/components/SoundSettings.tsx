@@ -10,4 +10,4 @@ export const SoundSettings: React.FC = () => {
       <p>Sound Settings Placeholder</p>
     </div>
   );
-}; 
+};

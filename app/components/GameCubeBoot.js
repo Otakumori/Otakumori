@@ -132,12 +132,8 @@ export default function GameCubeBoot({ onBootComplete }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-      <audio
-        ref={audioRef}
-        src="/assets/gamecube-boot.mp3"
-        preload="auto"
-      />
-      
+      <audio ref={audioRef} src="/assets/gamecube-boot.mp3" preload="auto" />
+
       <AnimatePresence mode="wait">
         {stage === 'black' && (
           <motion.div
@@ -151,10 +147,10 @@ export default function GameCubeBoot({ onBootComplete }) {
           <motion.div
             initial={{ scale: 0, rotate: 0 }}
             animate={{ scale: 1, rotate: 360 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
+            transition={{ duration: 1.5, ease: 'easeOut' }}
             className="relative h-64 w-64"
           >
-            <div className="absolute inset-0 animate-spin-slow rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-[0_0_50px_rgba(236,72,153,0.5)]" />
+            <div className="animate-spin-slow absolute inset-0 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 shadow-[0_0_50px_rgba(236,72,153,0.5)]" />
             <div className="absolute inset-2 rounded-lg bg-black" />
             <div className="absolute inset-4 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500" />
           </motion.div>
@@ -166,12 +162,8 @@ export default function GameCubeBoot({ onBootComplete }) {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <h1 className="mb-4 text-4xl font-bold text-pink-500">
-              Welcome to Otakumori
-            </h1>
-            <p className="text-lg text-pink-300">
-              Your anime adventure begins here
-            </p>
+            <h1 className="mb-4 text-4xl font-bold text-pink-500">Welcome to Otakumori</h1>
+            <p className="text-lg text-pink-300">Your anime adventure begins here</p>
           </motion.div>
         )}
       </AnimatePresence>

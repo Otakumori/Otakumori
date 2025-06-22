@@ -76,7 +76,7 @@ async function verifyDatabase() {
 
     // Verify RLS policies
     const { data: policies, error: policiesError } = await supabase.rpc('get_policies');
-    
+
     if (policiesError) {
       console.error('Error checking RLS policies:', policiesError);
       throw policiesError;
@@ -86,7 +86,7 @@ async function verifyDatabase() {
 
     // Verify functions
     const { data: functions, error: functionsError } = await supabase.rpc('get_functions');
-    
+
     if (functionsError) {
       console.error('Error checking functions:', functionsError);
       throw functionsError;
@@ -96,7 +96,7 @@ async function verifyDatabase() {
 
     // Verify triggers
     const { data: triggers, error: triggersError } = await supabase.rpc('get_triggers');
-    
+
     if (triggersError) {
       console.error('Error checking triggers:', triggersError);
       throw triggersError;
@@ -120,4 +120,4 @@ verifyDatabase()
   .catch(error => {
     console.error('Verification process failed:', error);
     process.exit(1);
-  }); 
+  });

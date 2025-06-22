@@ -48,7 +48,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items]);
 
   const updateTotals = (cartItems: CartItem[]) => {
-    const newTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const newTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const newItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
     setTotal(newTotal);
     setItemCount(newItemCount);
@@ -56,10 +56,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (newItem: CartItem) => {
     setItems(currentItems => {
-      const existingItem = currentItems.find(item => 
-        item.id === newItem.id && 
-        (!item.selectedVariant || !newItem.selectedVariant || 
-         item.selectedVariant.id === newItem.selectedVariant.id)
+      const existingItem = currentItems.find(
+        item =>
+          item.id === newItem.id &&
+          (!item.selectedVariant ||
+            !newItem.selectedVariant ||
+            item.selectedVariant.id === newItem.selectedVariant.id)
       );
 
       if (existingItem) {
@@ -85,9 +87,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     setItems(currentItems =>
-      currentItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
+      currentItems.map(item => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
@@ -121,4 +121,4 @@ export function useCart() {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
-} 
+}

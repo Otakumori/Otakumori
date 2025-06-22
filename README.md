@@ -1,406 +1,307 @@
-# 🌸 Otakumori - E-commerce Super Shop : Anime & Gaming Hub
+# 🌸 Otaku-mori - Anime Community Platform
 
-![Screenshot 2024-05-25 131107](https://github.com/user-attachments/assets/bda65d2e-09eb-4468-979a-6c8ac873cf4b)
+A comprehensive anime community platform built with Next.js, featuring user profiles, achievements, admin tools, community features, and more.
 
-Welcome to **Otakumori**, the ultimate blend of **anime aesthetics, interactive gamification, and a thriving otaku community**.  
-A **dynamic, immersive** online store **powered by Printify**, designed for **anime lovers, gamers, and dreamers**.
+## ✨ Features
 
----
+### 🎮 Core Features
 
-## **Features & Integrations**
+- **Memory Cube Boot Sequence** - Interactive startup animation with audio
+- **Achievement System** - Comprehensive achievement tracking with custom icons and petal tiers
+- **Profile System** - Rich user profiles with avatar customization and stats
+- **NSFW Gating** - Age verification and content filtering system
+- **Cherry Blossom Effects** - Beautiful sakura petal animations throughout the site
 
-### **Gamification & Achievements**
+### 👥 Community Features
 
-- **Petal Collecting System** 🌸 (Collect petals through site activity)
-- **Tiered Achievements** (Modeled after PlayStation trophies)
-- **Ranks & Leaderboard System**
+- **Echo Well** - Social media-style community interactions
+- **Petalnotes** - Collaborative knowledge sharing platform
+- **Friend System** - User connections and activity tracking
+- **Community Gallery** - User-generated content showcase
 
-### **GameCube UI + Trade System**
+### 🛍️ E-commerce
 
-- **Floating memory blocks** unlock over time
-- **Steam-style trading** for collectibles & perks
-- **Crafting system** for upgrading perks
+- **Shop Management** - Product catalog with inventory tracking
+- **Cart System** - Shopping cart with persistent state
+- **Order Management** - Complete order processing workflow
+- **Printify Integration** - Print-on-demand product fulfillment
 
-### **E-Commerce with Printify**
+### 🛠️ Admin Dashboard
 
-- **Full Printify API integration**
-- **Dynamic product showcase**
-- **Seamless checkout & tracking**
+- **User Management** - Complete user administration with bulk actions
+- **Content Moderation** - Flagged content and user report management
+- **Analytics Dashboard** - Comprehensive site analytics and metrics
+- **Blog Management** - Content creation and publishing tools
+- **Shop Administration** - Product and order management
+- **Bulk Actions** - Mass operations for efficiency
 
-### **Dark Souls-Style Blog System**
+### 📊 Analytics & Monitoring
 
-- **Users communicate in a lore-rich style**
-- **Pre-set runic phrases, like Dark Souls messages**
+- **Real-time Metrics** - User activity, revenue, and engagement tracking
+- **Performance Monitoring** - System health and error tracking
+- **SEO Optimization** - Search engine optimization tools
+- **Export Capabilities** - Data export for external analysis
 
-### 💬 **Live Chat & Community Comments**
+### 🌍 Internationalization
 
-- **Real-time community chat**
-- **Custom emoji & otaku references**
-- **Admin moderation tools**
+- **Multi-language Support** - English, Japanese, Korean, Chinese, Spanish, French, German, Portuguese
+- **Language Switcher** - Easy language selection with native names
+- **Localized Content** - Region-specific content and formatting
 
----
+### 📱 Mobile Experience
 
-## 🛠️ **Tech Stack**
+- **Mobile Navigation** - Bottom navigation and side menu
+- **Responsive Design** - Optimized for all screen sizes
+- **Touch Interactions** - Mobile-friendly gestures and interactions
+- **Progressive Web App** - App-like experience on mobile devices
 
-| **Technology**        | **Usage**                  |
-| --------------------- | -------------------------- |
-| **React + Vite**      | Frontend Framework         |
-| **TailwindCSS**       | Styling & Animations       |
-| **Supabase**          | Database & Authentication  |
-| **Printify API**      | E-Commerce Backend         |
-| **Vercel**            | Hosting & Deployment       |
-| **Node.js + Express** | Backend (Future Expansion) |
+### 🔔 Notifications & Feedback
 
----
+- **Toast System** - Comprehensive notification system
+- **Achievement Notifications** - Real-time achievement unlocks
+- **Sound Effects** - Audio feedback for interactions
+- **Haptic Feedback** - Mobile vibration feedback
 
-## 🔗 **Follow Otakumori**
+## 🚀 Getting Started
 
-📢 **Website:** [otakumori.com](https://otakumori.com)  
-📸 **Instagram:** [@otakumoriii](https://www.instagram.com/otakumoriii)  
-📘 **Facebook:** [Otakumorii](https://www.facebook.com/Otakumorii)  
-🎮 **Discord:** _Coming Soon_
+### Prerequisites
 
-# Otaku-m
+- Node.js 18+
+- npm or yarn
+- Supabase account (for database)
 
-A modern web application featuring mini-games, user progress tracking, and a beautiful cherry blossom theme.
+### Installation
 
-## Features
-
-- 🎮 Interactive mini-games
-- 🌸 Cherry blossom theme
-- 👤 User authentication and profiles
-- 🏆 Achievement system
-- 💾 Progress tracking
-- 🎨 Modern, responsive design
-
-## Tech Stack
-
-- Next.js 14
-- React 18
-- TypeScript
-- Tailwind CSS
-- Framer Motion
-- Supabase
-- Clerk Authentication
-- Three.js
-- React Three Fiber
-
-## Getting Started
-
-1. Clone the repository:
+1. **Clone the repository**
 
 ```bash
 git clone https://github.com/yourusername/Otakumori.git
 cd Otakumori
 ```
 
-2. Install dependencies:
+2. **Install dependencies**
 
 ```bash
 npm install
 ```
 
-3. Set up environment variables:
-   Create a `.env.local` file in the root directory with the following variables:
+3. **Set up environment variables**
 
-```env
-# NextAuth
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your_nextauth_secret
-
-# OAuth Providers
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
-GOOGLE_ID=your_google_client_id
-GOOGLE_SECRET=your_google_client_secret
-
-# Other environment variables...
+```bash
+cp .env.example .env.local
 ```
 
-4. Run the development server:
+Fill in your environment variables:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+```
+
+4. **Set up the database**
+
+```bash
+npm run db:setup
+npm run db:migrate
+```
+
+5. **Start the development server**
 
 ```bash
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Development
+## 🏗️ Project Structure
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+```
+Otakumori/
+├── app/                          # Next.js 13+ app directory
+│   ├── (auth)/                   # Authentication routes
+│   ├── (client)/                 # Client-side routes
+│   ├── admin/                    # Admin dashboard
+│   ├── api/                      # API routes
+│   ├── components/               # Reusable components
+│   │   ├── achievements/         # Achievement system
+│   │   ├── analytics/            # Analytics dashboard
+│   │   ├── community/            # Community features
+│   │   ├── i18n/                 # Internationalization
+│   │   ├── mobile/               # Mobile components
+│   │   ├── notifications/        # Notification system
+│   │   └── ui/                   # UI components
+│   ├── contexts/                 # React contexts
+│   ├── hooks/                    # Custom hooks
+│   ├── lib/                      # Utility libraries
+│   └── types/                    # TypeScript types
+├── public/                       # Static assets
+├── supabase/                     # Database migrations
+└── scripts/                      # Utility scripts
+```
 
-## Contributing
+## 🎨 Key Components
+
+### Achievement System
+
+- **AchievementCard** - Individual achievement display
+- **AchievementCategories** - Achievement organization
+- **AchievementDetails** - Detailed achievement information
+- **AchievementContext** - Global achievement state management
+
+### Admin Dashboard
+
+- **User Management** - Complete user administration
+- **Content Moderation** - Flagged content handling
+- **Analytics Dashboard** - Site metrics and charts
+- **Shop Management** - Product and order administration
+
+### Community Features
+
+- **Echo Well** - Social media interactions
+- **Petalnotes** - Collaborative knowledge sharing
+- **Friend System** - User connections
+- **Community Gallery** - Content showcase
+
+### Mobile Experience
+
+- **MobileNavigation** - Mobile-optimized navigation
+- **Bottom Navigation** - App-like bottom navigation
+- **Side Menu** - Slide-out navigation menu
+- **Touch Interactions** - Mobile-friendly interactions
+
+## 🔧 API Endpoints
+
+### Admin APIs
+
+- `GET/POST /api/admin/users` - User management
+- `GET/POST /api/admin/blog` - Blog management
+- `GET/POST /api/admin/shop` - Shop management
+- `GET/POST /api/admin/moderation` - Content moderation
+
+### User APIs
+
+- `GET/POST /api/auth/[...nextauth]` - Authentication
+- `GET/POST /api/profile` - Profile management
+- `GET/POST /api/achievements` - Achievement system
+
+### Community APIs
+
+- `GET/POST /api/community/echoes` - Echo Well
+- `GET/POST /api/community/petalnotes` - Petalnotes
+- `GET/POST /api/community/friends` - Friend system
+
+## 🎯 Achievement System
+
+The achievement system features:
+
+- **Custom Icons** - Unique achievement artwork
+- **Petal Tiers** - Bronze, Silver, Gold, Platinum, Diamond
+- **Categories** - Community, Gaming, Collection, Social
+- **Progress Tracking** - Real-time achievement progress
+- **Sound Effects** - Achievement unlock audio
+- **Notifications** - Toast notifications for unlocks
+
+## 🌸 Cherry Blossom Theme
+
+The site features a beautiful cherry blossom aesthetic:
+
+- **Petal Animations** - Drifting sakura petals
+- **Seasonal Changes** - Dynamic theming based on seasons
+- **Mood System** - Different petal behaviors based on user mood
+- **Interactive Elements** - Clickable petals with effects
+
+## 📱 Mobile Optimization
+
+Mobile features include:
+
+- **Bottom Navigation** - Easy thumb navigation
+- **Side Menu** - Comprehensive navigation menu
+- **Touch Gestures** - Swipe and tap interactions
+- **Responsive Design** - Optimized for all screen sizes
+- **Progressive Web App** - App-like experience
+
+## 🌍 Internationalization
+
+Multi-language support includes:
+
+- **8 Languages** - English, Japanese, Korean, Chinese, Spanish, French, German, Portuguese
+- **Native Names** - Language names in their native script
+- **Flag Icons** - Visual language identification
+- **Easy Switching** - One-click language changes
+
+## 🔔 Notification System
+
+Comprehensive notification features:
+
+- **Toast Notifications** - Non-intrusive message display
+- **Multiple Types** - Success, error, warning, info
+- **Auto-dismiss** - Automatic notification cleanup
+- **Action Buttons** - Interactive notification actions
+- **Sound Integration** - Audio notification support
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript checks
+npm run db:setup     # Setup database
+npm run db:migrate   # Run database migrations
+npm run db:seed      # Seed database with sample data
+```
+
+### Code Style
+
+- **TypeScript** - Full type safety
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+- **Tailwind CSS** - Utility-first styling
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Other Platforms
+
+- **Netlify** - Static site hosting
+- **Railway** - Full-stack deployment
+- **Docker** - Containerized deployment
+
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# Otakumori
+## 🙏 Acknowledgments
 
-A modern web application with comprehensive monitoring and maintenance capabilities.
+- **Next.js** - React framework
+- **Supabase** - Backend as a service
+- **Tailwind CSS** - Utility-first CSS framework
+- **Lucide React** - Beautiful icons
+- **Framer Motion** - Animation library
 
-## Features
+## 📞 Support
 
-- Real-time system monitoring dashboard
-- Automated database maintenance
-- System health checks
-- Log rotation and management
-- Performance metrics collection
-- Health report generation
+For support, email support@otaku-mori.com or join our Discord community.
 
-## Monitoring Dashboard
+---
 
-The monitoring dashboard provides real-time insights into system performance:
-
-- Active users tracking
-- Response time monitoring
-- CPU and memory usage
-- Database connection statistics
-- System health status
-
-## Maintenance Tasks
-
-The system includes several automated maintenance tasks:
-
-1. **Database Maintenance** (Daily at 2 AM)
-   - VACUUM ANALYZE
-   - REINDEX
-   - Health checks
-
-2. **System Health Check** (Every 6 hours)
-   - Database connection verification
-   - Cache system checks
-   - Performance metrics collection
-
-3. **Health Report Generation** (Daily at 1 AM)
-   - 24-hour metrics analysis
-   - System health status
-   - Performance statistics
-
-4. **Log Rotation** (Weekly on Sunday at 3 AM)
-   - Log archiving
-   - Log clearing
-   - Compression
-
-## Scripts
-
-- `npm run db:maintain` - Run database maintenance
-- `npm run system:check` - Check system health
-- `npm run system:report` - Generate health report
-- `npm run logs:rotate` - Rotate log files
-- `npm run logs:clear` - Clear log files
-- `npm run maintenance:schedule` - Start maintenance scheduler
-
-## Directory Structure
-
-- `/logs` - System logs
-- `/reports` - Health reports
-- `/scripts` - Maintenance scripts
-- `/lib` - Utility functions
-- `/app` - Application code
-
-## Environment Variables
-
-Required environment variables:
-
-- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
-- `UPSTASH_REDIS_REST_URL` - Upstash Redis URL
-- `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis token
-
-## Getting Started
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Set up environment variables:
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your credentials
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Start the maintenance scheduler:
-   ```bash
-   npm run maintenance:schedule
-   ```
-
-## Monitoring Dashboard Access
-
-The monitoring dashboard is available at `/admin/dashboard` and requires admin privileges to access.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
-
-# System Monitoring and Maintenance
-
-This project includes a comprehensive monitoring and maintenance system for tracking system health, performance metrics, and automated maintenance tasks.
-
-## Features
-
-- Real-time system monitoring
-- Automated database maintenance
-- System health checks
-- Log rotation
-- Performance metrics collection
-- Health report generation
-
-## Monitoring Dashboard
-
-The monitoring dashboard provides real-time insights into:
-
-- System metrics (CPU, memory, response time)
-- Frontend performance
-- Game metrics
-- API performance
-- Service health status
-
-## Maintenance Tasks
-
-### Metrics Collection
-- Collects system metrics every minute
-- Stores metrics in Redis for 7 days
-- Tracks CPU, memory, response time, and more
-
-### Health Checks
-- Runs every 5 minutes
-- Monitors service health
-- Alerts on threshold violations
-- Tracks database and cache status
-
-### Log Rotation
-- Runs daily at midnight
-- Compresses old logs
-- Removes logs older than 7 days
-- Maintains disk space
-
-## Scripts
-
-### Development
-```bash
-# Start metrics collection in development mode
-npm run metrics:dev
-
-# Start health checks in development mode
-npm run health:dev
-
-# Start log rotation scheduler
-npm run cron:logs
-```
-
-### Production
-```bash
-# Start all monitoring services
-npm run monitoring:start
-
-# Start individual services
-npm run metrics:start
-npm run health:start
-```
-
-## Directory Structure
-
-```
-scripts/
-  ├── collect-metrics.ts     # Metrics collection
-  ├── check-health.ts        # Health checks
-  ├── rotate-logs.js         # Log rotation
-  ├── cron-logs.js           # Log rotation scheduler
-  ├── start-metrics-collector.js
-  ├── start-health-check.js
-  └── start-monitoring.js    # Main monitoring script
-
-lib/
-  ├── monitor.ts            # Monitoring system
-  ├── redis.ts             # Redis client
-  └── logger.ts            # Logging system
-
-app/
-  ├── api/
-  │   ├── metrics/         # Metrics API
-  │   └── health/          # Health check API
-  └── admin/
-      └── dashboard/       # Monitoring dashboard
-```
-
-## Environment Variables
-
-Required environment variables:
-
-```env
-# Redis Configuration
-UPSTASH_REDIS_REST_URL=your_redis_url
-UPSTASH_REDIS_REST_TOKEN=your_redis_token
-
-# Application Configuration
-NODE_ENV=production
-```
-
-## Getting Started
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-3. Start monitoring services:
-   ```bash
-   npm run monitoring:start
-   ```
-
-4. Access the monitoring dashboard at `/admin/dashboard`
-
-## Monitoring Thresholds
-
-The system uses the following thresholds for alerts:
-
-- CPU Usage: 80%
-- Memory Usage: 85%
-- Error Rate: 5%
-- Response Time: 1000ms
-- Database Connections: 80%
-- Cache Hit Rate: 70%
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
+**Built with ❤️ for the anime community**

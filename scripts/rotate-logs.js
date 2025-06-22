@@ -2,14 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const { createGzip } = require('zlib');
 const { pipeline } = require('stream/promises');
-const { logger } = require("../lib/logger")
+const { logger } = require('../lib/logger');
 
 const LOGS_DIR = path.join(process.cwd(), 'logs');
 const MAX_LOG_AGE_DAYS = 7;
 
 async function rotateLogs() {
   try {
-    logger.info("Starting log rotation")
+    logger.info('Starting log rotation');
 
     // Create logs directory if it doesn't exist
     if (!fs.existsSync(LOGS_DIR)) {
@@ -30,13 +30,9 @@ async function rotateLogs() {
 
       if (fileAge > MAX_LOG_AGE_DAYS) {
         const gzipPath = `${filePath}.gz`;
-        
+
         // Compress the file
-        await pipeline(
-          fs.createReadStream(filePath),
-          createGzip(),
-          fs.createWriteStream(gzipPath)
-        );
+        await pipeline(fs.createReadStream(filePath), createGzip(), fs.createWriteStream(gzipPath));
 
         // Remove the original file
         fs.unlinkSync(filePath);
@@ -57,15 +53,15 @@ async function rotateLogs() {
       }
     }
 
-    logger.info("Log rotation completed successfully")
+    logger.info('Log rotation completed successfully');
   } catch (error) {
-    logger.error("Log rotation failed", { error })
-    process.exit(1)
+    logger.error('Log rotation failed', { error });
+    process.exit(1);
   }
 }
 
 // Run log rotation
-rotateLogs().catch((error) => {
-  logger.error("Failed to rotate logs", { error })
-  process.exit(1)
-}); 
+rotateLogs().catch(error => {
+  logger.error('Failed to rotate logs', { error });
+  process.exit(1);
+});

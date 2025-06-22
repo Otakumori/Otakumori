@@ -40,36 +40,47 @@ export default function ProductPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await fetch(`/api/shop/products/${productId}`);
-        if (!response.ok) throw new Error('Failed to fetch product');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch product: ${response.statusText}`);
+        }
         const data = await response.json();
+        if (!data.product) {
+          throw new Error('Product not found');
+        }
         setProduct(data.product);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load product');
+        console.error('Error fetching product:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
+    if (productId) {
+      fetchProduct();
+    }
   }, [productId]);
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-pink-500"></div>
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="rounded-lg bg-red-100 p-4 text-red-700">
-          <p>{error || 'Product not found'}</p>
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="rounded-lg bg-white p-8 shadow-lg">
+          <h2 className="mb-4 text-2xl font-bold text-red-600">Error</h2>
+          <p className="mb-6 text-gray-600">{error || 'Product not found'}</p>
           <Link
             href="/shop"
-            className="mt-2 inline-block rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+            className="inline-block rounded bg-pink-500 px-6 py-3 text-white transition-colors hover:bg-pink-600"
           >
             Back to Shop
           </Link>
@@ -105,12 +116,7 @@ export default function ProductPage() {
               animate={{ opacity: 1, y: 0 }}
               className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-lg"
             >
-              <Image
-                src={product.images[0]}
-                alt={product.title}
-                fill
-                className="object-cover"
-              />
+              <Image src={product.images[0]} alt={product.title} fill className="object-cover" />
             </motion.div>
             <div className="grid grid-cols-4 gap-4">
               {product.images.slice(1).map((image, index) => (
@@ -201,9 +207,7 @@ export default function ProductPage() {
               </button>
               <button
                 onClick={() =>
-                  isInWishlist(product.id)
-                    ? removeFromWishlist(product.id)
-                    : addToWishlist(product)
+                  isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)
                 }
                 className="rounded-lg border border-gray-300 p-3 hover:bg-gray-50"
               >
@@ -231,4 +235,4 @@ export default function ProductPage() {
       </div>
     </main>
   );
-} 
+}

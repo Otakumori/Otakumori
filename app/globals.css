@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Runic';
+  src: url('/assets/fonts/runic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-runic {
+  font-family: 'Runic', sans-serif;
+}
+
 @layer utilities {
   .animate-spin-slow {
     animation: spin 3s linear infinite;
@@ -22,21 +33,44 @@
 }
 
 @keyframes scanline-flicker {
-  0%, 100% { opacity: 0.08; }
-  50% { opacity: 0.12; }
+  0%,
+  100% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.12;
+  }
 }
 
 @keyframes logo-fade-in {
-  0% { opacity: 0; transform: scale(0.8); }
-  20% { opacity: 1; transform: scale(1); }
-  80% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.2); }
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
 }
 
 @keyframes flash-pink {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 :root {
@@ -57,11 +91,11 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply rounded-lg bg-pink-500 px-4 py-2 text-white hover:bg-pink-600 transition-colors;
+    @apply rounded-lg bg-pink-500 px-4 py-2 text-white transition-colors hover:bg-pink-600;
   }
 
   .btn-secondary {
-    @apply rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors;
+    @apply rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-50;
   }
 
   .input-field {
@@ -122,7 +156,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -132,6 +166,31 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(219, 39, 119, 0.7);
+}
+
+/* Smooth transitions */
+* {
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+/* Custom animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
 /* Glass effect */

@@ -1,10 +1,11 @@
 'use client';
+'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import BootCube3D from './BootCube3D';
-import SakuraParticles3D from './SakuraParticles3D';
+import BootCube3D from '../../components/BootCube3D';
+import SakuraParticles3D from '../../components/SakuraParticles3D';
 
 interface GameCubeBootProps {
   onBootComplete?: () => void;
@@ -19,11 +20,7 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
   const [showScanlines, setShowScanlines] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const cubeTextures = [
-    'px.png', 'nx.png',
-    'py.png', 'ny.png',
-    'pz.png', 'nz.png',
-  ];
+  const cubeTextures = ['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'];
 
   const sakuraTexture = '/assets/textures/sakura.png';
 
@@ -63,17 +60,14 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-      <audio
-        ref={audioRef}
-        src="/assets/sounds/gamecube-boot.mp3"
-        preload="auto"
-      />
-      
+      <audio ref={audioRef} src="/assets/sounds/gamecube-boot.mp3" preload="auto" />
+
       {showScanlines && (
-        <div 
+        <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background: 'repeating-linear-gradient(to bottom, transparent, transparent 1px, rgba(0,0,0,0.05) 2px)',
+            background:
+              'repeating-linear-gradient(to bottom, transparent, transparent 1px, rgba(0,0,0,0.05) 2px)',
             animation: 'scanline-flicker 0.06s infinite',
             opacity: 0.08,
           }}
@@ -101,18 +95,18 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
         )}
 
         {stage === '3d_scene' && showCube3D && showParticles3D && (
-           <motion.div
+          <motion.div
             key="3d_scene"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0"
-           >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <BootCube3D textures={cubeTextures} />
-              </div>
-               <SakuraParticles3D particleCount={500} sakuraTexture={sakuraTexture} />
-           </motion.div>
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <BootCube3D textures={cubeTextures} />
+            </div>
+            <SakuraParticles3D particleCount={500} sakuraTexture={sakuraTexture} />
+          </motion.div>
         )}
 
         {stage === 'interface' && showInterface && (
@@ -122,22 +116,23 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <h1 className="mb-4 text-4xl font-bold text-pink-500">
-              Welcome to Otakumori
-            </h1>
-            <p className="text-lg text-pink-300">
-              Your anime adventure begins here
-            </p>
+            <h1 className="mb-4 text-4xl font-bold text-pink-500">Welcome to Otakumori</h1>
+            <p className="text-lg text-pink-300">Your anime adventure begins here</p>
           </motion.div>
         )}
       </AnimatePresence>
 
       <style jsx>{`
         @keyframes scanline-flicker {
-          0%, 100% { opacity: 0.08; }
-          50% { opacity: 0.12; }
+          0%,
+          100% {
+            opacity: 0.08;
+          }
+          50% {
+            opacity: 0.12;
+          }
         }
       `}</style>
     </div>
   );
-} 
+}

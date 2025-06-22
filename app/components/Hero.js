@@ -4,17 +4,16 @@ import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 import CherryBlossomEffect from './CherryBlossomEffect';
 
-// Setup Supabase
-const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL,
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 export default function Hero() {
   const [collected, setCollected] = useState(0);
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+
     async function fetchUser() {
       const { data: session } = await supabase.auth.getSession();
       if (session?.user) {

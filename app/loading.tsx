@@ -4,4 +4,4 @@ export default function Loading() {
       <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-pink-500"></div>
     </div>
   );
-} 
+}

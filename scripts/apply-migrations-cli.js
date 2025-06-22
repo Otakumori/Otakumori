@@ -11,7 +11,7 @@ async function applyMigrations() {
     // Run the Supabase migration command
     const command = `supabase db push`;
     console.log(`Executing command: ${command}`);
-    
+
     execSync(command, { stdio: 'inherit' });
 
     console.log('All migrations completed successfully');
@@ -30,4 +30,4 @@ applyMigrations()
   .catch(error => {
     console.error('Migration process failed:', error);
     process.exit(1);
-  }); 
+  });
