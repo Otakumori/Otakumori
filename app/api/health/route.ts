@@ -4,7 +4,7 @@ import { monitor } from '@/lib/monitor';
 export async function GET() {
   try {
     const health = await monitor.checkHealth();
-    
+
     return NextResponse.json({
       status: health.status,
       message: health.message,
@@ -28,4 +28,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-} 
+}

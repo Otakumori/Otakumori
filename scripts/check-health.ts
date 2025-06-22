@@ -65,7 +65,7 @@ async function checkHealth() {
 setInterval(checkHealth, 5 * 60 * 1000);
 
 // Initial health check
-checkHealth().catch((error) => {
+checkHealth().catch(error => {
   logger.error('Failed to perform initial health check:', error);
   process.exit(1);
-}); 
+});

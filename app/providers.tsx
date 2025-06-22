@@ -28,21 +28,21 @@ interface OverlordState {
 }
 
 // Create a store for the petal system
-const usePetalStore = create<PetalState>((set) => ({
+const usePetalStore = create<PetalState>(set => ({
   petals: 0,
   dailyLimit: 50,
-  addPetals: (amount) => set((state) => ({ petals: state.petals + amount })),
+  addPetals: amount => set(state => ({ petals: state.petals + amount })),
   resetDailyLimit: () => set({ petals: 0 }),
 }));
 
 // Create a store for the AI Overlord
-const useOverlordStore = create<OverlordState>((set) => ({
+const useOverlordStore = create<OverlordState>(set => ({
   isActive: false,
   lastInteraction: null,
   quests: [],
   activate: () => set({ isActive: true }),
   deactivate: () => set({ isActive: false }),
-  addQuest: (quest) => set((state) => ({ quests: [...state.quests, quest] })),
+  addQuest: quest => set(state => ({ quests: [...state.quests, quest] })),
 }));
 
 const queryClient = new QueryClient();

@@ -33,7 +33,7 @@ export default function Gallery() {
     // Add more images as needed
   ];
 
-  const handleImageSelect = (image) => {
+  const handleImageSelect = image => {
     // Implement image selection logic here
   };
 
@@ -43,24 +43,24 @@ export default function Gallery() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Gallery</h1>
+      <h1 className="mb-6 text-3xl font-bold">Gallery</h1>
       <div className="mb-4">
         <p>Your Petals: {petals}</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {images.map((image) => (
-          <div key={image.id} className="border p-4 rounded-lg">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {images.map(image => (
+          <div key={image.id} className="rounded-lg border p-4">
             <img
               src={image.url}
               alt={image.title}
-              className="w-full h-48 object-cover rounded mb-2"
+              className="mb-2 h-48 w-full rounded object-cover"
             />
             <h2 className="text-xl font-semibold">{image.title}</h2>
             <p className="text-gray-600">{image.description}</p>
-            <p className="text-lg font-bold mt-2">{image.price} Petals</p>
+            <p className="mt-2 text-lg font-bold">{image.price} Petals</p>
             <button
               onClick={() => handleImageSelect(image)}
-              className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
             >
               Purchase
             </button>

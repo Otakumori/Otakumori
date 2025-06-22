@@ -69,7 +69,10 @@ async function generateHealthReport() {
     // Save report to file
     const reportsDir = path.join(process.cwd(), 'reports');
     await fs.mkdir(reportsDir, { recursive: true });
-    const reportPath = path.join(reportsDir, `health-report-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+    const reportPath = path.join(
+      reportsDir,
+      `health-report-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+    );
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
 
     console.log(`Health report generated successfully: ${reportPath}`);
@@ -135,7 +138,7 @@ function calculateTrend(values) {
   const first = values[0];
   const last = values[values.length - 1];
   const change = ((last - first) / first) * 100;
-  
+
   if (change > 10) return 'increasing';
   if (change < -10) return 'decreasing';
   return 'stable';
@@ -143,7 +146,7 @@ function calculateTrend(values) {
 
 function calculateOverallStatus(metrics, dbHealth, cacheHealth) {
   const warnings = [];
-  
+
   if (metrics.cpu > 80) warnings.push('High CPU usage');
   if (metrics.memory > 80) warnings.push('High memory usage');
   if (metrics.errorRate > 5) warnings.push('High error rate');
@@ -160,7 +163,9 @@ function generateRecommendations(metrics, dbHealth, cacheHealth) {
   const recommendations = [];
 
   if (metrics.cpu > 80) {
-    recommendations.push('Consider scaling up CPU resources or optimizing CPU-intensive operations');
+    recommendations.push(
+      'Consider scaling up CPU resources or optimizing CPU-intensive operations'
+    );
   }
   if (metrics.memory > 80) {
     recommendations.push('Consider increasing memory allocation or optimizing memory usage');
@@ -185,4 +190,4 @@ function generateRecommendations(metrics, dbHealth, cacheHealth) {
 }
 
 // Run the report generation
-generateHealthReport(); 
+generateHealthReport();

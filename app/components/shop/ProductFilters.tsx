@@ -16,7 +16,7 @@ interface ProductFiltersProps {
 export default function ProductFilters({ onFilterChange }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [priceRange, setPriceRange] = useState([0, 100]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -54,7 +54,7 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
 
   const updateFilters = (priceRange: number[], search: string, category: string | null) => {
     const params = new URLSearchParams();
-    
+
     if (search) params.set('search', search);
     if (priceRange[0] > 0) params.set('minPrice', priceRange[0].toString());
     if (priceRange[1] < 100) params.set('maxPrice', priceRange[1].toString());
@@ -67,7 +67,7 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="search" className="text-white mb-2 block">
+        <Label htmlFor="search" className="mb-2 block text-white">
           Search Products
         </Label>
         <Input
@@ -76,14 +76,12 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
           placeholder="Search..."
           value={searchQuery}
           onChange={handleSearch}
-          className="bg-white/20 border-pink-500/30 text-white placeholder:text-pink-200"
+          className="border-pink-500/30 bg-white/20 text-white placeholder:text-pink-200"
         />
       </div>
 
       <div>
-        <Label className="text-white mb-2 block">
-          Price Range
-        </Label>
+        <Label className="mb-2 block text-white">Price Range</Label>
         <Slider
           value={priceRange}
           onValueChange={handlePriceChange}
@@ -99,18 +97,16 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
       </div>
 
       <div>
-        <Label className="text-white mb-2 block">
-          Categories
-        </Label>
+        <Label className="mb-2 block text-white">Categories</Label>
         <div className="space-y-2">
-          {['Apparel', 'Accessories', 'Figures', 'Art Prints'].map((category) => (
+          {['Apparel', 'Accessories', 'Figures', 'Art Prints'].map(category => (
             <Button
               key={category}
               variant="ghost"
               className={`w-full justify-start ${
                 selectedCategory === category
                   ? 'bg-pink-500/20 text-white'
-                  : 'text-pink-200 hover:text-white hover:bg-pink-500/20'
+                  : 'text-pink-200 hover:bg-pink-500/20 hover:text-white'
               }`}
               onClick={() => handleCategoryClick(category)}
             >
@@ -120,7 +116,7 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
         </div>
       </div>
 
-      <Button 
+      <Button
         className="w-full bg-pink-600 hover:bg-pink-700"
         onClick={() => {
           setSearchQuery('');
@@ -134,4 +130,4 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
       </Button>
     </div>
   );
-} 
+}

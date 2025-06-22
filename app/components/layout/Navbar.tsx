@@ -1,11 +1,11 @@
 'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useCart } from '@/components/cart/CartProvider';
-import { Button } from '@/components/ui/button';
+import { useCart } from '../cart/CartProvider';
 import { ShoppingCart, Menu, X, User, Heart, Gift } from 'lucide-react';
 
 const Navbar: React.FC = () => {
@@ -17,10 +17,20 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-black/50 backdrop-blur-lg sticky top-0 z-50">
-      <nav className="container mx-auto px-4 py-3 flex justify-between items-center">
+    <header className="sticky top-0 z-50 w-full bg-black/50 backdrop-blur-lg">
+      {/* Skip to content for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only absolute left-2 top-2 z-50 rounded bg-pink-400/80 px-3 py-1 text-white focus:not-sr-only"
+      >
+        Skip to main content
+      </a>
+      <nav
+        className="container mx-auto flex items-center justify-between px-4 py-3"
+        aria-label="Main navigation"
+      >
         {/* Logo */}
-        <Link href="/">
+        <Link href="/" aria-label="Home">
           <Image
             src="/assets/logo.png"
             alt="Otaku-mori Logo"
@@ -31,37 +41,82 @@ const Navbar: React.FC = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6 text-white">
-          <Link href="/shop" className="hover:text-pink-500 transition-colors">Shop</Link>
-          <Link href="/community" className="hover:text-pink-500 transition-colors">Community</Link>
-          <Link href="/achievements" className="hover:text-pink-500 transition-colors">Achievements</Link>
-          <Link href="/events" className="hover:text-pink-500 transition-colors">Events</Link>
+        <div className="hidden items-center gap-6 text-white md:flex">
+          <Link href="/shop" className="transition-colors hover:text-pink-500" aria-label="Shop">
+            Shop
+          </Link>
+          <Link
+            href="/community"
+            className="transition-colors hover:text-pink-500"
+            aria-label="Community"
+          >
+            Community
+          </Link>
+          <Link
+            href="/achievements"
+            className="transition-colors hover:text-pink-500"
+            aria-label="Achievements"
+          >
+            Achievements
+          </Link>
+          <Link
+            href="/events"
+            className="transition-colors hover:text-pink-500"
+            aria-label="Events"
+          >
+            Events
+          </Link>
         </div>
 
         {/* Icons */}
-        <div className="flex items-center gap-4">
-          <Link href="/wishlist" className="text-white hover:text-pink-500 transition-colors">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/wishlist"
+            className="text-white transition-colors hover:text-pink-500"
+            aria-label="Wishlist"
+          >
             <Heart size={20} />
           </Link>
-          <Link href="/achievements" className="text-white hover:text-pink-500 transition-colors">
+          <Link
+            href="/achievements"
+            className="text-white transition-colors hover:text-pink-500"
+            aria-label="Achievements"
+          >
             <Gift size={20} />
           </Link>
-          <Link href="/cart" className="relative text-white hover:text-pink-500 transition-colors">
+          <Link
+            href="/cart"
+            className="relative text-white transition-colors hover:text-pink-500"
+            aria-label="Cart"
+          >
             <ShoppingCart size={20} />
             {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-xs text-white rounded-full h-4 w-4 flex items-center justify-center">
+              <span
+                className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+                aria-label={`Cart items: ${itemCount}`}
+              >
                 {itemCount}
               </span>
             )}
           </Link>
-          <Link href="/profile" className="text-white hover:text-pink-500 transition-colors">
+          <Link
+            href="/profile"
+            className="text-white transition-colors hover:text-pink-500"
+            aria-label="Profile"
+          >
             <User size={20} />
           </Link>
         </div>
 
         {/* Mobile Menu Button */}
         <div className="md:hidden">
-          <button onClick={toggleMenu} className="text-white">
+          <button
+            onClick={toggleMenu}
+            className="text-white"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
+          >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
@@ -71,18 +126,67 @@ const Navbar: React.FC = () => {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
+            id="mobile-menu"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-black/70 backdrop-blur-lg px-4 py-2"
+            className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-black/90 backdrop-blur-lg md:hidden"
+            role="menu"
+            aria-label="Mobile navigation"
           >
-            <div className="flex flex-col gap-2 text-white">
-              <Link href="/shop" className="py-2 hover:text-pink-500 transition-colors" onClick={toggleMenu}>Shop</Link>
-              <Link href="/community" className="py-2 hover:text-pink-500 transition-colors" onClick={toggleMenu}>Community</Link>
-              <Link href="/achievements" className="py-2 hover:text-pink-500 transition-colors" onClick={toggleMenu}>Achievements</Link>
-              <Link href="/events" className="py-2 hover:text-pink-500 transition-colors" onClick={toggleMenu}>Events</Link>
-            </div>
+            <Link
+              href="/shop"
+              className="text-2xl text-white"
+              aria-label="Shop"
+              tabIndex={0}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Shop
+            </Link>
+            <Link
+              href="/community"
+              className="text-2xl text-white"
+              aria-label="Community"
+              tabIndex={0}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Community
+            </Link>
+            <Link
+              href="/achievements"
+              className="text-2xl text-white"
+              aria-label="Achievements"
+              tabIndex={0}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Achievements
+            </Link>
+            <Link
+              href="/events"
+              className="text-2xl text-white"
+              aria-label="Events"
+              tabIndex={0}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Events
+            </Link>
+            <Link
+              href="/profile"
+              className="text-2xl text-white"
+              aria-label="Profile"
+              tabIndex={0}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Profile
+            </Link>
+            <button
+              onClick={toggleMenu}
+              className="absolute right-4 top-4 text-white"
+              aria-label="Close menu"
+            >
+              <X size={32} />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -90,4 +194,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

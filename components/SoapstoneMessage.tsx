@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,7 +13,7 @@ const SoapstoneMessage: React.FC<SoapstoneMessageProps> = ({
   message,
   duration = 5000,
   position = 'center',
-  type = 'praise'
+  type = 'praise',
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -58,10 +59,7 @@ const SoapstoneMessage: React.FC<SoapstoneMessageProps> = ({
           className={`fixed left-1/2 -translate-x-1/2 ${getPositionStyles()} z-50`}
         >
           <div
-            className={`${getTypeStyles()} px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm
-              border border-white/20 font-medieval text-lg tracking-wider
-              transform hover:scale-105 transition-transform duration-300
-              cursor-pointer select-none`}
+            className={`${getTypeStyles()} transform cursor-pointer select-none rounded-lg border border-white/20 px-6 py-3 font-medieval text-lg tracking-wider shadow-lg backdrop-blur-sm transition-transform duration-300 hover:scale-105`}
             onClick={() => setIsVisible(false)}
           >
             <div className="flex items-center gap-2">
@@ -76,4 +74,4 @@ const SoapstoneMessage: React.FC<SoapstoneMessageProps> = ({
   );
 };
 
-export default SoapstoneMessage; 
+export default SoapstoneMessage;

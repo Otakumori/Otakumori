@@ -1,47 +1,78 @@
-import { Achievement } from './AchievementProvider';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Achievement } from '@/types/achievements';
+import { useAchievements } from '@/contexts/AchievementContext';
 
 interface AchievementCardProps {
   achievement: Achievement;
 }
 
-export default function AchievementCard({ achievement }: AchievementCardProps) {
-  const progress = (achievement.progress / achievement.total) * 100;
+export function AchievementCard({ achievement }: AchievementCardProps) {
+  const { unlock } = useAchievements();
+  const isUnlocked = !!achievement.unlockedAt || achievement.isUnlocked;
 
   return (
-    <Card className={`relative overflow-hidden ${
-      achievement.unlocked 
-        ? 'bg-gradient-to-r from-pink-500/20 to-purple-500/20 border-pink-500/50' 
-        : 'bg-white/10 border-pink-500/30'
-    }`}>
-      <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <div className="text-3xl">{achievement.icon}</div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-white mb-1">{achievement.title}</h3>
-            <p className="text-sm text-pink-200 mb-2">{achievement.description}</p>
-            <div className="space-y-2">
-              <Progress value={progress} className="h-2" />
-              <div className="flex justify-between text-xs text-pink-200">
-                <span>Progress: {achievement.progress}/{achievement.total}</span>
-                {achievement.reward && (
-                  <span className="font-medium">
-                    Reward: {achievement.reward.type === 'points' && '+'}
-                    {achievement.reward.value}
-                    {achievement.reward.type === 'discount' && '%'}
-                  </span>
-                )}
-              </div>
-            </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`rounded-lg bg-white p-6 shadow-lg transition-opacity dark:bg-gray-800 ${
+        !isUnlocked ? 'opacity-75' : ''
+      }`}
+    >
+      <div className="flex items-start space-x-4">
+        <div className="flex-shrink-0">
+          <img
+            src={achievement.icon}
+            alt={achievement.name}
+            className={`h-12 w-12 rounded-lg ${!isUnlocked ? 'grayscale' : ''}`}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-lg font-medium text-gray-900 dark:text-white">
+            {achievement.name}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{achievement.category}</p>
+          <p className="mt-2 line-clamp-2 text-sm text-gray-700 dark:text-gray-300">
+            {achievement.description}
+          </p>
+        </div>
+      </div>
+
+      {!isUnlocked && achievement.progress !== undefined && achievement.target !== undefined && (
+        <div className="mt-4">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Progress</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {achievement.progress} / {achievement.target}
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${(achievement.progress / achievement.target) * 100}%` }}
+              className="h-1.5 rounded-full bg-indigo-600"
+            />
           </div>
         </div>
-      </CardContent>
-      {achievement.unlocked && (
-        <div className="absolute top-0 right-0 w-16 h-16 bg-pink-500/20 transform rotate-45 translate-x-8 -translate-y-8">
-          <div className="absolute top-2 right-2 text-pink-500">✨</div>
-        </div>
       )}
-    </Card>
+
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-700 dark:text-gray-300">
+            {achievement.petals} Petals
+          </span>
+          {achievement.badge && (
+            <span className="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+              {achievement.badge}
+            </span>
+          )}
+        </div>
+        {isUnlocked && (
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            Unlocked {new Date(achievement.unlockedAt!).toLocaleDateString()}
+          </span>
+        )}
+      </div>
+    </motion.div>
   );
-} 
+}

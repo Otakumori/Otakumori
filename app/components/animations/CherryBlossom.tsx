@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,47 +28,59 @@ const CherryBlossom = () => {
       delay: Math.random() * 5,
     });
 
-    const initialPetals = Array.from({ length: 30 }, (_, i) => createPetal(i));
+    const MAX_PETALS = 30;
+    const SPAWN_INTERVAL = 1000;
+    let animationFrameId: number;
+    let lastSpawnTime = 0;
+
+    const initialPetals = Array.from({ length: 15 }, (_, i) => createPetal(i));
     setPetals(initialPetals);
 
-    const interval = setInterval(() => {
-      setPetals(prev => {
-        const newPetals = [...prev];
-        if (newPetals.length < 60) {
-          newPetals.push(createPetal(newPetals.length));
-        }
-        return newPetals;
-      });
-    }, 1000);
+    const animate = (timestamp: number) => {
+      if (timestamp - lastSpawnTime >= SPAWN_INTERVAL) {
+        setPetals(prev => {
+          if (prev.length >= MAX_PETALS) {
+            return prev;
+          }
+          return [...prev, createPetal(prev.length)];
+        });
+        lastSpawnTime = timestamp;
+      }
+      animationFrameId = requestAnimationFrame(animate);
+    };
 
-    return () => clearInterval(interval);
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none">
+    <div className="pointer-events-none fixed inset-0">
       <AnimatePresence>
-        {petals.map((petal) => (
+        {petals.map(petal => (
           <motion.div
             key={petal.id}
-            initial={{ 
-              x: `${petal.x}%`, 
+            initial={{
+              x: `${petal.x}%`,
               y: `${petal.y}%`,
               rotate: petal.rotation,
               scale: petal.scale,
-              opacity: 0.8
+              opacity: 0.8,
             }}
             animate={{
               y: '110%',
               x: `${petal.x + (Math.random() * 40 - 20)}%`,
               rotate: petal.rotation + 720,
-              opacity: 0
+              opacity: 0,
             }}
             transition={{
               duration: petal.duration,
               delay: petal.delay,
               ease: [0.4, 0, 0.2, 1],
               repeat: Infinity,
-              repeatType: "loop"
+              repeatType: 'loop',
             }}
             className="absolute"
           >
@@ -93,4 +106,4 @@ const CherryBlossom = () => {
   );
 };
 
-export default CherryBlossom; 
+export default CherryBlossom;

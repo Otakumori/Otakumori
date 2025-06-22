@@ -1,3 +1,4 @@
+'use client';
 import { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { motion } from 'framer-motion';

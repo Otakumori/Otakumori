@@ -5,7 +5,7 @@ export async function GET() {
     status: 'healthy',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    environment: env.NODE_ENV,
+    environment: process.env.NODE_ENV,
     features: {
       authentication: true,
       database: true,
@@ -13,7 +13,7 @@ export async function GET() {
       notifications: true,
       contentModeration: true,
       userActivity: true,
-      trendingContent: true
-    }
+      trendingContent: true,
+    },
   });
-} 
+}

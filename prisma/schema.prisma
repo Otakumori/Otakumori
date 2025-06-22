@@ -1,0 +1,481 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  username      String   @unique
+  displayName   String?
+  avatarUrl     String?
+  bio           String?
+  dateOfBirth   DateTime?
+  isVerified    Boolean  @default(false)
+  isBanned      Boolean  @default(false)
+  role          UserRole @default(USER)
+  status        UserStatus @default(ACTIVE)
+  joinDate      DateTime @default(now())
+  lastActive    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Profile Settings
+  nsfwEnabled   Boolean  @default(false)
+  ageVerified   Boolean  @default(false)
+  theme         String   @default("default")
+  language      String   @default("en")
+
+  // Stats
+  level         Int      @default(1)
+  experience    Int      @default(0)
+  petals        Int      @default(0)
+  achievements  Int      @default(0)
+
+  // Relations
+  achievements  UserAchievement[]
+  echoes        Echo[]
+  petalnotes    Petalnote[]
+  petalnoteCollaborators PetalnoteCollaborator[]
+  friends       Friendship[] @relation("UserFriends")
+  friendsOf     Friendship[] @relation("FriendsUser")
+  orders        Order[]
+  cartItems     CartItem[]
+  reports       Report[] @relation("Reporter")
+  reportedBy    Report[] @relation("ReportedUser")
+  moderationActions ModerationAction[] @relation("Moderator")
+  flaggedContent FlaggedContent[] @relation("ContentAuthor")
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+  SUSPENDED
+}
+
+// Achievement System
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  iconUrl     String
+  category    AchievementCategory
+  tier        AchievementTier
+  rarity      AchievementRarity
+  points      Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  progress      Int      @default(0)
+  isCompleted   Boolean  @default(false)
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement  Achievement  @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+enum AchievementCategory {
+  COMMUNITY
+  GAMING
+  COLLECTION
+  SOCIAL
+  CREATIVE
+  SPECIAL
+}
+
+enum AchievementTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum AchievementRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+// Community Features
+model Echo {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  isPublic  Boolean  @default(true)
+  likes     Int      @default(0)
+  shares    Int      @default(0)
+  replies   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  tags      EchoTag[]
+  likes     EchoLike[]
+  reports   EchoReport[]
+
+  @@map("echoes")
+}
+
+model EchoTag {
+  id      String @id @default(cuid())
+  echoId  String
+  tag     String
+
+  // Relations
+  echo    Echo   @relation(fields: [echoId], references: [id], onDelete: Cascade)
+
+  @@unique([echoId, tag])
+  @@map("echo_tags")
+}
+
+model EchoLike {
+  id      String @id @default(cuid())
+  echoId  String
+  userId  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  echo    Echo   @relation(fields: [echoId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([echoId, userId])
+  @@map("echo_likes")
+}
+
+model Petalnote {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  excerpt     String
+  authorId    String
+  isPublic    Boolean  @default(true)
+  category    String
+  likes       Int      @default(0)
+  shares      Int      @default(0)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  collaborators PetalnoteCollaborator[]
+  tags        PetalnoteTag[]
+  likes       PetalnoteLike[]
+
+  @@map("petalnotes")
+}
+
+model PetalnoteCollaborator {
+  id          String @id @default(cuid())
+  petalnoteId String
+  userId      String
+  role        String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  petalnote   Petalnote @relation(fields: [petalnoteId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([petalnoteId, userId])
+  @@map("petalnote_collaborators")
+}
+
+model PetalnoteTag {
+  id          String @id @default(cuid())
+  petalnoteId String
+  tag         String
+
+  // Relations
+  petalnote   Petalnote @relation(fields: [petalnoteId], references: [id], onDelete: Cascade)
+
+  @@unique([petalnoteId, tag])
+  @@map("petalnote_tags")
+}
+
+model PetalnoteLike {
+  id          String @id @default(cuid())
+  petalnoteId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  // Relations
+  petalnote   Petalnote @relation(fields: [petalnoteId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([petalnoteId, userId])
+  @@map("petalnote_likes")
+}
+
+// Friend System
+model Friendship {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  status    FriendshipStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User     @relation("UserFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friend    User     @relation("FriendsUser", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@map("friendships")
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+// Shop & E-commerce
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Decimal
+  category    String
+  stock       Int      @default(0)
+  status      ProductStatus @default(ACTIVE)
+  imageUrl    String?
+  tags        String[]
+  salesCount  Int      @default(0)
+  revenue     Decimal  @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  status          OrderStatus @default(PENDING)
+  total           Decimal
+  shippingAddress String
+  trackingNumber  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal
+
+  // Relations
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model CartItem {
+  id        String @id @default(cuid())
+  userId    String
+  productId String
+  quantity  Int     @default(1)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+  @@map("cart_items")
+}
+
+// Moderation & Reports
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  reportedUserId String
+  reason      String
+  description String?
+  status      ReportStatus @default(INVESTIGATING)
+  moderatorAction String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  reporter   User     @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser User   @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+enum ReportStatus {
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+model FlaggedContent {
+  id          String   @id @default(cuid())
+  type        String
+  content     String
+  authorId    String
+  reason      String
+  status      FlaggedContentStatus @default(PENDING)
+  severity    ContentSeverity @default(MEDIUM)
+  reportedBy  String[]
+  moderatorAction String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("flagged_content")
+}
+
+enum FlaggedContentStatus {
+  PENDING
+  REVIEWED
+  APPROVED
+  REMOVED
+}
+
+enum ContentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model ModerationAction {
+  id          String   @id @default(cuid())
+  moderatorId String
+  targetType  String
+  targetId    String
+  action      String
+  reason      String
+  duration    String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  moderator   User     @relation("Moderator", fields: [moderatorId], references: [id], onDelete: Cascade)
+
+  @@map("moderation_actions")
+}
+
+// Blog System
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  excerpt     String
+  authorId    String
+  status      BlogPostStatus @default(DRAFT)
+  publishDate DateTime?
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("blog_posts")
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Analytics & Metrics
+model SiteMetric {
+  id          String   @id @default(cuid())
+  date        DateTime
+  metricType  String
+  value       Int
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@unique([date, metricType])
+  @@map("site_metrics")
+}
+
+// Echo Reports (for moderation)
+model EchoReport {
+  id      String @id @default(cuid())
+  echoId  String
+  reporterId String
+  reason  String
+  status  ReportStatus @default(INVESTIGATING)
+  createdAt DateTime @default(now())
+
+  // Relations
+  echo     Echo   @relation(fields: [echoId], references: [id], onDelete: Cascade)
+  reporter User   @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@map("echo_reports")
+} 

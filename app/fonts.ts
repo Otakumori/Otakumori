@@ -5,4 +5,4 @@ export const medievalFont = MedievalSharp({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-medieval',
-}); 
+});

@@ -20,10 +20,7 @@ const defaultConfig: RateLimitConfig = {
   keyPrefix: 'rate-limit:',
 };
 
-export async function rateLimit(
-  request: NextRequest,
-  config: Partial<RateLimitConfig> = {}
-) {
+export async function rateLimit(request: NextRequest, config: Partial<RateLimitConfig> = {}) {
   const { windowMs, max, keyPrefix } = { ...defaultConfig, ...config };
   const ip = request.ip ?? 'anonymous';
   const key = `${keyPrefix}${ip}`;
@@ -59,4 +56,4 @@ export async function rateLimit(
     console.error('Rate limit error:', error);
     return NextResponse.next();
   }
-} 
+}

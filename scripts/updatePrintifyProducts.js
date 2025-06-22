@@ -91,12 +91,10 @@ async function updatePrintifyProducts() {
     // Update Supabase with retry logic
     if (transformedProducts.length > 0) {
       await withRetry(async () => {
-        const { error: updateError } = await supabase
-          .from('products')
-          .upsert(transformedProducts, {
-            onConflict: 'printify_id',
-            ignoreDuplicates: false,
-          });
+        const { error: updateError } = await supabase.from('products').upsert(transformedProducts, {
+          onConflict: 'printify_id',
+          ignoreDuplicates: false,
+        });
 
         if (updateError) throw updateError;
         console.log('Successfully updated products in Supabase');

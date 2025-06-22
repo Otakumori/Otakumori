@@ -1,3 +1,4 @@
+'use client';
 import { motion } from 'framer-motion';
 import { useFriendStore } from '@/lib/store/friendStore';
 import { useLeaderboardStore } from '@/lib/store/leaderboardStore';

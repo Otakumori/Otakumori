@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -163,7 +164,7 @@ export default function ProfilePage() {
                   Claimed {entry.score} petals in {entry.game}
                 </p>
                 <p className="text-sm text-white/50">
-                  {new Date(entry.timestamp).toLocaleString()}
+                  {new Date(entry.timestamp || Date.now()).toLocaleString()}
                 </p>
               </motion.div>
             ))}

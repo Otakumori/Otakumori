@@ -1,17 +1,17 @@
-const fs = require("fs")
-const path = require("path")
-const { monitor } = require("../lib/monitor")
-const { logger } = require("../lib/logger")
+const fs = require('fs');
+const path = require('path');
+const { monitor } = require('../lib/monitor');
+const { logger } = require('../lib/logger');
 
 async function generateReport() {
   try {
-    logger.info("Starting health report generation")
+    logger.info('Starting health report generation');
 
     // Get system health
-    const health = await monitor.checkHealth()
+    const health = await monitor.checkHealth();
 
     // Get metrics history
-    const metrics = await monitor.getMetricsHistory(24)
+    const metrics = await monitor.getMetricsHistory(24);
 
     // Calculate statistics
     const stats = {
@@ -40,7 +40,7 @@ async function generateReport() {
         max: Math.max(...metrics.map(m => m.databaseConnections)),
         avg: metrics.reduce((sum, m) => sum + m.databaseConnections, 0) / metrics.length,
       },
-    }
+    };
 
     // Generate report
     const report = {
@@ -48,22 +48,25 @@ async function generateReport() {
       health,
       stats,
       metrics,
-    }
+    };
 
     // Save report
-    const reportsDir = path.join(__dirname, "../reports")
+    const reportsDir = path.join(__dirname, '../reports');
     if (!fs.existsSync(reportsDir)) {
-      fs.mkdirSync(reportsDir, { recursive: true })
+      fs.mkdirSync(reportsDir, { recursive: true });
     }
 
-    const reportPath = path.join(reportsDir, `health-report-${new Date().toISOString().split("T")[0]}.json`)
-    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2))
+    const reportPath = path.join(
+      reportsDir,
+      `health-report-${new Date().toISOString().split('T')[0]}.json`
+    );
+    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
 
-    logger.info("Health report generated successfully", { reportPath })
+    logger.info('Health report generated successfully', { reportPath });
   } catch (error) {
-    logger.error("Health report generation failed", { error })
-    process.exit(1)
+    logger.error('Health report generation failed', { error });
+    process.exit(1);
   }
 }
 
-generateReport() 
+generateReport();

@@ -41,10 +41,12 @@ export function GameMonitor() {
   }, [activeSessions, totalErrors]);
 
   const startGameSession = (gameId: string) => {
-    setActiveSessions(prev => new Map(prev).set(gameId, {
-      startTime: Date.now(),
-      errors: 0,
-    }));
+    setActiveSessions(prev =>
+      new Map(prev).set(gameId, {
+        startTime: Date.now(),
+        errors: 0,
+      })
+    );
   };
 
   const endGameSession = (gameId: string) => {
@@ -81,4 +83,4 @@ export function GameMonitor() {
     endGameSession,
     recordGameError,
   };
-} 
+}

@@ -79,7 +79,7 @@ export default function AbyssPage() {
     return () => clearTimeout(timer);
   }, [quests, addQuest]);
 
-  const handleStartQuest = (quest) => {
+  const handleStartQuest = quest => {
     // Simulate quest completion
     setTimeout(() => {
       addPetals(quest.reward);
@@ -92,8 +92,8 @@ export default function AbyssPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-pink-500"></div>
       </div>
     );
   }
@@ -105,15 +105,16 @@ export default function AbyssPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="text-4xl font-bold text-white mb-4">
+        <h1 className="mb-4 text-4xl font-bold text-white">
           Welcome to the Abyss, {session?.user?.name}
         </h1>
         <p className="text-gray-400">
-          Your journey into the depths begins here. Collect petals, complete quests, and explore the mysteries that await.
+          Your journey into the depths begins here. Collect petals, complete quests, and explore the
+          mysteries that await.
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {features.map((feature, index) => (
           <motion.div
             key={feature.title}
@@ -124,12 +125,12 @@ export default function AbyssPage() {
           >
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             <div className="relative z-10">
-              <span className="text-4xl mb-4 block">{feature.icon}</span>
-              <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
-              <p className="text-gray-200 mb-4">{feature.description}</p>
+              <span className="mb-4 block text-4xl">{feature.icon}</span>
+              <h3 className="mb-2 text-xl font-bold text-white">{feature.title}</h3>
+              <p className="mb-4 text-gray-200">{feature.description}</p>
               <a
                 href={feature.path}
-                className="inline-block bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors"
+                className="inline-block rounded-lg bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/20"
               >
                 Explore
               </a>
@@ -139,25 +140,21 @@ export default function AbyssPage() {
       </div>
 
       {quests.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8"
-        >
-          <h2 className="text-2xl font-bold text-white mb-4">Active Quests</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quests.map((quest) => (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
+          <h2 className="mb-4 text-2xl font-bold text-white">Active Quests</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {quests.map(quest => (
               <div
                 key={quest.id}
-                className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10"
+                className="rounded-lg border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
               >
-                <h3 className="text-lg font-semibold text-white mb-2">{quest.title}</h3>
-                <p className="text-gray-400 mb-2">{quest.description}</p>
+                <h3 className="mb-2 text-lg font-semibold text-white">{quest.title}</h3>
+                <p className="mb-2 text-gray-400">{quest.description}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-pink-500">Reward: {quest.reward} petals</span>
                   <button
                     onClick={() => handleStartQuest(quest)}
-                    className="text-white bg-pink-500/20 hover:bg-pink-500/30 px-3 py-1 rounded transition-colors"
+                    className="rounded bg-pink-500/20 px-3 py-1 text-white transition-colors hover:bg-pink-500/30"
                   >
                     Start Quest
                   </button>

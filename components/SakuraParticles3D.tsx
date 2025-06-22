@@ -92,5 +92,5 @@ export default function SakuraParticles3D({
     };
   }, [particleCount, sakuraTexture]);
 
-  return <div ref={mountRef} className="w-full h-full absolute inset-0" />;
-} 
+  return <div ref={mountRef} className="absolute inset-0 h-full w-full" />;
+}

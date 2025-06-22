@@ -9,7 +9,7 @@ const products = [
     image: '/images/products/placeholder.svg',
     category: 'Apparel',
     description: 'High-quality anime-themed t-shirt made from 100% cotton.',
-    stock: 50
+    stock: 50,
   },
   {
     id: '2',
@@ -18,7 +18,7 @@ const products = [
     image: '/images/products/placeholder.svg',
     category: 'Accessories',
     description: 'Cute manga character keychain, perfect for your keys or bag.',
-    stock: 100
+    stock: 100,
   },
   {
     id: '3',
@@ -27,7 +27,7 @@ const products = [
     image: '/images/products/placeholder.svg',
     category: 'Figures',
     description: 'Detailed anime figure from your favorite series.',
-    stock: 25
+    stock: 25,
   },
   {
     id: '4',
@@ -36,8 +36,8 @@ const products = [
     image: '/images/products/placeholder.svg',
     category: 'Art Prints',
     description: 'High-quality art print featuring popular anime artwork.',
-    stock: 75
-  }
+    stock: 75,
+  },
 ];
 
 export async function GET(request: Request) {
@@ -64,11 +64,12 @@ export async function GET(request: Request) {
 
   if (search) {
     const searchLower = search.toLowerCase();
-    filteredProducts = filteredProducts.filter(product => 
-      product.name.toLowerCase().includes(searchLower) ||
-      product.description.toLowerCase().includes(searchLower)
+    filteredProducts = filteredProducts.filter(
+      product =>
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower)
     );
   }
 
   return NextResponse.json(filteredProducts);
-} 
+}

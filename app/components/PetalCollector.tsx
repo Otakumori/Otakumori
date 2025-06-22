@@ -34,21 +34,33 @@ export default function PetalCollector() {
   const comboSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    collectSoundRef.current = new window.Audio('/assets/collect.mp3');
-    gameOverSoundRef.current = new window.Audio('/assets/game-over.mp3');
-    powerUpSoundRef.current = new window.Audio('/assets/power-up.mp3');
-    comboSoundRef.current = new window.Audio('/assets/combo.mp3');
+    const audioElements = {
+      collect: new window.Audio('/assets/collect.mp3'),
+      gameOver: new window.Audio('/assets/game-over.mp3'),
+      powerUp: new window.Audio('/assets/power-up.mp3'),
+      combo: new window.Audio('/assets/combo.mp3'),
+    };
 
-    if (collectSoundRef.current) collectSoundRef.current.volume = 0.2;
-    if (gameOverSoundRef.current) gameOverSoundRef.current.volume = 0.3;
-    if (powerUpSoundRef.current) powerUpSoundRef.current.volume = 0.25;
-    if (comboSoundRef.current) comboSoundRef.current.volume = 0.2;
+    // Set volumes
+    Object.values(audioElements).forEach(audio => {
+      audio.volume = 0.2;
+    });
+
+    // Store references
+    collectSoundRef.current = audioElements.collect;
+    gameOverSoundRef.current = audioElements.gameOver;
+    powerUpSoundRef.current = audioElements.powerUp;
+    comboSoundRef.current = audioElements.combo;
 
     return () => {
-      collectSoundRef.current?.pause();
-      gameOverSoundRef.current?.pause();
-      powerUpSoundRef.current?.pause();
-      comboSoundRef.current?.pause();
+      // Cleanup audio elements
+      Object.values(audioElements).forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.src = '';
+      });
+
+      // Clear references
       collectSoundRef.current = null;
       gameOverSoundRef.current = null;
       powerUpSoundRef.current = null;

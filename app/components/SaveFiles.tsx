@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -50,7 +51,7 @@ export default function SaveFiles() {
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {saveFiles.map((saveFile) => (
+      {saveFiles.map(saveFile => (
         <motion.div
           key={saveFile.id}
           initial={{ opacity: 0, y: 20 }}
@@ -110,4 +111,4 @@ export default function SaveFiles() {
       </motion.button>
     </div>
   );
-} 
+}

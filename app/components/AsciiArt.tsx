@@ -1,3 +1,5 @@
+'use client';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -50,38 +52,27 @@ const ASCII_ART = {
 };
 
 interface AsciiArtProps {
-  type: keyof typeof ASCII_ART;
+  type?: string;
   className?: string;
-  animate?: boolean;
 }
 
-export const AsciiArt = ({ type, className = '', animate = false }: AsciiArtProps) => {
-  const [displayedArt, setDisplayedArt] = useState('');
-  const art = ASCII_ART[type];
-
-  useEffect(() => {
-    if (animate) {
-      let currentIndex = 0;
-      const interval = setInterval(() => {
-        setDisplayedArt(art.slice(0, currentIndex));
-        currentIndex++;
-        if (currentIndex > art.length) {
-          clearInterval(interval);
-        }
-      }, 50);
-      return () => clearInterval(interval);
-    } else {
-      setDisplayedArt(art);
-    }
-  }, [art, animate]);
-
-  return (
-    <motion.pre
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={`whitespace-pre font-mono text-pink-400 ${className}`}
-    >
-      {displayedArt}
-    </motion.pre>
-  );
+export const AsciiArt: React.FC<AsciiArtProps> = ({ type = 'friend', className }) => {
+  let art = '';
+  switch (type) {
+    case 'friend':
+      art = `
+      (•‿•)
+      /|\
+      / \\
+      `;
+      break;
+    case 'star':
+      art = `
+      ★
+      `;
+      break;
+    default:
+      art = 'ASCII';
+  }
+  return <pre className={className}>{art}</pre>;
 };

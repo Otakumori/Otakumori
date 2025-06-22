@@ -5,8 +5,8 @@ import { compare } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL || '',
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
 declare module 'next-auth' {
@@ -23,14 +23,14 @@ declare module 'next-auth' {
 const handler = NextAuth({
   providers: [
     GithubProvider({
-      clientId: env.GITHUB_ID || '',
-      clientSecret: env.GITHUB_SECRET || '',
+      clientId: process.env.GITHUB_ID || '',
+      clientSecret: process.env.GITHUB_SECRET || '',
     }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -59,7 +59,7 @@ const handler = NextAuth({
           name: user.name,
           image: user.image,
         };
-      }
+      },
     }),
   ],
   pages: {
@@ -79,4 +79,4 @@ const handler = NextAuth({
   },
 });
 
-export { handler as GET, handler as POST }; 
+export { handler as GET, handler as POST };

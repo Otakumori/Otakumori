@@ -2,19 +2,16 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
-const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID;
-const PRINTIFY_API_KEY = env.PRINTIFY_API_KEY;
+const PRINTIFY_SHOP_ID = process.env.PRINTIFY_SHOP_ID;
+const PRINTIFY_API_KEY = process.env.PRINTIFY_API_KEY;
 
 // Initialize Supabase client
 const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL!,
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     // Check cache first
     const { data: cachedProduct, error: cacheError } = await supabase
@@ -63,13 +60,11 @@ export async function GET(
     };
 
     // Update cache
-    await supabase
-      .from('product_cache')
-      .upsert({
-        id: params.id,
-        data: transformedProduct,
-        updated_at: new Date().toISOString(),
-      });
+    await supabase.from('product_cache').upsert({
+      id: params.id,
+      data: transformedProduct,
+      updated_at: new Date().toISOString(),
+    });
 
     return NextResponse.json({ product: transformedProduct });
   } catch (error) {
@@ -79,4 +74,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

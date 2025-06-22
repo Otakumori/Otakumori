@@ -33,7 +33,7 @@ export default function MiniGames() {
     // Add more games as needed
   ];
 
-  const handleGameSelect = (game) => {
+  const handleGameSelect = game => {
     setSelectedGame(game);
   };
 
@@ -46,19 +46,19 @@ export default function MiniGames() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Mini Games</h1>
+      <h1 className="mb-4 text-2xl font-bold">Mini Games</h1>
       <div className="mb-4">
         <p>Your Petals: {petals}</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {games.map((game) => (
-          <div key={game.id} className="border p-4 rounded-lg">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {games.map(game => (
+          <div key={game.id} className="rounded-lg border p-4">
             <h2 className="text-xl font-semibold">{game.name}</h2>
             <p className="text-gray-600">{game.description}</p>
-            <p className="text-lg font-bold mt-2">Reward: {game.reward} Petals</p>
+            <p className="mt-2 text-lg font-bold">Reward: {game.reward} Petals</p>
             <button
               onClick={() => handleGameSelect(game)}
-              className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="mt-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
             >
               Play
             </button>
@@ -66,20 +66,17 @@ export default function MiniGames() {
         ))}
       </div>
       {selectedGame && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">{selectedGame.name}</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="rounded-lg bg-white p-6">
+            <h2 className="mb-4 text-xl font-bold">{selectedGame.name}</h2>
             <p>Game content will be implemented here.</p>
             <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={() => setSelectedGame(null)}
-                className="px-4 py-2 border rounded"
-              >
+              <button onClick={() => setSelectedGame(null)} className="rounded border px-4 py-2">
                 Close
               </button>
               <button
                 onClick={handleGameComplete}
-                className="px-4 py-2 bg-green-500 text-white rounded"
+                className="rounded bg-green-500 px-4 py-2 text-white"
               >
                 Complete Game
               </button>

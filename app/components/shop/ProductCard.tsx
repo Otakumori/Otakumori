@@ -12,7 +12,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ id, name, price, image, category }: ProductCardProps) {
   return (
-    <Card className="overflow-hidden bg-white/10 border-pink-500/30 hover:border-pink-500/50 transition-colors">
+    <Card className="overflow-hidden border-pink-500/30 bg-white/10 transition-colors hover:border-pink-500/50">
       <div className="relative aspect-square">
         <Image
           src={image}
@@ -30,10 +30,8 @@ export default function ProductCard({ id, name, price, image, category }: Produc
         </div>
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <Button className="w-full bg-pink-600 hover:bg-pink-700">
-          Add to Cart
-        </Button>
+        <Button className="w-full bg-pink-600 hover:bg-pink-700">Add to Cart</Button>
       </CardFooter>
     </Card>
   );
-} 
+}

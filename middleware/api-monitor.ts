@@ -3,10 +3,7 @@ import type { NextRequest } from 'next/server';
 import { monitor } from '@/lib/monitor';
 import { logger } from '@/lib/logger';
 
-export async function apiMonitor(
-  request: NextRequest,
-  response: NextResponse
-) {
+export async function apiMonitor(request: NextRequest, response: NextResponse) {
   const startTime = performance.now();
   const path = request.nextUrl.pathname;
   const method = request.method;
@@ -59,9 +56,6 @@ export async function apiMonitor(
       error: error instanceof Error ? error.message : String(error),
     });
 
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-} 
+}

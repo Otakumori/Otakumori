@@ -33,11 +33,11 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-sm">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="text-white font-bold text-xl">
+            <Link href="/" className="text-xl font-bold text-white">
               OtakuMori
             </Link>
           </div>
@@ -45,18 +45,12 @@ export default function Header() {
             {session ? (
               <div className="flex items-center space-x-4">
                 <span className="text-white">{session.user.name}</span>
-                <button
-                  onClick={() => signOut()}
-                  className="text-white hover:text-gray-300"
-                >
+                <button onClick={() => signOut()} className="text-white hover:text-gray-300">
                   Sign Out
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => signIn()}
-                className="text-white hover:text-gray-300"
-              >
+              <button onClick={() => signIn()} className="text-white hover:text-gray-300">
                 Sign In
               </button>
             )}

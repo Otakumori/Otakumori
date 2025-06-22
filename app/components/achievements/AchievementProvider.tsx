@@ -34,8 +34,8 @@ const defaultAchievements: Achievement[] = [
     total: 1,
     reward: {
       type: 'points',
-      value: 100
-    }
+      value: 100,
+    },
   },
   {
     id: 'collector',
@@ -47,8 +47,8 @@ const defaultAchievements: Achievement[] = [
     total: 10,
     reward: {
       type: 'badge',
-      value: 'Collector Badge'
-    }
+      value: 'Collector Badge',
+    },
   },
   {
     id: 'big_spender',
@@ -60,8 +60,8 @@ const defaultAchievements: Achievement[] = [
     total: 100,
     reward: {
       type: 'discount',
-      value: 10
-    }
+      value: 10,
+    },
   },
   {
     id: 'community_member',
@@ -73,8 +73,8 @@ const defaultAchievements: Achievement[] = [
     total: 1,
     reward: {
       type: 'points',
-      value: 50
-    }
+      value: 50,
+    },
   },
   {
     id: 'reviewer',
@@ -86,9 +86,9 @@ const defaultAchievements: Achievement[] = [
     total: 5,
     reward: {
       type: 'points',
-      value: 200
-    }
-  }
+      value: 200,
+    },
+  },
 ];
 
 const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
@@ -153,4 +153,4 @@ export function useAchievements() {
     throw new Error('useAchievements must be used within an AchievementProvider');
   }
   return context;
-} 
+}
