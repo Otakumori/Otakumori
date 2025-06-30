@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../../../utils/supabase/client';
+import { env } from '../../../../env';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
-const PRINTIFY_SHOP_ID = process.env.PRINTIFY_SHOP_ID;
-const PRINTIFY_API_KEY = process.env.PRINTIFY_API_KEY;
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID || '';
+const PRINTIFY_API_KEY = env.PRINTIFY_API_KEY || '';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
+    }
+
     // Check cache first
     const { data: cachedProduct, error: cacheError } = await supabase
       .from('product_cache')

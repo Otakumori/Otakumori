@@ -55,6 +55,8 @@ export interface PetalTier {
 
 export const PETAL_TIERS: PetalTier[] = [
   {
+    id: '1',
+    name: 'Fallen Leaf',
     tier: 1,
     title: 'Fallen Leaf',
     description: 'A single petal rests beside you. The journey has begun, quiet and unnoticed.',
@@ -63,6 +65,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-1-fallen-leaf.png',
   },
   {
+    id: '2',
+    name: 'Budding Warden',
     tier: 2,
     title: 'Budding Warden',
     description: 'The air knows your scent. You care for fragments most overlook.',
@@ -71,6 +75,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-2-budding-warden.png',
   },
   {
+    id: '3',
+    name: 'Bloomtouched',
     tier: 3,
     title: 'Bloomtouched',
     description: 'You walk where petals grow. Luck? Or something blooming beneath the surface.',
@@ -79,6 +85,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-3-bloomtouched.png',
   },
   {
+    id: '4',
+    name: 'Petalforged',
     tier: 4,
     title: 'Petalforged',
     description: "These petals weren't gathered. They were earned in motion, grown through intent.",
@@ -87,6 +95,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-4-petalforged.png',
   },
   {
+    id: '5',
+    name: 'Rootkeeper',
     tier: 5,
     title: 'Rootkeeper',
     description: "The veins of the world twist beneath your feet. You've grown past the surface.",
@@ -95,6 +105,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-5-rootkeeper.png',
   },
   {
+    id: '6',
+    name: 'Warden of Bloom',
     tier: 6,
     title: 'Warden of Bloom',
     description:
@@ -104,6 +116,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-6-warden-bloom.png',
   },
   {
+    id: '7',
+    name: 'Veilbloom Ascendant',
     tier: 7,
     title: 'Veilbloom Ascendant',
     description:
@@ -113,6 +127,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-7-veilbloom.png',
   },
   {
+    id: '8',
+    name: 'Thornbound Sovereign',
     tier: 8,
     title: 'Thornbound Sovereign',
     description:
@@ -122,6 +138,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-8-thornbound.png',
   },
   {
+    id: '9',
+    name: 'Crown of Aetherpetal',
     tier: 9,
     title: 'Crown of Aetherpetal',
     description:
@@ -131,6 +149,8 @@ export const PETAL_TIERS: PetalTier[] = [
     icon: '/assets/achievements/tier-9-aetherpetal.png',
   },
   {
+    id: '10',
+    name: 'Eclipse in Bloom',
     tier: 10,
     title: 'Eclipse in Bloom',
     description:

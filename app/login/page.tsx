@@ -1,12 +1,15 @@
 'use client';
-'use client';
 
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import CherryBlossom from '@/components/animations/CherryBlossom';
+import { Button } from '../components/ui/button';
+import { Card } from '../components/ui/card';
+import CherryBlossom from '../components/animations/CherryBlossom';
 
 const MovingFingers = () => {
   return (

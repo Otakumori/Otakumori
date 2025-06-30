@@ -76,8 +76,11 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.username = user.username;
-
+        if ('username' in user && user.username) {
+          token.username = user.username;
+        } else {
+          token.username = user.name || user.email || '';
+        }
         // Update last active
         await prisma.user.update({
           where: { id: user.id },
@@ -89,7 +92,8 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
-        session.user.username = token.username as string;
+        (session.user as typeof session.user & { username: string }).username =
+          token.username as string;
       }
       return session;
     },
@@ -105,7 +109,8 @@ export const authOptions: NextAuthOptions = {
           await prisma.user.create({
             data: {
               email: user.email!,
-              username: user.username || user.email!.split('@')[0],
+              username:
+                'username' in user && user.username ? user.username : user.email!.split('@')[0],
               displayName: user.name,
               avatarUrl: user.image,
               isVerified: true,
@@ -118,7 +123,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/login',
-    signUp: '/register',
     error: '/auth/error',
   },
   session: {

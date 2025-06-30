@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { desc } from 'drizzle-orm';
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '~/server/api/trpc';
-import { posts } from '~/server/db/schema';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { posts } from '../../db/schema';
 
 export const postRouter = createTRPCRouter({
   hello: publicProcedure.input(z.object({ text: z.string() })).query(({ input }) => {
@@ -20,11 +21,9 @@ export const postRouter = createTRPCRouter({
     }),
 
   getLatest: protectedProcedure.query(async ({ ctx }) => {
-    const post = await ctx.db.query.posts.findFirst({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-    });
+    const post = await ctx.db.select().from(posts).orderBy(desc(posts.createdAt)).limit(1);
 
-    return post ?? null;
+    return post[0] ?? null;
   }),
 
   getSecretMessage: protectedProcedure.query(() => {

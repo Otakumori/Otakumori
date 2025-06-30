@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useFriendStore } from '@/lib/store/friendStore';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useFriendStore } from '../app/lib/store/friendStore';
+import { useSound } from '../app/lib/hooks/useSound';
+import { useHaptic } from '../app/lib/hooks/useHaptic';
 
 export const FriendList = () => {
   const [activeTab, setActiveTab] = useState<'friends' | 'requests'>('friends');
@@ -116,7 +116,7 @@ export const FriendList = () => {
                   onClick={() => handleToggleFavorite(friend.id)}
                   className="text-white/50 transition-colors hover:text-pink-500"
                 >
-                  {friend.isFavorite ? '★' : '☆'}
+                  {friend.favorite ? '★' : '☆'}
                 </button>
               </motion.div>
             ))}
@@ -137,10 +137,10 @@ export const FriendList = () => {
               >
                 <div className="flex items-center space-x-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-500 text-white">
-                    {request.from[0].toUpperCase()}
+                    {request.fromUser.username[0].toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-medium text-white">{request.from}</p>
+                    <p className="font-medium text-white">{request.fromUser.username}</p>
                     <p className="text-sm text-white/50">
                       {new Date(request.timestamp).toLocaleDateString()}
                     </p>

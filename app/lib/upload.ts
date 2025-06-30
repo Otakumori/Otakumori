@@ -136,9 +136,9 @@ export async function handleFileUpload(
     const buffer = Buffer.from(arrayBuffer as ArrayBuffer);
 
     // Process image if it's an image file
-    let processedBuffer = buffer;
+    let processedBuffer: Buffer = buffer;
     if (file.type.startsWith('image/')) {
-      processedBuffer = await processImage(buffer, config);
+      processedBuffer = await processImage(buffer as Buffer, config);
     }
 
     // Generate filename

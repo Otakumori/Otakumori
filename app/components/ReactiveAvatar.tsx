@@ -1,12 +1,11 @@
 'use client';
-'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
-import { useAchievements } from '@/lib/hooks/useAchievements';
-import { useUserStore } from '@/lib/store/userStore';
+import { useSound } from '../lib/hooks/useSound';
+import { useHaptic } from '../lib/hooks/useHaptic';
+import { useAchievements } from '../lib/hooks/useAchievements';
+import { useUserStore } from '../lib/store/userStore';
 
 interface ReactiveAvatarProps {
   className?: string;
@@ -17,7 +16,6 @@ export const ReactiveAvatar = ({ className = '' }: ReactiveAvatarProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { user } = useUserStore();
   const { achievements } = useAchievements();
-  const { playSound } = useSound();
   const { vibrate } = useHaptic();
 
   // Calculate avatar state based on user progress
@@ -37,10 +35,9 @@ export const ReactiveAvatar = ({ className = '' }: ReactiveAvatarProps) => {
     const newMood = calculateMood();
     if (newMood !== mood) {
       setMood(newMood);
-      playSound('achievement');
       vibrate('light');
     }
-  }, [achievements, mood, playSound, vibrate]);
+  }, [achievements, mood, vibrate]);
 
   // Avatar expressions based on mood
   const expressions = {

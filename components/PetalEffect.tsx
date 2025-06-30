@@ -1,9 +1,18 @@
 'use client';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
-import { petalFloat } from '@/lib/animations';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useSound } from '../app/lib/hooks/useSound';
+import { useHaptic } from '../app/lib/hooks/useHaptic';
 import { useEffect } from 'react';
+
+const petalFloat = {
+  initial: { opacity: 0, y: 0, rotate: 0 },
+  animate: {
+    opacity: [0, 1, 1, 0],
+    y: [0, -100, -200, -300],
+    rotate: [0, 180, 360, 540],
+    transition: { duration: 3, ease: 'easeOut' },
+  },
+};
 
 interface PetalEffectProps {
   count?: number;

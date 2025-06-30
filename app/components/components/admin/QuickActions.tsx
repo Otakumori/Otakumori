@@ -1,8 +1,8 @@
 'use client';
 'use client';
 
-import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import React, { useState } from 'react';
+import { supabase } from '../../../lib/supabase';
 import { motion } from 'framer-motion';
 
 interface QuickAction {
@@ -10,41 +10,127 @@ interface QuickAction {
   title: string;
   description: string;
   icon: string;
-  action: () => Promise<void>;
   color: string;
+  action: () => Promise<void>;
 }
 
 export default function QuickActions() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<boolean | null>(null);
+
+  // Check current maintenance status
+  React.useEffect(() => {
+    checkMaintenanceStatus();
+  }, []);
+
+  const checkMaintenanceStatus = async () => {
+    try {
+      const response = await fetch('/api/admin/maintenance', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMaintenanceStatus(data.maintenance);
+      }
+    } catch (error) {
+      console.error('Failed to check maintenance status:', error);
+    }
+  };
+
+  const toggleMaintenanceMode = async () => {
+    try {
+      const response = await fetch('/api/admin/maintenance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+        },
+        body: JSON.stringify({
+          maintenance: !maintenanceStatus,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMaintenanceStatus(data.maintenance);
+        alert(`Maintenance mode ${data.maintenance ? 'enabled' : 'disabled'} successfully!`);
+      } else {
+        throw new Error('Failed to toggle maintenance mode');
+      }
+    } catch (error) {
+      console.error('Error toggling maintenance mode:', error);
+      alert('Failed to toggle maintenance mode. Please try again.');
+    }
+  };
 
   const quickActions: QuickAction[] = [
     {
-      id: 'clear-messages',
-      title: 'Clear Low-Rated Messages',
-      description: 'Remove messages with less than 3 stars',
-      icon: '🗑️',
-      color: 'bg-red-500/20 hover:bg-red-500/30',
+      id: 'view-users',
+      title: 'View Users',
+      description: 'Browse and manage user accounts',
+      icon: '👥',
+      color: 'bg-blue-500/20 hover:bg-blue-500/30',
       action: async () => {
-        setIsLoading('clear-messages');
+        setIsLoading('view-users');
         try {
-          const { error } = await supabase.from('soapstone_messages').delete().lt('rating', 3);
-          if (error) throw error;
+          // TODO: Navigate to user management page
+          alert('User management page coming soon!');
         } finally {
           setIsLoading(null);
         }
       },
     },
     {
-      id: 'reset-petals',
-      title: 'Reset Petal Economy',
-      description: "Set all users' petal counts to 0",
-      icon: '🌸',
-      color: 'bg-pink-500/20 hover:bg-pink-500/30',
+      id: 'manage-content',
+      title: 'Manage Content',
+      description: 'Edit blog posts and shop items',
+      icon: '📝',
+      color: 'bg-green-500/20 hover:bg-green-500/30',
       action: async () => {
-        setIsLoading('reset-petals');
+        setIsLoading('manage-content');
         try {
-          const { error } = await supabase.from('users').update({ petal_count: 0 });
-          if (error) throw error;
+          // TODO: Navigate to content management page
+          alert('Content management page coming soon!');
+        } finally {
+          setIsLoading(null);
+        }
+      },
+    },
+    {
+      id: 'view-analytics',
+      title: 'View Analytics',
+      description: 'Check site performance and user stats',
+      icon: '📊',
+      color: 'bg-purple-500/20 hover:bg-purple-500/30',
+      action: async () => {
+        setIsLoading('view-analytics');
+        try {
+          // TODO: Navigate to analytics dashboard
+          alert('Analytics dashboard coming soon!');
+        } finally {
+          setIsLoading(null);
+        }
+      },
+    },
+    {
+      id: 'toggle-maintenance',
+      title: maintenanceStatus ? 'Disable Maintenance' : 'Enable Maintenance',
+      description: maintenanceStatus
+        ? 'Disable site maintenance mode'
+        : 'Enable site maintenance mode',
+      icon: maintenanceStatus ? '🟢' : '🔧',
+      color: maintenanceStatus
+        ? 'bg-green-500/20 hover:bg-green-500/30'
+        : 'bg-yellow-500/20 hover:bg-yellow-500/30',
+      action: async () => {
+        setIsLoading('toggle-maintenance');
+        try {
+          await toggleMaintenanceMode();
         } finally {
           setIsLoading(null);
         }
@@ -53,39 +139,121 @@ export default function QuickActions() {
     {
       id: 'backup-data',
       title: 'Backup Data',
-      description: 'Export all user data to CSV',
+      description: 'Create database and file backups',
       icon: '💾',
-      color: 'bg-blue-500/20 hover:bg-blue-500/30',
+      color: 'bg-indigo-500/20 hover:bg-indigo-500/30',
       action: async () => {
         setIsLoading('backup-data');
         try {
-          const { data, error } = await supabase.from('users').select('*');
-          if (error) throw error;
+          const response = await fetch('/api/admin/backup', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+            },
+          });
 
-          // Convert to CSV
-          const csv = data.map(row => Object.values(row).join(',')).join('\n');
-          const blob = new Blob([csv], { type: 'text/csv' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'otaku-mori-backup.csv';
-          a.click();
+          if (response.ok) {
+            alert('Backup initiated successfully!');
+          } else {
+            throw new Error('Backup failed');
+          }
+        } catch (error) {
+          console.error('Backup error:', error);
+          alert('Failed to initiate backup. Please try again.');
         } finally {
           setIsLoading(null);
         }
       },
     },
     {
-      id: 'toggle-maintenance',
-      title: 'Toggle Maintenance Mode',
-      description: 'Enable/disable site maintenance mode',
-      icon: '🔧',
-      color: 'bg-yellow-500/20 hover:bg-yellow-500/30',
+      id: 'clear-cache',
+      title: 'Clear Cache',
+      description: 'Clear Redis cache and temporary files',
+      icon: '🧹',
+      color: 'bg-orange-500/20 hover:bg-orange-500/30',
       action: async () => {
-        setIsLoading('toggle-maintenance');
+        setIsLoading('clear-cache');
         try {
-          // TODO: Implement maintenance mode toggle
-          alert('Maintenance mode toggle coming soon!');
+          const response = await fetch('/api/admin/cache/clear', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+            },
+          });
+
+          if (response.ok) {
+            alert('Cache cleared successfully!');
+          } else {
+            throw new Error('Cache clear failed');
+          }
+        } catch (error) {
+          console.error('Cache clear error:', error);
+          alert('Failed to clear cache. Please try again.');
+        } finally {
+          setIsLoading(null);
+        }
+      },
+    },
+    {
+      id: 'system-health',
+      title: 'System Health',
+      description: 'Check system status and performance',
+      icon: '🏥',
+      color: 'bg-red-500/20 hover:bg-red-500/30',
+      action: async () => {
+        setIsLoading('system-health');
+        try {
+          const response = await fetch('/api/health', {
+            method: 'GET',
+          });
+
+          if (response.ok) {
+            const health = await response.json();
+            alert(
+              `System Status: ${health.status}\nDatabase: ${health.database}\nRedis: ${health.redis}`
+            );
+          } else {
+            throw new Error('Health check failed');
+          }
+        } catch (error) {
+          console.error('Health check error:', error);
+          alert('Failed to check system health. Please try again.');
+        } finally {
+          setIsLoading(null);
+        }
+      },
+    },
+    {
+      id: 'send-notification',
+      title: 'Send Notification',
+      description: 'Send site-wide notification to users',
+      icon: '📢',
+      color: 'bg-pink-500/20 hover:bg-pink-500/30',
+      action: async () => {
+        setIsLoading('send-notification');
+        try {
+          const message = prompt('Enter notification message:');
+          if (message) {
+            const response = await fetch('/api/admin/notifications', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+              },
+              body: JSON.stringify({ message }),
+            });
+
+            if (response.ok) {
+              alert('Notification sent successfully!');
+            } else {
+              throw new Error('Failed to send notification');
+            }
+          }
+        } catch (error) {
+          console.error('Notification error:', error);
+          alert('Failed to send notification. Please try again.');
         } finally {
           setIsLoading(null);
         }

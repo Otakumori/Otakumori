@@ -3,8 +3,8 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Button } from '../../components/ui/button.tsx';
+import { Card } from '../../components/ui/card.tsx';
 import { Share2, Heart, Bookmark } from 'lucide-react';
 
 // Mock blog data (replace with API call)

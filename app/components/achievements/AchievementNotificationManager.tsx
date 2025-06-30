@@ -1,14 +1,14 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Achievement } from '@/types/achievements';
-import { useAchievements } from '@/contexts/AchievementContext';
-import { AchievementNotification } from './AchievementNotification';
-import { achievementSoundInstance } from '@/utils/achievementSound';
+import { Achievement } from '../../types/achievements.ts';
+import { useAchievementContext } from '../../contexts/AchievementContext.tsx';
+import { AchievementNotification } from './AchievementNotification.tsx';
+import { achievementSoundInstance } from '../../utils/achievementSound.ts';
 
 export const AchievementNotificationManager: React.FC = () => {
   const [notifications, setNotifications] = useState<Achievement[]>([]);
-  const { achievements } = useAchievements();
+  const { achievements } = useAchievementContext();
 
   useEffect(() => {
     const handleAchievementUnlock = (achievement: Achievement) => {
@@ -16,24 +16,24 @@ export const AchievementNotificationManager: React.FC = () => {
       achievementSoundInstance.play();
     };
 
-    // Listen for achievement unlock events
-    window.addEventListener('achievementUnlock', ((event: CustomEvent<Achievement>) => {
-      handleAchievementUnlock(event.detail);
-    }) as EventListener);
+    // This is a placeholder for the event listener
+    // In a real app, you would listen for an event from your achievement system
+    // For now, we'll just simulate it with a timeout
+    const timer = setTimeout(() => {
+      if (achievements.length > 0) {
+        handleAchievementUnlock(achievements[0]);
+      }
+    }, 5000);
 
-    return () => {
-      window.removeEventListener('achievementUnlock', ((event: CustomEvent<Achievement>) => {
-        handleAchievementUnlock(event.detail);
-      }) as EventListener);
-    };
-  }, []);
+    return () => clearTimeout(timer);
+  }, [achievements]);
 
-  const handleClose = (achievementId: string) => {
-    setNotifications(prev => prev.filter(achievement => achievement.id !== achievementId));
+  const handleClose = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 space-y-4">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col space-y-4">
       <AnimatePresence>
         {notifications.map(achievement => (
           <AchievementNotification

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Achievement } from '@/types/achievements';
-import { useAchievements } from '@/contexts/AchievementContext';
+import type { Achievement } from '../../types/achievements';
+import { useAchievements } from '../../contexts/AchievementContext';
 
 interface AchievementProgressProps {
   achievement: Achievement;

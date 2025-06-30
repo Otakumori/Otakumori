@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PhoneCall } from './PhoneCall';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
-import { useAchievements } from '@/lib/hooks/useAchievements';
+import { useSound } from '../lib/hooks/useSound';
+import { useHaptic } from '../lib/hooks/useHaptic';
+import { useAchievements } from '../lib/hooks/useAchievements';
 
 interface TutorialStep {
   character: {

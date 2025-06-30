@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
-import { AchievementHeader } from '@/components/achievements/AchievementHeader';
-import { AchievementStats } from '@/components/achievements/AchievementStats';
-import { AchievementSearch } from '@/components/achievements/AchievementSearch';
-import { AchievementFilters } from '@/components/achievements/AchievementFilters';
-import { AchievementSort } from '@/components/achievements/AchievementSort';
-import { AchievementCategories } from '@/components/achievements/AchievementCategories';
-import { AchievementList } from '@/components/achievements/AchievementList';
-import { useAchievementContext } from '@/contexts/AchievementContext';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { AchievementHeader } from '../components/achievements/AchievementHeader';
+import { AchievementStats } from '../components/achievements/AchievementStats';
+import { AchievementSearch } from '../components/achievements/AchievementSearch';
+import { AchievementFilters } from '../components/achievements/AchievementFilters';
+import { AchievementSort } from '../components/achievements/AchievementSort';
+import { AchievementCategories } from '../components/achievements/AchievementCategories';
+import { AchievementList } from '../components/achievements/AchievementList';
+import { useAchievementContext } from '../contexts/AchievementContext';
+import { AchievementProgress } from '../components/achievements/AchievementProgress';
 
 export default function AchievementsPage() {
   const [searchQuery, setSearchQuery] = useState('');

@@ -3,9 +3,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import InteractiveCherryBlossom from '@/components/animations/InteractiveCherryBlossom';
-import { Product, BlogPost, SocialLink } from '@/app/types';
-import Header from '@/components/layout/Header';
+import InteractiveCherryBlossom from '../animations/InteractiveCherryBlossom';
+import { Product, BlogPost, SocialLink } from '../../app/types';
+import Header from '../layout/Header';
 
 const socialLinks: SocialLink[] = [
   {

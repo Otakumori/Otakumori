@@ -2,19 +2,21 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useSound } from '../app/lib/hooks/useSound';
+import { useHaptic } from '../app/lib/hooks/useHaptic';
 import { useState } from 'react';
 
 export const SoundSettings = () => {
-  const { isMuted, toggleMute, playSound } = useSound();
+  const { playSound } = useSound();
   const { vibrate } = useHaptic();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
-  const handleToggle = () => {
-    toggleMute();
-    vibrate('light');
-    playSound('click');
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (!isMuted) {
+      playSound('/assets/sounds/ui-click.mp3');
+    }
   };
 
   return (
@@ -42,7 +44,7 @@ export const SoundSettings = () => {
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={handleToggle}
+                  onClick={toggleMute}
                   className={`rounded-lg p-2 ${isMuted ? 'bg-red-500/20' : 'bg-green-500/20'}`}
                 >
                   {isMuted ? '🔇' : '🔊'}

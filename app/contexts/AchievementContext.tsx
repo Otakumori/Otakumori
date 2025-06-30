@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Achievement } from '@/types/achievements';
+import { Achievement } from '../types/achievements';
 
 interface AchievementContextType {
   achievements: Achievement[];

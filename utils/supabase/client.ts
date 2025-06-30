@@ -1,29 +1,35 @@
+import { env } from '../../app/env';
 import { createClient } from '@supabase/supabase-js';
-import { env } from '@/env';
-import type { Database } from '@/types/supabase';
+import type { Database } from '../../types/supabase';
 
-if (!env.NEXT_PUBLIC_SUPABASE_URL) {
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+if (!supabaseUrl) {
   throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
 }
 
-if (!env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+if (!supabaseAnonKey) {
   throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
+// Create Supabase client with fallback handling
 export const supabase = createClient<Database>(
-  env.NEXT_PUBLIC_SUPABASE_URL,
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  supabaseUrl || 'https://placeholder.supabase.co',
+  supabaseAnonKey || 'placeholder-key',
   {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
     },
-    realtime: {
-      params: {
-        eventsPerSecond: 10,
+    ...(typeof window !== 'undefined' && {
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
       },
-    },
+    }),
   }
 );
 

@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
-import { useFriendStore } from '@/lib/store/friendStore';
-import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
+import { useFriendStore } from '../app/lib/store/friendStore';
+import { useLeaderboardStore } from '../app/lib/store/leaderboardStore';
 
 interface Activity {
   id: string;
@@ -26,13 +26,13 @@ export const FriendActivity = () => {
 
   // Get the latest 3 game activities
   const gameActivities: Activity[] = entries
-    .sort((a, b) => b.timestamp - a.timestamp)
+    .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
     .slice(0, 3)
     .map(entry => ({
       id: `game-${entry.id}-${entry.timestamp}`,
       type: 'game' as const,
       message: `${entry.username ? entry.username : entry.id} scored ${entry.score} in ${entry.game}`,
-      timestamp: entry.timestamp,
+      timestamp: entry.timestamp ?? Date.now(),
       friendId: entry.id,
     }));
 

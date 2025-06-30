@@ -2,10 +2,10 @@
 
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { FriendChat } from '@/components/FriendChat';
-import { useFriendStore } from '@/lib/store/friendStore';
-import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
-import type { LeaderboardEntry } from '@/lib/store/leaderboardStore';
+import { FriendChat } from '../../components/FriendChat';
+import { useFriendStore } from '../../lib/store/friendStore';
+import { useLeaderboardStore } from '../../lib/store/leaderboardStore';
+import type { LeaderboardEntry } from '../../lib/store/leaderboardStore';
 
 export default function FriendProfilePage() {
   const params = useParams();

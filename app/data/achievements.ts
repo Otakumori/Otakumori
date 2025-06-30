@@ -1,4 +1,4 @@
-import { Achievement } from '@/types/achievements';
+import { Achievement } from '../types/achievements';
 
 export const achievements: Achievement[] = [
   // Site Interaction Achievements

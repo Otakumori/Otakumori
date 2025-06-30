@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { env } from '@/env';
+import { env } from '../../env';
 
 const BASE_URL = 'https://api.printify.com/v1';
 const MAX_RETRIES = 3;

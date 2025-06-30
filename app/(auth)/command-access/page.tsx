@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 import { motion } from 'framer-motion';
 
 export default function CommandAccess() {
@@ -43,7 +43,7 @@ export default function CommandAccess() {
           Commander Access
         </h1>
         <p className="mb-6 text-center text-sm text-gray-400">
-          Welcome to Otaku-mori’s inner sanctum
+          Welcome to Otaku-mori's inner sanctum
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">

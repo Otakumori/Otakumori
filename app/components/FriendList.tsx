@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useFriendSystemStore, Friend } from '@/lib/store/friendSystemStore';
-import { motion } from 'framer-motion';
+import { useFriendSystemStore, Friend } from '../lib/store/friendSystemStore';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AsciiArt } from './AsciiArt';
 
 interface FriendRequest {

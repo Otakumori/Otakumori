@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '@/components/cart/CartProvider';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { useCart } from '../../components/cart/CartProvider';
+import { Button } from '../../components/ui/button';
+import { Card } from '../../../components/ui/card';
+import Input from '../../../components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Lock } from 'lucide-react';

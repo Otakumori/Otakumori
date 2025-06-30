@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Petal } from '@/types';
+import { Petal } from '../../types';
 
 const InteractiveCherryBlossom: React.FC = () => {
   const [petals, setPetals] = useState<Petal[]>([]);

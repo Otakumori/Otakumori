@@ -1,12 +1,11 @@
-import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
+import * as Sentry from '@sentry/nextjs';
 import { Replay } from '@sentry/replay';
 
 Sentry.init({
   dsn: 'https://388fd3ecd8a41c61b6cf6c9e7f42e15d@o4509520271114240.ingest.us.sentry.io/4509520275701760',
   sendDefaultPii: true,
   tracesSampleRate: 1.0, // Adjust for production
-  integrations: [new BrowserTracing(), new Replay()],
+  integrations: [new Replay()],
   // You can add more options here (release, environment, etc.)
 });
 

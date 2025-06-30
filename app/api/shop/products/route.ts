@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { fetchProducts } from '@/utils/printifyAPI';
-import { supabase, handleSupabaseError } from '@/utils/supabase/client';
+import { NextRequest, NextResponse } from 'next/server';
+import { printify } from '../../../utils/printifyAPI.js';
+import { supabase, handleSupabaseError } from '../../../utils/supabase/client.ts';
 
 interface PrintifyImage {
   src: string;
@@ -33,7 +33,7 @@ interface PrintifyProduct {
 export async function GET() {
   try {
     // Fetch products from Printify
-    const printifyProducts: any = await fetchProducts();
+    const printifyProducts: any = await printify();
 
     // Type guard: check if printifyProducts has a data property
     const productsArray = Array.isArray(printifyProducts)

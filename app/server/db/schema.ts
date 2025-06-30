@@ -1,5 +1,5 @@
-import { relations, sql } from 'drizzle-orm';
-import { index, pgTableCreator, primaryKey } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { pgTable, integer, varchar, timestamp, text, serial } from 'drizzle-orm/pg-core';
 import { type AdapterAccount } from 'next-auth/adapters';
 
 /**
@@ -8,98 +8,52 @@ import { type AdapterAccount } from 'next-auth/adapters';
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator(name => `Otaku-mori_${name}`);
-
-export const posts = createTable(
-  'post',
-  d => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
-    createdById: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-  }),
-  t => [index('created_by_idx').on(t.createdById), index('name_idx').on(t.name)]
-);
-
-export const users = createTable('user', d => ({
-  id: d
-    .varchar({ length: 255 })
+export const posts = pgTable('posts', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 256 }),
+  createdById: varchar('createdById', { length: 255 })
     .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: d.varchar({ length: 255 }),
-  email: d.varchar({ length: 255 }).notNull(),
-  emailVerified: d
-    .timestamp({
-      mode: 'date',
-      withTimezone: true,
-    })
-    .default(sql`CURRENT_TIMESTAMP`),
-  image: d.varchar({ length: 255 }),
-}));
+    .references(() => users.id),
+  createdAt: timestamp('createdAt', { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp('updatedAt', { withTimezone: true }),
+});
 
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
+export const users = pgTable('users', {
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  name: varchar('name', { length: 255 }),
+  email: varchar('email', { length: 255 }).notNull(),
+  emailVerified: timestamp('emailVerified', { withTimezone: true }).default(sql`CURRENT_TIMESTAMP`),
+  image: varchar('image', { length: 255 }),
+});
 
-export const accounts = createTable(
-  'account',
-  d => ({
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    type: d.varchar({ length: 255 }).$type<AdapterAccount['type']>().notNull(),
-    provider: d.varchar({ length: 255 }).notNull(),
-    providerAccountId: d.varchar({ length: 255 }).notNull(),
-    refresh_token: d.text(),
-    access_token: d.text(),
-    expires_at: d.integer(),
-    token_type: d.varchar({ length: 255 }),
-    scope: d.varchar({ length: 255 }),
-    id_token: d.text(),
-    session_state: d.varchar({ length: 255 }),
-  }),
-  t => [
-    primaryKey({ columns: [t.provider, t.providerAccountId] }),
-    index('account_user_id_idx').on(t.userId),
-  ]
-);
+export const accounts = pgTable('accounts', {
+  userId: varchar('userId', { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  type: varchar('type', { length: 255 }).notNull(),
+  provider: varchar('provider', { length: 255 }).notNull(),
+  providerAccountId: varchar('providerAccountId', { length: 255 }).notNull(),
+  refresh_token: text('refresh_token'),
+  access_token: text('access_token'),
+  expires_at: integer('expires_at'),
+  token_type: varchar('token_type', { length: 255 }),
+  scope: varchar('scope', { length: 255 }),
+  id_token: text('id_token'),
+  session_state: varchar('session_state', { length: 255 }),
+});
 
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  user: one(users, { fields: [accounts.userId], references: [users.id] }),
-}));
+export const sessions = pgTable('sessions', {
+  sessionToken: varchar('sessionToken', { length: 255 }).notNull().primaryKey(),
+  userId: varchar('userId', { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  expires: timestamp('expires', { withTimezone: true }).notNull(),
+});
 
-export const sessions = createTable(
-  'session',
-  d => ({
-    sessionToken: d.varchar({ length: 255 }).notNull().primaryKey(),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    expires: d.timestamp({ mode: 'date', withTimezone: true }).notNull(),
-  }),
-  t => [index('t_user_id_idx').on(t.userId)]
-);
-
-export const sessionsRelations = relations(sessions, ({ one }) => ({
-  user: one(users, { fields: [sessions.userId], references: [users.id] }),
-}));
-
-export const verificationTokens = createTable(
-  'verification_token',
-  d => ({
-    identifier: d.varchar({ length: 255 }).notNull(),
-    token: d.varchar({ length: 255 }).notNull(),
-    expires: d.timestamp({ mode: 'date', withTimezone: true }).notNull(),
-  }),
-  t => [primaryKey({ columns: [t.identifier, t.token] })]
-);
+export const verificationTokens = pgTable('verification_tokens', {
+  identifier: varchar('identifier', { length: 255 }).notNull(),
+  token: varchar('token', { length: 255 }).notNull(),
+  expires: timestamp('expires', { withTimezone: true }).notNull(),
+});

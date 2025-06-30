@@ -2,8 +2,8 @@
 import { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import { motion } from 'framer-motion';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useSound } from '../lib/hooks/useSound';
+import { useHaptic } from '../lib/hooks/useHaptic';
 
 interface AvatarCustomizerProps {
   imageSrc: string;

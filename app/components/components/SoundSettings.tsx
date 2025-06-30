@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSoundSettings } from '@/hooks/hooks/useSoundSettings';
+import { useSoundSettings } from '../../hooks/hooks/useSoundSettings';
 
 export const SoundSettings = () => {
   const { volume, setVolume, isMuted, toggleMute } = useSoundSettings();

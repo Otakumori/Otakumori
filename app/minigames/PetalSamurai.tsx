@@ -1,6 +1,25 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAchievements } from '../lib/hooks/useAchievements';
+import Image from 'next/image';
+
+interface Petal {
+  id: number;
+  x: number;
+  y: number;
+  speed: number;
+  rotation: number;
+  sliced: boolean;
+  type: 'cherry' | 'sakura' | 'golden';
+}
+
+interface Slice {
+  id: number;
+  x: number;
+  y: number;
+  angle: number;
+  timestamp: number;
+}
 
 const PETAL = '°❀.ೃ࿔* ';
 const NINJA = '忍者';
@@ -31,249 +50,386 @@ function randomRotate() {
 
 export default function PetalSamurai() {
   const { unlockAchievement } = useAchievements();
-  const [petals, setPetals] = useState(
-    Array.from({ length: PETAL_COUNT }, (_, i) => ({
-      id: i + '-' + Math.random(),
-      x: randomX(),
-      duration: randomDuration(),
-      rotate: randomRotate(),
-      sliced: false,
-    }))
-  );
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [score, setScore] = useState(0);
-  const [resetKey, setResetKey] = useState(0);
   const [combo, setCombo] = useState(0);
-  const [multiplier, setMultiplier] = useState(1);
-  const comboTimer = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [petals, setPetals] = useState<Petal[]>([]);
+  const [slices, setSlices] = useState<Slice[]>([]);
+  const [samuraiX, setSamuraiX] = useState(50);
+  const [isGameActive, setIsGameActive] = useState(false);
+  const [gameTime, setGameTime] = useState(0);
+  const [lastPetalId, setLastPetalId] = useState(0);
+  const [lastSliceId, setLastSliceId] = useState(0);
 
-  const handleSlice = (id: string) => {
-    setPetals(petals => petals.map(p => (p.id === id && !p.sliced ? { ...p, sliced: true } : p)));
-    setScore(s => {
-      const newScore = s + 1 * multiplier;
-      // Achievement: Slice 100 petals in one round
-      if (newScore >= 100) unlockAchievement('petal_samurai_100slice');
-      // Achievement: Sliced in Silence (if audio muted and score >= 1000)
-      if (audioRef.current && audioRef.current.volume === 0 && newScore >= 1000)
-        unlockAchievement('petal_samurai_silence');
-      return newScore;
-    });
-    setCombo(c => {
-      const newCombo = c + 1;
-      // Achievement: Edge Lord (combo streak 20)
-      if (newCombo === 20) unlockAchievement('petal_samurai_edgelord');
-      // Achievement: Zen Is a Lie (swing 50+ times in 10s)
-      // (This would require a swing counter and timer, omitted for brevity)
-      return newCombo;
-    });
-    setMultiplier(m => Math.min(5, m + 1));
-    if (comboTimer.current) clearTimeout(comboTimer.current);
-    comboTimer.current = setTimeout(() => {
-      setCombo(0);
-      setMultiplier(1);
-    }, 1200);
+  const GAME_WIDTH = 800;
+  const GAME_HEIGHT = 600;
+  const SAMURAI_SPEED = 2;
+  const PETAL_SPAWN_RATE = 60; // frames between spawns
+
+  // Petal image paths - use your new PNGs
+  const PETAL_IMAGES = {
+    cherry: '/assets/images/petal-cherry.png',
+    sakura: '/assets/images/petal-sakura.png',
+    golden: '/assets/images/petal-golden.png',
   };
 
+  // Preload petal images on client
+  const petalImageCache = useRef<{ [key in Petal['type']]: HTMLImageElement | null }>({
+    cherry: null,
+    sakura: null,
+    golden: null,
+  });
   useEffect(() => {
-    // Remove sliced petals and respawn new ones
-    const t = setInterval(() => {
-      setPetals(petals =>
-        petals.map(p =>
-          p.sliced
-            ? {
-                id: Math.random() + '-' + Date.now(),
-                x: randomX(),
-                duration: randomDuration(),
-                rotate: randomRotate(),
-                sliced: false,
-              }
-            : p
-        )
+    if (typeof window === 'undefined') return;
+    (['cherry', 'sakura', 'golden'] as Petal['type'][]).forEach(type => {
+      const img = new window.Image();
+      img.src = PETAL_IMAGES[type];
+      petalImageCache.current[type] = img;
+    });
+  }, []);
+
+  // Game loop
+  useEffect(() => {
+    if (!isGameActive) return;
+
+    let frameCount = 0;
+    const gameLoop = () => {
+      frameCount++;
+
+      // Spawn petals
+      if (frameCount % PETAL_SPAWN_RATE === 0) {
+        spawnPetal();
+      }
+
+      // Update petal positions
+      setPetals(prev =>
+        prev
+          .map(petal => ({
+            ...petal,
+            y: petal.y - petal.speed,
+            rotation: petal.rotation + 2,
+          }))
+          .filter(petal => petal.y > -50)
       );
-    }, 900);
-    return () => clearInterval(t);
-  }, [resetKey]);
 
+      // Update slice effects
+      setSlices(prev => prev.filter(slice => Date.now() - slice.timestamp < 500));
+
+      // Update samurai position
+      setSamuraiX(prev => {
+        const targetX = 50 + Math.sin(Date.now() * 0.001) * 20;
+        return prev + (targetX - prev) * 0.1;
+      });
+
+      // Update game time
+      setGameTime(prev => prev + 1);
+
+      requestAnimationFrame(gameLoop);
+    };
+
+    const interval = requestAnimationFrame(gameLoop);
+    return () => cancelAnimationFrame(interval);
+  }, [isGameActive]);
+
+  const spawnPetal = useCallback(() => {
+    const types: Petal['type'][] = ['cherry', 'sakura', 'golden'];
+    const newPetal: Petal = {
+      id: lastPetalId + 1,
+      x: Math.random() * (GAME_WIDTH - 100) + 50,
+      y: GAME_HEIGHT + 50,
+      speed: 1 + Math.random() * 2,
+      rotation: 0,
+      sliced: false,
+      type: types[Math.floor(Math.random() * types.length)],
+    };
+    setLastPetalId(prev => prev + 1);
+    setPetals(prev => [...prev, newPetal]);
+  }, [lastPetalId]);
+
+  const handleSlice = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!isGameActive) return;
+
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Create slice effect
+      const newSlice: Slice = {
+        id: lastSliceId + 1,
+        x,
+        y,
+        angle: Math.atan2(y - GAME_HEIGHT / 2, x - GAME_WIDTH / 2),
+        timestamp: Date.now(),
+      };
+      setLastSliceId(prev => prev + 1);
+      setSlices(prev => [...prev, newSlice]);
+
+      // Check for petal hits
+      setPetals(prev =>
+        prev.map(petal => {
+          const distance = Math.sqrt((x - petal.x) ** 2 + (y - petal.y) ** 2);
+          if (distance < 30 && !petal.sliced) {
+            // Petal hit!
+            const points = petal.type === 'golden' ? 50 : petal.type === 'sakura' ? 20 : 10;
+            setScore(s => s + points);
+            setCombo(c => c + 1);
+
+            // Achievement unlocks
+            if (combo + 1 >= 10) unlockAchievement('petal_samurai_combo');
+            if (score + points >= 1000) unlockAchievement('petal_samurai_master');
+            if (petal.type === 'golden') unlockAchievement('petal_samurai_golden');
+
+            return { ...petal, sliced: true };
+          }
+          return petal;
+        })
+      );
+    },
+    [isGameActive, lastSliceId, combo, score, unlockAchievement]
+  );
+
+  const startGame = () => {
+    setIsGameActive(true);
+    setScore(0);
+    setCombo(0);
+    setGameTime(0);
+    setPetals([]);
+    setSlices([]);
+  };
+
+  const stopGame = () => {
+    setIsGameActive(false);
+    if (score > 500) unlockAchievement('petal_samurai_warrior');
+  };
+
+  // Draw game
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = 0.25;
-      audioRef.current.loop = true;
-      audioRef.current.play().catch(() => {});
+    if (typeof window === 'undefined') return; // Only run on client
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Draw background gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Draw cherry blossoms in background
+    ctx.fillStyle = 'rgba(255, 182, 193, 0.1)';
+    for (let i = 0; i < 20; i++) {
+      const x = (i * 40) % GAME_WIDTH;
+      const y = (Date.now() * 0.1 + i * 30) % GAME_HEIGHT;
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
     }
-  }, [resetKey]);
 
-  useEffect(() => {
-    // Achievement: All Petal, No Metal (lose with 0 slashes)
-    if (score === 0 && resetKey > 0) unlockAchievement('petal_samurai_nometal');
-    // Achievement: Don't Touch My Petals (miss 0 petals in a full session)
-    // (Would require tracking missed petals, omitted for brevity)
-  }, [resetKey]);
+    // Draw samurai (simplified)
+    ctx.fillStyle = '#8B0000';
+    ctx.fillRect(samuraiX - 10, GAME_HEIGHT - 80, 20, 60);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(samuraiX - 5, GAME_HEIGHT - 90, 10, 20);
+
+    // Draw petals using images
+    petals.forEach(petal => {
+      ctx.save();
+      ctx.translate(petal.x, petal.y);
+      ctx.rotate((petal.rotation * Math.PI) / 180);
+      const img = petalImageCache.current[petal.type];
+      if (petal.sliced) {
+        ctx.globalAlpha = 0.5;
+      }
+      if (img && img.complete) {
+        ctx.drawImage(img, -15, -8, 30, 16);
+      }
+      ctx.restore();
+    });
+
+    // Draw slice effects
+    slices.forEach(slice => {
+      const alpha = 1 - (Date.now() - slice.timestamp) / 500;
+      ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(slice.x - 20, slice.y - 20);
+      ctx.lineTo(slice.x + 20, slice.y + 20);
+      ctx.stroke();
+    });
+
+    // Draw UI
+    ctx.fillStyle = '#fff';
+    ctx.font = '24px Arial';
+    ctx.fillText(`Score: ${score}`, 20, 40);
+    ctx.fillText(`Combo: ${combo}`, 20, 70);
+    ctx.fillText(`Time: ${Math.floor(gameTime / 60)}s`, 20, 100);
+  }, [petals, slices, samuraiX, score, combo, gameTime]);
 
   return (
     <div
       style={{
-        position: 'relative',
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
-        background: 'linear-gradient(to top, #f9e6ff 0%, #b2d8f7 100%)',
+        background: '#181818',
+        minHeight: '100vh',
+        color: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
       }}
     >
-      <audio ref={audioRef} src={MUSIC_SRC} preload="auto" />
+      {/* GameCube-style header */}
       <div
         style={{
-          position: 'absolute',
-          left: '50%',
-          bottom: 32,
-          transform: 'translateX(-50%)',
-          width: 96,
-          height: 128,
-          zIndex: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pointerEvents: 'none',
+          background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)',
+          borderRadius: '12px',
+          padding: '16px 24px',
+          marginBottom: '24px',
+          border: '2px solid #F59E0B',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
         }}
       >
-        <div className="samurai-idle">
-          <img
-            src={FEMALE_SKIN}
-            alt="Samurai Skin"
-            style={{ position: 'absolute', width: 96, height: 128, zIndex: 1 }}
-          />
-          <img
-            src={FEMALE_HAIR}
-            alt="Samurai Hair"
-            style={{
-              position: 'absolute',
-              width: 96,
-              height: 128,
-              zIndex: 2,
-              animation: 'hair-sway 2.2s ease-in-out infinite',
-            }}
-          />
-          <img
-            src={FEMALE_CLOTHING}
-            alt="Samurai Clothing"
-            style={{ position: 'absolute', width: 96, height: 128, zIndex: 3 }}
-          />
-          <img
-            src={FEMALE_BOOTS}
-            alt="Samurai Boots"
-            style={{ position: 'absolute', width: 96, height: 128, zIndex: 4 }}
-          />
-          <img
-            src={FEMALE_SWORD}
-            alt="Samurai Sword"
-            style={{
-              position: 'absolute',
-              width: 96,
-              height: 128,
-              zIndex: 5,
-              animation: 'sword-bounce 1.8s ease-in-out infinite',
-            }}
-          />
-        </div>
-      </div>
-      <style>{`
-        .samurai-idle {
-          position: relative;
-          width: 96px;
-          height: 128px;
-          animation: idle-bounce 2s ease-in-out infinite;
-        }
-        @keyframes idle-bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes hair-sway {
-          0%, 100% { transform: rotate(-2deg); }
-          50% { transform: rotate(4deg); }
-        }
-        @keyframes sword-bounce {
-          0%, 100% { transform: translateY(0) rotate(-2deg); }
-          50% { transform: translateY(-4px) rotate(2deg); }
-        }
-      `}</style>
-      {petals.map((p, i) => (
-        <span
-          key={p.id}
-          onClick={() => handleSlice(p.id)}
+        <div
           style={{
-            position: 'absolute',
-            left: p.x,
-            top: p.sliced ? '110%' : '-40px',
-            fontSize: 36 + Math.random() * 18,
-            cursor: p.sliced ? 'default' : 'pointer',
-            userSelect: 'none',
-            transition: `top ${p.duration}s linear, transform ${p.duration}s linear`,
-            transitionDelay: p.sliced ? '0s' : `${i * 0.18}s`,
-            transform: `rotate(${p.rotate}deg)`,
-            filter: p.sliced ? 'blur(2px) opacity(0.3)' : 'drop-shadow(0 2px 8px #fff8)',
-            color: '#e75480',
-            textShadow: '0 2px 8px #fff8',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            color: '#fff',
           }}
         >
-          {PETAL}
-        </span>
-      ))}
-      <div
-        style={{
-          position: 'absolute',
-          top: 24,
-          left: 24,
-          fontSize: 26,
-          color: '#333',
-          background: '#fff8',
-          borderRadius: 10,
-          padding: '10px 28px',
-          fontWeight: 700,
-          boxShadow: '0 2px 8px #0002',
-        }}
-      >
-        Score: {score}
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              background: '#F59E0B',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#000',
+            }}
+          >
+            GC
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>Petal Samurai</h1>
+          <div
+            style={{
+              fontSize: '12px',
+              color: '#F59E0B',
+              fontFamily: 'monospace',
+            }}
+          >
+            GAME CUBE
+          </div>
+        </div>
       </div>
-      <div
-        style={{
-          position: 'absolute',
-          top: 24,
-          right: 24,
-          fontSize: 22,
-          color: '#fff',
-          background: '#e75480',
-          borderRadius: 10,
-          padding: '8px 20px',
-          fontWeight: 700,
-          boxShadow: '0 2px 8px #e7548088',
-          letterSpacing: 2,
-        }}
-      >
-        Combo: {combo}x &nbsp;|&nbsp; Multiplier: {multiplier}x
+
+      <p style={{ fontSize: 18, marginBottom: 32, textAlign: 'center' }}>
+        Slice falling petals with calm precision. Build combos for higher scores!
+      </p>
+
+      <div style={{ position: 'relative', marginBottom: 20 }}>
+        <canvas
+          ref={canvasRef}
+          width={GAME_WIDTH}
+          height={GAME_HEIGHT}
+          style={{
+            border: '3px solid #8B5CF6',
+            borderRadius: '12px',
+            cursor: 'crosshair',
+            boxShadow: '0 8px 32px rgba(139, 92, 246, 0.3)',
+          }}
+          onMouseMove={handleSlice}
+        />
+
+        {!isGameActive && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+              background: 'rgba(0, 0, 0, 0.9)',
+              padding: '24px',
+              borderRadius: '12px',
+              border: '2px solid #8B5CF6',
+            }}
+          >
+            <p style={{ marginBottom: '16px', fontSize: '18px' }}>Click to slice petals!</p>
+            <button
+              onClick={startGame}
+              style={{
+                fontSize: '18px',
+                padding: '12px 24px',
+                background: 'linear-gradient(135deg, #8B5CF6, #3B82F6)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+              }}
+            >
+              Start Game
+            </button>
+          </div>
+        )}
       </div>
-      <button
-        onClick={() => {
-          setScore(0);
-          setCombo(0);
-          setMultiplier(1);
-          setResetKey(k => k + 1);
-        }}
-        style={{
-          position: 'absolute',
-          bottom: 32,
-          right: 32,
-          fontSize: 18,
-          padding: '10px 28px',
-          borderRadius: 10,
-          background: '#fff',
-          color: '#222',
-          border: 'none',
-          cursor: 'pointer',
-          boxShadow: '0 2px 8px #0003',
-          fontWeight: 700,
-        }}
-      >
-        Reset
-      </button>
+
+      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+        <button
+          onClick={isGameActive ? stopGame : startGame}
+          style={{
+            fontSize: 16,
+            padding: '10px 20px',
+            background: isGameActive ? '#EF4444' : '#10B981',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+          }}
+        >
+          {isGameActive ? 'Stop Game' : 'Start Game'}
+        </button>
+
+        <button
+          onClick={() => window.history.back()}
+          style={{
+            fontSize: 16,
+            padding: '10px 20px',
+            background: '#6B7280',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+          }}
+        >
+          Back to Menu
+        </button>
+      </div>
+
+      <div style={{ fontSize: 14, textAlign: 'center', maxWidth: '600px' }}>
+        <p>
+          <strong>How to play:</strong>
+        </p>
+        <p>• Move your mouse to slice falling petals</p>
+        <p>• Cherry petals: 10 points | Sakura petals: 20 points | Golden petals: 50 points</p>
+        <p>• Build combos for bonus achievements!</p>
+      </div>
     </div>
   );
 }

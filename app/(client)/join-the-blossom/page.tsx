@@ -2,8 +2,9 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { supabase } from '../../lib/supabaseClient';
+import { motion } from 'framer-motion';
 
 function JoinTheBlossomContent() {
   const searchParams = useSearchParams();
@@ -17,6 +18,10 @@ function JoinTheBlossomContent() {
     setError('');
     if (!email.match(/^[^@\s]+@[^@\s]+\.[^@\s]+$/)) {
       setError('Please enter a valid email address.');
+      return;
+    }
+    if (!supabase) {
+      setError('Database not configured');
       return;
     }
     const { error } = await supabase.from('newsletter_signups').insert({ email });

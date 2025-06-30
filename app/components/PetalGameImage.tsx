@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { supabase } from '@/utils/supabase/client';
+import { supabase } from '../utils/supabase/client';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 
@@ -38,6 +38,10 @@ export default function PetalGameImage() {
   // Fetch global and user petal counts
   useEffect(() => {
     const fetchGlobal = async () => {
+      if (!supabase) {
+        console.warn('Supabase client not available');
+        return;
+      }
       const { data } = await supabase
         .from('petal_counters')
         .select('count')

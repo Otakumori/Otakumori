@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Achievement } from '@/app/types/achievements';
-import { useAchievements } from '@/app/contexts/AchievementContext';
+import { Achievement } from '../../app/types/achievements';
+import { useAchievements } from '../../app/contexts/AchievementContext';
 
 interface AchievementCardProps {
   achievement: Achievement;
 }
 
 export default function AchievementCard({ achievement }: AchievementCardProps) {
-  const { getAchievementProgress } = useAchievements();
-  const progress = getAchievementProgress(achievement.id);
+  // const { getAchievementProgress } = useAchievements();
+  const progress = achievement.progress ?? 0;
 
   return (
     <motion.div
@@ -52,9 +52,6 @@ export default function AchievementCard({ achievement }: AchievementCardProps) {
       {/* Reward Info */}
       <div className="flex items-center justify-between text-sm">
         <span className="text-pink-400">{achievement.reward.petals} petals</span>
-        {achievement.reward.customReward && (
-          <span className="text-pink-300">{achievement.reward.customReward}</span>
-        )}
       </div>
 
       {/* Unlock Date */}

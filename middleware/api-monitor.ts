@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { monitor } from '@/lib/monitor';
-import { logger } from '@/lib/logger';
+import { monitor } from '../app/lib/monitor';
+import { logger } from '../app/lib/logger';
 
 export async function apiMonitor(request: NextRequest, response: NextResponse) {
   const startTime = performance.now();
@@ -10,7 +10,7 @@ export async function apiMonitor(request: NextRequest, response: NextResponse) {
 
   try {
     // Record the request
-    await monitor.recordRequest(0); // Initial request time
+    monitor.log('API request started');
 
     // Process the request
     const result = await response;
@@ -19,17 +19,11 @@ export async function apiMonitor(request: NextRequest, response: NextResponse) {
     const responseTime = performance.now() - startTime;
 
     // Record API metrics
-    await monitor.recordApiMetrics({
-      endpoint: path,
-      method,
-      responseTime,
-      statusCode: result.status,
-      errorCount: result.status >= 400 ? 1 : 0,
-    });
+    monitor.log(`API ${method} ${path} - ${result.status} (${responseTime}ms)`);
 
     // Record error if status code indicates failure
     if (result.status >= 400) {
-      await monitor.recordError();
+      monitor.error(`API Error: ${method} ${path} - ${result.status}`);
       logger.error('API Error', {
         path,
         method,
@@ -41,14 +35,8 @@ export async function apiMonitor(request: NextRequest, response: NextResponse) {
     return result;
   } catch (error) {
     // Record error
-    await monitor.recordError();
-    await monitor.recordApiMetrics({
-      endpoint: path,
-      method,
-      responseTime: performance.now() - startTime,
-      statusCode: 500,
-      errorCount: 1,
-    });
+    monitor.error(`API Error: ${method} ${path} - ${error}`);
+    monitor.log(`API ${method} ${path} - 500 (${Date.now() - startTime}ms)`);
 
     logger.error('API Error', {
       path,

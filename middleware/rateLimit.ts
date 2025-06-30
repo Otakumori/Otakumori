@@ -1,59 +1,46 @@
-import { Redis } from '@upstash/redis';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { RateLimitError } from '@/lib/error';
+import { env } from '../app/env';
 
-const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL!,
-  token: env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
-interface RateLimitConfig {
-  windowMs: number;
-  max: number;
-  keyPrefix: string;
+class RateLimitError extends Error {
+  constructor(message = 'Rate limit exceeded') {
+    super(message);
+    this.name = 'RateLimitError';
+  }
 }
 
-const defaultConfig: RateLimitConfig = {
-  windowMs: 60 * 1000, // 1 minute
-  max: 100, // 100 requests per window
-  keyPrefix: 'rate-limit:',
-};
+// Simple in-memory rate limiting
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-export async function rateLimit(request: NextRequest, config: Partial<RateLimitConfig> = {}) {
-  const { windowMs, max, keyPrefix } = { ...defaultConfig, ...config };
-  const ip = request.ip ?? 'anonymous';
-  const key = `${keyPrefix}${ip}`;
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS = 100; // 100 requests per minute
 
+export async function rateLimit(request: NextRequest) {
+  const ip = request.ip || 'unknown';
+  const now = Date.now();
+
+  const rateLimitInfo = rateLimitMap.get(ip);
+
+  if (!rateLimitInfo || now > rateLimitInfo.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return;
+  }
+
+  if (rateLimitInfo.count >= MAX_REQUESTS) {
+    throw new RateLimitError();
+  }
+
+  rateLimitInfo.count++;
+}
+
+export async function rateLimitMiddleware(request: NextRequest) {
   try {
-    const current = await redis.incr(key);
-    if (current === 1) {
-      await redis.expire(key, windowMs / 1000);
-    }
-
-    if (current > max) {
-      throw new RateLimitError();
-    }
-
+    await rateLimit(request);
     return NextResponse.next();
   } catch (error) {
     if (error instanceof RateLimitError) {
-      return new NextResponse(
-        JSON.stringify({
-          error: 'Rate limit exceeded',
-          retryAfter: Math.ceil(windowMs / 1000),
-        }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': Math.ceil(windowMs / 1000).toString(),
-          },
-        }
-      );
+      return new NextResponse('Rate limit exceeded', { status: 429 });
     }
-
-    console.error('Rate limit error:', error);
-    return NextResponse.next();
+    throw error;
   }
 }
