@@ -1,10 +1,9 @@
 'use client';
-'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useSound } from '../lib/hooks/useSound';
+import { useHaptic } from '../lib/hooks/useHaptic';
 
 interface PhoneCallProps {
   character: {

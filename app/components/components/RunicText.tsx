@@ -1,6 +1,6 @@
-import { useRunicText } from '@/hooks/hooks/useRunicText';
-import { cn } from '@/lib/utils';
-import { useAudio } from '@/hooks/useAudio';
+import { useRunicText } from '../../hooks/hooks/useRunicText';
+import { cn } from '../../lib/utils';
+import { useAudio } from '../../hooks/useAudio';
 
 interface RunicTextProps {
   text: string;

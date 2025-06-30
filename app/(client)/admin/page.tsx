@@ -1,13 +1,12 @@
 'use client';
-'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import LoadingBonfire from '@/components/ui/LoadingBonfire';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import LoadingBonfire from '../../../components/ui/LoadingBonfire';
 import { motion } from 'framer-motion';
-import QuickActions from '@/components/admin/QuickActions';
-import MessageManager from '@/components/admin/MessageManager';
+import QuickActions from '../../../components/admin/QuickActions';
+import MessageManager from '../../../components/admin/MessageManager';
 
 interface AdminStats {
   totalUsers: number;
@@ -18,6 +17,7 @@ interface AdminStats {
 }
 
 export default function AdminPage() {
+  const supabase = useSupabaseClient();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);

@@ -1,12 +1,13 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { PetalEffect } from '../PetalEffect';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useSound } from '../../app/lib/hooks/useSound';
+import { useHaptic } from '../../app/lib/hooks/useHaptic';
 import { useToast } from '../Toast';
-import { useAchievements } from '@/lib/hooks/useAchievements';
-import { usePetalCollection } from '@/lib/hooks/usePetalCollection';
+import { useAchievements } from '../../app/lib/hooks/useAchievements';
+import { usePetals } from '../../app/hooks/hooks/usePetals';
 
 interface GameState {
   score: number;
@@ -27,7 +28,7 @@ export const PetalCatch = () => {
   const { vibrate } = useHaptic();
   const { showToast } = useToast();
   const { unlockAchievement } = useAchievements();
-  const { collectPetal } = usePetalCollection();
+  const { addPetal } = usePetals();
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -78,7 +79,7 @@ export const PetalCatch = () => {
       score: prev.score + 1,
     }));
 
-    collectPetal(1);
+    addPetal();
     playSound('petal');
     vibrate('light');
 

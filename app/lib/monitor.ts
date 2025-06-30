@@ -1,5 +1,5 @@
 export const monitor = {
-  log: (message: string) => console.log(message),
+  log: (...args: any[]) => console.log(...args),
   error: (error: any) => console.error(error),
   checkHealth: async () => ({
     status: 'healthy',
@@ -80,4 +80,30 @@ export const monitor = {
       animationErrors: 0,
     },
   }),
+  collectMetrics: async (metrics?: any) => {
+    try {
+      const page = window.location.pathname;
+      const userAgent = navigator.userAgent;
+      const payload = {
+        metrics,
+        page,
+        userAgent,
+        timestamp: Date.now(),
+      };
+      const res = await fetch('/api/metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('Failed to send metrics');
+      const data = await res.json();
+      monitor.log('Metrics sent:', data);
+      return data;
+    } catch (err) {
+      monitor.error(err);
+    }
+  },
+  recordGameMetrics: (metrics: any) => {
+    monitor.log('Game metrics recorded:', metrics);
+  },
 };

@@ -1,10 +1,10 @@
 'use client';
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMessageCircle, FiX } from 'react-icons/fi';
+import { supabase } from '../lib/supabaseClient';
 
 interface SoapstoneComment {
   id: string;

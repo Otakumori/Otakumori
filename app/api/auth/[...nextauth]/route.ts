@@ -3,10 +3,11 @@ import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
+import { env } from '../../../env';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  env.NEXT_PUBLIC_SUPABASE_URL || '',
+  env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
 declare module 'next-auth' {
@@ -23,8 +24,8 @@ declare module 'next-auth' {
 const handler = NextAuth({
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID || '',
-      clientSecret: process.env.GITHUB_SECRET || '',
+      clientId: env.AUTH_DISCORD_ID || '',
+      clientSecret: env.AUTH_DISCORD_SECRET || '',
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -58,6 +59,7 @@ const handler = NextAuth({
           email: user.email,
           name: user.name,
           image: user.image,
+          username: user.username || user.name || user.email,
         };
       },
     }),

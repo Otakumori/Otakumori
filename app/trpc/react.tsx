@@ -2,25 +2,24 @@
 
 import { useState } from 'react';
 import { createTRPCReact } from '@trpc/react-query';
-import { httpBatchStreamLink, loggerLink } from '@trpc/client';
+import { httpBatchLink, loggerLink } from '@trpc/client';
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
-import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import SuperJSON from 'superjson';
 
-import { type AppRouter } from '~/server/api/root';
-import { createQueryClient } from './query-client';
-import { env } from '@/env'; // ✅ Import validated env vars
+import { env } from '../env'; // ✅ Import validated env vars
+import type { AppRouter } from '../server/api/root';
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 
 const getQueryClient = () => {
   if (typeof window === 'undefined') {
     // Server: create a new QueryClient instance
-    return createQueryClient();
+    return new QueryClient();
   }
 
   // Browser: use singleton instance
-  clientQueryClientSingleton ??= createQueryClient();
+  clientQueryClientSingleton ??= new QueryClient();
   return clientQueryClientSingleton;
 };
 
@@ -40,14 +39,12 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             env.NODE_ENV === 'development' ||
             (op.direction === 'down' && op.result instanceof Error),
         }),
-        httpBatchStreamLink({
-          transformer: SuperJSON,
+        httpBatchLink({
           url: getBaseUrl() + '/api/trpc',
-          headers: () => {
-            const headers = new Headers();
-            headers.set('x-trpc-source', 'nextjs-react');
-            return headers;
-          },
+          transformer: SuperJSON,
+          headers: () => ({
+            'x-trpc-source': 'nextjs-react',
+          }),
         }),
       ],
     })
@@ -64,6 +61,5 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
 
 function getBaseUrl() {
   if (typeof window !== 'undefined') return window.location.origin;
-  if (env.VERCEL_URL) return `https://${env.VERCEL_URL}`;
-  return `http://localhost:${env.PORT ?? 3000}`;
+  return 'http://localhost:3000';
 }

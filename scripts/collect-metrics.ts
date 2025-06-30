@@ -1,6 +1,6 @@
-import { monitor } from '@/lib/monitor';
-import { redis } from '@/lib/redis';
-import { logger } from '@/lib/logger';
+import { monitor } from '../app/lib/monitor';
+import { logger } from '../app/lib/logger';
+import { redis } from './lib/redis';
 
 async function collectMetrics() {
   try {

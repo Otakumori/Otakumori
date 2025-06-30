@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { CherryBlossomTree } from '@/components/games/CherryBlossomTree';
-import { FeaturedProducts } from '@/components/shop/FeaturedProducts';
-import { BlogPreview } from '@/components/blog/BlogPreview';
-import { CommunityGallery } from '@/components/community/CommunityGallery';
-import { Footer } from '@/components/layout/Footer';
+import { CherryBlossomTree } from './components/games/CherryBlossomTree';
+import { FeaturedProducts } from './components/shop/FeaturedProducts';
+import { BlogPreview } from './components/blog/BlogPreview';
+import { CommunityGallery } from './components/community/CommunityGallery';
+import { Footer } from './components/layout/Footer';
+import { Header } from './components/layout/Header';
 
 export default function Home() {
   return (

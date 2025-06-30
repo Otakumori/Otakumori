@@ -1,5 +1,6 @@
 import React from 'react';
-import { Achievement } from '@/types/achievements';
+import type { Achievement } from '../../types/achievements';
+import { AchievementCard } from './AchievementCard';
 
 interface AchievementListProps {
   achievements: Achievement[];

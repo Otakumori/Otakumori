@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/utils/supabase/client';
+import { supabase } from '../utils/supabase/client';
 
 export default function PetalStats() {
   const [progress, setProgress] = useState(0);
@@ -9,6 +9,11 @@ export default function PetalStats() {
 
   useEffect(() => {
     async function fetchStats() {
+      if (!supabase) {
+        console.warn('Supabase client not available');
+        setLoading(false);
+        return;
+      }
       // Example: fetch from a 'seasonal_progress' table
       const { data, error } = await supabase
         .from('seasonal_progress')

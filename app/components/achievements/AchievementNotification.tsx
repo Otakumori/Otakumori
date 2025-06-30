@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Achievement } from '@/types/achievements';
+import { CheckCircle } from 'lucide-react';
+import type { Achievement } from '../../types/achievements';
 
 interface AchievementNotificationProps {
   achievement: Achievement;

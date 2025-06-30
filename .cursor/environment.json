@@ -1,3 +1,8 @@
 {
-  "agentCanUpdateSnapshot": true
+  "install": "npm install",
+  "start": "npm run dev",
+  "build": {
+    "context": ".",
+    "dockerfile": "Dockerfile"
+  }
 }

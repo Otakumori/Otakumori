@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { monitor } from '@/lib/monitor';
+import { monitor } from './app/lib/monitor';
 import { apiMonitor } from './middleware/api-monitor';
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+// TODO: Replace with HTTP-based Redis client if needed
+
+const MAINTENANCE_KEY = 'site:maintenance';
+
+async function isAdmin(request: NextRequest) {
+  const apiKey = request.headers.get('x-api-key');
+  if (apiKey && apiKey === process.env.API_KEY) return true;
+  // Add session-based admin check here if needed
+  return false;
+}
 
 export async function middleware(request: NextRequest) {
   const startTime = Date.now();
@@ -27,6 +37,9 @@ export async function middleware(request: NextRequest) {
 
     // Check if the request is for an API endpoint
     const isApiRequest = path.startsWith('/api');
+
+    // Maintenance mode check
+    // TODO: Integrate HTTP-based Redis client for maintenance mode
 
     // Initialize Supabase client
     const res = NextResponse.next();
@@ -63,14 +76,14 @@ export async function middleware(request: NextRequest) {
 
     // Record request metrics
     const responseTime = Date.now() - startTime;
-    await monitor.recordRequest(responseTime);
+    monitor.log(`Request completed in ${responseTime}ms`);
 
     return response;
   } catch (error) {
     // Record error
     monitor.error(error);
     console.error('Middleware error:', error);
-    return NextResponse.next(); // Allow the request to proceed even if monitoring fails
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 

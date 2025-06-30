@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { AchievementProvider } from '@/contexts/AchievementContext';
-import { AchievementNotificationManager } from '@/components/achievements/AchievementNotificationManager';
+import { AchievementProvider } from '../contexts/AchievementContext';
+import { AchievementNotificationManager } from '../components/achievements/AchievementNotificationManager';
 
 interface AchievementsLayoutProps {
   children: React.ReactNode;

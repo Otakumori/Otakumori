@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Petal } from '@/app/types';
+import { Petal } from '../../app/types';
 
 interface LeaderboardEntry {
   username: string;

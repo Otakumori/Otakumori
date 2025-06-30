@@ -1,8 +1,10 @@
+'use client';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function Footer() {
   const { isAuthenticated } = useAuth();

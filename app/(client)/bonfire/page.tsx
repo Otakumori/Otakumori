@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import LoadingBonfire from '@/components/ui/LoadingBonfire';
+import { motion } from 'framer-motion';
+import LoadingBonfire from '../../components/ui/LoadingBonfire';
 
 export default function BonfirePage() {
   return (

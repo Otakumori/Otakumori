@@ -1,9 +1,9 @@
 'use client';
 
-import { useCart } from '@/components/cart/CartProvider';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import Image from 'next/image';
+import { useCart } from '../components/cart/CartProvider.tsx';
+import { Button } from '../components/ui/button.tsx';
+import { Card } from '../components/ui/card.tsx';
 import Link from 'next/link';
 import { Minus, Plus, Trash2, ArrowLeft } from 'lucide-react';
 

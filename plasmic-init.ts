@@ -1,5 +1,5 @@
 import { initPlasmicLoader } from '@plasmicapp/loader-nextjs';
-import PlasmicButton from './src/components/plasmic/PlasmicButton';
+import PlasmicButton from './app/components/components/plasmic/PlasmicButton';
 
 export const PLASMIC = initPlasmicLoader({
   projects: [

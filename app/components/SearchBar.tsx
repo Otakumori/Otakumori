@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useDebounce } from '../hooks/useDebounce';
 
 interface SearchResult {
   id: string;

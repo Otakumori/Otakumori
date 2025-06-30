@@ -3,8 +3,8 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { RunicText } from '@/components/components/RunicText';
+import { supabase } from '../../lib/supabase';
+import { RunicText } from './RunicText';
 
 interface SoapstoneMessageProps {
   message: {

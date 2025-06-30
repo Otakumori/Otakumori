@@ -1,5 +1,5 @@
-import { monitor } from '@/lib/monitor';
-import { logger } from '@/lib/logger';
+import { monitor } from '../app/lib/monitor';
+import { logger } from '../app/lib/logger';
 
 // Define thresholds for alerts
 const THRESHOLDS = {
@@ -48,7 +48,7 @@ async function checkHealth() {
 
     // Check service health
     if (health.services.database.status !== 'healthy') {
-      logger.error('Database service unhealthy:', health.services.database.error);
+      logger.error('Database service unhealthy');
     }
 
     if (health.services.cache.status !== 'healthy') {

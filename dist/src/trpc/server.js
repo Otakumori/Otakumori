@@ -22,6 +22,6 @@ const createContext = (0, react_1.cache)(async () => {
 });
 const getQueryClient = (0, react_1.cache)(query_client_1.createQueryClient);
 const caller = (0, root_1.createCaller)(createContext);
-(_a = (0, rsc_1.createHydrationHelpers)(caller, getQueryClient)),
+((_a = (0, rsc_1.createHydrationHelpers)(caller, getQueryClient)),
   (exports.api = _a.trpc),
-  (exports.HydrateClient = _a.HydrateClient);
+  (exports.HydrateClient = _a.HydrateClient));

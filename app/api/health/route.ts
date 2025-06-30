@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { monitor } from '@/lib/monitor';
+import { monitor } from '../../lib/monitor';
 
 export async function GET() {
   try {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 export default function SoapstoneForm() {
   const [message, setMessage] = useState('');
@@ -14,6 +14,10 @@ export default function SoapstoneForm() {
     setError('');
 
     try {
+      if (!supabase) {
+        throw new Error('Database not configured');
+      }
+
       const {
         data: { user },
       } = await supabase.auth.getUser();

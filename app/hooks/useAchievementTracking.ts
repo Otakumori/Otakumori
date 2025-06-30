@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useAchievements } from '@/hooks/hooks/useAchievements';
+import { useAchievements } from './hooks/useAchievements';
+import { useCommunityAchievements } from './useCommunityAchievements';
 
 // Site Interaction Achievements
 export function useSiteInteractionTracking() {
@@ -228,5 +229,21 @@ export function useSpecialTracking() {
     trackError,
     trackProfileImageUpload,
     trackMysteryBox,
+  };
+}
+
+export function useAchievementTracking() {
+  // Call side-effect-only hooks (they return void)
+  useSiteInteractionTracking();
+  useMysteryTracking();
+
+  // Spread the ones that return objects
+  return {
+    ...useProfileGrowthTracking(),
+    ...useShoppingEngagementTracking(),
+    ...useCommunityTracking(),
+    ...useLoreDiscoveryTracking(),
+    ...useSeasonalTracking(),
+    ...useSpecialTracking(),
   };
 }
