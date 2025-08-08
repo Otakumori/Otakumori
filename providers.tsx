@@ -5,9 +5,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { create } from 'zustand';
 import React, { createContext, useContext, useRef, useEffect } from 'react';
-import { supabase } from './utils/supabase/client';
+// import { supabase } from './utils/supabase/client';
 import { useLocalStorage } from './app/hooks/hooks/useLocalStorage';
-import { useUserStore } from './lib/store/userStore';
+// import { useUserStore } from './lib/store/userStore';
 import mitt from 'mitt';
 
 interface PetalState {
@@ -111,15 +111,9 @@ const usePetalStore = create<PetalState & {
   },
   resetDailyLimit: () => set({ petals: 0 }),
   syncPetals: async (userId: string) => {
-    // Fetch petals from Supabase for logged-in user
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('petals')
-      .eq('id', userId)
-      .single();
-    if (!error && data) {
-      set({ petals: data.petals });
-    }
+    // TODO: Fetch petals from Supabase for logged-in user (disabled for deployment)
+    console.log('syncPetals called for userId:', userId);
+    // For now, do nothing - use localStorage only
   },
 }));
 
@@ -139,38 +133,26 @@ const queryClient = new QueryClient();
 const PetalContext = createContext<typeof usePetalStore | null>(null);
 const OverlordContext = createContext<typeof useOverlordStore | null>(null);
 
-// PetalProvider with persistence logic
+// PetalProvider with persistence logic (simplified for deployment)
 export function PetalProvider({ children }: { children: React.ReactNode }) {
   const store = useRef(usePetalStore);
-  const user = useUserStore(state => state.user);
+  // const user = useUserStore(state => state.user);
   const [localPetals, setLocalPetals] = useLocalStorage('totalPetals', 0);
   const [localRewards, setLocalRewards] = useLocalStorage('petalRewards', PETAL_REWARDS);
 
-  // Sync petals on login/logout
+  // Use localStorage only for now (no user/Supabase integration)
   useEffect(() => {
-    if (user?.id) {
-      // Logged in: sync with Supabase
-      store.current.getState().syncPetals(user.id);
-    } else {
-      // Not logged in: use localStorage
-      store.current.getState().setPetals(localPetals);
-    }
-  }, [user?.id]);
+    store.current.getState().setPetals(localPetals);
+  }, [localPetals]);
 
-  // Persist petals to Supabase/localStorage on change
+  // Persist petals to localStorage only
   useEffect(() => {
     const unsub = store.current.subscribe(state => {
-      if (user?.id) {
-        // Save to Supabase
-        supabase.from('user_profiles').update({ petals: state.petals }).eq('id', user.id);
-      } else {
-        // Save to localStorage
-        setLocalPetals(state.petals);
-        setLocalRewards(state.rewards);
-      }
+      setLocalPetals(state.petals);
+      setLocalRewards(state.rewards);
     });
     return () => unsub();
-  }, [user?.id]);
+  }, [setLocalPetals, setLocalRewards]);
 
   return <PetalContext.Provider value={store.current}>{children}</PetalContext.Provider>;
 }

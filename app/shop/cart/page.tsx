@@ -1,7 +1,10 @@
 'use client';
 
+// Force dynamic rendering to avoid static generation issues with context providers
+export const dynamic = 'force-dynamic';
+
 import Image from 'next/image';
-import { useCart } from '@/components/cart/CartProvider';
+import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
@@ -20,8 +23,7 @@ interface CartItem {
 }
 
 export default function CartPage() {
-  const { cart, updateQuantity, removeFromCart } = useCart();
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { items: cart, updateQuantity, removeItem: removeFromCart, total } = useCart();
 
   if (cart.length === 0) {
     return (

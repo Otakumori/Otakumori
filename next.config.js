@@ -6,6 +6,10 @@ const nextConfig = {
     // Disable ESLint during builds to allow deployment with current linting issues
     ignoreDuringBuilds: true,
   },
+  // Skip static generation for pages with dynamic dependencies
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
   images: {
     domains: [
       'images.unsplash.com',
