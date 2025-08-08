@@ -2,8 +2,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '../app/lib/hooks/useSound';
-import { useHaptic } from '../app/lib/hooks/useHaptic';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
 import { useState } from 'react';
 
 export const SoundSettings = () => {

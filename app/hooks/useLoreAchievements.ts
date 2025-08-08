@@ -1,37 +1,37 @@
 import { useEffect } from 'react';
-import { useAchievements } from '../contexts/AchievementContext';
+import { useAchievements } from '../components/achievements/AchievementProvider';
 
 export function useLoreAchievements() {
-  const { unlock } = useAchievements();
+  const { unlockAchievement } = useAchievements();
 
   // Track hidden link clicks
   const trackHiddenLinkClick = () => {
-    unlock('hidden_link_clicks');
+    unlockAchievement('hidden_link_clicks');
   };
 
   // Track 404 visits
   const track404Visit = () => {
-    unlock('404_visits');
+    unlockAchievement('404_visits');
   };
 
   // Track lore message deciphering
   const trackLoreMessageDeciphered = () => {
-    unlock('lore_messages_deciphered');
+    unlockAchievement('lore_messages_deciphered');
   };
 
   // Track secret page visits
   const trackSecretPageVisit = () => {
-    unlock('secret_page_visits');
+    unlockAchievement('secret_page_visits');
   };
 
   // Track easter egg discoveries
   const trackEasterEggDiscovery = () => {
-    unlock('easter_egg_discoveries');
+    unlockAchievement('easter_egg_discoveries');
   };
 
   // Track lore item collection
   const trackLoreItemCollection = () => {
-    unlock('lore_items_collected');
+    unlockAchievement('lore_items_collected');
   };
 
   return {

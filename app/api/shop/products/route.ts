@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { printify } from '../../../utils/printifyAPI.js';
-import { supabase, handleSupabaseError } from '../../../utils/supabase/client.ts';
+import { printify } from '@/utils/printifyAPI.js';
+import { supabase, handleSupabaseError } from '@/utils/supabase/client.ts';
 
 interface PrintifyImage {
   src: string;

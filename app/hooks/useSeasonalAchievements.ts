@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { useAchievements } from '../contexts/AchievementContext';
+import { useAchievements } from '../components/achievements/AchievementProvider';
 
 export function useSeasonalAchievements() {
-  const { unlock } = useAchievements();
+  const { unlockAchievement } = useAchievements();
 
   // Track seasonal interactions
   const trackSeasonalInteraction = () => {
@@ -10,19 +10,19 @@ export function useSeasonalAchievements() {
 
     // Spring (March-May)
     if (month >= 2 && month <= 4) {
-      unlock('spring_interactions');
+      unlockAchievement('spring_interactions');
     }
     // Summer (June-August)
     else if (month >= 5 && month <= 7) {
-      unlock('summer_interactions');
+      unlockAchievement('summer_interactions');
     }
     // Fall (September-November)
     else if (month >= 8 && month <= 10) {
-      unlock('fall_interactions');
+      unlockAchievement('fall_interactions');
     }
     // Winter (December-February)
     else {
-      unlock('winter_interactions');
+      unlockAchievement('winter_interactions');
     }
   };
 
@@ -33,7 +33,7 @@ export function useSeasonalAchievements() {
     const day = date.getDate();
 
     if (month === 9 && day >= 15 && day <= 31) {
-      unlock('halloween_event');
+      unlockAchievement('halloween_event');
     }
   };
 
@@ -44,18 +44,18 @@ export function useSeasonalAchievements() {
     const day = date.getDate();
 
     if (month === 11) {
-      unlock('december_daily_visits');
+      unlockAchievement('december_daily_visits');
     }
   };
 
   // Track special event participation
   const trackSpecialEvent = (eventId: string) => {
-    unlock('special_event_participation');
+    unlockAchievement('special_event_participation');
   };
 
   // Track seasonal item collection
   const trackSeasonalItem = () => {
-    unlock('seasonal_items_collected');
+    unlockAchievement('seasonal_items_collected');
   };
 
   return {

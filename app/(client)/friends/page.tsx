@@ -4,7 +4,7 @@ import { FriendList } from '../../components/FriendList';
 import { Leaderboard } from '../../components/Leaderboard';
 import { FriendActivity } from '../../components/FriendActivity';
 import { AsciiArt } from '../../components/AsciiArt';
-import { useLeaderboardStore } from '../../lib/store/leaderboardStore';
+import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
 
 export default function FriendsPage() {
   const entries = useLeaderboardStore(state => state.entries);

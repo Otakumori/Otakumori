@@ -1,16 +1,14 @@
-import { env } from '../../app/env';
+import { env } from '@/env';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../../types/supabase';
+import type { Database } from '@/types/supabase';
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-if (!supabaseUrl) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_URL');
-}
-
-if (!supabaseAnonKey) {
-  throw new Error('Missing env.NEXT_PUBLIC_SUPABASE_ANON_KEY');
+// Graceful handling for missing environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('⚠️ Supabase credentials not configured. Some features may not work.');
+  console.warn('Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local file');
 }
 
 // Create Supabase client with fallback handling

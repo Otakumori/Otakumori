@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'framer-motion';
-import { useFriendStore } from '../app/lib/store/friendStore';
-import { useLeaderboardStore } from '../app/lib/store/leaderboardStore';
+import { useFriendStore } from '@/lib/store/friendStore';
+import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
 
 interface Activity {
   id: string;

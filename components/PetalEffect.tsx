@@ -1,7 +1,7 @@
 'use client';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
-import { useSound } from '../app/lib/hooks/useSound';
-import { useHaptic } from '../app/lib/hooks/useHaptic';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
 import { useEffect } from 'react';
 
 const petalFloat = {
@@ -63,14 +63,16 @@ export const PetalEffect = ({
     }
   }, [controls, interactive]);
 
+  // Calculate transforms outside of the map
+  const x = useTransform(mouseX, [0, typeof window !== 'undefined' ? window.innerWidth : 1920], [-20, 20]);
+  const y = useTransform(mouseY, [0, typeof window !== 'undefined' ? window.innerHeight : 1080], [-20, 20]);
+
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
       onMouseMove={handleMouseMove}
     >
       {Array.from({ length: count }).map((_, index) => {
-        const x = useTransform(mouseX, [0, window.innerWidth], [-20, 20]);
-        const y = useTransform(mouseY, [0, window.innerHeight], [-20, 20]);
 
         return (
           <motion.div

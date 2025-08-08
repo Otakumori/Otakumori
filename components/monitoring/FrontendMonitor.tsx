@@ -1,9 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { monitor } from '../../app/lib/monitor';
+import { monitor } from '@/lib/monitor';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '../../app/lib/hooks/useSound';
-import { useHaptic } from '../../app/lib/hooks/useHaptic';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
 
 interface FrontendMetrics {
   pageLoadTime: number;

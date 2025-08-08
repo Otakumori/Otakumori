@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../cart/CartProvider';
 import { ShoppingCart, Menu, X, User, Heart, Gift } from 'lucide-react';
+import PetalWallet from '../PetalWallet';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -106,6 +107,7 @@ const Navbar: React.FC = () => {
           >
             <User size={20} />
           </Link>
+          <PetalWallet />
         </div>
 
         {/* Mobile Menu Button */}

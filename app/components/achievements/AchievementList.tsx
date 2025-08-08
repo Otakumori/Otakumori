@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Achievement } from '../../types/achievements';
+import type { Achievement } from './AchievementProvider';
 import { AchievementCard } from './AchievementCard';
 
 interface AchievementListProps {
@@ -11,7 +11,7 @@ export const AchievementList: React.FC<AchievementListProps> = ({ achievements }
     {achievements.length > 0 ? (
       achievements.map(achievement => (
         <div key={achievement.id} className="rounded bg-white p-4 shadow">
-          {achievement.name}
+          {achievement.title}
         </div>
       ))
     ) : (

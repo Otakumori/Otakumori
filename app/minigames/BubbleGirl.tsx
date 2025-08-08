@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useAchievements } from '../lib/hooks/useAchievements';
+import { useAchievements } from '@/lib/hooks/useAchievements';
 
 const CHARACTER_IMG = 'https://i.pinimg.com/1200x/51/dd/0d/51dd0d34730c783541a4138d4a17da43.jpg'; // User-provided sprite
 const BUBBLE_SFX = 'https://cdn.fesliyanstudios.com/audio/8%20Bit%20Adventure.mp3'; // Example: Bubble pop sound

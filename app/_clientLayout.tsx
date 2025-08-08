@@ -3,10 +3,10 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { ToastProvider } from './components/Toast';
-import { PetalEffect } from '../components/PetalEffect';
+import { PetalEffect } from '@/components/PetalEffect';
 import { SoundSettings } from './components/SoundSettings';
-import { useAuth } from './contexts/AuthContext';
-import { Providers } from './providers';
+import { useAuth } from '@/contexts/AuthContext';
+import Providers from '@/providers';
 import { Toaster } from 'react-hot-toast';
 import Footer, { BottomLogoAndSocials } from './components/Footer';
 import FloatingSoapstoneComments from './components/FloatingSoapstoneComments';

@@ -1,5 +1,5 @@
-import { monitor } from '../app/lib/monitor';
-import { logger } from '../app/lib/logger';
+import { monitor } from '@/lib/monitor';
+import { logger } from '@/lib/logger';
 
 // Define thresholds for alerts
 const THRESHOLDS = {

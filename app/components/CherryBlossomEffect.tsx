@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useAnimation } from 'framer-motion';
-import { usePetalContext } from '../providers';
+import { usePetalContext } from '@/providers';
 
 interface Petal {
   id: number;

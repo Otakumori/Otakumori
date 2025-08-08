@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { monitor } from '../../lib/monitor';
+import { monitor } from '@/lib/monitor';
 // import { redis } from '../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
 

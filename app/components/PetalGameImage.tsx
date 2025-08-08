@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { supabase } from '../utils/supabase/client';
+import { supabase } from '@/utils/supabase/client';
 import Particles from 'react-tsparticles';
 import { loadFull } from 'tsparticles';
 

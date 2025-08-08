@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '../../components/cart/CartProvider';
-import { Button } from '../../components/ui/button';
-import { Card } from '../../../components/ui/card';
-import Input from '../../../components/ui/input';
+import { useCart } from '@/components/cart/CartProvider';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Input from '@/components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Lock } from 'lucide-react';
@@ -33,7 +33,8 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const { items, total, clearCart } = useCart();
+  const { cart, clearCart } = useCart();
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',
@@ -53,11 +54,11 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement payment processing and order creation
-    console.log('Processing order...', { items, shippingInfo });
+    console.log('Processing order...', { cart, shippingInfo });
     // clearCart();
   };
 
-  if (items.length === 0) {
+  if (cart.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
         <div className="container mx-auto px-4 py-16">
@@ -203,7 +204,7 @@ export default function CheckoutPage() {
             <Card className="border-pink-500/30 bg-white/10 p-6 backdrop-blur-lg">
               <h2 className="mb-6 text-2xl font-bold text-white">Order Summary</h2>
               <div className="space-y-4">
-                {items.map((item: CartItem) => (
+                {cart.map((item: CartItem) => (
                   <div key={item.id} className="flex items-center gap-4">
                     <div className="relative h-20 w-20">
                       <Image

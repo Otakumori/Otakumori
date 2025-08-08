@@ -4,11 +4,11 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCart } from '../components/cart/CartProvider';
-import { Button } from '../components/ui/button';
-import { Card } from '../../components/ui/card';
-import Input from '../../components/ui/input';
-import Select from '../../components/ui/select';
+import { useCart } from '@/components/cart/CartProvider';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Input from '@/components/ui/input';
+import Select from '@/components/ui/select';
 import { Search, Filter, ShoppingCart } from 'lucide-react';
 
 // Define Product interface (assuming it's not already in types)
@@ -69,7 +69,7 @@ const ShopPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('popular');
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
 
   const filteredProducts = useMemo(() => {
     return mockProducts.filter(product => {
@@ -145,7 +145,7 @@ const ShopPage: React.FC = () => {
                   <p className="mt-2 text-pink-200">${product.price}</p>
                   <Button
                     className="mt-4 w-full bg-pink-500 hover:bg-pink-600"
-                    onClick={() => addItem({ ...product, id: String(product.id), quantity: 1 })}
+                    onClick={() => addToCart({ ...product, id: String(product.id), quantity: 1 })}
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Add to Cart
