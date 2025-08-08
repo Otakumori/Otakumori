@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAbyss } from '../context/AbyssContext';
+import { useAbyss } from '@/context/AbyssContext';
 import CherryBlossomEffect from './CherryBlossomEffect';
 
 export default function PetalCollectionGame() {

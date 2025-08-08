@@ -7,7 +7,7 @@ import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import SuperJSON from 'superjson';
 
-import { env } from '../env'; // ✅ Import validated env vars
+import { env } from '@/env'; // ✅ Import validated env vars
 import type { AppRouter } from '../server/api/root';
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { monitor } from './app/lib/monitor';
+import { monitor } from './lib/monitor';
 import { apiMonitor } from './middleware/api-monitor';
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-// TODO: Replace with HTTP-based Redis client if needed
+import { env } from './env';
 
 const MAINTENANCE_KEY = 'site:maintenance';
 
@@ -39,7 +39,15 @@ export async function middleware(request: NextRequest) {
     const isApiRequest = path.startsWith('/api');
 
     // Maintenance mode check
-    // TODO: Integrate HTTP-based Redis client for maintenance mode
+    const maintenanceMode = env.NODE_ENV === 'production' && 
+      process.env.MAINTENANCE_MODE === 'true';
+    
+    if (maintenanceMode && !isAdmin(request)) {
+      return NextResponse.json(
+        { error: 'Site is under maintenance' },
+        { status: 503 }
+      );
+    }
 
     // Initialize Supabase client
     const res = NextResponse.next();

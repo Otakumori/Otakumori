@@ -1,14 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Achievement } from '../../types/achievements.ts';
-import { useAchievementContext } from '../../contexts/AchievementContext.tsx';
+import { Achievement } from './AchievementProvider';
+import { useAchievements } from './AchievementProvider';
 import { AchievementNotification } from './AchievementNotification.tsx';
 import { achievementSoundInstance } from '../../utils/achievementSound.ts';
 
 export const AchievementNotificationManager: React.FC = () => {
   const [notifications, setNotifications] = useState<Achievement[]>([]);
-  const { achievements } = useAchievementContext();
+  const { achievements } = useAchievements();
 
   useEffect(() => {
     const handleAchievementUnlock = (achievement: Achievement) => {

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -41,7 +41,7 @@ export default function ContactForm() {
         setLoading(false);
         return;
       }
-      imageUrl = `${env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/otakumori-bucket/${filePath}`;
+      imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/otakumori-bucket/${filePath}`;
     }
 
     // Save Contact Form Data

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import Header from '../../components/Header';
-import SaveFiles from '../../components/SaveFiles';
+import Header from '@/components/Header';
+import SaveFiles from '@/components/SaveFiles';
 
 export default function SaveFilesPage() {
   return (

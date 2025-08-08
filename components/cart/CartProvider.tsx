@@ -15,6 +15,7 @@ interface CartContextType {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
+  updateQuantity: (id: string, quantity: number) => void;
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -53,9 +54,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
+  const updateQuantity = (id: string, quantity: number) => {
+    setCart(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+      )
+    );
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, clearCart, isOpen, openCart, closeCart }}
+      value={{ cart, addToCart, removeFromCart, clearCart, updateQuantity, isOpen, openCart, closeCart }}
     >
       {children}
       <CartDrawer />

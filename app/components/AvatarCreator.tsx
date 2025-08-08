@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
-import { useSound } from '../lib/hooks/useSound';
-import { useHaptic } from '../lib/hooks/useHaptic';
-import { useUserStore } from '../lib/store/userStore';
-import { useAchievements } from '../lib/hooks/useAchievements';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useUserStore } from '@/lib/store/userStore';
+import { useAchievements } from '@/lib/hooks/useAchievements';
 
 interface AvatarPart {
   id: string;

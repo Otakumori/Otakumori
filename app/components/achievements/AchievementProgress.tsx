@@ -1,25 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { Achievement } from '../../types/achievements';
-import { useAchievements } from '../../contexts/AchievementContext';
+import type { Achievement } from './AchievementProvider';
+import { useAchievements } from './AchievementProvider';
 
 interface AchievementProgressProps {
   achievement: Achievement;
 }
 
 export function AchievementProgress({ achievement }: AchievementProgressProps) {
-  const { unlock } = useAchievements();
-  const isUnlocked = !!achievement.unlockedAt || achievement.isUnlocked;
+  const { unlockAchievement } = useAchievements();
+  const isUnlocked = achievement.unlocked;
 
   // Use achievement's own progress data if available
   const current = achievement.progress || 0;
-  const target = achievement.target || 1;
+  const target = achievement.total || 1;
 
   return (
     <div className="w-full">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {achievement.name}
+          {achievement.title}
         </span>
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {current}/{target}

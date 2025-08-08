@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import DarkSoulsMessage from '../components/DarkSoulsMessage';
+import DarkSoulsMessage from '@/components/DarkSoulsMessage';
 
 const MessageContext = createContext();
 

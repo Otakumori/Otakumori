@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { monitor } from '../app/lib/monitor';
-import { logger } from '../app/lib/logger';
+import { monitor } from '@/lib/monitor';
+import { logger } from '@/lib/logger';
 
 export async function apiMonitor(request: NextRequest, response: NextResponse) {
   const startTime = performance.now();

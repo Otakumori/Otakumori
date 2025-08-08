@@ -3,15 +3,15 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '../../lib/hooks/useSound';
-import { useHaptic } from '../../lib/hooks/useHaptic';
-import { useAchievements } from '../../lib/hooks/useAchievements';
-import { useUserStore } from '../../lib/store/userStore';
-import { useLeaderboardStore } from '../../lib/store/leaderboardStore';
-import { useFriendSystemStore } from '../../lib/store/friendSystemStore';
-import { AvatarCustomizer } from '../../components/AvatarCustomizer';
-import { ReactiveAvatar } from '../../components/ReactiveAvatar';
-import { Tutorial } from '../../components/Tutorial';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useAchievements } from '@/lib/hooks/useAchievements';
+import { useUserStore } from '@/lib/store/userStore';
+import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
+import { useFriendSystemStore } from '@/lib/store/friendSystemStore';
+import { AvatarCustomizer } from '@/components/AvatarCustomizer';
+import { ReactiveAvatar } from '@/components/ReactiveAvatar';
+import { Tutorial } from '@/components/Tutorial';
 
 // Kojima Easter Egg
 const KOJIMA_CODE = 'kojima';

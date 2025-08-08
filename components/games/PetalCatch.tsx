@@ -2,12 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { PetalEffect } from '../PetalEffect';
-import { useSound } from '../../app/lib/hooks/useSound';
-import { useHaptic } from '../../app/lib/hooks/useHaptic';
-import { useToast } from '../Toast';
-import { useAchievements } from '../../app/lib/hooks/useAchievements';
-import { usePetals } from '../../app/hooks/hooks/usePetals';
+import { PetalEffect } from '@/components/PetalEffect';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
+import { useToast } from '@/components/Toast';
+import { useAchievements } from '@/lib/hooks/useAchievements';
+import { usePetals } from '@/lib/hooks/usePetals';
 
 interface GameState {
   score: number;

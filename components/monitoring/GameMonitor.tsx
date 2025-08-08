@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { monitor } from '../../app/lib/monitor';
+import { monitor } from '@/lib/monitor';
 
 interface GameSession {
   startTime: number;

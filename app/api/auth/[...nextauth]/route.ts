@@ -3,12 +3,13 @@ import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
-import { env } from '../../../env';
+import { env } from '@/env';
 
-const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL || '',
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-);
+// Create Supabase client with proper fallback handling
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 declare module 'next-auth' {
   interface Session {

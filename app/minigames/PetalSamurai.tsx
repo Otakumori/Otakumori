@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAchievements } from '../lib/hooks/useAchievements';
+import { useAchievements } from '@/lib/hooks/useAchievements';
 import Image from 'next/image';
 
 interface Petal {

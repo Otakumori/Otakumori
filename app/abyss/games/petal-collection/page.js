@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useAbyss } from '../../../context/AbyssContext';
+import { useAbyss } from '@/context/AbyssContext';
 
 export default function PetalCollectionPage() {
   const { data: session, status } = useSession();

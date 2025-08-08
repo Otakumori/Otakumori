@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   LineChart,
   Line,
@@ -10,15 +10,15 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Skeleton } from '../ui/skeleton';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Activity, Users, Clock, Server, Database, Shield, Gamepad, Film } from 'lucide-react';
-import { monitor } from '../../app/lib/monitor';
+import { monitor } from '@/lib/monitor';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '../../app/lib/hooks/useSound';
-import { useHaptic } from '../../app/lib/hooks/useHaptic';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
 
 interface SystemMetrics {
   timestamp: number;

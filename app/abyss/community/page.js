@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
-import { useAbyss } from '../../context/AbyssContext';
+import { useAbyss } from '@/context/AbyssContext';
 
 export default function CommunityPage() {
   const { data: session, status } = useSession();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
-import type { Achievement } from '../../types/achievements';
+import type { Achievement } from './AchievementProvider';
 
 interface AchievementNotificationProps {
   achievement: Achievement;
@@ -21,7 +21,7 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
           <div className="h-12 w-12 flex-shrink-0">
             <img
               src={achievement.icon}
-              alt={achievement.name}
+              alt={achievement.title}
               className="h-full w-full object-contain"
             />
           </div>
@@ -29,7 +29,7 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Achievement Unlocked!
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{achievement.name}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{achievement.title}</p>
           </div>
           <button
             onClick={onClose}
@@ -50,7 +50,7 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
             <span className="mr-2">Reward:</span>
             <span className="flex items-center">
               <img src="/assets/achievements/petal.png" alt="Petal" className="mr-1 h-4 w-4" />
-              {achievement.reward.petals} petals
+              {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'} {achievement.reward?.type === 'points' ? 'points' : (achievement.reward?.type || 'reward')}
             </span>
           </div>
         </div>

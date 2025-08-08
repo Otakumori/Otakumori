@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '../../app/env';
+import { env } from '@/app/lib/env';
 
 export const createClient = (request: NextRequest) => {
   // Create an unmodified response

@@ -1,38 +1,38 @@
 import { useEffect } from 'react';
-import { useAchievements } from '../contexts/AchievementContext';
+import { useAchievements } from '../components/achievements/AchievementProvider';
 
 export function useCommunityAchievements() {
-  const { unlock } = useAchievements();
+  const { unlockAchievement } = useAchievements();
 
   // Track structured comments
   const trackStructuredComment = () => {
-    unlock('structured_comments');
+    unlockAchievement('structured_comments');
   };
 
   // Track total comments
   const trackTotalComments = (count: number) => {
-    unlock('total_comments');
+    unlockAchievement('total_comments');
   };
 
   // Track first comment
   const trackFirstComment = () => {
-    unlock('first_comment');
+    unlockAchievement('first_comment');
   };
 
   // Track comment reactions
   const trackCommentReaction = () => {
-    unlock('comment_reactions');
+    unlockAchievement('comment_reactions');
   };
 
   // Track comment replies
   const trackCommentReply = () => {
-    unlock('comment_replies');
+    unlockAchievement('comment_replies');
   };
 
   // Track comment length
   const trackCommentLength = (length: number) => {
     if (length >= 1000) {
-      unlock('long_comments');
+      unlockAchievement('long_comments');
     }
   };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../utils/supabase/client';
+import { supabase } from '@/utils/supabase/client';
 
 export default function PetalStats() {
   const [progress, setProgress] = useState(0);

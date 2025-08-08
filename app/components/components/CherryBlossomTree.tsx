@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { useInView } from 'react-intersection-observer';
-import { usePetals } from '../../hooks/hooks/usePetals';
-import { useAchievements } from '../../hooks/hooks/useAchievements';
-import { useAudio } from '../../hooks/useAudio';
+import { usePetals } from '@/lib/hooks/usePetals';
+import { useAchievements } from '@/lib/hooks/useAchievements';
+import { useAudio } from '@/lib/hooks/useAudio';
 
 interface Petal {
   id: number;

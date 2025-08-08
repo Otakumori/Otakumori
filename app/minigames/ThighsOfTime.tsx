@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAchievements } from '../lib/hooks/useAchievements';
+import { useAchievements } from '@/lib/hooks/useAchievements';
 
 export default function ThighsOfTime() {
   const { unlockAchievement } = useAchievements();

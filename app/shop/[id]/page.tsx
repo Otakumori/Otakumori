@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useCart } from '../../components/cart/CartProvider';
-import { Button } from '../../components/ui/button';
-import { Card } from '../../components/ui/card';
+import { useCart } from '@/components/cart/CartProvider';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, Share2 } from 'lucide-react';
@@ -46,10 +46,10 @@ const product: Product = {
 export default function ProductPage({ params }: { params: { id: string } }) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    addItem({
+    addToCart({
       id: product.id,
       name: product.name,
       price: selectedVariant.price,
@@ -135,14 +135,14 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               </Button>
               <Button
                 variant="outline"
-                size="icon"
+                size="sm"
                 className="border-pink-500/30 text-pink-200 hover:bg-pink-500/10"
               >
                 <Heart className="h-5 w-5" />
               </Button>
               <Button
                 variant="outline"
-                size="icon"
+                size="sm"
                 className="border-pink-500/30 text-pink-200 hover:bg-pink-500/10"
               >
                 <Share2 className="h-5 w-5" />

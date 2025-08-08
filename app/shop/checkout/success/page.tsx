@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useCart } from '../../../../components/cart/CartProvider';
-import Button from '../../../../components/ui/button';
-import { Card } from '../../../../components/ui/card';
+import { useCart } from '@/components/cart/CartProvider';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useLeaderboardStore } from '../lib/store/leaderboardStore';
+import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
 import { motion } from 'framer-motion';
 import { AsciiArt } from './AsciiArt';
 

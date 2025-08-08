@@ -5,10 +5,10 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, ArrowLeft } from 'lucide-react';
-import { useCart } from '../../../lib/hooks/useCart';
-import { useWishlist } from '../../../lib/hooks/useWishlist';
-import { useAchievements } from '../../../hooks/hooks/useAchievements';
-import { Button } from '../../../components/ui/button';
+import { useCart } from '@/lib/hooks/useCart';
+import { useWishlist } from '@/lib/hooks/useWishlist';
+import { useAchievements } from '@/lib/hooks/useAchievements';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 interface Product {

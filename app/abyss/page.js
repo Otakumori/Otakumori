@@ -3,8 +3,8 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { usePetalContext } from '../providers';
-import { useOverlordContext } from '../providers';
+import { usePetalContext } from '@/providers';
+import { useOverlordContext } from '@/providers';
 
 const features = [
   {

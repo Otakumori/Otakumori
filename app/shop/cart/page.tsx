@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useCart } from '../../components/cart/CartProvider';
-import { Button } from '../../components/ui/button';
-import { Card } from '../../../components/ui/card';
+import { useCart } from '@/components/cart/CartProvider';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react';
 
@@ -20,9 +20,10 @@ interface CartItem {
 }
 
 export default function CartPage() {
-  const { items, total, updateQuantity, removeItem } = useCart();
+  const { cart, updateQuantity, removeFromCart } = useCart();
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  if (items.length === 0) {
+  if (cart.length === 0) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900 pt-20">
         <div className="container mx-auto px-4 py-16">
@@ -54,7 +55,7 @@ export default function CartPage() {
             <Card className="border-pink-500/30 bg-white/10 p-6 backdrop-blur-lg">
               <h1 className="mb-6 text-2xl font-bold text-white">Shopping Cart</h1>
               <div className="space-y-6">
-                {items.map((item: CartItem) => (
+                {cart.map((item: CartItem) => (
                   <div key={item.id} className="flex items-center gap-6">
                     <div className="relative h-24 w-24">
                       <Image
@@ -74,7 +75,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="h-8 w-8 border-pink-500/30 text-pink-200 hover:bg-pink-500/10"
                       >
@@ -83,7 +84,7 @@ export default function CartPage() {
                       <span className="w-8 text-center text-white">{item.quantity}</span>
                       <Button
                         variant="outline"
-                        size="icon"
+                        size="sm"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="h-8 w-8 border-pink-500/30 text-pink-200 hover:bg-pink-500/10"
                       >
@@ -92,8 +93,8 @@ export default function CartPage() {
                     </div>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      onClick={() => removeItem(item.id)}
+                      size="sm"
+                      onClick={() => removeFromCart(item.id)}
                       className="text-pink-200 hover:bg-pink-500/10 hover:text-white"
                     >
                       <Trash2 className="h-5 w-5" />

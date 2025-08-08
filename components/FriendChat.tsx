@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useFriendStore } from '../app/lib/store/friendStore';
-import { useSound } from '../app/lib/hooks/useSound';
-import { useHaptic } from '../app/lib/hooks/useHaptic';
+import { useFriendStore } from '@/lib/store/friendStore';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
 
 interface Message {
   id: string;
