@@ -1,10 +1,13 @@
 'use client';
 
+// Force dynamic rendering to avoid static generation issues with context providers
+export const dynamic = 'force-dynamic';
+
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCart } from '@/components/cart/CartProvider';
+import { useCart } from '../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Input from '@/components/ui/input';
@@ -69,7 +72,7 @@ const ShopPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('popular');
-  const { addToCart } = useCart();
+  const { addItem: addToCart } = useCart();
 
   const filteredProducts = useMemo(() => {
     return mockProducts.filter(product => {

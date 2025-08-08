@@ -1,7 +1,10 @@
 'use client';
 
+// Force dynamic rendering to avoid static generation issues with context providers
+export const dynamic = 'force-dynamic';
+
 import { useEffect } from 'react';
-import { useCart } from '@/components/cart/CartProvider';
+import { useCart } from '../../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';

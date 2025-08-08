@@ -1,7 +1,10 @@
 'use client';
 
+// Force dynamic rendering to avoid static generation issues with context providers
+export const dynamic = 'force-dynamic';
+
 import { useState } from 'react';
-import { useCart } from '@/components/cart/CartProvider';
+import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Input from '@/components/ui/input';
@@ -33,8 +36,7 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCart();
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const { items: cart, clearCart, total } = useCart();
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from './components/cart/CartProvider';
+import { PetalProvider } from '../providers';
 
 import Navbar from './components/layout/Navbar';
 import { medievalFont } from './fonts';
@@ -20,10 +21,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.className} ${medievalFont.variable}`}>
       <body className="font-medieval">
         <CartProvider>
-          <Navbar />
-          <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900">
-            {children}
-          </div>
+          <PetalProvider>
+            <Navbar />
+            <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900">
+              {children}
+            </div>
+          </PetalProvider>
         </CartProvider>
       </body>
     </html>
