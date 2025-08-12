@@ -1,5 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 
 // Constants
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
@@ -21,6 +21,7 @@ const missingEnvVars = Object.entries(requiredEnvVars)
 
 if (missingEnvVars.length > 0) {
   console.error('Missing required environment variables:', missingEnvVars.join(', '));
+  console.error('Please ensure .env.local file exists and contains all required variables');
   process.exit(1);
 }
 
@@ -101,6 +102,7 @@ async function updatePrintifyProducts() {
       });
     }
 
+    console.log('Printify product update completed successfully');
     return transformedProducts;
   } catch (error) {
     console.error('Error updating Printify products:', error);
@@ -108,13 +110,17 @@ async function updatePrintifyProducts() {
   }
 }
 
-// Run the update
-updatePrintifyProducts()
-  .then(() => {
-    console.log('Product update completed successfully');
-    process.exit(0);
-  })
-  .catch(error => {
-    console.error('Product update failed:', error);
-    process.exit(1);
-  });
+// Run the update if this script is executed directly
+if (require.main === module) {
+  updatePrintifyProducts()
+    .then(() => {
+      console.log('Script completed successfully');
+      process.exit(0);
+    })
+    .catch(error => {
+      console.error('Script failed:', error);
+      process.exit(1);
+    });
+}
+
+module.exports = { updatePrintifyProducts };

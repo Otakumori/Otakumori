@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { printify } from '@/utils/printifyAPI.js';
-import { supabase, handleSupabaseError } from '@/utils/supabase/client.ts';
+import { printify } from '../../../../utils/printifyAPI';
+import { supabase, handleSupabaseError } from '../../../../utils/supabase/client';
+import { env } from '../../../../env';
 
 interface PrintifyImage {
   src: string;
@@ -32,6 +33,49 @@ interface PrintifyProduct {
 
 export async function GET() {
   try {
+    // Check if Printify credentials are configured
+    if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID) {
+      console.warn('Printify credentials not configured, returning mock data');
+      
+      // Return mock data when Printify is not configured
+      const mockProducts = [
+        {
+          id: '1',
+          title: 'Anime T-Shirt',
+          description: 'High-quality anime-themed t-shirt made from 100% cotton.',
+          price: 29.99,
+          images: ['/images/products/placeholder.svg'],
+          variants: [{ id: '1', title: 'Default', price: 2999, is_enabled: true, is_default: true, sku: 'ANIME-TS-001' }],
+          category: 'Apparel',
+          tags: ['anime', 't-shirt', 'cotton'],
+          metadata: {
+            printify_id: null,
+            published: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        },
+        {
+          id: '2',
+          title: 'Manga Keychain',
+          description: 'Cute manga character keychain, perfect for your keys or bag.',
+          price: 9.99,
+          images: ['/images/products/placeholder.svg'],
+          variants: [{ id: '2', title: 'Default', price: 999, is_enabled: true, is_default: true, sku: 'MANGA-KC-001' }],
+          category: 'Accessories',
+          tags: ['manga', 'keychain', 'cute'],
+          metadata: {
+            printify_id: null,
+            published: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+        },
+      ];
+
+      return NextResponse.json({ products: mockProducts }, { status: 200 });
+    }
+
     // Fetch products from Printify
     const printifyProducts: any = await printify();
 
@@ -60,14 +104,21 @@ export async function GET() {
       },
     }));
 
-    // Upsert products to Supabase
-    const { error } = await supabase.from('products').upsert(transformedProducts, {
-      onConflict: 'id',
-      ignoreDuplicates: false,
-    });
+    // Only attempt to upsert to Supabase if we have products and Supabase is configured
+    if (transformedProducts.length > 0 && env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      try {
+        const { error } = await supabase.from('products').upsert(transformedProducts, {
+          onConflict: 'id',
+          ignoreDuplicates: false,
+        });
 
-    if (error) {
-      handleSupabaseError(error);
+        if (error) {
+          handleSupabaseError(error);
+        }
+      } catch (dbError) {
+        console.error('Supabase upsert error:', dbError);
+        // Continue execution even if database update fails
+      }
     }
 
     return NextResponse.json({ products: transformedProducts }, { status: 200 });

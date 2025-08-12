@@ -1,209 +1,138 @@
 'use client';
-'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiMessageCircle, FiX } from 'react-icons/fi';
-import { supabase } from '../lib/supabaseClient';
+import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-interface SoapstoneComment {
+interface SoapstoneMessage {
   id: string;
   content: string;
   created_at: string;
 }
 
-const MAX_VISIBLE = 4;
-const CYCLE_INTERVAL = 5000; // ms
-const COLORS = [
-  'bg-gray-800/90 text-pink-100 shadow-pink-900/40',
-  'bg-pink-900/90 text-pink-200 shadow-pink-700/40',
-  'bg-black/90 text-pink-300 shadow-black/40',
-];
-
 export default function FloatingSoapstoneComments() {
-  const [comments, setComments] = useState<SoapstoneComment[]>([]);
-  const [visibleIdx, setVisibleIdx] = useState(0);
-  const [input, setInput] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [comments, setComments] = useState<SoapstoneMessage[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch recent comments
+  // Create Supabase client for client-side use
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  );
+
   useEffect(() => {
     const fetchComments = async () => {
-      const { data, error } = await supabase
+      try {
+        const { data, error } = await supabase
+          .from('soapstone_messages')
+          .select('id, content, created_at')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) {
+          console.error('Error fetching comments:', error);
+          return;
+        }
+
+        setComments(data || []);
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+      }
+    };
+
+    fetchComments();
+  }, [supabase]);
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('soapstone_messages')
+        .insert([{ content: newComment.trim() }]);
+
+      if (error) {
+        console.error('Error submitting comment:', error);
+        return;
+      }
+
+      setNewComment('');
+      // Refresh comments
+      const { data, error: fetchError } = await supabase
         .from('soapstone_messages')
         .select('id, content, created_at')
         .order('created_at', { ascending: false })
-        .limit(20);
-      if (!error && data) setComments(data);
-    };
-    fetchComments();
-    const sub = supabase
-      .channel('soapstone:realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'soapstone_messages' },
-        fetchComments
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(sub);
-    };
-  }, []);
+        .limit(10);
 
-  // Cycle visible comments
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setVisibleIdx(idx => (idx + 1) % Math.max(1, comments.length - MAX_VISIBLE + 1));
-    }, CYCLE_INTERVAL);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [comments]);
-
-  // Submit new comment
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    setSubmitting(true);
-    await supabase
-      .from('soapstone_messages')
-      .insert({ content: input.trim(), author: 'Anonymous' });
-    setInput('');
-    setSubmitting(false);
+      if (!fetchError && data) {
+        setComments(data);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Responsive random positions
-  function getRandomPosition(idx: number) {
-    // For mobile, stack at bottom; for desktop, randomize
-    if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      return { left: `${10 + idx * 22}%`, bottom: `${10 + idx * 8}%` };
-    }
-    return {
-      left: `${Math.random() * 70 + 10}%`,
-      top: `${Math.random() * 60 + 10}%`,
-    };
-  }
-
   return (
-    <div className="pointer-events-none fixed inset-0 z-40 select-none">
-      {/* Floating comments */}
-      <AnimatePresence>
-        {comments.slice(visibleIdx, visibleIdx + MAX_VISIBLE).map((c, i) => (
-          <motion.div
-            key={c.id}
-            drag
-            dragConstraints={{
-              left: 0,
-              right: window.innerWidth - 220,
-              top: 0,
-              bottom: window.innerHeight - 80,
-            }}
-            initial={{ opacity: 0, scale: 0.8, ...getRandomPosition(i) }}
-            animate={{ opacity: 1, scale: 1, ...getRandomPosition(i) }}
-            exit={{ opacity: 0, scale: 0.7 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className={`pointer-events-auto absolute min-w-[160px] max-w-xs cursor-pointer rounded-2xl border-2 border-pink-700/40 p-4 text-base font-semibold shadow-2xl ${COLORS[i % COLORS.length]} animate-pulse`}
-            style={{ zIndex: 50 + i }}
-            whileTap={{ scale: 1.08 }}
-            onClick={e => {
-              // Bring to center on click
-              e.currentTarget.style.left = '50%';
-              e.currentTarget.style.top = '60%';
-              e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.1)';
-            }}
-          >
-            {c.content}
-          </motion.div>
-        ))}
-      </AnimatePresence>
-      {/* Floating soapstone button and form */}
-      <div className="pointer-events-auto fixed bottom-24 right-4 z-50 sm:bottom-12">
-        {!formOpen ? (
-          <button
-            aria-label="Leave a soapstone message"
-            className="flex items-center justify-center rounded-full bg-pink-600 p-4 text-white shadow-lg hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-400"
-            onClick={() => setFormOpen(true)}
-          >
-            <FiMessageCircle size={28} />
-          </button>
-        ) : (
-          <motion.form
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            onSubmit={handleSubmit}
-            className="flex items-center gap-2 rounded-full bg-black/90 px-4 py-2 shadow-2xl"
-            style={{ maxWidth: 400, minWidth: 220 }}
-          >
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              maxLength={200}
-              placeholder="Leave a soapstone message..."
-              className="w-32 bg-transparent px-2 py-1 text-white placeholder-pink-300 outline-none sm:w-48"
-              disabled={submitting}
-              autoFocus
-            />
-            <button
-              type="submit"
-              disabled={submitting || !input.trim()}
-              className="rounded-full bg-pink-600 px-4 py-1 font-semibold text-white transition hover:bg-pink-700 disabled:opacity-50"
-            >
-              Send
-            </button>
-            <button
-              type="button"
-              aria-label="Close"
-              className="ml-1 text-gray-400 hover:text-pink-400"
-              onClick={() => setFormOpen(false)}
-            >
-              <FiX size={22} />
-            </button>
-          </motion.form>
-        )}
-      </div>
-      {/* Mobile full-width form */}
-      {formOpen && (
-        <div className="pointer-events-auto fixed bottom-0 left-0 right-0 z-50 sm:hidden">
-          <motion.form
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            onSubmit={handleSubmit}
-            className="flex w-full items-center gap-2 rounded-t-2xl bg-black/90 px-4 py-3 shadow-2xl"
-            style={{ maxWidth: '100vw' }}
-          >
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              maxLength={200}
-              placeholder="Leave a soapstone message..."
-              className="w-full bg-transparent px-2 py-1 text-white placeholder-pink-300 outline-none"
-              disabled={submitting}
-              autoFocus
-            />
-            <button
-              type="submit"
-              disabled={submitting || !input.trim()}
-              className="rounded-full bg-pink-600 px-4 py-1 font-semibold text-white transition hover:bg-pink-700 disabled:opacity-50"
-            >
-              Send
-            </button>
-            <button
-              type="button"
-              aria-label="Close"
-              className="ml-1 text-gray-400 hover:text-pink-400"
-              onClick={() => setFormOpen(false)}
-            >
-              <FiX size={22} />
-            </button>
-          </motion.form>
+    <>
+      {/* Floating Button */}
+      <button
+        onClick={() => setIsVisible(!isVisible)}
+        className="fixed bottom-6 right-6 z-50 bg-pink-500 hover:bg-pink-600 text-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
+        aria-label="Toggle comments"
+      >
+        💬
+      </button>
+
+      {/* Comments Panel */}
+      {isVisible && (
+        <div className="fixed bottom-20 right-6 z-40 w-80 max-h-96 bg-white rounded-lg shadow-xl border border-pink-200 overflow-hidden">
+          <div className="bg-pink-500 text-white p-3">
+            <h3 className="font-semibold">Soapstone Messages</h3>
+          </div>
+          
+          <div className="p-4 max-h-64 overflow-y-auto">
+            {comments.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No messages yet. Be the first!</p>
+            ) : (
+              <div className="space-y-3">
+                {comments.map((comment) => (
+                  <div key={comment.id} className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm text-gray-800">{comment.content}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {new Date(comment.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={handleSubmitComment} className="p-4 border-t border-gray-200">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Leave a message..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                maxLength={200}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !newComment.trim()}
+                className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? '...' : 'Send'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
-    </div>
+    </>
   );
 }

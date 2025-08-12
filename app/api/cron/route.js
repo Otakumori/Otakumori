@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import path from 'path';
 import { NextResponse } from 'next/server';
 import fs from 'fs';
+import { env } from '../../../env';
 
 // Create logs directory if it doesn't exist
 const logsDir = path.join(process.cwd(), 'logs');
@@ -49,7 +50,7 @@ function validateEnv() {
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   ];
 
-  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  const missingVars = requiredEnvVars.filter(varName => !env[varName]);
 
   if (missingVars.length > 0) {
     throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
@@ -98,37 +99,58 @@ export async function GET(request) {
             new NextResponse('Error executing update script', {
               status: 500,
               headers: {
-                'X-Execution-Time': `${duration}ms`,
+                'Content-Type': 'application/json',
               },
+              body: JSON.stringify({
+                error: error.message,
+                duration,
+                timestamp: new Date().toISOString(),
+              }),
             })
           );
           return;
         }
 
+        log(`Script executed successfully in ${duration}ms`);
+        log(`STDOUT: ${stdout}`);
         if (stderr) {
-          log('Script produced stderr output', 'WARN', new Error(stderr));
+          log(`STDERR: ${stderr}`, 'WARN');
         }
 
-        log(`Script execution completed in ${duration}ms`, 'INFO');
-        log(`Script output: ${stdout}`, 'DEBUG');
-
         resolve(
-          new NextResponse('Update completed successfully', {
-            status: 200,
-            headers: {
-              'X-Execution-Time': `${duration}ms`,
-            },
-          })
+          new NextResponse(
+            JSON.stringify({
+              success: true,
+              message: 'Cron job executed successfully',
+              duration,
+              timestamp: new Date().toISOString(),
+              stdout: stdout.trim(),
+              stderr: stderr.trim() || null,
+            }),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
         );
       });
     });
   } catch (error) {
     log('Unhandled error in cron endpoint', 'ERROR', error);
-    return new NextResponse('Internal Server Error', {
-      status: 500,
-      headers: {
-        'X-Error-Type': error.name,
-      },
-    });
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Internal server error',
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 }
