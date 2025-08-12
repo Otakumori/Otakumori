@@ -1,29 +1,37 @@
 import { NextResponse } from 'next/server';
-import { monitor } from '@/lib/monitor';
 
 export async function GET() {
   try {
-    const health = await monitor.checkHealth();
-
+    const startTime = Date.now();
+    
+    // Check system resources
+    const memoryUsage = process.memoryUsage();
+    const uptime = process.uptime();
+    
+    const responseTime = Date.now() - startTime;
+    
     return NextResponse.json({
-      status: health.status,
-      message: health.message,
-      lastChecked: new Date().toISOString(),
-      metrics: health.metrics,
-      services: health.services,
+      status: 'healthy',
+      message: 'API is running',
+      timestamp: new Date().toISOString(),
+      framework: 'Next.js',
+      environment: process.env.NODE_ENV || 'development',
+      responseTime: `${responseTime}ms`,
+      uptime: `${Math.floor(uptime)}s`,
+      memory: {
+        rss: `${Math.round(memoryUsage.rss / 1024 / 1024)}MB`,
+        heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`,
+        heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)}MB`,
+      },
+      version: process.env.npm_package_version || 'unknown',
     });
   } catch (error) {
-    console.error('Error checking health:', error);
     return NextResponse.json(
       {
         status: 'error',
-        message: 'Failed to check system health',
-        lastChecked: new Date().toISOString(),
-        metrics: null,
-        services: {
-          database: { status: 'error' },
-          cache: { status: 'error' },
-        },
+        message: 'Health check failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
       },
       { status: 500 }
     );

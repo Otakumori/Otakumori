@@ -1,33 +1,90 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { CartProvider } from './components/cart/CartProvider';
+import { ClerkProvider } from '@clerk/nextjs';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { CartProvider } from '../components/cart/CartProvider';
 import { PetalProvider } from '../providers';
-
-import Navbar from './components/layout/Navbar';
-import { medievalFont } from './fonts';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Otakumori - Your Anime Community',
-  description:
-    'Join Otakumori, your ultimate destination for anime merchandise, manga, and otaku culture.',
-  keywords: 'anime, manga, otaku, community, merchandise, figures, art prints',
+  title: 'Otakumori - Anime & Manga Community',
+  description: 'Join the ultimate anime and manga community. Shop, connect, and explore with fellow otaku.',
+  keywords: 'anime, manga, otaku, community, shop, merchandise',
+  authors: [{ name: 'Otakumori Team' }],
+  creator: 'Otakumori',
+  publisher: 'Otakumori',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  openGraph: {
+    title: 'Otakumori - Anime & Manga Community',
+    description: 'Join the ultimate anime and manga community. Shop, connect, and explore with fellow otaku.',
+    url: '/',
+    siteName: 'Otakumori',
+    images: [
+      {
+        url: '/images/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Otakumori - Anime & Manga Community',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Otakumori - Anime & Manga Community',
+    description: 'Join the ultimate anime and manga community. Shop, connect, and explore with fellow otaku.',
+    images: ['/images/og-image.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${inter.className} ${medievalFont.variable}`}>
-      <body className="font-medieval">
-        <CartProvider>
-          <PetalProvider>
-            <Navbar />
-            <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-red-900">
-              {children}
-            </div>
-          </PetalProvider>
-        </CartProvider>
+    <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content="#ec4899" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+      </head>
+      <body className={inter.className}>
+        <ErrorBoundary>
+          <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+            <PetalProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </PetalProvider>
+          </ClerkProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

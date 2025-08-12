@@ -1,75 +1,114 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createSupabaseWithToken } from '@/app/lib/supabaseClient';
 
-// Mock database
-const products = [
-  {
-    id: '1',
-    name: 'Anime T-Shirt',
-    price: 29.99,
-    image: '/images/products/placeholder.svg',
-    category: 'Apparel',
-    description: 'High-quality anime-themed t-shirt made from 100% cotton.',
-    stock: 50,
-  },
-  {
-    id: '2',
-    name: 'Manga Keychain',
-    price: 9.99,
-    image: '/images/products/placeholder.svg',
-    category: 'Accessories',
-    description: 'Cute manga character keychain, perfect for your keys or bag.',
-    stock: 100,
-  },
-  {
-    id: '3',
-    name: 'Figure Collection',
-    price: 49.99,
-    image: '/images/products/placeholder.svg',
-    category: 'Figures',
-    description: 'Detailed anime figure from your favorite series.',
-    stock: 25,
-  },
-  {
-    id: '4',
-    name: 'Art Print',
-    price: 19.99,
-    image: '/images/products/placeholder.svg',
-    category: 'Art Prints',
-    description: 'High-quality art print featuring popular anime artwork.',
-    stock: 75,
-  },
-];
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    const subcategory = searchParams.get('subcategory');
+    const includeVariants = searchParams.get('variants') === 'true';
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const category = searchParams.get('category');
-  const minPrice = searchParams.get('minPrice');
-  const maxPrice = searchParams.get('maxPrice');
-  const search = searchParams.get('search');
+    // Build query
+    let query = `
+      SELECT 
+        p.*,
+        ${includeVariants ? 'v.id as variant_id, v.title as variant_title, v.price_cents as variant_price_cents, v.sku, v.options' : ''}
+      FROM products p
+      ${includeVariants ? 'LEFT JOIN variants v ON p.id = v.product_id' : ''}
+      WHERE p.visible = true
+    `;
 
-  let filteredProducts = [...products];
+    const params: any[] = [];
+    let paramIndex = 1;
 
-  // Apply filters
-  if (category) {
-    filteredProducts = filteredProducts.filter(product => product.category === category);
-  }
+    if (category) {
+      query += ` AND p.category = $${paramIndex}`;
+      params.push(category);
+      paramIndex++;
+    }
 
-  if (minPrice) {
-    filteredProducts = filteredProducts.filter(product => product.price >= Number(minPrice));
-  }
+    if (subcategory) {
+      query += ` AND p.subcategory = $${paramIndex}`;
+      params.push(subcategory);
+      paramIndex++;
+    }
 
-  if (maxPrice) {
-    filteredProducts = filteredProducts.filter(product => product.price <= Number(maxPrice));
-  }
+    query += ` ORDER BY p.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(limit, offset);
 
-  if (search) {
-    const searchLower = search.toLowerCase();
-    filteredProducts = filteredProducts.filter(
-      product =>
-        product.name.toLowerCase().includes(searchLower) ||
-        product.description.toLowerCase().includes(searchLower)
+    // For now, use the basic Supabase client since this is public data
+    // In production, you might want to add rate limiting here
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data, error } = await supabase.rpc('exec_sql', {
+      query,
+      params
+    });
+
+    if (error) {
+      console.error('Supabase query error:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch products' },
+        { status: 500 }
+      );
+    }
+
+    // Transform data if variants are included
+    let products;
+    if (includeVariants) {
+      // Group by product and collect variants
+      const productMap = new Map();
+      data.forEach((row: any) => {
+        if (!productMap.has(row.id)) {
+          productMap.set(row.id, {
+            id: row.id,
+            title: row.title,
+            description: row.description,
+            category: row.category,
+            subcategory: row.subcategory,
+            image_url: row.image_url,
+            price_cents: row.price_cents,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            variants: []
+          });
+        }
+        
+        if (row.variant_id) {
+          productMap.get(row.id).variants.push({
+            id: row.variant_id,
+            title: row.variant_title,
+            price_cents: row.variant_price_cents,
+            sku: row.sku,
+            options: row.options
+          });
+        }
+      });
+      products = Array.from(productMap.values());
+    } else {
+      products = data;
+    }
+
+    return NextResponse.json({
+      products,
+      pagination: {
+        limit,
+        offset,
+        total: products.length
+      }
+    });
+
+  } catch (error) {
+    console.error('Products API error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json(filteredProducts);
 }

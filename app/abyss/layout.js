@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { usePetalContext } from '@/providers';
 
@@ -17,7 +17,7 @@ const navItems = [
 
 export default function AbyssLayout({ children }) {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
   const { petals } = usePetalContext();
   const [scrolled, setScrolled] = useState(false);
 
@@ -29,7 +29,7 @@ export default function AbyssLayout({ children }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-black">
         <div className="flex flex-col items-center gap-4">
@@ -40,8 +40,8 @@ export default function AbyssLayout({ children }) {
     );
   }
 
-  if (!session) {
-    redirect('/auth/signin');
+  if (!user) {
+    redirect('/login');
   }
 
   return (
