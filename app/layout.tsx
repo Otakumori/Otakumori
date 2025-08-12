@@ -77,7 +77,21 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ErrorBoundary>
-          <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
+          <ClerkProvider 
+            publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+            appearance={{
+              elements: {
+                formButtonPrimary: 'bg-pink-600 hover:bg-pink-700 text-white',
+                card: 'bg-gray-900 border border-pink-500/20',
+                headerTitle: 'text-white',
+                headerSubtitle: 'text-gray-300',
+                socialButtonsBlockButton: 'bg-gray-800 hover:bg-gray-700 border border-pink-500/20',
+                formFieldInput: 'bg-gray-800 border border-pink-500/20 text-white',
+                formFieldLabel: 'text-gray-300',
+                footerActionLink: 'text-pink-400 hover:text-pink-300',
+              }
+            }}
+          >
             <PetalProvider>
               <CartProvider>
                 {children}
