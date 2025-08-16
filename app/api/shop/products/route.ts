@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchProducts, fetchProductDetails } from '../../../../utils/printifyAPI';
-import { supabase, handleSupabaseError } from '../../../../utils/supabase/client';
+import { fetchProducts, fetchProductDetails } from '@/app/utils/utils/printifyAPI';
+import { supabase, handleSupabaseError } from '@/utils/supabase/client';
 import { env } from '@/app/lib/env';
 
 interface PrintifyImage {
