@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '../../env';
+import { env } from '@/app/lib/env';
 
 // Create a Supabase client that works with Clerk authentication
 export async function createSupabaseClientWithClerk() {
@@ -17,6 +17,10 @@ export async function createSupabaseClientWithClerk() {
 
   if (!token) {
     throw new Error('Failed to get authentication token');
+  }
+
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    throw new Error('Missing required Supabase environment variables');
   }
 
   // Create Supabase client with Clerk JWT
@@ -37,6 +41,10 @@ export async function createSupabaseClientWithClerk() {
 
 // Create a Supabase client for server-side operations
 export function createServerSupabaseClient() {
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    throw new Error('Missing required Supabase environment variables');
+  }
+  
   return createClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -45,6 +53,10 @@ export function createServerSupabaseClient() {
 
 // Create a Supabase client for client-side operations
 export function createClientSupabaseClient() {
+  if (!env.NEXT_PUBLIC_SUPABASE_URL || !env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    throw new Error('Missing required Supabase environment variables');
+  }
+  
   return createClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY
