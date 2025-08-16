@@ -1,11 +1,12 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import NextAuth from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { compare } from 'bcryptjs';
+import { compare } from 'bcryptjs'; // TODO: Install 'bcryptjs' or replace with a compatible hashing library if not available
 import { createClient } from '@supabase/supabase-js';
-import { env } from '@/app/lib/env';
-
-// Create Supabase client with proper environment variables
+import { env } from '@/env';
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

@@ -1,5 +1,5 @@
 import { inngest } from "./client";
-import { env } from "@/app/lib/env";
+import { env } from "@/env";
 
 // ============================================================================
 // USER MANAGEMENT FUNCTIONS
@@ -12,7 +12,7 @@ export const syncUserToSupabase = inngest.createFunction(
     id: "sync-user-to-supabase"
   },
   { event: "clerk/user.created" },
-  async ({ event, step }) => {
+  async ({ event, step }: { event: any; step: any }) => {
     const user = event.data;
     
     return await step.run("sync-user-data", async () => {
@@ -42,7 +42,7 @@ export const updatePrintifyProducts = inngest.createFunction(
     id: "update-printify-products"
   },
   { event: "printify/products.update" },
-  async ({ event, step }) => {
+  async ({ event, step }: { event: any; step: any }) => {
     return await step.run("fetch-printify-products", async () => {
       console.log("Fetching products from Printify");
       

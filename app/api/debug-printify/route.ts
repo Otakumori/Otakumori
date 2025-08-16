@@ -1,38 +1,22 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextResponse } from 'next/server';
-import { env } from '@/app/lib/env';
+import { printify } from '@/lib/printifyClient';
+
+const mask = (s?: string) => (s ? s.slice(0, 4) + '********' + s.slice(-4) : null);
 
 export async function GET() {
   try {
-    // Check environment variables
-    const printifyApiKey = env.PRINTIFY_API_KEY;
-    const printifyShopId = env.PRINTIFY_SHOP_ID;
-    
-    // Check raw process.env
-    const rawApiKey = process.env.PRINTIFY_API_KEY;
-    const rawShopId = process.env.PRINTIFY_SHOP_ID;
-
+    const res = await printify.get('/shops.json');
+    const count = Array.isArray(res.data) ? res.data.length : undefined;
+    return NextResponse.json({ ok: true, shops: count });
+  } catch (e: any) {
     return NextResponse.json({
-      status: 'debug',
-      timestamp: new Date().toISOString(),
-      env: {
-        PRINTIFY_API_KEY: printifyApiKey ? `${printifyApiKey.substring(0, 8)}...` : 'undefined',
-        PRINTIFY_SHOP_ID: printifyShopId || 'undefined',
-        hasApiKey: !!printifyApiKey,
-        hasShopId: !!printifyShopId,
-      },
-      raw: {
-        PRINTIFY_API_KEY: rawApiKey ? `${rawApiKey.substring(0, 8)}...` : 'undefined',
-        PRINTIFY_SHOP_ID: rawShopId || 'undefined',
-        hasApiKey: !!rawApiKey,
-        hasShopId: !!rawShopId,
-      },
-      message: 'Debug information for Printify environment variables'
-    });
-  } catch (error) {
-    return NextResponse.json({
-      status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
+      ok: false,
+      status: e?.response?.status,
+      data: e?.response?.data,
+      tokenMasked: mask(process.env.PRINTIFY_API_KEY),
     }, { status: 500 });
   }
 }

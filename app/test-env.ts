@@ -1,2 +1,2 @@
-import { env } from '@/app/lib/env';
+import { env } from '@/env';
 const foo = env.AUTH_SECRET;

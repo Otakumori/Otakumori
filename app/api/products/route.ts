@@ -1,5 +1,9 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseWithToken } from '@/app/lib/supabaseClient';
+import { env } from '@/env';
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,8 +46,8 @@ export async function GET(request: NextRequest) {
     // In production, you might want to add rate limiting here
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      env.NEXT_PUBLIC_SUPABASE_URL,
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
     const { data, error } = await supabase.rpc('exec_sql', {

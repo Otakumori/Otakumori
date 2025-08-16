@@ -5,6 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node-terminal",
+      "name": "Next.js: build",
+      "command": "npm run build"
+    },
+    {
       "command": "npm start",
       "name": "Run npm start",
       "request": "launch",
