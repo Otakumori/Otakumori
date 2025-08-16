@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { env } from '@/app/lib/env';
+import { env } from '@/env';
 
 class RateLimitError extends Error {
   constructor(message = 'Rate limit exceeded') {

@@ -1,8 +1,4 @@
-import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { type DefaultSession, type NextAuthOptions } from 'next-auth';
-
-import { db } from '../db';
-import { accounts, sessions, users, verificationTokens } from '../db/schema';
 
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
@@ -21,12 +17,8 @@ export const authConfig: NextAuthOptions = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  // Note: Using Clerk for authentication, so no Drizzle adapter needed
+  // If you need NextAuth later, you can add the adapter back
   callbacks: {
     session: ({ session, user }) => ({
       ...session,

@@ -1,7 +1,6 @@
-import axios from 'axios';
-import { env } from '@/app/lib/env';
+import { printify } from '@/lib/printifyClient';
+import { env } from '@/env';
 
-const BASE_URL = 'https://api.printify.com/v1';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
@@ -30,22 +29,17 @@ const handleApiError = error => {
   }
 };
 
-const fetchWithRetry = async (url, options, retries = MAX_RETRIES) => {
+const fetchWithRetry = async (endpoint, options = {}, retries = MAX_RETRIES) => {
   try {
-    const response = await axios({
-      url,
+    const response = await printify({
+      url: endpoint,
       ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
     });
     return response.data;
   } catch (error) {
     if (retries > 0 && (error.response?.status === 429 || error.response?.status >= 500)) {
       await sleep(RETRY_DELAY);
-      return fetchWithRetry(url, options, retries - 1);
+      return fetchWithRetry(endpoint, options, retries - 1);
     }
     handleApiError(error);
   }
@@ -53,7 +47,7 @@ const fetchWithRetry = async (url, options, retries = MAX_RETRIES) => {
 
 export const fetchProducts = async () => {
   try {
-    return await fetchWithRetry(`${BASE_URL}/shops/${env.PRINTIFY_SHOP_ID}/products.json`, {
+    return await fetchWithRetry(`/shops/${env.PRINTIFY_SHOP_ID}/products.json`, {
       method: 'GET',
     });
   } catch (error) {
@@ -65,7 +59,7 @@ export const fetchProducts = async () => {
 export const fetchProductDetails = async productId => {
   try {
     return await fetchWithRetry(
-      `${BASE_URL}/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}.json`,
+      `/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}.json`,
       {
         method: 'GET',
       }
@@ -79,7 +73,7 @@ export const fetchProductDetails = async productId => {
 export const publishProduct = async productId => {
   try {
     return await fetchWithRetry(
-      `${BASE_URL}/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}/publish.json`,
+      `/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}/publish.json`,
       {
         method: 'POST',
       }
@@ -87,5 +81,5 @@ export const publishProduct = async productId => {
   } catch (error) {
     console.error(`Failed to publish product ${productId}:`, error);
     throw error;
-  }
+    }
 };

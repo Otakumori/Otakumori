@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/app/lib/env';
+import { env } from '@/env';
 
 // Create a Supabase client that works with Clerk authentication
 export async function createSupabaseClientWithClerk() {

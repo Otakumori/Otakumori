@@ -1,11 +1,15 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getUserFromSupabase, syncUserToSupabase } from '../../../../utils/supabase/clerk-integration';
+import { env } from '@/env';
 
 export async function GET() {
   try {
     // Check if Clerk is properly configured
-    if (!process.env.CLERK_SECRET_KEY) {
+    if (!env.CLERK_SECRET_KEY) {
       return NextResponse.json(
         { 
           error: 'Clerk not configured',
@@ -50,7 +54,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     // Check if Clerk is properly configured
-    if (!process.env.CLERK_SECRET_KEY) {
+    if (!env.CLERK_SECRET_KEY) {
       return NextResponse.json(
         { 
           error: 'Clerk not configured',
@@ -85,8 +89,8 @@ export async function PUT(request: NextRequest) {
     // Update user data in Supabase
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      env.NEXT_PUBLIC_SUPABASE_URL,
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
     const { data, error } = await supabase

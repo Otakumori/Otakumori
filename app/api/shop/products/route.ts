@@ -1,7 +1,10 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchProducts, fetchProductDetails } from '@/app/utils/utils/printifyAPI';
 import { supabase, handleSupabaseError } from '@/utils/supabase/client';
-import { env } from '@/app/lib/env';
+import { env } from '@/env';
 
 interface PrintifyImage {
   src: string;
