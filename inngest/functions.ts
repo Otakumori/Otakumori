@@ -1,5 +1,5 @@
 import { inngest } from "./client";
-import { env } from "../env";
+import { env } from "@/app/lib/env";
 
 // ============================================================================
 // USER MANAGEMENT FUNCTIONS
