@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "clerk-react",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build - clerk-react",
+			"detail": "react-router build"
+		}
+	]
+}

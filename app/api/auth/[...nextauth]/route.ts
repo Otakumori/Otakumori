@@ -3,11 +3,15 @@ import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
-import { env } from '@/env';
+import { env } from '@/app/lib/env';
 
-// Create Supabase client with proper fallback handling
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+// Create Supabase client with proper environment variables
+const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing required Supabase environment variables');
+}
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -25,8 +29,8 @@ declare module 'next-auth' {
 const handler = NextAuth({
   providers: [
     GithubProvider({
-      clientId: env.AUTH_DISCORD_ID || '',
-      clientSecret: env.AUTH_DISCORD_SECRET || '',
+      clientId: env.GITHUB_CLIENT_ID || '',
+      clientSecret: env.GITHUB_CLIENT_SECRET || '',
     }),
     CredentialsProvider({
       name: 'Credentials',
