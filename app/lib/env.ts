@@ -39,6 +39,8 @@ const envSchema = z.object({
 
   // GitHub
   GITHUB_PAT: z.string().optional(),
+  GITHUB_CLIENT_ID: z.string().optional(),
+  GITHUB_CLIENT_SECRET: z.string().optional(),
 
   // Stack (if used)
   NEXT_PUBLIC_STACK_PROJECT_ID: z.string().optional(),

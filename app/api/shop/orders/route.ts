@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/utils/supabase/client';
-import { env } from '@/env';
+import { env } from '@/app/lib/env';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
 const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID || '';
