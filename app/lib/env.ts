@@ -5,33 +5,68 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url().default('postgresql://postgres:password@localhost:5432/otakumori'),
   POSTGRES_SUPABASE_URL: z.string().url().optional(),
   POSTGRES_SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+  POSTGRES_POSTGRES_DATABASE: z.string().optional(),
+  POSTGRES_POSTGRES_HOST: z.string().optional(),
+  POSTGRES_POSTGRES_PASSWORD: z.string().optional(),
+  POSTGRES_POSTGRES_USER: z.string().optional(),
 
-  // NextAuth
+  // NextAuth / Auth
   NEXTAUTH_SECRET: z.string().min(1).default('dev-secret-key-change-in-production'),
   NEXTAUTH_URL: z.string().url().default('http://localhost:3000'),
+  AUTH_SECRET: z.string().optional(), // legacy
 
-  // OAuth Providers
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  DISCORD_CLIENT_ID: z.string().optional(),
-  DISCORD_CLIENT_SECRET: z.string().optional(),
+  // Clerk
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().optional(),
+  CLERK_SECRET_KEY: z.string().optional(),
+  NEXT_PUBLIC_CLERK_FRONTEND_API: z.string().optional(),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().optional(),
+  NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().optional(),
+
+  // Supabase
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+  POSTGRES_SUPABASE_JWT_SECRET: z.string().optional(),
+
+  // Stripe
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_WEBHOOK_URL: z.string().url().optional(),
+
+  // Printify
+  PRINTIFY_API_KEY: z.string().min(1),
+  PRINTIFY_SHOP_ID: z.string().min(1),
+
+  // GitHub
+  GITHUB_PAT: z.string().optional(),
+
+  // Stack (if used)
+  NEXT_PUBLIC_STACK_PROJECT_ID: z.string().optional(),
+  NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: z.string().optional(),
+  STACK_SECRET_SERVER_KEY: z.string().optional(),
+
+  // PayPal
+  PAYPAL_ENV: z.enum(['live', 'sandbox']).optional(),
+  PAYPAL_CLIENT_ID: z.string().optional(),
+  PAYPAL_CLIENT_SECRET: z.string().optional(),
+  PAYPAL_WEBHOOK_ID: z.string().optional(),
+  NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string().optional(),
+
+  // Site configuration
+  NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_VERCEL_ENVIRONMENT: z.string().optional(),
+  DEBUG_MODE: z.string().optional(),
+
+  // Sentry / monitoring
+  SENTRY_DSN: z.string().url().optional(),
 
   // Redis
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   REDIS_URL: z.string().url().optional(),
 
-  // Supabase
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
-
-  // Sentry
-  SENTRY_DSN: z.string().url().optional(),
-
-  // App
+  // Misc
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
-
-  // Node Environment
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
 
