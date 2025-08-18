@@ -10,7 +10,7 @@ const petalFloat = {
     opacity: [0, 1, 1, 0],
     y: [0, -100, -200, -300],
     rotate: [0, 180, 360, 540],
-    transition: { duration: 3, ease: 'easeOut' },
+    transition: { duration: 3, ease: "easeOut" as const },
   },
 };
 

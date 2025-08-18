@@ -1,0 +1,32 @@
+/* Mini-games cohesion styles */
+.mg-crt {
+  /* CRT filter effect */
+  filter: contrast(1.1) brightness(1.05) saturate(1.1);
+}
+
+.mg-tint {
+  /* Subtle pink tint for consistency */
+  filter: hue-rotate(340deg) saturate(1.1);
+}
+
+/* Touch-friendly canvas */
+canvas {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mg-crt {
+    filter: none;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

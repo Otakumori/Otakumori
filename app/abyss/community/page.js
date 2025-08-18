@@ -1,11 +1,11 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 import { useState } from 'react';
 import { useAbyss } from '@/context/AbyssContext';
 
 export default function CommunityPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
   const { petals } = useAbyss();
   const [posts, setPosts] = useState([
     {
@@ -25,11 +25,11 @@ export default function CommunityPage() {
     // Add more posts as needed
   ]);
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
+  if (!user) {
     return <div>Please sign in to access the community</div>;
   }
 

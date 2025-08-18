@@ -1,25 +1,25 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useAbyss } from '@/context/AbyssContext';
+import { useUser } from '@clerk/nextjs';
+import { useState } from 'react';
 
 export default function PetalCollectionPage() {
-  const { data: session, status } = useSession();
-  const { petals, setPetals } = useAbyss();
+  const { user, isLoaded } = useUser();
+  const [score, setScore] = useState(0);
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
-    return <div>Please sign in to access petal collection</div>;
+  if (!user) {
+    return <div>Please sign in to access the petal collection game</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold">Petal Collection</h1>
       <div className="mb-4">
-        <p>Your Petals: {petals}</p>
+        <p>Your Petals: {score}</p>
       </div>
       {/* Add your petal collection game content here */}
     </div>

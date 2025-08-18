@@ -5,6 +5,9 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { CartProvider } from '../components/cart/CartProvider';
 import { PetalProvider } from '../providers';
+import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
+import GlobalMusicBar from '../components/music/GlobalMusicBar';
+import SoapstoneDock from '../components/SoapstoneDock';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -94,7 +97,11 @@ export default function RootLayout({
           >
             <PetalProvider>
               <CartProvider>
-                {children}
+                <GlobalMusicProvider>
+                  {children}
+                  <GlobalMusicBar />
+                  <SoapstoneDock />
+                </GlobalMusicProvider>
               </CartProvider>
             </PetalProvider>
           </ClerkProvider>

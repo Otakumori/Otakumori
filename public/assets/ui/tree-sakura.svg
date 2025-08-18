@@ -1,0 +1,33 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="treeGradient" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#8B4513"/>
+      <stop offset="100%" stop-color="#654321"/>
+    </radialGradient>
+    <radialGradient id="blossomGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFB7C5"/>
+      <stop offset="100%" stop-color="#FF69B4"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Tree trunk -->
+  <rect x="180" y="400" width="40" height="200" fill="url(#treeGradient)" rx="5"/>
+  
+  <!-- Main branches -->
+  <path d="M 200 400 Q 150 350 120 300 Q 100 250 120 200 Q 140 150 180 120 Q 220 150 240 200 Q 260 250 240 300 Q 210 350 200 400" 
+        fill="url(#treeGradient)" stroke="#654321" stroke-width="3"/>
+  
+  <!-- Sakura blossoms -->
+  <circle cx="120" cy="200" r="15" fill="url(#blossomGradient)"/>
+  <circle cx="180" cy="120" r="18" fill="url(#blossomGradient)"/>
+  <circle cx="240" cy="200" r="16" fill="url(#blossomGradient)"/>
+  <circle cx="200" cy="150" r="12" fill="url(#blossomGradient)"/>
+  <circle cx="160" cy="180" r="14" fill="url(#blossomGradient)"/>
+  <circle cx="220" cy="180" r="13" fill="url(#blossomGradient)"/>
+  
+  <!-- Smaller blossoms -->
+  <circle cx="140" cy="160" r="8" fill="url(#blossomGradient)"/>
+  <circle cx="200" cy="200" r="10" fill="url(#blossomGradient)"/>
+  <circle cx="180" cy="250" r="9" fill="url(#blossomGradient)"/>
+  <circle cx="220" cy="250" r="7" fill="url(#blossomGradient)"/>
+</svg>

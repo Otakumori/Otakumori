@@ -1,0 +1,38 @@
+<svg width="512" height="256" viewBox="0 0 512 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="soapstoneGradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#FFB7C5" stop-opacity="0.1"/>
+      <stop offset="50%" stop-color="#FF69B4" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#FF1493" stop-opacity="0.05"/>
+    </radialGradient>
+    
+    <filter id="soapstoneGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Soapstone background glow -->
+  <rect x="0" y="0" width="512" height="256" fill="url(#soapstoneGradient)" rx="32"/>
+  
+  <!-- Subtle rune-like patterns -->
+  <path d="M 64 64 Q 128 48 192 64 Q 256 80 320 64 Q 384 48 448 64" 
+        stroke="#FFB7C5" stroke-width="1" opacity="0.3" fill="none"/>
+  <path d="M 64 192 Q 128 208 192 192 Q 256 176 320 192 Q 384 208 448 192" 
+        stroke="#FFB7C5" stroke-width="1" opacity="0.3" fill="none"/>
+  
+  <!-- Corner accents -->
+  <circle cx="64" cy="64" r="8" fill="#FF69B4" opacity="0.2"/>
+  <circle cx="448" cy="64" r="8" fill="#FF69B4" opacity="0.2"/>
+  <circle cx="64" cy="192" r="8" fill="#FF69B4" opacity="0.2"/>
+  <circle cx="448" cy="192" r="8" fill="#FF69B4" opacity="0.2"/>
+  
+  <!-- Center rune symbol -->
+  <g transform="translate(256, 128)" opacity="0.4">
+    <circle cx="0" cy="0" r="24" fill="none" stroke="#FFB7C5" stroke-width="2"/>
+    <path d="M -16 -16 L 16 16 M -16 16 L 16 -16" stroke="#FFB7C5" stroke-width="2"/>
+  </g>
+</svg>

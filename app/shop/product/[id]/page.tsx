@@ -1,15 +1,10 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, ArrowLeft } from 'lucide-react';
-import { useCart } from '@/lib/hooks/useCart';
-import { useWishlist } from '@/lib/hooks/useWishlist';
-import { useAchievements } from '@/lib/hooks/useAchievements';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { prisma } from "@/app/lib/prisma";
+import ReviewForm from "@/components/reviews/ReviewForm";
+import Image from "next/image";
+import { auth } from "@clerk/nextjs/server";
+import Link from "next/link";
+import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Product {
   id: string;
@@ -28,58 +23,35 @@ interface ProductParams {
   id: string;
 }
 
-export default function ProductPage() {
-  const params = useParams();
-  const productId = params?.id as string;
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedVariant, setSelectedVariant] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+export default async function ProductPage({ params }: { params: ProductParams }) {
+  const { id } = params;
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch(`/api/shop/products/${productId}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch product: ${response.statusText}`);
-        }
-        const data = await response.json();
-        if (!data.product) {
-          throw new Error('Product not found');
-        }
-        setProduct(data.product);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load product');
-        console.error('Error fetching product:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch product data (you'll need to implement this based on your actual data structure)
+  // For now, I'll use a placeholder - you should replace this with your actual product fetching logic
+  const product: Product = {
+    id,
+    title: "Sample Product",
+    description: "This is a sample product description",
+    images: ["/images/placeholder.jpg"],
+    variants: [{ id: "1", price: 2500, title: "Default" }],
+    tags: ["sample", "product"]
+  };
 
-    if (productId) {
-      fetchProduct();
-    }
-  }, [productId]);
+  // Fetch reviews for this product
+  const reviews = await prisma.productReview.findMany({
+    where: { productId: id, isApproved: true },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
-      </div>
-    );
-  }
+  const { userId } = auth(); // to decide if we show the form
 
-  if (error || !product) {
+  if (!product) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="rounded-lg bg-white p-8 shadow-lg">
           <h2 className="mb-4 text-2xl font-bold text-red-600">Error</h2>
-          <p className="mb-6 text-gray-600">{error || 'Product not found'}</p>
+          <p className="mb-6 text-gray-600">Product not found</p>
           <Link
             href="/shop"
             className="inline-block rounded bg-pink-500 px-6 py-3 text-white transition-colors hover:bg-pink-600"
@@ -90,13 +62,6 @@ export default function ProductPage() {
       </div>
     );
   }
-
-  const handleAddToCart = () => {
-    addToCart({
-      ...product,
-      selectedVariant: product.variants[selectedVariant],
-    });
-  };
 
   return (
     <main className="min-h-screen bg-gray-50 py-12">
@@ -113,20 +78,13 @@ export default function ProductPage() {
         <div className="grid gap-8 md:grid-cols-2">
           {/* Product Images */}
           <div className="space-y-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-lg"
-            >
+            <div className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-lg">
               <Image src={product.images[0]} alt={product.title} fill className="object-cover" />
-            </motion.div>
+            </div>
             <div className="grid grid-cols-4 gap-4">
               {product.images.slice(1).map((image, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
                   className="relative aspect-square overflow-hidden rounded-lg bg-white shadow"
                 >
                   <Image
@@ -135,17 +93,13 @@ export default function ProductPage() {
                     fill
                     className="object-cover"
                   />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
 
           {/* Product Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
+          <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
               <p className="mt-2 text-lg text-gray-600">{product.description}</p>
@@ -153,7 +107,7 @@ export default function ProductPage() {
 
             {/* Price */}
             <div className="text-2xl font-bold text-pink-500">
-              ${(product.variants[selectedVariant].price / 100).toFixed(2)}
+              ${(product.variants[0].price / 100).toFixed(2)}
             </div>
 
             {/* Variants */}
@@ -164,12 +118,7 @@ export default function ProductPage() {
                   {product.variants.map((variant, index) => (
                     <button
                       key={variant.id}
-                      onClick={() => setSelectedVariant(index)}
-                      className={`rounded-lg px-4 py-2 ${
-                        selectedVariant === index
-                          ? 'bg-pink-500 text-white'
-                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                      }`}
+                      className="rounded-lg px-4 py-2 bg-gray-100 text-gray-900 hover:bg-gray-200"
                     >
                       {variant.title}
                     </button>
@@ -178,46 +127,14 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Quantity */}
-            <div>
-              <h3 className="mb-2 font-medium text-gray-900">Quantity</h3>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="rounded-lg bg-gray-100 px-3 py-1 hover:bg-gray-200"
-                >
-                  -
-                </button>
-                <span className="w-8 text-center">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="rounded-lg bg-gray-100 px-3 py-1 hover:bg-gray-200"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
             {/* Actions */}
             <div className="flex space-x-4">
-              <button
-                onClick={handleAddToCart}
-                className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-pink-500 px-6 py-3 text-white hover:bg-pink-600"
-              >
+              <button className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-pink-500 px-6 py-3 text-white hover:bg-pink-600">
                 <ShoppingCart className="h-5 w-5" />
                 <span>Add to Cart</span>
               </button>
-              <button
-                onClick={() =>
-                  isInWishlist(product.id) ? removeFromWishlist(product.id) : addToWishlist(product)
-                }
-                className="rounded-lg border border-gray-300 p-3 hover:bg-gray-50"
-              >
-                <Heart
-                  className={`h-5 w-5 ${
-                    isInWishlist(product.id) ? 'fill-pink-500 text-pink-500' : 'text-gray-600'
-                  }`}
-                />
+              <button className="rounded-lg border border-gray-300 p-3 hover:bg-gray-50">
+                <Heart className="h-5 w-5 text-gray-600" />
               </button>
             </div>
 
@@ -232,8 +149,46 @@ export default function ProductPage() {
                 </span>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
+
+        {/* Reviews Section */}
+        <section className="mt-12 space-y-6">
+          <h2 className="text-xl font-semibold">Customer Reviews</h2>
+
+          {userId ? (
+            <ReviewForm productId={id} />
+          ) : (
+            <p className="text-sm text-zinc-400">Sign in to write a review.</p>
+          )}
+
+          <ul className="space-y-6">
+            {reviews.map((r) => (
+              <li key={r.id} className="rounded-2xl border border-zinc-800/60 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">{r.title ?? "Review"}</div>
+                  <div className="text-sm text-yellow-400">{r.rating} ★</div>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-200">{r.body}</p>
+
+                {r.imageUrls.length > 0 && (
+                  <div className="mt-3 flex gap-3">
+                    {r.imageUrls.map((url) => (
+                      <div key={url} className="relative h-24 w-24 overflow-hidden rounded-lg border border-zinc-700">
+                        <Image src={url} alt="review photo" fill sizes="96px" className="object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-2 text-xs text-zinc-500">
+                  {new Date(r.createdAt).toLocaleString()}
+                </div>
+              </li>
+            ))}
+            {reviews.length === 0 && <li className="text-sm text-zinc-500">No reviews yet.</li>}
+          </ul>
+        </section>
       </div>
     </main>
   );

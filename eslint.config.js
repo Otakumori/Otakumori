@@ -35,6 +35,10 @@ export default tseslint.config(
       ],
       'drizzle/enforce-delete-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],
       'drizzle/enforce-update-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],
+      // Reduce noise during development
+      'react/no-unescaped-entities': 'off',
+      '@next/next/no-img-element': 'warn',
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
   {

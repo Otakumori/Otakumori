@@ -1,0 +1,3 @@
+# This is a placeholder for the petal.png asset
+# In production, this should be a proper PNG image with alpha transparency
+# For now, the game will fall back to drawing a simple pink rectangle
