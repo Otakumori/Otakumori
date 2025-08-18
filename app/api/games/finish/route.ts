@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { GAME_FLAGS } from "@/config/games";
+import type { LeaderboardScore } from "@prisma/client";
 
 type Body = {
   game: string;
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
     ok: true,
     score,
     personalBest: newPersonalBest,
-    top: top.map((t)=>({
+    top: top.map((t: LeaderboardScore)=>({
       userId: t.userId,
       score: t.score,
       diff: t.diff,
