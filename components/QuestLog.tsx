@@ -28,7 +28,7 @@ type QuestData = {
 export default function QuestLog() {
   const [claiming, setClaiming] = useState<string | null>(null);
   
-  const { data, mutate } = useSWR<QuestData>('/api/quests/list', (url) => 
+  const { data, mutate } = useSWR<QuestData>('/api/quests/list', (url: string) => 
     fetch(url).then(r => r.json())
   );
   
