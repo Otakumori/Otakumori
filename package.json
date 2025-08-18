@@ -55,6 +55,7 @@
   "dependencies": {
     "@clerk/nextjs": "^4.31.8",
     "@prisma/client": "^5.7.1",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@react-spring/web": "^10.0.1",
     "@supabase/ssr": "^0.6.1",
