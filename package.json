@@ -12,7 +12,7 @@
     "cron": "node scripts/cron.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "is-ci || husky install",
+    "prepare": "node -e \"try { require('husky').install() } catch(e) { console.log('Husky not available, skipping') }\"",
     "db:migrate": "node scripts/apply-migrations.js",
     "db:migrate:cli": "node scripts/apply-migrations-cli.js",
     "db:verify": "node scripts/verify-database.js",
