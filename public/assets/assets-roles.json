@@ -1,0 +1,70 @@
+{
+  "site": {
+    "treeMask": "ui.treeSakura",
+    "petalParticle": "ui.petal",
+    "soapstoneFilter": "ui.soapstoneFilter"
+  },
+  "games": {
+    "samuraiPetalSlice": {
+      "icon": "games.samuraiPetalSlice.icon",
+      "thumbnail": "games.samuraiPetalSlice.thumbnail",
+      "background": "games.samuraiPetalSlice.background",
+      "sprites": "games.samuraiPetalSlice.sprites",
+      "sfx": "games.samuraiPetalSlice.sfx"
+    },
+    "animeMemoryMatch": {
+      "icon": "games.animeMemoryMatch.icon",
+      "thumbnail": "games.animeMemoryMatch.thumbnail",
+      "background": "games.animeMemoryMatch.background",
+      "sprites": "games.animeMemoryMatch.sprites",
+      "sfx": "games.animeMemoryMatch.sfx"
+    },
+    "bubblePopGacha": {
+      "icon": "games.bubblePopGacha.icon",
+      "thumbnail": "games.bubblePopGacha.thumbnail",
+      "background": "games.bubblePopGacha.background",
+      "sprites": "games.bubblePopGacha.sprites",
+      "sfx": "games.bubblePopGacha.sfx"
+    },
+    "rhythmBeatEmUp": {
+      "icon": "games.rhythmBeatEmUp.icon",
+      "thumbnail": "games.rhythmBeatEmUp.thumbnail",
+      "background": "games.rhythmBeatEmUp.background",
+      "sprites": "games.rhythmBeatEmUp.sprites",
+      "sfx": "games.rhythmBeatEmUp.sfx"
+    },
+    "memoryMatch": {
+      "icon": "games.memoryMatch.icon",
+      "thumbnail": "games.memoryMatch.thumbnail",
+      "background": "games.memoryMatch.background",
+      "sprites": "games.memoryMatch.sprites",
+      "sfx": "games.memoryMatch.sfx"
+    },
+    "quickMath": {
+      "icon": "games.quickMath.icon",
+      "thumbnail": "games.quickMath.thumbnail",
+      "background": "games.quickMath.background",
+      "sprites": "games.quickMath.sprites",
+      "sfx": "games.quickMath.sfx"
+    },
+    "petalCollection": {
+      "icon": "games.petalCollection.icon",
+      "thumbnail": "games.petalCollection.thumbnail",
+      "background": "games.petalCollection.background",
+      "sprites": "games.petalCollection.sprites",
+      "sfx": "games.petalCollection.sfx"
+    }
+  },
+  "ui": {
+    "click": "audio.ui.click",
+    "hover": "audio.ui.hover",
+    "success": "audio.ui.success",
+    "error": "audio.ui.error"
+  },
+  "music": {
+    "background": "audio.music.background",
+    "hanami": "audio.music.hanami",
+    "halloween": "audio.music.halloween",
+    "winter": "audio.music.winter"
+  }
+}

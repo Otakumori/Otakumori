@@ -1,18 +1,18 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useUser } from '@clerk/nextjs';
 
 const AbyssContext = createContext();
 
 export function AbyssProvider({ children }) {
-  const { data: session, status } = useSession();
+  const { user, isLoaded, isSignedIn } = useUser();
   const [petals, setPetals] = useState(0);
   const [level, setLevel] = useState(1);
   const [experience, setExperience] = useState(0);
 
   useEffect(() => {
-    if (session?.user) {
+    if (isSignedIn && user) {
       // Fetch user data from your database
       // This is where you'd typically make an API call to get the user's petals, level, etc.
       // For now, we'll use placeholder data
@@ -20,11 +20,11 @@ export function AbyssProvider({ children }) {
       setLevel(1);
       setExperience(0);
     }
-  }, [session]);
+  }, [isSignedIn, user]);
 
   const value = {
-    user: session?.user,
-    isLoaded: status !== 'loading',
+    user: user,
+    isLoaded: isLoaded,
     petals,
     setPetals,
     level,

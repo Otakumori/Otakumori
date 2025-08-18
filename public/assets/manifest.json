@@ -1,0 +1,24 @@
+{
+  "ui": {
+    "petal": "/assets/ui/petal.png",
+    "kenneyFantasyBorders": "/assets/ui/kenney-fantasy-ui-borders.png"
+  },
+  "bg": {
+    "oakWoods": "/assets/bg/oak-woods.png",
+    "nightGradient": "/assets/bg/night-gradient.png"
+  },
+  "particles": {
+    "bubble": "/assets/particles/bubble.png"
+  },
+  "sfx": {
+    "pop": "/assets/sfx/pop.ogg",
+    "boing": "/assets/sfx/boing.ogg",
+    "thud": "/assets/sfx/thud.ogg",
+    "samurai-slash": "/assets/sfx/samurai-slash.ogg",
+    "hit-good": "/assets/sfx/hit-good.ogg",
+    "hit-miss": "/assets/sfx/hit-miss.ogg"
+  },
+  "games": {
+    "avatarFallback": "/assets/avatars/fallback-sprite.png"
+  }
+}

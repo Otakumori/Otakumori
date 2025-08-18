@@ -1,0 +1,3 @@
+# This is a placeholder for the oak-woods.png background asset
+# In production, this should be a proper PNG image
+# For now, the game will fall back to drawing a gradient background

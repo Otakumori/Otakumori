@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require("path");
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -9,6 +11,14 @@ const nextConfig = {
   // Skip static generation for pages with dynamic dependencies
   experimental: {
     missingSuspenseWithCSRBailout: false,
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      "next-auth/react": path.join(__dirname, "lib/auth/nextAuthCompat.tsx"),
+      "@supabase/auth-helpers-react": path.join(__dirname, "lib/auth/supabaseCompat.tsx"),
+    };
+    return config;
   },
   images: {
     domains: [

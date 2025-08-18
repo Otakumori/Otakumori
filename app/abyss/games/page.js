@@ -1,16 +1,17 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
+import { useState } from 'react';
 
 export default function GamesPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
+  const [selectedGame, setSelectedGame] = useState(null);
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
+  if (!user) {
     return <div>Please sign in to access the games</div>;
   }
 

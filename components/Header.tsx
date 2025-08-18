@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { useUser, useClerk } from '@clerk/nextjs';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -22,7 +22,8 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,17 +43,17 @@ export default function Header() {
             </Link>
           </div>
           <div className="flex items-center space-x-4">
-            {session ? (
+            {isLoaded && isSignedIn && user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-white">{session.user.name}</span>
+                <span className="text-white">{user.firstName || user.username}</span>
                 <button onClick={() => signOut()} className="text-white hover:text-gray-300">
                   Sign Out
                 </button>
               </div>
             ) : (
-              <button onClick={() => signIn()} className="text-white hover:text-gray-300">
+              <Link href="/sign-in" className="text-white hover:text-gray-300">
                 Sign In
-              </button>
+              </Link>
             )}
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useUser, useClerk } from '@clerk/nextjs';
 import LoadingBonfire from '../../../components/ui/LoadingBonfire';
 import { motion } from 'framer-motion';
 import QuickActions from '../../../components/admin/QuickActions';
@@ -17,7 +17,8 @@ interface AdminStats {
 }
 
 export default function AdminPage() {
-  const supabase = useSupabaseClient();
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -32,42 +33,32 @@ export default function AdminPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+      if (!isLoaded) return;
 
-        if (!session?.user?.email) {
+      try {
+        if (!user) {
           router.push('/login');
           return;
         }
 
-        const isAdmin = await supabase.rpc('is_admin', { user_email: session.user.email });
+        // Check if user has admin role (you can implement your own admin check)
+        const isAdmin = user.publicMetadata?.role === 'admin' || 
+                       user.emailAddresses.some(email => 
+                         email.emailAddress === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+                       );
 
         if (!isAdmin) {
           router.push('/');
           return;
         }
 
-        // Fetch all admin stats
-        const [{ data: userStats }, { data: messageStats }, { data: topMessage }] =
-          await Promise.all([
-            supabase.from('users').select('count, sum(petal_count)').single(),
-            supabase.from('soapstone_messages').select('count').single(),
-            supabase
-              .from('soapstone_messages')
-              .select('content')
-              .order('rating', { ascending: false })
-              .limit(1)
-              .single(),
-          ]);
-
+        // For now, set mock stats since we don't have the database tables
         setStats({
-          totalUsers: userStats?.count || 0,
-          totalPetals: Number(userStats?.sum) || 0,
-          activeUsers: 0, // TODO: Implement active users tracking
-          totalMessages: messageStats?.count || 0,
-          topRatedMessage: topMessage?.content || 'No messages yet',
+          totalUsers: 0,
+          totalPetals: 0,
+          activeUsers: 0,
+          totalMessages: 0,
+          topRatedMessage: 'No messages yet',
         });
 
         setIsAuthorized(true);
@@ -80,7 +71,7 @@ export default function AdminPage() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [user, isLoaded, router]);
 
   if (isLoading) {
     return <LoadingBonfire />;
@@ -100,7 +91,7 @@ export default function AdminPage() {
             <p className="mt-2 text-gray-400">Welcome to your domain, Your Highness</p>
           </div>
           <button
-            onClick={() => supabase.auth.signOut()}
+            onClick={() => signOut()}
             className="rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-pink-700"
           >
             Leave the Throne
@@ -109,7 +100,7 @@ export default function AdminPage() {
 
         {/* Navigation Tabs */}
         <div className="mb-8 flex space-x-4 border-b border-gray-700">
-          {['dashboard', 'messages', 'users', 'settings'].map(tab => (
+          {['dashboard', 'messages', 'users', 'media', 'reviews', 'music', 'settings'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -222,6 +213,72 @@ export default function AdminPage() {
               <p className="text-gray-400">
                 Coming soon: User management tools, permissions, and more!
               </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Media Tab */}
+        {activeTab === 'media' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="rounded-lg border border-pink-500/20 bg-gray-800 p-6 shadow-lg">
+              <h2 className="mb-4 text-xl font-semibold text-pink-400">Media Management</h2>
+              <p className="mb-4 text-gray-400">
+                Manage your site's media files, upload new images, and organize your content.
+              </p>
+              <a
+                href="/admin/media"
+                className="inline-block rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-pink-700"
+              >
+                Go to Media Manager
+              </a>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Reviews Tab */}
+        {activeTab === 'reviews' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="rounded-lg border border-pink-500/20 bg-gray-800 p-6 shadow-lg">
+              <h2 className="mb-4 text-xl font-semibold text-pink-400">Review Moderation</h2>
+              <p className="mb-4 text-gray-400">
+                Moderate customer reviews, approve or reject submissions, and maintain quality.
+              </p>
+              <a
+                href="/admin/reviews"
+                className="inline-block rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-pink-700"
+              >
+                Go to Review Queue
+              </a>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Music Tab */}
+        {activeTab === 'music' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <div className="rounded-lg border border-pink-500/20 bg-gray-800 p-6 shadow-lg">
+              <h2 className="mb-4 text-xl font-semibold text-pink-400">Music Management</h2>
+              <p className="mb-4 text-gray-400">
+                Create playlists, upload MP3s, and manage your site's background music. Users can opt-in to enjoy the tunes!
+              </p>
+              <a
+                href="/admin/music"
+                className="inline-block rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-pink-700"
+              >
+                Go to Music Manager
+              </a>
             </div>
           </motion.div>
         )}

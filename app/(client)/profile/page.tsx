@@ -1,5 +1,4 @@
 'use client';
-'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +11,8 @@ import { useFriendSystemStore } from '@/lib/store/friendSystemStore';
 import { AvatarCustomizer } from '@/components/AvatarCustomizer';
 import { ReactiveAvatar } from '@/components/ReactiveAvatar';
 import { Tutorial } from '@/components/Tutorial';
+import PetalEmitterTree from '@/components/PetalEmitterTree';
+import Soapstone from '@/components/Soapstone';
 
 // Kojima Easter Egg
 const KOJIMA_CODE = 'kojima';
@@ -67,32 +68,54 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Tutorial */}
-      <Tutorial />
+    <div className="mx-auto max-w-5xl px-6 py-10 text-pink-100/90">
+      {/* Sakura header (tree + petals only in this box) */}
+      <PetalEmitterTree 
+        className="h-64 w-full rounded-2xl" 
+        onCollect={async () => {
+          await fetch("/api/petals/click", { method: "POST" });
+        }}
+      />
 
-      {/* Header Section */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative mb-8 rounded-lg bg-gradient-to-r from-pink-500/20 to-purple-500/20 p-6 backdrop-blur-lg"
-      >
-        <div className="flex items-center gap-6">
-          <ReactiveAvatar className="group relative" />
-          <div>
-            <h1 className="text-3xl font-bold text-pink-400">
-              {user?.username || 'Wandering Soul'}
-            </h1>
-            <p className="text-white/70">Level {user?.level || 1} Chosen One</p>
-            <p className="italic text-white/50">
-              "{user?.statusMessage || 'Your legend awaits...'}"
-            </p>
+      {/* Stats row */}
+      <div className="mt-6 grid grid-cols-3 gap-6">
+        <div className="col-span-2">
+          <h1 className="text-4xl font-semibold tracking-wide">
+            {user?.username || 'Wandering Soul'}
+          </h1>
+          <p className="mt-1 text-pink-200/80">
+            Tier <span className="text-pink-300">Eternal Bloom</span>
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-2xl">❀</span>
+            <span className="text-2xl font-bold">{stats.petalsCollected}</span>
           </div>
         </div>
-      </motion.div>
+        <div className="justify-self-end h-40 w-32 rounded-2xl overflow-hidden border border-pink-300/30 bg-black/30">
+          {/* slot avatar canvas/sprite here */}
+          <ReactiveAvatar className="h-full w-full" />
+        </div>
+      </div>
+
+      {/* Soapstones */}
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <Soapstone 
+          preview="Are you still thinking about me, traveler?" 
+          text="Revealed message content." 
+        />
+        <Soapstone 
+          preview="Petals remember what we forget." 
+          text="Revealed message content." 
+        />
+      </div>
+
+      {/* Tutorial */}
+      <div className="mt-8">
+        <Tutorial />
+      </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Achievements & Runes */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -1,18 +1,18 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useAbyss } from '@/context/AbyssContext';
+import { useUser } from '@clerk/nextjs';
+import { useState } from 'react';
 
-export default function Gallery() {
-  const { data: session, status } = useSession();
-  const { petals } = useAbyss();
+export default function GalleryPage() {
+  const { user, isLoaded } = useUser();
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  if (status === 'loading') {
+  if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
-    return <div>Please sign in to access the gallery.</div>;
+  if (!user) {
+    return <div>Please sign in to access the gallery</div>;
   }
 
   const images = [
@@ -45,7 +45,7 @@ export default function Gallery() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold">Gallery</h1>
       <div className="mb-4">
-        <p>Your Petals: {petals}</p>
+        <p>Your Petals: {user.petals}</p>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {images.map(image => (

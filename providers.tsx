@@ -2,7 +2,6 @@
 
 import { ClerkProvider } from '@clerk/nextjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SessionProvider } from 'next-auth/react';
 import { create } from 'zustand';
 import React, { createContext, useContext, useRef, useEffect } from 'react';
 // import { supabase } from './utils/supabase/client';
@@ -181,13 +180,11 @@ export const useOverlordContext = () => {
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
-      <SessionProvider>
-        <QueryClientProvider client={queryClient}>
-          <PetalProvider>
-            <OverlordProvider>{children}</OverlordProvider>
-          </PetalProvider>
-        </QueryClientProvider>
-      </SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <PetalProvider>
+          <OverlordProvider>{children}</OverlordProvider>
+        </PetalProvider>
+      </QueryClientProvider>
     </ClerkProvider>
   );
 }

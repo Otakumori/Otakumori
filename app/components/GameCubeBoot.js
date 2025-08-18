@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSession } from 'next-auth/react';
 
 const SEASONAL_PETALS = {
   spring: { color: '#FF69B4', shape: '🌸', particles: 20 },
@@ -20,7 +20,7 @@ const ABYSS_PETALS = {
 };
 
 export default function GameCubeBoot({ onBootComplete }) {
-  const { data: session } = useSession();
+  const { user, isLoaded } = useUser();
   const [currentSeason, setCurrentSeason] = useState('spring');
   const [stage, setStage] = useState('black');
   const [petals, setPetals] = useState([]);
@@ -98,7 +98,7 @@ export default function GameCubeBoot({ onBootComplete }) {
 
   // Boot sequence stages
   useEffect(() => {
-    if (!session) return;
+    if (!user) return;
 
     const bootSequence = async () => {
       // Play boot sound
@@ -124,9 +124,9 @@ export default function GameCubeBoot({ onBootComplete }) {
     };
 
     bootSequence();
-  }, [session, onBootComplete]);
+  }, [user, onBootComplete]);
 
-  if (!session) {
+  if (!user) {
     return null;
   }
 

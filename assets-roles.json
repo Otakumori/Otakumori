@@ -1,0 +1,18 @@
+{
+  "bubble-ragdoll": {
+    "bg": "bg.nightGradient",
+    "bubbleSprite": "particles.bubble",
+    "bounceSfx": "sfx.boing",
+    "failSfx": "sfx.thud",
+    "uiFrame": "ui.kenneyFantasyBorders",
+    "avatarFallbackSprite": "games.avatarFallback"
+  },
+  "samurai-petal-slice": {
+    "bg": "bg.oakWoods",
+    "petalParticle": "ui.petal",
+    "slashSfx": "sfx.samurai-slash",
+    "hitSfx": "sfx.hit-good",
+    "missSfx": "sfx.hit-miss",
+    "uiFrame": "ui.kenneyFantasyBorders"
+  }
+}

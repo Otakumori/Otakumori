@@ -1,7 +1,7 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { usePetalContext } from '@/providers';
 import { useOverlordContext } from '@/providers';
@@ -59,10 +59,19 @@ const sampleQuests = [
 ];
 
 export default function AbyssPage() {
-  const { data: session } = useSession();
+  const { user, isLoaded } = useUser();
+  const [currentSection, setCurrentSection] = useState('main');
   const [isLoading, setIsLoading] = useState(true);
   const { petals, addPetals } = usePetalContext();
   const { quests, addQuest } = useOverlordContext();
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <div>Please sign in to access the Abyss</div>;
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -106,7 +115,7 @@ export default function AbyssPage() {
         className="text-center"
       >
         <h1 className="mb-4 text-4xl font-bold text-white">
-          Welcome to the Abyss, {session?.user?.name}
+          Welcome to the Abyss, {user?.firstName}
         </h1>
         <p className="text-gray-400">
           Your journey into the depths begins here. Collect petals, complete quests, and explore the
