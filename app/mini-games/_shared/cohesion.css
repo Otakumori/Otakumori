@@ -18,6 +18,14 @@ canvas {
   -ms-user-select: none;
 }
 
+/* Respect mobile safe areas and height */
+@supports (height: 100dvh) {
+  .gc-viewport { min-height: 70dvh; }
+}
+@supports not (height: 100dvh) {
+  .gc-viewport { min-height: 70vh; }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .mg-crt {
@@ -29,4 +37,21 @@ canvas {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.gc-shell-container {
+	transform-origin: center center;
+	will-change: transform, filter, opacity;
+}
+
+.gc-enter { animation: gcEnter 260ms ease-out both; }
+@keyframes gcEnter {
+	from { transform: scale(0.98); filter: blur(1px); opacity: 0; }
+	to   { transform: scale(1);    filter: blur(0);   opacity: 1; }
+}
+
+.gc-exit  { animation: gcExit 420ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes gcExit {
+	from { transform: scale(1);   filter: blur(0);   opacity: 1; }
+	to   { transform: scale(0.86); filter: blur(2px); opacity: 0; }
 }

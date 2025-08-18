@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { getEnabledGames, GameDefinition } from '@/app/lib/games';
 import { playSfx, setMuted, isMuted } from '@/app/lib/assets';
 import RippleBackdrop from '@/components/effects/RippleBackdrop';
+import { GAME_FLAGS } from '@/config/games';
 
 interface GameTileProps {
   game: GameDefinition;
@@ -102,7 +103,7 @@ export default function MiniGamesPage() {
 
   useEffect(() => {
     if (isLoaded) {
-      const enabledGames = getEnabledGames();
+      const enabledGames = getEnabledGames().filter(game => GAME_FLAGS[game.key as keyof typeof GAME_FLAGS]?.enabled);
       setGames(enabledGames);
       setIsLoading(false);
       

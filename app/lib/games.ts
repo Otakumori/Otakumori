@@ -168,34 +168,7 @@ export const games: Record<string, GameDefinition> = {
       touch: { 'tap': 'Select', 'swipe': 'Navigate' }
     }
   },
-  'quick-math': {
-    key: 'quick-math',
-    name: 'Quick Math',
-    tagline: 'Speed arithmetic with style.',
-    iconKey: 'math-icon',
-    thumbKey: 'math-thumb',
-    howToPlay: 'Solve math problems quickly. Streaks multiply your score!',
-    difficulty: 'medium',
-    maxRewardPerRun: 100,
-    sfx: {
-      start: 'math-start',
-      win: 'correct-chime',
-      lose: 'wrong-buzz',
-      ui: ['typewriter-tap', 'streak-chime', 'ui-click']
-    },
-    textures: {
-      background: 'math-bg',
-      sprites: ['numbers', 'operators', 'streak-counter'],
-      ui: ['problem-display', 'timer', 'score-display']
-    },
-    featureFlagKey: 'quick_math_enabled',
-    seeded: true,
-    inputMap: {
-      keyboard: { '0-9': 'Numbers', 'ENTER': 'Submit', 'BACKSPACE': 'Clear' },
-      gamepad: { 'DPAD': 'Navigate', 'A': 'Select', 'B': 'Clear' },
-      touch: { 'tap': 'Select', 'swipe': 'Navigate', 'keyboard': 'Input' }
-    }
-  },
+
   'petal-collection': {
     key: 'petal-collection',
     name: 'Petal Collection',
@@ -234,11 +207,16 @@ export function isGameEnabled(key: string): boolean {
   const game = getGameDef(key);
   if (!game) return false;
   
-  // Check feature flag from environment or admin settings
-  const flagKey = game.featureFlagKey;
-  const envValue = process.env[`NEXT_PUBLIC_${flagKey.toUpperCase()}`];
-  
-  return envValue === 'true' || envValue === '1';
+  // Check game flags from config
+  try {
+    const { isEnabled } = require('@/config/games');
+    return isEnabled(key);
+  } catch {
+    // Fallback to environment variables if config not available
+    const flagKey = game.featureFlagKey;
+    const envValue = process.env[`NEXT_PUBLIC_${flagKey.toUpperCase()}`];
+    return envValue === 'true' || envValue === '1';
+  }
 }
 
 export function getEnabledGames(): GameDefinition[] {

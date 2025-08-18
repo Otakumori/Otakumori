@@ -328,3 +328,17 @@ model SoapstoneLike {
   message   SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
   @@unique([messageId, userId]) // one like per user per message
 }
+
+model LeaderboardScore {
+  id        String   @id @default(cuid())
+  userId    String
+  game      String              // e.g., "quick-math", "samurai-petal-slice"
+  diff      String?             // optional: e.g., "easy|normal|hard|insane"
+  score     Int
+  statsJson Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([game, diff, score])
+  @@unique([userId, game, diff])
+}

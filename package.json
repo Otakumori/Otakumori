@@ -43,7 +43,8 @@
     "inngest:logs": "npx inngest-cli@latest logs",
     "test:webhooks": "curl -X GET http://localhost:3000/api/webhooks/inngest",
     "test:inngest": "curl -X POST http://localhost:8288/api/inngest -H 'Content-Type: application/json' -d '{\"name\": \"test/function\", \"data\": {\"test\": true}}'",
-    "test:admin": "node scripts/test-admin-setup.js"
+    "test:admin": "node scripts/test-admin-setup.js",
+    "assets:validate": "npx tsx scripts/validators/assets-validate.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "1.6.0",

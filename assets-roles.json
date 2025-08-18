@@ -1,18 +1,72 @@
 {
   "bubble-ragdoll": {
     "bg": "bg.nightGradient",
-    "bubbleSprite": "particles.bubble",
+    "bubbleSprite": "particles.kenney-bubble",
+    "popSfx": "sfx.pop",
     "bounceSfx": "sfx.boing",
     "failSfx": "sfx.thud",
     "uiFrame": "ui.kenneyFantasyBorders",
-    "avatarFallbackSprite": "games.avatarFallback"
+    "avatarFallbackSprite": "games.avatarFallback",
+
+    "themeAccent": "#b2c7ff",
+    "themeOverlayBg": "rgba(10,12,18,0.72)",
+
+    "themeCreditsText": "Bubbles & VFX by Kenney (CC0)",
+    "themeCreditsUrl": "https://kenney.nl/assets/particle-pack",
+    "themePledgeLabel": "Support Kenney",
+    "themePledgeUrl": "https://kenney.nl/support",
+    "showCreditsInPause": "always"
   },
+  
   "samurai-petal-slice": {
     "bg": "bg.oakWoods",
     "petalParticle": "ui.petal",
     "slashSfx": "sfx.samurai-slash",
     "hitSfx": "sfx.hit-good",
     "missSfx": "sfx.hit-miss",
-    "uiFrame": "ui.kenneyFantasyBorders"
+    "uiFrame": "ui.kenneyFantasyBorders",
+
+    "themeAccent": "#ffb7c5",
+    "themeOverlayBg": "rgba(14,12,17,0.72)",
+
+    "themeCreditsText": "Sakura UI & borders credit: Kenney / Petal particle & UI by site",
+    "themeCreditsUrl": "https://kenney.nl/assets/fantasy-ui-borders",
+    "themePledgeLabel": "Support Kenney",
+    "themePledgeUrl": "https://kenney.nl/support",
+    "showCreditsInPause": "always"
+  },
+
+  "rhythm-beat-em-up": {
+    "bg": "bg.rhythm",
+    "lane": "ui.rhythm.lane",
+    "note": "ui.rhythm.note",
+    "hitGoodSfx": "sfx.hit-good",
+    "hitMissSfx": "sfx.hit-miss",
+    "musicLoop": "music.final-punch-track01",
+    "map": "maps.final-punch-track01-easy",
+
+    "themeAccent": "#dba6f5",
+    "themeOverlayBg": "rgba(10,5,18,0.85)",
+
+    "themeCreditsText": "GothicVania art by Ansimuz • Music: Final Punch (royalty-free)",
+    "themeCreditsUrl": "https://ansimuz.itch.io/gothicvania-patreon-collection",
+    "themePledgeLabel": "Support Ansimuz",
+    "themePledgeUrl": "https://www.patreon.com/ansimuz",
+    "showCreditsInPause": "always"
+  },
+
+  "petal-collection": {
+    "bg": "bg.oak-woods",
+    "petalParticle": "ui.petal",
+    "collectSfx": "sfx.collect",
+    "missSfx": "sfx.miss",
+
+    "themeAccent": "#ffb7c5",
+    "themeOverlayBg": "rgba(14,12,17,0.72)",
+    "themeCreditsText": "Background art & particles credited in site assets",
+    "themeCreditsUrl": "https://github.com/nayleen/jQuery-Sakura",
+    "themePledgeLabel": "Support Asset Creators",
+    "themePledgeUrl": "https://kenney.nl/support",
+    "showCreditsInPause": "always"
   }
 }
