@@ -110,6 +110,7 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
     "@types/jest": "^29.5.11",
     "@types/seedrandom": "^3.0.8",
     "@types/three": "^0.179.0",
