@@ -55,12 +55,13 @@ export default function SamuraiSlice() {
 
     function resize() {
       const r = host.getBoundingClientRect();
-      W = Math.max(360, Math.round(r.width));
-      H = Math.max(360, Math.round(r.height * 0.7));
+      W = Math.max(320, Math.round(r.width));
+      H = Math.max(180, Math.round(r.height)); // will be 16:9 by shell
       c.width = Math.round(W * dpr);
       c.height = Math.round(H * dpr);
       c.style.width = `${W}px`;
       c.style.height = `${H}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
     window.addEventListener("resize", resize);
@@ -304,8 +305,8 @@ export default function SamuraiSlice() {
   }, []);
 
   return (
-    <div ref={hostRef} className="mg-crt mg-tint relative mx-auto w-full max-w-4xl overflow-hidden rounded-2xl border border-pink-300/30 bg-[#0e0c11] p-2">
-      <canvas ref={canvasRef} className="h-[70vh] w-full touch-none select-none" />
+    <div ref={hostRef} className="gc-viewport mg-crt mg-tint relative w-full h-full">
+      <canvas ref={canvasRef} className="w-full h-full touch-none select-none" />
       {over && (
         <div className="absolute inset-0 grid place-items-center">
           <div className="rounded-2xl border border-pink-300/40 bg-black/60 px-6 py-4 text-pink-100">

@@ -1,14 +1,25 @@
 {
   "ui": {
     "petal": "/assets/ui/petal.png",
-    "kenneyFantasyBorders": "/assets/ui/kenney-fantasy-ui-borders.png"
+    "petals": {
+      "petal_pink": "/assets/ui/petals/petal_pink.png"
+    },
+    "kenneyFantasyBorders": "/assets/ui/kenney-fantasy-ui-borders.png",
+    "rhythm": {
+      "lane": "/assets/ui/rhythm/lane.png",
+      "note": "/assets/ui/rhythm/note.png"
+    }
   },
   "bg": {
     "oakWoods": "/assets/bg/oak-woods.png",
-    "nightGradient": "/assets/bg/night-gradient.png"
+    "oak-woods": "/assets/bg/oak_woods.png",
+    "nightGradient": "/assets/bg/night_gradient.jpg",
+    "night-gradient": "/assets/bg/night-gradient.png",
+    "rhythm": "/assets/bg/rhythm-bg.png"
   },
   "particles": {
-    "bubble": "/assets/particles/bubble.png"
+    "bubble": "/assets/particles/bubble.png",
+    "kenney-bubble": "/assets/particles/kenney-bubble.png"
   },
   "sfx": {
     "pop": "/assets/sfx/pop.ogg",
@@ -16,7 +27,18 @@
     "thud": "/assets/sfx/thud.ogg",
     "samurai-slash": "/assets/sfx/samurai-slash.ogg",
     "hit-good": "/assets/sfx/hit-good.ogg",
-    "hit-miss": "/assets/sfx/hit-miss.ogg"
+    "hit-miss": "/assets/sfx/hit-miss.ogg",
+    "collect": "/assets/sfx/petal_collect.ogg",
+    "miss": "/assets/sfx/miss.ogg",
+    "tick": "/assets/sfx/tick.ogg",
+    "success": "/assets/sfx/success.ogg",
+    "fail": "/assets/sfx/fail.ogg"
+  },
+  "music": {
+    "final-punch-track01": "/assets/music/final-punch-track01.ogg"
+  },
+  "maps": {
+    "final-punch-track01-easy": "/assets/maps/final-punch-track01-easy.json"
   },
   "games": {
     "avatarFallback": "/assets/avatars/fallback-sprite.png"
