@@ -1,215 +1,210 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Heart, ShoppingCart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, Star, ShoppingBag } from 'lucide-react';
 
-// Mock featured products data (replace with real API call)
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Cherry Blossom Hoodie",
-    category: "Apparel",
-    price: 45.99,
-    image: "/assets/images/products/hoodie-placeholder.jpg",
-    description: "Soft, comfortable hoodie featuring delicate cherry blossom design"
-  },
-  {
-    id: 2,
-    name: "Anime Character Pin Set",
-    category: "Accessories",
-    price: 12.99,
-    image: "/assets/images/products/pins-placeholder.jpg",
-    description: "Collection of high-quality enamel pins featuring popular anime characters"
-  },
-  {
-    id: 3,
-    name: "Gaming Mouse Pad",
-    category: "Home Decor",
-    price: 24.99,
-    image: "/assets/images/products/mousepad-placeholder.jpg",
-    description: "Large gaming mouse pad with anime-inspired artwork"
-  },
-  {
-    id: 4,
-    name: "Limited Edition T-Shirt",
-    category: "Apparel",
-    price: 29.99,
-    image: "/assets/images/products/tshirt-placeholder.jpg",
-    description: "Exclusive design available only for a limited time"
-  },
-  {
-    id: 5,
-    name: "Desk Organizer",
-    category: "Home Decor",
-    price: 34.99,
-    image: "/assets/images/products/organizer-placeholder.jpg",
-    description: "Keep your workspace tidy with this stylish organizer"
-  }
-];
+interface FeaturedProduct {
+  id: string;
+  title: string;
+  description?: string;
+  price: number;
+  images: string[];
+  category?: string;
+  tags: string[];
+}
 
-export function FeaturedCarousel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
-  const autoPlayRef = useRef<NodeJS.Timeout>();
+export default function FeaturedCarousel() {
+  const [products, setProducts] = useState<FeaturedProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Auto-play functionality
   useEffect(() => {
-    if (!isAutoPlaying || isHovered) return;
+    fetchFeaturedProducts();
+  }, []);
 
-    autoPlayRef.current = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % featuredProducts.length);
-    }, 4000);
-
-    return () => {
-      if (autoPlayRef.current) {
-        clearInterval(autoPlayRef.current);
+  const fetchFeaturedProducts = async () => {
+    try {
+      const response = await fetch('/api/v1/shop/products?limit=6');
+      const data = await response.json();
+      
+      if (data.ok && data.data) {
+        setProducts(data.data.products);
       }
-    };
-  }, [isAutoPlaying, isHovered]);
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % featuredProducts.length);
-    // Pause auto-play temporarily when manually navigating
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 5000);
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + featuredProducts.length) % featuredProducts.length);
-    // Pause auto-play temporarily when manually navigating
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 5000);
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % Math.ceil(products.length / 3));
   };
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-    // Pause auto-play temporarily when manually navigating
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 5000);
+  const prevSlide = () => {
+    setCurrentSlide((prev) => 
+      prev === 0 ? Math.ceil(products.length / 3) - 1 : prev - 1
+    );
   };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(price);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-6xl mb-4">🌸</div>
+        <h3 className="text-xl font-semibold text-white mb-2">Featured Collection</h3>
+        <p className="text-neutral-400">Coming soon...</p>
+      </div>
+    );
+  }
+
+  const slides = [];
+  for (let i = 0; i < products.length; i += 3) {
+    slides.push(products.slice(i, i + 3));
+  }
 
   return (
-    <div 
-      className="relative"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Carousel Container */}
-      <div className="relative overflow-hidden rounded-2xl bg-neutral-800/50 border border-pink-500/20">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="relative"
-          >
-            <div className="grid md:grid-cols-2 gap-8 items-center p-8">
-              {/* Product Image */}
-              <div className="relative group">
-                <div className="w-full h-80 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-xl border border-pink-500/30 flex items-center justify-center overflow-hidden">
-                  <div className="text-center">
-                    <div className="text-8xl mb-4">🌸</div>
-                    <p className="text-pink-300 font-medium">Product Image</p>
-                    <p className="text-sm text-neutral-400 mt-2">Placeholder for {featuredProducts[currentIndex].name}</p>
-                  </div>
-                </div>
-                
-                {/* Quick Action Buttons */}
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-colors">
-                    <Heart className="h-5 w-5 text-pink-400" />
-                  </button>
-                  <button className="p-2 bg-white/10 backdrop-blur-sm rounded-full hover:bg-white/20 transition-colors">
-                    <ShoppingCart className="h-5 w-5 text-pink-400" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Product Info */}
-              <div className="space-y-6">
-                <div>
-                  <span className="inline-block px-3 py-1 bg-pink-500/20 text-pink-400 text-sm rounded-full mb-3">
-                    {featuredProducts[currentIndex].category}
-                  </span>
-                  <h3 className="text-3xl font-bold text-white mb-3">
-                    {featuredProducts[currentIndex].name}
-                  </h3>
-                  <p className="text-lg text-neutral-300 leading-relaxed">
-                    {featuredProducts[currentIndex].description}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-pink-400">
-                    ${featuredProducts[currentIndex].price}
-                  </div>
-                  <button className="px-8 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition-colors">
-                    Add to Cart
-                  </button>
-                </div>
-
-                {/* Product Features */}
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-pink-500/20">
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">🚚</div>
-                    <p className="text-sm text-neutral-400">Free Shipping</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl mb-2">⭐</div>
-                    <p className="text-sm text-neutral-400">Premium Quality</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
+    <div className="relative">
       {/* Navigation Arrows */}
       <button
-        onClick={goToPrevious}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-neutral-800/80 hover:bg-neutral-700/80 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-sm border border-pink-500/30"
-        aria-label="Previous product"
+        onClick={prevSlide}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
+        aria-label="Previous slide"
       >
         <ChevronLeft className="h-6 w-6" />
       </button>
 
       <button
-        onClick={goToNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-neutral-800/80 hover:bg-neutral-700/80 text-white rounded-full flex items-center justify-center transition-colors backdrop-blur-sm border border-pink-500/30"
-        aria-label="Next product"
+        onClick={nextSlide}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-all duration-200 backdrop-blur-sm"
+        aria-label="Next slide"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
 
-      {/* Dots Indicator */}
-      <div className="flex justify-center mt-6 space-x-2">
-        {featuredProducts.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              index === currentIndex
-                ? 'bg-pink-400 scale-125'
-                : 'bg-neutral-600 hover:bg-neutral-500'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+      {/* Carousel Container */}
+      <div className="overflow-hidden">
+        <div 
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        >
+          {slides.map((slide, slideIndex) => (
+            <div key={slideIndex} className="w-full flex-shrink-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+                {slide.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden hover:border-pink-500/50 transition-all duration-200 hover:scale-105"
+                  >
+                    {/* Product Image */}
+                    <div className="aspect-square bg-neutral-800 relative overflow-hidden">
+                      <img
+                        src={product.images[0] || '/images/products/placeholder.svg'}
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      
+                      {/* Quick Actions */}
+                      <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Link
+                          href={`/shop/product/${product.id}`}
+                          className="w-full py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                        >
+                          <ShoppingBag className="h-4 w-4" />
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold text-white text-sm line-clamp-2 group-hover:text-pink-400 transition-colors">
+                          {product.title}
+                        </h3>
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                          <span className="text-xs text-neutral-400">4.8</span>
+                        </div>
+                      </div>
+                      
+                      {product.category && (
+                        <span className="inline-block px-2 py-1 bg-pink-600/20 text-pink-400 text-xs rounded-full mb-2">
+                          {product.category}
+                        </span>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-pink-400">
+                          {formatPrice(product.price)}
+                        </span>
+                      </div>
+
+                      {/* Tags */}
+                      {product.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {product.tags.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-1 bg-neutral-800 text-xs text-neutral-300 rounded"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Auto-play Controls */}
-      <div className="flex justify-center mt-4">
-        <button
-          onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-          className="px-4 py-2 text-sm text-neutral-400 hover:text-pink-400 transition-colors"
+      {/* Slide Indicators */}
+      {slides.length > 1 && (
+        <div className="flex justify-center mt-8 space-x-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                index === currentSlide
+                  ? 'bg-pink-500 w-8'
+                  : 'bg-neutral-600 hover:bg-neutral-500'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* View All Button */}
+      <div className="text-center mt-8">
+        <Link
+          href="/shop"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition-colors"
         >
-          {isAutoPlaying ? 'Pause' : 'Play'} Auto-play
-        </button>
+          View All Products
+          <ChevronRight className="h-4 w-4" />
+        </Link>
       </div>
     </div>
   );

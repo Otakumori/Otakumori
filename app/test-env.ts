@@ -1,2 +1,2 @@
-import { env } from '@/env';
-const foo = env.AUTH_SECRET;
+import { env } from '@/env.mjs';
+const foo = env.CLERK_SECRET_KEY;

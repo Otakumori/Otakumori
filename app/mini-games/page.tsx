@@ -1,270 +1,349 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { getEnabledGames, GameDefinition } from '@/app/lib/games';
-import { playSfx, setMuted, isMuted } from '@/app/lib/assets';
-import RippleBackdrop from '@/components/effects/RippleBackdrop';
-import { GAME_FLAGS } from '@/config/games';
+import Link from 'next/link';
+import { Gamepad2, Trophy, Coins, Star, Clock, Target } from 'lucide-react';
+import SectionShell from "@/app/(sections)/_shared/SectionShell";
+import GameCubeBoot from './_shared/GameCubeBoot';
 
-interface GameTileProps {
-  game: GameDefinition;
-  onPlay: (gameKey: string) => void;
+interface Game {
+  slug: string;
+  title: string;
+  componentKey: string;
+  shortPrompt: string;
+  enabled: boolean;
+  difficulty?: string;
+  petalReward?: number;
 }
 
-function GameTile({ game, onPlay }: GameTileProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleClick = () => {
-    playSfx('ui-click');
-    onPlay(game.key);
-  };
-
-  return (
-    <div
-      className={`
-        relative group cursor-pointer transform transition-all duration-300
-        bg-gradient-to-br from-pink-50 to-gray-100 
-        border-2 border-pink-200 rounded-xl p-6
-        hover:scale-105 hover:shadow-lg hover:shadow-pink-200/50
-        ${isHovered ? 'ring-2 ring-pink-300' : ''}
-      `}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
-    >
-      {/* Difficulty Badge */}
-      <div className={`
-        absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium
-        ${game.difficulty === 'easy' ? 'bg-green-100 text-green-700' : ''}
-        ${game.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' : ''}
-        ${game.difficulty === 'hard' ? 'bg-red-100 text-red-700' : ''}
-      `}>
-        {game.difficulty}
-      </div>
-
-      {/* Game Icon */}
-      <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-200 to-purple-200 rounded-full flex items-center justify-center">
-        <span className="text-2xl">🎮</span>
-      </div>
-
-      {/* Game Title */}
-      <h3 className="text-lg font-bold text-gray-800 mb-2 text-center">
-        {game.name}
-      </h3>
-
-      {/* Tagline */}
-      <p className="text-sm text-gray-600 text-center mb-4 italic">
-        {game.tagline}
-      </p>
-
-      {/* How to Play */}
-      <p className="text-xs text-gray-500 text-center mb-4">
-        {game.howToPlay}
-      </p>
-
-      {/* Max Reward */}
-      <div className="text-center">
-        <span className="text-xs text-gray-500">Max Reward:</span>
-        <div className="flex items-center justify-center gap-1 mt-1">
-          <span className="text-pink-500 font-semibold">{game.maxRewardPerRun}</span>
-          <span className="text-xs text-pink-400">🌸</span>
-        </div>
-      </div>
-
-      {/* Play Button */}
-      <button
-        className={`
-          w-full mt-4 py-2 px-4 rounded-lg font-medium transition-all duration-200
-          bg-gradient-to-r from-pink-400 to-purple-400 text-white
-          hover:from-pink-500 hover:to-purple-500
-          active:scale-95 transform
-        `}
-      >
-        Play Now
-      </button>
-
-      {/* Hover Effects */}
-      {isHovered && (
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 to-purple-100/20 rounded-xl pointer-events-none" />
-      )}
-    </div>
-  );
+interface UserStats {
+  totalRuns: number;
+  totalPetalsEarned: number;
+  favoriteGame?: string;
+  lastPlayed?: string;
 }
+
+interface Achievement {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+  points: number;
+  isUnlocked: boolean;
+  unlockedAt?: string;
+}
+
+const AVAILABLE_GAMES: Game[] = [
+  {
+    slug: 'samurai-petal-slice',
+    title: 'Samurai Petal Slice',
+    componentKey: 'samurai_petal_slice',
+    shortPrompt: 'Draw the Tetsusaiga\'s arc…',
+    enabled: true,
+    difficulty: 'Medium',
+    petalReward: 25
+  },
+  {
+    slug: 'memory-match',
+    title: 'Anime Memory Match',
+    componentKey: 'anime_memory_match',
+    shortPrompt: 'Recall the faces bound by fate.',
+    enabled: true,
+    difficulty: 'Easy',
+    petalReward: 15
+  },
+  {
+    slug: 'bubble-pop-gacha',
+    title: 'Bubble-Pop Gacha',
+    componentKey: 'bubble_pop_gacha',
+    shortPrompt: 'Pop for spy-craft secrets…',
+    enabled: true,
+    difficulty: 'Easy',
+    petalReward: 10
+  },
+  {
+    slug: 'rhythm-beat-em-up',
+    title: 'Rhythm Beat-Em-Up',
+    componentKey: 'rhythm_beat_em_up',
+    shortPrompt: 'Sync to the Moon Prism\'s pulse.',
+    enabled: true,
+    difficulty: 'Hard',
+    petalReward: 50
+  },
+  {
+    slug: 'quick-math',
+    title: 'Quick Math Challenge',
+    componentKey: 'quick_math',
+    shortPrompt: 'Solve equations under pressure.',
+    enabled: true,
+    difficulty: 'Medium',
+    petalReward: 20
+  },
+  {
+    slug: 'petal-catch',
+    title: 'Petal Catch',
+    componentKey: 'petal_catch',
+    shortPrompt: 'Catch falling petals before they touch the ground.',
+    enabled: true,
+    difficulty: 'Easy',
+    petalReward: 15
+  }
+];
 
 export default function MiniGamesPage() {
-  const { user, isLoaded } = useUser();
-  const router = useRouter();
-  const [games, setGames] = useState<GameDefinition[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [sfxMuted, setSfxMuted] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const { user } = useUser();
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [petalBalance, setPetalBalance] = useState(0);
+  const [bootComplete, setBootComplete] = useState(false);
 
   useEffect(() => {
-    if (isLoaded) {
-      const enabledGames = getEnabledGames().filter(game => GAME_FLAGS[game.key as keyof typeof GAME_FLAGS]?.enabled);
-      setGames(enabledGames);
-      setIsLoading(false);
+    if (user) {
+      fetchUserData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const handleBootComplete = () => {
+    setBootComplete(true);
+  };
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
       
-      // Load user preferences
-      setSfxMuted(isMuted());
-      setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      // Fetch user stats
+      const statsResponse = await fetch('/api/v1/games/stats');
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        if (statsData.ok && statsData.data) {
+          setUserStats(statsData.data.totalStats);
+        }
+      }
+
+      // Fetch achievements
+      const achievementsResponse = await fetch('/api/v1/games/achievements');
+      if (achievementsResponse.ok) {
+        const achievementsData = await achievementsResponse.json();
+        if (achievementsData.ok && achievementsData.data) {
+          setAchievements(achievementsData.data.achievements);
+        }
+      }
+
+      // Fetch petal balance
+      const balanceResponse = await fetch('/api/v1/petals/balance');
+      if (balanceResponse.ok) {
+        const balanceData = await balanceResponse.json();
+        if (balanceData.ok && balanceData.data) {
+          setPetalBalance(balanceData.data.petalBalance);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [isLoaded]);
+  };
 
-  const handlePlayGame = (gameKey: string) => {
-    if (!user) {
-      router.push('/login');
-      return;
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Easy':
+        return 'text-green-400 bg-green-400/20';
+      case 'Medium':
+        return 'text-yellow-400 bg-yellow-400/20';
+      case 'Hard':
+        return 'text-red-400 bg-red-400/20';
+      default:
+        return 'text-neutral-400 bg-neutral-400/20';
     }
-    
-    router.push(`/mini-games/${gameKey}`);
   };
 
-  const toggleSfx = () => {
-    const newMuted = !sfxMuted;
-    setSfxMuted(newMuted);
-    setMuted(newMuted);
-    playSfx('ui-click');
+  const getDifficultyIcon = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Easy':
+        return '🌸';
+      case 'Medium':
+        return '⚡';
+      case 'Hard':
+        return '🔥';
+      default:
+        return '🎮';
+    }
   };
 
-  const toggleReducedMotion = () => {
-    setReducedMotion(!reducedMotion);
-    // Apply reduced motion to the page
-    document.documentElement.style.setProperty(
-      '--reduced-motion',
-      (!reducedMotion).toString()
-    );
-  };
+  // Show boot screen until complete
+  if (!bootComplete) {
+    return <GameCubeBoot onBootComplete={handleBootComplete} />;
+  }
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading mini-games...</p>
+      <SectionShell title="Mini-Games" subtitle="Loading…">
+        <div className="h-full w-full grid place-items-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+            <p className="mt-4 text-neutral-300">Loading mini-games…</p>
+          </div>
         </div>
-      </div>
+      </SectionShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      {/* Background Effects */}
-      {!reducedMotion && <RippleBackdrop durationMs={8000} strength={0.6} />}
-
-      {/* Header */}
-      <header className="relative z-10 bg-white/80 backdrop-blur-sm border-b border-pink-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Back Button */}
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-gray-600 hover:text-pink-600 transition-colors"
-            >
-              <span className="text-xl">←</span>
-              <span>Back</span>
-            </button>
-
-            {/* Page Title */}
-            <h1 className="text-2xl font-bold text-gray-800">
-              Mini-Games Hub
-            </h1>
-
-            {/* Controls */}
-            <div className="flex items-center gap-4">
-              {/* SFX Toggle */}
-              <button
-                onClick={toggleSfx}
-                className={`
-                  p-2 rounded-lg transition-colors
-                  ${sfxMuted 
-                    ? 'bg-gray-200 text-gray-600 hover:bg-gray-300' 
-                    : 'bg-pink-200 text-pink-600 hover:bg-pink-300'
-                  }
-                `}
-                title={sfxMuted ? 'Unmute SFX' : 'Mute SFX'}
-              >
-                {sfxMuted ? '🔇' : '🔊'}
-              </button>
-
-              {/* Reduced Motion Toggle */}
-              <button
-                onClick={toggleReducedMotion}
-                className={`
-                  p-2 rounded-lg transition-colors
-                  ${reducedMotion 
-                    ? 'bg-blue-200 text-blue-600 hover:bg-blue-300' 
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }
-                `}
-                title={reducedMotion ? 'Enable Motion' : 'Reduce Motion'}
-              >
-                {reducedMotion ? '🚫' : '🎬'}
-              </button>
-
-              {/* Petal Counter */}
-              {user && (
-                <div className="flex items-center gap-2 bg-pink-100 px-3 py-2 rounded-lg">
-                  <span className="text-pink-600 font-semibold">🌸</span>
-                  <span className="text-sm text-pink-700">
-                    {(user.publicMetadata as any)?.petalBalance || 0}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Message */}
+    <SectionShell title="Mini-Games" subtitle="Challenge yourself and earn petals">
+      <div className="mx-auto max-w-7xl px-4 py-6">
+        {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Welcome to the Mini-Games Hub!
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Choose from our collection of arcade-style mini-games. Each game offers unique challenges 
-            and rewards. Complete games to earn petals and unlock achievements!
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Gamepad2 className="h-12 w-12 text-purple-400" />
+            <h1 className="text-4xl font-bold">Mini-Games</h1>
+          </div>
+          <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
+            Challenge yourself with these anime-themed mini-games and earn petals for your achievements.
           </p>
         </div>
 
-        {/* Games Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => (
-            <GameTile
-              key={game.key}
-              game={game}
-              onPlay={handlePlayGame}
-            />
-          ))}
-        </div>
-
-        {/* No Games Available */}
-        {games.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🎮</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              No Games Available
-            </h3>
-            <p className="text-gray-500">
-              Check back later for new mini-games!
-            </p>
+        {/* User Stats & Petal Balance */}
+        {user && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 text-center">
+              <div className="text-3xl mb-2">🌸</div>
+              <div className="text-2xl font-bold text-pink-400">{petalBalance}</div>
+              <div className="text-sm text-neutral-400">Petals Available</div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center">
+              <div className="text-3xl mb-2">🎮</div>
+              <div className="text-2xl font-bold text-blue-400">{userStats?.totalRuns || 0}</div>
+              <div className="text-sm text-neutral-400">Games Played</div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-6 text-center">
+              <div className="text-3xl mb-2">🏆</div>
+              <div className="text-2xl font-bold text-yellow-400">
+                {achievements.filter(a => a.isUnlocked).length}
+              </div>
+              <div className="text-sm text-neutral-400">Achievements Unlocked</div>
+            </div>
           </div>
         )}
 
-        {/* Footer Info */}
-        <div className="mt-16 text-center text-sm text-gray-500">
-          <p className="mb-2">
-            Daily petal limit: {process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || 500} 🌸
-          </p>
-          <p>
-            Event: {process.env.NEXT_PUBLIC_EVENT_CODE || 'SPRING_HANAMI'} 🌸
-          </p>
+        {/* Games Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {AVAILABLE_GAMES.map((game) => (
+            <div
+              key={game.slug}
+              className="group bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden hover:border-pink-500/50 transition-all duration-200 hover:scale-105"
+            >
+              {/* Game Header */}
+              <div className="p-6 border-b border-neutral-800">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-xl font-semibold text-white group-hover:text-pink-400 transition-colors">
+                    {game.title}
+                  </h3>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(game.difficulty || 'Medium')}`}>
+                    {getDifficultyIcon(game.difficulty || 'Medium')} {game.difficulty || 'Medium'}
+                  </div>
+                </div>
+                
+                <p className="text-sm text-neutral-400 mb-4 italic">
+                  "{game.shortPrompt}"
+                </p>
+
+                {/* Petal Reward */}
+                <div className="flex items-center gap-2 text-pink-400">
+                  <Coins className="h-4 w-4" />
+                  <span className="text-sm font-medium">{game.petalReward} petals reward</span>
+                </div>
+              </div>
+
+              {/* Game Actions */}
+              <div className="p-6">
+                <Link
+                  href={`/mini-games/${game.slug}`}
+                  className="w-full py-3 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <Gamepad2 className="h-4 w-4" />
+                  Play Now
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
-      </main>
-    </div>
+
+        {/* Recent Achievements */}
+        {user && achievements.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <Trophy className="h-6 w-6 text-yellow-400" />
+              Recent Achievements
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {achievements
+                .filter(a => a.isUnlocked)
+                .slice(0, 6)
+                .map((achievement) => (
+                  <div
+                    key={achievement.id}
+                    className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg p-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">🏆</div>
+                      <div>
+                        <h4 className="font-semibold text-white">{achievement.name}</h4>
+                        <p className="text-sm text-neutral-300">{achievement.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                          <span className="text-xs text-yellow-400">{achievement.points} points</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* How to Earn More Petals */}
+        <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Want More Petals?</h2>
+          <p className="text-neutral-300 mb-6">
+            Complete daily challenges, unlock achievements, and improve your high scores to earn more petals!
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl mb-3">🎯</div>
+              <h3 className="font-semibold text-white mb-2">Daily Challenges</h3>
+              <p className="text-sm text-neutral-400">Complete daily tasks for bonus petals</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-3">⭐</div>
+              <h3 className="font-semibold text-white mb-2">High Scores</h3>
+              <p className="text-sm text-neutral-400">Beat your best scores for rewards</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-3">🏆</div>
+              <h3 className="font-semibold text-white mb-2">Achievements</h3>
+              <p className="text-sm text-neutral-400">Unlock milestones for big rewards</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Petal Store Link */}
+        <div className="text-center mt-12">
+          <Link
+            href="/account/petals"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105"
+          >
+            <Coins className="h-5 w-5" />
+            Spend Your Petals in the Store
+          </Link>
+        </div>
+      </div>
+    </SectionShell>
   );
 }

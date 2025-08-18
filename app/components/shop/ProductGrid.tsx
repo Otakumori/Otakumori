@@ -1,89 +1,63 @@
-import { useEffect, useState } from 'react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import Image from 'next/image';
+"use client";
 
-interface Product {
+import { useEffect, useState } from "react";
+
+type Product = {
   id: string;
   title: string;
-  description: string;
-  image_url: string;
   price: number;
-  currency: string;
-}
+  image?: string;
+  tags?: string[];
+};
 
 export default function ProductGrid() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [items, setItems] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    let alive = true;
+    (async () => {
       try {
-        setLoading(true);
-        const response = await fetch('/api/shop/products');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.statusText}`);
-        }
-        const data = await response.json();
-        setProducts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred while fetching products');
-        console.error('Error fetching products:', err);
+        // Replace with your real products endpoint when ready
+        const res = await fetch("/api/products", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to load products");
+        const json = await res.json();
+        if (!alive) return;
+        // expect shape: { ok: true, data: Product[] }
+        setItems(json?.data ?? []);
+      } catch {
+        setItems([]);
       } finally {
         setLoading(false);
       }
+    })();
+    return () => {
+      alive = false;
     };
-
-    fetchProducts();
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
-      </div>
-    );
+    return <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="h-64 rounded-xl animate-pulse bg-white/10" />
+      ))}
+    </div>;
   }
 
-  if (error) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <div className="rounded-lg bg-red-100 p-4 text-red-700">
-          <p className="font-medium">Error loading products</p>
-          <p className="text-sm">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-2 rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+  if (!items || items.length === 0) {
+    return <p className="opacity-80">No products found.</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {products.map(product => (
-        <Card
-          key={product.id}
-          className="overflow-hidden border-pink-500/30 bg-white/10 backdrop-blur-lg transition-all hover:border-pink-500"
-        >
-          <div className="relative h-48 w-full">
-            <Image src={product.image_url} alt={product.title} fill className="object-cover" />
-          </div>
-          <div className="p-4">
-            <h3 className="mb-2 text-xl font-bold text-white">{product.title}</h3>
-            <p className="mb-4 line-clamp-2 text-pink-200">{product.description}</p>
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-white">
-                {product.currency} {product.price.toFixed(2)}
-              </span>
-              <Button className="bg-pink-600 hover:bg-pink-700">Add to Cart</Button>
-            </div>
-          </div>
-        </Card>
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {items.map((p) => (
+        <div key={p.id} className="rounded-2xl p-4 bg-white/10 backdrop-blur">
+          {/* swap to next/image when you have URLs */}
+          <div className="aspect-square rounded-xl bg-white/10 mb-3" />
+          <div className="text-sm opacity-80">{p.tags?.join(" · ")}</div>
+          <div className="font-semibold">{p.title}</div>
+          <div className="opacity-80">${p.price.toFixed(2)}</div>
+        </div>
       ))}
     </div>
   );

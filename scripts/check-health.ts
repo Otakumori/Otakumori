@@ -1,5 +1,5 @@
-import { monitor } from '@/lib/monitor';
-import { logger } from '@/lib/logger';
+import { monitor } from '../lib/monitor';
+import { logger } from '../app/lib/logger';
 
 // Define thresholds for alerts
 const THRESHOLDS = {
@@ -57,7 +57,7 @@ async function checkHealth() {
 
     logger.info('Health check completed successfully');
   } catch (error) {
-    logger.error('Error checking system health:', error);
+    logger.error('Error checking system health', { extra: { error: error instanceof Error ? error.message : String(error) } });
   }
 }
 
@@ -66,6 +66,6 @@ setInterval(checkHealth, 5 * 60 * 1000);
 
 // Initial health check
 checkHealth().catch(error => {
-  logger.error('Failed to perform initial health check:', error);
+  logger.error('Failed to perform initial health check', { extra: { error: error instanceof Error ? error.message : String(error) } });
   process.exit(1);
 });

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabase/client';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
 const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID || '';
@@ -46,15 +45,8 @@ export async function POST(request: Request) {
 
     const order = await response.json();
 
-    // Store order in Supabase
-    await supabase.from('orders').insert({
-      order_id: order.id,
-      external_id: order.external_id,
-      status: order.status,
-      shipping_address: shippingAddress,
-      line_items: items,
-      created_at: new Date().toISOString(),
-    });
+    // TODO: Store order in your database if needed
+    // For now, just return the Printify order ID
 
     return NextResponse.json({ orderId: order.id });
   } catch (error) {

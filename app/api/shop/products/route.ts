@@ -3,8 +3,7 @@ export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchProducts, fetchProductDetails } from '@/app/utils/utils/printifyAPI';
-import { supabase, handleSupabaseError } from '@/utils/supabase/client';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 
 interface PrintifyImage {
   src: string;
@@ -89,7 +88,7 @@ export async function GET() {
         ? printifyProducts.data
         : [];
 
-    // Transform and store in Supabase
+    // Transform products for frontend consumption
     const transformedProducts = productsArray.map((product: PrintifyProduct) => ({
       id: product.id,
       title: product.title,
@@ -106,23 +105,6 @@ export async function GET() {
         updated_at: product.updated_at,
       },
     }));
-
-    // Only attempt to upsert to Supabase if we have products and Supabase is configured
-    if (transformedProducts.length > 0 && env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      try {
-        const { error } = await supabase.from('products').upsert(transformedProducts, {
-          onConflict: 'id',
-          ignoreDuplicates: false,
-        });
-
-        if (error) {
-          handleSupabaseError(error);
-        }
-      } catch (dbError) {
-        console.error('Supabase upsert error:', dbError);
-        // Continue execution even if database update fails
-      }
-    }
 
     return NextResponse.json({ products: transformedProducts }, { status: 200 });
   } catch (error) {

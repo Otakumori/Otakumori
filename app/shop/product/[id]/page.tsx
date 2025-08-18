@@ -1,61 +1,115 @@
-import { prisma } from "@/app/lib/prisma";
-import ReviewForm from "@/components/reviews/ReviewForm";
-import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
-import Link from "next/link";
-import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+"use client";
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
+import Link from 'next/link';
+import NSFWAffirmNote from '@/components/NSFWAffirmNote';
+
+interface ProductVariant {
+  id: string;
+  title: string;
+  price: number;
+  is_enabled: boolean;
+  is_default: boolean;
+  sku: string;
+}
 
 interface Product {
   id: string;
   title: string;
   description: string;
-  images: string[];
-  variants: {
-    id: string;
-    price: number;
-    title: string;
-  }[];
-  tags: string[];
+  image_url: string;
+  price: number;
+  currency: string;
+  isNSFW?: boolean;
+  variants?: ProductVariant[];
+  category?: string;
+  tags?: string[];
 }
 
-interface ProductParams {
-  id: string;
-}
+export default function ProductDetailPage() {
+  const params = useParams();
+  const productId = params.id as string;
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [quantity, setQuantity] = useState(1);
 
-export default async function ProductPage({ params }: { params: ProductParams }) {
-  const { id } = params;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/shop/products`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const products = data.products || data;
+        const foundProduct = products.find((p: Product) => p.id === productId);
+        
+        if (foundProduct) {
+          setProduct(foundProduct);
+          // Set default variant
+          if (foundProduct.variants && foundProduct.variants.length > 0) {
+            const defaultVariant = foundProduct.variants.find((v: ProductVariant) => v.is_default) || foundProduct.variants[0];
+            setSelectedVariant(defaultVariant);
+          }
+        } else {
+          setError('Product not found');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred while fetching the product');
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Fetch product data (you'll need to implement this based on your actual data structure)
-  // For now, I'll use a placeholder - you should replace this with your actual product fetching logic
-  const product: Product = {
-    id,
-    title: "Sample Product",
-    description: "This is a sample product description",
-    images: ["/images/placeholder.jpg"],
-    variants: [{ id: "1", price: 2500, title: "Default" }],
-    tags: ["sample", "product"]
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
+
+  const handleAddToCart = async () => {
+    if (!selectedVariant || !product) return;
+    
+    try {
+      // You can implement cart functionality here
+      console.log('Adding to cart:', {
+        productId: product.id,
+        variantId: selectedVariant.id,
+        quantity,
+        price: selectedVariant.price,
+      });
+      // Example: await addToCart(product.id, quantity, selectedVariant.id);
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+    }
   };
 
-  // Fetch reviews for this product
-  const reviews = await prisma.productReview.findMany({
-    where: { productId: id, isApproved: true },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-
-  const { userId } = auth(); // to decide if we show the form
-
-  if (!product) {
+  if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="rounded-lg bg-white p-8 shadow-lg">
-          <h2 className="mb-4 text-2xl font-bold text-red-600">Error</h2>
-          <p className="mb-6 text-gray-600">Product not found</p>
-          <Link
-            href="/shop"
-            className="inline-block rounded bg-pink-500 px-6 py-3 text-white transition-colors hover:bg-pink-600"
-          >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        <div className="flex min-h-[400px] items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">😔</div>
+          <h3 className="text-xl font-semibold mb-2">Product not found</h3>
+          <p className="text-white/60 mb-4">{error || 'The product you are looking for does not exist.'}</p>
+          <Link href="/shop" className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
             Back to Shop
           </Link>
         </div>
@@ -63,133 +117,143 @@ export default async function ProductPage({ params }: { params: ProductParams })
     );
   }
 
+  const imageUrl = product.image_url || '/images/products/placeholder.svg';
+  const currentPrice = selectedVariant?.price || product.price;
+  const currency = product.currency || 'USD';
+
   return (
-    <main className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
-        {/* Back Button */}
-        <Link
-          href="/shop"
-          className="mb-8 inline-flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Shop
-        </Link>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      {/* Breadcrumb */}
+      <nav className="mb-8">
+        <ol className="flex items-center space-x-2 text-sm text-white/60">
+          <li><Link href="/shop" className="hover:text-white">Shop</Link></li>
+          <li>/</li>
+          <li className="text-white">{product.title}</li>
+        </ol>
+      </nav>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-lg">
-              <Image src={product.images[0]} alt={product.title} fill className="object-cover" />
-            </div>
-            <div className="grid grid-cols-4 gap-4">
-              {product.images.slice(1).map((image, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square overflow-hidden rounded-lg bg-white shadow"
-                >
-                  <Image
-                    src={image}
-                    alt={`${product.title} - Image ${index + 2}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+      {/* NSFW Affirmation Note */}
+      {product.isNSFW && <NSFWAffirmNote />}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Product Image */}
+        <div className="space-y-4">
+          <div className="relative aspect-square overflow-hidden rounded-lg border border-white/20">
+            <Image
+              src={imageUrl}
+              alt={product.title}
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
-
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
-              <p className="mt-2 text-lg text-gray-600">{product.description}</p>
-            </div>
-
-            {/* Price */}
-            <div className="text-2xl font-bold text-pink-500">
-              ${(product.variants[0].price / 100).toFixed(2)}
-            </div>
-
-            {/* Variants */}
-            {product.variants.length > 1 && (
-              <div>
-                <h3 className="mb-2 font-medium text-gray-900">Select Variant</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.variants.map((variant, index) => (
-                    <button
-                      key={variant.id}
-                      className="rounded-lg px-4 py-2 bg-gray-100 text-gray-900 hover:bg-gray-200"
-                    >
-                      {variant.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex space-x-4">
-              <button className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-pink-500 px-6 py-3 text-white hover:bg-pink-600">
-                <ShoppingCart className="h-5 w-5" />
-                <span>Add to Cart</span>
-              </button>
-              <button className="rounded-lg border border-gray-300 p-3 hover:bg-gray-50">
-                <Heart className="h-5 w-5 text-gray-600" />
-              </button>
-            </div>
-
-            {/* Tags */}
+          
+          {/* Tags */}
+          {product.tags && product.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {product.tags.map(tag => (
+              {product.tags.map((tag, index) => (
                 <span
-                  key={tag}
-                  className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600"
+                  key={index}
+                  className="px-3 py-1 bg-pink-500/20 text-sm text-pink-200 rounded-full"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Reviews Section */}
-        <section className="mt-12 space-y-6">
-          <h2 className="text-xl font-semibold">Customer Reviews</h2>
+        {/* Product Info */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">{product.title}</h1>
+            {product.category && (
+              <p className="text-pink-400 text-sm">{product.category}</p>
+            )}
+          </div>
 
-          {userId ? (
-            <ReviewForm productId={id} />
-          ) : (
-            <p className="text-sm text-zinc-400">Sign in to write a review.</p>
+          {/* Price */}
+          <div className="text-3xl font-bold text-pink-400">
+            {currency} {currentPrice.toFixed(2)}
+          </div>
+
+          {/* Description */}
+          {product.description && (
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
+              <p className="text-white/80 leading-relaxed">{product.description}</p>
+            </div>
           )}
 
-          <ul className="space-y-6">
-            {reviews.map((r) => (
-              <li key={r.id} className="rounded-2xl border border-zinc-800/60 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium">{r.title ?? "Review"}</div>
-                  <div className="text-sm text-yellow-400">{r.rating} ★</div>
-                </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-200">{r.body}</p>
+          {/* Variants */}
+          {product.variants && product.variants.length > 1 && (
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-3">Options</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {product.variants.map((variant) => (
+                  <button
+                    key={variant.id}
+                    onClick={() => setSelectedVariant(variant)}
+                    className={`p-3 rounded-lg border transition-colors ${
+                      selectedVariant?.id === variant.id
+                        ? 'border-pink-500 bg-pink-500/20 text-white'
+                        : 'border-white/20 bg-white/10 text-white/80 hover:border-white/40'
+                    }`}
+                    disabled={!variant.is_enabled}
+                  >
+                    <div className="text-sm font-medium">{variant.title}</div>
+                    <div className="text-xs opacity-60">
+                      {product.currency || 'USD'} {variant.price.toFixed(2)}
+                    </div>
+                    {!variant.is_enabled && (
+                      <div className="text-xs text-red-400">Unavailable</div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-                {r.imageUrls.length > 0 && (
-                  <div className="mt-3 flex gap-3">
-                    {r.imageUrls.map((url) => (
-                      <div key={url} className="relative h-24 w-24 overflow-hidden rounded-lg border border-zinc-700">
-                        <Image src={url} alt="review photo" fill sizes="96px" className="object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                )}
+          {/* Quantity */}
+          <div>
+            <label className="block text-sm font-medium text-white mb-2">Quantity</label>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-10 h-10 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors"
+              >
+                -
+              </button>
+              <span className="w-16 text-center text-white">{quantity}</span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="w-10 h-10 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors"
+              >
+                +
+              </button>
+            </div>
+          </div>
 
-                <div className="mt-2 text-xs text-zinc-500">
-                  {new Date(r.createdAt).toLocaleString()}
-                </div>
-              </li>
-            ))}
-            {reviews.length === 0 && <li className="text-sm text-zinc-500">No reviews yet.</li>}
-          </ul>
-        </section>
+          {/* Add to Cart */}
+          <Button
+            onClick={handleAddToCart}
+            disabled={!selectedVariant?.is_enabled}
+            className="w-full bg-pink-600 hover:bg-pink-700 text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {selectedVariant?.is_enabled ? 'Add to Cart' : 'Unavailable'}
+          </Button>
+
+          {/* Back to Shop */}
+          <div className="text-center">
+            <Link
+              href="/shop"
+              className="text-pink-400 hover:text-pink-300 transition-colors"
+            >
+              ← Back to Shop
+            </Link>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

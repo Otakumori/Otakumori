@@ -8,6 +8,26 @@
     "rhythm": {
       "lane": "/assets/ui/rhythm/lane.png",
       "note": "/assets/ui/rhythm/note.png"
+    },
+    "hub": {
+      "cubeFrame": "/assets/ui/hub/cube_frame.png",
+      "iconGames": "/assets/ui/hub/icon_games.png",
+      "iconTrade": "/assets/ui/hub/icon_trade.png",
+      "iconAvatar": "/assets/ui/hub/icon_avatar.png",
+      "iconMusic": "/assets/ui/hub/icon_music.png",
+      "iconDrawerTop": "/assets/ui/hub/icon_drawer_top.png",
+      "iconDrawerBottom": "/assets/ui/hub/icon_drawer_bottom.png",
+      "avatarIdle": "/assets/ui/hub/avatar_idle.png",
+      "avatarShadow": "/assets/ui/hub/avatar_shadow.png"
+    },
+    "trade": {
+      "blurPanel": "/assets/ui/trade/blur_panel.png"
+    },
+    "profile": {
+      "banner": "/assets/ui/profile/banner_placeholder.png",
+      "frame":  "/assets/ui/profile/avatar_frame.png",
+      "badge":  "/assets/ui/profile/badge_placeholder.png",
+      "title":  "/assets/ui/profile/title_chip.png"
     }
   },
   "bg": {
@@ -32,7 +52,12 @@
     "miss": "/assets/sfx/miss.ogg",
     "tick": "/assets/sfx/tick.ogg",
     "success": "/assets/sfx/success.ogg",
-    "fail": "/assets/sfx/fail.ogg"
+    "fail": "/assets/sfx/fail.ogg",
+    "purchaseOk": "/assets/sfx/purchase_ok.ogg",
+    "purchaseFail": "/assets/sfx/purchase_fail.ogg",
+    "hub_move": "/assets/sfx/hub_move.ogg",
+    "hub_select": "/assets/sfx/hub_select.ogg",
+    "hub_back": "/assets/sfx/hub_back.ogg"
   },
   "music": {
     "final-punch-track01": "/assets/music/final-punch-track01.ogg"
@@ -42,5 +67,22 @@
   },
   "games": {
     "avatarFallback": "/assets/avatars/fallback-sprite.png"
+  },
+  "cosmetics": {
+    "frames": {
+      "sakura_v1": "/assets/cosmetics/frames/frame_sakura_v1.png",
+      "neon_v1": "/assets/cosmetics/frames/frame_neon_v1.png"
+    },
+    "cursors": {
+      "katana_v1": "/assets/cosmetics/cursors/cursor_katana_v1.png"
+    }
+  },
+  "overlays": {
+    "sakura_tint1": "/assets/overlays/overlay_sakura_tint1.png",
+    "sakura_anim_v1": "/assets/overlays/overlay_animated_sakura.gif",
+    "legendary_set": "/assets/overlays/overlay_legendary_set.png"
+  },
+  "textstyles": {
+    "sample_multicolor": "/assets/textstyles/sample_multicolor.png"
   }
 }

@@ -1,5 +1,5 @@
 import { printify } from '@/lib/printifyClient';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
@@ -31,10 +31,7 @@ const handleApiError = error => {
 
 const fetchWithRetry = async (endpoint, options = {}, retries = MAX_RETRIES) => {
   try {
-    const response = await printify({
-      url: endpoint,
-      ...options,
-    });
+    const response = await printify.get(endpoint, options);
     return response.data;
   } catch (error) {
     if (retries > 0 && (error.response?.status === 429 || error.response?.status >= 500)) {
