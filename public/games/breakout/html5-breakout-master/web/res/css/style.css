@@ -1,0 +1,67 @@
+body{
+	width: 960px;
+	margin: 0 auto;
+	background: #333;
+	color: #fff;
+	font-family: sans-serif;
+}
+
+h2 {
+	font-size: 2em;
+}
+
+.chroma {
+	text-shadow: 0 -2px 1px #ff0,
+                 0 -4px 1px #f00,
+                 0  2px 1px #0ff,
+                 0  4px 1px #00f,
+                 0  0   5px #000; /* normal shadow */
+}
+
+.container {
+	text-align: center;
+}
+
+#canvas {
+	border: 1px solid #000;
+	cursor: url("../img/cursor.png") 0 0, auto;
+	box-shadow: 0 0 5px rgba(0,0,0,0.25);
+}
+
+#about, #controls, #achievements {
+	display: none;
+	width: 640px;
+	min-height: 450px;
+	background: #000;
+	border: 1px solid #000;
+	background: url("../img/starfield.png");
+}
+
+a {
+	color: #fff;
+}
+
+.tabs a, .tabs a:hover, .tabs a:visited {
+	cursor: pointer;
+	font-size: 1.5em;
+	box-shadow: 0 0 5px rgba(0,0,0,0.25);
+	background: #000;
+	display: block-inline;
+	padding: 10px;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+	text-decoration: none;
+	color: #fff;
+}
+
+.tabs a:hover {
+	text-decoration: underline;
+}
+
+li.complete {
+	color: #0f0;
+}
+
+li.notcomplete {
+	color: #666;
+}

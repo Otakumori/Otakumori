@@ -1,11 +1,12 @@
 export type FaceKey = 
+  | "top-petal-store"
   | "top-trade" 
   | "left-games" 
   | "right-community" 
   | "down-music" 
   | "front-about";
 
-export type FaceType = "trade" | "games" | "community" | "music" | "about";
+export type FaceType = "store" | "trade" | "games" | "community" | "music" | "about";
 
 export type GameKey = 
   | "samurai_petal_slice"
@@ -18,11 +19,11 @@ export type GameKey =
   | "shadow_path";
 
 export interface CubeFace {
-  slot: 0 | 1 | 2 | 3 | 4;
+  slot: 0 | 1 | 2 | 3 | 4 | 5;
   key: FaceKey;
   type: FaceType;
   label: string;
-  slug: "trade" | "mini-games" | "community" | "music" | "about";
+  slug: "petal-store" | "trade" | "mini-games" | "community" | "music" | "about";
   enabled: boolean;
   faceTooltip?: string;
 }

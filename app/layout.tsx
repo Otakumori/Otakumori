@@ -2,12 +2,14 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
+import { env } from '@/env.mjs';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { CartProvider } from '../components/cart/CartProvider';
 import { PetalProvider } from '../providers';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
+import DockedGacha from '../components/DockedGacha';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -81,7 +83,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <ClerkProvider 
-            publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+            publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
             appearance={{
               elements: {
                 formButtonPrimary: 'bg-pink-600 hover:bg-pink-700 text-white',
@@ -101,6 +103,7 @@ export default function RootLayout({
                   {children}
                   <GlobalMusicBar />
                   <SoapstoneDock />
+                  <DockedGacha />
                 </GlobalMusicProvider>
               </CartProvider>
             </PetalProvider>

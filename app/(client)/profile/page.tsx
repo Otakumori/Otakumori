@@ -11,6 +11,7 @@ import { useFriendSystemStore } from '@/lib/store/friendSystemStore';
 import { AvatarCustomizer } from '@/components/AvatarCustomizer';
 import { ReactiveAvatar } from '@/components/ReactiveAvatar';
 import { Tutorial } from '@/components/Tutorial';
+import SectionShell from "@/app/(sections)/_shared/SectionShell";
 import PetalEmitterTree from '@/components/PetalEmitterTree';
 import Soapstone from '@/components/Soapstone';
 

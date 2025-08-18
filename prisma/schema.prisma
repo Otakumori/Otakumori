@@ -71,6 +71,9 @@ model Product {
   primaryImageUrl   String?
   stripeProductId   String?          @unique
   printifyProductId String?          @unique
+  active            Boolean          @default(true)
+  category          String?
+  isNSFW            Boolean          @default(false)
   OrderItem         OrderItem[]
   ProductVariant    ProductVariant[]
 }
@@ -113,27 +116,300 @@ model RewardLedger {
 }
 
 model User {
-  id                   String         @id
-  email                String         @unique
-  username             String         @unique
+  id                   String             @id @default(cuid())
+  email                String             @unique
+  username             String             @unique
   display_name         String?
   avatarUrl            String?
-  createdAt            DateTime       @default(now())
-  petalBalance         Int            @default(0)
-  hideRewardsExplainer Boolean        @default(false)
-  runes                Int            @default(0)
-  dailyClicks          Int            @default(0)
-  lastClickDayUTC      DateTime       @default(now())
+  createdAt            DateTime           @default(now())
+  petalBalance         Int                @default(0)
+  hideRewardsExplainer Boolean            @default(false)
   activeCosmetic       String?
   activeOverlay        String?
-  Order                Order[]
-  RewardLedger         RewardLedger[]
-  PetalLedger          PetalLedger[]
-  gameRuns             GameRun[]
-  achievements         UserAchievement[]
-  inventory            InventoryItem[]
+  clerkId              String             @unique
+  dailyClicks          Int                @default(0)
+  lastClickDayUTC      DateTime           @default(now())
+  level                Int                @default(1)
+  runes                Int                @default(0)
+  xp                   Int                @default(0)
+  nsfwAffirmationVer   Int                @default(1)
+  nsfwAffirmedAt       DateTime?
+  nsfwEnabled          Boolean            @default(true)
   coupons              CouponGrant[]
+  gameRuns             GameRun[]
+  inventory            InventoryItem[]
+  Order                Order[]
+  PetalLedger          PetalLedger[]
+  questAssignments     QuestAssignment[]
+  RewardLedger         RewardLedger[]
   soapstoneMessages    SoapstoneMessage[]
+  streakShards         StreakShard[]
+  achievements         UserAchievement[]
+  userFiles            UserFile[]
+  userTitles           UserTitle[]
+
+  @@index([clerkId])
+}
+
+model PetalLedger {
+  id        String     @id @default(cuid())
+  userId    String
+  type      LedgerType
+  amount    Int
+  reason    String
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, type, createdAt])
+}
+
+model Quest {
+  id          String            @id @default(cuid())
+  key         String            @unique
+  title       String
+  description String
+  kind        String
+  basePetals  Int               @default(20)
+  bonusPetals Int               @default(10)
+  active      Boolean           @default(true)
+  assignments QuestAssignment[]
+}
+
+model QuestAssignment {
+  id            String    @id @default(cuid())
+  userId        String
+  questId       String
+  day           String
+  progress      Int       @default(0)
+  target        Int       @default(1)
+  completedAt   DateTime?
+  claimedAt     DateTime?
+  bonusEligible Boolean   @default(true)
+  quest         Quest     @relation(fields: [questId], references: [id])
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questId, day])
+  @@index([userId, day])
+  @@index([questId, day])
+}
+
+model StreakShard {
+  id        String   @id @default(cuid())
+  userId    String
+  day       String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
+  @@index([userId, day])
+}
+
+model ProductReview {
+  id         String   @id @default(cuid())
+  productId  String
+  userId     String
+  rating     Int
+  title      String?
+  body       String
+  imageUrls  String[]
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([productId, createdAt])
+  @@index([isApproved, createdAt])
+}
+
+model MusicPlaylist {
+  id        String       @id @default(cuid())
+  name      String
+  isPublic  Boolean      @default(true)
+  createdBy String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  tracks    MusicTrack[]
+}
+
+model MusicTrack {
+  id         String        @id @default(cuid())
+  playlistId String
+  title      String
+  artist     String
+  url        String
+  sort       Int
+  createdAt  DateTime      @default(now())
+  playlist   MusicPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+
+  @@index([playlistId, sort])
+}
+
+model IdempotencyKey {
+  key       String   @id
+  purpose   String
+  createdAt DateTime @default(now())
+}
+
+model GameRun {
+  id           String    @id @default(cuid())
+  userId       String
+  gameKey      String
+  score        Int
+  startedAt    DateTime  @default(now())
+  finishedAt   DateTime?
+  rewardPetals Int       @default(0)
+  meta         Json?
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, gameKey])
+}
+
+model Achievement {
+  id               String            @id @default(cuid())
+  code             String            @unique
+  name             String
+  description      String
+  points           Int               @default(0)
+  rewardId         String?
+  reward           Reward?           @relation(fields: [rewardId], references: [id])
+  userAchievements UserAchievement[]
+
+  @@index([code])
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  createdAt     DateTime    @default(now())
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+model Reward {
+  id           String        @id @default(cuid())
+  kind         RewardKind
+  sku          String?
+  value        Int?
+  metadata     Json?
+  createdAt    DateTime      @default(now())
+  achievements Achievement[]
+
+  @@index([kind])
+  @@index([sku])
+}
+
+model InventoryItem {
+  id         String        @id @default(cuid())
+  userId     String
+  sku        String
+  kind       InventoryKind
+  acquiredAt DateTime      @default(now())
+  metadata   Json?
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sku])
+}
+
+model CouponGrant {
+  id           String       @id @default(cuid())
+  userId       String
+  code         String       @unique
+  discountType DiscountType
+  amountOff    Int?
+  percentOff   Int?
+  expiresAt    DateTime?
+  createdAt    DateTime     @default(now())
+  redeemedAt   DateTime?
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SoapstoneMessage {
+  id        String          @id @default(cuid())
+  userId    String?
+  content   String
+  rotation  Float           @default(0)
+  createdAt DateTime        @default(now())
+  isHidden  Boolean         @default(false)
+  isFlagged Boolean         @default(false)
+  upvotes   Int             @default(0)
+  likes     SoapstoneLike[]
+  user      User?           @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([isHidden, createdAt])
+  @@index([isFlagged, createdAt])
+}
+
+model SoapstoneLike {
+  id        String           @id @default(cuid())
+  messageId String
+  userId    String
+  createdAt DateTime         @default(now())
+  message   SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+}
+
+model LeaderboardScore {
+  id        String   @id @default(cuid())
+  userId    String
+  game      String
+  diff      String?
+  score     Int
+  statsJson Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, game, diff])
+  @@index([game, diff, score])
+}
+
+model PetalShopItem {
+  id          String    @id @default(cuid())
+  sku         String    @unique
+  name        String
+  kind        String
+  priceRunes  Int?
+  pricePetals Int?
+  eventTag    String?
+  visibleFrom DateTime?
+  visibleTo   DateTime?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([kind])
+  @@index([eventTag])
+  @@index([visibleFrom, visibleTo])
+  @@map("ShopItem")
+}
+
+model UserFile {
+  id        String   @id @default(cuid())
+  userId    String
+  key       String   @unique
+  url       String
+  size      Int
+  mimeType  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+model UserTitle {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  awardedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, awardedAt])
 }
 
 enum OrderStatus {
@@ -150,195 +426,24 @@ enum LedgerType {
   adjust
 }
 
-model PetalLedger {
-  id        String      @id @default(cuid())
-  userId    String
-  type      LedgerType
-  amount    Int         // +earn, -spend
-  reason    String
-  createdAt DateTime    @default(now())
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-  @@index([userId, type, createdAt])
+enum RewardKind {
+  PETALS_BONUS
+  COSMETIC
+  OVERLAY
+  COUPON_PERCENT
+  COUPON_AMOUNT
+  RUNE_GRANT
+  TRACK_UNLOCK
 }
 
-model ProductReview {
-  id         String   @id @default(cuid())
-  productId  String
-  userId     String
-  rating     Int      // 1..5
-  title      String?
-  body       String
-  imageUrls  String[] // Vercel Blob public URLs (max 3)
-  isApproved Boolean  @default(false) // moderation gate
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([productId, createdAt])
-  @@index([isApproved, createdAt])    // for admin queue & public listing
+enum InventoryKind {
+  COSMETIC
+  OVERLAY
+  TEXT
+  CURSOR
 }
 
-model MusicPlaylist {
-  id        String      @id @default(cuid())
-  name      String
-  isPublic  Boolean     @default(true)
-  createdBy String
-  tracks    MusicTrack[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-}
-
-model MusicTrack {
-  id         String  @id @default(cuid())
-  playlistId String
-  title      String
-  artist     String
-  url        String   // Vercel Blob URL
-  sort       Int
-  createdAt  DateTime @default(now())
-
-  playlist   MusicPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
-
-  @@index([playlistId, sort])
-}
-
-model IdempotencyKey {
-  key       String   @id
-  purpose   String
-  createdAt DateTime @default(now())
-}
-
-// Mini-Games System Models
-model GameRun {
-  id           String   @id @default(cuid())
-  userId       String
-  gameKey      String
-  score        Int
-  startedAt    DateTime @default(now())
-  finishedAt   DateTime?
-  rewardPetals Int      @default(0)
-  meta         Json?
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId, gameKey])
-}
-
-model Achievement {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  name        String
-  description String
-  points      Int      @default(0)
-  rewardId    String?
-  reward      Reward?  @relation(fields: [rewardId], references: [id])
-  userAchievements UserAchievement[]
-}
-
-model UserAchievement {
-  id            String   @id @default(cuid())
-  userId        String
-  achievementId String
-  createdAt     DateTime @default(now())
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  @@unique([userId, achievementId])
-}
-
-enum RewardKind { 
-  PETALS_BONUS 
-  COSMETIC 
-  OVERLAY 
-  COUPON_PERCENT 
-  COUPON_AMOUNT 
-  RUNE_GRANT 
-  TRACK_UNLOCK 
-}
-
-model Reward {
-  id        String    @id @default(cuid())
-  kind      RewardKind
-  sku       String?
-  value     Int?
-  metadata  Json?
-  createdAt DateTime  @default(now())
-  achievements Achievement[]
-}
-
-enum InventoryKind { 
-  COSMETIC 
-  OVERLAY 
-}
-
-model InventoryItem {
-  id         String        @id @default(cuid())
-  userId     String
-  sku        String
-  kind       InventoryKind
-  acquiredAt DateTime      @default(now())
-  metadata   Json?
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId, sku])
-}
-
-enum DiscountType { 
-  PERCENT 
-  OFF_AMOUNT 
-}
-
-model CouponGrant {
-  id           String       @id @default(cuid())
-  userId       String
-  code         String       @unique
-  discountType DiscountType
-  amountOff    Int?
-  percentOff   Int?
-  expiresAt    DateTime?
-  createdAt    DateTime     @default(now())
-  redeemedAt   DateTime?
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// Soapstone Messages System
-model SoapstoneMessage {
-  id        String   @id @default(cuid())
-  userId    String?  // null = anon/guest if allowed
-  content   String
-  rotation  Float    @default(0) // degrees; small tilt like a rune
-  createdAt DateTime @default(now())
-  // moderation flags
-  isHidden  Boolean  @default(false)
-  isFlagged Boolean  @default(false)
-  // score
-  upvotes   Int      @default(0)
-  
-  likes     SoapstoneLike[]
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  @@index([userId, createdAt])
-  @@index([isHidden, createdAt])
-  @@index([isFlagged, createdAt])
-}
-
-model SoapstoneLike {
-  id        String   @id @default(cuid())
-  messageId String
-  userId    String   // require auth to prevent abuse; or store ipHash if guests
-  createdAt DateTime @default(now())
-
-  message   SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  @@unique([messageId, userId]) // one like per user per message
-}
-
-model LeaderboardScore {
-  id        String   @id @default(cuid())
-  userId    String
-  game      String              // e.g., "quick-math", "samurai-petal-slice"
-  diff      String?             // optional: e.g., "easy|normal|hard|insane"
-  score     Int
-  statsJson Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([game, diff, score])
-  @@unique([userId, game, diff])
+enum DiscountType {
+  PERCENT
+  OFF_AMOUNT
 }

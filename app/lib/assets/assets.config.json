@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json.schemastore.org/json-schema",
+  "version": 2,
+  "baseDir": "public/assets",
+  "gamesDir": "public/games",
+  "items": [
+    {
+      "id": "pack.ui.kenney",
+      "url": "https://opengameart.org/sites/default/files/kenney_ui-pack.zip",
+      "type": "zip",
+      "license": "CC0",
+      "dest": "ui/kenney/",
+      "extract": true,
+      "flatten": false
+    },
+    {
+      "id": "icon.play",
+      "url": "https://raw.githubusercontent.com/tailwindlabs/heroicons/master/optimized/24/solid/play.svg",
+      "type": "image",
+      "license": "MIT",
+      "dest": "icons/"
+    },
+    {
+      "id": "icon.pause",
+      "url": "https://raw.githubusercontent.com/tailwindlabs/heroicons/master/optimized/24/solid/pause.svg",
+      "type": "image",
+      "license": "MIT",
+      "dest": "icons/"
+    },
+    {
+      "id": "font.runic.elderFuthark",
+      "url": "https://www.babelstone.co.uk/Fonts/WOFF/BabelStoneRunicElderFuthark.woff2",
+      "type": "font",
+      "license": "OFL-1.1",
+      "dest": "fonts/"
+    },
+    {
+      "id": "sfx.ui.click",
+      "url": "https://gamesounds.xyz/Kenney%27s%20Sound%20Pack/UI%20Audio/click1.ogg",
+      "type": "audio",
+      "license": "CC0",
+      "dest": "sfx/ui/"
+    },
+    {
+      "id": "sfx.ui.rollover",
+      "url": "https://gamesounds.xyz/Kenney%27s%20Sound%20Pack/UI%20Audio/rollover1.ogg",
+      "type": "audio",
+      "license": "CC0",
+      "dest": "sfx/ui/"
+    },
+    {
+      "id": "game.2048",
+      "url": "https://github.com/gabrielecirulli/2048/archive/refs/heads/master.zip",
+      "type": "zip",
+      "license": "MIT",
+      "gameSlug": "2048",
+      "extractToGames": true
+    },
+    {
+      "id": "game.snake",
+      "url": "https://github.com/rembound/Snake-Game-HTML5/archive/refs/heads/master.zip",
+      "type": "zip",
+      "license": "MIT",
+      "gameSlug": "snake",
+      "extractToGames": true
+    },
+    {
+      "id": "game.breakout",
+      "url": "https://github.com/bbrks/html5-breakout/archive/refs/heads/master.zip",
+      "type": "zip",
+      "license": "MIT",
+      "gameSlug": "breakout",
+      "extractToGames": true
+    },
+    {
+      "id": "neutral-neutral-sfx1",
+      "type": "audio",
+      "file": "assets/sfx/neutral-neutral-sfx1.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-neutral-sfx2",
+      "type": "audio",
+      "file": "assets/sfx/neutral-neutral-sfx2.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-neutral-sfx3",
+      "type": "audio",
+      "file": "assets/sfx/neutral-neutral-sfx3.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-neutral-sfx4",
+      "type": "audio",
+      "file": "assets/sfx/neutral-neutral-sfx4.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-female-yumi-sfx1",
+      "type": "audio",
+      "file": "assets/sfx/spicy-female-yumi-sfx1.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-female-yumi-sfx2",
+      "type": "audio",
+      "file": "assets/sfx/spicy-female-yumi-sfx2.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-female-yumi-sfx3",
+      "type": "audio",
+      "file": "assets/sfx/spicy-female-yumi-sfx3.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-male-akira-sfx1",
+      "type": "audio",
+      "file": "assets/sfx/spicy-male-akira-sfx1.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-male-akira-sfx2",
+      "type": "audio",
+      "file": "assets/sfx/spicy-male-akira-sfx2.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-male-akira-sfx3",
+      "type": "audio",
+      "file": "assets/sfx/spicy-male-akira-sfx3.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-male-akira-sfx4",
+      "type": "audio",
+      "file": "assets/sfx/spicy-male-akira-sfx4.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-male-akira-sfx5",
+      "type": "audio",
+      "file": "assets/sfx/spicy-male-akira-sfx5.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "spicy-male-akira-sfx6",
+      "type": "audio",
+      "file": "assets/sfx/spicy-male-akira-sfx6.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-test-sfx1",
+      "type": "audio",
+      "file": "assets/sfx/neutral-test-sfx1.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-test-sfx2",
+      "type": "audio",
+      "file": "assets/sfx/neutral-test-sfx2.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-test-sfx3",
+      "type": "audio",
+      "file": "assets/sfx/neutral-test-sfx3.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-test-sfx4",
+      "type": "audio",
+      "file": "assets/sfx/neutral-test-sfx4.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-test-sfx5",
+      "type": "audio",
+      "file": "assets/sfx/neutral-test-sfx5.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    },
+    {
+      "id": "neutral-test-sfx6",
+      "type": "audio",
+      "file": "assets/sfx/neutral-test-sfx6.wav",
+      "license": "GENERATED",
+      "dest": "sfx/"
+    }
+  ]
+}

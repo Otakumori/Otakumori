@@ -7,7 +7,8 @@ import Navigation from '@/components/layout/Navigation';
 import { TestSupabaseButton } from '@/components/TestSupabaseButton';
 import { PetalSystem } from '@/components/PetalSystem';
 import { SoapstoneFooter } from '@/components/SoapstoneFooter';
-import { FeaturedCarousel } from '@/components/FeaturedCarousel';
+import FeaturedCarousel from '@/components/FeaturedCarousel';
+import Link from 'next/link';
 
 export default function HomePage() {
   const [petalsCollected, setPetalsCollected] = useState(0);
@@ -91,14 +92,14 @@ export default function HomePage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-              <button className="px-8 py-4 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition-colors flex items-center group">
+              <Link href="/shop" className="px-8 py-4 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition-colors flex items-center group">
                 Explore Collection
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </Link>
               
-              <button className="px-8 py-4 bg-transparent border-2 border-pink-500/50 hover:border-pink-400 text-pink-400 hover:text-pink-300 font-semibold rounded-lg transition-colors">
+              <Link href="/abyss/gallery" className="px-8 py-4 bg-transparent border-2 border-pink-500/50 hover:border-pink-400 text-pink-400 hover:text-pink-300 font-semibold rounded-lg transition-colors">
                 View Gallery
-              </button>
+              </Link>
             </div>
 
             {/* Fallback Links */}

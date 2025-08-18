@@ -7,6 +7,8 @@ import LoadingBonfire from '../../../components/ui/LoadingBonfire';
 import { motion } from 'framer-motion';
 import QuickActions from '../../../components/admin/QuickActions';
 import MessageManager from '../../../components/admin/MessageManager';
+import Link from 'next/link';
+import { admin } from '@/app/lib/brand-microcopy';
 
 interface AdminStats {
   totalUsers: number;
@@ -41,14 +43,15 @@ export default function AdminPage() {
           return;
         }
 
-        // Check if user has admin role (you can implement your own admin check)
+        // Check if user has admin role
         const isAdmin = user.publicMetadata?.role === 'admin' || 
                        user.emailAddresses.some(email => 
                          email.emailAddress === process.env.NEXT_PUBLIC_ADMIN_EMAIL
                        );
 
         if (!isAdmin) {
-          router.push('/');
+          setIsAuthorized(false);
+          setIsLoading(false);
           return;
         }
 
@@ -64,7 +67,7 @@ export default function AdminPage() {
         setIsAuthorized(true);
       } catch (error) {
         console.error('Auth check failed:', error);
-        router.push('/');
+        setIsAuthorized(false);
       } finally {
         setIsLoading(false);
       }
@@ -77,8 +80,39 @@ export default function AdminPage() {
     return <LoadingBonfire />;
   }
 
+  // Admin gate for non-admin users
   if (!isAuthorized) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md"
+        >
+          <div className="text-6xl mb-6">👑</div>
+          <h1 className="text-3xl font-bold text-pink-400 mb-4">
+            {admin.access}
+          </h1>
+          <p className="text-gray-400 mb-8 text-lg">
+            {admin.denied}
+          </p>
+          <div className="space-y-4">
+            <Link
+              href="/"
+              className="block w-full py-3 px-6 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Return to the Realm
+            </Link>
+            <Link
+              href="/login"
+              className="block w-full py-3 px-6 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
+            >
+              Sign In with Different Account
+            </Link>
+          </div>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
@@ -87,14 +121,14 @@ export default function AdminPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-pink-400">Princess Admin General's Throne</h1>
-            <p className="mt-2 text-gray-400">Welcome to your domain, Your Highness</p>
+            <h1 className="text-4xl font-bold text-pink-400">{admin.title}</h1>
+            <p className="mt-2 text-gray-400">{admin.subtitle}</p>
           </div>
           <button
             onClick={() => signOut()}
             className="rounded-lg bg-pink-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-pink-700"
           >
-            Leave the Throne
+            {admin.signOut}
           </button>
         </div>
 

@@ -75,6 +75,7 @@ export default function GameCubeUI({ faces }: { faces: CubeFace[] }) {
       2: "rotate-y-180",  // Down
       3: "rotate-y-270",  // Left
       4: "rotate-x-90",   // Top
+      5: "rotate-x-90",   // Top (second slot)
     };
     return rotations[slot as keyof typeof rotations] || "rotate-y-0";
   };
@@ -115,7 +116,7 @@ function CubeFacePanel({
   onClick, 
   disabled 
 }: { 
-  slot: 0 | 1 | 2 | 3 | 4; 
+  slot: 0 | 1 | 2 | 3 | 4 | 5; 
   label: string; 
   onClick: () => void;
   disabled: boolean;
@@ -127,6 +128,7 @@ function CubeFacePanel({
       2: "translate-z-neg-48", // Back
       3: "translate-x-neg-48", // Left
       4: "translate-y-neg-48", // Top
+      5: "translate-y-neg-48", // Top (second slot)
     };
     return positions[slot as keyof typeof positions] || "translate-z-48";
   };
@@ -138,6 +140,7 @@ function CubeFacePanel({
       2: "rotate-y-180",  // Back
       3: "rotate-y-270",  // Left
       4: "rotate-x-90",   // Top
+      5: "rotate-x-90",   // Top (second slot)
     };
     return rotations[slot as keyof typeof rotations] || "rotate-y-0";
   };

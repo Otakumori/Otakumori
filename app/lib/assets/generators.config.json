@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "provider": "comfyui",
+  "endpoint": "http://127.0.0.1:8188",
+  "defaults": {
+    "width": 768,
+    "height": 768,
+    "steps": 26,
+    "cfg": 6.5,
+    "sampler": "euler",
+    "seed": -1,
+    "upscale": false
+  },
+  "families": {
+    "spicy-male": {
+      "ui": "minigame.noir.tech",
+      "textures": "tex.psx.frames",
+      "icons": "hud.soulslike.runes",
+      "avatars": "char.psx.hunk",
+      "sfx": "gen.jsfxr.male"
+    },
+    "spicy-female": {
+      "ui": "minigame.candy.pop",
+      "textures": "tex.psx.frames.soft",
+      "icons": "hud.kawaii.icons",
+      "avatars": "char.psx.waifu",
+      "sfx": "gen.jsfxr.female"
+    },
+    "neutral": {
+      "ui": "minigame.forest.cozy",
+      "textures": "tex.psx.frames.wood",
+      "icons": "hud.cozy.icons",
+      "avatars": "char.psx.neutral",
+      "sfx": "gen.jsfxr.neutral"
+    }
+  },
+  "presets": {
+    "minigame.noir.tech": {
+      "positive": "PS1 HUD with techno-noir feel, bevel hints, chromatic micro-glow, orthographic, minimal grain, readably bold glyphs, transparent background",
+      "negative": "photo, clutter, thin unreadable type, smear",
+      "palette": ["#0f172a", "#94a3b8", "#22d3ee", "#38bdf8", "#e2e8f0"],
+      "count": 7,
+      "names": ["hack", "scan", "link", "deploy", "trace", "abort", "menu"]
+    },
+    "minigame.candy.pop": {
+      "positive": "pixel-art candy UI, soft bevel, cute highlights, kawaii arcade tone, clean vector-like edges, transparent background",
+      "negative": "photo, gritty noise, muddy color",
+      "palette": ["#ff7eb3", "#ffd1e8", "#ffffff", "#6366f1", "#1f2937"],
+      "count": 6,
+      "names": ["play", "shop", "gacha", "stash", "rank", "quit"]
+    },
+    "minigame.forest.cozy": {
+      "positive": "PS1-lofi UI panels with soft dither, mossy wood accents, gentle light, studio-clean icon silhouettes, transparent background, nostalgic console menu",
+      "negative": "photo, grunge noise, text watermark, harsh bloom",
+      "palette": ["#2b3a2e", "#7da07a", "#c7d8c6", "#6c5a48", "#f5f1e6"],
+      "count": 6,
+      "names": ["play", "map", "quests", "bag", "camp", "exit"]
+    },
+    "tex.psx.frames": {
+      "positive": "PS1-era UI frame texture atlas, seamless tiles, gentle dither, 256-color look, clean edges, designed for slicing into 9-slice borders",
+      "negative": "photoreal, over-sharpened, high-gloss modern",
+      "palette": ["#111111", "#2a2a2a", "#5a5a5a", "#a8a8a8", "#e6e6e6"],
+      "count": 1,
+      "names": ["ui-atlas"]
+    },
+    "tex.psx.frames.soft": {
+      "positive": "PS1 soft UI frames, pastel edges, gentle bevels, seamless tiles, designed for slicing into 9-slice borders",
+      "negative": "photoreal, harsh edges, modern glossy",
+      "palette": ["#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6", "#ec4899"],
+      "count": 1,
+      "names": ["ui-atlas-soft"]
+    },
+    "tex.psx.frames.wood": {
+      "positive": "PS1 wood-textured UI frames, natural grain, warm tones, seamless tiles, designed for slicing into 9-slice borders",
+      "negative": "photoreal, synthetic, cold colors",
+      "palette": ["#8b4513", "#a0522d", "#cd853f", "#deb887", "#f5deb3"],
+      "count": 1,
+      "names": ["ui-atlas-wood"]
+    },
+    "hud.soulslike.runes": {
+      "positive": "dark fantasy HUD rune icons, glowing ember outlines, crisp vector silhouettes, high contrast, readable at 48px, minimal grunge, UI icon sheet, transparent background",
+      "negative": "realistic photo, text, watermark, busy background, lowres",
+      "count": 12,
+      "names": ["guard", "eternal", "abyss", "light", "fire", "ice", "poison", "shock", "wind", "earth", "blood", "void"]
+    },
+    "hud.kawaii.icons": {
+      "positive": "kawaii HUD icons, cute silhouettes, soft edges, pastel colors, readable at 48px, minimal noise, transparent background",
+      "negative": "realistic, dark, harsh edges, busy background",
+      "palette": ["#ffb6c1", "#ffc0cb", "#ffd1dc", "#ffe4e1", "#f0f8ff"],
+      "count": 12,
+      "names": ["heart", "star", "flower", "crown", "gem", "moon", "sun", "cloud", "leaf", "butterfly", "rainbow", "sparkle"]
+    },
+    "hud.cozy.icons": {
+      "positive": "cozy HUD icons, warm silhouettes, soft edges, earth tones, readable at 48px, minimal noise, transparent background",
+      "negative": "realistic, bright, harsh edges, busy background",
+      "palette": ["#8b4513", "#a0522d", "#cd853f", "#deb887", "#f5deb3"],
+      "count": 12,
+      "names": ["home", "fire", "tree", "mountain", "river", "sun", "moon", "star", "leaf", "flower", "heart", "peace"]
+    },
+    "char.psx.hunk": {
+      "positive": "PS1-style male character portrait, handsome features, strong jawline, confident expression, limited color palette, nostalgic console look",
+      "negative": "photoreal, modern, feminine, weak features",
+      "palette": ["#2d2d2d", "#5a5a5a", "#a8a8a8", "#e6e6e6", "#ff7eb3"],
+      "count": 1,
+      "names": ["portrait"]
+    },
+    "char.psx.waifu": {
+      "positive": "PS1-style female character portrait, cute features, soft expression, kawaii style, limited color palette, nostalgic console look",
+      "negative": "photoreal, modern, masculine, harsh features",
+      "palette": ["#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6", "#ec4899"],
+      "count": 1,
+      "names": ["portrait"]
+    },
+    "char.psx.neutral": {
+      "positive": "PS1-style neutral character portrait, balanced features, calm expression, limited color palette, nostalgic console look",
+      "negative": "photoreal, modern, extreme features, harsh expression",
+      "palette": ["#8b4513", "#a0522d", "#cd853f", "#deb887", "#f5deb3"],
+      "count": 1,
+      "names": ["portrait"]
+    },
+    "gen.jsfxr.male": {
+      "positive": "masculine sound effects, deep tones, strong impact, electronic elements",
+      "negative": "feminine, soft, gentle, natural",
+      "count": 5,
+      "names": ["click", "hover", "confirm", "error", "success"]
+    },
+    "gen.jsfxr.female": {
+      "positive": "feminine sound effects, bright tones, soft impact, melodic elements",
+      "negative": "masculine, harsh, deep, aggressive",
+      "count": 5,
+      "names": ["click", "hover", "confirm", "error", "success"]
+    },
+    "gen.jsfxr.neutral": {
+      "positive": "neutral sound effects, balanced tones, moderate impact, natural elements",
+      "negative": "extreme, artificial, harsh, soft",
+      "count": 5,
+      "names": ["click", "hover", "confirm", "error", "success"]
+    }
+  }
+}

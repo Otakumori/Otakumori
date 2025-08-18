@@ -1,0 +1,41 @@
+{
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": { "ckpt_name": "v1-5-pruned-emaonly.ckpt" }
+  },
+  "2": {
+    "class_type": "CLIPTextEncode",
+    "_meta": { "title": "CLIPTextEncode (positive)" },
+    "inputs": { "text": "", "clip": [ "1", "CLIP" ] }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "_meta": { "title": "CLIPTextEncode (negative)" },
+    "inputs": { "text": "", "clip": [ "1", "CLIP" ] }
+  },
+  "4": {
+    "class_type": "EmptyLatentImage",
+    "inputs": { "width": 896, "height": 896, "batch_size": 1 }
+  },
+  "5": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [ "1", "MODEL" ],
+      "positive": [ "2", "CONDITIONING" ],
+      "negative": [ "3", "CONDITIONING" ],
+      "latent_image": [ "4", "LATENT" ],
+      "steps": 30,
+      "cfg": 7,
+      "sampler_name": "euler",
+      "seed": -1
+    }
+  },
+  "6": {
+    "class_type": "VAEDecode",
+    "inputs": { "samples": [ "5", "SAMPLES" ], "vae": [ "1", "VAE" ] }
+  },
+  "7": {
+    "class_type": "SaveImage",
+    "inputs": { "images": [ "6", "IMAGE" ] }
+  }
+}

@@ -1,5 +1,5 @@
-import { monitor } from '@/lib/monitor';
-import { logger } from '@/lib/logger';
+import { monitor } from '../lib/monitor';
+import { logger } from '../app/lib/logger';
 import { redis } from './lib/redis';
 
 async function collectMetrics() {
@@ -19,7 +19,7 @@ async function collectMetrics() {
 
     logger.info('Metrics collected and stored successfully');
   } catch (error) {
-    logger.error('Error collecting metrics:', error);
+    logger.error('Error collecting metrics', { extra: { error: error instanceof Error ? error.message : String(error) } });
   }
 }
 
@@ -28,6 +28,6 @@ setInterval(collectMetrics, 60 * 1000);
 
 // Initial collection
 collectMetrics().catch(error => {
-  logger.error('Failed to collect initial metrics:', error);
+  logger.error('Failed to collect initial metrics', { extra: { error: error instanceof Error ? error.message : String(error) } });
   process.exit(1);
 });

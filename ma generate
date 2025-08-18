@@ -1,0 +1,437 @@
+[1mdiff --git a/prisma/schema.prisma b/prisma/schema.prisma[m
+[1mindex 58907bc..7dd61e7 100644[m
+[1m--- a/prisma/schema.prisma[m
+[1m+++ b/prisma/schema.prisma[m
+[36m@@ -71,6 +71,9 @@[m [mmodel Product {[m
+   primaryImageUrl   String?[m
+   stripeProductId   String?          @unique[m
+   printifyProductId String?          @unique[m
+[32m+[m[32m  active            Boolean          @default(true)[m
+[32m+[m[32m  category          String?[m
+[32m+[m[32m  isNSFW            Boolean          @default(false)[m
+   OrderItem         OrderItem[][m
+   ProductVariant    ProductVariant[][m
+ }[m
+[36m@@ -113,91 +116,129 @@[m [mmodel RewardLedger {[m
+ }[m
+ [m
+ model User {[m
+[31m-  id                   String         @id[m
+[31m-  email                String         @unique[m
+[31m-  username             String         @unique[m
+[32m+[m[32m  id                   String             @id @default(cuid())[m
+[32m+[m[32m  email                String             @unique[m
+[32m+[m[32m  username             String             @unique[m
+   display_name         String?[m
+   avatarUrl            String?[m
+[31m-  createdAt            DateTime       @default(now())[m
+[31m-  petalBalance         Int            @default(0)[m
+[31m-  hideRewardsExplainer Boolean        @default(false)[m
+[31m-  runes                Int            @default(0)[m
+[31m-  dailyClicks          Int            @default(0)[m
+[31m-  lastClickDayUTC      DateTime       @default(now())[m
+[32m+[m[32m  createdAt            DateTime           @default(now())[m
+[32m+[m[32m  petalBalance         Int                @default(0)[m
+[32m+[m[32m  hideRewardsExplainer Boolean            @default(false)[m
+   activeCosmetic       String?[m
+   activeOverlay        String?[m
+[31m-  Order                Order[][m
+[31m-  RewardLedger         RewardLedger[][m
+[31m-  PetalLedger          PetalLedger[][m
+[32m+[m[32m  clerkId              String             @unique[m
+[32m+[m[32m  dailyClicks          Int                @default(0)[m
+[32m+[m[32m  lastClickDayUTC      DateTime           @default(now())[m
+[32m+[m[32m  level                Int                @default(1)[m
+[32m+[m[32m  runes                Int                @default(0)[m
+[32m+[m[32m  xp                   Int                @default(0)[m
+[32m+[m[32m  nsfwAffirmationVer   Int                @default(1)[m
+[32m+[m[32m  nsfwAffirmedAt       DateTime?[m
+[32m+[m[32m  nsfwEnabled          Boolean            @default(true)[m
+[32m+[m[32m  coupons              CouponGrant[][m
+   gameRuns             GameRun[][m
+[31m-  achievements         UserAchievement[][m
+   inventory            InventoryItem[][m
+[31m-  coupons              CouponGrant[][m
+[32m+[m[32m  Order                Order[][m
+[32m+[m[32m  PetalLedger          PetalLedger[][m
+[32m+[m[32m  questAssignments     QuestAssignment[][m
+[32m+[m[32m  RewardLedger         RewardLedger[][m
+   soapstoneMessages    SoapstoneMessage[][m
+[31m-}[m
+[31m-[m
+[31m-enum OrderStatus {[m
+[31m-  pending[m
+[31m-  pending_mapping[m
+[31m-  in_production[m
+[31m-  shipped[m
+[31m-  cancelled[m
+[31m-}[m
+[32m+[m[32m  streakShards         StreakShard[][m
+[32m+[m[32m  achievements         UserAchievement[][m
+[32m+[m[32m  userFiles            UserFile[][m
+[32m+[m[32m  userTitles           UserTitle[][m
+ [m
+[31m-enum LedgerType {[m
+[31m-  earn[m
+[31m-  spend[m
+[31m-  adjust[m
+[32m+[m[32m  @@index([clerkId])[m
+ }[m
+ [m
+ model PetalLedger {[m
+[31m-  id        String      @id @default(cuid())[m
+[32m+[m[32m  id        String     @id @default(cuid())[m
+   userId    String[m
+   type      LedgerType[m
+[31m-  amount    Int         // +earn, -spend[m
+[32m+[m[32m  amount    Int[m
+   reason    String[m
+[31m-  createdAt DateTime    @default(now())[m
+[31m-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m[32m  createdAt DateTime   @default(now())[m
+[32m+[m[32m  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+ [m
+   @@index([userId, createdAt])[m
+   @@index([userId, type, createdAt])[m
+ }[m
+ [m
+[32m+[m[32mmodel Quest {[m
+[32m+[m[32m  id          String            @id @default(cuid())[m
+[32m+[m[32m  key         String            @unique[m
+[32m+[m[32m  title       String[m
+[32m+[m[32m  description String[m
+[32m+[m[32m  kind        String[m
+[32m+[m[32m  basePetals  Int               @default(20)[m
+[32m+[m[32m  bonusPetals Int               @default(10)[m
+[32m+[m[32m  active      Boolean           @default(true)[m
+[32m+[m[32m  assignments QuestAssignment[][m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mmodel QuestAssignment {[m
+[32m+[m[32m  id            String    @id @default(cuid())[m
+[32m+[m[32m  userId        String[m
+[32m+[m[32m  questId       String[m
+[32m+[m[32m  day           String[m
+[32m+[m[32m  progress      Int       @default(0)[m
+[32m+[m[32m  target        Int       @default(1)[m
+[32m+[m[32m  completedAt   DateTime?[m
+[32m+[m[32m  claimedAt     DateTime?[m
+[32m+[m[32m  bonusEligible Boolean   @default(true)[m
+[32m+[m[32m  quest         Quest     @relation(fields: [questId], references: [id])[m
+[32m+[m[32m  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m
+[32m+[m[32m  @@unique([userId, questId, day])[m
+[32m+[m[32m  @@index([userId, day])[m
+[32m+[m[32m  @@index([questId, day])[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mmodel StreakShard {[m
+[32m+[m[32m  id        String   @id @default(cuid())[m
+[32m+[m[32m  userId    String[m
+[32m+[m[32m  day       String[m
+[32m+[m[32m  createdAt DateTime @default(now())[m
+[32m+[m[32m  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m
+[32m+[m[32m  @@unique([userId, day])[m
+[32m+[m[32m  @@index([userId, day])[m
+[32m+[m[32m}[m
+[32m+[m
+ model ProductReview {[m
+   id         String   @id @default(cuid())[m
+   productId  String[m
+   userId     String[m
+[31m-  rating     Int      // 1..5[m
+[32m+[m[32m  rating     Int[m
+   title      String?[m
+   body       String[m
+[31m-  imageUrls  String[] // Vercel Blob public URLs (max 3)[m
+[31m-  isApproved Boolean  @default(false) // moderation gate[m
+[32m+[m[32m  imageUrls  String[][m
+[32m+[m[32m  isApproved Boolean  @default(false)[m
+   createdAt  DateTime @default(now())[m
+   updatedAt  DateTime @updatedAt[m
+ [m
+   @@index([productId, createdAt])[m
+[31m-  @@index([isApproved, createdAt])    // for admin queue & public listing[m
+[32m+[m[32m  @@index([isApproved, createdAt])[m
+ }[m
+ [m
+ model MusicPlaylist {[m
+[31m-  id        String      @id @default(cuid())[m
+[32m+[m[32m  id        String       @id @default(cuid())[m
+   name      String[m
+[31m-  isPublic  Boolean     @default(true)[m
+[32m+[m[32m  isPublic  Boolean      @default(true)[m
+   createdBy String[m
+[32m+[m[32m  createdAt DateTime     @default(now())[m
+[32m+[m[32m  updatedAt DateTime     @updatedAt[m
+   tracks    MusicTrack[][m
+[31m-  createdAt DateTime    @default(now())[m
+[31m-  updatedAt DateTime    @updatedAt[m
+ }[m
+ [m
+ model MusicTrack {[m
+[31m-  id         String  @id @default(cuid())[m
+[32m+[m[32m  id         String        @id @default(cuid())[m
+   playlistId String[m
+   title      String[m
+   artist     String[m
+[31m-  url        String   // Vercel Blob URL[m
+[32m+[m[32m  url        String[m
+   sort       Int[m
+[31m-  createdAt  DateTime @default(now())[m
+[31m-[m
+[32m+[m[32m  createdAt  DateTime      @default(now())[m
+   playlist   MusicPlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)[m
+ [m
+   @@index([playlistId, sort])[m
+[36m@@ -209,64 +250,55 @@[m [mmodel IdempotencyKey {[m
+   createdAt DateTime @default(now())[m
+ }[m
+ [m
+[31m-// Mini-Games System Models[m
+ model GameRun {[m
+[31m-  id           String   @id @default(cuid())[m
+[32m+[m[32m  id           String    @id @default(cuid())[m
+   userId       String[m
+   gameKey      String[m
+   score        Int[m
+[31m-  startedAt    DateTime @default(now())[m
+[32m+[m[32m  startedAt    DateTime  @default(now())[m
+   finishedAt   DateTime?[m
+[31m-  rewardPetals Int      @default(0)[m
+[32m+[m[32m  rewardPetals Int       @default(0)[m
+   meta         Json?[m
+[31m-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m[32m  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m
+   @@index([userId, gameKey])[m
+ }[m
+ [m
+ model Achievement {[m
+[31m-  id          String   @id @default(cuid())[m
+[31m-  code        String   @unique[m
+[31m-  name        String[m
+[31m-  description String[m
+[31m-  points      Int      @default(0)[m
+[31m-  rewardId    String?[m
+[31m-  reward      Reward?  @relation(fields: [rewardId], references: [id])[m
+[32m+[m[32m  id               String            @id @default(cuid())[m
+[32m+[m[32m  code             String            @unique[m
+[32m+[m[32m  name             String[m
+[32m+[m[32m  description      String[m
+[32m+[m[32m  points           Int               @default(0)[m
+[32m+[m[32m  rewardId         String?[m
+[32m+[m[32m  reward           Reward?           @relation(fields: [rewardId], references: [id])[m
+   userAchievements UserAchievement[][m
+[32m+[m
+[32m+[m[32m  @@index([code])[m
+ }[m
+ [m
+ model UserAchievement {[m
+[31m-  id            String   @id @default(cuid())[m
+[32m+[m[32m  id            String      @id @default(cuid())[m
+   userId        String[m
+   achievementId String[m
+[31m-  createdAt     DateTime @default(now())[m
+[31m-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m[32m  createdAt     DateTime    @default(now())[m
+   achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)[m
+[31m-  @@unique([userId, achievementId])[m
+[31m-}[m
+[32m+[m[32m  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+ [m
+[31m-enum RewardKind { [m
+[31m-  PETALS_BONUS [m
+[31m-  COSMETIC [m
+[31m-  OVERLAY [m
+[31m-  COUPON_PERCENT [m
+[31m-  COUPON_AMOUNT [m
+[31m-  RUNE_GRANT [m
+[31m-  TRACK_UNLOCK [m
+[32m+[m[32m  @@unique([userId, achievementId])[m
+ }[m
+ [m
+ model Reward {[m
+[31m-  id        String    @id @default(cuid())[m
+[31m-  kind      RewardKind[m
+[31m-  sku       String?[m
+[31m-  value     Int?[m
+[31m-  metadata  Json?[m
+[31m-  createdAt DateTime  @default(now())[m
+[32m+[m[32m  id           String        @id @default(cuid())[m
+[32m+[m[32m  kind         RewardKind[m
+[32m+[m[32m  sku          String?[m
+[32m+[m[32m  value        Int?[m
+[32m+[m[32m  metadata     Json?[m
+[32m+[m[32m  createdAt    DateTime      @default(now())[m
+   achievements Achievement[][m
+[31m-}[m
+ [m
+[31m-enum InventoryKind { [m
+[31m-  COSMETIC [m
+[31m-  OVERLAY [m
+[32m+[m[32m  @@index([kind])[m
+[32m+[m[32m  @@index([sku])[m
+ }[m
+ [m
+ model InventoryItem {[m
+[36m@@ -277,12 +309,8 @@[m [mmodel InventoryItem {[m
+   acquiredAt DateTime      @default(now())[m
+   metadata   Json?[m
+   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[31m-  @@index([userId, sku])[m
+[31m-}[m
+ [m
+[31m-enum DiscountType { [m
+[31m-  PERCENT [m
+[31m-  OFF_AMOUNT [m
+[32m+[m[32m  @@index([userId, sku])[m
+ }[m
+ [m
+ model CouponGrant {[m
+[36m@@ -298,47 +326,123 @@[m [mmodel CouponGrant {[m
+   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+ }[m
+ [m
+[31m-// Soapstone Messages System[m
+ model SoapstoneMessage {[m
+[31m-  id        String   @id @default(cuid())[m
+[31m-  userId    String?  // null = anon/guest if allowed[m
+[32m+[m[32m  id        String          @id @default(cuid())[m
+[32m+[m[32m  userId    String?[m
+   content   String[m
+[31m-  rotation  Float    @default(0) // degrees; small tilt like a rune[m
+[31m-  createdAt DateTime @default(now())[m
+[31m-  // moderation flags[m
+[31m-  isHidden  Boolean  @default(false)[m
+[31m-  isFlagged Boolean  @default(false)[m
+[31m-  // score[m
+[31m-  upvotes   Int      @default(0)[m
+[31m-  [m
+[32m+[m[32m  rotation  Float           @default(0)[m
+[32m+[m[32m  createdAt DateTime        @default(now())[m
+[32m+[m[32m  isHidden  Boolean         @default(false)[m
+[32m+[m[32m  isFlagged Boolean         @default(false)[m
+[32m+[m[32m  upvotes   Int             @default(0)[m
+   likes     SoapstoneLike[][m
+[31m-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)[m
+[31m-  [m
+[32m+[m[32m  user      User?           @relation(fields: [userId], references: [id])[m
+[32m+[m
+   @@index([userId, createdAt])[m
+   @@index([isHidden, createdAt])[m
+   @@index([isFlagged, createdAt])[m
+ }[m
+ [m
+ model SoapstoneLike {[m
+[31m-  id        String   @id @default(cuid())[m
+[32m+[m[32m  id        String           @id @default(cuid())[m
+   messageId String[m
+[31m-  userId    String   // require auth to prevent abuse; or store ipHash if guests[m
+[31m-  createdAt DateTime @default(now())[m
+[31m-[m
+[32m+[m[32m  userId    String[m
+[32m+[m[32m  createdAt DateTime         @default(now())[m
+   message   SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)[m
+[31m-  @@unique([messageId, userId]) // one like per user per message[m
+[32m+[m
+[32m+[m[32m  @@unique([messageId, userId])[m
+ }[m
+ [m
+ model LeaderboardScore {[m
+   id        String   @id @default(cuid())[m
+   userId    String[m
+[31m-  game      String              // e.g., "quick-math", "samurai-petal-slice"[m
+[31m-  diff      String?             // optional: e.g., "easy|normal|hard|insane"[m
+[32m+[m[32m  game      String[m
+[32m+[m[32m  diff      String?[m
+   score     Int[m
+   statsJson Json?[m
+   createdAt DateTime @default(now())[m
+   updatedAt DateTime @updatedAt[m
+ [m
+[31m-  @@index([game, diff, score])[m
+   @@unique([userId, game, diff])[m
+[32m+[m[32m  @@index([game, diff, score])[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mmodel ShopItem {[m
+[32m+[m[32m  id          String    @id @default(cuid())[m
+[32m+[m[32m  sku         String    @unique[m
+[32m+[m[32m  name        String[m
+[32m+[m[32m  kind        String[m
+[32m+[m[32m  priceRunes  Int?[m
+[32m+[m[32m  pricePetals Int?[m
+[32m+[m[32m  eventTag    String?[m
+[32m+[m[32m  visibleFrom DateTime?[m
+[32m+[m[32m  visibleTo   DateTime?[m
+[32m+[m[32m  metadata    Json?[m
+[32m+[m[32m  createdAt   DateTime  @default(now())[m
+[32m+[m[32m  updatedAt   DateTime  @updatedAt[m
+[32m+[m
+[32m+[m[32m  @@index([kind])[m
+[32m+[m[32m  @@index([eventTag])[m
+[32m+[m[32m  @@index([visibleFrom, visibleTo])[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mmodel UserFile {[m
+[32m+[m[32m  id        String   @id @default(cuid())[m
+[32m+[m[32m  userId    String[m
+[32m+[m[32m  key       String   @unique[m
+[32m+[m[32m  url       String[m
+[32m+[m[32m  size      Int[m
+[32m+[m[32m  mimeType  String[m
+[32m+[m[32m  createdAt DateTime @default(now())[m
+[32m+[m[32m  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m
+[32m+[m[32m  @@index([userId])[m
+[32m+[m[32m  @@index([userId, createdAt])[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mmodel UserTitle {[m
+[32m+[m[32m  id        String   @id @default(cuid())[m
+[32m+[m[32m  userId    String[m
+[32m+[m[32m  title     String[m
+[32m+[m[32m  awardedAt DateTime @default(now())[m
+[32m+[m[32m  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)[m
+[32m+[m
+[32m+[m[32m  @@index([userId])[m
+[32m+[m[32m  @@index([userId, awardedAt])[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32menum OrderStatus {[m
+[32m+[m[32m  pending[m
+[32m+[m[32m  pending_mapping[m
+[32m+[m[32m  in_production[m
+[32m+[m[32m  shipped[m
+[32m+[m[32m  cancelled[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32menum LedgerType {[m
+[32m+[m[32m  earn[m
+[32m+[m[32m  spend[m
+[32m+[m[32m  adjust[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32menum RewardKind {[m
+[32m+[m[32m  PETALS_BONUS[m
+[32m+[m[32m  COSMETIC[m
+[32m+[m[32m  OVERLAY[m
+[32m+[m[32m  COUPON_PERCENT[m
+[32m+[m[32m  COUPON_AMOUNT[m
+[32m+[m[32m  RUNE_GRANT[m
+[32m+[m[32m  TRACK_UNLOCK[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32menum InventoryKind {[m
+[32m+[m[32m  COSMETIC[m
+[32m+[m[32m  OVERLAY[m
+[32m+[m[32m  TEXT[m
+[32m+[m[32m  CURSOR[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32menum DiscountType {[m
+[32m+[m[32m  PERCENT[m
+[32m+[m[32m  OFF_AMOUNT[m
+ }[m

@@ -1,72 +1,216 @@
 {
-  "bubble-ragdoll": {
-    "bg": "bg.nightGradient",
-    "bubbleSprite": "particles.kenney-bubble",
-    "popSfx": "sfx.pop",
-    "bounceSfx": "sfx.boing",
-    "failSfx": "sfx.thud",
-    "uiFrame": "ui.kenneyFantasyBorders",
-    "avatarFallbackSprite": "games.avatarFallback",
-
-    "themeAccent": "#b2c7ff",
-    "themeOverlayBg": "rgba(10,12,18,0.72)",
-
-    "themeCreditsText": "Bubbles & VFX by Kenney (CC0)",
-    "themeCreditsUrl": "https://kenney.nl/assets/particle-pack",
-    "themePledgeLabel": "Support Kenney",
-    "themePledgeUrl": "https://kenney.nl/support",
-    "showCreditsInPause": "always"
+  "ui": {
+    "hub": {
+      "icons": {
+        "shop": "/assets/ui/hub/shop-icon.png",
+        "mini-games": "/assets/ui/hub/games-icon.png",
+        "blog": "/assets/ui/hub/blog-icon.png",
+        "profile": "/assets/ui/hub/profile-icon.png",
+        "trade": "/assets/ui/hub/trade-icon.png",
+        "music": "/assets/ui/hub/music-icon.png"
+      },
+      "sounds": {
+        "ping": "/assets/ui/hub/ping.mp3",
+        "confirm": "/assets/ui/hub/confirm.mp3",
+        "rotate": "/assets/ui/hub/rotate.mp3"
+      }
+    },
+    "frames": {
+      "sakura": "/assets/ui/frames/sakura.png",
+      "neon": "/assets/ui/frames/neon.png",
+      "classic": "/assets/ui/frames/classic.png",
+      "default": "/assets/ui/frames/default.png"
+    },
+    "overlays": {
+      "ember": "/assets/ui/overlays/ember.png",
+      "sparkle": "/assets/ui/overlays/sparkle.png",
+      "rainbow": "/assets/ui/overlays/rainbow.png",
+      "default": "/assets/ui/overlays/default.png"
+    },
+    "badges": {
+      "first-victory": "/assets/ui/badges/first-victory.png",
+      "petal-master": "/assets/ui/badges/petal-master.png",
+      "achievement-hunter": "/assets/ui/badges/achievement-hunter.png",
+      "default": "/assets/ui/badges/default.png"
+    },
+    "common": {
+      "loading": "/assets/ui/common/loading.gif",
+      "placeholder": "/assets/ui/common/placeholder.png",
+      "fallback": "/assets/ui/common/fallback.png"
+    }
   },
-  
-  "samurai-petal-slice": {
-    "bg": "bg.oakWoods",
-    "petalParticle": "ui.petal",
-    "slashSfx": "sfx.samurai-slash",
-    "hitSfx": "sfx.hit-good",
-    "missSfx": "sfx.hit-miss",
-    "uiFrame": "ui.kenneyFantasyBorders",
-
-    "themeAccent": "#ffb7c5",
-    "themeOverlayBg": "rgba(14,12,17,0.72)",
-
-    "themeCreditsText": "Sakura UI & borders credit: Kenney / Petal particle & UI by site",
-    "themeCreditsUrl": "https://kenney.nl/assets/fantasy-ui-borders",
-    "themePledgeLabel": "Support Kenney",
-    "themePledgeUrl": "https://kenney.nl/support",
-    "showCreditsInPause": "always"
+  "games": {
+    "samurai-slice": {
+      "backgrounds": {
+        "dojo": "/assets/games/samurai-slice/dojo-bg.jpg",
+        "cherry-blossom": "/assets/games/samurai-slice/cherry-bg.jpg"
+      },
+      "sprites": {
+        "sword": "/assets/games/samurai-slice/sword.png",
+        "petals": "/assets/games/samurai-slice/petals.png",
+        "enemy": "/assets/games/samurai-slice/enemy.png"
+      },
+      "sounds": {
+        "slash": "/assets/games/samurai-slice/slash.mp3",
+        "hit": "/assets/games/samurai-slice/hit.mp3",
+        "miss": "/assets/games/samurai-slice/miss.mp3",
+        "victory": "/assets/games/samurai-slice/victory.mp3"
+      },
+      "ui": {
+        "score": "/assets/games/samurai-slice/score-ui.png",
+        "timer": "/assets/games/samurai-slice/timer-ui.png"
+      }
+    },
+    "memory-match": {
+      "backgrounds": {
+        "anime": "/assets/games/memory-match/anime-bg.jpg",
+        "school": "/assets/games/memory-match/school-bg.jpg"
+      },
+      "cards": {
+        "anime-characters": "/assets/games/memory-match/cards/",
+        "school-items": "/assets/games/memory-match/cards/"
+      },
+      "sounds": {
+        "flip": "/assets/games/memory-match/flip.mp3",
+        "match": "/assets/games/memory-match/match.mp3",
+        "complete": "/assets/games/memory-match/complete.mp3"
+      }
+    },
+    "bubble-ragdoll": {
+      "backgrounds": {
+        "sky": "/assets/games/bubble-ragdoll/sky-bg.jpg",
+        "night": "/assets/games/bubble-ragdoll/night-bg.jpg"
+      },
+      "sprites": {
+        "bubble": "/assets/games/bubble-ragdoll/bubble.png",
+        "character": "/assets/games/bubble-ragdoll/character.png",
+        "platform": "/assets/games/bubble-ragdoll/platform.png"
+      },
+      "sounds": {
+        "pop": "/assets/games/bubble-ragdoll/pop.mp3",
+        "bounce": "/assets/games/bubble-ragdoll/bounce.mp3",
+        "land": "/assets/games/bubble-ragdoll/land.mp3"
+      }
+    },
+    "rhythm-beat-em-up": {
+      "backgrounds": {
+        "city": "/assets/games/rhythm-beat-em-up/city-bg.jpg",
+        "neon": "/assets/games/rhythm-beat-em-up/neon-bg.jpg"
+      },
+      "sprites": {
+        "player": "/assets/games/rhythm-beat-em-up/player.png",
+        "enemy": "/assets/games/rhythm-beat-em-up/enemy.png",
+        "beat-line": "/assets/games/rhythm-beat-em-up/beat-line.png"
+      },
+      "sounds": {
+        "beat": "/assets/games/rhythm-beat-em-up/beat.mp3",
+        "punch": "/assets/games/rhythm-beat-em-up/punch.mp3",
+        "combo": "/assets/games/rhythm-beat-em-up/combo.mp3"
+      }
+    }
   },
-
-  "rhythm-beat-em-up": {
-    "bg": "bg.rhythm",
-    "lane": "ui.rhythm.lane",
-    "note": "ui.rhythm.note",
-    "hitGoodSfx": "sfx.hit-good",
-    "hitMissSfx": "sfx.hit-miss",
-    "musicLoop": "music.final-punch-track01",
-    "map": "maps.final-punch-track01-easy",
-
-    "themeAccent": "#dba6f5",
-    "themeOverlayBg": "rgba(10,5,18,0.85)",
-
-    "themeCreditsText": "GothicVania art by Ansimuz • Music: Final Punch (royalty-free)",
-    "themeCreditsUrl": "https://ansimuz.itch.io/gothicvania-patreon-collection",
-    "themePledgeLabel": "Support Ansimuz",
-    "themePledgeUrl": "https://www.patreon.com/ansimuz",
-    "showCreditsInPause": "always"
+  "sections": {
+    "shop": {
+      "icons": {
+        "category": "/assets/sections/shop/category-icon.png",
+        "filter": "/assets/sections/shop/filter-icon.png",
+        "sort": "/assets/sections/shop/sort-icon.png"
+      },
+      "backgrounds": {
+        "hero": "/assets/sections/shop/hero-bg.jpg"
+      }
+    },
+    "blog": {
+      "icons": {
+        "read-more": "/assets/sections/blog/read-more.png",
+        "share": "/assets/sections/blog/share.png",
+        "bookmark": "/assets/sections/blog/bookmark.png"
+      },
+      "backgrounds": {
+        "default": "/assets/sections/blog/default-bg.jpg"
+      }
+    },
+    "profile": {
+      "icons": {
+        "edit": "/assets/sections/profile/edit-icon.png",
+        "settings": "/assets/sections/profile/settings-icon.png",
+        "achievements": "/assets/sections/profile/achievements-icon.png"
+      },
+      "backgrounds": {
+        "default": "/assets/sections/profile/default-bg.jpg"
+      }
+    },
+    "trade": {
+      "icons": {
+        "offer": "/assets/sections/trade/offer-icon.png",
+        "inventory": "/assets/sections/trade/inventory-icon.png",
+        "history": "/assets/sections/trade/history-icon.png"
+      },
+      "backgrounds": {
+        "default": "/assets/sections/trade/default-bg.jpg"
+      }
+    },
+    "music": {
+      "icons": {
+        "play": "/assets/sections/music/play-icon.png",
+        "pause": "/assets/sections/music/pause-icon.png",
+        "next": "/assets/sections/music/next-icon.png",
+        "prev": "/assets/sections/music/prev-icon.png"
+      },
+      "backgrounds": {
+        "default": "/assets/sections/music/default-bg.jpg"
+      }
+    }
   },
-
-  "petal-collection": {
-    "bg": "bg.oak-woods",
-    "petalParticle": "ui.petal",
-    "collectSfx": "sfx.collect",
-    "missSfx": "sfx.miss",
-
-    "themeAccent": "#ffb7c5",
-    "themeOverlayBg": "rgba(14,12,17,0.72)",
-    "themeCreditsText": "Background art & particles credited in site assets",
-    "themeCreditsUrl": "https://github.com/nayleen/jQuery-Sakura",
-    "themePledgeLabel": "Support Asset Creators",
-    "themePledgeUrl": "https://kenney.nl/support",
-    "showCreditsInPause": "always"
+  "cosmetics": {
+    "frames": {
+      "sakura": "/assets/cosmetics/frames/sakura.png",
+      "neon": "/assets/cosmetics/frames/neon.png",
+      "classic": "/assets/cosmetics/frames/classic.png"
+    },
+    "overlays": {
+      "ember": "/assets/cosmetics/overlays/ember.png",
+      "sparkle": "/assets/cosmetics/overlays/sparkle.png",
+      "rainbow": "/assets/cosmetics/overlays/rainbow.png"
+    },
+    "badges": {
+      "first-victory": "/assets/cosmetics/badges/first-victory.png",
+      "petal-master": "/assets/cosmetics/badges/petal-master.png",
+      "achievement-hunter": "/assets/cosmetics/badges/achievement-hunter.png"
+    },
+    "cursors": {
+      "anime-eyes": "/assets/cosmetics/cursors/anime-eyes.png",
+      "sword": "/assets/cosmetics/cursors/sword.png",
+      "magic": "/assets/cosmetics/cursors/magic.png"
+    }
+  },
+  "fallbacks": {
+    "ui": {
+      "icon": "/assets/fallbacks/ui-icon.png",
+      "image": "/assets/fallbacks/image.png",
+      "avatar": "/assets/fallbacks/avatar.png"
+    },
+    "games": {
+      "background": "/assets/fallbacks/game-bg.png",
+      "sprite": "/assets/fallbacks/sprite.png",
+      "sound": "/assets/fallbacks/sound.mp3"
+    },
+    "cosmetics": {
+      "frame": "/assets/fallbacks/frame.png",
+      "overlay": "/assets/fallbacks/overlay.png",
+      "badge": "/assets/fallbacks/badge.png"
+    }
+  },
+  "audio": {
+    "music": {
+      "background": "/assets/audio/music/background/",
+      "game": "/assets/audio/music/game/",
+      "menu": "/assets/audio/music/menu/"
+    },
+    "sfx": {
+      "ui": "/assets/audio/sfx/ui/",
+      "game": "/assets/audio/sfx/game/",
+      "ambient": "/assets/audio/sfx/ambient/"
+    }
   }
 }
