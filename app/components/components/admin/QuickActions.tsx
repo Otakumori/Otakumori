@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { supabase } from '../../../lib/supabase';
+// Removed supabase import - using API routes for admin actions
 import { motion } from 'framer-motion';
 
 interface QuickAction {

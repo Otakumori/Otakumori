@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabaseClient';
+// import { supabase } from '../../lib/supabaseClient';
 import { motion } from 'framer-motion';
 
 function JoinTheBlossomContent() {
@@ -20,15 +20,22 @@ function JoinTheBlossomContent() {
       setError('Please enter a valid email address.');
       return;
     }
-    if (!supabase) {
-      setError('Database not configured');
-      return;
-    }
-    const { error } = await supabase.from('newsletter_signups').insert({ email });
-    if (error) {
-      setError('Something went wrong. Please try again!');
-    } else {
+    
+    try {
+      // Call our Prisma-based API instead of direct Supabase
+      const response = await fetch('/api/newsletter/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Signup failed');
+      }
+      
       setSubmitted(true);
+    } catch (error) {
+      setError('Something went wrong. Please try again!');
     }
   }
 

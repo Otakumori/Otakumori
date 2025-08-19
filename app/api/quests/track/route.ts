@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
+import { auth } from "@clerk/nextjs/server";
 import { userDayNY, ensureDailyAssignments } from "@/app/lib/quests/server";
 
 const prisma = new PrismaClient();
@@ -27,19 +26,13 @@ export async function POST(req: Request) {
 
     const { type } = await req.json(); // e.g., "view-product", "submit-review", "gacha-roll", "purchase"
     
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!, 
-      process.env.SUPABASE_SERVICE_ROLE_KEY!, 
-      { cookies: { get: k => cookies().get(k)?.value } }
-    );
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: "auth" }, { status: 401 });
     }
 
     const day = userDayNY();
-    await ensureDailyAssignments(user.id, day);
+    await ensureDailyAssignments(userId, day);
 
     // Map event types to quest keys
     const eventToQuestMap: Record<string, string[]> = {
@@ -59,7 +52,7 @@ export async function POST(req: Request) {
     // Update progress for matching quests
     const assignments = await prisma.questAssignment.findMany({
       where: { 
-        userId: user.id, 
+        userId: userId, 
         day, 
         quest: { key: { in: questKeys } } 
       }, 

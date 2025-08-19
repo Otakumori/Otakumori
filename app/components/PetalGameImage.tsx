@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { supabase } from '@/utils/supabase/client';
-import Particles from 'react-tsparticles';
-import { loadFull } from 'tsparticles';
+// import { supabase } from '@/utils/supabase/client';
+// Temporarily disabled tsparticles due to API compatibility issues
+// import Particles from '@tsparticles/react';
+// import { loadFull } from 'tsparticles';
+// import { Engine } from '@tsparticles/engine';
 
 const GLOBAL_PETAL_KEY = 'global_petals';
 const USER_PETAL_KEY = 'user_petals';
@@ -35,21 +37,23 @@ export default function PetalGameImage() {
     }
   }, []);
 
-  // Fetch global and user petal counts
+  // Fetch global and user petal counts - disabled during Supabase migration
   useEffect(() => {
-    const fetchGlobal = async () => {
-      if (!supabase) {
-        console.warn('Supabase client not available');
-        return;
-      }
-      const { data } = await supabase
-        .from('petal_counters')
-        .select('count')
-        .eq('id', GLOBAL_PETAL_KEY)
-        .single();
-      if (data && data.count !== undefined) setGlobalPetals(data.count);
-    };
-    fetchGlobal();
+    // Temporarily disabled while migrating to Prisma
+    console.log('Petal fetching disabled during migration');
+    // const fetchGlobal = async () => {
+    //   if (!supabase) {
+    //     console.warn('Supabase client not available');
+    //     return;
+    //   }
+    //   const { data } = await supabase
+    //     .from('petal_counters')
+    //     .select('count')
+    //     .eq('id', GLOBAL_PETAL_KEY)
+    //     .single();
+    //   if (data && data.count !== undefined) setGlobalPetals(data.count);
+    // };
+    // fetchGlobal();
   }, []);
 
   // Particle click handler
@@ -72,51 +76,51 @@ export default function PetalGameImage() {
     [userPetals]
   );
 
-  // Particle options
-  const particlesInit = useCallback(async (engine: any) => {
-    await loadFull(engine);
-  }, []);
+  // Particle options - temporarily disabled due to API compatibility issues
+  // const particlesInit = useCallback(async (engine: Engine) => {
+  //   await loadFull(engine);
+  // }, []);
 
-  const particlesOptions = {
-    fullScreen: false,
-    background: { color: 'transparent' },
-    particles: {
-      number: { value: 24, density: { enable: true, area: 800 } },
-      color: { value: '#FFB6C1' },
-      shape: {
-        type: 'image',
-        image: [
-          {
-            src: 'data:image/svg+xml;base64,' + btoa(petalSvg),
-            width: 32,
-            height: 32,
-          },
-        ],
-      },
-      opacity: { value: 0.85 },
-      size: { value: 24, random: { enable: true, minimumValue: 16 } },
-      move: {
-        enable: true,
-        speed: 1.5,
-        direction: 'bottom' as const,
-        random: true,
-        straight: false,
-        outModes: { default: 'out' as const },
-      },
-    },
-    detectRetina: true,
-    interactivity: {
-      events: {
-        onClick: { enable: true, mode: 'repulse' },
-        onHover: { enable: true, mode: 'bubble' },
-      },
-      modes: {
-        repulse: { distance: 80, duration: 0.4 },
-        bubble: { distance: 60, duration: 0.3, size: 32, opacity: 1 },
-      },
-    },
-    emitters: [],
-  };
+  // const particlesOptions = {
+  //   fullScreen: false,
+  //   background: { color: 'transparent' },
+  //   particles: {
+  //     number: { value: 24, density: { enable: true, area: 800 } },
+  //     color: { value: '#FFB6C1' },
+  //     shape: {
+  //       type: 'image',
+  //       image: [
+  //         {
+  //           src: 'data:image/svg+xml;base64,' + btoa(petalSvg),
+  //       width: 32,
+  //       height: 32,
+  //         },
+  //       ],
+  //     },
+  //     opacity: { value: 0.85 },
+  //       size: { value: 24, random: { enable: true, minimumValue: 16 } },
+  //       move: {
+  //         enable: true,
+  //         speed: 1.5,
+  //         direction: 'bottom' as const,
+  //         random: true,
+  //         straight: false,
+  //         outModes: { default: 'out' as const },
+  //       },
+  //     },
+  //     detectRetina: true,
+  //     interactivity: {
+  //       events: {
+  //         onClick: { enable: true, mode: 'repulse' },
+  //         onHover: { enable: true, mode: 'bubble' },
+  //       },
+  //       modes: {
+  //         repulse: { distance: 80, duration: 0.4 },
+  //         bubble: { distance: 60, duration: 0.3, size: 32, opacity: 1 },
+  //       },
+  //     },
+  //     emitters: [],
+  //   };
 
   return (
     <div
@@ -130,15 +134,14 @@ export default function PetalGameImage() {
         className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-center"
         draggable={false}
       />
-      {/* Petal Particles Overlay */}
-      <Particles
+      {/* Petal Particles Overlay - temporarily disabled due to API compatibility issues */}
+      {/* <Particles
         id="petalParticles"
-        init={particlesInit}
+        particlesInit={particlesInit}
         options={particlesOptions}
         className="pointer-events-auto absolute inset-0 z-10 h-full w-full"
         style={{ pointerEvents: 'auto' }}
-        canvasClassName="pointer-events-auto"
-      />
+      /> */}
       {/* User petal counter */}
       <div className="absolute right-4 top-2 z-20 rounded-full bg-pink-900/80 px-4 py-1 text-lg font-bold text-white shadow-lg">
         Your Petals: {userPetals} / {GUEST_LIMIT}

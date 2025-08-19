@@ -1,9 +1,12 @@
 'use client';
 
 import { useAuth } from '@clerk/nextjs';
-import { createSupabaseWithToken } from '@/app/lib/supabaseClient';
+// import { createSupabaseWithToken } from '@/app/lib/supabaseClient';
 
 export function TestSupabaseButton() {
+  // Disabled during Supabase to Prisma migration
+  return null;
+  
   const { getToken, isSignedIn } = useAuth();
   
   if (!isSignedIn) return null;
@@ -16,16 +19,14 @@ export function TestSupabaseButton() {
         return;
       }
       
-      const supabase = createSupabaseWithToken(token);
-      const { data, error } = await supabase.from('profiles').select('*').limit(1);
+      // TODO: Implement with Prisma instead of Supabase
+      // const supabase = createSupabaseWithToken(token);
+      // const { data, error } = await supabase.from('profiles').select('*').limit(1);
       
-      console.log('Supabase test result:', { data, error });
+      console.log('Prisma migration in progress - Supabase disabled');
       
-      if (error) {
-        console.error('Supabase error:', error);
-      } else {
-        console.log('Supabase connection successful:', data);
-      }
+      // For now, just log that we're migrating
+      console.log('Database migration in progress');
     } catch (err) {
       console.error('Test failed:', err);
     }

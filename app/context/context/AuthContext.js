@@ -1,22 +1,19 @@
 'use client';
 
 import { useEffect, useState, createContext } from 'react';
-import supabase from '@/utils/supabaseClient';
+import { useUser } from '@clerk/nextjs';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
+  const { user, isLoaded } = useUser();
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-    });
-
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
-  }, []);
+    if (isLoaded) {
+      setSession(user ? { user } : null);
+    }
+  }, [user, isLoaded]);
 
   return <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>;
 };

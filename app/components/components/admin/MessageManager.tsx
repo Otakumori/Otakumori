@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
@@ -10,7 +9,7 @@ interface Message {
   content: string;
   author: string;
   created_at: string;
-  rating: number;
+  upvotes: number;
 }
 
 export default function MessageManager() {
@@ -25,20 +24,16 @@ export default function MessageManager() {
 
   const fetchMessages = async () => {
     try {
-      let query = supabase
-        .from('soapstone_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (filter === 'low-rated') {
-        query = query.lt('rating', 3);
-      } else if (filter === 'high-rated') {
-        query = query.gte('rating', 4);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setMessages(data || []);
+      const response = await fetch(`/api/soapstones?filter=${filter}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) throw new Error('Failed to fetch messages');
+      
+      const data = await response.json();
+      setMessages(data.messages || []);
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
@@ -48,9 +43,15 @@ export default function MessageManager() {
 
   const deleteMessage = async (id: string) => {
     try {
-      const { error } = await supabase.from('soapstone_messages').delete().eq('id', id);
-
-      if (error) throw error;
+      const response = await fetch(`/api/soapstones/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete message');
+      
       setMessages(messages.filter(msg => msg.id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);
@@ -95,7 +96,7 @@ export default function MessageManager() {
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
             }`}
           >
-            Low Rated
+            Low Upvotes
           </button>
           <button
             onClick={() => setFilter('high-rated')}
@@ -136,7 +137,7 @@ export default function MessageManager() {
                       <span>•</span>
                       <span>{new Date(message.created_at).toLocaleDateString()}</span>
                       <span>•</span>
-                      <span>{'⭐'.repeat(message.rating)}</span>
+                      <span>👍 {message.upvotes}</span>
                     </div>
                   </div>
                   <button

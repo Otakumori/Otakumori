@@ -1,113 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { createSupabaseWithToken } from '@/app/lib/supabaseClient';
+import { db } from '@/lib/db';
+import { z } from 'zod';
 
-// Rate limiting: max 5 petals per second per user
-const RATE_LIMIT_PER_SECOND = 5;
+const earnPetalsSchema = z.object({
+  amount: z.number().int().positive(),
+  reason: z.string().min(1).max(100),
+});
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { petals_to_add = 1 } = body;
+    const { amount, reason } = earnPetalsSchema.parse(body);
 
-    if (typeof petals_to_add !== 'number' || petals_to_add <= 0 || petals_to_add > 10) {
-      return NextResponse.json(
-        { error: 'Invalid petal count (1-10 allowed)' },
-        { status: 400 }
-      );
-    }
-
-    // Get Clerk session token for Supabase
-    const { getToken } = auth();
-    const token = await getToken({
-      template: 'supabase',
-    });
-    
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Failed to get authentication token' },
-        { status: 500 }
-      );
-    }
-
-    // Create Supabase client with token
-    const supabase = createSupabaseWithToken(token);
-
-    // Check rate limiting
-    const { data: recentCollections } = await supabase
-      .from('petal_collections')
-      .select('last_collection')
-      .eq('clerk_id', userId)
-      .single();
-
-    if (recentCollections?.last_collection) {
-      const timeSinceLastCollection = Date.now() - new Date(recentCollections.last_collection).getTime();
-      if (timeSinceLastCollection < 1000) { // Less than 1 second
-        return NextResponse.json(
-          { error: 'Rate limited. Please wait before collecting more petals.' },
-          { status: 429 }
-        );
-      }
-    }
-
-    // Update petal collection using the database function
-    const { data: result, error } = await supabase.rpc('update_petal_collection', {
-      user_clerk_id: userId,
-      petals_to_add: petals_to_add
+    // Check daily click limit
+    const today = new Date().toISOString().split('T')[0];
+    const user = await db.user.findUnique({
+      where: { clerkId: userId },
+      select: { id: true, dailyClicks: true, lastClickDayUTC: true },
     });
 
-    if (error) {
-      console.error('Failed to update petal collection:', error);
-      return NextResponse.json(
-        { error: 'Failed to collect petals' },
-        { status: 500 }
-      );
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    if (!result) {
-      return NextResponse.json(
-        { error: 'Rate limited. Please wait before collecting more petals.' },
-        { status: 429 }
-      );
+    // Reset daily clicks if it's a new day
+    let dailyClicks = user.dailyClicks;
+    if (user.lastClickDayUTC.toISOString().split('T')[0] !== today) {
+      dailyClicks = 0;
     }
 
-    // Get updated collection data
-    const { data: collection } = await supabase
-      .from('petal_collections')
-      .select('petals_collected, total_clicks')
-      .eq('clerk_id', userId)
-      .single();
+    // Check if user has exceeded daily limit (assuming 100 clicks per day)
+    if (dailyClicks >= 100) {
+      return NextResponse.json({ error: 'Daily click limit reached' }, { status: 429 });
+    }
 
-    // Get achievement data
-    const { data: achievement } = await supabase
-      .from('user_achievements')
-      .select('achievement_value')
-      .eq('clerk_id', userId)
-      .eq('achievement_type', 'petal_collection')
-      .single();
+    // Update user's petal balance and daily clicks
+    const updatedUser = await db.user.update({
+      where: { id: user.id },
+      data: {
+        petalBalance: { increment: amount },
+        dailyClicks: { increment: 1 },
+        lastClickDayUTC: new Date(),
+      },
+    });
+
+    // Record the transaction
+    await db.petalLedger.create({
+      data: {
+        userId: user.id,
+        type: 'earn',
+        amount,
+        reason,
+      },
+    });
 
     return NextResponse.json({
-      success: true,
-      petals_collected: collection?.petals_collected || 0,
-      total_clicks: collection?.total_clicks || 0,
-      achievement_value: achievement?.achievement_value || 0,
-      message: `Collected ${petals_to_add} petal(s)!`
+      data: {
+        newBalance: updatedUser.petalBalance,
+        dailyClicks: updatedUser.dailyClicks,
+        message: `Earned ${amount} petals for ${reason}`,
+      },
     });
-
   } catch (error) {
-    console.error('Petal collection API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Error earning petals:', error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -115,83 +80,55 @@ export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const includeLeaderboard = searchParams.get('leaderboard') === 'true';
-
-    // Get Clerk session token for Supabase
-    const { getToken } = auth();
-    const token = await getToken({ template: 'supabase' });
-
-    if (!token) {
-      return NextResponse.json(
-        { error: 'Failed to get authentication token' },
-        { status: 500 }
-      );
-    }
-
-    // Create Supabase client with token
-    const supabase = createSupabaseWithToken(token);
-
-    // Get user's collection data
-    const { data: collection, error: collectionError } = await supabase
-      .from('petal_collections')
-      .select('petals_collected, total_clicks, last_collection')
-      .eq('clerk_id', userId)
-      .single();
-
-    if (collectionError && collectionError.code !== 'PGRST116') {
-      console.error('Failed to fetch collection:', collectionError);
-      return NextResponse.json(
-        { error: 'Failed to fetch collection data' },
-        { status: 500 }
-      );
-    }
-
-    // Get user's achievements
-    const { data: achievements, error: achievementsError } = await supabase
-      .from('user_achievements')
-      .select('achievement_type, achievement_value, last_updated')
-      .eq('clerk_id', userId);
-
-    if (achievementsError) {
-      console.error('Failed to fetch achievements:', achievementsError);
-    }
-
-    let leaderboardData = null;
-    if (includeLeaderboard) {
-      // Get global petal collection leaderboard
-      const { data: leaderboard, error: leaderboardError } = await supabase.rpc('get_game_leaderboard', {
-        game_type_param: 'petal_collection',
-        limit_count: 10
-      });
-
-      if (!leaderboardError) {
-        leaderboardData = leaderboard;
-      }
-    }
-
-    return NextResponse.json({
-      collection: collection || {
-        petals_collected: 0,
-        total_clicks: 0,
-        last_collection: null
+    const user = await db.user.findUnique({
+      where: { clerkId: userId },
+      select: {
+        id: true,
+        petalBalance: true,
+        dailyClicks: true,
+        lastClickDayUTC: true,
+        level: true,
+        xp: true,
       },
-      achievements: achievements || [],
-      leaderboard: leaderboardData,
-      timestamp: new Date().toISOString()
     });
 
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Get recent petal transactions
+    const recentTransactions = await db.petalLedger.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+
+    // Get global petal statistics
+    const globalStats = await db.petalLedger.aggregate({
+      _sum: { amount: true },
+      where: { type: 'earn' },
+    });
+
+    return NextResponse.json({
+      data: {
+        user: {
+          petalBalance: user.petalBalance,
+          dailyClicks: user.dailyClicks,
+          lastClickDayUTC: user.lastClickDayUTC,
+          level: user.level,
+          xp: user.xp,
+        },
+        recentTransactions,
+        globalStats: {
+          totalPetalsEarned: globalStats._sum.amount || 0,
+        },
+      },
+    });
   } catch (error) {
-    console.error('Petal collection GET API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('Error fetching petal data:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -4,35 +4,28 @@ export const preferredRegion = "iad1";        // optional: co-locate w/ your log
 export const maxDuration = 10;                // optional guard
 
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 import { PrismaClient } from "@prisma/client";
 import { ensureDailyAssignments, userDayNY } from "@/app/lib/quests/server";
-import { cookies } from "next/headers";
+import { auth } from "@clerk/nextjs/server";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!, 
-      process.env.SUPABASE_SERVICE_ROLE_KEY!, 
-      { cookies: { get: k => cookies().get(k)?.value } }
-    );
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: "auth" }, { status: 401 });
     }
 
     const day = userDayNY();
     
     // Ensure today's quests are assigned
-    const today = await ensureDailyAssignments(user.id, day);
+    const today = await ensureDailyAssignments(userId, day);
     
     // Get backlog (incomplete quests from previous days)
     const backlog = await prisma.questAssignment.findMany({
       where: { 
-        userId: user.id, 
+        userId: userId, 
         day: { lt: day }, 
         completedAt: null 
       },
@@ -43,7 +36,7 @@ export async function GET() {
 
     // Get user's current petal balance
     const userRecord = await prisma.user.findUnique({
-      where: { clerkId: user.id },
+      where: { clerkId: userId },
       select: { petalBalance: true }
     });
 
