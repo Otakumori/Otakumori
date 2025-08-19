@@ -1,8 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -26,41 +23,12 @@ export default function ContactForm() {
     e.preventDefault();
     setLoading(true);
 
-    // Upload Image if exists
-    let imageUrl = null;
-    if (formData.file) {
-      const fileExt = formData.file.name.split('.').pop();
-      const filePath = `contact-images/${Date.now()}.${fileExt}`;
+    // TODO: Replace with Prisma API call when migration is complete
+    // For now, just show success message
+    console.log('Contact form would be submitted:', formData);
 
-      const { data, error } = await supabase.storage
-        .from('otakumori-bucket')
-        .upload(filePath, formData.file);
-
-      if (error) {
-        setStatus({ type: 'error', message: 'Image upload failed.' });
-        setLoading(false);
-        return;
-      }
-      imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/otakumori-bucket/${filePath}`;
-    }
-
-    // Save Contact Form Data
-    const { error } = await supabase.from('contact_messages').insert([
-      {
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
-        image_url: imageUrl,
-      },
-    ]);
-
-    if (error) {
-      setStatus({ type: 'error', message: 'Failed to submit.' });
-    } else {
-      setStatus({ type: 'success', message: 'Message sent!' });
-      setFormData({ name: '', email: '', message: '', file: null });
-    }
-
+    setStatus({ type: 'success', message: 'Contact system temporarily disabled during migration. Please try again later.' });
+    setFormData({ name: '', email: '', message: '', file: null });
     setLoading(false);
   };
 
@@ -102,14 +70,15 @@ export default function ContactForm() {
         />
         <input
           type="file"
-          accept="image/*"
+          name="file"
           onChange={handleChange}
-          className="w-full rounded-lg bg-gray-900 p-2 text-white focus:outline-none"
+          accept="image/*"
+          className="w-full rounded-lg bg-gray-900 p-3 text-white placeholder-gray-400 focus:outline-none"
         />
         <button
           type="submit"
-          className="w-full rounded-lg bg-pink-600 px-4 py-3 font-bold text-white transition-all hover:bg-pink-700"
           disabled={loading}
+          className="w-full rounded-lg bg-pink-600 px-4 py-2 font-medium text-white transition-colors hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? 'Sending...' : 'Send Message'}
         </button>
