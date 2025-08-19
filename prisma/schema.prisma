@@ -147,6 +147,8 @@ model User {
   achievements         UserAchievement[]
   userFiles            UserFile[]
   userTitles           UserTitle[]
+  contactMessages      ContactMessage[]
+  blogPosts            BlogPost[]
 
   @@index([clerkId])
 }
@@ -410,6 +412,39 @@ model UserTitle {
 
   @@index([userId])
   @@index([userId, awardedAt])
+}
+
+model ContactMessage {
+  id        String    @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  imageUrl  String?
+  userId    String?
+  createdAt DateTime  @default(now())
+  user      User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?
+  content     String
+  category    String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  authorId    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  author      User      @relation(fields: [authorId], references: [id])
+
+  @@index([authorId])
+  @@index([published, publishedAt])
+  @@index([category])
 }
 
 enum OrderStatus {

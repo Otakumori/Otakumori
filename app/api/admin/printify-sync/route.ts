@@ -1,6 +1,6 @@
 // app/api/admin/printify-sync/route.ts  (admin-only)
 import { requireAdminOrThrow } from '@/lib/adminGuard';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { prisma } from '@/app/lib/prisma';
 
 export const runtime = 'nodejs';
 
@@ -11,7 +11,6 @@ export async function POST() {
 }
 
 async function syncPrintify() {
-  const sb = supabaseAdmin();
   const base = `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}`;
   const headers = {
     'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY!}`,
@@ -34,26 +33,50 @@ async function syncPrintify() {
     const visible = !full.visible ? false : (full.variants?.some((v: any) => v.is_enabled !== false) ?? true);
     if (!visible) hidden++;
 
-    await sb.from('products').upsert({
-      id: full.id,
-      title: full.title,
-      description: full.description ?? '',
-      category: mapCategory(full),         // custom mapper below
-      subcategory: mapSubcategory(full),
-      image_url: full.images?.[0]?.src ?? null,
-      price_cents: firstPrice(full) ?? null,
-      visible,
+    await prisma.product.upsert({
+      where: { id: String(full.id) },
+      update: {
+        name: full.title,
+        description: full.description ?? '',
+        category: mapCategory(full),
+        primaryImageUrl: full.images?.[0]?.src ?? null,
+        active: visible,
+        printifyProductId: String(full.id),
+      },
+      create: {
+        id: String(full.id),
+        name: full.title,
+        description: full.description ?? '',
+        category: mapCategory(full),
+        primaryImageUrl: full.images?.[0]?.src ?? null,
+        active: visible,
+        printifyProductId: String(full.id),
+      }
     });
 
-    const variantRows = (full.variants ?? []).map((v: any) => ({
-      id: v.id,
-      product_id: full.id,
-      title: v.title ?? v.sku ?? String(v.id),
-      price_cents: toCents(v.price ?? firstPrice(full) ?? 0),
-      sku: v.sku ?? null,
-      options: v.options ?? {},
-    }));
-    if (variantRows.length) await sb.from('variants').upsert(variantRows);
+    for (const v of (full.variants ?? [])) {
+      await prisma.productVariant.upsert({
+        where: { 
+          productId_printifyVariantId: { 
+            productId: String(full.id), 
+            printifyVariantId: v.id 
+          } 
+        },
+        update: {
+          priceCents: toCents(v.price ?? firstPrice(full) ?? 0),
+          isEnabled: v.is_enabled !== false,
+          inStock: true,
+        },
+        create: {
+          id: `${full.id}-${v.id}`,
+          productId: String(full.id),
+          printifyVariantId: v.id,
+          priceCents: toCents(v.price ?? firstPrice(full) ?? 0),
+          isEnabled: v.is_enabled !== false,
+          inStock: true,
+        }
+      });
+    }
     upserted++;
   }
 

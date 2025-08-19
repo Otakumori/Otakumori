@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabaseClient';
+// import { supabase } from '../../lib/supabaseClient';
 import { motion } from 'framer-motion';
 
 export default function CommandAccess() {
@@ -20,17 +20,9 @@ export default function CommandAccess() {
     setLoading(true);
     setErrorMsg('');
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      router.push('/dashboard');
-    }
-
+    // Temporarily disabled during migration from Supabase to Clerk
+    setErrorMsg('Authentication system is being upgraded. Please try again later.');
+    
     setLoading(false);
   };
 

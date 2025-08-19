@@ -1,8 +1,17 @@
-// lib/supabaseAdmin.ts (server)
-import { createClient } from '@supabase/supabase-js';
+// Disabled during Supabase to Prisma migration
+console.warn('⚠️ lib/supabaseAdmin.ts is deprecated. Use Prisma instead.');
 
-export function supabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  return createClient(url, key, { auth: { persistSession: false } });
-}
+// Stub exports to prevent build errors
+export const supabaseAdmin = {
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        single: () => ({ data: null, error: null }),
+        limit: () => ({ data: [], error: null })
+      })
+    }),
+    insert: () => ({ data: null, error: null }),
+    upsert: () => ({ data: null, error: null }),
+    delete: () => ({ data: null, error: null })
+  })
+};

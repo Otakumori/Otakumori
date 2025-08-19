@@ -1,27 +1,72 @@
-// lib/shop.ts (server)
-import { createClient } from '@supabase/supabase-js';
+import { prisma } from '@/app/lib/prisma';
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Shop functions using Prisma
+export const getProducts = async (params?: { 
+  category?: string; 
+  subcategory?: string; 
+  page?: number; 
+  pageSize?: number; 
+}) => {
+  const page = params?.page || 1;
+  const pageSize = params?.pageSize || 20;
+  const skip = (page - 1) * pageSize;
 
-export async function getProducts(params: {
-  category?: string; subcategory?: string; page?: number; pageSize?: number;
-}) {
-  const sb = createClient(url, anon, { auth: { persistSession: false } });
-  const page = params.page ?? 1, pageSize = params.pageSize ?? 24;
-  let q = sb.from('products').select('*', { count: 'exact' }).eq('visible', true);
-  if (params.category) q = q.eq('category', params.category);
-  if (params.subcategory) q = q.eq('subcategory', params.subcategory);
-  q = q.order('title', { ascending: true }).range((page-1)*pageSize, page*pageSize - 1);
-  const { data, count, error } = await q;
-  if (error) throw error;
-  return { data: data ?? [], count: count ?? 0, page, pageSize };
-}
+  const where = {
+    active: true,
+    ...(params?.category && { category: params.category }),
+  };
 
-export async function getProductById(id: string) {
-  const sb = createClient(url, anon, { auth: { persistSession: false } });
-  const { data: product } = await sb.from('products').select('*').eq('id', id).single();
+  const [products, count] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        ProductVariant: {
+          where: { isEnabled: true },
+          take: 1,
+          orderBy: { priceCents: 'asc' }
+        }
+      },
+      skip,
+      take: pageSize,
+      orderBy: { name: 'asc' }
+    }),
+    prisma.product.count({ where })
+  ]);
+
+  return { 
+    data: products.map(p => ({
+      id: p.id,
+      title: p.name,
+      description: p.description,
+      images: p.primaryImageUrl ? [p.primaryImageUrl] : [],
+      price: p.ProductVariant[0]?.priceCents ? p.ProductVariant[0].priceCents / 100 : 0,
+      category: p.category,
+      variants: p.ProductVariant
+    })), 
+    count, 
+    pageSize 
+  };
+};
+
+export const getProduct = async (id: string) => {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      ProductVariant: {
+        where: { isEnabled: true }
+      }
+    }
+  });
+
   if (!product) return null;
-  const { data: variants } = await sb.from('variants').select('*').eq('product_id', id).order('price_cents');
-  return { product, variants: variants ?? [] };
-}
+
+  return {
+    id: product.id,
+    title: product.name,
+    description: product.description,
+    images: product.primaryImageUrl ? [product.primaryImageUrl] : [],
+    price: product.ProductVariant[0]?.priceCents ? product.ProductVariant[0].priceCents / 100 : 0,
+    category: product.category,
+    variants: product.ProductVariant
+  };
+};

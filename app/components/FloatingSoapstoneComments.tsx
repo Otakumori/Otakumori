@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 
 interface SoapstoneMessage {
   id: string;
@@ -10,72 +10,75 @@ interface SoapstoneMessage {
 }
 
 export default function FloatingSoapstoneComments() {
+  // Temporarily disabled - migrating from Supabase to Prisma
+  return null;
+  
   const [comments, setComments] = useState<SoapstoneMessage[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Create Supabase client for client-side use
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  );
+  // const supabase = createClient(
+  //   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  // );
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('soapstone_messages')
-          .select('id, content, created_at')
-          .order('created_at', { ascending: false })
-          .limit(10);
+  // useEffect(() => {
+  //   const fetchComments = async () => {
+  //     try {
+  //       const { data, error } = await supabase
+  //         .from('soapstone_messages')
+  //         .select('id, content, created_at')
+  //         .order('created_at', { ascending: false })
+  //         .limit(10);
 
-        if (error) {
-          console.error('Error fetching comments:', error);
-          return;
-        }
+  //       if (error) {
+  //         console.error('Error fetching comments:', error);
+  //         return;
+  //       }
 
-        setComments(data || []);
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
-    };
+  //       setComments(data || []);
+  //     } catch (error) {
+  //       console.error('Error fetching comments:', error);
+  //     }
+  //   };
 
-    fetchComments();
-  }, [supabase]);
+  //   fetchComments();
+  // }, [supabase]);
 
-  const handleSubmitComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
+  // const handleSubmitComment = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!newComment.trim()) return;
 
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('soapstone_messages')
-        .insert([{ content: newComment.trim() }]);
+  //   setIsLoading(true);
+  //   try {
+  //     const { error } = await supabase
+  //       .from('soapstone_messages')
+  //       .insert([{ content: newComment.trim() }]);
 
-      if (error) {
-        console.error('Error submitting comment:', error);
-        return;
-      }
+  //     if (error) {
+  //       console.error('Error submitting comment:', error);
+  //       return;
+  //     }
 
-      setNewComment('');
-      // Refresh comments
-      const { data, error: fetchError } = await supabase
-        .from('soapstone_messages')
-        .select('id, content, created_at')
-        .order('created_at', { ascending: false })
-        .limit(10);
+  //     setNewComment('');
+  //     // Refresh comments
+  //     const { data, error: fetchError } = await supabase
+  //       .from('soapstone_messages')
+  //       .select('id, content, created_at')
+  //       .order('created_at', { ascending: false })
+  //       .limit(10);
 
-      if (!fetchError && data) {
-        setComments(data);
-      }
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //       if (!fetchError && data) {
+  //         setComments(data);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error submitting comment:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -112,7 +115,7 @@ export default function FloatingSoapstoneComments() {
             )}
           </div>
 
-          <form onSubmit={handleSubmitComment} className="p-4 border-t border-gray-200">
+          <form onSubmit={() => {}} className="p-4 border-t border-gray-200">
             <div className="flex gap-2">
               <input
                 type="text"

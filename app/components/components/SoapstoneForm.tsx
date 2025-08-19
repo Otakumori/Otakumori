@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { useUser } from '@clerk/nextjs';
 
 export default function SoapstoneForm() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const { user } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,29 +15,31 @@ export default function SoapstoneForm() {
     setError('');
 
     try {
-      if (!supabase) {
-        throw new Error('Database not configured');
-      }
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
       if (!user) {
         throw new Error('You must be signed in to leave a message');
       }
 
-      const { error } = await supabase.from('soapstone_messages').insert([
-        {
-          content: message,
-          author: user.email,
-          rating: 0,
+      const response = await fetch('/api/soapstones', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      ]);
+        body: JSON.stringify({
+          content: message,
+          rotation: Math.random() * 10 - 5, // Random rotation for visual variety
+        }),
+      });
 
-      if (error) throw error;
+      const result = await response.json();
 
-      setMessage('');
+      if (response.ok) {
+        setMessage('');
+        setError('Message carved successfully!');
+        // Clear success message after 3 seconds
+        setTimeout(() => setError(''), 3000);
+      } else {
+        throw new Error(result.error || 'Failed to leave message');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to leave message');
     } finally {
