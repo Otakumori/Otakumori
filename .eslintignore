@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# Vendor / static content
+public/**
+docs/**
+comfy/**
+clerk-react/**
+
+# Non-code filetypes (ESLint shouldn't parse these)
+**/*.md
+**/*.json
+**/*.css
+**/*.scss
+**/*.svg
+**/*.yaml
+**/*.yml
+**/*.txt
+**/*.log
+
+# Generated files
+*.d.ts
+*.js.map
+*.css.map
+
+# Test files (if you want to exclude them)
+# tests/**
+# **/*.test.*
+# **/*.spec.*
