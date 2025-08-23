@@ -2,6 +2,78 @@ import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+// Helper function to sync user data to Prisma
+async function syncUserToPrisma(userData: any, operation: 'create' | 'update') {
+  try {
+    const userId = userData.id;
+    const email = userData.email_addresses?.[0]?.email_address || userData.email;
+    const username = userData.username || `user_${userId.slice(-8)}`;
+    const displayName = userData.first_name && userData.last_name 
+      ? `${userData.first_name} ${userData.last_name}` 
+      : userData.username || username;
+    const avatarUrl = userData.profile_image_url || userData.image_url;
+
+    if (!email || !userId) {
+      console.error('Missing required user data:', { userId, email });
+      return;
+    }
+
+    const userDataForPrisma = {
+      email,
+      username,
+      display_name: displayName,
+      avatarUrl,
+      clerkId: userId,
+      // Set NSFW affirmation if they have confirmed their age (18+)
+      nsfwAffirmedAt: userData.public_metadata?.age_verified ? new Date() : null,
+      nsfwEnabled: Boolean(userData.public_metadata?.age_verified),
+    };
+
+    if (operation === 'create') {
+      await prisma.user.create({
+        data: userDataForPrisma
+      });
+      console.log(`✅ User created in Prisma: ${username} (${email})`);
+    } else {
+      await prisma.user.upsert({
+        where: { clerkId: userId },
+        update: userDataForPrisma,
+        create: userDataForPrisma
+      });
+      console.log(`✅ User updated in Prisma: ${username} (${email})`);
+    }
+  } catch (error) {
+    console.error('Error syncing user to Prisma:', error);
+    throw error;
+  }
+}
+
+// Helper function to delete user from Prisma
+async function deleteUserFromPrisma(userId: string) {
+  try {
+    if (!userId) {
+      console.error('No user ID provided for deletion');
+      return;
+    }
+
+    // Delete user and all related data (cascade will handle most relationships)
+    const deletedUser = await prisma.user.delete({
+      where: { clerkId: userId }
+    });
+
+    console.log(`✅ User deleted from Prisma: ${deletedUser.username} (${deletedUser.email})`);
+  } catch (error) {
+    if (error.code === 'P2025') {
+      // User not found - this is okay, maybe they were already deleted
+      console.log(`ℹ️ User with Clerk ID ${userId} not found in Prisma (already deleted?)`);
+    } else {
+      console.error('Error deleting user from Prisma:', error);
+      throw error;
+    }
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -70,17 +142,17 @@ export async function POST(req: Request) {
     switch (eventType) {
       case 'user.created':
         console.log('User created:', userId);
-        // TODO: Implement user sync to Supabase
+        await syncUserToPrisma(userData, 'create');
         break;
         
       case 'user.updated':
         console.log('User updated:', userId);
-        // TODO: Implement user sync to Supabase
+        await syncUserToPrisma(userData, 'update');
         break;
         
       case 'user.deleted':
         console.log('User deleted:', userId);
-        // TODO: Implement user cleanup in Supabase
+        await deleteUserFromPrisma(userId);
         break;
         
       default:

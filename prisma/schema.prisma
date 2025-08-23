@@ -135,6 +135,7 @@ model User {
   nsfwAffirmationVer   Int                @default(1)
   nsfwAffirmedAt       DateTime?
   nsfwEnabled          Boolean            @default(true)
+  isAdmin              Boolean            @default(false)
   coupons              CouponGrant[]
   gameRuns             GameRun[]
   inventory            InventoryItem[]
@@ -149,6 +150,12 @@ model User {
   userTitles           UserTitle[]
   contactMessages      ContactMessage[]
   blogPosts            BlogPost[]
+  chatMessages         ChatMessage[]
+  contentReports       ContentReport[]
+  userWarnings         UserWarning[] @relation("UserWarningUser")
+  userBans             UserBan[] @relation("UserBanUser")
+  warningsModerated    UserWarning[] @relation("UserWarningModerator")
+  bansModerated        UserBan[] @relation("UserBanModerator")
 
   @@index([clerkId])
 }
@@ -445,6 +452,77 @@ model BlogPost {
   @@index([authorId])
   @@index([published, publishedAt])
   @@index([category])
+}
+
+// Simple community chat model
+model ChatMessage {
+  id        String   @id @default(cuid())
+  authorId  String
+  content   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  @@index([authorId])
+  @@index([isActive, createdAt])
+}
+
+// Content reporting and moderation system
+model ContentReport {
+  id          String   @id @default(cuid())
+  reporterId  String
+  contentType String   // chat_message, blog_post, etc.
+  contentId   String
+  reason      String
+  status      String   @default("pending") // pending, reviewed, resolved
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  reporter   User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  
+  @@index([reporterId])
+  @@index([contentType, contentId])
+  @@index([status, createdAt])
+}
+
+model UserWarning {
+  id          String   @id @default(cuid())
+  userId      String
+  moderatorId String
+  reason      String
+  severity    String   @default("low") // low, medium, high
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+  
+  // Relations
+  user       User     @relation("UserWarningUser", fields: [userId], references: [id], onDelete: Cascade)
+  moderator  User     @relation("UserWarningModerator", fields: [moderatorId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([moderatorId])
+  @@index([severity, createdAt])
+}
+
+model UserBan {
+  id          String   @id @default(cuid())
+  userId      String
+  moderatorId String
+  reason      String
+  duration    String   // 7 days, permanent, etc.
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  user       User     @relation("UserBanUser", fields: [userId], references: [id], onDelete: Cascade)
+  moderator  User     @relation("UserBanModerator", fields: [moderatorId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([moderatorId])
+  @@index([expiresAt])
 }
 
 enum OrderStatus {
