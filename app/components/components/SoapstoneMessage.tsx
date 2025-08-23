@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { supabase } from '../../lib/supabase';
+// TODO: Replace with Prisma when implementing message rating
 import { RunicText } from './RunicText';
 
 interface SoapstoneMessageProps {

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Star, Users, ShoppingBag, Heart, Search, Sparkles } from 'lucide-react';
 import Navigation from '@/components/layout/Navigation';
-import { TestSupabaseButton } from '@/components/TestSupabaseButton';
+
 import { PetalSystem } from '@/components/PetalSystem';
 import { SoapstoneFooter } from '@/components/SoapstoneFooter';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
@@ -199,9 +199,6 @@ export default function HomePage() {
 
       {/* Soapstone Footer */}
       <SoapstoneFooter />
-
-      {/* Development Test Button */}
-      <TestSupabaseButton />
     </>
   );
 }
