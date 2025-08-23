@@ -16,7 +16,6 @@ const nextConfig = {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       "next-auth/react": path.join(__dirname, "lib/auth/nextAuthCompat.tsx"),
-      "@supabase/auth-helpers-react": path.join(__dirname, "lib/auth/supabaseCompat.tsx"),
     };
     return config;
   },
@@ -27,7 +26,6 @@ const nextConfig = {
       'lh3.googleusercontent.com',
       'res.cloudinary.com',
       'storage.googleapis.com',
-      'supabase.co',
       'localhost',
     ],
     remotePatterns: [
@@ -36,10 +34,6 @@ const nextConfig = {
         hostname: '**',
       },
     ],
-  },
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
 };
 
