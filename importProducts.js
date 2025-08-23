@@ -1,21 +1,15 @@
-// importProducts.js
+// importProducts.js - Updated for Prisma
 
 require('dotenv').config();
 const fs = require('fs');
 const csv = require('csv-parser');
-const { createClient } = require('@supabase/supabase-js');
 
-// Load environment variables
-const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// TODO: Update this script to use Prisma instead of Supabase
+// This script needs to be converted to use Prisma client for database operations
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables.');
-  process.exit(1);
-}
-
-// Initialize Supabase client
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+console.log('⚠️  This script needs to be updated to use Prisma');
+console.log('The legacy Supabase implementation has been removed');
+console.log('Please implement product import using Prisma client');
 
 // Array to hold CSV data
 const products = [];
@@ -47,19 +41,16 @@ fs.createReadStream(csvFilePath)
   })
   .on('end', async () => {
     console.log(`Parsed ${products.length} products from CSV.`);
-
+    console.log('⚠️  Products were not imported - script needs Prisma implementation');
+    console.log('TODO: Implement with Prisma client:');
+    console.log('1. Import Prisma client');
+    console.log('2. Use prisma.product.upsert() for each product');
+    console.log('3. Handle errors appropriately');
+    
     if (products.length === 0) {
       console.error('No products parsed. Please check the CSV file headers and content.');
       process.exit(1);
     }
 
-    // Insert/Upsert products into Supabase
-    const { data, error } = await supabase.from('products').upsert(products);
-
-    if (error) {
-      console.error('Error upserting products:', error);
-    } else {
-      console.log('Products imported successfully!', data);
-    }
     process.exit();
   });
