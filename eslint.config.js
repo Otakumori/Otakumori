@@ -1,19 +1,35 @@
-export default tseslint.config(
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tseslintParser from '@typescript-eslint/parser';
+import drizzle from 'eslint-plugin-drizzle';
+import reactHooks from 'eslint-plugin-react-hooks';
+
+export default [
   {
-    ignores: ['.next'],
+    ignores: ['.next', 'node_modules', 'dist', 'coverage', 'public', 'docs', 'comfy'],
   },
-  ...compat.extends('next/core-web-vitals'),
   {
-    files: ['**/*.ts', '**/*.tsx'],
-    plugins: {
-      drizzle,
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parser: tseslintParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+        project: './tsconfig.json',
+        tsconfigRootDir: '.',
+      },
     },
-    extends: [
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-    ],
+    plugins: {
+      '@typescript-eslint': tseslint,
+      drizzle,
+      'react-hooks': reactHooks,
+    },
     rules: {
+      ...tseslint.configs['flat/recommended'].rules,
+      ...tseslint.configs['flat/recommended-type-checked'].rules,
+      ...tseslint.configs['flat/stylistic-type-checked'].rules,
       '@typescript-eslint/array-type': 'off',
       '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/consistent-type-imports': [
@@ -37,25 +53,12 @@ export default tseslint.config(
       'drizzle/enforce-update-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],
       // Reduce noise during development
       'react/no-unescaped-entities': 'off',
-      '@next/next/no-img-element': 'warn',
       'react-hooks/exhaustive-deps': 'warn',
-    },
-  },
-  {
-    // ✅ This disables the rule inside `env.ts`
-    files: ['src/env.ts'],
-    rules: {
-      'no-restricted-syntax': 'off',
     },
   },
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,
     },
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-      },
-    },
   }
-);
+];
