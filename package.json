@@ -2,6 +2,7 @@
   "name": "otakumori",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build:scripts": "tsc --project tsconfig.json --outDir dist --rootDir . lib/*.ts scripts/*.ts",
