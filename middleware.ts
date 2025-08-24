@@ -7,15 +7,6 @@ export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const host = req.headers.get("host") || "";
 
-  // Debug logging
-  console.log("🔍 Middleware Debug:", {
-    host,
-    pathname: url.pathname,
-    nodeEnv: process.env.NODE_ENV,
-    vercelEnv: process.env.VERCEL_ENV,
-    canonical: CANON
-  });
-
   // Only redirect preview hosts in production, not during deployment
   const isPreviewHost = host.endsWith(".vercel.app");
   const isProduction = process.env.NODE_ENV === "production";
@@ -23,7 +14,6 @@ export function middleware(req: NextRequest) {
   
   // Don't redirect if we're in a Vercel preview environment
   if (isProduction && isPreviewHost && !isVercelPreview) {
-    console.log("🔄 Redirecting preview host to canonical:", host, "→", CANON);
     const canonical = new URL(url.pathname + url.search, CANON);
     return NextResponse.redirect(canonical, 308);
   }
