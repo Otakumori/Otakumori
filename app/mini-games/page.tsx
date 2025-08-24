@@ -115,31 +115,49 @@ export default function MiniGamesPage() {
     try {
       setLoading(true);
       
-      // Fetch user stats
-      const statsResponse = await fetch('/api/v1/games/stats');
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
-        if (statsData.ok && statsData.data) {
-          setUserStats(statsData.data.totalStats);
+      // Only fetch data if user is authenticated
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch user stats (only for authenticated users)
+      try {
+        const statsResponse = await fetch('/api/v1/games/stats');
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          if (statsData.ok && statsData.data) {
+            setUserStats(statsData.data.totalStats);
+          }
         }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
       }
 
-      // Fetch achievements
-      const achievementsResponse = await fetch('/api/v1/games/achievements');
-      if (achievementsResponse.ok) {
-        const achievementsData = await achievementsResponse.json();
-        if (achievementsData.ok && achievementsData.data) {
-          setAchievements(achievementsData.data.achievements);
+      // Fetch achievements (only for authenticated users)
+      try {
+        const achievementsResponse = await fetch('/api/v1/games/achievements');
+        if (achievementsResponse.ok) {
+          const achievementsData = await achievementsResponse.json();
+          if (achievementsData.ok && achievementsData.data) {
+            setAchievements(achievementsData.data.achievements);
+          }
         }
+      } catch (error) {
+        console.error('Error fetching achievements:', error);
       }
 
-      // Fetch petal balance
-      const balanceResponse = await fetch('/api/v1/petals/balance');
-      if (balanceResponse.ok) {
-        const balanceData = await balanceResponse.json();
-        if (balanceData.ok && balanceData.data) {
-          setPetalBalance(balanceData.data.petalBalance);
+      // Fetch petal balance (only for authenticated users)
+      try {
+        const balanceResponse = await fetch('/api/v1/petals/balance');
+        if (balanceResponse.ok) {
+          const balanceData = await balanceResponse.json();
+          if (balanceData.ok && balanceData.data) {
+            setPetalBalance(balanceData.data.petalBalance);
+          }
         }
+      } catch (error) {
+        console.error('Error fetching petal balance:', error);
       }
       
     } catch (error) {

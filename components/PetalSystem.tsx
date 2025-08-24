@@ -26,8 +26,16 @@ export function PetalSystem({ onPetalCollected, petalsCollected }: PetalSystemPr
   const getToken = useSessionToken();
   
   // Performance settings based on device capability
-  const maxPetals = window.innerWidth < 768 ? 15 : 25;
+  const [maxPetals, setMaxPetals] = useState(25);
   const spawnInterval = 2000; // 2 seconds between spawns
+
+  // Set client-side values
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setMaxPetals(window.innerWidth < 768 ? 15 : 25);
+      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+  }, []);
 
   // Handle tab visibility for performance
   useEffect(() => {
@@ -47,7 +55,7 @@ export function PetalSystem({ onPetalCollected, petalsCollected }: PetalSystemPr
   }, []);
 
   // Check for reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   const spawnPetal = useCallback(() => {
     if (petals.length >= maxPetals) return;

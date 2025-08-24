@@ -30,9 +30,19 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [volume, setVolume] = useState<number>(() => Number(localStorage.getItem("music:vol") ?? 0.6));
-  const [optIn, setOptIn] = useState<boolean>(() => localStorage.getItem("music:optin") === "1");
+  const [volume, setVolume] = useState<number>(0.6);
+  const [optIn, setOptIn] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Load localStorage values only on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedVolume = localStorage.getItem("music:vol");
+      const savedOptIn = localStorage.getItem("music:optin");
+      if (savedVolume) setVolume(Number(savedVolume));
+      if (savedOptIn === "1") setOptIn(true);
+    }
+  }, []);
 
   useEffect(() => {
     fetch("/api/music/playlist", { cache: "no-store" })

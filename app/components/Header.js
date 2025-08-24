@@ -48,7 +48,7 @@ export default function Header() {
           </div>
 
           <Link href="/blog">Blog</Link>
-          <Link href="/minigames">Mini Games</Link>
+          <Link href="/mini-games">Mini Games</Link>
 
           {/* Search Bar */}
           <div className="relative">

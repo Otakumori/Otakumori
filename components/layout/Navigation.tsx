@@ -43,7 +43,7 @@ const navigation = [
     ]
   },
   { name: 'Blog', href: '/blog' },
-  { name: 'Mini-Games', href: '/minigames' },
+  { name: 'Mini-Games', href: '/mini-games' },
   { name: 'About me', href: '/about' },
 ];
 
@@ -51,7 +51,7 @@ const mobileNavigation = [
   { name: 'Home', href: '/' },
   { name: 'Shop', href: '/shop' },
   { name: 'Blog', href: '/blog' },
-  { name: 'Mini-Games', href: '/minigames' },
+  { name: 'Mini-Games', href: '/mini-games' },
   { name: 'About me', href: '/about' },
   { name: 'Cart', href: '/cart' },
 ];

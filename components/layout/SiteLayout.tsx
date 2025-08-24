@@ -209,7 +209,7 @@ export default function SiteLayout({
             <a className="hover:text-pink-200" href="/blog">
               Blog
             </a>
-            <a className="hover:text-pink-200" href="/minigames">
+            <a className="hover:text-pink-200" href="/mini-games">
               Mini-Games
             </a>
             <a className="hover:text-pink-200" href="/about">
