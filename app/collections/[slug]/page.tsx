@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { appUrl } from '@/lib/urls';
+import { appUrl } from '@/lib/canonical';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

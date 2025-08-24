@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { appUrl } from "@/lib/canonical";
 
 type Review = {
   id: string;
@@ -21,7 +22,7 @@ export default function AdminReviewsClient() {
 
   async function loadPage(next?: string | null) {
     setLoading(true);
-    const url = new URL("/api/admin/reviews", window.location.origin);
+    const url = new URL("/api/admin/reviews", appUrl());
     url.searchParams.set("take", String(take));
     if (next) url.searchParams.set("cursor", next);
 
