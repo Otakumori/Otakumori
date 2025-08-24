@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { appUrl } from '@/lib/urls';
 
 interface SEOProps {
   title?: string;
@@ -25,7 +26,7 @@ export function SEO({
   title = 'Otakumori - Small-batch anime-inspired apparel, accessories & home decor',
   description = 'Discover unique anime-inspired merchandise crafted with passion. From apparel to accessories and home decor, join our vibrant otaku community.',
   image = '/assets/images/og-default.jpg',
-  url = 'https://www.otaku-mori.com',
+  url = appUrl(),
   type = 'website',
   publishedTime,
   modifiedTime,
@@ -135,8 +136,8 @@ export function SEO({
             "@context": "https://schema.org",
             "@type": "Organization",
             "name": "Otakumori",
-            "url": "https://www.otaku-mori.com",
-            "logo": "https://www.otaku-mori.com/assets/circlelogo.png",
+            "url": appUrl(),
+            "logo": `${appUrl()}/assets/circlelogo.png`,
             "description": "Small-batch anime-inspired apparel, accessories & home decor",
             "sameAs": [
               "https://twitter.com/otakumori",

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { appUrl } from "@/lib/urls";
 
 const prisma = new PrismaClient();
 
@@ -31,7 +32,7 @@ export async function POST(req: Request) {
 
     // Return the starter pack download URL
     const starterPackUrl = process.env.STARTER_PACK_URL || 
-      'https://otakumori-assets.vercel.app/starter-pack.zip';
+      `${appUrl()}/api/starter-pack/download`;
 
     return NextResponse.json({ 
       url: starterPackUrl,
