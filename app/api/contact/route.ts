@@ -16,24 +16,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, message, imageUrl } = contactSchema.parse(body);
 
-    // Store contact message in database
-    const contactMessage = await db.contactMessage.create({
-      data: {
-        name,
-        email,
-        message,
-        imageUrl,
-        userId: userId || null,
-      },
-    });
-
+    // TODO: Store contact message in database when model is added
     // TODO: Send email notification to admin
     // await sendContactNotification({ name, email, message, imageUrl });
 
     return NextResponse.json({
       data: {
         message: 'Contact message sent successfully',
-        id: contactMessage.id,
+        id: 'temp-' + Date.now(),
       },
     });
   } catch (error) {
@@ -62,26 +52,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get contact messages (admin only)
+    // TODO: Get contact messages when model is added
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
-
-    const messages = await db.contactMessage.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      skip: offset,
-    });
-
-    const total = await db.contactMessage.count();
-
+    
     return NextResponse.json({
-      data: messages,
+      data: [],
       pagination: {
-        total,
+        total: 0,
         limit,
         offset,
-        hasMore: offset + limit < total,
+        hasMore: false,
       },
     });
   } catch (error) {
