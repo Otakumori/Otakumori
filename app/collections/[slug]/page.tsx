@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { appUrl } from '@/lib/urls';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -163,7 +164,7 @@ export default function CollectionPage({ params }: Props) {
     '@type': 'CollectionPage',
     name: collection.title,
     description: collection.description,
-    url: `https://otakumori.com/collections/${params.slug}`,
+            url: `${appUrl()}/collections/${params.slug}`,
     mainEntity: {
       '@type': 'ItemList',
       itemListElement: collection.products.map((product, index) => ({

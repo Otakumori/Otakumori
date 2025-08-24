@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
+import { appUrl } from '@/lib/urls';
 import { useCart } from '../cart/CartProvider';
 import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 
@@ -190,12 +191,12 @@ export default function Navigation() {
                 />
               ) : (
                 <div className="hidden md:flex items-center space-x-3">
-                  <SignInButton mode="modal">
+                  <SignInButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
                     <button className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-pink-400 transition-colors">
                       Sign In
                     </button>
                   </SignInButton>
-                  <SignUpButton mode="modal">
+                  <SignUpButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
                     <button className="px-4 py-2 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
                       Join the quest
                     </button>
@@ -291,12 +292,12 @@ export default function Navigation() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <SignInButton mode="modal">
+                      <SignInButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
                         <button className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-pink-500/30 hover:bg-pink-500/10 rounded-lg transition-colors">
                           Sign In
                         </button>
                       </SignInButton>
-                      <SignUpButton mode="modal">
+                      <SignUpButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
                         <button className="w-full px-4 py-3 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
                           Join the quest
                         </button>

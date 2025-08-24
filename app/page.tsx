@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Star, Users, ShoppingBag, Heart, Search, Sparkles } from 'lucide-react';
 import Navigation from '@/components/layout/Navigation';
+import { appUrl } from '@/lib/urls';
 
 import { PetalSystem } from '@/components/PetalSystem';
 import { SoapstoneFooter } from '@/components/SoapstoneFooter';
@@ -106,7 +107,7 @@ export default function HomePage() {
             <div className="mt-6 text-xs text-pink-200/60">
               <span>Having trouble? </span>
               <a
-                href="https://accounts.otaku-mori.com/sign-in"
+                href={`https://accounts.otaku-mori.com/sign-in?redirect_url=${encodeURIComponent(appUrl("/"))}`}
                 className="underline hover:text-pink-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -115,7 +116,7 @@ export default function HomePage() {
               </a>
               <span> or </span>
               <a
-                href="https://accounts.otaku-mori.com/sign-up"
+                href={`https://accounts.otaku-mori.com/sign-up?redirect_url=${encodeURIComponent(appUrl("/onboarding"))}`}
                 className="underline hover:text-pink-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
