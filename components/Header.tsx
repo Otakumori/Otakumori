@@ -11,7 +11,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
   { href: '/blog', label: 'Blog' },
-  { href: '/minigames', label: 'Mini-Games' },
+  { href: '/mini-games', label: 'Mini-Games' },
   { href: '/friends', label: 'Friends' },
   { href: '/profile', label: 'My Account' },
   { href: '/community', label: 'Community' },

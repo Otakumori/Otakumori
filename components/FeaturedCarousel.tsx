@@ -25,14 +25,21 @@ export default function FeaturedCarousel() {
 
   const fetchFeaturedProducts = async () => {
     try {
+      console.log('🛍️ Fetching featured products...');
       const response = await fetch('/api/v1/shop/products?limit=6');
-      const data = await response.json();
+      console.log('📡 Response status:', response.status);
       
-      if (data.ok && data.data) {
+      const data = await response.json();
+      console.log('📦 API response data:', data);
+      
+      if (data.ok && data.data && data.data.products) {
+        console.log('✅ Setting products:', data.data.products.length, 'products');
         setProducts(data.data.products);
+      } else {
+        console.log('❌ No products in response:', data);
       }
     } catch (error) {
-      console.error('Error fetching featured products:', error);
+      console.error('❌ Error fetching featured products:', error);
     } finally {
       setLoading(false);
     }

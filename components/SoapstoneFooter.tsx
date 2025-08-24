@@ -237,7 +237,7 @@ export function SoapstoneFooter() {
             <div>
               <h4 className="text-white font-semibold mb-3">Community</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
-                <li><a href="/minigames" className="hover:text-pink-400 transition-colors">Mini-Games</a></li>
+                <li><a href="/mini-games" className="hover:text-pink-400 transition-colors">Mini-Games</a></li>
                 <li><a href="/blog" className="hover:text-pink-400 transition-colors">Blog</a></li>
                 <li><a href="/about" className="hover:text-pink-400 transition-colors">About</a></li>
               </ul>
