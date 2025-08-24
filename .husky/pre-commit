@@ -1,2 +1,5 @@
-npm run lint
-npm run format:check 
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Fast & quiet; allow empty commits so it doesn't block version bumps, etc.
+npx lint-staged -q --allow-empty 

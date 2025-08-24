@@ -1,35 +1,29 @@
-# Dependencies
+# build + deps
 node_modules/
 .next/
-dist/
-build/
+out/
 coverage/
+dist/
 
-# Big/static content that doesn't need Prettier
+# assets & third-party stuff
+public/
 public/**
 docs/**
 comfy/**
-clerk-react/**
+public/games/**
+public/assets/**
 
-# Generated or tool configs you don't want touched
-*.min.js
-*.min.css
-*.bundle.js
-*.chunk.js
+# generated files
+*.lock
+*.log
+*.d.ts
+*.js.map
+*.css.map
 
-# Lock files
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
+# test coverage
+coverage/
+*.lcov
 
-# Environment files
+# environment files
 .env*
 !.env.example
-
-# Logs
-*.log
-logs/
-
-# Build artifacts
-.vercel/
-.cursor/
