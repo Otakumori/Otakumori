@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 
@@ -10,22 +10,16 @@ export async function POST(request: NextRequest) {
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user
     const user = await db.user.findUnique({
-      where: { clerkId: userId }
+      where: { clerkId: userId },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
     // Simple gacha system - random rewards
@@ -64,25 +58,50 @@ export async function POST(request: NextRequest) {
       selectedReward = rewards[0]; // Fallback to common
     }
 
-    // Record the gacha pull
-    await db.gachaPull.create({
-      data: {
-        userId: user.id,
-        rewardType: selectedReward.type,
-        rewardData: JSON.stringify(selectedReward),
-        rarity: selectedReward.rarity,
-      }
-    });
+    // Record the gacha pull using existing models
+    if (selectedReward.type === 'petals' && selectedReward.amount) {
+      // Record petal reward in PetalLedger
+      await db.petalLedger.create({
+        data: {
+          userId: user.id,
+          type: 'earn',
+          amount: selectedReward.amount,
+          reason: `Gacha pull - ${selectedReward.rarity} reward`,
+        },
+      });
 
-    // If it's petals, add them to user's balance
-    if (selectedReward.type === 'petals') {
+      // Update user's petal balance
       await db.user.update({
         where: { id: user.id },
         data: {
           petalBalance: {
-            increment: selectedReward.amount
-          }
-        }
+            increment: selectedReward.amount,
+          },
+        },
+      });
+    } else if (selectedReward.type === 'achievement' && selectedReward.name) {
+      // Check if achievement exists, create if not
+      let achievement = await db.achievement.findFirst({
+        where: { name: selectedReward.name },
+      });
+
+      if (!achievement) {
+        achievement = await db.achievement.create({
+          data: {
+            code: `gacha_${selectedReward.name?.toLowerCase().replace(/\s+/g, '_')}`,
+            name: selectedReward.name,
+            description: `Earned from gacha pull`,
+            points: selectedReward.rarity === 'rare' ? 50 : 100,
+          },
+        });
+      }
+
+      // Grant achievement to user
+      await db.userAchievement.create({
+        data: {
+          userId: user.id,
+          achievementId: achievement.id,
+        },
       });
     }
 
@@ -91,15 +110,11 @@ export async function POST(request: NextRequest) {
       data: {
         reward: selectedReward,
         message: `You got ${selectedReward.amount || selectedReward.name}!`,
-        rarity: selectedReward.rarity
-      }
+        rarity: selectedReward.rarity,
+      },
     });
-
   } catch (error) {
     console.error('Error in gacha:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
