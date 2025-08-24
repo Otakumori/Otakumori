@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
-import { appUrl } from '@/lib/urls';
+import { appUrl } from '@/lib/canonical';
 import { useCart } from '../cart/CartProvider';
 import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 

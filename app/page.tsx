@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Star, Users, ShoppingBag, Heart, Search, Sparkles } from 'lucide-react';
 import Navigation from '@/components/layout/Navigation';
-import { appUrl } from '@/lib/urls';
+import { hostedSignInUrl, hostedSignUpUrl, canonicalOrigin } from '@/lib/canonical';
 
 import { PetalSystem } from '@/components/PetalSystem';
 import { SoapstoneFooter } from '@/components/SoapstoneFooter';
@@ -14,6 +14,11 @@ import Link from 'next/link';
 export default function HomePage() {
   const [petalsCollected, setPetalsCollected] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+
+  // Runtime assertion test for canonical origin
+  useEffect(() => {
+    console.log('🔍 Canonical Origin Check:', canonicalOrigin());
+  }, []);
 
   // Handle tab visibility for performance
   useEffect(() => {
@@ -107,7 +112,7 @@ export default function HomePage() {
             <div className="mt-6 text-xs text-pink-200/60">
               <span>Having trouble? </span>
               <a
-                href={`https://accounts.otaku-mori.com/sign-in?redirect_url=${encodeURIComponent(appUrl("/"))}`}
+                href={hostedSignInUrl("/")}
                 className="underline hover:text-pink-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -116,7 +121,7 @@ export default function HomePage() {
               </a>
               <span> or </span>
               <a
-                href={`https://accounts.otaku-mori.com/sign-up?redirect_url=${encodeURIComponent(appUrl("/onboarding"))}`}
+                href={hostedSignUpUrl("/onboarding")}
                 className="underline hover:text-pink-300 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"

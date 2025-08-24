@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { appUrl } from '@/lib/urls';
+import { appUrl } from '@/lib/canonical';
 
 interface SEOProps {
   title?: string;

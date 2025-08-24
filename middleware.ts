@@ -1,16 +1,36 @@
-import { authMiddleware } from '@clerk/nextjs/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default authMiddleware();
+const CANON = (process.env.NEXT_PUBLIC_CANONICAL_ORIGIN || "https://otaku-mori.com").replace(/\/$/, "");
+
+export function middleware(req: NextRequest) {
+  const url = req.nextUrl.clone();
+  const host = req.headers.get("host") || "";
+
+  // Debug logging
+  console.log("🔍 Middleware Debug:", {
+    host,
+    pathname: url.pathname,
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV,
+    canonical: CANON
+  });
+
+  // Only redirect preview hosts in production, not during deployment
+  const isPreviewHost = host.endsWith(".vercel.app");
+  const isProduction = process.env.NODE_ENV === "production";
+  const isVercelPreview = process.env.VERCEL_ENV === "preview";
+  
+  // Don't redirect if we're in a Vercel preview environment
+  if (isProduction && isPreviewHost && !isVercelPreview) {
+    console.log("🔄 Redirecting preview host to canonical:", host, "→", CANON);
+    const canonical = new URL(url.pathname + url.search, CANON);
+    return NextResponse.redirect(canonical, 308);
+  }
+  
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"],
 };
