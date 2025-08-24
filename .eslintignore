@@ -1,33 +1,37 @@
-# Dependencies
+# build + deps
 node_modules/
 .next/
-dist/
-build/
+out/
 coverage/
+dist/
 
-# Vendor / static content
+# assets & third-party stuff
+public/
 public/**
 docs/**
 comfy/**
-clerk-react/**
+public/games/**
+public/assets/**
 
-# Non-code filetypes (ESLint shouldn't parse these)
-**/*.md
-**/*.json
+# styles (we're not ESLinting CSS)
 **/*.css
 **/*.scss
-**/*.svg
-**/*.yaml
-**/*.yml
-**/*.txt
-**/*.log
+**/*.sass
 
-# Generated files
-*.d.ts
-*.js.map
-*.css.map
-
-# Test files (if you want to exclude them)
-# tests/**
-# **/*.test.*
-# **/*.spec.*
+# misc
+*.lock
+*.log
+*.md
+*.json
+*.yaml
+*.yml
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot
