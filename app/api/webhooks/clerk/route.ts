@@ -2,7 +2,7 @@ import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../../../lib/prisma';
 
 // Helper function to sync user data to Prisma
 async function syncUserToPrisma(userData: any, operation: 'create' | 'update') {
@@ -65,7 +65,7 @@ async function deleteUserFromPrisma(userId: string) {
 
     console.log(`✅ User deleted from Prisma: ${deletedUser.username} (${deletedUser.email})`);
   } catch (error) {
-    if (error.code === 'P2025') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2025') {
       // User not found - this is okay, maybe they were already deleted
       console.log(`ℹ️ User with Clerk ID ${userId} not found in Prisma (already deleted?)`);
     } else {
