@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -11,17 +13,13 @@ export async function GET(request: NextRequest) {
 
     const where: any = {};
     
-    if (category) {
-      where.category = category;
-    }
-    
     if (published) {
       where.published = true;
     }
 
-    const posts = await db.blogPost.findMany({
+    const posts = await db.contentPage.findMany({
       where,
-      orderBy: { publishedAt: 'desc' },
+      orderBy: { updatedAt: 'desc' },
       take: limit,
       skip: offset,
       select: {
@@ -29,18 +27,12 @@ export async function GET(request: NextRequest) {
         title: true,
         excerpt: true,
         slug: true,
-        publishedAt: true,
-        category: true,
-        author: {
-          select: {
-            username: true,
-            display_name: true,
-          },
-        },
+        updatedAt: true,
+        published: true,
       },
     });
 
-    const total = await db.blogPost.count({ where });
+    const total = await db.contentPage.count({ where });
 
     return NextResponse.json({
       data: posts,
