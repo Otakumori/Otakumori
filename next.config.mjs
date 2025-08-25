@@ -2,7 +2,7 @@
 const nextConfig = {
   // safety net during build; real fix is dynamic rendering
   staticPageGenerationTimeout: 120,
-  experimental: { ppr: true }, // optional streaming where helpful
+  experimental: {}, // experimental features disabled for stability
   
   // Clerk proxy configuration
   async rewrites() {
@@ -10,6 +10,28 @@ const nextConfig = {
       {
         source: '/clerk/:path*',
         destination: 'https://clerk.otaku-mori.com/:path*',
+      },
+    ];
+  },
+
+  // Security headers including CSP for Clerk
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self';",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev;",
+              "frame-src https://*.clerk.com https://*.clerkstage.dev;",
+              "img-src 'self' data: blob: https:;",
+              "style-src 'self' 'unsafe-inline' https:;",
+              "connect-src 'self' https://*.clerk.com https://*.clerkstage.dev https://api.clerk.com;",
+            ].join(' '),
+          },
+        ],
       },
     ];
   },

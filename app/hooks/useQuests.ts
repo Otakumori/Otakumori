@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 
-type QuestEventType = 
-  | 'view-product' 
-  | 'submit-review' 
-  | 'gacha-roll' 
-  | 'purchase' 
-  | 'visit-checkout' 
+type QuestEventType =
+  | 'view-product'
+  | 'submit-review'
+  | 'gacha-roll'
+  | 'purchase'
+  | 'visit-checkout'
   | 'browse-collection';
 
 /**
@@ -18,9 +18,9 @@ export function useQuests() {
       const response = await fetch('/api/quests/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: eventType })
+        body: JSON.stringify({ type: eventType }),
       });
-      
+
       if (response.ok) {
         const result = await response.json();
         if (result.updated > 0) {
@@ -39,53 +39,48 @@ export function useQuests() {
 
 /**
  * Predefined quest tracking functions for common actions
+ * These functions should be used within components that call useQuests()
  */
 export const questTracking = {
   /**
    * Track when user views a product page
    */
-  viewProduct: () => {
-    const { trackQuest } = useQuests();
+  viewProduct: (trackQuest: (eventType: QuestEventType) => Promise<any>) => {
     return trackQuest('view-product');
   },
 
   /**
    * Track when user submits a review
    */
-  submitReview: () => {
-    const { trackQuest } = useQuests();
+  submitReview: (trackQuest: (eventType: QuestEventType) => Promise<any>) => {
     return trackQuest('submit-review');
   },
 
   /**
    * Track when user rolls the gacha
    */
-  rollGacha: () => {
-    const { trackQuest } = useQuests();
+  rollGacha: (trackQuest: (eventType: QuestEventType) => Promise<any>) => {
     return trackQuest('gacha-roll');
   },
 
   /**
    * Track when user completes a purchase
    */
-  completePurchase: () => {
-    const { trackQuest } = useQuests();
+  completePurchase: (trackQuest: (eventType: QuestEventType) => Promise<any>) => {
     return trackQuest('purchase');
   },
 
   /**
    * Track when user visits checkout
    */
-  visitCheckout: () => {
-    const { trackQuest } = useQuests();
+  visitCheckout: (trackQuest: (eventType: QuestEventType) => Promise<any>) => {
     return trackQuest('visit-checkout');
   },
 
   /**
    * Track when user browses a collection
    */
-  browseCollection: () => {
-    const { trackQuest } = useQuests();
+  browseCollection: (trackQuest: (eventType: QuestEventType) => Promise<any>) => {
     return trackQuest('browse-collection');
-  }
+  },
 };

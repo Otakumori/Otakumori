@@ -10,80 +10,64 @@ import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
 import DockedGacha from '../components/DockedGacha';
+import { NavBar } from '../components/NavBar';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Otakumori - Anime & Manga Community',
-  description: 'Join the ultimate anime and manga community. Shop, connect, and explore with fellow otaku.',
-  keywords: 'anime, manga, otaku, community, shop, merchandise',
-  authors: [{ name: 'Otakumori Team' }],
-  creator: 'Otakumori',
-  publisher: 'Otakumori',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  title: 'Otaku-Mori ❤︎',
+  description: 'Welcome to Otaku-Mori, where anime and gaming <co-exist>!',
+  keywords: 'anime, gaming, otaku, community, shop, mini-games',
+  authors: [{ name: 'Otaku-Mori Team' }],
+  creator: 'Otaku-Mori',
+  publisher: 'Otaku-Mori',
+  robots: 'index, follow',
   openGraph: {
-    title: 'Otakumori - Anime & Manga Community',
-    description: 'Join the ultimate anime and manga community. Shop, connect, and explore with fellow otaku.',
-    url: '/',
-    siteName: 'Otakumori',
-    images: [
-      {
-        url: '/images/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Otakumori - Anime & Manga Community',
-      },
-    ],
-    locale: 'en_US',
     type: 'website',
+    locale: 'en_US',
+    url: 'https://otaku-mori.com',
+    title: 'Otaku-Mori ❤︎',
+    description: 'Welcome to Otaku-Mori, where anime and gaming <co-exist>!',
+    siteName: 'Otaku-Mori',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Otakumori - Anime & Manga Community',
-    description: 'Join the ultimate anime and manga community. Shop, connect, and explore with fellow otaku.',
-    images: ['/images/og-image.jpg'],
+    title: 'Otaku-Mori ❤︎',
+    description: 'Welcome to Otaku-Mori, where anime and gaming <co-exist>!',
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: 'your-google-verification-code',
+  viewport: 'width=device-width, initial-scale=1',
+  themeColor: '#ec4899',
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+// Boot logging for Clerk instance detection
+if (typeof window === 'undefined') {
+  const isTest = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_test_');
+  const isLive = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_live_');
+  console.log(`🚀 Clerk Boot: Using ${isTest ? 'TEST' : isLive ? 'LIVE' : 'UNKNOWN'} instance`);
+  console.log(`🌐 APP_URL: ${env.NEXT_PUBLIC_APP_URL || 'Not set'}`);
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/site.webmanifest" />
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#ec4899" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
       <body className={inter.className}>
         <ErrorBoundary>
-          <ClerkProvider 
-            publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+          <ClerkProvider
             appearance={{
               elements: {
                 formButtonPrimary: 'bg-pink-600 hover:bg-pink-700 text-white',
@@ -94,12 +78,13 @@ export default function RootLayout({
                 formFieldInput: 'bg-gray-800 border border-pink-500/20 text-white',
                 formFieldLabel: 'text-gray-300',
                 footerActionLink: 'text-pink-400 hover:text-pink-300',
-              }
+              },
             }}
           >
             <PetalProvider>
               <CartProvider>
                 <GlobalMusicProvider>
+                  <NavBar />
                   {children}
                   <GlobalMusicBar />
                   <SoapstoneDock />

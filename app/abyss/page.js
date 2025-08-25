@@ -65,14 +65,6 @@ export default function AbyssPage() {
   const { petals, addPetals } = usePetalContext();
   const { quests, addQuest } = useOverlordContext();
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <div>Please sign in to access the Abyss</div>;
-  }
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -87,6 +79,14 @@ export default function AbyssPage() {
 
     return () => clearTimeout(timer);
   }, [quests, addQuest]);
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <div>Please sign in to access the Abyss</div>;
+  }
 
   const handleStartQuest = quest => {
     // Simulate quest completion

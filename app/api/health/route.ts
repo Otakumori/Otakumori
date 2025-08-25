@@ -1,23 +1,17 @@
-import { NextResponse } from "next/server";
-import { log } from "@/lib/logger";
+import { auth } from '@clerk/nextjs/server';
+import { env } from '@/env.mjs';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 export const maxDuration = 10;
 
 export async function GET() {
-  try {
-    log("health_check", { timestamp: new Date().toISOString() });
-    return NextResponse.json({ 
-      ok: true, 
-      status: "healthy",
-      timestamp: new Date().toISOString()
-    });
-  } catch (e) {
-    log("health_check_error", { message: String(e) });
-    return NextResponse.json({ 
-      ok: false, 
-      status: "unhealthy",
-      error: String(e)
-    }, { status: 500 });
-  }
+  const ok = !!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !!env.CLERK_SECRET_KEY;
+  const { userId } = auth(); // will be null for anonymous
+
+  return Response.json({
+    clerk: ok ? 'ok' : 'missing env',
+    userId: userId ?? null,
+    timestamp: new Date().toISOString(),
+    environment: env.NODE_ENV || 'development',
+  });
 }

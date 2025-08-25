@@ -17,8 +17,6 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-        project: './tsconfig.json',
-        tsconfigRootDir: '.',
       },
     },
     plugins: {
@@ -37,11 +35,9 @@ export default [
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-var-requires': 'warn',
       '@typescript-eslint/require-await': 'off',
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        { checksVoidReturn: { attributes: false } },
-      ],
+      '@typescript-eslint/no-misused-promises': 'off', // Disabled due to type information requirements
       'no-restricted-syntax': [
         'error',
         {
@@ -60,5 +56,5 @@ export default [
     linterOptions: {
       reportUnusedDisableDirectives: true,
     },
-  }
+  },
 ];

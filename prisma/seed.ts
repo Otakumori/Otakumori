@@ -26,8 +26,8 @@ async function main() {
         description: 'Beautiful cherry blossom frame for your profile',
         type: 'FRAME',
         rarity: 'RARE',
-        imageUrl: '/assets/ui/frames/sakura.png'
-      }
+        imageUrl: '/assets/ui/frames/sakura.png',
+      },
     },
     {
       sku: 'frame.neon',
@@ -42,8 +42,8 @@ async function main() {
         description: 'Cyberpunk-style neon border',
         type: 'FRAME',
         rarity: 'LEGENDARY',
-        imageUrl: '/assets/ui/frames/neon.png'
-      }
+        imageUrl: '/assets/ui/frames/neon.png',
+      },
     },
     {
       sku: 'frame.classic',
@@ -58,8 +58,8 @@ async function main() {
         description: 'Timeless elegant border',
         type: 'FRAME',
         rarity: 'COMMON',
-        imageUrl: '/assets/ui/frames/classic.png'
-      }
+        imageUrl: '/assets/ui/frames/classic.png',
+      },
     },
 
     // Overlays
@@ -76,8 +76,8 @@ async function main() {
         description: 'Warm fire-like overlay effect',
         type: 'OVERLAY',
         rarity: 'LEGENDARY',
-        imageUrl: '/assets/ui/overlays/ember.png'
-      }
+        imageUrl: '/assets/ui/overlays/ember.png',
+      },
     },
     {
       sku: 'overlay.sparkle',
@@ -92,8 +92,8 @@ async function main() {
         description: 'Magical sparkle effects',
         type: 'OVERLAY',
         rarity: 'RARE',
-        imageUrl: '/assets/ui/overlays/sparkle.png'
-      }
+        imageUrl: '/assets/ui/overlays/sparkle.png',
+      },
     },
     {
       sku: 'overlay.rainbow',
@@ -108,8 +108,8 @@ async function main() {
         description: 'Colorful rainbow aura effect',
         type: 'OVERLAY',
         rarity: 'RARE',
-        imageUrl: '/assets/ui/overlays/rainbow.png'
-      }
+        imageUrl: '/assets/ui/overlays/rainbow.png',
+      },
     },
 
     // Text Styles
@@ -125,8 +125,8 @@ async function main() {
       metadata: {
         description: 'Vibrant rainbow text effects',
         type: 'TEXT_STYLE',
-        rarity: 'LEGENDARY'
-      }
+        rarity: 'LEGENDARY',
+      },
     },
     {
       sku: 'textstyle.neon',
@@ -140,8 +140,8 @@ async function main() {
       metadata: {
         description: 'Glowing neon text style',
         type: 'TEXT_STYLE',
-        rarity: 'RARE'
-      }
+        rarity: 'RARE',
+      },
     },
     {
       sku: 'textstyle.glow',
@@ -155,8 +155,8 @@ async function main() {
       metadata: {
         description: 'Soft glowing text effect',
         type: 'TEXT_STYLE',
-        rarity: 'RARE'
-      }
+        rarity: 'RARE',
+      },
     },
 
     // Cursors
@@ -173,8 +173,8 @@ async function main() {
         description: 'Cute anime eyes cursor',
         type: 'CURSOR',
         rarity: 'COMMON',
-        imageUrl: '/assets/ui/cursors/anime-eyes.png'
-      }
+        imageUrl: '/assets/ui/cursors/anime-eyes.png',
+      },
     },
     {
       sku: 'cursor.sword',
@@ -189,14 +189,14 @@ async function main() {
         description: 'Epic sword cursor',
         type: 'CURSOR',
         rarity: 'RARE',
-        imageUrl: '/assets/ui/cursors/sword.png'
-      }
-    }
+        imageUrl: '/assets/ui/cursors/sword.png',
+      },
+    },
   ];
 
   for (const item of shopItems) {
     await prisma.petalShopItem.create({
-      data: item
+      data: item,
     });
   }
 
@@ -209,78 +209,60 @@ async function main() {
       name: 'First Steps',
       description: 'Win your first mini-game',
       points: 10,
-      category: 'GAMING',
-      enabled: true
     },
     {
       code: 'PETAL_COLLECTOR',
       name: 'Petal Collector',
       description: 'Collect 100 petals',
       points: 25,
-      category: 'ECONOMY',
-      enabled: true
     },
     {
       code: 'GAME_MASTER',
       name: 'Game Master',
       description: 'Win 10 mini-games',
       points: 50,
-      category: 'GAMING',
-      enabled: true
     },
     {
       code: 'ACHIEVEMENT_HUNTER',
       name: 'Achievement Hunter',
       description: 'Unlock 5 achievements',
       points: 30,
-      category: 'PROGRESSION',
-      enabled: true
     },
     {
       code: 'SHOP_SPENDER',
       name: 'Shop Spender',
       description: 'Purchase your first cosmetic',
       points: 15,
-      category: 'ECONOMY',
-      enabled: true
     },
     {
       code: 'SPECIAL_SAMURAI',
       name: 'Special Samurai',
       description: 'Achieve perfect score in Samurai Slice',
       points: 100,
-      category: 'GAMING',
-      enabled: true
     },
     {
       code: 'MEMORY_MASTER',
       name: 'Memory Master',
       description: 'Complete Memory Match in under 30 seconds',
       points: 75,
-      category: 'GAMING',
-      enabled: true
     },
     {
       code: 'BUBBLE_POPPER',
       name: 'Bubble Popper',
       description: 'Pop 100 bubbles in one session',
       points: 40,
-      category: 'GAMING',
-      enabled: true
     },
     {
       code: 'RHYTHM_KING',
       name: 'Rhythm King',
       description: 'Achieve 95% accuracy in Rhythm Beat-Em-Up',
       points: 80,
-      category: 'GAMING',
-      enabled: true
-    }
+    },
   ];
 
   for (const achievement of achievements) {
     await prisma.achievement.create({
-      data: achievement
+      data: achievement,
     });
   }
 
@@ -290,10 +272,10 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error('❌ Error during seeding:', e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .finally(() => {
+    prisma.$disconnect();
   });

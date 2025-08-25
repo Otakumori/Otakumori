@@ -22,7 +22,7 @@ export default function CommandAccess() {
 
     // Temporarily disabled during migration from Supabase to Clerk
     setErrorMsg('Authentication system is being upgraded. Please try again later.');
-    
+
     setLoading(false);
   };
 
@@ -38,7 +38,7 @@ export default function CommandAccess() {
           Commander Access
         </h1>
         <p className="mb-6 text-center text-sm text-gray-400">
-          Welcome to Otaku-mori's inner sanctum
+          Welcome to Otaku-mori&apos;s inner sanctum
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">
