@@ -6,8 +6,6 @@
  * Can be run as a background service or in production monitoring
  */
 
-import { APIHealthChecker } from './api-health-check';
-
 interface MonitoringConfig {
   checkInterval: number; // milliseconds
   alertThreshold: number; // consecutive failures before alerting
@@ -156,4 +154,4 @@ if (require.main === module) {
   monitor.start().catch(console.error);
 }
 
-export { APIMonitor, MonitoringConfig };
+export type { APIMonitor, MonitoringConfig };

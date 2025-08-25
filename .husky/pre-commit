@@ -1,5 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env sh
 . "$(dirname "$0")/_/husky.sh"
 
-# Fast & quiet; allow empty commits so it doesn't block version bumps, etc.
-npx lint-staged -q --allow-empty 
+# run lint/format/test (adjust to your scripts)
+npm run lint-staged || exit 1 

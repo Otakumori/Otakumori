@@ -41,9 +41,12 @@ model Order {
   displayNumber   Int            @unique @default(autoincrement())
   primaryItemName String?        @default("")
   label           String?        @default("")
+  subtotalCents   Int            @default(0)
   User            User           @relation(fields: [userId], references: [id])
   OrderItem       OrderItem[]
   RewardLedger    RewardLedger[]
+  UserRunes       UserRune[]
+  EmailLogs       EmailLog[]
 }
 
 model OrderItem {
@@ -57,12 +60,14 @@ model OrderItem {
   unitAmount        Int
   printifyProductId String?
   printifyVariantId Int?
+  upc               String?        // Printify UPC for rune mapping
   Order             Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
   Product           Product        @relation(fields: [productId], references: [id])
   ProductVariant    ProductVariant @relation(fields: [productVariantId], references: [id])
 
   @@index([orderId])
-  @@index([productVariantId])
+  @@index([printifyVariantId])
+  @@index([upc])
 }
 
 model Product {
@@ -102,7 +107,7 @@ model ProductVariant {
 
 model RewardLedger {
   id           String   @id
-  userId       String
+  userId       String?
   orderId      String?
   type         String
   amount       Int
@@ -110,7 +115,7 @@ model RewardLedger {
   metadata     Json?
   createdAt    DateTime @default(now())
   Order        Order?   @relation(fields: [orderId], references: [id])
-  User         User     @relation(fields: [userId], references: [id])
+  User         User?    @relation(fields: [userId], references: [id])
 
   @@index([orderId])
   @@index([userId, createdAt])
@@ -148,21 +153,28 @@ model User {
   achievements         UserAchievement[]
   userFiles            UserFile[]
   userTitles           UserTitle[]
+  mergeLogs            MergeLog[]
+  UserRunes            UserRune[]
+  EmailLogs            EmailLog[]
 
   @@index([clerkId])
 }
 
 model PetalLedger {
   id        String     @id @default(cuid())
-  userId    String
+  userId    String?
+  guestSessionId String?
   type      LedgerType
   amount    Int
   reason    String
   createdAt DateTime   @default(now())
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([userId, type, createdAt])
+  @@index([guestSessionId, createdAt])
+  @@index([guestSessionId, type, createdAt])
 }
 
 model Quest {
@@ -413,6 +425,126 @@ model UserTitle {
   @@index([userId, awardedAt])
 }
 
+model GuestSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+  petalEvents PetalLedger[]
+  mergeLogs  MergeLog[]
+
+  @@index([createdAt])
+  @@index([lastSeenAt])
+}
+
+model MergeLog {
+  id                String   @id @default(cuid())
+  guestSessionId    String
+  userId            String
+  mergedAt          DateTime @default(now())
+  guestPetalCountAtMerge Int
+  userPetalCountBefore   Int
+  userPetalCountAfter    Int
+  guestSession      GuestSession @relation(fields: [guestSessionId], references: [id], onDelete: Cascade)
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([guestSessionId, userId])
+  @@index([userId, mergedAt])
+  @@index([guestSessionId, mergedAt])
+}
+
+model SiteConfig {
+  id        String   @id @default("singleton")
+  guestCap  Int      @default(50)
+  burst     Json     @default("{\"enabled\":true,\"minCooldownSec\":15,\"maxPerMinute\":3,\"particleCount\":{\"small\":20,\"medium\":40,\"large\":80},\"rarityWeights\":{\"small\":0.6,\"medium\":0.3,\"large\":0.1}}")
+  tree      Json     @default("{\"sway\":0.5,\"spawnRate\":2000,\"snapPx\":4,\"dither\":0.3}")
+  theme     Json     @default("{\"pinkIntensity\":0.7,\"grayIntensity\":0.8,\"motionIntensity\":2}")
+  seasonal  Json     @default("{\"sakuraBoost\":false,\"springMode\":false,\"autumnMode\":false}")
+  rewards   Json     @default("{\"baseRateCents\":300,\"minPerOrder\":5,\"maxPerOrder\":120,\"streak\":{\"enabled\":true,\"dailyBonusPct\":0.05,\"maxPct\":0.25},\"seasonal\":{\"multiplier\":1.0},\"daily\":{\"softCap\":200,\"postSoftRatePct\":0.5,\"hardCap\":400},\"firstPurchaseBonus\":20}")
+  runes     Json     @default("{\"defs\":[],\"combos\":[],\"gacha\":{\"enabled\":false}}")
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model RuneDef {
+  id            String   @id @default(cuid())
+  canonicalId   String   @unique // rune_a, rune_b, etc.
+  displayName   String?
+  glyph         String?
+  lore          String?
+  printifyUPCs  String[] // Array of UPCs that map to this rune
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userRunes     UserRune[]
+  runeCombos    RuneComboMember[]
+
+  @@index([canonicalId])
+  @@index([isActive])
+}
+
+model RuneCombo {
+  id            String   @id @default(cuid())
+  comboId       String   @unique
+  members       String[] // Array of canonical rune IDs
+  revealCopy    String?
+  cosmeticBurst String?  // "small", "medium", "large"
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  members_rel   RuneComboMember[]
+
+  @@index([comboId])
+  @@index([isActive])
+}
+
+model RuneComboMember {
+  id          String    @id @default(cuid())
+  comboId     String
+  runeId      String
+  combo       RuneCombo @relation(fields: [comboId], references: [id], onDelete: Cascade)
+  rune        RuneDef   @relation(fields: [runeId], references: [id], onDelete: Cascade)
+
+  @@unique([comboId, runeId])
+  @@index([comboId])
+  @@index([runeId])
+}
+
+model UserRune {
+  id        String   @id @default(cuid())
+  userId    String
+  runeId    String
+  orderId   String?
+  acquiredAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rune      RuneDef  @relation(fields: [runeId], references: [id], onDelete: Cascade)
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, runeId])
+  @@index([userId, acquiredAt])
+  @@index([runeId])
+  @@index([orderId])
+}
+
+model EmailLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  orderId    String?
+  to         String
+  provider   String   @default("resend")
+  template   String
+  status     String   @default("pending")
+  meta       Json?
+  sentAt     DateTime?
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order      Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@index([sentAt])
+}
+
 enum OrderStatus {
   pending
   pending_mapping
@@ -425,6 +557,12 @@ enum LedgerType {
   earn
   spend
   adjust
+  burst_bonus
+  seasonal
+  purchase_bonus
+  first_purchase_bonus
+  milestone_bonus
+  combo_reveal
 }
 
 enum RewardKind {

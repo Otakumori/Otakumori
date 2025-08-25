@@ -2,6 +2,7 @@
   "name": "otakumori",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build:scripts": "tsc --project tsconfig.json --outDir dist --rootDir . lib/*.ts scripts/*.ts",
@@ -15,6 +16,7 @@
     "postinstall": "prisma generate",
     "db:seed": "prisma db seed",
     "db:seed:shop": "npx tsx scripts/seed-shop.ts",
+    "db:seed:runes": "npx tsx scripts/seed-runes.ts",
     "seed": "prisma db seed",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -50,7 +52,8 @@
     "api:health": "tsx scripts/api-health-check.ts",
     "api:test": "npm run api:health",
     "db:test": "tsx scripts/test-database.ts",
-    "pre-deploy": "npm run build && npm run api:health"
+    "pre-deploy": "npm run build && npm run api:health",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.31.8",

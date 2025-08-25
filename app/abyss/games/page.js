@@ -2,6 +2,7 @@
 
 import { useUser } from '@clerk/nextjs';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function GamesPage() {
   const { user, isLoaded } = useUser();
