@@ -233,7 +233,7 @@ export default function ThankYouPage() {
                     key={rune.id}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
+                    transition={{ delay: 0.8 + _index * 0.1 }}
                     className="rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-500/20 to-orange-500/20 p-6 transition-colors hover:border-amber-300/50"
                   >
                     <div className="text-center">
