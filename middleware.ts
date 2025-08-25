@@ -8,7 +8,7 @@ export default authMiddleware({
     '/shop(.*)',
     '/api/health(.*)',
     '/api/shop(.*)',
-    '/api/v1/shop(.*)',  // Add this for the v1 API
+    '/api/v1/shop(.*)', // Add this for the v1 API
     '/api/products(.*)',
     '/api/soapstones(.*)',
     '/api/blog(.*)',
@@ -18,19 +18,12 @@ export default authMiddleware({
     '/api/reviews(.*)',
     '/api/search(.*)',
     '/api/webhooks(.*)',
-    '/api/test-env',  // Add this for testing
+    '/api/system-check', // Add system diagnostics
+    '/api/metrics', // Add performance metrics
   ],
-  ignoredRoutes: [
-    '/api/webhooks/clerk',
-    '/api/webhooks/stripe',
-    '/api/webhooks/printify',
-  ],
+  ignoredRoutes: ['/api/webhooks/clerk', '/api/webhooks/stripe', '/api/webhooks/printify'],
 });
 
 export const config = {
-  matcher: [
-    '/((?!.+\\.[\\w]+$|_next).*)',
-    '/',
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };

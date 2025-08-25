@@ -46,7 +46,11 @@
     "assets:sync": "tsx scripts/assets.ts",
     "gen:asset": "tsx scripts/generate.ts",
     "gen:sfx": "tsx scripts/generate-sfx.ts",
-    "gen:pack": "tsx scripts/gen-pack.ts"
+    "gen:pack": "tsx scripts/gen-pack.ts",
+    "api:health": "tsx scripts/api-health-check.ts",
+    "api:test": "npm run api:health",
+    "db:test": "tsx scripts/test-database.ts",
+    "pre-deploy": "npm run build && npm run api:health"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.31.8",
@@ -166,6 +170,7 @@
     "rimraf": "^5.0.0",
     "tailwindcss": "^3.3.0",
     "ts-jest": "^29.1.2",
+    "tsx": "^4.20.5",
     "typescript": "^5.3.3"
   },
   "lint-staged": {
