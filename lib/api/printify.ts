@@ -49,6 +49,7 @@ export const PrintifyShopSchema = z.object({
 const getAuthHeaders = () => {
   const apiKey = process.env.PRINTIFY_API_KEY;
   if (!apiKey) {
+    console.error("PRINTIFY_API_KEY environment variable is not set");
     throw new Error("PRINTIFY_API_KEY environment variable is not set");
   }
   return { Authorization: `Bearer ${apiKey}` };
@@ -58,6 +59,7 @@ const getAuthHeaders = () => {
 const getShopId = () => {
   const shopId = process.env.PRINTIFY_SHOP_ID;
   if (!shopId) {
+    console.error("PRINTIFY_SHOP_ID environment variable is not set");
     throw new Error("PRINTIFY_SHOP_ID environment variable is not set");
   }
   return shopId;
@@ -65,67 +67,128 @@ const getShopId = () => {
 
 // API functions
 export async function getCatalog(page = 1, limit = 50) {
-  const shopId = getShopId();
-  const url = `${PRINTIFY_BASE}/shops/${shopId}/products.json?page=${page}&limit=${limit}`;
-  
-  return http.get(url, PrintifyCatalogSchema, {
-    headers: getAuthHeaders(),
-    timeoutMs: 15000,
-    retries: 2,
-    cache: "no-store",
-  });
+  try {
+    const shopId = getShopId();
+    const url = `${PRINTIFY_BASE}/shops/${shopId}/products.json?page=${page}&limit=${limit}`;
+    
+    console.log(`Fetching Printify catalog from: ${url}`);
+    console.log(`Shop ID: ${shopId}`);
+    console.log(`API Key present: ${!!process.env.PRINTIFY_API_KEY}`);
+
+    const result = await http.get(url, PrintifyCatalogSchema, {
+      headers: getAuthHeaders(),
+      timeoutMs: 15000,
+      retries: 2,
+      cache: "no-store",
+    });
+
+    console.log(`Printify catalog fetched successfully: ${result.data.length} products`);
+    return result;
+  } catch (error) {
+    console.error("Error fetching Printify catalog:", error);
+    throw error;
+  }
 }
 
 export async function getProduct(productId: string) {
-  const shopId = getShopId();
-  const url = `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}.json`;
-  
-  return http.get(url, PrintifyProductSchema, {
-    headers: getAuthHeaders(),
-    timeoutMs: 15000,
-    retries: 2,
-    cache: "no-store",
-  });
+  try {
+    const shopId = getShopId();
+    const url = `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}.json`;
+
+    return await http.get(url, PrintifyProductSchema, {
+      headers: getAuthHeaders(),
+      timeoutMs: 15000,
+      retries: 2,
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error(`Error fetching Printify product ${productId}:`, error);
+    throw error;
+  }
 }
 
 export async function getShopInfo() {
-  const shopId = getShopId();
-  const url = `${PRINTIFY_BASE}/shops/${shopId}.json`;
-  
-  return http.get(url, PrintifyShopSchema, {
-    headers: getAuthHeaders(),
-    timeoutMs: 10000,
-    retries: 1,
-    cache: "no-store",
-  });
+  try {
+    const shopId = getShopId();
+    const url = `${PRINTIFY_BASE}/shops/${shopId}.json`;
+
+    return await http.get(url, PrintifyShopSchema, {
+      headers: getAuthHeaders(),
+      timeoutMs: 10000,
+      retries: 1,
+      cache: "no-store",
+    });
+  } catch (error) {
+    console.error("Error fetching Printify shop info:", error);
+    throw error;
+  }
 }
 
 export async function publishProduct(productId: string) {
-  const shopId = getShopId();
-  const url = `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}/publish.json`;
-  
-  return http.post(url, z.object({ success: z.boolean() }), {}, {
-    headers: getAuthHeaders(),
-    timeoutMs: 20000,
-    retries: 2,
-  });
+  try {
+    const shopId = getShopId();
+    const url = `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}/publish.json`;
+
+    return await http.post(url, z.object({ success: z.boolean() }), {}, {
+      headers: getAuthHeaders(),
+      timeoutMs: 20000,
+      retries: 2,
+    });
+  } catch (error) {
+    console.error(`Error publishing Printify product ${productId}:`, error);
+    throw error;
+  }
 }
 
-// Health check function
+// Health check function with detailed diagnostics
 export async function checkPrintifyHealth() {
   try {
+    console.log("Starting Printify health check...");
+    console.log(`Environment check:`, {
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_ENV: process.env.VERCEL_ENVIRONMENT,
+      hasApiKey: !!process.env.PRINTIFY_API_KEY,
+      hasShopId: !!process.env.PRINTIFY_SHOP_ID,
+      apiKeyLength: process.env.PRINTIFY_API_KEY?.length || 0,
+      shopId: process.env.PRINTIFY_SHOP_ID || 'Not set'
+    });
+
+    // Test basic connectivity first
+    const testResponse = await fetch('https://api.printify.com/v1/health', {
+      method: 'GET',
+      cache: 'no-store'
+    });
+    
+    console.log(`Printify API connectivity test: ${testResponse.status} ${testResponse.statusText}`);
+
+    if (!testResponse.ok) {
+      return {
+        healthy: false,
+        error: `API connectivity failed: ${testResponse.status} ${testResponse.statusText}`,
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    // Test shop info
     const shopInfo = await getShopInfo();
+    console.log("Shop info retrieved successfully:", shopInfo);
+    
     return {
       healthy: true,
       shopId: shopInfo.id,
       shopTitle: shopInfo.title,
       timestamp: new Date().toISOString(),
+      connectivity: "OK",
+      shopAccess: "OK"
     };
   } catch (error) {
+    console.error("Printify health check failed:", error);
     return {
       healthy: false,
       error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString(),
+      connectivity: "Failed",
+      shopAccess: "Failed"
     };
   }
 }
