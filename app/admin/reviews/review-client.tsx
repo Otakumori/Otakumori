@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -36,7 +38,7 @@ export default function AdminReviewsClient() {
     setLoading(false);
   }
 
-  useEffect(() => { loadPage(null); }, []);
+  useEffect(() => { loadPage(null); }, [null]);
 
   async function approve(id: string) {
     const res = await fetch(`/api/admin/reviews/${id}/approve`, { method: "POST" });

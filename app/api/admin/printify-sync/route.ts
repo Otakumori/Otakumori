@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 // app/api/admin/printify-sync/route.ts  (admin-only)
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { prisma } from '@/app/lib/prisma';

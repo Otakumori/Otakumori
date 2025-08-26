@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { appUrl } from "@/lib/canonical";

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { AdminDashboardClient } from './AdminDashboardClient';

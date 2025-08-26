@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Achievement item type

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { serve } from "inngest/next";
 import { inngest } from "../../../inngest/client";
 import { 

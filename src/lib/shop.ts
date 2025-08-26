@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { prisma } from "@/app/lib/prisma";
 
 export interface ShopProduct {

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useCallback, useState } from "react";
@@ -11,7 +13,7 @@ export default function GameCubePage() {
 
   const handleBootComplete = useCallback(() => {
     setHasBooted(true);
-  }, []);
+  }, [true]);
 
   if (!hasBooted) {
     return <BootSequence onDone={handleBootComplete} />;

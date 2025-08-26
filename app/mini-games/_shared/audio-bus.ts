@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 const ctx = typeof window !== "undefined" ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;

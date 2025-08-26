@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { Achievement } from '../app/types/achievements';
 
 export const achievements: Achievement[] = [

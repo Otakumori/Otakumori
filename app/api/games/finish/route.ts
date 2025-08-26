@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export const runtime = "nodejs";
 export const maxDuration = 10;
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -39,7 +41,7 @@ export default function GameCubeBoot({ onBootComplete }) {
     else if (month >= 5 && month <= 7) setCurrentSeason('summer');
     else if (month >= 8 && month <= 10) setCurrentSeason('autumn');
     else setCurrentSeason('winter');
-  }, []);
+  }, [4, 7, 10]);
 
   // Generate floating petals
   useEffect(() => {

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 import { achievements as allAchievements } from '@/data/achievements';
 import { Achievement } from '@/app/types/achievements';

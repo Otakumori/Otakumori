@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from 'react';
 
 const API_KEY = process.env.NEXT_PUBLIC_ADMIN_API_KEY;

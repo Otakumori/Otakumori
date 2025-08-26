@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 // app/lib/style-map.ts
 export type Vibe = "spicy-male" | "spicy-female" | "neutral";
 

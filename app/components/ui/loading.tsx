@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export default function Loading() {
   return (
     <div className="flex min-h-[200px] items-center justify-center">

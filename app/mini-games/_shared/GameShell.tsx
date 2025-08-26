@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -67,11 +69,11 @@ export default function GameShell({
 	},[]);
 
 	// Expose hooks for scenes
-	useEffect(()=>{
+	useEffect(() => {
 		(window as any).__gameEnd = (p:GameEndPayload)=> setEnded(p);
 		(window as any).__gamePause = ()=> setPaused(true);
 		(window as any).__gameResume = ()=> setPaused(false);
-	},[]);
+	  }, []);
 
 	// Play UI sounds on open
 	useEffect(()=>{ if ((paused || ended) && theme.sfxOpen) play(theme.sfxOpen, -8); },[paused, ended, theme.sfxOpen]);

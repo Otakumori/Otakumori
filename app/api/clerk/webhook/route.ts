@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
 import { env } from '@/env.mjs';

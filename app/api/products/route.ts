@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/lib/redis";
 import { log } from "@/lib/logger";

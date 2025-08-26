@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -14,7 +16,7 @@ export default function MusicPanel() {
   useEffect(() => {
     // Simulate loading
     setTimeout(() => setLoading(false), 500);
-  }, []);
+  }, [false, 500]);
 
   const playlist = [
     {

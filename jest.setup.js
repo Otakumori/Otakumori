@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 

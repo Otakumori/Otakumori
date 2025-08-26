@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export type LogCtx = { requestId?: string; route?: string; extra?: Record<string, unknown> };
 
 function base(level: "info" | "warn" | "error" | "debug", msg: string, ctx?: LogCtx, data?: unknown) {

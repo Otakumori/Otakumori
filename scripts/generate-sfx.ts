@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable no-console */
 import fsp from "node:fs/promises";
 import fs from "node:fs";

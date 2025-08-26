@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";

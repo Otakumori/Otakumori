@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -77,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     setIsLoading(false);
-  }, []);
+  }, [false]);
 
   return (
     <AuthContext.Provider

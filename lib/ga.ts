@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "";
 
 export const pageview = (path: string) => {

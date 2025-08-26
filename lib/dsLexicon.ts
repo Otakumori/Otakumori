@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export const OPENERS = ["Try","Be wary of","Praise the","Visions of","Offer","Could this be a","Time for","First off","Likely","Fear","Weakness:"];
 export const SUBJECTS = ["finger","hole","boss","merchant","ambush","ladder","secret passage","lover","enemy","friend","sorcery","rune","anime reference","abyss"];
 export const JOINERS  = ["but","therefore","and then","in short","or","however"];

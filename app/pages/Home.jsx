@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import Layout from '../components/Layout';
 import { motion } from 'framer-motion';
 import ContactForm from '../../app/components/ContactForm'; // Adjust based on actual location

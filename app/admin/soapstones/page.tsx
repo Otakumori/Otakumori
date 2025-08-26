@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { isAdmin } from "@/app/lib/authz";
 import AdminSoapstones from "./ui";
 

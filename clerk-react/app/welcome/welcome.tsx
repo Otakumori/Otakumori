@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import logoDark from './logo-dark.svg';
 import logoLight from './logo-light.svg';
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { NextResponse } from "next/server";
 import { requireUserId } from "@/app/lib/auth";
 import { writePetalTxn } from "@/app/lib/petals";

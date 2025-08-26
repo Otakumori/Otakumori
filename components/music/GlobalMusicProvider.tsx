@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";

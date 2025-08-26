@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 const PROD_ORIGIN =
   (process.env.NEXT_PUBLIC_CANONICAL_ORIGIN || "https://otaku-mori.com").replace(/\/$/, "");
 

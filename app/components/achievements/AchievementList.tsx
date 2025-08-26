@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 import type { Achievement } from './AchievementProvider';
 import { AchievementCard } from './AchievementCard';

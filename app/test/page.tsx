@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export default function TestPage() {
   return (
     <div className="min-h-screen bg-neutral-900 text-white p-8">

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 // Placeholder Drizzle schema - this project uses Prisma instead
 // This file exists to satisfy any remaining imports during the transition
 

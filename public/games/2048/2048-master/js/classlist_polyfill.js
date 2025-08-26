@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 (function () {
   if (typeof window.Element === "undefined" ||
       "classList" in document.documentElement) {

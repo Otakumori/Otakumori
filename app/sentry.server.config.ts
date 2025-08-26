@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({

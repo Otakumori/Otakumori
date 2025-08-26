@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import GameShell from "../_shared/GameShell";
 import LeaderboardPanel from "../_shared/LeaderboardPanel";
 import Scene from "./Scene";

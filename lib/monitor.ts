@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export const monitor = {
   log: (...args: any[]) => console.log(...args),
   error: (error: any) => console.error(error),

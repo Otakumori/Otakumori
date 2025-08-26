@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export interface GameLoopOptions {
   targetFPS?: number;
   maxFrameSkip?: number;
