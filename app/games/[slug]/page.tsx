@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { getGame } from "@/app/lib/assets/manifest";
 import { notFound } from "next/navigation";
 

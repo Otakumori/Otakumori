@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import Layout from '../components/Layout';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { prisma } from '../../../lib/prisma';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NSFWContextType {

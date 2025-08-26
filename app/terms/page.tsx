@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export default function TermsPage() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 py-10">

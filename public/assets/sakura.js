@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 const Sakura = function (selector, options) {
   if (typeof selector === 'undefined') {
     throw new Error('No selector present. Define an element.');

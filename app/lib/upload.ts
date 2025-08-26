@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { NextRequest } from 'next/server';

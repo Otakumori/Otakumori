@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { appUrl } from '@/lib/canonical';

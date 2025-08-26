@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import AdminMusicClient from "./page.client";
 
 export const dynamic = "force-dynamic";

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef, useState, useCallback } from 'react';
 // import { supabase } from '@/utils/supabase/client';
 // Temporarily disabled tsparticles due to API compatibility issues

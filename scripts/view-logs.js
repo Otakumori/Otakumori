@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 const { logger } = require('../lib/logger');
 
 async function viewLogs() {

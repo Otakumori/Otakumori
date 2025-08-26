@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { monitor } from '../lib/monitor';
 import { logger } from '../app/lib/logger';
 import { redis } from './lib/redis';

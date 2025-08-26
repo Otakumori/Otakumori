@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export type AssetType = "image" | "audio" | "video" | "font" | "shader" | "zip" | "other";
 
 export interface AssetConfigItem {

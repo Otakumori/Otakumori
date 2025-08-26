@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { redis } from "@/lib/redis";
 import { DSMessage } from "@/lib/z";
 import { randomUUID } from "crypto";

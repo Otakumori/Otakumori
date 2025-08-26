@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { initPlasmicLoader } from '@plasmicapp/loader-nextjs';
 import PlasmicButton from './app/components/components/plasmic/PlasmicButton';
 

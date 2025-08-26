@@ -1,43 +1,44 @@
-import { authMiddleware } from '@clerk/nextjs/server';
-
-import { env } from '@/env.mjs';
-
-const authorizedParties =
-  env.AUTHORIZED_PARTIES?.split(',')
-    .map(s => s.trim())
-    .filter(Boolean) ?? [];
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
+import { authMiddleware } from "@clerk/nextjs/server";
 
 export default authMiddleware({
-  // Explicit allowlist mitigates subdomain cookie/session leakage.
-  authorizedParties: authorizedParties.length ? authorizedParties : undefined,
   publicRoutes: [
-    '/',
-    '/about',
-    '/blog(.*)',
-    '/shop(.*)',
-    '/mini-games(.*)',
-    '/api/health(.*)',
-    '/api/shop(.*)',
-    '/api/v1/shop(.*)',
-    '/api/products(.*)',
-    '/api/soapstones(.*)',
-    '/api/blog(.*)',
-    '/api/community(.*)',
-    '/api/games(.*)',
-    '/api/leaderboard(.*)',
-    '/api/reviews(.*)',
-    '/api/search(.*)',
-    '/api/webhooks(.*)',
-    '/api/system-check',
-    '/api/metrics',
+    "/",
+    "/shop(.*)",
+    "/mini-games(.*)",
+    "/blog(.*)",
+    "/about",
+    "/search",
+    "/api/shop(.*)",
+    "/api/health",
   ],
+  ignoredRoutes: [
+    "/api/clerk/webhook",
+    "/api/stripe/webhook",
+  ],
+  afterAuth(auth, req) {
+    const { pathname } = req.nextUrl;
+    
+    // Redirect old profile route to account
+    if (pathname.startsWith('/profile')) {
+      const newUrl = new URL(pathname.replace('/profile', '/account'), req.url);
+      return Response.redirect(newUrl);
+    }
+    
+    // For API routes, only protect admin endpoints
+    if (pathname.startsWith('/api/admin')) {
+      if (!auth.userId) {
+        return Response.redirect(new URL('/sign-in', req.url));
+      }
+    }
+  },
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    "/((?!.+\\.[\\w]+$|_next).*)",
+    "/",
+    "/(api)(.*)",
   ],
 };

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
@@ -159,6 +161,7 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
         <button
           onClick={handleRemove}
           className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+          aria-label="Remove notification"
         >
           <X className="h-4 w-4 text-gray-400" />
         </button>

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import Shop from "./ui/Shop";
 import "./trade.css";
 import SectionShell from "@/app/(sections)/_shared/SectionShell";

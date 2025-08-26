@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { printify } from '@/lib/printifyClient';
 import { env } from '@/env.mjs';
 

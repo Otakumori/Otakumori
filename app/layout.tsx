@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';

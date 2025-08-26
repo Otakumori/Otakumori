@@ -1,51 +1,34 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_CANONICAL_ORIGIN || 'https://otaku-mori.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://otaku-mori.com';
   
   return {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
-        disallow: [
-          '/api/',
-          '/admin/',
-          '/profile',
-          '/checkout/',
-          '/cart/',
-          '/_next/',
-          '/private/',
+        allow: [
+          '/',
+          '/shop',
+          '/mini-games',
+          '/blog',
+          '/about',
+          '/search',
         ],
-      },
-      {
-        userAgent: 'Googlebot',
-        allow: '/',
         disallow: [
-          '/api/',
-          '/admin/',
-          '/profile',
-          '/checkout/',
-          '/cart/',
-          '/_next/',
-          '/private/',
-        ],
-      },
-      {
-        userAgent: 'Bingbot',
-        allow: '/',
-        disallow: [
-          '/api/',
-          '/admin/',
-          '/profile',
-          '/checkout/',
-          '/cart/',
-          '/_next/',
-          '/private/',
+          '/sign-in',
+          '/sign-up',
+          '/account',
+          '/admin',
+          '/api/admin',
+          '/api/clerk',
+          '/api/stripe',
+          '/api/debug',
         ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
   };
 }

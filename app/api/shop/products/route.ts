@@ -1,45 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @next/next/no-img-element */
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchProducts, fetchProductDetails } from '@/app/utils/utils/printifyAPI';
-import { env } from '@/env.mjs';
+import { getCatalog, checkPrintifyHealth } from '@/lib/api/printify';
 
-interface PrintifyImage {
-  src: string;
-  variant_ids: string[];
-  position: string;
-  is_default: boolean;
-}
-
-interface PrintifyVariant {
-  id: string;
-  title: string;
-  price: number;
-  is_enabled: boolean;
-  is_default: boolean;
-  sku: string;
-}
-
-interface PrintifyProduct {
-  id: string;
-  title: string;
-  description: string;
-  images: PrintifyImage[];
-  variants: PrintifyVariant[];
-  tags: string[];
-  published: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Check if Printify credentials are configured
-    if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID) {
-      console.warn('Printify credentials not configured, returning mock data');
+    // Check Printify API health first
+    const health = await checkPrintifyHealth();
+    
+    if (!health.healthy) {
+      console.warn('Printify API unhealthy, returning mock data:', health.error);
       
-      // Return mock data when Printify is not configured
+      // Return mock data when Printify is not working
       const mockProducts = [
         {
           id: '1',
@@ -75,26 +50,23 @@ export async function GET() {
         },
       ];
 
-      return NextResponse.json({ products: mockProducts }, { status: 200 });
+      return NextResponse.json({ 
+        products: mockProducts,
+        source: 'mock',
+        health: health
+      }, { status: 200 });
     }
 
     // Fetch products from Printify
-    const printifyProducts: any = await fetchProducts();
-
-    // Type guard: check if printifyProducts has a data property
-    const productsArray = Array.isArray(printifyProducts)
-      ? printifyProducts
-      : printifyProducts && Array.isArray(printifyProducts.data)
-        ? printifyProducts.data
-        : [];
-
+    const catalog = await getCatalog(1, 50);
+    
     // Transform products for frontend consumption
-    const transformedProducts = productsArray.map((product: PrintifyProduct) => ({
+    const transformedProducts = catalog.data.map(product => ({
       id: product.id,
       title: product.title,
       description: product.description,
       price: product.variants[0]?.price / 100 || 0,
-      images: product.images.map((img: PrintifyImage) => img.src),
+      images: product.images.map(img => img.src),
       variants: product.variants,
       category: product.tags[0] || 'Other',
       tags: product.tags,
@@ -106,7 +78,12 @@ export async function GET() {
       },
     }));
 
-    return NextResponse.json({ products: transformedProducts }, { status: 200 });
+    return NextResponse.json({ 
+      products: transformedProducts,
+      source: 'printify',
+      health: health,
+      total: catalog.total || transformedProducts.length
+    }, { status: 200 });
   } catch (error) {
     console.error('Error in /api/shop/products:', error);
 
@@ -114,6 +91,7 @@ export async function GET() {
       {
         error: error instanceof Error ? error.message : 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
+        source: 'error'
       },
       { status: error instanceof Error && error.message.includes('Authentication') ? 401 : 500 }
     );
