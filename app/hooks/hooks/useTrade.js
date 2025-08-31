@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState } from 'react';
 
 export default function useTrade() {
   const [trades, setTrades] = useState([]);
 
-  const initiateTrade = item => {
+  const initiateTrade = (item) => {
     setTrades([...trades, item]);
   };
 

@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { getShopProducts, ShopProduct, ShopFilters, ShopSort } from "@/src/lib/shop";
-import { addToCart } from "@/src/lib/cart";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { getShopProducts, ShopProduct, ShopFilters, ShopSort } from '@/src/lib/shop';
+import { addToCart } from '@/src/lib/cart';
 
 interface ShopProductsProps {
   category?: string;
@@ -28,8 +28,8 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
 
         // Parse sort parameter
         const sortMap: Record<string, ShopSort> = {
-          'newest': { field: 'createdAt', direction: 'desc' },
-          'oldest': { field: 'createdAt', direction: 'asc' },
+          newest: { field: 'createdAt', direction: 'desc' },
+          oldest: { field: 'createdAt', direction: 'asc' },
           'name-asc': { field: 'name', direction: 'asc' },
           'name-desc': { field: 'name', direction: 'desc' },
           'price-low': { field: 'name', direction: 'asc' }, // We'll sort by price in the query
@@ -130,7 +130,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
         <p className="text-sm text-white/60">
           Showing {products.length} of {total} products
         </p>
-        
+
         {/* Sort Options */}
         <select
           value={sort}
@@ -155,8 +155,11 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => {
           const defaultVariant = product.variants[0];
-          const imageUrl = product.primaryImageUrl || defaultVariant?.previewImageUrl || '/images/products/placeholder.svg';
-          
+          const imageUrl =
+            product.primaryImageUrl ||
+            defaultVariant?.previewImageUrl ||
+            '/images/products/placeholder.svg';
+
           return (
             <div key={product.id} className="group glass neon-edge p-4 rounded-lg">
               <Link href={`/shop/product/${product.id}`} className="block">
@@ -174,16 +177,16 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
                 <h3 className="font-semibold text-white mb-2 line-clamp-2 group-hover:text-pink-400 transition-colors">
                   {product.name}
                 </h3>
-                
+
                 {product.description && (
-                  <p className="text-sm text-white/60 mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
+                  <p className="text-sm text-white/60 mb-3 line-clamp-2">{product.description}</p>
                 )}
 
                 {/* Price */}
                 <div className="text-lg font-bold text-pink-400 mb-3">
-                  {defaultVariant ? formatPrice(defaultVariant.priceCents, defaultVariant.currency) : 'Price not available'}
+                  {defaultVariant
+                    ? formatPrice(defaultVariant.priceCents, defaultVariant.currency)
+                    : 'Price not available'}
                 </div>
 
                 {/* Stock Status */}
@@ -226,11 +229,11 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
               Previous
             </Link>
           )}
-          
+
           <span className="px-4 py-2 text-white/60">
             Page {page} of {Math.ceil(total / 24)}
           </span>
-          
+
           {hasMore && (
             <Link
               href={`/shop?${new URLSearchParams({

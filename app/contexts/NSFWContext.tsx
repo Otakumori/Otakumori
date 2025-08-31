@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NSFWContextType {
@@ -58,8 +58,8 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
               min={0}
               max={120}
               className="mb-4 w-20 rounded bg-pink-400/10 px-2 text-pink-100"
-              onKeyDown={e => e.stopPropagation()}
-              onChange={e => verifyAge(Number(e.target.value))}
+              onKeyDown={(e) => e.stopPropagation()}
+              onChange={(e) => verifyAge(Number(e.target.value))}
             />
             <button
               onClick={() => setShowModal(false)}

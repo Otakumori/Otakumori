@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -14,11 +14,14 @@ export async function GET() {
     const count = Array.isArray(res.data) ? res.data.length : undefined;
     return NextResponse.json({ ok: true, shops: count });
   } catch (e: any) {
-    return NextResponse.json({
-      ok: false,
-      status: e?.response?.status,
-      data: e?.response?.data,
-      tokenMasked: mask(process.env.PRINTIFY_API_KEY),
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        status: e?.response?.status,
+        data: e?.response?.data,
+        tokenMasked: mask(process.env.PRINTIFY_API_KEY),
+      },
+      { status: 500 },
+    );
   }
 }

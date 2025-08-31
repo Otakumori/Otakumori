@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -15,7 +15,7 @@ export default function QuickActions() {
     <div className="rounded-lg border border-pink-900/40 bg-black/80 p-4 shadow-2xl">
       <h2 className="mb-4 text-xl font-bold text-pink-400">Quick Actions</h2>
       <div className="space-y-2">
-        {actions.map(action => (
+        {actions.map((action) => (
           <motion.button
             key={action.id}
             whileHover={{ scale: 1.05 }}

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -34,25 +34,25 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
       }
 
       setShowScanlines(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setStage('logo');
       setShowLogo(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       setShowLogo(false);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       setStage('3d_scene');
       setShowCube3D(true);
       setShowParticles3D(true);
-      await new Promise(resolve => setTimeout(resolve, 4000));
+      await new Promise((resolve) => setTimeout(resolve, 4000));
 
       setStage('interface');
       setShowCube3D(false);
       setShowParticles3D(false);
       setShowInterface(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       onBootComplete?.();
     };

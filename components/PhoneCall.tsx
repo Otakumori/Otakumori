@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -44,7 +44,7 @@ export const PhoneCall = ({ character, messages, onComplete }: PhoneCallProps) =
 
     const typingInterval = setInterval(() => {
       if (currentIndex < text.length) {
-        setDisplayedText(prev => prev + text[currentIndex]);
+        setDisplayedText((prev) => prev + text[currentIndex]);
         currentIndex++;
         playSound('click');
         vibrate('light');
@@ -54,7 +54,7 @@ export const PhoneCall = ({ character, messages, onComplete }: PhoneCallProps) =
 
         // Wait before showing next message
         setTimeout(() => {
-          setCurrentMessageIndex(prev => prev + 1);
+          setCurrentMessageIndex((prev) => prev + 1);
         }, 1000);
       }
     }, delay);

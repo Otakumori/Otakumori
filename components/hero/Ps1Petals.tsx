@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -72,16 +72,16 @@ export function Ps1Petals({
         swayAmount: (Math.random() - 0.5) * 2,
       };
 
-      setPetals(prev => [...prev, newPetal]);
+      setPetals((prev) => [...prev, newPetal]);
     },
-    [petals.length, maxPetals, spawnRate, snapPixels]
+    [petals.length, maxPetals, spawnRate, snapPixels],
   );
 
   // Collect petal
   const collectPetal = useCallback(
     async (petalId: string) => {
-      setPetals(prev =>
-        prev.map(petal => (petal.id === petalId ? { ...petal, collected: true } : petal))
+      setPetals((prev) =>
+        prev.map((petal) => (petal.id === petalId ? { ...petal, collected: true } : petal)),
       );
 
       try {
@@ -92,10 +92,10 @@ export function Ps1Petals({
 
       // Remove petal after collection animation
       setTimeout(() => {
-        setPetals(prev => prev.filter(petal => petal.id !== petalId));
+        setPetals((prev) => prev.filter((petal) => petal.id !== petalId));
       }, 800);
     },
-    [onPetalCollected]
+    [onPetalCollected],
   );
 
   // Animation loop
@@ -103,8 +103,8 @@ export function Ps1Petals({
     if (!isVisible || prefersReducedMotion) return;
 
     const animate = () => {
-      setPetals(prev =>
-        prev.map(petal => {
+      setPetals((prev) =>
+        prev.map((petal) => {
           if (petal.collected) return petal;
 
           const time = Date.now() * 0.001;
@@ -116,11 +116,11 @@ export function Ps1Petals({
             y: snapToGrid(petal.y - petal.driftSpeed),
             rotation: snapToGrid(petal.rotation + (prefersReducedMotion ? 0.5 : 1)),
           };
-        })
+        }),
       );
 
       // Remove petals that go off-screen
-      setPetals(prev => prev.filter(petal => petal.y > -10));
+      setPetals((prev) => prev.filter((petal) => petal.y > -10));
 
       // Auto-spawn if no petals
       if (petals.length < maxPetals * 0.3) {
@@ -179,7 +179,7 @@ export function Ps1Petals({
   return (
     <div className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
       <AnimatePresence>
-        {petals.map(petal => (
+        {petals.map((petal) => (
           <motion.div
             key={petal.id}
             className="pointer-events-auto absolute cursor-pointer"

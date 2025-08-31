@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,32 +21,32 @@ export default function MusicPanel() {
   const playlist = [
     {
       id: 1,
-      title: "Sakura Dreams",
-      artist: "Anime OST",
-      duration: "3:45",
-      genre: "Ambient"
+      title: 'Sakura Dreams',
+      artist: 'Anime OST',
+      duration: '3:45',
+      genre: 'Ambient',
     },
     {
       id: 2,
-      title: "Neon Nights",
-      artist: "Cyberpunk Beats",
-      duration: "4:12",
-      genre: "Electronic"
+      title: 'Neon Nights',
+      artist: 'Cyberpunk Beats',
+      duration: '4:12',
+      genre: 'Electronic',
     },
     {
       id: 3,
-      title: "Cherry Blossom Waltz",
-      artist: "Classical Fusion",
-      duration: "5:23",
-      genre: "Classical"
+      title: 'Cherry Blossom Waltz',
+      artist: 'Classical Fusion',
+      duration: '5:23',
+      genre: 'Classical',
     },
     {
       id: 4,
-      title: "Digital Rain",
-      artist: "Matrix Vibes",
-      duration: "3:58",
-      genre: "Synthwave"
-    }
+      title: 'Digital Rain',
+      artist: 'Matrix Vibes',
+      duration: '3:58',
+      genre: 'Synthwave',
+    },
   ];
 
   const togglePlay = () => {
@@ -108,7 +108,7 @@ export default function MusicPanel() {
             >
               <SkipBack className="h-6 w-6 text-white" />
             </button>
-            
+
             <button
               onClick={togglePlay}
               className="p-4 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors"
@@ -119,7 +119,7 @@ export default function MusicPanel() {
                 <Play className="h-8 w-8 text-white" />
               )}
             </button>
-            
+
             <button
               onClick={nextTrack}
               className="p-3 rounded-full bg-neutral-800 hover:bg-neutral-700 transition-colors"
@@ -132,7 +132,7 @@ export default function MusicPanel() {
           <div className="w-full bg-neutral-800 rounded-full h-2 mb-4">
             <div className="bg-purple-500 h-2 rounded-full w-1/3"></div>
           </div>
-          
+
           <div className="flex justify-between text-sm text-neutral-400">
             <span>1:23</span>
             <span>{playlist[currentTrack].duration}</span>
@@ -148,7 +148,7 @@ export default function MusicPanel() {
               View All
             </button>
           </div>
-          
+
           <div className="space-y-3">
             {playlist.map((track, index) => (
               <div
@@ -173,7 +173,7 @@ export default function MusicPanel() {
                     <p className="text-sm text-neutral-400">{track.artist}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-neutral-400">{track.duration}</span>
                   <button className="p-2 rounded hover:bg-neutral-700 transition-colors">
@@ -231,8 +231,8 @@ export default function MusicPanel() {
         <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">🎵 Full Music Experience Coming Soon</h2>
           <p className="text-neutral-300 mb-6">
-            We're working on bringing you a complete music streaming experience with 
-            custom playlists, music discovery, and social features!
+            We're working on bringing you a complete music streaming experience with custom
+            playlists, music discovery, and social features!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

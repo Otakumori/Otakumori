@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import Shop from "./ui/Shop";
-import "./trade.css";
-import SectionShell from "@/app/(sections)/_shared/SectionShell";
+/* eslint-disable-line @next/next/no-img-element */
+import Shop from './ui/Shop';
+import './trade.css';
+import SectionShell from '@/app/(sections)/_shared/SectionShell';
 
-export const metadata = { title: "Trade Center" };
+export const metadata = { title: 'Trade Center' };
 
-export default function TradePage(){
+export default function TradePage() {
   return (
     <SectionShell title="Trade Center" subtitle="Runes & Petals">
       <div className="p-4">

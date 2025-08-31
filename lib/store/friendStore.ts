@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { create } from 'zustand';
 
 interface Friend {
@@ -27,29 +27,29 @@ interface FriendStoreState {
   toggleFavorite: (friendId: string) => void;
 }
 
-export const useFriendStore = create<FriendStoreState>(set => ({
+export const useFriendStore = create<FriendStoreState>((set) => ({
   friends: [],
-  setFriends: friends => set({ friends }),
+  setFriends: (friends) => set({ friends }),
   friendRequests: [],
-  acceptFriendRequest: requestId =>
-    set(state => {
-      const request = state.friendRequests.find(r => r.id === requestId);
+  acceptFriendRequest: (requestId) =>
+    set((state) => {
+      const request = state.friendRequests.find((r) => r.id === requestId);
       if (!request) return state;
       return {
-        friendRequests: state.friendRequests.map(r =>
-          r.id === requestId ? { ...r, status: 'accepted' } : r
+        friendRequests: state.friendRequests.map((r) =>
+          r.id === requestId ? { ...r, status: 'accepted' } : r,
         ),
         friends: [...state.friends, request.fromUser],
       };
     }),
-  rejectFriendRequest: requestId =>
-    set(state => ({
-      friendRequests: state.friendRequests.map(r =>
-        r.id === requestId ? { ...r, status: 'declined' } : r
+  rejectFriendRequest: (requestId) =>
+    set((state) => ({
+      friendRequests: state.friendRequests.map((r) =>
+        r.id === requestId ? { ...r, status: 'declined' } : r,
       ),
     })),
-  toggleFavorite: friendId =>
-    set(state => ({
-      friends: state.friends.map(f => (f.id === friendId ? { ...f, favorite: !f.favorite } : f)),
+  toggleFavorite: (friendId) =>
+    set((state) => ({
+      friends: state.friends.map((f) => (f.id === friendId ? { ...f, favorite: !f.favorite } : f)),
     })),
 }));

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -18,7 +18,7 @@ export async function GET() {
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -61,7 +61,7 @@ export async function GET() {
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             error: `Missing required field: ${field}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             error: `Invalid value for ${field}: must be a positive number`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'Min per order cannot be greater than max per order',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             error: 'Daily bonus percentage must be between 0 and 1',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             error: 'Max streak percentage must be between 0 and 1',
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'Seasonal multiplier must be between 0.1 and 5',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'Soft cap cannot be greater than hard cap',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -201,7 +201,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'Post-soft cap rate must be between 0 and 1',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,54 +1,91 @@
-.hub-root { position: relative; min-height: 100svh; color: #fff; }
+.hub-root {
+  position: relative;
+  min-height: 100svh;
+  color: #fff;
+}
 .hub-topbar {
-  position: absolute; inset-inline: 0; top: 0;
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 16px; z-index: 10;
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  z-index: 10;
   backdrop-filter: blur(4px);
 }
-.hub-brand { font-weight: 700; letter-spacing: .12em; opacity: .9; }
-.hub-right { display: flex; gap: 8px; }
+.hub-brand {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+.hub-right {
+  display: flex;
+  gap: 8px;
+}
 .hub-btn {
-  border: 1px solid rgba(255,255,255,.15);
-  background: rgba(0,0,0,.3);
-  padding: 6px 10px; border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 10px;
+  border-radius: 10px;
 }
 .hub-stage {
-  position: absolute; inset-inline: 0;
-  top: 20svh; bottom: 4svh; /* lower third placement */
+  position: absolute;
+  inset-inline: 0;
+  top: 20svh;
+  bottom: 4svh; /* lower third placement */
 }
 
 /* Glassmorphism chips for front selector */
 .gc-chip {
-  position: absolute; transform: translate(-50%, -50%);
-  pointer-events: auto; display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: 14px;
-  border: 1px solid rgba(255,255,255,.18);
-  background: rgba(16,14,22,.55);
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(16, 14, 22, 0.55);
   backdrop-filter: blur(10px) saturate(1.05);
-  box-shadow: 0 8px 30px rgba(255,183,197,.12), inset 0 1px 0 rgba(255,255,255,.06);
-  color: #fff; font-size: 14px;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  box-shadow:
+    0 8px 30px rgba(255, 183, 197, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 14px;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
   text-decoration: none;
 }
-.gc-chip:hover { 
-  transform: translate(-50%, -50%) scale(1.03); 
-  border-color: rgba(255,183,197,.45); 
-  box-shadow: 0 14px 50px rgba(255,183,197,.2); 
+.gc-chip:hover {
+  transform: translate(-50%, -50%) scale(1.03);
+  border-color: rgba(255, 183, 197, 0.45);
+  box-shadow: 0 14px 50px rgba(255, 183, 197, 0.2);
 }
-.gc-chip.hot { 
-  border-color: rgba(255,183,197,.55); 
-  box-shadow: 0 16px 60px rgba(255,183,197,.28); 
+.gc-chip.hot {
+  border-color: rgba(255, 183, 197, 0.55);
+  box-shadow: 0 16px 60px rgba(255, 183, 197, 0.28);
 }
-.gc-chip-ico { 
-  width: 18px; height: 18px; 
-  opacity: .9; 
-  display: flex; 
-  align-items: center; 
+.gc-chip-ico {
+  width: 18px;
+  height: 18px;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
   justify-content: center;
   font-size: 16px;
 }
-.gc-chip-label { letter-spacing: .01em; }
-.gc-chip--drawer { font-size: 12px; padding: 6px 10px; opacity: .9; }
+.gc-chip-label {
+  letter-spacing: 0.01em;
+}
+.gc-chip--drawer {
+  font-size: 12px;
+  padding: 6px 10px;
+  opacity: 0.9;
+}
 
 /* Subtle ripple/line from chip toward screen center */
 .gc-ripple {
@@ -59,21 +96,34 @@
   height: 2px;
   width: 60px; /* default; overridden inline */
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(255,183,197,.6), rgba(255,183,197,0));
-  filter: drop-shadow(0 0 6px rgba(255,183,197,.25));
-  opacity: .85;
+  background: linear-gradient(90deg, rgba(255, 183, 197, 0.6), rgba(255, 183, 197, 0));
+  filter: drop-shadow(0 0 6px rgba(255, 183, 197, 0.25));
+  opacity: 0.85;
   animation: gc-pulse 1.8s ease-in-out infinite;
 }
 
 @keyframes gc-pulse {
-  0% { opacity: .3; }
-  50% { opacity: .9; }
-  100% { opacity: .3; }
+  0% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.3;
+  }
 }
 
 /* Reduced motion: pin chips, no ripple */
 @media (prefers-reduced-motion: reduce) {
-  .gc-chip { transition: none; }
-  .gc-chip:hover { transform: translate(-50%, -50%); box-shadow: none; }
-  .gc-ripple { display: none; }
+  .gc-chip {
+    transition: none;
+  }
+  .gc-chip:hover {
+    transform: translate(-50%, -50%);
+    box-shadow: none;
+  }
+  .gc-ripple {
+    display: none;
+  }
 }

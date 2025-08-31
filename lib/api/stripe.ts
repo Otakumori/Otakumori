@@ -1,9 +1,10 @@
-import Stripe from "stripe";
-import { z } from "zod";
+import Stripe from 'stripe';
+import { z } from 'zod';
+import { env } from '@/env';
 
 // Initialize Stripe client
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16',
 });
 
 // Zod schemas for Stripe webhook events
@@ -47,12 +48,14 @@ export const StripePaymentIntentSchema = z.object({
 export async function verifyWebhookSignature(
   payload: string,
   signature: string,
-  secret: string
+  secret: string,
 ): Promise<Stripe.Event> {
   try {
     return stripe.webhooks.constructEvent(payload, signature, secret);
   } catch (error) {
-    throw new Error(`Webhook signature verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Webhook signature verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 }
 
@@ -124,7 +127,7 @@ export async function checkStripeHealth() {
   } catch (error) {
     return {
       healthy: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
     };
   }

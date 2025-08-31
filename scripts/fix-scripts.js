@@ -9,18 +9,18 @@ console.log('🔧 Fixing script files...');
 function findScriptFiles(dir) {
   const files = [];
   const items = fs.readdirSync(dir);
-  
+
   for (const item of items) {
     const fullPath = path.join(dir, item);
     const stat = fs.statSync(fullPath);
-    
+
     if (stat.isDirectory() && !item.startsWith('.') && item !== 'node_modules') {
       files.push(...findScriptFiles(fullPath));
     } else if (item.endsWith('.ts') || item.endsWith('.js')) {
       files.push(fullPath);
     }
   }
-  
+
   return files;
 }
 
@@ -32,7 +32,7 @@ function fixScriptFile(content, filePath) {
     content = content.replace(/\/\* eslint-disable[^*]*\*\/\n?/g, '');
     return { content, modified: true };
   }
-  
+
   return { content, modified: false };
 }
 
@@ -41,14 +41,14 @@ function main() {
   try {
     const projectRoot = process.cwd();
     const files = findScriptFiles(projectRoot);
-    
+
     let totalFixed = 0;
-    
+
     for (const file of files) {
       try {
         const content = fs.readFileSync(file, 'utf8');
         const result = fixScriptFile(content, file);
-        
+
         if (result.modified) {
           fs.writeFileSync(file, result.content, 'utf8');
           totalFixed++;
@@ -58,9 +58,8 @@ function main() {
         console.log(`⚠️  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
       }
     }
-    
+
     console.log(`\n🎉 Fixed ${totalFixed} script files!`);
-    
   } catch (error) {
     console.error('❌ Error:', error.message);
     process.exit(1);

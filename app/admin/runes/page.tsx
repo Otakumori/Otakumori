@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -194,7 +194,7 @@ export default function AdminRunesPage() {
             </div>
 
             <div className="space-y-4">
-              {runes.map(rune => (
+              {runes.map((rune) => (
                 <motion.div
                   key={rune.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -270,7 +270,7 @@ export default function AdminRunesPage() {
             </div>
 
             <div className="space-y-4">
-              {combos.map(combo => (
+              {combos.map((combo) => (
                 <motion.div
                   key={combo.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -364,7 +364,7 @@ export default function AdminRunesPage() {
 
                 <ComboForm
                   combo={editingCombo}
-                  availableRunes={runes.map(r => r.canonicalId)}
+                  availableRunes={runes.map((r) => r.canonicalId)}
                   onSave={saveCombo}
                   onCancel={() => {
                     setShowComboForm(false);
@@ -424,14 +424,14 @@ function RuneForm({
         <label className="mb-2 block text-sm font-medium text-neutral-300">Canonical ID</label>
         <select
           value={formData.canonicalId}
-          onChange={e =>
+          onChange={(e) =>
             setFormData({ ...formData, canonicalId: e.target.value as CanonicalRuneId })
           }
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           required
           aria-label="Select canonical rune ID"
         >
-          {Object.keys(DEFAULT_RUNE_DISPLAYS).map(id => (
+          {Object.keys(DEFAULT_RUNE_DISPLAYS).map((id) => (
             <option key={id} value={id}>
               {id} - {DEFAULT_RUNE_DISPLAYS[id as CanonicalRuneId].name}
             </option>
@@ -446,7 +446,7 @@ function RuneForm({
         <input
           type="text"
           value={formData.displayName || ''}
-          onChange={e => setFormData({ ...formData, displayName: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           placeholder="Custom name for this rune"
         />
@@ -457,7 +457,7 @@ function RuneForm({
         <input
           type="text"
           value={formData.glyph || ''}
-          onChange={e => setFormData({ ...formData, glyph: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, glyph: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           placeholder="Symbol or emoji"
         />
@@ -467,7 +467,7 @@ function RuneForm({
         <label className="mb-2 block text-sm font-medium text-neutral-300">Lore (optional)</label>
         <textarea
           value={formData.lore || ''}
-          onChange={e => setFormData({ ...formData, lore: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, lore: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           rows={3}
           placeholder="Mysterious description..."
@@ -481,12 +481,12 @@ function RuneForm({
         <input
           type="text"
           value={formData.printifyUPCs?.join(', ') || ''}
-          onChange={e =>
+          onChange={(e) =>
             setFormData({
               ...formData,
               printifyUPCs: e.target.value
                 .split(',')
-                .map(s => s.trim())
+                .map((s) => s.trim())
                 .filter(Boolean),
             })
           }
@@ -500,7 +500,7 @@ function RuneForm({
           type="checkbox"
           id="isActive"
           checked={formData.isActive}
-          onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
+          onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
           className="rounded border-neutral-600 bg-neutral-800 text-pink-500"
         />
         <label htmlFor="isActive" className="text-sm text-neutral-300">
@@ -572,7 +572,7 @@ function ComboForm({
         <input
           type="text"
           value={formData.comboId}
-          onChange={e => setFormData({ ...formData, comboId: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, comboId: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           placeholder="e.g., sakura_power"
           required
@@ -582,12 +582,12 @@ function ComboForm({
       <div>
         <label className="mb-2 block text-sm font-medium text-neutral-300">Required Runes</label>
         <div className="max-h-32 space-y-2 overflow-y-auto">
-          {availableRunes.map(runeId => (
+          {availableRunes.map((runeId) => (
             <label key={runeId} className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={formData.members?.includes(runeId as CanonicalRuneId)}
-                onChange={e => {
+                onChange={(e) => {
                   const currentMembers = formData.members || [];
                   if (e.target.checked) {
                     setFormData({
@@ -597,7 +597,7 @@ function ComboForm({
                   } else {
                     setFormData({
                       ...formData,
-                      members: currentMembers.filter(m => m !== runeId),
+                      members: currentMembers.filter((m) => m !== runeId),
                     });
                   }
                 }}
@@ -615,7 +615,7 @@ function ComboForm({
         </label>
         <textarea
           value={formData.revealCopy || ''}
-          onChange={e => setFormData({ ...formData, revealCopy: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, revealCopy: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           rows={2}
           placeholder="Message shown when combo is completed..."
@@ -626,7 +626,7 @@ function ComboForm({
         <label className="mb-2 block text-sm font-medium text-neutral-300">Cosmetic Burst</label>
         <select
           value={formData.cosmeticBurst}
-          onChange={e => setFormData({ ...formData, cosmeticBurst: e.target.value as any })}
+          onChange={(e) => setFormData({ ...formData, cosmeticBurst: e.target.value as any })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           aria-label="Select cosmetic burst size"
         >
@@ -641,7 +641,7 @@ function ComboForm({
           type="checkbox"
           id="comboIsActive"
           checked={formData.isActive}
-          onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
+          onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
           className="rounded border-neutral-600 bg-neutral-800 text-pink-500"
         />
         <label htmlFor="comboIsActive" className="text-sm text-neutral-300">

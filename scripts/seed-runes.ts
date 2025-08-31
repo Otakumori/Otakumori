@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -244,8 +244,8 @@ async function main() {
     where: { id: 'singleton' },
     data: {
       runes: {
-        defs: runeDefs.map(r => r.canonicalId),
-        combos: runeCombos.map(c => c.comboId),
+        defs: runeDefs.map((r) => r.canonicalId),
+        combos: runeCombos.map((c) => c.comboId),
         gacha: { enabled: true },
       },
       updatedAt: new Date(),
@@ -261,7 +261,7 @@ async function main() {
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error('❌ Seeding failed:', e);
     process.exit(1);
   })

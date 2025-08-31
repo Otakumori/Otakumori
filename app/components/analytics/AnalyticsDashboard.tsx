@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -163,7 +163,7 @@ export default function AnalyticsDashboard() {
         <div className="flex gap-2">
           <select
             value={timeRange}
-            onChange={e => setTimeRange(e.target.value)}
+            onChange={(e) => setTimeRange(e.target.value)}
             className="rounded-md border bg-white px-3 py-2 dark:bg-gray-800"
           >
             <option value="7d">Last 7 days</option>
@@ -336,7 +336,7 @@ export default function AnalyticsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {data.sales.topCategories.map(category => (
+              {data.sales.topCategories.map((category) => (
                 <div key={category.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-3 rounded-full bg-pink-500" />

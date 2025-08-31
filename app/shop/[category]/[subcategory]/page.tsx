@@ -5,14 +5,14 @@ import Image from 'next/image';
 import { getProducts } from '@/lib/shop';
 
 const CATS = {
-  apparel: ['tops','bottoms','unmentionables','kicks'],
-  accessories: ['pins','hats','bows'],
-  'home-decor': ['cups','pillows','stickers'],
+  apparel: ['tops', 'bottoms', 'unmentionables', 'kicks'],
+  accessories: ['pins', 'hats', 'bows'],
+  'home-decor': ['cups', 'pillows', 'stickers'],
 } as const;
 
 export async function generateStaticParams() {
   return Object.entries(CATS).flatMap(([category, subs]) =>
-    subs.map(subcategory => ({ category, subcategory }))
+    subs.map((subcategory) => ({ category, subcategory })),
   );
 }
 
@@ -31,7 +31,10 @@ export default async function CategoryPage({ params, searchParams }: any) {
 
         <ul className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {data.map((p: any) => (
-            <li key={p.id} className="rounded-xl border border-white/10 hover:border-pink-400/30 p-3">
+            <li
+              key={p.id}
+              className="rounded-xl border border-white/10 hover:border-pink-400/30 p-3"
+            >
               <Link href={`/shop/product/${p.id}`}>
                 <div className="aspect-square relative mb-2 overflow-hidden rounded-lg bg-neutral-900">
                   {p.image_url && (
@@ -40,7 +43,9 @@ export default async function CategoryPage({ params, searchParams }: any) {
                 </div>
                 <div className="text-sm font-medium line-clamp-2">{p.title}</div>
                 {p.price_cents != null && (
-                  <div className="text-sm text-neutral-400 mt-0.5">${(p.price_cents/100).toFixed(2)}</div>
+                  <div className="text-sm text-neutral-400 mt-0.5">
+                    ${(p.price_cents / 100).toFixed(2)}
+                  </div>
                 )}
               </Link>
             </li>
@@ -50,8 +55,16 @@ export default async function CategoryPage({ params, searchParams }: any) {
         {/* simple pager */}
         {count > pageSize && (
           <div className="flex gap-2 mt-6">
-            {page > 1 && <Link className="underline" href={`?page=${page-1}`}>Prev</Link>}
-            {page * pageSize < count && <Link className="underline" href={`?page=${page+1}`}>Next</Link>}
+            {page > 1 && (
+              <Link className="underline" href={`?page=${page - 1}`}>
+                Prev
+              </Link>
+            )}
+            {page * pageSize < count && (
+              <Link className="underline" href={`?page=${page + 1}`}>
+                Next
+              </Link>
+            )}
           </div>
         )}
       </div>

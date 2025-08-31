@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useRunicText } from '../../hooks/hooks/useRunicText';
 import { cn } from '@/lib/utils';
 import { useAudio } from '@/lib/hooks/useAudio';
@@ -44,7 +44,7 @@ export const RunicText = ({
         'hover:scale-105 active:scale-95',
         'medieval-text text-gray-400',
         isRevealed && 'text-white',
-        className
+        className,
       )}
       onClick={handleClick}
       onTouchStart={handleClick}

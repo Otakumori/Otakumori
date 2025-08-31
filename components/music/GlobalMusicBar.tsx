@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useMusic } from "./GlobalMusicProvider";
-import { useEffect, useState } from "react";
+import { useMusic } from './GlobalMusicProvider';
+import { useEffect, useState } from 'react';
 
 export default function GlobalMusicBar() {
-  const { playlist, current, playing, volume, setVolume, toggle, next, prev, optIn, setOptIn } = useMusic();
+  const { playlist, current, playing, volume, setVolume, toggle, next, prev, optIn, setOptIn } =
+    useMusic();
   const track = playlist?.tracks?.[current];
   const [shown, setShown] = useState(true);
 
@@ -38,12 +39,18 @@ export default function GlobalMusicBar() {
           </>
         ) : (
           <>
-            <button onClick={prev} className="rounded px-2 py-1 hover:bg-zinc-900">⏮</button>
-            <button onClick={toggle} className="rounded px-2 py-1 hover:bg-zinc-900">{playing ? "⏸" : "▶️"}</button>
-            <button onClick={next} className="rounded px-2 py-1 hover:bg-zinc-900">⏭</button>
+            <button onClick={prev} className="rounded px-2 py-1 hover:bg-zinc-900">
+              ⏮
+            </button>
+            <button onClick={toggle} className="rounded px-2 py-1 hover:bg-zinc-900">
+              {playing ? '⏸' : '▶️'}
+            </button>
+            <button onClick={next} className="rounded px-2 py-1 hover:bg-zinc-900">
+              ⏭
+            </button>
             <div className="min-w-[200px] text-sm">
-              <div className="truncate font-medium">{track?.title ?? "Untitled"}</div>
-              <div className="truncate text-xs text-zinc-400">{track?.artist ?? ""}</div>
+              <div className="truncate font-medium">{track?.title ?? 'Untitled'}</div>
+              <div className="truncate text-xs text-zinc-400">{track?.artist ?? ''}</div>
             </div>
             <input
               type="range"
@@ -55,7 +62,9 @@ export default function GlobalMusicBar() {
               className="h-1 w-28"
               aria-label="Volume"
             />
-            <button onClick={() => setOptIn(false)} className="rounded px-2 py-1 hover:bg-zinc-900">🔇</button>
+            <button onClick={() => setOptIn(false)} className="rounded px-2 py-1 hover:bg-zinc-900">
+              🔇
+            </button>
           </>
         )}
       </div>

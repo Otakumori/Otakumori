@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -14,7 +14,7 @@ interface SoapstoneMessage {
 export default function FloatingSoapstoneComments() {
   // Temporarily disabled - migrating from Supabase to Prisma
   return null;
-  
+
   const [comments, setComments] = useState<SoapstoneMessage[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -99,7 +99,7 @@ export default function FloatingSoapstoneComments() {
           <div className="bg-pink-500 text-white p-3">
             <h3 className="font-semibold">Soapstone Messages</h3>
           </div>
-          
+
           <div className="p-4 max-h-64 overflow-y-auto">
             {comments.length === 0 ? (
               <p className="text-gray-500 text-center py-4">No messages yet. Be the first!</p>

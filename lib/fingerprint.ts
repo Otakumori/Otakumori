@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { env } from '../env.mjs';
 import { createHash } from 'crypto';
 
@@ -16,7 +16,7 @@ export interface FingerprintData {
 export function generateFingerprint(
   userAgent: string,
   ipAddress: string | null,
-  sessionId: string
+  sessionId: string,
 ): FingerprintData {
   const uaHash = createHash('sha256')
     .update(userAgent + env.PETAL_SALT)

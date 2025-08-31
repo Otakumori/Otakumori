@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -47,7 +47,9 @@ export default function CommunityHubPanel() {
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">👤</div>
             <h3 className="text-xl font-semibold text-white mb-2">Avatar Customization</h3>
-            <p className="text-neutral-300 mb-4">Customize your profile with cosmetics and overlays</p>
+            <p className="text-neutral-300 mb-4">
+              Customize your profile with cosmetics and overlays
+            </p>
             <Link
               href="/panel/community/avatar"
               className="inline-block px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition-colors"
@@ -155,8 +157,8 @@ export default function CommunityHubPanel() {
         <div className="bg-gradient-to-br from-green-500/20 to-blue-500/20 border border-green-500/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">🚧 Community Features Coming Soon</h2>
           <p className="text-neutral-300 mb-6">
-            We're building an amazing community experience! In the meantime, 
-            you can customize your avatar and visit the Petal Store.
+            We're building an amazing community experience! In the meantime, you can customize your
+            avatar and visit the Petal Store.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -37,7 +37,7 @@ export default function LanguageSwitcher({
 }: LanguageSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const currentLang = languages.find(lang => lang.code === currentLanguage) || languages[0];
+  const currentLang = languages.find((lang) => lang.code === currentLanguage) || languages[0];
 
   const handleLanguageSelect = (languageCode: string) => {
     onLanguageChange?.(languageCode);
@@ -59,7 +59,7 @@ export default function LanguageSwitcher({
       {isOpen && (
         <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-lg border bg-white shadow-lg dark:bg-gray-800">
           <div className="py-1">
-            {languages.map(language => (
+            {languages.map((language) => (
               <button
                 key={language.code}
                 onClick={() => handleLanguageSelect(language.code)}

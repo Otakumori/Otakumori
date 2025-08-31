@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Achievement item type
@@ -35,10 +35,10 @@ export const AchievementProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const addAchievement = (achievement: Achievement) => {
-    setAchievements(prev => {
-      const existing = prev.find(a => a.id === achievement.id);
+    setAchievements((prev) => {
+      const existing = prev.find((a) => a.id === achievement.id);
       if (existing) {
-        return prev.map(a => (a.id === achievement.id ? { ...a, unlocked: true } : a));
+        return prev.map((a) => (a.id === achievement.id ? { ...a, unlocked: true } : a));
       }
       return [...prev, achievement];
     });
@@ -46,7 +46,7 @@ export const AchievementProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeAchievement = (id: string) => {
-    setAchievements(prev => prev.filter(achievement => achievement.id !== id));
+    setAchievements((prev) => prev.filter((achievement) => achievement.id !== id));
   };
 
   const clearAchievements = () => setAchievements([]);
@@ -103,7 +103,7 @@ const AchievementDrawer = () => {
             <p className="text-sm text-blue-300">Keep exploring to earn achievements~</p>
           </div>
         ) : (
-          achievements.map(achievement => (
+          achievements.map((achievement) => (
             <div
               key={achievement.id}
               className="group flex items-center rounded-xl bg-white/80 p-3 shadow transition hover:shadow-lg"

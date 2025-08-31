@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,7 +50,7 @@ export const AvatarCreator = ({ onClose }: AvatarCreatorProps) => {
   const { unlockAchievement } = useAchievements();
 
   const handlePartSelect = (partId: string, option: string) => {
-    setSelectedParts(prev => ({ ...prev, [partId]: option }));
+    setSelectedParts((prev) => ({ ...prev, [partId]: option }));
     playSound('click');
     vibrate('light');
   };
@@ -90,11 +90,11 @@ export const AvatarCreator = ({ onClose }: AvatarCreatorProps) => {
 
         {/* Customization Options */}
         <div className="space-y-6">
-          {AVATAR_PARTS.map(part => (
+          {AVATAR_PARTS.map((part) => (
             <div key={part.id}>
               <h3 className="mb-3 text-white/70">{part.name}</h3>
               <div className="flex gap-3">
-                {part.options.map(option => (
+                {part.options.map((option) => (
                   <button
                     key={option}
                     onClick={() => handlePartSelect(part.id, option)}

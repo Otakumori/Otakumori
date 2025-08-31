@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Simple Printify API call
     const url = `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`;
     console.log('🌐 Calling URL:', url);
-    
+
     const printifyResponse = await fetch(url, {
       headers: {
         Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
@@ -38,13 +38,13 @@ export async function GET(request: NextRequest) {
       console.error('❌ Printify API error:', printifyResponse.status, errorText);
       return NextResponse.json(
         { ok: false, error: `Printify API error: ${printifyResponse.status}` },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const printifyData = await printifyResponse.json();
     console.log('✅ Success! Products found:', printifyData.data?.length || 0);
-    
+
     // Transform products
     const products = printifyData.data.map((product: any) => ({
       id: product.id,
@@ -70,12 +70,8 @@ export async function GET(request: NextRequest) {
         total: filteredProducts.length,
       },
     });
-
   } catch (error) {
     console.error('❌ Error fetching products:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useEffect, useRef, useState, useCallback } from 'react';
 // import { supabase } from '@/utils/supabase/client';
 // Temporarily disabled tsparticles due to API compatibility issues
@@ -65,7 +65,7 @@ export default function PetalGameImage() {
         setLimitReached(true);
         return;
       }
-      setUserPetals(count => {
+      setUserPetals((count) => {
         const newCount = count + 1;
         localStorage.setItem(USER_PETAL_KEY, String(newCount));
         if (ACHIEVEMENTS.includes(newCount)) {
@@ -75,7 +75,7 @@ export default function PetalGameImage() {
         return newCount;
       });
     },
-    [userPetals]
+    [userPetals],
   );
 
   // Particle options - temporarily disabled due to API compatibility issues

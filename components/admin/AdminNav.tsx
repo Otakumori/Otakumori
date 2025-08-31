@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -61,7 +61,7 @@ export default function AdminNav() {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-2 p-4">
-          {adminRoutes.map(route => {
+          {adminRoutes.map((route) => {
             const Icon = route.icon;
             const isActive = pathname === route.path;
 

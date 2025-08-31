@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import Image from "next/image";
+/* eslint-disable-line @next/next/no-img-element */
+import Image from 'next/image';
 
 interface SoapstoneProps {
   preview: string;
@@ -14,12 +14,12 @@ export default function Soapstone({ preview, text }: SoapstoneProps) {
         {preview}
       </summary>
       <div className="relative p-4 text-pink-100/90">
-        <Image 
-          src="/assets/ui/soapstonefilter.svg" 
-          alt="" 
-          width={800} 
-          height={400} 
-          className="pointer-events-none absolute inset-0 opacity-50 mix-blend-screen" 
+        <Image
+          src="/assets/ui/soapstonefilter.svg"
+          alt=""
+          width={800}
+          height={400}
+          className="pointer-events-none absolute inset-0 opacity-50 mix-blend-screen"
         />
         <p className="relative">{text}</p>
       </div>

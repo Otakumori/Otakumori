@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -75,7 +75,7 @@ export default function CherryBlossomEffect({ isActive, containerRef }) {
           -particle.size * 0.7,
           particle.size * 0.8,
           0,
-          particle.size * 1.2
+          particle.size * 1.2,
         );
         ctx.bezierCurveTo(
           particle.size * 0.7,
@@ -83,7 +83,7 @@ export default function CherryBlossomEffect({ isActive, containerRef }) {
           particle.size,
           -particle.size * 0.3,
           0,
-          0
+          0,
         );
         ctx.fill();
 

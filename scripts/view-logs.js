@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const { logger } = require('../lib/logger');
 
 async function viewLogs() {
@@ -9,7 +9,7 @@ async function viewLogs() {
     console.log('\nRecent Application Logs:');
     console.log('======================\n');
 
-    logs.forEach(log => {
+    logs.forEach((log) => {
       const timestamp = new Date(log.timestamp).toLocaleString();
       const level = log.level.toUpperCase().padEnd(7);
       const message = log.message;

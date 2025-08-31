@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -26,7 +26,7 @@ export function PetalSystem({ onPetalCollected, petalsCollected }: PetalSystemPr
   const animationRef = useRef<number>();
   const lastSpawnTime = useRef<number>(0);
   const getToken = useSessionToken();
-  
+
   // Performance settings based on device capability
   const [maxPetals, setMaxPetals] = useState(25);
   const spawnInterval = 2000; // 2 seconds between spawns
@@ -76,50 +76,55 @@ export function PetalSystem({ onPetalCollected, petalsCollected }: PetalSystemPr
       collected: false,
     };
 
-    setPetals(prev => [...prev, newPetal]);
+    setPetals((prev) => [...prev, newPetal]);
   }, [petals.length, maxPetals]);
 
-  const collectPetal = useCallback(async (petalId: number) => {
-    setPetals(prev => prev.map(petal => 
-      petal.id === petalId ? { ...petal, collected: true } : petal
-    ));
+  const collectPetal = useCallback(
+    async (petalId: number) => {
+      setPetals((prev) =>
+        prev.map((petal) => (petal.id === petalId ? { ...petal, collected: true } : petal)),
+      );
 
-    // Remove petal after collection animation
-    setTimeout(() => {
-      setPetals(prev => prev.filter(petal => petal.id !== petalId));
-    }, 500);
+      // Remove petal after collection animation
+      setTimeout(() => {
+        setPetals((prev) => prev.filter((petal) => petal.id !== petalId));
+      }, 500);
 
-    // Update collection count
-    onPetalCollected(1);
+      // Update collection count
+      onPetalCollected(1);
 
-    // Send to API if user is authenticated
-    try {
-      const token = await getToken();
-      if (token) {
-        await fetch('/api/petals', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ petals_to_add: 1 }),
-        });
+      // Send to API if user is authenticated
+      try {
+        const token = await getToken();
+        if (token) {
+          await fetch('/api/petals', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ petals_to_add: 1 }),
+          });
+        }
+      } catch (error) {
+        // Silently fail if not authenticated or API error
+        console.log('Petal collection not tracked (user not signed in)');
       }
-    } catch (error) {
-      // Silently fail if not authenticated or API error
-      console.log('Petal collection not tracked (user not signed in)');
-    }
-  }, [onPetalCollected, getToken]);
+    },
+    [onPetalCollected, getToken],
+  );
 
   const startAnimation = useCallback(() => {
     if (!isVisible || prefersReducedMotion) return;
 
     const animate = () => {
-      setPetals(prev => prev.map(petal => ({
-        ...petal,
-        y: petal.y - 0.5, // Gentle upward drift
-        rotation: petal.rotation + (prefersReducedMotion ? 0.5 : 1), // Slower rotation if reduced motion
-      })));
+      setPetals((prev) =>
+        prev.map((petal) => ({
+          ...petal,
+          y: petal.y - 0.5, // Gentle upward drift
+          rotation: petal.rotation + (prefersReducedMotion ? 0.5 : 1), // Slower rotation if reduced motion
+        })),
+      );
 
       // Remove petals that go off-screen
-      setPetals(prev => prev.filter(petal => petal.y > -10));
+      setPetals((prev) => prev.filter((petal) => petal.y > -10));
 
       // Spawn new petals
       spawnPetal();
@@ -166,38 +171,36 @@ export function PetalSystem({ onPetalCollected, petalsCollected }: PetalSystemPr
               left: `${petal.x}%`,
               top: `${petal.y}%`,
             }}
-            initial={{ 
-              scale: 0, 
+            initial={{
+              scale: 0,
               rotate: petal.rotation,
-              opacity: 0 
+              opacity: 0,
             }}
-            animate={{ 
+            animate={{
               scale: petal.collected ? 0 : petal.scale,
               rotate: petal.rotation,
               opacity: petal.collected ? 0 : 1,
               y: petal.collected ? -20 : 0,
             }}
-            exit={{ 
-              scale: 0, 
+            exit={{
+              scale: 0,
               opacity: 0,
-              y: -50 
+              y: -50,
             }}
-            transition={{ 
+            transition={{
               duration: petal.collected ? 0.5 : 0.3,
-              ease: "easeOut"
+              ease: 'easeOut',
             }}
             onClick={() => !petal.collected && collectPetal(petal.id)}
-            whileHover={{ 
+            whileHover={{
               scale: petal.scale * 1.2,
-              filter: "brightness(1.2)",
+              filter: 'brightness(1.2)',
             }}
-            whileTap={{ 
-              scale: petal.scale * 0.8 
+            whileTap={{
+              scale: petal.scale * 0.8,
             }}
           >
-            <div className="text-2xl select-none">
-              🌸
-            </div>
+            <div className="text-2xl select-none">🌸</div>
           </motion.div>
         ))}
       </AnimatePresence>

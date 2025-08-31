@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useEffect, useState, useRef } from 'react';
 
 interface Petal {
@@ -44,7 +44,7 @@ export default function PetalCollector() {
     };
 
     // Set volumes
-    Object.values(audioElements).forEach(audio => {
+    Object.values(audioElements).forEach((audio) => {
       audio.volume = 0.2;
     });
 
@@ -56,7 +56,7 @@ export default function PetalCollector() {
 
     return () => {
       // Cleanup audio elements
-      Object.values(audioElements).forEach(audio => {
+      Object.values(audioElements).forEach((audio) => {
         audio.pause();
         audio.currentTime = 0;
         audio.src = '';
@@ -97,32 +97,32 @@ export default function PetalCollector() {
   const collectPetal = (id: number) => {
     if (!gameActive) return;
 
-    const petal = petals.find(p => p.id === id);
+    const petal = petals.find((p) => p.id === id);
     if (!petal) return;
 
     collectSoundRef.current?.play();
-    setScore(prev => prev + petal.points * multiplier);
-    setCombo(prev => {
+    setScore((prev) => prev + petal.points * multiplier);
+    setCombo((prev) => {
       const newCombo = prev + 1;
       if (newCombo > maxCombo) setMaxCombo(newCombo);
       if (newCombo % 5 === 0) {
         comboSoundRef.current?.play();
-        setTimeLeft(prev => Math.min(prev + 2, 30));
+        setTimeLeft((prev) => Math.min(prev + 2, 30));
       }
       return newCombo;
     });
 
     // Spawn new petal
     const newPetal = spawnPetal(
-      Math.random() < 0.1 ? 'golden' : Math.random() < 0.2 ? 'special' : 'normal'
+      Math.random() < 0.1 ? 'golden' : Math.random() < 0.2 ? 'special' : 'normal',
     );
-    setPetals(prev => [...prev.filter(p => p.id !== id), newPetal]);
+    setPetals((prev) => [...prev.filter((p) => p.id !== id), newPetal]);
 
     // Chance to spawn power-up
     if (Math.random() < 0.1) {
       const powerUpTypes: ('time' | 'multiplier' | 'magnet')[] = ['time', 'multiplier', 'magnet'];
       const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-      setPowerUps(prev => [
+      setPowerUps((prev) => [
         ...prev,
         {
           id: Date.now(),
@@ -139,7 +139,7 @@ export default function PetalCollector() {
     let timer: NodeJS.Timeout;
     if (gameActive && timeLeft > 0) {
       timer = setInterval(() => {
-        setTimeLeft(prev => {
+        setTimeLeft((prev) => {
           if (prev <= 1) {
             setGameActive(false);
             if (score > highScore) {
@@ -159,17 +159,17 @@ export default function PetalCollector() {
     let timer: NodeJS.Timeout;
     if (gameActive) {
       timer = setInterval(() => {
-        setPowerUps(prev => {
+        setPowerUps((prev) => {
           const updated = prev
-            .map(p => ({
+            .map((p) => ({
               ...p,
               duration: p.duration - 1,
               active: p.duration > 0,
             }))
-            .filter(p => p.duration > 0);
+            .filter((p) => p.duration > 0);
 
           // Update multiplier based on active power-ups
-          const hasMultiplier = updated.some(p => p.type === 'multiplier' && p.active);
+          const hasMultiplier = updated.some((p) => p.type === 'multiplier' && p.active);
           setMultiplier(hasMultiplier ? 2 : 1);
 
           return updated;
@@ -196,7 +196,7 @@ export default function PetalCollector() {
       {/* Power-ups Display */}
       <div className="absolute right-4 top-4 z-10 text-white">
         {powerUps.map(
-          powerUp =>
+          (powerUp) =>
             powerUp.active && (
               <div key={powerUp.id} className="mb-2">
                 <span className="text-pink-400">
@@ -204,14 +204,14 @@ export default function PetalCollector() {
                   {powerUp.duration}s
                 </span>
               </div>
-            )
+            ),
         )}
       </div>
 
       {/* Game Area */}
       <div className="absolute inset-0">
         {petals.map(
-          petal =>
+          (petal) =>
             !petal.collected && (
               <div
                 key={petal.id}
@@ -231,7 +231,7 @@ export default function PetalCollector() {
                 }}
                 onClick={() => collectPetal(petal.id)}
               />
-            )
+            ),
         )}
       </div>
 

@@ -1,10 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 
-export const runtime = 'nodejs';
+
 
 // GET: Fetch dashboard statistics
 export async function GET() {
@@ -17,7 +21,7 @@ export async function GET() {
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -64,7 +68,7 @@ export async function GET() {
       ]);
 
     // Format recent activity
-    const formattedActivity = recentActivity.map(event => ({
+    const formattedActivity = recentActivity.map((event) => ({
       id: event.id,
       type: event.type,
       description: `${event.user?.username || 'User'} ${event.type === 'earn' ? 'earned' : 'spent'} ${event.amount} petals`,
@@ -91,7 +95,7 @@ export async function GET() {
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

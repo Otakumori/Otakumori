@@ -6,7 +6,7 @@
   --color-primary-dark: #e11d48;
   --color-secondary: #8b5cf6;
   --color-accent: #06b6d4;
-  
+
   /* Neutral scale */
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f5;
@@ -19,31 +19,31 @@
   --color-neutral-800: #262626;
   --color-neutral-900: #171717;
   --color-neutral-950: #0a0a0a;
-  
+
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   --glass-blur: blur(10px);
-  
+
   /* Animation durations */
   --duration-fast: 150ms;
   --duration-normal: 300ms;
   --duration-slow: 500ms;
-  
+
   /* Border radius */
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  
+
   /* Z-index scale */
   --z-dropdown: 1000;
   --z-sticky: 1020;
@@ -61,14 +61,15 @@
     --glass-border: rgba(255, 255, 255, 0.25);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
-  
+
   .glass {
     background: var(--glass-bg) !important;
     border: 2px solid var(--glass-border) !important;
     box-shadow: var(--glass-shadow) !important;
   }
-  
-  button, .btn {
+
+  button,
+  .btn {
     border: 2px solid currentColor !important;
   }
 }
@@ -83,13 +84,13 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  
+
   .animate-pulse,
   .animate-spin,
   .animate-bounce {
     animation: none !important;
   }
-  
+
   .transition-all,
   .transition-colors,
   .transition-transform {
@@ -148,19 +149,18 @@
 
 /* Loading states */
 .loading-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* Disable shimmer in reduced motion */
@@ -206,11 +206,11 @@
   .no-print {
     display: none !important;
   }
-  
+
   .print-only {
     display: block !important;
   }
-  
+
   * {
     background: white !important;
     color: black !important;

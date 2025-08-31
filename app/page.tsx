@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { HeroShrine } from '@/components/hero/HeroShrine';
@@ -9,10 +9,14 @@ import { MiniGamesTeaser } from '@/components/hero/MiniGamesTeaser';
 import { BlogTeaser } from '@/components/hero/BlogTeaser';
 import { InsidersSignup } from '@/components/hero/InsidersSignup';
 import { CompactFooter } from '@/components/hero/CompactFooter';
+import TreeStage from './components/tree/TreeStage';
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="relative">
+      {/* Tree Stage Background */}
+      <TreeStage />
+
       {/* 1. Hero Shrine */}
       <HeroShrine />
 

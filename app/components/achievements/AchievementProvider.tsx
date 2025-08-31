@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -109,30 +109,30 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
   }, [achievements]);
 
   const unlockAchievement = (id: string) => {
-    setAchievements(current =>
-      current.map(achievement =>
+    setAchievements((current) =>
+      current.map((achievement) =>
         achievement.id === id
           ? { ...achievement, unlocked: true, progress: achievement.total }
-          : achievement
-      )
+          : achievement,
+      ),
     );
   };
 
   const updateProgress = (id: string, progress: number) => {
-    setAchievements(current =>
-      current.map(achievement => {
+    setAchievements((current) =>
+      current.map((achievement) => {
         if (achievement.id === id) {
           const newProgress = Math.min(progress, achievement.total);
           const unlocked = newProgress >= achievement.total;
           return { ...achievement, progress: newProgress, unlocked };
         }
         return achievement;
-      })
+      }),
     );
   };
 
   const getUnlockedCount = () => {
-    return achievements.filter(a => a.unlocked).length;
+    return achievements.filter((a) => a.unlocked).length;
   };
 
   return (

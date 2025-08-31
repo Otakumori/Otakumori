@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useUser } from '@clerk/nextjs';
@@ -35,7 +35,7 @@ export default function GalleryPage() {
     // Add more images as needed
   ];
 
-  const handleImageSelect = image => {
+  const handleImageSelect = (image) => {
     // Implement image selection logic here
   };
 
@@ -50,7 +50,7 @@ export default function GalleryPage() {
         <p>Your Petals: {user.petals}</p>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {images.map(image => (
+        {images.map((image) => (
           <div key={image.id} className="rounded-lg border p-4">
             <img
               src={image.url}

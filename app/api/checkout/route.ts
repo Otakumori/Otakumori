@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
+import { env } from '@/env';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
 
@@ -12,27 +13,18 @@ export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { items, shipping_address } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json(
-        { error: 'Invalid items array' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid items array' }, { status: 400 });
     }
 
     if (!shipping_address) {
-      return NextResponse.json(
-        { error: 'Shipping address required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Shipping address required' }, { status: 400 });
     }
 
     // Calculate total and format line items for Stripe
@@ -40,7 +32,7 @@ export async function POST(request: NextRequest) {
     const line_items = items.map((item: any) => {
       const price_cents = item.price_cents || 0;
       total_cents += price_cents * item.quantity;
-      
+
       return {
         price_data: {
           currency: 'usd',
@@ -60,8 +52,8 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cart`,
+      success_url: `${env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${env.NEXT_PUBLIC_SITE_URL}/cart`,
       metadata: {
         clerk_user_id: userId,
         items: JSON.stringify(items),
@@ -100,12 +92,8 @@ export async function POST(request: NextRequest) {
       session_id: session.id,
       url: session.url,
     });
-
   } catch (error) {
     console.error('Checkout API error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

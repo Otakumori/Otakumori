@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { auth, currentUser } from "@clerk/nextjs/server";
+/* eslint-disable-line @next/next/no-img-element */
+import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function isAdmin(): Promise<boolean> {
   const { userId } = auth();
   if (!userId) return false;
-  
+
   // Check Clerk metadata for admin role
   // You can set this in Clerk Dashboard > Users > [User] > Metadata
   // Add: { "role": "admin" }
   try {
     const user = await currentUser();
     const metadata = user?.publicMetadata;
-    return metadata?.role === "admin";
+    return metadata?.role === 'admin';
   } catch {
     return false;
   }
@@ -21,7 +21,7 @@ export async function isAdmin(): Promise<boolean> {
 export async function getUserRole(): Promise<string | null> {
   const { userId } = auth();
   if (!userId) return null;
-  
+
   try {
     const user = await currentUser();
     return (user?.publicMetadata?.role as string) || null;
@@ -37,8 +37,8 @@ export async function requireAdmin() {
   try {
     const user = await currentUser();
     const metadata = user?.publicMetadata;
-    const isAdmin = metadata?.role === "admin";
-    
+    const isAdmin = metadata?.role === 'admin';
+
     if (!isAdmin) return { ok: false as const, status: 403 as const };
     return { ok: true as const, userId };
   } catch {

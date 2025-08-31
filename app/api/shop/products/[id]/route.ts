@@ -17,7 +17,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
           Authorization: `Bearer ${PRINTIFY_API_KEY}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     console.error('Error fetching product:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to fetch product' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

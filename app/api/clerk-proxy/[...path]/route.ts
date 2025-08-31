@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     const data = await response.json();

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React from 'react';
@@ -56,7 +56,7 @@ export function FeaturedProducts() {
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {products
-        .filter(product => !product.isNSFW || isAuthenticated)
+        .filter((product) => !product.isNSFW || isAuthenticated)
         .map((product, index) => (
           <motion.div
             key={product.id}

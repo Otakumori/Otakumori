@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const { execSync } = require('child_process');
 const path = require('path');
 
@@ -29,7 +29,7 @@ applyMigrations()
     console.log('Migration process completed');
     process.exit(0);
   })
-  .catch(error => {
+  .catch((error) => {
     console.error('Migration process failed:', error);
     process.exit(1);
   });

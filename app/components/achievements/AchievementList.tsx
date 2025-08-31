@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 import type { Achievement } from './AchievementProvider';
 import { AchievementCard } from './AchievementCard';
@@ -11,7 +11,7 @@ interface AchievementListProps {
 export const AchievementList: React.FC<AchievementListProps> = ({ achievements }) => (
   <div className="space-y-2">
     {achievements.length > 0 ? (
-      achievements.map(achievement => (
+      achievements.map((achievement) => (
         <div key={achievement.id} className="rounded bg-white p-4 shadow">
           {achievement.title}
         </div>

@@ -80,8 +80,19 @@ model Product {
   active            Boolean          @default(true)
   category          String?
   isNSFW            Boolean          @default(false)
+  integrationRef    String?          @unique @map("integration_ref")
+  categorySlug      String?          @map("category_slug")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
   OrderItem         OrderItem[]
   ProductVariant    ProductVariant[]
+  Reviews           Review[]
+
+  @@index([categorySlug])
+  @@index([integrationRef])
+  @@index([active, categorySlug])
+  @@index([createdAt])
+  @@index([updatedAt])
 }
 
 model ProductVariant {
@@ -141,6 +152,15 @@ model User {
   nsfwAffirmationVer   Int                @default(1)
   nsfwAffirmedAt       DateTime?
   nsfwEnabled          Boolean            @default(true)
+  
+  // Profile 2.0 fields
+  visibility            String             @default("public") // 'public','friends','private'
+  bio                   String?
+  location              String?
+  website               String?
+  bannerUrl             String?
+  
+  // Existing relations
   coupons              CouponGrant[]
   gameRuns             GameRun[]
   inventory            InventoryItem[]
@@ -156,6 +176,66 @@ model User {
   mergeLogs            MergeLog[]
   UserRunes            UserRune[]
   EmailLogs            EmailLog[]
+  
+  // Social relations
+  profileSections      ProfileSection[]
+  profileLinks         ProfileLink[]
+  profileTheme         ProfileTheme?
+  presence             Presence?
+  
+  // Follow system
+  following            Follow[]           @relation("UserFollowing")
+  followers            Follow[]           @relation("UserFollowers")
+  
+  // Block system
+  blocking             Block[]            @relation("UserBlocking")
+  blockedBy            Block[]            @relation("UserBlockedBy")
+  
+  // Character system
+  characterConfigs     CharacterConfig[]
+  characterPresets     UserCharacterPreset[]
+  
+  // Messaging system
+  comments             Comment[]
+  commentLikes         CommentLike[]
+  commentReports       CommentReport[] @relation("CommentReportReporter")
+  moderatedReports     CommentReport[] @relation("CommentReportModerator")
+  
+  // Sprint 2 relations
+  activities           Activity[]
+  notifications        Notification[]
+  leaderboardScores    LeaderboardScore[]
+  
+  // Party & Coop relations
+  ledParties           Party[]                @relation("PartyLeader")
+  partyMemberships     PartyMember[]          @relation("PartyMember")
+  sentInvitations      PartyInvitation[]      @relation("PartyInvitationInviter")
+  receivedInvitations  PartyInvitation[]      @relation("PartyInvitationInvitee")
+  coopParticipants     CoopSessionParticipant[] @relation("CoopSessionParticipant")
+  partyMessages        PartyMessage[]         @relation("PartyMessageAuthor")
+  
+  // Safety & Moderation relations
+  safetySettings       UserSafetySettings?
+  moderatorRoles       ModeratorRole[]        @relation("ModeratorRoleUser")
+  assignedModeratorRoles ModeratorRole[]      @relation("ModeratorRoleAssignedBy")
+  reportsSubmitted     UserReport[]           @relation("UserReportReporter")
+  reportsReceived      UserReport[]           @relation("UserReportReported")
+  reportsAssigned      UserReport[]           @relation("UserReportModerator")
+  moderationActionsReceived ModerationAction[] @relation("ModerationActionUser")
+  moderationActionsTaken ModerationAction[]   @relation("ModerationActionModerator")
+  contentModerated     ContentModeration[]    @relation("ContentModerationAuthor")
+  contentReviewed      ContentModeration[]    @relation("ContentModerationModerator")
+  appealsSubmitted     ModerationAppeal[]     @relation("ModerationAppealUser")
+  appealsReviewed      ModerationAppeal[]     @relation("ModerationAppealReviewer")
+  
+  // Search & Discovery relations
+  searchHistory        SearchHistory[]
+  searchAnalytics      SearchAnalytics[]
+  
+  // Settings & Preferences relations
+  userSettings         UserSettings?
+  privacySettings      PrivacySettings?
+  gameSettings         GameSettings[]
 
   @@index([clerkId])
 }
@@ -376,8 +456,91 @@ model LeaderboardScore {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Enhanced leaderboard fields
+  boardId    String?
+  profileId  String?
+  meta       Json?    // additional score metadata
+  rank       Int?
+  board      Leaderboard? @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  profile    User?     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
   @@unique([userId, game, diff])
   @@index([game, diff, score])
+  @@index([boardId])
+  @@index([profileId])
+  @@index([rank])
+}
+
+model CharacterPreset {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  category        String   // 'hair', 'face', 'body', 'clothing', 'accessories'
+  meshData        Json     // Low-poly mesh data
+  textureData     Json     // Retro texture mapping
+  colorPalette    Json     // Available color options
+  rarity          String   @default("common") // 'common', 'rare', 'epic', 'legendary'
+  unlockCondition Json?    // How to unlock this preset
+  isDefault       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  userPresets     UserCharacterPreset[]
+
+  @@index([category])
+  @@index([rarity])
+}
+
+model CharacterConfig {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  isActive    Boolean  @default(false)
+  configData  Json     // Complete character configuration
+  meshData    Json     // Compiled mesh data for rendering
+  textureData Json     // Compiled texture data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions   CharacterReaction[]
+
+  @@unique([userId, isActive], map: "CharacterConfig_userId_isActive_unique")
+  @@index([userId])
+  @@index([isActive])
+}
+
+model CharacterReaction {
+  id                String   @id @default(cuid())
+  characterConfigId String
+  context           String   // 'home', 'shop', 'games', 'social', 'achievements'
+  reactionType      String   // 'idle', 'happy', 'excited', 'focused', 'sleepy'
+  animationData     Json     // Animation keyframes and timing
+  triggerConditions Json?    // When to trigger this reaction
+  createdAt         DateTime @default(now())
+
+  // Relations
+  characterConfig   CharacterConfig @relation(fields: [characterConfigId], references: [id], onDelete: Cascade)
+
+  @@index([characterConfigId])
+  @@index([context])
+}
+
+model UserCharacterPreset {
+  id        String   @id @default(cuid())
+  userId    String
+  presetId  String
+  unlockedAt DateTime @default(now())
+
+  // Relations
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preset    CharacterPreset @relation(fields: [presetId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, presetId])
+  @@index([userId])
+  @@index([presetId])
 }
 
 model PetalShopItem {
@@ -563,6 +726,7 @@ enum LedgerType {
   first_purchase_bonus
   milestone_bonus
   combo_reveal
+  preset_unlock
 }
 
 enum RewardKind {
@@ -586,3 +750,632 @@ enum DiscountType {
   PERCENT
   OFF_AMOUNT
 }
+
+// Social Foundation Models
+
+model ProfileSection {
+  id        String   @id @default(cuid())
+  profileId String
+  code      String   // 'about','showcase','stats','achievements','collections'
+  orderIdx  Int
+  visible   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([orderIdx])
+}
+
+model ProfileLink {
+  id        String   @id @default(cuid())
+  profileId String
+  label     String   // 'Portfolio','X','Bluesky','Itch'
+  url       String
+  orderIdx  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([orderIdx])
+}
+
+model ProfileTheme {
+  profileId String   @id
+  themeCode String   @default("glass_pink") // 'glass_pink','ink_dark','retro_ps2'
+  accentHex String   @default("#ec4899")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile   User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  followerId String   @default(cuid())
+  followeeId String   @default(cuid())
+  createdAt  DateTime @default(now())
+  follower   User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  followee   User     @relation("UserFollowers", fields: [followeeId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followeeId])
+  @@index([followerId])
+  @@index([followeeId])
+}
+
+model Block {
+  blockerId String   @default(cuid())
+  blockedId String   @default(cuid())
+  createdAt DateTime @default(now())
+  blocker   User     @relation("UserBlocking", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("UserBlockedBy", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@id([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+model Presence {
+  profileId    String   @id
+  status       String   @default("online") // 'online','idle','dnd','offline'
+  lastSeen     DateTime @default(now())
+  activity     Json     @default("{}") // {page:'mini-games', game:'petal-samurai'}
+  showActivity Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  profile      User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([lastSeen])
+}
+
+// Sprint 2: Activity Feed, Notifications, Enhanced Leaderboards
+
+model Activity {
+  id         String   @id @default(cuid())
+  profileId  String
+  type       String   // 'achievement','score','purchase','unlock','trade','follow'
+  payload    Json     // normalized data
+  visibility String   @default("public") // 'public','friends','private'
+  createdAt  DateTime @default(now())
+  profile    User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([type])
+  @@index([visibility])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  profileId String
+  type      String   // 'follow','request','achievement','trade','score-beaten','comment','system'
+  payload   Json     // notification data
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  profile   User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([type])
+  @@index([read])
+  @@index([createdAt])
+}
+
+model Leaderboard {
+  id        String   @id @default(cuid())
+  gameCode  String   // 'petal-samurai','bubble-girl', etc.
+  scope     String   @default("global") // 'global','friends'
+  period    String   @default("daily") // 'daily','weekly','all'
+  createdAt DateTime @default(now())
+  scores    LeaderboardScore[]
+
+  @@index([gameCode])
+  @@index([scope])
+  @@index([period])
+  @@index([createdAt])
+}
+
+// Messaging System Models
+model Comment {
+  id              String   @id @default(cuid())
+  content         String
+  authorId        String
+  parentId        String?  // For nested replies
+  contentType     String   // 'profile', 'achievement', 'leaderboard', 'activity'
+  contentId       String   // ID of the content being commented on
+  isDeleted       Boolean  @default(false)
+  isModerated     Boolean  @default(false)
+  moderationReason String?
+  likeCount       Int      @default(0)
+  replyCount      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  author          User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent          Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies         Comment[]      @relation("CommentReplies")
+  likes           CommentLike[]
+  reports         CommentReport[]
+
+  @@index([contentType, contentId])
+  @@index([authorId])
+  @@index([parentId])
+  @@index([createdAt])
+  @@index([isDeleted])
+  @@index([isModerated])
+}
+
+model CommentLike {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+}
+
+model CommentReport {
+  id              String    @id @default(cuid())
+  commentId       String
+  reporterId      String
+  reason          String    // 'spam', 'harassment', 'inappropriate', 'other'
+  description     String?
+  status          String    @default("pending") // 'pending', 'reviewed', 'resolved', 'dismissed'
+  moderatorId     String?
+  moderatorNotes  String?
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
+
+  // Relations
+  comment         Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter        User      @relation("CommentReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  moderator       User?     @relation("CommentReportModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  @@unique([commentId, reporterId])
+  @@index([commentId])
+  @@index([reporterId])
+  @@index([status])
+}
+
+// Parties & Coop System Models
+model Party {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  leaderId    String
+  maxMembers  Int      @default(4)
+  isPublic    Boolean  @default(true)
+  gameMode    String?  // 'mini-games', 'exploration', 'social', 'custom'
+  status      String   @default("open") // 'open', 'full', 'in-game', 'closed'
+  settings    Json?    // Party-specific settings and preferences
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  leader      User                @relation("PartyLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  members     PartyMember[]
+  invitations PartyInvitation[]
+  sessions    CoopSession[]
+  messages    PartyMessage[]
+
+  @@index([leaderId])
+  @@index([status])
+  @@index([gameMode])
+  @@index([isPublic])
+  @@index([createdAt])
+}
+
+model PartyMember {
+  id           String   @id @default(cuid())
+  partyId      String
+  userId       String
+  role         String   @default("member") // 'leader', 'moderator', 'member'
+  joinedAt     DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+  permissions  Json?    // Role-specific permissions
+
+  // Relations
+  party        Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  user         User     @relation("PartyMember", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([partyId, userId])
+  @@index([partyId])
+  @@index([userId])
+  @@index([role])
+}
+
+model PartyInvitation {
+  id         String    @id @default(cuid())
+  partyId    String
+  inviterId  String
+  inviteeId  String
+  status     String    @default("pending") // 'pending', 'accepted', 'declined', 'expired'
+  message    String?
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  respondedAt DateTime?
+
+  // Relations
+  party      Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  inviter    User      @relation("PartyInvitationInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee    User      @relation("PartyInvitationInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([partyId, inviteeId])
+  @@index([partyId])
+  @@index([inviterId])
+  @@index([inviteeId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model CoopSession {
+  id        String    @id @default(cuid())
+  partyId   String
+  gameType  String    // 'mini-game', 'exploration', 'social'
+  gameId    String?   // Specific game or activity ID
+  status    String    @default("active") // 'active', 'paused', 'completed', 'abandoned'
+  settings  Json?     // Game-specific settings
+  progress  Json?     // Session progress and state
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  createdAt DateTime  @default(now())
+
+  // Relations
+  party       Party                    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  participants CoopSessionParticipant[]
+
+  @@index([partyId])
+  @@index([gameType])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model CoopSessionParticipant {
+  id        String    @id @default(cuid())
+  sessionId String
+  userId    String
+  role      String    @default("player") // 'player', 'spectator', 'moderator'
+  joinedAt  DateTime  @default(now())
+  leftAt    DateTime?
+  stats     Json?     // Session-specific statistics
+
+  // Relations
+  session   CoopSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User        @relation("CoopSessionParticipant", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, userId])
+  @@index([sessionId])
+  @@index([userId])
+}
+
+model PartyMessage {
+  id          String   @id @default(cuid())
+  partyId     String
+  authorId    String
+  content     String
+  messageType String   @default("text") // 'text', 'system', 'game_event'
+  metadata    Json?    // Additional message data
+  createdAt   DateTime @default(now())
+
+  // Relations
+  party       Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  author      User     @relation("PartyMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+// Safety, Reporting & Moderation System Models
+model UserReport {
+  id                  String    @id @default(cuid())
+  reporterId          String
+  reportedUserId      String?
+  contentType         String    // 'user', 'comment', 'party', 'party_message', 'activity'
+  contentId           String?   // ID of the reported content
+  reason              String    // 'spam', 'harassment', 'inappropriate', 'fake', 'underage', 'other'
+  description         String?
+  evidence            Json?     // Screenshots, links, additional context
+  status              String    @default("pending") // 'pending', 'reviewed', 'resolved', 'dismissed'
+  priority            String    @default("medium") // 'low', 'medium', 'high', 'urgent'
+  assignedModeratorId String?
+  moderatorNotes      String?
+  resolution          String?   // 'warning', 'content_removed', 'user_suspended', 'user_banned', 'no_action'
+  createdAt           DateTime  @default(now())
+  resolvedAt          DateTime?
+
+  // Relations
+  reporter            User      @relation("UserReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser        User?     @relation("UserReportReported", fields: [reportedUserId], references: [id], onDelete: SetNull)
+  assignedModerator   User?     @relation("UserReportModerator", fields: [assignedModeratorId], references: [id], onDelete: SetNull)
+  actions             ModerationAction[]
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([contentType])
+  @@index([contentId])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedModeratorId])
+  @@index([createdAt])
+}
+
+model ModerationAction {
+  id           String    @id @default(cuid())
+  userId       String
+  moderatorId  String
+  actionType   String    // 'warning', 'content_removed', 'suspension', 'ban', 'restriction'
+  reason       String
+  details      Json?     // Action-specific details (duration, scope, etc.)
+  reportId     String?
+  expiresAt    DateTime? // For temporary actions
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  appealedAt   DateTime?
+  appealStatus String    @default("none") // 'none', 'pending', 'approved', 'denied'
+
+  // Relations
+  user         User      @relation("ModerationActionUser", fields: [userId], references: [id], onDelete: Cascade)
+  moderator    User      @relation("ModerationActionModerator", fields: [moderatorId], references: [id], onDelete: Cascade)
+  report       UserReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+  appeals      ModerationAppeal[]
+
+  @@index([userId])
+  @@index([moderatorId])
+  @@index([actionType])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@index([createdAt])
+}
+
+model ContentModeration {
+  id             String    @id @default(cuid())
+  contentType    String    // 'comment', 'party_message', 'profile_bio', 'activity'
+  contentId      String
+  content        String
+  authorId       String
+  status         String    @default("pending") // 'pending', 'approved', 'rejected', 'flagged'
+  automatedScore Decimal?  // AI/automated moderation score (0.00-1.00)
+  moderatorId    String?
+  moderatorNotes String?
+  flags          Json?     // Automated flags (profanity, spam, etc.)
+  createdAt      DateTime  @default(now())
+  reviewedAt     DateTime?
+
+  // Relations
+  author         User      @relation("ContentModerationAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  moderator      User?     @relation("ContentModerationModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  @@index([contentType])
+  @@index([contentId])
+  @@index([authorId])
+  @@index([status])
+  @@index([automatedScore])
+  @@index([createdAt])
+}
+
+model UserSafetySettings {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  allowFriendRequests       Boolean  @default(true)
+  allowPartyInvites         Boolean  @default(true)
+  allowMessages             Boolean  @default(true)
+  blockedUsers              String[] // Array of blocked user IDs
+  contentFilter             String   @default("moderate") // 'strict', 'moderate', 'lenient'
+  reportNotifications       Boolean  @default(true)
+  moderationNotifications   Boolean  @default(true)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  // Relations
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ModeratorRole {
+  id          String    @id @default(cuid())
+  userId      String
+  role        String    // 'moderator', 'senior_moderator', 'admin'
+  permissions Json      // Specific permissions for this role
+  assignedBy  String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  expiresAt   DateTime? // For temporary moderator roles
+
+  // Relations
+  user        User      @relation("ModeratorRoleUser", fields: [userId], references: [id], onDelete: Cascade)
+  assignedByUser User   @relation("ModeratorRoleAssignedBy", fields: [assignedBy], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
+  @@index([isActive])
+}
+
+model ModerationAppeal {
+  id           String    @id @default(cuid())
+  actionId     String
+  userId       String
+  reason       String
+  evidence     Json?     // Additional evidence for the appeal
+  status       String    @default("pending") // 'pending', 'under_review', 'approved', 'denied'
+  reviewedBy   String?
+  reviewNotes  String?
+  createdAt    DateTime  @default(now())
+  resolvedAt   DateTime?
+
+  // Relations
+  action       ModerationAction @relation(fields: [actionId], references: [id], onDelete: Cascade)
+  user         User             @relation("ModerationAppealUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer     User?            @relation("ModerationAppealReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@index([actionId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Search & Discovery Models
+model SearchHistory {
+  id          String    @id @default(cuid())
+  userId      String
+  query       String
+  searchType  String    // 'people', 'content', 'products', 'all'
+  filters     Json?     // Search filters applied
+  resultCount Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([query])
+  @@index([searchType])
+  @@index([createdAt])
+}
+
+model SearchSuggestion {
+  id              String    @id @default(cuid())
+  query           String
+  suggestionType  String    // 'user', 'product', 'content', 'tag'
+  targetId        String?
+  targetType      String?   // 'user', 'product', 'comment', 'party'
+  popularity      Int       @default(0)
+  lastUsed        DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([query, suggestionType, targetId])
+  @@index([query])
+  @@index([suggestionType])
+  @@index([popularity])
+  @@index([lastUsed])
+}
+
+model SearchAnalytics {
+  id                String    @id @default(cuid())
+  query             String
+  searchType        String
+  resultCount       Int
+  clickedResultId   String?
+  clickedResultType String?
+  sessionId         String?
+  userId            String?
+  createdAt         DateTime  @default(now())
+
+  // Relations
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([query])
+  @@index([searchType])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// User Settings & Preferences Models
+model UserSettings {
+  id                      String    @id @default(cuid())
+  userId                  String    @unique
+  profileVisibility       String    @default("public") // 'public', 'friends', 'private'
+  allowFriendRequests     Boolean   @default(true)
+  allowPartyInvites       Boolean   @default(true)
+  allowMessages           Boolean   @default(true)
+  activityVisibility      String    @default("public") // 'public', 'friends', 'private'
+  leaderboardOptOut       Boolean   @default(false)
+  notificationPreferences Json      @default("{\"email\": true, \"push\": true, \"inApp\": true, \"friendRequests\": true, \"partyInvites\": true, \"achievements\": true, \"leaderboards\": true, \"comments\": true, \"activities\": true}")
+  contentFilter           String    @default("moderate") // 'strict', 'moderate', 'lenient'
+  language                String    @default("en")
+  timezone                String    @default("UTC")
+  theme                   String    @default("auto") // 'light', 'dark', 'auto'
+  motionReduced           Boolean   @default(false)
+  soundEnabled            Boolean   @default(true)
+  musicEnabled            Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([profileVisibility])
+  @@index([activityVisibility])
+}
+
+model PrivacySettings {
+  id                      String    @id @default(cuid())
+  userId                  String    @unique
+  showOnlineStatus        Boolean   @default(true)
+  showLastSeen            Boolean   @default(true)
+  showActivity            Boolean   @default(true)
+  showAchievements        Boolean   @default(true)
+  showLeaderboardScores   Boolean   @default(true)
+  showPartyActivity       Boolean   @default(true)
+  showPurchaseHistory     Boolean   @default(false)
+  allowSearchIndexing     Boolean   @default(true)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GameSettings {
+  id              String    @id @default(cuid())
+  userId          String
+  gameCode        String    // 'petal_samurai', 'puzzle_reveal', 'bubble_girl', 'memory_match'
+  difficulty      String    @default("normal") // 'easy', 'normal', 'hard'
+  soundEffects    Boolean   @default(true)
+  music           Boolean   @default(true)
+  hapticFeedback  Boolean   @default(true)
+  autoSave        Boolean   @default(true)
+  customSettings  Json?     // Game-specific custom settings
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameCode])
+  @@index([gameCode])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  productId   String
+  userId      String   // Clerk userId
+  rating      Int      // 1-5
+  title       String?
+  body        String?
+  images      Json     @default("[]") // [{url, alt}]
+  isApproved  Boolean  @default(false) @map("is_approved")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([productId])
+  @@index([userId])
+  @@index([isApproved])
+  @@index([createdAt])
+}
+
+model HomeRail {
+  id           String    @id @default(cuid())
+  key          String    @unique // "new", "best", "editors"
+  title        String
+  productSlugs String[]  @default([]) @map("product_slugs")
+  startsAt     DateTime? @map("starts_at")
+  endsAt       DateTime? @map("ends_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  
+  @@index([key])
+  @@index([startsAt, endsAt])
+}
+
+

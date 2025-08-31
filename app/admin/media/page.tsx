@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type BlobItem = {
   url: string;
@@ -24,12 +24,12 @@ export default function AdminMediaPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/media/list", { cache: "no-store" });
+      const res = await fetch('/api/admin/media/list', { cache: 'no-store' });
       const json = await res.json();
-      if (!json.ok) throw new Error(json.error || "Failed to list blobs");
+      if (!json.ok) throw new Error(json.error || 'Failed to list blobs');
       setBlobs(json.blobs || []);
     } catch (e: any) {
-      setError(e.message || "List failed");
+      setError(e.message || 'List failed');
     } finally {
       setLoading(false);
     }
@@ -44,39 +44,39 @@ export default function AdminMediaPage() {
     setError(null);
     try {
       const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/media/upload", { method: "POST", body: fd });
+      fd.append('file', file);
+      const res = await fetch('/api/admin/media/upload', { method: 'POST', body: fd });
       const json = await res.json();
-      if (!json.ok) throw new Error(json.error || "Upload failed");
+      if (!json.ok) throw new Error(json.error || 'Upload failed');
       await fetchList();
     } catch (e: any) {
-      setError(e.message || "Upload error");
+      setError(e.message || 'Upload error');
     } finally {
       setUpLoading(false);
-      if (inputRef.current) inputRef.current.value = "";
+      if (inputRef.current) inputRef.current.value = '';
     }
   };
 
   const onDelete = async (url: string) => {
-    if (!confirm("Delete this asset? This cannot be undone.")) return;
+    if (!confirm('Delete this asset? This cannot be undone.')) return;
     setError(null);
     try {
-      const res = await fetch("/api/admin/media/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/admin/media/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       });
       const json = await res.json();
-      if (!json.ok) throw new Error(json.error || "Delete failed");
-      setBlobs(prev => prev.filter(b => b.url !== url));
+      if (!json.ok) throw new Error(json.error || 'Delete failed');
+      setBlobs((prev) => prev.filter((b) => b.url !== url));
     } catch (e: any) {
-      setError(e.message || "Delete error");
+      setError(e.message || 'Delete error');
     }
   };
 
   const totalSizeMB = useMemo(
     () => (blobs.reduce((s, b) => s + (b.size || 0), 0) / (1024 * 1024)).toFixed(2),
-    [blobs]
+    [blobs],
   );
 
   return (
@@ -88,7 +88,7 @@ export default function AdminMediaPage() {
           className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           disabled={loading}
         >
-          {loading ? "Refreshing..." : "Refresh"}
+          {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </header>
 
@@ -113,7 +113,7 @@ export default function AdminMediaPage() {
             className="rounded-xl bg-black px-4 py-2 text-white hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-black"
             disabled={upLoading}
           >
-            {upLoading ? "Uploading..." : "Select File"}
+            {upLoading ? 'Uploading...' : 'Select File'}
           </button>
         </div>
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
@@ -132,9 +132,9 @@ export default function AdminMediaPage() {
         ) : (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {blobs.map((b) => {
-              const isImage = (b.contentType || "").startsWith("image/");
-              const name = b.pathname.split("/").pop() || b.pathname;
-              const uploaded = b.uploadedAt ? new Date(b.uploadedAt).toLocaleString() : "";
+              const isImage = (b.contentType || '').startsWith('image/');
+              const name = b.pathname.split('/').pop() || b.pathname;
+              const uploaded = b.uploadedAt ? new Date(b.uploadedAt).toLocaleString() : '';
 
               return (
                 <li key={b.url} className="rounded-xl border p-3">
@@ -144,7 +144,7 @@ export default function AdminMediaPage() {
                       <img src={b.url} alt={name} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500">
-                        {b.contentType || "binary"}
+                        {b.contentType || 'binary'}
                       </div>
                     )}
                   </div>

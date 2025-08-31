@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'No guest session to merge',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
           ok: false,
           error: 'User not found',
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Perform merge transaction
-    const result = await db.$transaction(async tx => {
+    const result = await db.$transaction(async (tx) => {
       // Update user petal balance
       const newBalance = user.petalBalance + guestPetalCount;
 
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

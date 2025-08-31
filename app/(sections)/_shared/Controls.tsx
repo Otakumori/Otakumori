@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ControlHint {
   key: string;
@@ -16,7 +16,7 @@ interface ControlsProps {
   className?: string;
 }
 
-export default function Controls({ title = "Controls", hints, className = "" }: ControlsProps) {
+export default function Controls({ title = 'Controls', hints, className = '' }: ControlsProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -59,9 +59,7 @@ export default function Controls({ title = "Controls", hints, className = "" }: 
                   </kbd>
                   <span className="text-neutral-300 font-medium">{hint.action}</span>
                   {hint.description && (
-                    <span className="text-neutral-500 text-xs ml-auto">
-                      {hint.description}
-                    </span>
+                    <span className="text-neutral-500 text-xs ml-auto">{hint.description}</span>
                   )}
                 </div>
               ))}
@@ -79,23 +77,23 @@ export default function Controls({ title = "Controls", hints, className = "" }: 
 
 // Predefined control sets for common actions
 export const GAME_CONTROLS: ControlHint[] = [
-  { key: "WASD", action: "Move", description: "Arrow keys also work" },
-  { key: "SPACE", action: "Jump/Action" },
-  { key: "ESC", action: "Pause/Menu" },
-  { key: "R", action: "Restart" },
-  { key: "M", action: "Mute/Unmute" }
+  { key: 'WASD', action: 'Move', description: 'Arrow keys also work' },
+  { key: 'SPACE', action: 'Jump/Action' },
+  { key: 'ESC', action: 'Pause/Menu' },
+  { key: 'R', action: 'Restart' },
+  { key: 'M', action: 'Mute/Unmute' },
 ];
 
 export const HUB_CONTROLS: ControlHint[] = [
-  { key: "←→", action: "Navigate", description: "D-pad or arrow keys" },
-  { key: "A", action: "Confirm", description: "Enter or Space" },
-  { key: "B", action: "Back", description: "Escape or B button" },
-  { key: "LS", action: "Rotate", description: "Left stick movement" }
+  { key: '←→', action: 'Navigate', description: 'D-pad or arrow keys' },
+  { key: 'A', action: 'Confirm', description: 'Enter or Space' },
+  { key: 'B', action: 'Back', description: 'Escape or B button' },
+  { key: 'LS', action: 'Rotate', description: 'Left stick movement' },
 ];
 
 export const SHOP_CONTROLS: ControlHint[] = [
-  { key: "↑↓", action: "Navigate items" },
-  { key: "ENTER", action: "Select item" },
-  { key: "ESC", action: "Close/Back" },
-  { key: "F", action: "Filter/Search" }
+  { key: '↑↓', action: 'Navigate items' },
+  { key: 'ENTER', action: 'Select item' },
+  { key: 'ESC', action: 'Close/Back' },
+  { key: 'F', action: 'Filter/Search' },
 ];

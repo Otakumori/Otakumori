@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -57,20 +57,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addItem = (newItem: CartItem) => {
-    setItems(currentItems => {
+    setItems((currentItems) => {
       const existingItem = currentItems.find(
-        item =>
+        (item) =>
           item.id === newItem.id &&
           (!item.selectedVariant ||
             !newItem.selectedVariant ||
-            item.selectedVariant.id === newItem.selectedVariant.id)
+            item.selectedVariant.id === newItem.selectedVariant.id),
       );
 
       if (existingItem) {
-        return currentItems.map(item =>
+        return currentItems.map((item) =>
           item.id === existingItem.id
             ? { ...item, quantity: item.quantity + newItem.quantity }
-            : item
+            : item,
         );
       }
 
@@ -79,7 +79,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeItem = (id: string) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== id));
+    setItems((currentItems) => currentItems.filter((item) => item.id !== id));
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -88,8 +88,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setItems(currentItems =>
-      currentItems.map(item => (item.id === id ? { ...item, quantity } : item))
+    setItems((currentItems) =>
+      currentItems.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
   };
 

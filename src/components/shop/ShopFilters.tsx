@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
-import { getShopCategories } from "@/src/lib/shop";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { getShopCategories } from '@/src/lib/shop';
 
 interface ShopFiltersProps {
   currentCategory?: string;
@@ -12,7 +12,9 @@ interface ShopFiltersProps {
 export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [categories, setCategories] = useState<Array<{ slug: string; name: string; count: number }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ slug: string; name: string; count: number }>
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
 
   const updateFilters = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams);
-    
+
     Object.entries(updates).forEach(([key, value]) => {
       if (value === undefined || value === '') {
         params.delete(key);
@@ -39,10 +41,10 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
         params.set(key, value);
       }
     });
-    
+
     // Reset to page 1 when filters change
     params.delete('page');
-    
+
     const newUrl = `/shop?${params.toString()}`;
     router.push(newUrl);
   };
@@ -52,9 +54,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
   };
 
   const handlePriceChange = (min?: string, max?: string) => {
-    updateFilters({ 
-      minPrice: min || undefined, 
-      maxPrice: max || undefined 
+    updateFilters({
+      minPrice: min || undefined,
+      maxPrice: max || undefined,
     });
   };
 
@@ -109,7 +111,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
               min="0"
               step="0.01"
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-              onChange={(e) => handlePriceChange(e.target.value, searchParams.get('maxPrice') || undefined)}
+              onChange={(e) =>
+                handlePriceChange(e.target.value, searchParams.get('maxPrice') || undefined)
+              }
             />
           </div>
           <div>
@@ -120,7 +124,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
               min="0"
               step="0.01"
               className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/40"
-              onChange={(e) => handlePriceChange(searchParams.get('minPrice') || undefined, e.target.value)}
+              onChange={(e) =>
+                handlePriceChange(searchParams.get('minPrice') || undefined, e.target.value)
+              }
             />
           </div>
         </div>
@@ -143,7 +149,10 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
       </div>
 
       {/* Clear Filters */}
-      {(currentCategory || searchParams.get('minPrice') || searchParams.get('maxPrice') || searchParams.get('inStock')) && (
+      {(currentCategory ||
+        searchParams.get('minPrice') ||
+        searchParams.get('maxPrice') ||
+        searchParams.get('inStock')) && (
         <div>
           <button
             onClick={() => router.push('/shop')}

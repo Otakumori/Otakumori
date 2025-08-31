@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useEffect, useRef } from "react";
-import * as THREE from "three";
-import { useHub } from "./store";
-import { useAnchors } from "./anchors";
-import { getAsset } from "@/app/mini-games/_shared/assets-resolver";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { useHub } from './store';
+import { useAnchors } from './anchors';
+import { getAsset } from '@/app/mini-games/_shared/assets-resolver';
 
 export default function CubeHub() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -14,7 +14,7 @@ export default function CubeHub() {
   useEffect(() => {
     const mount = mountRef.current!;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 16/9, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 100);
     camera.position.set(0, 0.2, 3.2);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -24,29 +24,47 @@ export default function CubeHub() {
 
     // resize
     function onResize() {
-      const w = mount.clientWidth, h = mount.clientHeight;
-      renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+      const w = mount.clientWidth,
+        h = mount.clientHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
     }
-    const ro = new ResizeObserver(onResize); ro.observe(mount);
+    const ro = new ResizeObserver(onResize);
+    ro.observe(mount);
 
     // cube
     const size = 1;
     const geom = new THREE.BoxGeometry(size, size, size);
-    const mat = new THREE.MeshStandardMaterial({ color: 0x7a6ad6, metalness: 0.3, roughness: 0.35 });
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x7a6ad6,
+      metalness: 0.3,
+      roughness: 0.35,
+    });
     const cube = new THREE.Mesh(geom, mat);
     scene.add(cube);
 
     // ground decal (frame png)
-    const frameTex = new THREE.TextureLoader().load(getAsset("site", "cubeFrame") ?? "/assets/ui/hub/cube_frame.png");
+    const frameTex = new THREE.TextureLoader().load(
+      getAsset('site', 'cubeFrame') ?? '/assets/ui/hub/cube_frame.png',
+    );
     frameTex.wrapS = frameTex.wrapT = THREE.ClampToEdgeWrapping;
-    const frameMat = new THREE.MeshBasicMaterial({ map: frameTex, transparent: true, opacity: 0.9 });
+    const frameMat = new THREE.MeshBasicMaterial({
+      map: frameTex,
+      transparent: true,
+      opacity: 0.9,
+    });
     const framePlane = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), frameMat);
-    framePlane.position.set(0, -0.9, 0); framePlane.rotateX(-Math.PI / 2 * 0.92);
+    framePlane.position.set(0, -0.9, 0);
+    framePlane.rotateX((-Math.PI / 2) * 0.92);
     scene.add(framePlane);
 
     // light
-    const amb = new THREE.AmbientLight(0xffffff, 0.8); scene.add(amb);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.6); dir.position.set(2, 3, 2); scene.add(dir);
+    const amb = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(amb);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+    dir.position.set(2, 3, 2);
+    scene.add(dir);
 
     // focus targets per face
     const faceRot: Record<string, THREE.Euler> = {
@@ -54,14 +72,15 @@ export default function CubeHub() {
       games: new THREE.Euler(0, 0, 0),
       trade: new THREE.Euler(0, Math.PI / 2, 0),
       avatar: new THREE.Euler(0, Math.PI, 0),
-      music: new THREE.Euler(0, -Math.PI / 2, 0)
+      music: new THREE.Euler(0, -Math.PI / 2, 0),
     };
 
     // Anchor tracking for selector overlay
     const anchors = useAnchors.getState();
     function screenOf(vec3: THREE.Vector3) {
       const v = vec3.clone().project(camera);
-      const w = mount.clientWidth, h = mount.clientHeight;
+      const w = mount.clientWidth,
+        h = mount.clientHeight;
       return { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, visible: v.z < 1.0 };
     }
 
@@ -91,7 +110,8 @@ export default function CubeHub() {
     let t = 0;
     function animate(now = 0) {
       requestAnimationFrame(animate);
-      const dt = (now - t) * 0.001; t = now;
+      const dt = (now - t) * 0.001;
+      t = now;
 
       // idle wobble (gentle)
       if (idle && !isZooming) {

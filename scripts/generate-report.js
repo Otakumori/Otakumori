@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const fs = require('fs');
 const path = require('path');
 const { monitor } = require('../lib/monitor');
@@ -18,28 +18,28 @@ async function generateReport() {
     // Calculate statistics
     const stats = {
       activeUsers: {
-        min: Math.min(...metrics.map(m => m.activeUsers)),
-        max: Math.max(...metrics.map(m => m.activeUsers)),
+        min: Math.min(...metrics.map((m) => m.activeUsers)),
+        max: Math.max(...metrics.map((m) => m.activeUsers)),
         avg: metrics.reduce((sum, m) => sum + m.activeUsers, 0) / metrics.length,
       },
       responseTime: {
-        min: Math.min(...metrics.map(m => m.responseTime)),
-        max: Math.max(...metrics.map(m => m.responseTime)),
+        min: Math.min(...metrics.map((m) => m.responseTime)),
+        max: Math.max(...metrics.map((m) => m.responseTime)),
         avg: metrics.reduce((sum, m) => sum + m.responseTime, 0) / metrics.length,
       },
       cpuUsage: {
-        min: Math.min(...metrics.map(m => m.cpuUsage)),
-        max: Math.max(...metrics.map(m => m.cpuUsage)),
+        min: Math.min(...metrics.map((m) => m.cpuUsage)),
+        max: Math.max(...metrics.map((m) => m.cpuUsage)),
         avg: metrics.reduce((sum, m) => sum + m.cpuUsage, 0) / metrics.length,
       },
       memoryUsage: {
-        min: Math.min(...metrics.map(m => m.memoryUsage)),
-        max: Math.max(...metrics.map(m => m.memoryUsage)),
+        min: Math.min(...metrics.map((m) => m.memoryUsage)),
+        max: Math.max(...metrics.map((m) => m.memoryUsage)),
         avg: metrics.reduce((sum, m) => sum + m.memoryUsage, 0) / metrics.length,
       },
       databaseConnections: {
-        min: Math.min(...metrics.map(m => m.databaseConnections)),
-        max: Math.max(...metrics.map(m => m.databaseConnections)),
+        min: Math.min(...metrics.map((m) => m.databaseConnections)),
+        max: Math.max(...metrics.map((m) => m.databaseConnections)),
         avg: metrics.reduce((sum, m) => sum + m.databaseConnections, 0) / metrics.length,
       },
     };
@@ -60,7 +60,7 @@ async function generateReport() {
 
     const reportPath = path.join(
       reportsDir,
-      `health-report-${new Date().toISOString().split('T')[0]}.json`
+      `health-report-${new Date().toISOString().split('T')[0]}.json`,
     );
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
 

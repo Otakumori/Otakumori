@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock blog post data
@@ -24,13 +24,13 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const data = await req.json();
   // TODO: Update post in real database
-  blogPosts = blogPosts.map(p => (p.id === data.id ? { ...p, ...data } : p));
+  blogPosts = blogPosts.map((p) => (p.id === data.id ? { ...p, ...data } : p));
   return NextResponse.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   // TODO: Remove post from real database
-  blogPosts = blogPosts.filter(p => p.id !== id);
+  blogPosts = blogPosts.filter((p) => p.id !== id);
   return NextResponse.json({ success: true });
 }

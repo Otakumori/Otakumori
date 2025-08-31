@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 class AchievementSound {
   private static instance: AchievementSound;
   private audio: HTMLAudioElement;
@@ -18,7 +18,7 @@ class AchievementSound {
 
   public play(): void {
     this.audio.currentTime = 0;
-    this.audio.play().catch(error => {
+    this.audio.play().catch((error) => {
       console.error('Failed to play achievement sound:', error);
     });
   }

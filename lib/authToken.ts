@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useAuth } from '@clerk/nextjs';
 
 /**
@@ -8,7 +8,7 @@ import { useAuth } from '@clerk/nextjs';
  */
 export function useSessionToken() {
   const { getToken } = useAuth();
-  
+
   return async () => {
     const token = await getToken();
     if (!token) {
@@ -35,7 +35,7 @@ export async function getSessionTokenOrThrow(): Promise<string> {
  */
 export async function withTokenRetry<T>(
   operation: () => Promise<T>,
-  maxRetries: number = 1
+  maxRetries: number = 1,
 ): Promise<T> {
   try {
     return await operation();

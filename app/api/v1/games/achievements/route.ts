@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-export const dynamic = "force-dynamic";      // tells Next this cannot be statically analyzed
-export const runtime = "nodejs";              // keep on Node runtime (not edge)
-export const preferredRegion = "iad1";        // optional: co-locate w/ your logs region
-export const maxDuration = 10;                // optional guard
+/* eslint-disable-line @next/next/no-img-element */
+export const dynamic = 'force-dynamic'; // tells Next this cannot be statically analyzed
+export const runtime = 'nodejs'; // keep on Node runtime (not edge)
+export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
+export const maxDuration = 10; // optional guard
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -15,48 +15,42 @@ export async function GET(request: NextRequest) {
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user
     const user = await db.user.findUnique({
-      where: { clerkId: userId }
+      where: { clerkId: userId },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
     // Get all achievements
     const allAchievements = await db.achievement.findMany({
       include: { reward: true },
-      orderBy: { points: 'desc' }
+      orderBy: { points: 'desc' },
     });
 
     // Get user's unlocked achievements
     const userAchievements = await db.userAchievement.findMany({
       where: { userId: user.id },
       include: { achievement: { include: { reward: true } } },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     // Create a map of unlocked achievement IDs for quick lookup
-    const unlockedAchievementIds = new Set(
-      userAchievements.map(ua => ua.achievementId)
-    );
+    const unlockedAchievementIds = new Set(userAchievements.map((ua) => ua.achievementId));
 
     // Transform achievements to include unlock status
-    const transformedAchievements = allAchievements.map(achievement => {
+    const transformedAchievements = allAchievements.map((achievement) => {
       const isUnlocked = unlockedAchievementIds.has(achievement.id);
-      const unlockedAt = isUnlocked ? 
-        userAchievements.find(ua => ua.achievementId === achievement.id)?.createdAt.toISOString() : 
-        undefined;
+      const unlockedAt = isUnlocked
+        ? userAchievements
+            .find((ua) => ua.achievementId === achievement.id)
+            ?.createdAt.toISOString()
+        : undefined;
 
       return {
         id: achievement.id,
@@ -66,11 +60,13 @@ export async function GET(request: NextRequest) {
         points: achievement.points,
         isUnlocked,
         unlockedAt,
-        reward: achievement.reward ? {
-          kind: achievement.reward.kind,
-          value: achievement.reward.value,
-          sku: achievement.reward.sku
-        } : null
+        reward: achievement.reward
+          ? {
+              kind: achievement.reward.kind,
+              value: achievement.reward.value,
+              sku: achievement.reward.sku,
+            }
+          : null,
       };
     });
 
@@ -87,16 +83,12 @@ export async function GET(request: NextRequest) {
           unlocked: unlockedCount,
           total: allAchievements.length,
           points: totalPoints,
-          completionPercentage
-        }
-      }
+          completionPercentage,
+        },
+      },
     });
-
   } catch (error) {
     console.error('Error fetching achievements:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { prisma } from '../../../lib/prisma';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
@@ -9,7 +9,7 @@ export async function getAbyssProducts() {
     // First check if we have cached products in Prisma
     const cachedProducts = await prisma.abyssProduct.findMany({
       where: { isActive: true },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
 
     // If we have cached products and they're less than 1 hour old, return them
@@ -23,12 +23,15 @@ export async function getAbyssProducts() {
     }
 
     // Fetch fresh products from Printify
-    const response = await fetch(`${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`, {
-      headers: {
-        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     if (!response.ok) throw new Error('Failed to fetch products from Printify');
 
@@ -36,8 +39,8 @@ export async function getAbyssProducts() {
 
     // Filter and transform products for Abyss section
     const abyssProducts = products.data
-      .filter(product => product.tags.includes('abyss') || product.tags.includes('r18'))
-      .map(product => ({
+      .filter((product) => product.tags.includes('abyss') || product.tags.includes('r18'))
+      .map((product) => ({
         id: product.id.toString(),
         name: product.title,
         description: product.description,
@@ -61,9 +64,9 @@ export async function getAbyssProducts() {
             price: product.price,
             image: product.image,
             tags: product.tags,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
-          create: product
+          create: product,
         });
       }
     }
@@ -84,7 +87,7 @@ export async function getProductDetails(productId) {
           Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     if (!response.ok) throw new Error('Failed to fetch product details');
@@ -99,25 +102,28 @@ export async function getProductDetails(productId) {
 
 export async function createOrder(productId, variantId, quantity, shippingAddress) {
   try {
-    const response = await fetch(`${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          external_id: `abyss-${Date.now()}`,
+          line_items: [
+            {
+              blueprint_id: productId,
+              variant_id: variantId,
+              quantity: quantity,
+            },
+          ],
+          shipping_method: 1,
+          shipping_address: shippingAddress,
+        }),
       },
-      body: JSON.stringify({
-        external_id: `abyss-${Date.now()}`,
-        line_items: [
-          {
-            blueprint_id: productId,
-            variant_id: variantId,
-            quantity: quantity,
-          },
-        ],
-        shipping_method: 1,
-        shipping_address: shippingAddress,
-      }),
-    });
+    );
 
     if (!response.ok) throw new Error('Failed to create order');
 
@@ -134,7 +140,7 @@ export async function getCachedAbyssProducts() {
   try {
     return await prisma.abyssProduct.findMany({
       where: { isActive: true },
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   } catch (error) {
     console.error('Error fetching cached Abyss products:', error);
@@ -148,8 +154,8 @@ export async function updateProductCache(productId, updateData) {
       where: { id: productId },
       data: {
         ...updateData,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   } catch (error) {
     console.error('Error updating product cache:', error);
@@ -161,7 +167,7 @@ export async function deactivateProduct(productId) {
   try {
     return await prisma.abyssProduct.update({
       where: { id: productId },
-      data: { isActive: false }
+      data: { isActive: false },
     });
   } catch (error) {
     console.error('Error deactivating product:', error);
@@ -173,27 +179,27 @@ export async function searchAbyssProducts(query, tags = []) {
   try {
     const where = {
       isActive: true,
-      AND: []
+      AND: [],
     };
 
     if (query) {
       where.AND.push({
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } }
-        ]
+          { description: { contains: query, mode: 'insensitive' } },
+        ],
       });
     }
 
     if (tags.length > 0) {
       where.AND.push({
-        tags: { hasSome: tags }
+        tags: { hasSome: tags },
       });
     }
 
     return await prisma.abyssProduct.findMany({
       where,
-      orderBy: { updatedAt: 'desc' }
+      orderBy: { updatedAt: 'desc' },
     });
   } catch (error) {
     console.error('Error searching Abyss products:', error);

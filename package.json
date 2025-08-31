@@ -28,6 +28,11 @@
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "doctor": "npm run type-check && npm run build",
     "analyze": "ANALYZE=true next build",
+    "assets:check": "node ./scripts/check-assets.cjs",
+    "assets:report": "node ./scripts/report-missing-assets.cjs",
+    "assets:scan": "node ./scripts/scan-image-refs.cjs",
+    "assets:gen:achievements": "tsx ./scripts/gen-achievements.ts --png",
+    "assets:gen:achievements:frames": "tsx ./scripts/gen-achievements.ts --png --frame",
     "logs:view": "node scripts/view-logs.js",
     "logs:clear": "node scripts/clear-logs.js",
     "maintenance:schedule": "node scripts/schedule-maintenance.js",
@@ -120,7 +125,7 @@
     "recharts": "^2.12.0",
     "redis": "^5.8.1",
     "remark-gfm": "^4.0.1",
-    "resend": "^6.0.1",
+    "resend": "^6.0.2",
     "sakura-js": "^1.1.1",
     "seedrandom": "^3.0.5",
     "sharp": "^0.34.3",
@@ -131,17 +136,18 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.161.0",
-    "ts-node": "^10.9.2",
     "tsparticles": "^3.9.1",
     "uuid": "^11.1.0",
     "wav-encoder": "^1.3.0",
     "web3": "^4.4.0",
     "winston": "^3.11.0",
     "zod": "^3.22.4",
-    "zustand": "^4.5.0"
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@react-email/components": "^0.5.1",
+    "@react-email/render": "^1.2.1",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
@@ -159,7 +165,9 @@
     "autoprefixer": "^10.0.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.0.4",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-drizzle": "^0.2.3",
+    "eslint-plugin-next": "^0.0.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
     "is-ci": "^4.1.0",
@@ -173,12 +181,16 @@
     "rimraf": "^5.0.0",
     "tailwindcss": "^3.3.0",
     "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.3.3"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "**/*.{ts,tsx,js,jsx}": [
       "eslint --fix --cache",
+      "prettier --write"
+    ],
+    "**/*.{json,md,css,scss,html,yml,yaml}": [
       "prettier --write"
     ]
   },

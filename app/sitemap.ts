@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://otaku-mori.com';
-  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://otaku-mori.com'; // eslint-disable-line no-restricted-syntax
+
   return [
     {
       url: baseUrl,

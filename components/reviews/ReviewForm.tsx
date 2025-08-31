@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useState, useRef } from "react";
-import Image from "next/image";
+import { useState, useRef } from 'react';
+import Image from 'next/image';
 
 type Props = { productId: string };
 
 export default function ReviewForm({ productId }: Props) {
   const [rating, setRating] = useState<number>(5);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -31,23 +31,23 @@ export default function ReviewForm({ productId }: Props) {
       const uploaded: string[] = [];
       for (const f of toUpload) {
         const fd = new FormData();
-        fd.append("file", f);
-        const res = await fetch("/api/reviews/upload", { method: "POST", body: fd });
+        fd.append('file', f);
+        const res = await fetch('/api/reviews/upload', { method: 'POST', body: fd });
         const json = await res.json();
-        if (!json.ok) throw new Error(json.error || "Upload failed");
+        if (!json.ok) throw new Error(json.error || 'Upload failed');
         uploaded.push(json.url as string);
       }
-      setImageUrls(prev => [...prev, ...uploaded]);
+      setImageUrls((prev) => [...prev, ...uploaded]);
     } catch (err: any) {
-      setError(err?.message ?? "Upload error");
+      setError(err?.message ?? 'Upload error');
     } finally {
       setUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
+      if (inputRef.current) inputRef.current.value = '';
     }
   }
 
   function removeImage(url: string) {
-    setImageUrls(prev => prev.filter(u => u !== url));
+    setImageUrls((prev) => prev.filter((u) => u !== url));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -55,24 +55,24 @@ export default function ReviewForm({ productId }: Props) {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await fetch("/api/reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId, rating, title, body, imageUrls }),
       });
       const json = await res.json();
-      if (!json.ok) throw new Error(json.error || "Failed to submit review");
+      if (!json.ok) throw new Error(json.error || 'Failed to submit review');
 
       // Reset UI and optionally refresh page or a list
-      setTitle("");
-      setBody("");
+      setTitle('');
+      setBody('');
       setImageUrls([]);
       setRating(5);
       // You can trigger a router.refresh() here if you render reviews on the same page
       // or emit an event to update list.
-      alert("Review submitted. Thank you!");
+      alert('Review submitted. Thank you!');
     } catch (err: any) {
-      setError(err?.message ?? "Submit error");
+      setError(err?.message ?? 'Submit error');
     } finally {
       setSubmitting(false);
     }
@@ -89,7 +89,11 @@ export default function ReviewForm({ productId }: Props) {
           onChange={(e) => setRating(Number(e.target.value))}
           className="rounded-md border border-zinc-700 bg-black p-2"
         >
-          {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} ★</option>)}
+          {[5, 4, 3, 2, 1].map((r) => (
+            <option key={r} value={r}>
+              {r} ★
+            </option>
+          ))}
         </select>
       </div>
 
@@ -130,7 +134,10 @@ export default function ReviewForm({ productId }: Props) {
         {imageUrls.length > 0 && (
           <div className="mt-2 flex gap-3">
             {imageUrls.map((url) => (
-              <div key={url} className="relative h-20 w-20 overflow-hidden rounded-lg border border-zinc-700">
+              <div
+                key={url}
+                className="relative h-20 w-20 overflow-hidden rounded-lg border border-zinc-700"
+              >
                 <Image src={url} alt="upload preview" fill sizes="80px" className="object-cover" />
                 <button
                   type="button"
@@ -152,7 +159,7 @@ export default function ReviewForm({ productId }: Props) {
         disabled={submitting || uploading || !body.trim()}
         className="rounded-md bg-pink-600 px-4 py-2 font-medium hover:bg-pink-500 disabled:opacity-50"
       >
-        {submitting ? "Submitting..." : "Submit Review"}
+        {submitting ? 'Submitting...' : 'Submit Review'}
       </button>
     </form>
   );

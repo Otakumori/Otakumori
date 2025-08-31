@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useEffect, useState } from 'react';
 
@@ -27,17 +27,25 @@ export default function CartPage() {
     <main className="min-h-screen bg-neutral-950 text-neutral-100">
       <div className="mx-auto max-w-4xl px-4 py-8">
         <h1 className="text-2xl font-semibold">Cart</h1>
-        {items.length === 0 ? <p className="text-neutral-400 mt-2">Your cart is empty.</p> : (
+        {items.length === 0 ? (
+          <p className="text-neutral-400 mt-2">Your cart is empty.</p>
+        ) : (
           <>
             <ul className="mt-4 grid gap-2">
               {items.map((i, idx) => (
-                <li key={idx} className="flex justify-between text-sm border-b border-white/10 py-2">
+                <li
+                  key={idx}
+                  className="flex justify-between text-sm border-b border-white/10 py-2"
+                >
                   <div>Variant {i.variant_id}</div>
                   <div>× {i.quantity}</div>
                 </li>
               ))}
             </ul>
-            <button onClick={checkout} className="mt-6 rounded-xl bg-pink-500/90 hover:bg-pink-500 px-4 py-2">
+            <button
+              onClick={checkout}
+              className="mt-6 rounded-xl bg-pink-500/90 hover:bg-pink-500 px-4 py-2"
+            >
               Checkout ({totalQty})
             </button>
           </>

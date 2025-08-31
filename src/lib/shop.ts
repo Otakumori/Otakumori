@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { prisma } from "@/app/lib/prisma";
+/* eslint-disable-line @next/next/no-img-element */
+import { prisma } from '@/app/lib/prisma';
 
 export interface ShopProduct {
   id: string;
@@ -35,19 +35,19 @@ export async function getShopProducts(
   filters: ShopFilters = {},
   sort: ShopSort = { field: 'createdAt', direction: 'desc' },
   page: number = 1,
-  limit: number = 24
+  limit: number = 24,
 ): Promise<{ products: ShopProduct[]; total: number; hasMore: boolean }> {
   try {
     // Build where clause for filtering
     const where: any = {};
-    
+
     if (filters.query) {
       where.OR = [
         { name: { contains: filters.query, mode: 'insensitive' } },
         { description: { contains: filters.query, mode: 'insensitive' } },
       ];
     }
-    
+
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
       where.ProductVariant = {
         some: {
@@ -58,7 +58,7 @@ export async function getShopProducts(
         },
       };
     }
-    
+
     if (filters.inStock !== undefined) {
       where.ProductVariant = {
         some: {
@@ -73,7 +73,7 @@ export async function getShopProducts(
 
     // Get total count for pagination
     const total = await prisma.product.count({ where });
-    
+
     // Get products with pagination
     const products = await prisma.product.findMany({
       where,
@@ -91,13 +91,13 @@ export async function getShopProducts(
     const hasMore = page * limit < total;
 
     // Transform to match our interface
-    const transformedProducts: ShopProduct[] = products.map(product => ({
+    const transformedProducts: ShopProduct[] = products.map((product) => ({
       id: product.id,
       name: product.name,
       description: product.description,
       primaryImageUrl: product.primaryImageUrl,
       printifyProductId: product.printifyProductId,
-      variants: product.ProductVariant.map(variant => ({
+      variants: product.ProductVariant.map((variant) => ({
         id: variant.id,
         printifyVariantId: variant.printifyVariantId,
         priceCents: variant.priceCents,
@@ -123,13 +123,13 @@ export async function getShopProducts(
   }
 }
 
-export async function getShopCategories(): Promise<Array<{ slug: string; name: string; count: number }>> {
+export async function getShopCategories(): Promise<
+  Array<{ slug: string; name: string; count: number }>
+> {
   try {
     // Since we don't have categories in the current schema, return a default structure
     // You can extend this later when you add category support
-    return [
-      { slug: 'all', name: 'All Products', count: await prisma.product.count() },
-    ];
+    return [{ slug: 'all', name: 'All Products', count: await prisma.product.count() }];
   } catch (error) {
     console.error('Error fetching shop categories:', error);
     return [];

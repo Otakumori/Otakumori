@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
@@ -160,7 +160,7 @@ export const Leaderboard: React.FC = () => {
         <div className="animate-pulse">
           <div className="mb-4 h-6 w-1/3 rounded bg-gray-200"></div>
           <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map(i => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="h-16 rounded bg-gray-200"></div>
             ))}
           </div>
@@ -208,7 +208,7 @@ export const Leaderboard: React.FC = () => {
       </div>
 
       <div className="space-y-2">
-        {leaderboard.map(entry => (
+        {leaderboard.map((entry) => (
           <div
             key={entry.id}
             className={`flex items-center justify-between rounded-lg border p-4 ${

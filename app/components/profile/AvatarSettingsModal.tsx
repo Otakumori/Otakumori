@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useState } from 'react';
 
 interface AvatarSettingsModalProps {
@@ -74,10 +74,10 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
           <label className="font-cormorant-garamond mb-2 block text-pink-200">Pose</label>
           <select
             value={pose}
-            onChange={e => setPose(e.target.value)}
+            onChange={(e) => setPose(e.target.value)}
             className="w-full rounded bg-pink-400/10 p-2 text-pink-100"
           >
-            {poseOptions.map(opt => (
+            {poseOptions.map((opt) => (
               <option key={opt.value} value={opt.value} disabled={opt.nsfw && !deepAccess}>
                 {opt.label} {opt.nsfw ? '(NSFW)' : ''}
               </option>
@@ -89,10 +89,10 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
           <label className="font-cormorant-garamond mb-2 block text-pink-200">Outfit</label>
           <select
             value={outfit}
-            onChange={e => setOutfit(e.target.value)}
+            onChange={(e) => setOutfit(e.target.value)}
             className="w-full rounded bg-pink-400/10 p-2 text-pink-100"
           >
-            {outfitOptions.map(opt => (
+            {outfitOptions.map((opt) => (
               <option key={opt.value} value={opt.value} disabled={opt.nsfw && !deepAccess}>
                 {opt.label} {opt.nsfw ? '(NSFW)' : ''}
               </option>
@@ -107,7 +107,7 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
                 type="number"
                 placeholder="Age"
                 value={age}
-                onChange={e => setAge(e.target.value)}
+                onChange={(e) => setAge(e.target.value)}
                 className="w-16 rounded bg-pink-400/10 px-2 text-pink-100"
               />
               <button

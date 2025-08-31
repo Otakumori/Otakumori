@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     console.error('Error creating order:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to create order' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

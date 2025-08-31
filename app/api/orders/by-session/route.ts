@@ -1,10 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+export const runtime = "nodejs";
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 
-export const runtime = 'nodejs';
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +20,7 @@ export async function GET(request: NextRequest) {
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -29,7 +33,7 @@ export async function GET(request: NextRequest) {
           ok: false,
           error: 'Session ID required',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,7 +56,7 @@ export async function GET(request: NextRequest) {
           ok: false,
           error: 'Order not found',
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -63,12 +67,12 @@ export async function GET(request: NextRequest) {
           ok: false,
           error: 'Access denied',
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // Get runes for this order
-    const runes = order.UserRunes.map(ur => ({
+    const runes = order.UserRunes.map((ur) => ({
       id: ur.rune.id,
       canonicalId: ur.rune.canonicalId,
       displayName: ur.rune.displayName,
@@ -95,7 +99,7 @@ export async function GET(request: NextRequest) {
           include: { rune: true },
         });
 
-        const userRuneIds = userRunes.map(ur => ur.rune.canonicalId);
+        const userRuneIds = userRunes.map((ur) => ur.rune.canonicalId);
         const isCompleted = combo.members.every((member: string) => userRuneIds.includes(member));
 
         if (isCompleted) {
@@ -125,7 +129,7 @@ export async function GET(request: NextRequest) {
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

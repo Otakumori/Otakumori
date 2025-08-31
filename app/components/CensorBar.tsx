@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 
 interface CensorBarProps {
@@ -10,7 +10,13 @@ interface CensorBarProps {
   text?: string;
 }
 
-const CensorBar: React.FC<CensorBarProps> = ({ variant = 'black', width = 120, height = 24, color, text }) => {
+const CensorBar: React.FC<CensorBarProps> = ({
+  variant = 'black',
+  width = 120,
+  height = 24,
+  color,
+  text,
+}) => {
   let style = {
     width,
     height,
@@ -27,7 +33,11 @@ const CensorBar: React.FC<CensorBarProps> = ({ variant = 'black', width = 120, h
     style.boxShadow = '0 0 8px #fff';
   } else if (variant === 'text') {
     style.background = color || '#222';
-    content = <span style={{ color: '#fff', fontWeight: 700, fontSize: 14, letterSpacing: 1 }}>{text || 'Too lewd for this realm.'}</span>;
+    content = (
+      <span style={{ color: '#fff', fontWeight: 700, fontSize: 14, letterSpacing: 1 }}>
+        {text || 'Too lewd for this realm.'}
+      </span>
+    );
     style.display = 'flex';
     style.alignItems = 'center';
     style.justifyContent = 'center';
@@ -42,4 +52,4 @@ const CensorBar: React.FC<CensorBarProps> = ({ variant = 'black', width = 120, h
   );
 };
 
-export default CensorBar; 
+export default CensorBar;

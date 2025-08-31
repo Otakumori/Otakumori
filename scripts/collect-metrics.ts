@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { monitor } from '../lib/monitor';
 import { logger } from '../app/lib/logger';
 import { redis } from './lib/redis';
@@ -21,7 +21,9 @@ async function collectMetrics() {
 
     logger.info('Metrics collected and stored successfully');
   } catch (error) {
-    logger.error('Error collecting metrics', { extra: { error: error instanceof Error ? error.message : String(error) } });
+    logger.error('Error collecting metrics', {
+      extra: { error: error instanceof Error ? error.message : String(error) },
+    });
   }
 }
 
@@ -29,7 +31,9 @@ async function collectMetrics() {
 setInterval(collectMetrics, 60 * 1000);
 
 // Initial collection
-collectMetrics().catch(error => {
-  logger.error('Failed to collect initial metrics', { extra: { error: error instanceof Error ? error.message : String(error) } });
+collectMetrics().catch((error) => {
+  logger.error('Failed to collect initial metrics', {
+    extra: { error: error instanceof Error ? error.message : String(error) },
+  });
   process.exit(1);
 });

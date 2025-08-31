@@ -1,58 +1,106 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
-import { env } from '@/env.mjs';
+import { headers } from 'next/headers';
+import { WebhookEvent } from '@clerk/nextjs/server';
+import { env } from '@/env';
 
-export const runtime = 'nodejs';
+/**
+ * Clerk webhook handler
+ * Sets default avatar presets for new users
+ */
 
-export async function POST(req: Request) {
-  const payload = await req.text();
-  const h = headers();
-  const svixId = h.get('svix-id');
-  const svixTimestamp = h.get('svix-timestamp');
-  const svixSignature = h.get('svix-signature');
+const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
 
-  if (!svixId || !svixTimestamp || !svixSignature) {
-    return new Response('Missing svix headers', { status: 400 });
+export async function POST(req: NextRequest) {
+  if (!WEBHOOK_SECRET) {
+    return new Response('Webhook secret not configured', { status: 500 });
+  }
+  // Get the headers
+  const headerPayload = headers();
+  const svix_id = headerPayload.get('svix-id');
+  const svix_timestamp = headerPayload.get('svix-timestamp');
+  const svix_signature = headerPayload.get('svix-signature');
+
+  // If there are no headers, error out
+  if (!svix_id || !svix_timestamp || !svix_signature) {
+    return new Response('Error occured -- no svix headers', {
+      status: 400,
+    });
   }
 
-  const wh = new Webhook(env.CLERK_WEBHOOK_SECRET!);
-  let evt;
+  // Get the body
+  const payload = await req.text();
+  const body = JSON.parse(payload);
 
+  // Create a new Svix instance with your secret.
+  const wh = new Webhook(WEBHOOK_SECRET!);
+
+  let evt: WebhookEvent;
+
+  // Verify the payload with the headers
   try {
     evt = wh.verify(payload, {
-      'svix-id': svixId,
-      'svix-timestamp': svixTimestamp,
-      'svix-signature': svixSignature,
+      'svix-id': svix_id,
+      'svix-timestamp': svix_timestamp,
+      'svix-signature': svix_signature,
+    }) as WebhookEvent;
+  } catch (err) {
+    console.error('Error verifying webhook:', err);
+    return new Response('Error occured', {
+      status: 400,
     });
-  } catch {
-    return new Response('Invalid signature', { status: 400 });
   }
 
-  // Handle events as needed (user.created, user.updated, etc.)
-  const eventType = (evt as any).type;
-  console.log(`Received Clerk webhook: ${eventType}`, (evt as any).data);
+  // Handle the webhook
+  const eventType = evt.type;
 
-  switch (eventType) {
-    case 'user.created':
-      // Handle new user creation
-      console.log('New user created:', (evt as any).data);
-      break;
+  if (eventType === 'user.created') {
+    const { id, email_addresses, public_metadata } = evt.data;
 
-    case 'user.updated':
-      // Handle user updates
-      console.log('User updated:', (evt as any).data);
-      break;
+    console.log(`New user created: ${id}`);
 
-    case 'user.deleted':
-      // Handle user deletion
-      console.log('User deleted:', (evt as any).data);
-      break;
+    // Set default avatar preset if not already set
+    if (!public_metadata?.avatarPreset) {
+      try {
+        // Import Clerk client dynamically to avoid issues
+        const { clerkClient } = await import('@clerk/nextjs/server');
 
-    default:
-      console.log(`Unhandled event type: ${eventType}`);
+        // Set a default avatar preset
+        const defaultPreset = {
+          gender: 'female',
+          hair: 'long',
+          hairColor: 'pink',
+          eyes: 'blue',
+          skin: 'fair',
+          outfit: 'casual',
+          accessories: [],
+        };
+
+        await clerkClient.users.updateUserMetadata(id, {
+          publicMetadata: {
+            ...public_metadata,
+            avatarPreset: defaultPreset,
+            joinedAt: new Date().toISOString(),
+          },
+        });
+
+        console.log(`Set default avatar preset for user: ${id}`);
+      } catch (error) {
+        console.error('Error setting avatar preset:', error);
+        // Don't fail the webhook if avatar preset setting fails
+      }
+    }
   }
 
-  return new Response('ok', { status: 200 });
+  if (eventType === 'user.updated') {
+    const { id, public_metadata } = evt.data;
+    console.log(`User updated: ${id}`);
+
+    // Log avatar preset changes for debugging
+    if (public_metadata?.avatarPreset) {
+      console.log(`Avatar preset updated for user: ${id}`, public_metadata.avatarPreset);
+    }
+  }
+
+  return new Response('', { status: 200 });
 }

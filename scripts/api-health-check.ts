@@ -30,7 +30,7 @@ class APIHealthChecker {
     endpoint: string,
     method: 'GET' | 'POST' = 'GET',
     expectedStatus: number = 200,
-    body?: any
+    body?: any,
   ): Promise<TestResult> {
     const startTime = Date.now();
     const url = `${this.baseUrl}${endpoint}`;
@@ -119,8 +119,8 @@ class APIHealthChecker {
   private printResults(): void {
     console.log('\n📋 API Health Check Results:\n');
 
-    const passed = this.results.filter(r => r.status === 'PASS').length;
-    const failed = this.results.filter(r => r.status === 'FAIL').length;
+    const passed = this.results.filter((r) => r.status === 'PASS').length;
+    const failed = this.results.filter((r) => r.status === 'FAIL').length;
     const total = this.results.length;
 
     console.log(`✅ PASSED: ${passed}/${total}`);
@@ -128,10 +128,10 @@ class APIHealthChecker {
     console.log(`📊 SUCCESS RATE: ${((passed / total) * 100).toFixed(1)}%\n`);
 
     // Show failed tests
-    const failedTests = this.results.filter(r => r.status === 'FAIL');
+    const failedTests = this.results.filter((r) => r.status === 'FAIL');
     if (failedTests.length > 0) {
       console.log('❌ FAILED TESTS:');
-      failedTests.forEach(test => {
+      failedTests.forEach((test) => {
         console.log(`  • ${test.method} ${test.endpoint}`);
         if (test.statusCode) console.log(`    Status: ${test.statusCode}`);
         if (test.error) console.log(`    Error: ${test.error}`);
@@ -140,12 +140,12 @@ class APIHealthChecker {
     }
 
     // Show passed tests
-    const passedTests = this.results.filter(r => r.status === 'PASS');
+    const passedTests = this.results.filter((r) => r.status === 'PASS');
     if (passedTests.length > 0) {
       console.log('\n✅ PASSED TESTS:');
-      passedTests.forEach(test => {
+      passedTests.forEach((test) => {
         console.log(
-          `  • ${test.method} ${test.endpoint} (${test.statusCode}) - ${test.responseTime}ms`
+          `  • ${test.method} ${test.endpoint} (${test.statusCode}) - ${test.responseTime}ms`,
         );
       });
     }

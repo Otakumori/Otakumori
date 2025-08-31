@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
+/* eslint-disable-line @next/next/no-img-element */
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/app/lib/prisma';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
   const { userId } = auth();
-  if (!userId) return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+  if (!userId) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
 
-  const { displayName } = await req.json() as { displayName?: string };
+  const { displayName } = (await req.json()) as { displayName?: string };
 
   await prisma.user.update({
     where: { id: userId },

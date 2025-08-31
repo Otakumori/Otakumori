@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,7 +42,7 @@ export default function DarkSoulsMessage({ message, duration = 5000, onComplete 
       const count = Math.floor(Math.random() * 3) + 2; // 2-4 symbols
       return Array.from(
         { length: count },
-        () => runicSymbols[Math.floor(Math.random() * runicSymbols.length)]
+        () => runicSymbols[Math.floor(Math.random() * runicSymbols.length)],
       );
     };
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client'; // 👈 THIS IS THE FIX
 export const dynamic = 'force-dynamic';
 
@@ -22,19 +22,19 @@ function JoinTheBlossomContent() {
       setError('Please enter a valid email address.');
       return;
     }
-    
+
     try {
       // Call our Prisma-based API instead of direct Supabase
       const response = await fetch('/api/newsletter/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Signup failed');
       }
-      
+
       setSubmitted(true);
     } catch (error) {
       setError('Something went wrong. Please try again!');
@@ -64,7 +64,7 @@ function JoinTheBlossomContent() {
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Your email address"
               className="w-full rounded-lg bg-gray-800 px-4 py-2 text-white placeholder-pink-300 shadow focus:outline-none focus:ring-2 focus:ring-pink-500"
               required

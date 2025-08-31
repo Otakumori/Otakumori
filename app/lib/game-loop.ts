@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 export interface GameLoopOptions {
   targetFPS?: number;
   maxFrameSkip?: number;
@@ -34,7 +34,7 @@ export class GameLoop {
     updateTime: 0,
     renderTime: 0,
     frameCount: 0,
-    lastFrameTime: 0
+    lastFrameTime: 0,
   };
 
   constructor(options: GameLoopOptions = {}) {
@@ -58,7 +58,7 @@ export class GameLoop {
       updateTime: 0,
       renderTime: 0,
       frameCount: 0,
-      lastFrameTime: 0
+      lastFrameTime: 0,
     };
 
     this.loop();
@@ -76,7 +76,10 @@ export class GameLoop {
     if (!this.isRunning) return;
 
     const currentTime = performance.now();
-    const deltaTime = Math.min(currentTime - this.lastTime, this.targetFrameTime * this.maxFrameSkip);
+    const deltaTime = Math.min(
+      currentTime - this.lastTime,
+      this.targetFrameTime * this.maxFrameSkip,
+    );
     this.lastTime = currentTime;
 
     this.accumulator += deltaTime;

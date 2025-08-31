@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -36,7 +36,7 @@ export default function CherryBlossomEffect() {
 
     const interval = setInterval(() => {
       if (petals.length < 20) {
-        setPetals(prev => [...prev, createPetal()]);
+        setPetals((prev) => [...prev, createPetal()]);
       }
     }, 1000);
 
@@ -44,7 +44,7 @@ export default function CherryBlossomEffect() {
   }, [petals.length]);
 
   const handlePetalClick = (id: number) => {
-    setPetals(prev => prev.filter(p => p.id !== id));
+    setPetals((prev) => prev.filter((p) => p.id !== id));
     controls.start({
       scale: [1, 1.2, 1],
       transition: { duration: 0.3 },
@@ -57,7 +57,7 @@ export default function CherryBlossomEffect() {
       className="pointer-events-none fixed inset-0 z-0"
       style={{ overflow: 'hidden' }}
     >
-      {petals.map(petal => (
+      {petals.map((petal) => (
         <motion.div
           key={petal.id}
           className="pointer-events-auto absolute cursor-pointer"

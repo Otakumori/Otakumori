@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { createClient } from 'redis';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
@@ -10,7 +10,7 @@ export const redis = createClient({
   password: redisPassword,
 });
 
-redis.on('error', err => console.error('Redis Client Error', err));
+redis.on('error', (err) => console.error('Redis Client Error', err));
 
 (async () => {
   if (!redis.isOpen) {

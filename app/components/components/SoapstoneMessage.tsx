@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -54,7 +54,7 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
 
       {/* Rating System */}
       <div className="mt-2 flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map(star => (
+        {[1, 2, 3, 4, 5].map((star) => (
           <button key={star} onClick={() => handleRate(star)} className="text-xl">
             {star <= rating ? '⭐' : '☆'}
           </button>

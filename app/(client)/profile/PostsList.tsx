@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import useSWR from "swr";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import useSWR from 'swr';
 
-export default function PostsList(){
-  const { data } = useSWR("/api/profile/me", (u)=>fetch(u).then(r=>r.json()));
+export default function PostsList() {
+  const { data } = useSWR('/api/profile/me', (u) => fetch(u).then((r) => r.json()));
   const list = data?.posts ?? [];
   return (
     <div className="list">
-      {list.map((p:any)=>(
+      {list.map((p: any) => (
         <article key={p.id} className="post">
           <div className="mb-1 flex items-center justify-between text-xs opacity-70">
             <span>{new Date(p.createdAt).toLocaleString()}</span>
@@ -19,7 +19,9 @@ export default function PostsList(){
           {!!p.isFlagged && <div className="mt-1 text-xs text-yellow-300/80">Flagged</div>}
         </article>
       ))}
-      {!list.length && <div className="text-sm opacity-60">You haven't posted any soapstones yet.</div>}
+      {!list.length && (
+        <div className="text-sm opacity-60">You haven't posted any soapstones yet.</div>
+      )}
     </div>
   );
 }

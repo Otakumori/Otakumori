@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -54,7 +54,7 @@ export default function SoapstoneForm() {
       <div className="relative">
         <textarea
           value={message}
-          onChange={e => setMessage(e.target.value)}
+          onChange={(e) => setMessage(e.target.value)}
           placeholder="Leave your message, Ashen One..."
           className="h-32 w-full rounded-lg border border-pink-500/30 bg-gray-800/80 p-4 text-pink-200 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-pink-500"
           maxLength={200}

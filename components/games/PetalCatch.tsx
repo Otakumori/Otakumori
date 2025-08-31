@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -36,7 +36,7 @@ export const PetalCatch = () => {
     let timer: NodeJS.Timeout;
     if (gameState.isPlaying && gameState.timeLeft > 0) {
       timer = setInterval(() => {
-        setGameState(prev => ({
+        setGameState((prev) => ({
           ...prev,
           timeLeft: prev.timeLeft - 1,
         }));
@@ -59,7 +59,7 @@ export const PetalCatch = () => {
   };
 
   const handleGameOver = () => {
-    setGameState(prev => ({
+    setGameState((prev) => ({
       ...prev,
       isPlaying: false,
       highScore: Math.max(prev.score, prev.highScore),
@@ -76,7 +76,7 @@ export const PetalCatch = () => {
   const handlePetalCollect = () => {
     if (!gameState.isPlaying) return;
 
-    setGameState(prev => ({
+    setGameState((prev) => ({
       ...prev,
       score: prev.score + 1,
     }));

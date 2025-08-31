@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useState } from 'react';
 
 interface MemoryEntry {
@@ -21,20 +21,26 @@ const MemoryLog: React.FC<MemoryLogProps> = ({ entries }) => {
         <span className="text-pink-400 font-bold text-lg mr-2">Senpai.exe Memory Log</span>
         <button
           className="ml-auto px-3 py-1 rounded bg-pink-700/80 text-white text-xs hover:bg-pink-600/90"
-          onClick={() => setCensor(c => !c)}
+          onClick={() => setCensor((c) => !c)}
         >
           {censor ? 'Show All' : 'Censor Spicy'}
         </button>
       </div>
       <div className="space-y-4">
         {entries.length === 0 && <div className="text-pink-200">No memories yet…</div>}
-        {entries.map(entry => (
+        {entries.map((entry) => (
           <div
             key={entry.id}
             className={`p-3 rounded-lg border border-pink-800/40 bg-black/40 shadow-inner ${entry.spicy && censor ? 'blur-sm' : ''}`}
           >
-            <span className={`block text-xs mb-1 ${entry.type === 'senpai' ? 'text-pink-400' : entry.type === 'lore' ? 'text-violet-400' : 'text-white'}`}>
-              {entry.type === 'senpai' ? 'Senpai.exe' : entry.type === 'lore' ? 'Lore Fragment' : 'Player'}
+            <span
+              className={`block text-xs mb-1 ${entry.type === 'senpai' ? 'text-pink-400' : entry.type === 'lore' ? 'text-violet-400' : 'text-white'}`}
+            >
+              {entry.type === 'senpai'
+                ? 'Senpai.exe'
+                : entry.type === 'lore'
+                  ? 'Lore Fragment'
+                  : 'Player'}
             </span>
             <span className="whitespace-pre-line text-pink-100">{entry.content}</span>
             {entry.spicy && censor && (
@@ -47,4 +53,4 @@ const MemoryLog: React.FC<MemoryLogProps> = ({ entries }) => {
   );
 };
 
-export default MemoryLog; 
+export default MemoryLog;

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
@@ -33,7 +33,7 @@ export default function Hero() {
 
   const handlePetalClick = async () => {
     if (loading) return;
-    
+
     setLoading(true);
     try {
       const response = await fetch('/api/petals', {
@@ -57,7 +57,7 @@ export default function Hero() {
         petal.style.left = Math.random() * window.innerWidth + 'px';
         petal.style.top = Math.random() * window.innerHeight + 'px';
         document.body.appendChild(petal);
-        
+
         setTimeout(() => {
           document.body.removeChild(petal);
         }, 2000);
@@ -87,7 +87,9 @@ export default function Hero() {
       <div className="absolute bottom-10 rounded-lg bg-black/80 p-3 text-white shadow-lg">
         <div className="text-center">
           <div className="text-lg font-semibold">Community Petals Collected</div>
-          <div className="text-2xl font-bold text-pink-400">{collected.toLocaleString()} / 10,000</div>
+          <div className="text-2xl font-bold text-pink-400">
+            {collected.toLocaleString()} / 10,000
+          </div>
         </div>
       </div>
 

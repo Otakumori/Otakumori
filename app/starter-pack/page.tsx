@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
@@ -21,11 +21,11 @@ export default function StarterPackPage() {
     try {
       // Track starter pack signup for quests
       await trackQuest('browse-collection');
-      
+
       const response = await fetch('/api/starter-pack', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
@@ -35,7 +35,7 @@ export default function StarterPackPage() {
       }
 
       setSuccess(true);
-      
+
       // Trigger download
       if (data.url) {
         const link = document.createElement('a');
@@ -45,7 +45,6 @@ export default function StarterPackPage() {
         link.click();
         document.body.removeChild(link);
       }
-
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -58,12 +57,10 @@ export default function StarterPackPage() {
       <main className="min-h-screen bg-gradient-to-br from-cube-900 via-cube-800 to-slate-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
           <div className="mb-6 text-6xl">🎉</div>
-          <h1 className="text-2xl font-bold text-slatey-200 mb-4">
-            Welcome to the Adventure!
-          </h1>
+          <h1 className="text-2xl font-bold text-slatey-200 mb-4">Welcome to the Adventure!</h1>
           <p className="text-slatey-400 mb-6">
-            Your starter pack is downloading now. We've also sent the link to your email 
-            so you can re-download anytime.
+            Your starter pack is downloading now. We've also sent the link to your email so you can
+            re-download anytime.
           </p>
           <div className="bg-slate-800/50 rounded-xl p-4 mb-6">
             <h3 className="text-slatey-200 font-medium mb-2">What's Inside:</h3>
@@ -75,7 +72,7 @@ export default function StarterPackPage() {
               <li>• Quick start tutorial</li>
             </ul>
           </div>
-          <a 
+          <a
             href="/"
             className="inline-block bg-sakura-500/20 border border-sakura-400 text-slatey-200 px-6 py-3 rounded-xl hover:bg-sakura-500/30 transition-colors"
           >
@@ -92,12 +89,10 @@ export default function StarterPackPage() {
         {/* Hero Section */}
         <div className="text-center mb-8">
           <div className="mb-4 text-6xl">🎮</div>
-          <h1 className="text-3xl font-bold text-slatey-200 mb-4">
-            Free Starter Pack
-          </h1>
+          <h1 className="text-3xl font-bold text-slatey-200 mb-4">Free Starter Pack</h1>
           <p className="text-lg text-slatey-400">
-            Get your first taste of Otakumori's retro gaming assets. 
-            No strings attached, just pure pixel goodness.
+            Get your first taste of Otakumori's retro gaming assets. No strings attached, just pure
+            pixel goodness.
           </p>
         </div>
 
@@ -112,7 +107,7 @@ export default function StarterPackPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700">
             <div className="flex items-center gap-3">
               <div className="text-2xl">🔊</div>
@@ -122,7 +117,7 @@ export default function StarterPackPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700">
             <div className="flex items-center gap-3">
               <div className="text-2xl">🎯</div>
@@ -139,7 +134,7 @@ export default function StarterPackPage() {
           <h2 className="text-xl font-semibold text-slatey-200 mb-4 text-center">
             Get Your Free Pack
           </h2>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slatey-300 mb-2">
@@ -155,13 +150,13 @@ export default function StarterPackPage() {
                 className="w-full px-4 py-3 rounded-xl border border-slate-600 bg-slate-700 text-slatey-200 placeholder-slatey-400 focus:border-sakura-400 focus:outline-none transition-colors"
               />
             </div>
-            
+
             {error && (
               <div className="text-red-400 text-sm bg-red-900/20 border border-red-800 rounded-lg p-3">
                 {error}
               </div>
             )}
-            
+
             <button
               type="submit"
               disabled={loading || !email}
@@ -170,10 +165,10 @@ export default function StarterPackPage() {
               {loading ? 'Preparing Download...' : 'Download Starter Pack'}
             </button>
           </form>
-          
+
           <p className="text-xs text-slatey-400 text-center mt-4">
-            We'll send you the download link and occasional updates about new assets.
-            Unsubscribe anytime.
+            We'll send you the download link and occasional updates about new assets. Unsubscribe
+            anytime.
           </p>
         </div>
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useUser } from '@clerk/nextjs';
@@ -42,7 +42,7 @@ export function useUserProfile(): UseUserProfileReturn {
       setError(null);
 
       const response = await fetch('/api/user/profile');
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch profile');
       }
@@ -121,7 +121,7 @@ export function useUserCart() {
       setError(null);
 
       const response = await fetch('/api/user/cart');
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch cart');
       }
@@ -166,7 +166,7 @@ export function useUserOrders() {
       setError(null);
 
       const response = await fetch('/api/user/orders');
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }

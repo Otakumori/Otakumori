@@ -81,21 +81,60 @@
       "positive": "dark fantasy HUD rune icons, glowing ember outlines, crisp vector silhouettes, high contrast, readable at 48px, minimal grunge, UI icon sheet, transparent background",
       "negative": "realistic photo, text, watermark, busy background, lowres",
       "count": 12,
-      "names": ["guard", "eternal", "abyss", "light", "fire", "ice", "poison", "shock", "wind", "earth", "blood", "void"]
+      "names": [
+        "guard",
+        "eternal",
+        "abyss",
+        "light",
+        "fire",
+        "ice",
+        "poison",
+        "shock",
+        "wind",
+        "earth",
+        "blood",
+        "void"
+      ]
     },
     "hud.kawaii.icons": {
       "positive": "kawaii HUD icons, cute silhouettes, soft edges, pastel colors, readable at 48px, minimal noise, transparent background",
       "negative": "realistic, dark, harsh edges, busy background",
       "palette": ["#ffb6c1", "#ffc0cb", "#ffd1dc", "#ffe4e1", "#f0f8ff"],
       "count": 12,
-      "names": ["heart", "star", "flower", "crown", "gem", "moon", "sun", "cloud", "leaf", "butterfly", "rainbow", "sparkle"]
+      "names": [
+        "heart",
+        "star",
+        "flower",
+        "crown",
+        "gem",
+        "moon",
+        "sun",
+        "cloud",
+        "leaf",
+        "butterfly",
+        "rainbow",
+        "sparkle"
+      ]
     },
     "hud.cozy.icons": {
       "positive": "cozy HUD icons, warm silhouettes, soft edges, earth tones, readable at 48px, minimal noise, transparent background",
       "negative": "realistic, bright, harsh edges, busy background",
       "palette": ["#8b4513", "#a0522d", "#cd853f", "#deb887", "#f5deb3"],
       "count": 12,
-      "names": ["home", "fire", "tree", "mountain", "river", "sun", "moon", "star", "leaf", "flower", "heart", "peace"]
+      "names": [
+        "home",
+        "fire",
+        "tree",
+        "mountain",
+        "river",
+        "sun",
+        "moon",
+        "star",
+        "leaf",
+        "flower",
+        "heart",
+        "peace"
+      ]
     },
     "char.psx.hunk": {
       "positive": "PS1-style male character portrait, handsome features, strong jawline, confident expression, limited color palette, nostalgic console look",

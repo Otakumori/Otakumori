@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -23,7 +23,7 @@ export const FriendChat = ({ friendId }: { friendId: string }) => {
   const { playSound } = useSound();
   const { vibrate } = useHaptic();
 
-  const friend = friends.find(f => f.id === friendId);
+  const friend = friends.find((f) => f.id === friendId);
 
   useEffect(() => {
     // Scroll to bottom when new messages arrive
@@ -40,7 +40,7 @@ export const FriendChat = ({ friendId }: { friendId: string }) => {
       timestamp: Date.now(),
     };
 
-    setMessages(prev => [...prev, message]);
+    setMessages((prev) => [...prev, message]);
     setNewMessage('');
     playSound('click');
     vibrate('light');
@@ -53,7 +53,7 @@ export const FriendChat = ({ friendId }: { friendId: string }) => {
         content: 'Thanks for your message! This is a simulated response.',
         timestamp: Date.now(),
       };
-      setMessages(prev => [...prev, response]);
+      setMessages((prev) => [...prev, response]);
       playSound('notification');
       vibrate('success');
     }, 1000);
@@ -85,7 +85,7 @@ export const FriendChat = ({ friendId }: { friendId: string }) => {
       </div>
 
       <div className="mb-4 h-96 space-y-4 overflow-y-auto">
-        {messages.map(message => (
+        {messages.map((message) => (
           <motion.div
             key={message.id}
             initial={{ opacity: 0, y: 10 }}
@@ -111,8 +111,8 @@ export const FriendChat = ({ friendId }: { friendId: string }) => {
         <input
           type="text"
           value={newMessage}
-          onChange={e => setNewMessage(e.target.value)}
-          onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
           placeholder="Type a message..."
           className="flex-1 rounded-lg bg-white/20 px-4 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
         />

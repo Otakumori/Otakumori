@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -76,9 +76,7 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
                 <div className="text-pink-400 text-6xl font-bold tracking-wider mb-4">
                   OTAKUMORI
                 </div>
-                <div className="text-neutral-400 text-lg">
-                  Loading the realm...
-                </div>
+                <div className="text-neutral-400 text-lg">Loading the realm...</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -96,13 +94,20 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
                   OTAKUMORI
                 </div>
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  <div
+                    className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                    style={{ animationDelay: '0ms' }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                    style={{ animationDelay: '150ms' }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                    style={{ animationDelay: '300ms' }}
+                  ></div>
                 </div>
-                <div className="text-neutral-400 text-sm">
-                  Initializing mini-games...
-                </div>
+                <div className="text-neutral-400 text-sm">Initializing mini-games...</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -116,12 +121,8 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
                 exit={{ opacity: 0, scale: 1.2 }}
                 className="text-center"
               >
-                <div className="text-pink-400 text-4xl font-bold tracking-wider mb-4">
-                  READY
-                </div>
-                <div className="text-neutral-400 text-lg">
-                  Enter the arena...
-                </div>
+                <div className="text-pink-400 text-4xl font-bold tracking-wider mb-4">READY</div>
+                <div className="text-neutral-400 text-lg">Enter the arena...</div>
               </motion.div>
             )}
           </AnimatePresence>

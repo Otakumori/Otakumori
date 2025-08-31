@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,7 +22,7 @@ export const ReactiveAvatar = ({ className = '' }: ReactiveAvatarProps) => {
 
   // Calculate avatar state based on user progress
   const calculateMood = () => {
-    const unlockedAchievements = achievements.filter(a => a.unlockedAt).length;
+    const unlockedAchievements = achievements.filter((a) => a.unlockedAt).length;
     const totalAchievements = achievements.length;
     const achievementRatio = unlockedAchievements / totalAchievements;
 

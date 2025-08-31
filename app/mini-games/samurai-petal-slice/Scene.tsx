@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { getAsset } from "../_shared/assets-resolver";
-import { play } from "../_shared/audio-bus";
-import "../_shared/cohesion.css";
+import { useEffect, useRef, useState } from 'react';
+import { getAsset } from '../_shared/assets-resolver';
+import { play } from '../_shared/audio-bus';
+import '../_shared/cohesion.css';
 
 // --- tunables (env/admin later) ---
 const PETALS_START = 28;
 const PETALS_MAX = 60;
 const PETAL_SPEED = { min: 0.7, max: 1.7 }; // px/ms
 const WIND_X = 0.05; // base drift
-const CRIT_ANGLE = 22 * Math.PI / 180; // slash ± deg for crit
+const CRIT_ANGLE = (22 * Math.PI) / 180; // slash ± deg for crit
 const SLASH_LIFE = 220; // ms trail fade
 const ROUND_TIME = 60_000; // 60 sec
 
@@ -33,26 +33,33 @@ type SlashPt = { x: number; y: number; t: number };
 export default function SamuraiSlice() {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [over, setOver] = useState<null | { score: number; hits: number; crit: number; miss: number }>(null);
+  const [over, setOver] = useState<null | {
+    score: number;
+    hits: number;
+    crit: number;
+    miss: number;
+  }>(null);
 
   useEffect(() => {
-    const host = hostRef.current!, c = canvasRef.current!;
-    const ctx = c.getContext("2d")!;
+    const host = hostRef.current!,
+      c = canvasRef.current!;
+    const ctx = c.getContext('2d')!;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     // assets via roles
-    const bgUrl = getAsset("samurai-petal-slice", "bg") ?? "";
-    const petalUrl = getAsset("samurai-petal-slice", "petalParticle") ?? "";
-    const slashSfx = getAsset("samurai-petal-slice", "slashSfx") ?? "";
-    const hitSfx = getAsset("samurai-petal-slice", "hitSfx") ?? "";
-    const missSfx = getAsset("samurai-petal-slice", "missSfx") ?? "";
+    const bgUrl = getAsset('samurai-petal-slice', 'bg') ?? '';
+    const petalUrl = getAsset('samurai-petal-slice', 'petalParticle') ?? '';
+    const slashSfx = getAsset('samurai-petal-slice', 'slashSfx') ?? '';
+    const hitSfx = getAsset('samurai-petal-slice', 'hitSfx') ?? '';
+    const missSfx = getAsset('samurai-petal-slice', 'missSfx') ?? '';
 
     const bgImg = new Image();
     if (bgUrl) bgImg.src = bgUrl;
     const petalImg = new Image();
     if (petalUrl) petalImg.src = petalUrl;
 
-    let W = 800, H = 480;
+    let W = 800,
+      H = 480;
     let running = true;
 
     function resize() {
@@ -66,7 +73,7 @@ export default function SamuraiSlice() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
-    window.addEventListener("resize", resize);
+    window.addEventListener('resize', resize);
 
     // game state
     const petals: Petal[] = [];
@@ -79,7 +86,7 @@ export default function SamuraiSlice() {
     let miss = 0;
     let crit = 0;
     const endAt = performance.now() + ROUND_TIME;
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
     // spawn petals
     function spawn(n: number) {
@@ -94,7 +101,7 @@ export default function SamuraiSlice() {
           r: Math.random() * Math.PI * 2,
           s,
           hit: false,
-          glow: 0
+          glow: 0,
         });
       }
     }
@@ -119,9 +126,9 @@ export default function SamuraiSlice() {
       if (trail.length > 40) trail.shift();
       if (slashSfx) play(slashSfx, -8);
     }
-    c.addEventListener("pointerdown", onDown);
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
+    c.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
 
     function pruneTrail(now: number) {
       // keep only last SLASH_LIFE ms
@@ -133,20 +140,24 @@ export default function SamuraiSlice() {
     // simple spatial grid to speed intersections
     function checkIntersections() {
       if (trail.length < 2) return;
-      const a = trail[trail.length - 2], b = trail[trail.length - 1];
-      const dx = b.x - a.x, dy = b.y - a.y;
+      const a = trail[trail.length - 2],
+        b = trail[trail.length - 1];
+      const dx = b.x - a.x,
+        dy = b.y - a.y;
       const len = Math.hypot(dx, dy);
       if (len < 6) return; // too short
 
       const angle = Math.atan2(dy, dx); // slash angle
-      let anyHit = false, anyCrit = false;
+      let anyHit = false,
+        anyCrit = false;
 
       for (const p of petals) {
         if (p.hit) continue;
         // distance from petal to segment ab < radius
         const r = 12 * p.s;
         const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / (len * len)));
-        const px = a.x + t * dx, py = a.y + t * dy;
+        const px = a.x + t * dx,
+          py = a.y + t * dy;
         const d2 = (px - p.x) * (px - p.x) + (py - p.y) * (py - p.y);
         if (d2 <= r * r) {
           p.hit = true;
@@ -210,30 +221,32 @@ export default function SamuraiSlice() {
       // bg
       if (bgImg.complete && bgImg.naturalWidth > 0) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
-        const iw = bgImg.naturalWidth * s, ih = bgImg.naturalHeight * s;
+        const iw = bgImg.naturalWidth * s,
+          ih = bgImg.naturalHeight * s;
         ctx.drawImage(bgImg, (W - iw) / 2, (H - ih) / 2, iw, ih);
       } else {
         const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, "#0e0c11");
-        g.addColorStop(1, "#1a1321");
+        g.addColorStop(0, '#0e0c11');
+        g.addColorStop(1, '#1a1321');
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
       }
 
       // petals
       for (const p of petals) {
-        const w = 18 * p.s, h = 12 * p.s;
+        const w = 18 * p.s,
+          h = 12 * p.s;
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.r);
         if (p.glow > 0) {
           // burst aura
           ctx.shadowBlur = 18 * p.glow;
-          ctx.shadowColor = "rgba(255,170,190,0.9)";
+          ctx.shadowColor = 'rgba(255,170,190,0.9)';
         }
         if (petalImg.complete) ctx.drawImage(petalImg, -w / 2, -h / 3, w, h);
         else {
-          ctx.fillStyle = "#ffb7c5";
+          ctx.fillStyle = '#ffb7c5';
           ctx.fillRect(-w / 2, -h / 2, w, h);
         }
         ctx.restore();
@@ -242,9 +255,10 @@ export default function SamuraiSlice() {
       // slash trail (additive)
       if (trail.length >= 2) {
         ctx.save();
-        ctx.globalCompositeOperation = "lighter";
+        ctx.globalCompositeOperation = 'lighter';
         for (let i = 1; i < trail.length; i++) {
-          const a = trail[i - 1], b = trail[i];
+          const a = trail[i - 1],
+            b = trail[i];
           const age = (now - b.t) / SLASH_LIFE;
           if (age > 1) continue;
           ctx.strokeStyle = `rgba(255,170,190,${Math.max(0, 1 - age)})`;
@@ -259,8 +273,8 @@ export default function SamuraiSlice() {
 
       // UI: timer & score
       const remain = Math.max(0, endAt - now);
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.font = "600 16px ui-sans-serif, system-ui";
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.font = '600 16px ui-sans-serif, system-ui';
       ctx.fillText(`Score ${score}`, 14, 24);
       ctx.fillText(`Time ${Math.ceil(remain / 1000)}s`, 14, 46);
     }
@@ -283,26 +297,26 @@ export default function SamuraiSlice() {
     async function end() {
       setOver({ score, hits, crit, miss });
       try {
-        await fetch("/api/games/finish", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        await fetch('/api/games/finish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            game: "samurai-petal-slice",
+            game: 'samurai-petal-slice',
             score,
             durationMs: ROUND_TIME,
-            stats: { hits, crit, miss }
-          })
+            stats: { hits, crit, miss },
+          }),
         });
-      } catch { }
+      } catch {}
     }
 
     return () => {
       running = false;
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      c.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener('resize', resize);
+      c.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
     };
   }, []);
 
@@ -314,8 +328,15 @@ export default function SamuraiSlice() {
           <div className="rounded-2xl border border-pink-300/40 bg-black/60 px-6 py-4 text-pink-100">
             <div className="text-xl font-semibold">Samurai Petal Slice</div>
             <div className="mt-2 text-pink-200/90">Score: {over.score}</div>
-            <div className="text-pink-200/70">Hits: {over.hits} • Crit: {over.crit} • Miss: {over.miss}</div>
-            <a href="/mini-games" className="mt-3 inline-block rounded-xl border border-pink-300/40 px-3 py-2 hover:bg-pink-300/10">Back to hub</a>
+            <div className="text-pink-200/70">
+              Hits: {over.hits} • Crit: {over.crit} • Miss: {over.miss}
+            </div>
+            <a
+              href="/mini-games"
+              className="mt-3 inline-block rounded-xl border border-pink-300/40 px-3 py-2 hover:bg-pink-300/10"
+            >
+              Back to hub
+            </a>
           </div>
         </div>
       )}

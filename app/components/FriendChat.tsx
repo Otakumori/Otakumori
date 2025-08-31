@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useState, useEffect, useRef } from 'react';
 
 interface Message {
@@ -67,7 +67,7 @@ export const FriendChat: React.FC = () => {
             addMessage(selectedFriend.id, selectedFriend.name, randomResponse, false);
           }
         },
-        2000 + Math.random() * 3000
+        2000 + Math.random() * 3000,
       );
       return () => clearTimeout(timer);
     }
@@ -82,7 +82,7 @@ export const FriendChat: React.FC = () => {
       timestamp: new Date(),
       isOwn,
     };
-    setMessages(prev => [...prev, message]);
+    setMessages((prev) => [...prev, message]);
   };
 
   const handleSendMessage = () => {
@@ -164,10 +164,10 @@ export const FriendChat: React.FC = () => {
             fontWeight: 'bold',
           }}
         >
-          Friends ({friends.filter(f => f.status === 'online').length} online)
+          Friends ({friends.filter((f) => f.status === 'online').length} online)
         </div>
 
-        {friends.map(friend => (
+        {friends.map((friend) => (
           <div
             key={friend.id}
             onClick={() => setSelectedFriend(friend)}
@@ -179,12 +179,12 @@ export const FriendChat: React.FC = () => {
               color: selectedFriend?.id === friend.id ? '#fff' : '#ccc',
               transition: 'all 0.2s ease',
             }}
-            onMouseEnter={e => {
+            onMouseEnter={(e) => {
               if (selectedFriend?.id !== friend.id) {
                 e.currentTarget.style.background = '#333';
               }
             }}
-            onMouseLeave={e => {
+            onMouseLeave={(e) => {
               if (selectedFriend?.id !== friend.id) {
                 e.currentTarget.style.background = 'transparent';
               }
@@ -281,7 +281,7 @@ export const FriendChat: React.FC = () => {
                 </div>
               )}
 
-              {messages.map(message => (
+              {messages.map((message) => (
                 <div
                   key={message.id}
                   style={{
@@ -350,7 +350,7 @@ export const FriendChat: React.FC = () => {
               <div style={{ display: 'flex', gap: '8px' }}>
                 <textarea
                   value={newMessage}
-                  onChange={e => setNewMessage(e.target.value)}
+                  onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={`Message ${selectedFriend.name}...`}
                   style={{

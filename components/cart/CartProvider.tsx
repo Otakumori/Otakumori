@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
@@ -34,15 +34,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Add item to cart
   const addItem = (newItem: CartItem) => {
-    setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === newItem.id);
-      
+    setItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === newItem.id);
+
       if (existingItem) {
         // Update quantity if item already exists
-        return prevItems.map(item =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + newItem.quantity }
-            : item
+        return prevItems.map((item) =>
+          item.id === newItem.id ? { ...item, quantity: item.quantity + newItem.quantity } : item,
         );
       } else {
         // Add new item
@@ -53,7 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Remove item from cart
   const removeItem = (id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   // Update item quantity
@@ -62,11 +60,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem(id);
       return;
     }
-    
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
+
+    setItems((prevItems) =>
+      prevItems.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
   };
 
@@ -79,7 +75,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
 
   // Calculate total price
-  const totalPrice = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const totalPrice = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const value: CartContextType = {
     items,
@@ -91,11 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     totalPrice,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 // Custom hook to use cart context

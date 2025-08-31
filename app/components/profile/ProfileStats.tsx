@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -75,7 +75,7 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
           Achievements
         </h2>
         <div className="flex gap-4 overflow-x-auto pb-2">
-          {achievements.map(ach => (
+          {achievements.map((ach) => (
             <motion.div
               key={ach.id}
               whileHover={{ scale: 1.08 }}

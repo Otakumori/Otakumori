@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -92,7 +92,7 @@ export default function ProfileHeader() {
           <h1 className="text-2xl font-bold text-white mb-2">Profile</h1>
           <p className="text-neutral-400">Your anime identity and achievements</p>
         </div>
-        
+
         {/* Colorful Text Toggle */}
         <div className="flex items-center gap-3">
           <span className="text-sm text-neutral-300">Colorful Text</span>
@@ -116,19 +116,19 @@ export default function ProfileHeader() {
         {/* Frame */}
         {equippedState?.frame && (
           <div className="absolute inset-0">
-            <img 
-              src={equippedState.frame.imageUrl || '/assets/ui/frames/default.png'} 
+            <img
+              src={equippedState.frame.imageUrl || '/assets/ui/frames/default.png'}
               alt={equippedState.frame.name}
               className="w-full h-full object-cover"
             />
           </div>
         )}
-        
+
         {/* Overlay */}
         {equippedState?.overlay && (
           <div className="absolute inset-0">
-            <img 
-              src={equippedState.overlay.imageUrl || '/assets/ui/overlays/default.png'} 
+            <img
+              src={equippedState.overlay.imageUrl || '/assets/ui/overlays/default.png'}
               alt={equippedState.overlay.name}
               className="w-full h-full object-cover mix-blend-overlay"
             />
@@ -142,25 +142,29 @@ export default function ProfileHeader() {
             <div className="w-24 h-24 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full border-4 border-pink-500/30 mx-auto mb-4 flex items-center justify-center">
               <span className="text-4xl">👤</span>
             </div>
-            
+
             {/* Title */}
             {equippedState?.title && (
               <div className="mb-2">
-                <span className={`text-lg font-semibold px-3 py-1 rounded-full border ${getRarityColor(equippedState.title.rarity)}`}>
+                <span
+                  className={`text-lg font-semibold px-3 py-1 rounded-full border ${getRarityColor(equippedState.title.rarity)}`}
+                >
                   {equippedState.title.name}
                 </span>
               </div>
             )}
-            
+
             {/* Username with Colorful Text Preview */}
-            <h2 className={`text-2xl font-bold ${
-              colorfulTextEnabled 
-                ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent' 
-                : 'text-white'
-            }`}>
+            <h2
+              className={`text-2xl font-bold ${
+                colorfulTextEnabled
+                  ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent'
+                  : 'text-white'
+              }`}
+            >
               Username
             </h2>
-            
+
             {/* Badges */}
             {equippedState?.badges && equippedState.badges.length > 0 && (
               <div className="flex items-center justify-center gap-2 mt-3">
@@ -174,7 +178,9 @@ export default function ProfileHeader() {
                   </div>
                 ))}
                 {equippedState.badges.length > 3 && (
-                  <span className="text-xs text-neutral-400">+{equippedState.badges.length - 3}</span>
+                  <span className="text-xs text-neutral-400">
+                    +{equippedState.badges.length - 3}
+                  </span>
                 )}
               </div>
             )}
@@ -195,33 +201,45 @@ export default function ProfileHeader() {
         {equippedState?.frame && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
             <div className="text-2xl mb-2">🖼️</div>
-            <div className="text-xs font-medium text-white truncate">{equippedState.frame.name}</div>
-            <span className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(equippedState.frame.rarity)}`}>
+            <div className="text-xs font-medium text-white truncate">
+              {equippedState.frame.name}
+            </div>
+            <span
+              className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(equippedState.frame.rarity)}`}
+            >
               {getRarityIcon(equippedState.frame.rarity)}
             </span>
           </div>
         )}
-        
+
         {equippedState?.overlay && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
             <div className="text-2xl mb-2">✨</div>
-            <div className="text-xs font-medium text-white truncate">{equippedState.overlay.name}</div>
-            <span className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(equippedState.overlay.rarity)}`}>
+            <div className="text-xs font-medium text-white truncate">
+              {equippedState.overlay.name}
+            </div>
+            <span
+              className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(equippedState.overlay.rarity)}`}
+            >
               {getRarityIcon(equippedState.overlay.rarity)}
             </span>
           </div>
         )}
-        
+
         {equippedState?.title && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
             <div className="text-2xl mb-2">👑</div>
-            <div className="text-xs font-medium text-white truncate">{equippedState.title.name}</div>
-            <span className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(equippedState.title.rarity)}`}>
+            <div className="text-xs font-medium text-white truncate">
+              {equippedState.title.name}
+            </div>
+            <span
+              className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(equippedState.title.rarity)}`}
+            >
               {getRarityIcon(equippedState.title.rarity)}
             </span>
           </div>
         )}
-        
+
         <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
           <div className="text-2xl mb-2">🏅</div>
           <div className="text-xs font-medium text-white">

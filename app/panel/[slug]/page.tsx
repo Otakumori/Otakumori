@@ -24,21 +24,41 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
     description: 'Shop and trading hub for the community',
     icon: <ShoppingBag className="h-12 w-12 text-pink-400" />,
     routes: [
-      { name: 'Shop Collection', href: '/shop', description: 'Browse anime-inspired apparel and accessories' },
+      {
+        name: 'Shop Collection',
+        href: '/shop',
+        description: 'Browse anime-inspired apparel and accessories',
+      },
       { name: 'Trade Items', href: '/trade', description: 'Exchange items with other players' },
-      { name: 'Petals Store', href: '/account/petals', description: 'Spend your hard-earned petals' },
-    ]
+      {
+        name: 'Petals Store',
+        href: '/account/petals',
+        description: 'Spend your hard-earned petals',
+      },
+    ],
   },
   'mini-games': {
     title: 'Mini-Games',
     description: 'Seasonal arcade games and challenges',
     icon: <Gamepad2 className="h-12 w-12 text-purple-400" />,
     routes: [
-      { name: 'Samurai Petal Slice', href: '/mini-games/samurai-petal-slice', description: 'Draw the Tetsusaiga\'s arc' },
-      { name: 'Memory Match', href: '/mini-games/memory-match', description: 'Recall the faces bound by fate' },
-      { name: 'Rhythm Beat-Em-Up', href: '/mini-games/rhythm-beat-em-up', description: 'Sync to the Moon Prism\'s pulse' },
+      {
+        name: 'Samurai Petal Slice',
+        href: '/mini-games/samurai-petal-slice',
+        description: "Draw the Tetsusaiga's arc",
+      },
+      {
+        name: 'Memory Match',
+        href: '/mini-games/memory-match',
+        description: 'Recall the faces bound by fate',
+      },
+      {
+        name: 'Rhythm Beat-Em-Up',
+        href: '/mini-games/rhythm-beat-em-up',
+        description: "Sync to the Moon Prism's pulse",
+      },
       { name: 'All Games', href: '/mini-games', description: 'Browse all available mini-games' },
-    ]
+    ],
   },
   community: {
     title: 'Avatar / Community Hub',
@@ -46,10 +66,14 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
     icon: <Users className="h-12 w-12 text-blue-400" />,
     routes: [
       { name: 'Profile', href: '/profile', description: 'Customize your avatar and profile' },
-      { name: 'Achievements', href: '/profile/achievements', description: 'View your unlocked achievements' },
+      {
+        name: 'Achievements',
+        href: '/profile/achievements',
+        description: 'View your unlocked achievements',
+      },
       { name: 'Friends', href: '/friends', description: 'Connect with other players' },
       { name: 'Community', href: '/community', description: 'Join discussions and events' },
-    ]
+    ],
   },
   music: {
     title: 'Music / Extras',
@@ -59,7 +83,7 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
       { name: 'Music Player', href: '/music', description: 'Listen to curated anime OSTs' },
       { name: 'Playlists', href: '/music/playlists', description: 'Community-created playlists' },
       { name: 'Bonus Content', href: '/bonus', description: 'Exclusive extras and rewards' },
-    ]
+    ],
   },
   about: {
     title: 'About',
@@ -69,8 +93,8 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
       { name: 'About Us', href: '/about', description: 'Our story and mission' },
       { name: 'FAQ', href: '/faq', description: 'Frequently asked questions' },
       { name: 'Contact', href: '/contact', description: 'Get in touch with us' },
-    ]
-  }
+    ],
+  },
 };
 
 export default function PanelPage() {
@@ -97,7 +121,7 @@ export default function PanelPage() {
       <div className="border-b border-neutral-800">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/gamecube"
               className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
             >

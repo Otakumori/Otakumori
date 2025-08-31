@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 // Disabled during Supabase to Prisma migration
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  return NextResponse.json({ 
-    error: "Supabase test disabled during migration to Prisma" 
-  }, { status: 503 });
+  return NextResponse.json(
+    {
+      error: 'Supabase test disabled during migration to Prisma',
+    },
+    { status: 503 },
+  );
 }

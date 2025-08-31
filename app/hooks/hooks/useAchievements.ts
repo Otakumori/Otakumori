@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
@@ -57,7 +57,7 @@ export const useAchievements = () => {
   const [showUnlock, setShowUnlock] = useState<Achievement | null>(null);
 
   const checkAchievements = (count: number) => {
-    const newAchievements = achievements.map(achievement => {
+    const newAchievements = achievements.map((achievement) => {
       if (count >= achievement.requirement && !achievement.unlocked) {
         setShowUnlock(achievement);
         return { ...achievement, unlocked: true };
@@ -72,7 +72,7 @@ export const useAchievements = () => {
   };
 
   const getUnlockedCount = () => {
-    return achievements.filter(a => a.unlocked).length;
+    return achievements.filter((a) => a.unlocked).length;
   };
 
   return {

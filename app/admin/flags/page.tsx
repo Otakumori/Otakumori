@@ -1,47 +1,47 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
 interface FeatureFlag {
   id: string;
   name: string;
   description: string;
   enabled: boolean;
-  category: "events" | "gameplay" | "economy" | "admin";
+  category: 'events' | 'gameplay' | 'economy' | 'admin';
 }
 
 const DEFAULT_FLAGS: FeatureFlag[] = [
   {
-    id: "event_hanami",
-    name: "Hanami Event",
-    description: "Enable cherry blossom festival content and rewards",
+    id: 'event_hanami',
+    name: 'Hanami Event',
+    description: 'Enable cherry blossom festival content and rewards',
     enabled: true,
-    category: "events"
+    category: 'events',
   },
   {
-    id: "crit_rate_boost",
-    name: "Critical Rate Boost",
-    description: "Increase critical hit chance in mini-games by 15%",
+    id: 'crit_rate_boost',
+    name: 'Critical Rate Boost',
+    description: 'Increase critical hit chance in mini-games by 15%',
     enabled: false,
-    category: "gameplay"
+    category: 'gameplay',
   },
   {
-    id: "daily_limit_removal",
-    name: "Remove Daily Limits",
-    description: "Allow unlimited petal earning per day",
+    id: 'daily_limit_removal',
+    name: 'Remove Daily Limits',
+    description: 'Allow unlimited petal earning per day',
     enabled: false,
-    category: "economy"
+    category: 'economy',
   },
   {
-    id: "admin_debug_mode",
-    name: "Admin Debug Mode",
-    description: "Show debug info and testing tools",
+    id: 'admin_debug_mode',
+    name: 'Admin Debug Mode',
+    description: 'Show debug info and testing tools',
     enabled: false,
-    category: "admin"
-  }
+    category: 'admin',
+  },
 ];
 
 export default function AdminFlagsPage() {
@@ -53,16 +53,16 @@ export default function AdminFlagsPage() {
 
   useEffect(() => {
     if (!isLoaded) return;
-    
+
     if (!user) {
-      router.push("/login");
+      router.push('/login');
       return;
     }
 
     // Check if user has admin role
-    const isAdmin = user.publicMetadata?.role === "admin";
+    const isAdmin = user.publicMetadata?.role === 'admin';
     if (!isAdmin) {
-      router.push("/");
+      router.push('/');
       return;
     }
 
@@ -71,7 +71,7 @@ export default function AdminFlagsPage() {
 
   const loadFlags = async () => {
     try {
-      const response = await fetch("/api/admin/flags");
+      const response = await fetch('/api/admin/flags');
       if (response.ok) {
         const data = await response.json();
         if (data.ok) {
@@ -79,7 +79,7 @@ export default function AdminFlagsPage() {
         }
       }
     } catch (error) {
-      console.error("Failed to load flags:", error);
+      console.error('Failed to load flags:', error);
     } finally {
       setLoading(false);
     }
@@ -88,36 +88,36 @@ export default function AdminFlagsPage() {
   const toggleFlag = async (flagId: string) => {
     setSaving(true);
     try {
-      const response = await fetch("/api/admin/flags", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ flagId, action: "toggle" })
+      const response = await fetch('/api/admin/flags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flagId, action: 'toggle' }),
       });
 
       if (response.ok) {
         const data = await response.json();
         if (data.ok) {
-          setFlags(prev => prev.map(f => 
-            f.id === flagId ? { ...f, enabled: !f.enabled } : f
-          ));
+          setFlags((prev) =>
+            prev.map((f) => (f.id === flagId ? { ...f, enabled: !f.enabled } : f)),
+          );
         }
       }
     } catch (error) {
-      console.error("Failed to toggle flag:", error);
+      console.error('Failed to toggle flag:', error);
     } finally {
       setSaving(false);
     }
   };
 
   const resetFlags = async () => {
-    if (!confirm("Reset all flags to defaults? This cannot be undone.")) return;
-    
+    if (!confirm('Reset all flags to defaults? This cannot be undone.')) return;
+
     setSaving(true);
     try {
-      const response = await fetch("/api/admin/flags", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reset" })
+      const response = await fetch('/api/admin/flags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset' }),
       });
 
       if (response.ok) {
@@ -127,7 +127,7 @@ export default function AdminFlagsPage() {
         }
       }
     } catch (error) {
-      console.error("Failed to reset flags:", error);
+      console.error('Failed to reset flags:', error);
     } finally {
       setSaving(false);
     }
@@ -144,11 +144,14 @@ export default function AdminFlagsPage() {
     );
   }
 
-  const groupedFlags = flags.reduce((acc, flag) => {
-    if (!acc[flag.category]) acc[flag.category] = [];
-    acc[flag.category].push(flag);
-    return acc;
-  }, {} as Record<string, FeatureFlag[]>);
+  const groupedFlags = flags.reduce(
+    (acc, flag) => {
+      if (!acc[flag.category]) acc[flag.category] = [];
+      acc[flag.category].push(flag);
+      return acc;
+    },
+    {} as Record<string, FeatureFlag[]>,
+  );
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
@@ -178,7 +181,7 @@ export default function AdminFlagsPage() {
         {Object.entries(groupedFlags).map(([category, categoryFlags]) => (
           <div key={category} className="mb-8">
             <h2 className="text-xl font-semibold text-white mb-4 capitalize">
-              {category.replace("_", " ")}
+              {category.replace('_', ' ')}
             </h2>
             <div className="grid gap-4">
               {categoryFlags.map((flag) => (
@@ -211,7 +214,9 @@ export default function AdminFlagsPage() {
         <div className="mt-8 p-4 bg-neutral-900 rounded-lg border border-neutral-800">
           <h3 className="font-medium text-white mb-2">Flag Status</h3>
           <div className="text-sm text-neutral-400">
-            <p>Active flags: {flags.filter(f => f.enabled).length} / {flags.length}</p>
+            <p>
+              Active flags: {flags.filter((f) => f.enabled).length} / {flags.length}
+            </p>
             <p>Last updated: {new Date().toLocaleString()}</p>
           </div>
         </div>

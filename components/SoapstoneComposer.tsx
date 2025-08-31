@@ -1,33 +1,33 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useState } from "react";
-import { useSWRConfig } from "swr";
+import { useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 export default function SoapstoneComposer() {
-  const [val, setVal] = useState("");
+  const [val, setVal] = useState('');
   const [busy, setBusy] = useState(false);
   const { mutate } = useSWRConfig();
 
   async function submit() {
     if (!val.trim()) return;
-    
+
     setBusy(true);
     const content = val.trim().slice(0, 160);
-    
+
     try {
-      const res = await fetch("/api/soapstones", {
-        method: "POST",
+      const res = await fetch('/api/soapstones', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content })
+        body: JSON.stringify({ content }),
       });
-      
+
       if (res.ok) {
-        setVal("");
-        mutate("/api/soapstones"); // refresh dock
+        setVal('');
+        mutate('/api/soapstones'); // refresh dock
       }
     } finally {
       setBusy(false);
@@ -39,7 +39,7 @@ export default function SoapstoneComposer() {
       <input
         value={val}
         onChange={(e) => setVal(e.target.value)}
-        onKeyDown={(e) => (e.key === "Enter") && submit()}
+        onKeyDown={(e) => e.key === 'Enter' && submit()}
         maxLength={160}
         placeholder="Leave a soapstone message…"
         className="flex-1 bg-transparent text-pink-100 placeholder-pink-300/40 outline-none"

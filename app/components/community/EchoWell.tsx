@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -109,8 +109,8 @@ export default function EchoWell({ className }: EchoWellProps) {
   }, []);
 
   const handleLike = (echoId: string) => {
-    setEchoes(prev =>
-      prev.map(echo => {
+    setEchoes((prev) =>
+      prev.map((echo) => {
         if (echo.id === echoId) {
           return {
             ...echo,
@@ -119,29 +119,29 @@ export default function EchoWell({ className }: EchoWellProps) {
           };
         }
         return echo;
-      })
+      }),
     );
   };
 
   const handleShare = (echoId: string) => {
-    setEchoes(prev =>
-      prev.map(echo => {
+    setEchoes((prev) =>
+      prev.map((echo) => {
         if (echo.id === echoId) {
           return { ...echo, shares: echo.shares + 1 };
         }
         return echo;
-      })
+      }),
     );
   };
 
   const handleFlag = (echoId: string) => {
-    setEchoes(prev =>
-      prev.map(echo => {
+    setEchoes((prev) =>
+      prev.map((echo) => {
         if (echo.id === echoId) {
           return { ...echo, isFlagged: !echo.isFlagged };
         }
         return echo;
-      })
+      }),
     );
   };
 
@@ -165,7 +165,7 @@ export default function EchoWell({ className }: EchoWellProps) {
       isFlagged: false,
     };
 
-    setEchoes(prev => [echo, ...prev]);
+    setEchoes((prev) => [echo, ...prev]);
     setNewEcho('');
     setSelectedTags([]);
   };
@@ -180,7 +180,7 @@ export default function EchoWell({ className }: EchoWellProps) {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const filteredEchoes = echoes.filter(echo => {
+  const filteredEchoes = echoes.filter((echo) => {
     const matchesSearch =
       echo.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
       echo.author.username.toLowerCase().includes(searchTerm.toLowerCase());
@@ -228,7 +228,7 @@ export default function EchoWell({ className }: EchoWellProps) {
             <div className="flex-1">
               <textarea
                 value={newEcho}
-                onChange={e => setNewEcho(e.target.value)}
+                onChange={(e) => setNewEcho(e.target.value)}
                 placeholder="What's on your mind, otaku?"
                 className="w-full resize-none rounded-lg border p-3 focus:border-transparent focus:ring-2 focus:ring-pink-500"
                 rows={3}
@@ -238,12 +238,12 @@ export default function EchoWell({ className }: EchoWellProps) {
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            {['anime', 'manga', 'cosplay', 'gaming', 'fanart', 'discussion'].map(tag => (
+            {['anime', 'manga', 'cosplay', 'gaming', 'fanart', 'discussion'].map((tag) => (
               <button
                 key={tag}
                 onClick={() => {
                   if (selectedTags.includes(tag)) {
-                    setSelectedTags(selectedTags.filter(t => t !== tag));
+                    setSelectedTags(selectedTags.filter((t) => t !== tag));
                   } else {
                     setSelectedTags([...selectedTags, tag]);
                   }
@@ -276,13 +276,13 @@ export default function EchoWell({ className }: EchoWellProps) {
           <Input
             placeholder="Search echoes..."
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
         </div>
         <select
           value={filter}
-          onChange={e => setFilter(e.target.value)}
+          onChange={(e) => setFilter(e.target.value)}
           className="rounded-md border px-3 py-2"
         >
           <option value="all">All Echoes</option>
@@ -297,7 +297,7 @@ export default function EchoWell({ className }: EchoWellProps) {
 
       {/* Echoes Feed */}
       <div className="space-y-4">
-        {filteredEchoes.map(echo => (
+        {filteredEchoes.map((echo) => (
           <Card key={echo.id} className="transition-shadow hover:shadow-md">
             <CardContent className="p-6">
               <div className="flex gap-4">
@@ -321,7 +321,7 @@ export default function EchoWell({ className }: EchoWellProps) {
 
                   {/* Tags */}
                   <div className="mb-4 flex flex-wrap gap-1">
-                    {echo.tags.map(tag => (
+                    {echo.tags.map((tag) => (
                       <Badge key={tag} variant="secondary" className="text-xs">
                         #{tag}
                       </Badge>

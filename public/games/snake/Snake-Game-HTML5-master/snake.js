@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 // ------------------------------------------------------------
 // Creating A Snake Game Tutorial With HTML5
 // Copyright (c) 2015 Rembound.com

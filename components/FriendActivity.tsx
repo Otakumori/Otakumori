@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { motion } from 'framer-motion';
 import { useFriendStore } from '@/lib/store/friendStore';
@@ -18,7 +18,7 @@ export const FriendActivity = () => {
   const { entries } = useLeaderboardStore();
 
   // Generate activities from friend actions and game scores
-  const friendActivities: Activity[] = friends.map(friend => ({
+  const friendActivities: Activity[] = friends.map((friend) => ({
     id: `friend-${friend.id}-${Date.now()}`,
     type: 'friend' as const,
     message: `${friend.username} is now ${friend.status}`,
@@ -30,7 +30,7 @@ export const FriendActivity = () => {
   const gameActivities: Activity[] = entries
     .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
     .slice(0, 3)
-    .map(entry => ({
+    .map((entry) => ({
       id: `game-${entry.id}-${entry.timestamp}`,
       type: 'game' as const,
       message: `${entry.username ? entry.username : entry.id} scored ${entry.score} in ${entry.game}`,
@@ -39,14 +39,14 @@ export const FriendActivity = () => {
     }));
 
   const activities: Activity[] = [...friendActivities, ...gameActivities].sort(
-    (a, b) => b.timestamp - a.timestamp
+    (a, b) => b.timestamp - a.timestamp,
   );
 
   return (
     <div className="mx-auto w-full max-w-md rounded-lg bg-white/10 p-4 shadow-lg backdrop-blur-lg">
       <h3 className="mb-4 text-xl font-semibold text-white">Friend Activity</h3>
       <div className="space-y-3">
-        {activities.map(activity => (
+        {activities.map((activity) => (
           <motion.div
             key={activity.id}
             initial={{ opacity: 0, x: -20 }}

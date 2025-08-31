@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
@@ -9,11 +9,11 @@ export const useSoundSettings = () => {
 
   useEffect(() => {
     // Ensure volume is between 0 and 1
-    setVolume(prevVolume => Math.max(0, Math.min(1, prevVolume)));
+    setVolume((prevVolume) => Math.max(0, Math.min(1, prevVolume)));
   }, [setVolume]);
 
   const toggleMute = () => {
-    setIsMuted(prevMuted => !prevMuted);
+    setIsMuted((prevMuted) => !prevMuted);
   };
 
   return {

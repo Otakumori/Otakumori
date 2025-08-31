@@ -5,6 +5,7 @@
 ### Option 1: Deploy from GitHub (Recommended)
 
 1. **Push your code to GitHub** (if not already done):
+
    ```bash
    git add .
    git commit -m "Ready for deployment"
@@ -22,11 +23,13 @@
 ### Option 2: Deploy from CLI
 
 1. **Install Vercel CLI**:
+
    ```bash
    npm i -g vercel
    ```
 
 2. **Deploy**:
+
    ```bash
    vercel
    ```
@@ -41,6 +44,7 @@
 Make sure these are set in your Vercel project settings:
 
 ### Required
+
 ```env
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
@@ -60,6 +64,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 ### Optional
+
 ```env
 # Printify Integration
 PRINTIFY_API_KEY=...
@@ -72,6 +77,7 @@ SENTRY_DSN=...
 ## Build Settings
 
 Vercel will automatically detect:
+
 - **Framework**: Next.js
 - **Build Command**: `npm run build`
 - **Output Directory**: `.next`
@@ -105,16 +111,19 @@ Vercel will automatically detect:
 ## Troubleshooting
 
 ### Build Failures
+
 - Check environment variables are set
 - Verify all dependencies are in `package.json`
 - Check for TypeScript errors: `npm run type-check`
 
 ### Runtime Errors
+
 - Check Vercel function logs
 - Verify API routes are working
 - Test database connections
 
 ### Performance Issues
+
 - Enable Vercel Analytics
 - Check bundle sizes
 - Optimize images and assets
@@ -122,6 +131,7 @@ Vercel will automatically detect:
 ## Support
 
 If you encounter issues:
+
 1. Check Vercel deployment logs
 2. Verify environment variables
 3. Test locally with `npm run build`

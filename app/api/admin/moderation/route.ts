@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock data for moderation
@@ -138,9 +138,9 @@ export async function GET(request: NextRequest) {
         });
 
       case 'stats':
-        const pendingContent = mockFlaggedContent.filter(c => c.status === 'pending').length;
-        const pendingReports = mockUserReports.filter(r => r.status === 'investigating').length;
-        const highSeverity = mockFlaggedContent.filter(c => c.severity === 'high').length;
+        const pendingContent = mockFlaggedContent.filter((c) => c.status === 'pending').length;
+        const pendingReports = mockUserReports.filter((r) => r.status === 'investigating').length;
+        const highSeverity = mockFlaggedContent.filter((c) => c.severity === 'high').length;
 
         return NextResponse.json({
           success: true,

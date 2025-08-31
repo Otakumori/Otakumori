@@ -21,10 +21,10 @@ if (fs.existsSync(envPath)) {
     'EMAIL_FROM',
     'SUPABASE_SERVICE_ROLE_KEY',
     'PRINTIFY_API_KEY',
-    'PRINTIFY_SHOP_ID'
+    'PRINTIFY_SHOP_ID',
   ];
-  
-  const missing = requiredVars.filter(varName => !envContent.includes(varName));
+
+  const missing = requiredVars.filter((varName) => !envContent.includes(varName));
   if (missing.length === 0) {
     console.log('✅ All required environment variables found');
   } else {
@@ -39,8 +39,8 @@ console.log('\n2. Checking dependencies...');
 try {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const requiredDeps = ['resend', '@uiw/react-md-editor', '@uiw/react-markdown-preview'];
-  const missingDeps = requiredDeps.filter(dep => !packageJson.dependencies[dep]);
-  
+  const missingDeps = requiredDeps.filter((dep) => !packageJson.dependencies[dep]);
+
   if (missingDeps.length === 0) {
     console.log('✅ All required dependencies installed');
   } else {
@@ -64,10 +64,10 @@ const adminFiles = [
   'app/admin/minigames/page.tsx',
   'app/admin/soapstones/page.tsx',
   'app/admin/products/page.tsx',
-  'app/api/admin/printify-sync/route.ts'
+  'app/api/admin/printify-sync/route.ts',
 ];
 
-adminFiles.forEach(file => {
+adminFiles.forEach((file) => {
   if (fs.existsSync(file)) {
     console.log(`✅ ${file}`);
   } else {

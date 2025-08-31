@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-export const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "";
+/* eslint-disable-line @next/next/no-img-element */
+import { env } from '@/env';
+
+export const GA_ID = env.NEXT_PUBLIC_GA_ID || '';
 
 export const pageview = (path: string) => {
-  if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("config", GA_ID, {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('config', GA_ID, {
       page_path: path,
     });
   }
@@ -13,8 +15,8 @@ export const pageview = (path: string) => {
 export type GAEventParams = Record<string, any>;
 
 export const gaEvent = (name: string, params?: GAEventParams) => {
-  if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("event", name, params);
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', name, params);
   }
 };
 
@@ -25,8 +27,8 @@ export const trackAddToCart = (product: {
   price: number;
   quantity: number;
 }) => {
-  gaEvent("add_to_cart", {
-    currency: "USD",
+  gaEvent('add_to_cart', {
+    currency: 'USD',
     value: product.price * product.quantity,
     items: [
       {
@@ -49,8 +51,8 @@ export const trackBeginCheckout = (cart: {
     quantity: number;
   }>;
 }) => {
-  gaEvent("begin_checkout", {
-    currency: "USD",
+  gaEvent('begin_checkout', {
+    currency: 'USD',
     value: cart.totalPrice,
     items: cart.items.map((item) => ({
       item_id: item.id,
@@ -72,10 +74,10 @@ export const trackPurchase = (order: {
     quantity: number;
   }>;
 }) => {
-  gaEvent("purchase", {
+  gaEvent('purchase', {
     transaction_id: order.id,
     value: order.total,
-    currency: order.currency || "USD",
+    currency: order.currency || 'USD',
     items: order.items.map((item) => ({
       item_id: item.id,
       item_name: item.name,
@@ -85,13 +87,9 @@ export const trackPurchase = (order: {
   });
 };
 
-export const trackViewItem = (product: {
-  id: string;
-  name: string;
-  price: number;
-}) => {
-  gaEvent("view_item", {
-    currency: "USD",
+export const trackViewItem = (product: { id: string; name: string; price: number }) => {
+  gaEvent('view_item', {
+    currency: 'USD',
     value: product.price,
     items: [
       {

@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/app/lib/prisma';
 
 type LeaderboardScore = {
   id: string;
@@ -16,18 +16,15 @@ type LeaderboardScore = {
   updatedAt: Date;
 };
 
-export async function GET(
-  req: Request,
-  { params }: { params: { game: string } }
-) {
+export async function GET(req: Request, { params }: { params: { game: string } }) {
   const url = new URL(req.url);
-  const diff = url.searchParams.get("diff");
-  const n = Math.min(50, Math.max(5, Number(url.searchParams.get("n") ?? 25)));
+  const diff = url.searchParams.get('diff');
+  const n = Math.min(50, Math.max(5, Number(url.searchParams.get('n') ?? 25)));
 
   const rows = await prisma.leaderboardScore.findMany({
     where: { game: params.game, ...(diff ? { diff } : {}) },
-    orderBy: [{ score: "desc" }, { updatedAt: "asc" }],
-    take: n
+    orderBy: [{ score: 'desc' }, { updatedAt: 'asc' }],
+    take: n,
   });
 
   return NextResponse.json({
@@ -38,7 +35,7 @@ export async function GET(
       userId: r.userId,
       score: r.score,
       diff: r.diff,
-      when: r.updatedAt
-    }))
+      when: r.updatedAt,
+    })),
   });
 }

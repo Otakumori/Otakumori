@@ -17,7 +17,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -33,7 +33,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Combo ID is required',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -48,7 +48,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Combo not found',
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -77,7 +77,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

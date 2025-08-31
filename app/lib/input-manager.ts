@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 export interface InputEvent {
   type: 'keydown' | 'keyup' | 'gamepad' | 'touchstart' | 'touchend' | 'touchmove';
   action: string;
@@ -59,12 +59,12 @@ export class InputManager {
 
   private pollGamepad(gamepad: Gamepad): void {
     const currentState = new Set<number>();
-    
+
     // Check button states
     for (let i = 0; i < gamepad.buttons.length; i++) {
       if (gamepad.buttons[i].pressed) {
         currentState.add(i);
-        
+
         // Check if this button was just pressed
         const previousState = this.gamepadState.get(gamepad.index) || new Set();
         if (!previousState.has(i)) {
@@ -72,7 +72,7 @@ export class InputManager {
             type: 'gamepad',
             action: `gamepad_${gamepad.index}_button_${i}`,
             value: gamepad.buttons[i].value,
-            timestamp: performance.now()
+            timestamp: performance.now(),
           });
         }
       }
@@ -84,22 +84,28 @@ export class InputManager {
     const triggerThreshold = 0.5;
 
     // Left stick
-    if (Math.abs(gamepad.axes[0]) > leftStickThreshold || Math.abs(gamepad.axes[1]) > leftStickThreshold) {
+    if (
+      Math.abs(gamepad.axes[0]) > leftStickThreshold ||
+      Math.abs(gamepad.axes[1]) > leftStickThreshold
+    ) {
       this.emitInputEvent({
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_left_stick`,
         value: Math.sqrt(gamepad.axes[0] ** 2 + gamepad.axes[1] ** 2),
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
 
     // Right stick
-    if (Math.abs(gamepad.axes[2]) > rightStickThreshold || Math.abs(gamepad.axes[3]) > rightStickThreshold) {
+    if (
+      Math.abs(gamepad.axes[2]) > rightStickThreshold ||
+      Math.abs(gamepad.axes[3]) > rightStickThreshold
+    ) {
       this.emitInputEvent({
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_right_stick`,
         value: Math.sqrt(gamepad.axes[2] ** 2 + gamepad.axes[3] ** 2),
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
 
@@ -109,7 +115,7 @@ export class InputManager {
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_left_trigger`,
         value: gamepad.axes[4],
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
 
@@ -118,7 +124,7 @@ export class InputManager {
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_right_trigger`,
         value: gamepad.axes[5],
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
 
@@ -133,7 +139,7 @@ export class InputManager {
       this.emitInputEvent({
         type: 'keydown',
         action,
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
   }
@@ -146,7 +152,7 @@ export class InputManager {
       this.emitInputEvent({
         type: 'keyup',
         action,
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
   }
@@ -158,13 +164,13 @@ export class InputManager {
       this.touchState.set(touch.identifier, {
         x: touch.clientX,
         y: touch.clientY,
-        startTime: performance.now()
+        startTime: performance.now(),
       });
 
       this.emitInputEvent({
         type: 'touchstart',
         action: `touch_${touch.identifier}_start`,
-        timestamp: performance.now()
+        timestamp: performance.now(),
       });
     }
   }
@@ -177,7 +183,7 @@ export class InputManager {
       if (touchData) {
         const duration = performance.now() - touchData.startTime;
         const distance = Math.sqrt(
-          (touch.clientX - touchData.x) ** 2 + (touch.clientY - touchData.y) ** 2
+          (touch.clientX - touchData.x) ** 2 + (touch.clientY - touchData.y) ** 2,
         );
 
         // Determine gesture type
@@ -189,7 +195,7 @@ export class InputManager {
           type: 'touchend',
           action: `touch_${touch.identifier}_${gesture}`,
           value: distance,
-          timestamp: performance.now()
+          timestamp: performance.now(),
         });
 
         this.touchState.delete(touch.identifier);
@@ -204,15 +210,16 @@ export class InputManager {
       const touchData = this.touchState.get(touch.identifier);
       if (touchData) {
         const distance = Math.sqrt(
-          (touch.clientX - touchData.x) ** 2 + (touch.clientY - touchData.y) ** 2
+          (touch.clientX - touchData.x) ** 2 + (touch.clientY - touchData.y) ** 2,
         );
 
-        if (distance > 10) { // Only emit if moved significantly
+        if (distance > 10) {
+          // Only emit if moved significantly
           this.emitInputEvent({
             type: 'touchmove',
             action: `touch_${touch.identifier}_move`,
             value: distance,
-            timestamp: performance.now()
+            timestamp: performance.now(),
           });
         }
       }
@@ -278,7 +285,7 @@ export class InputManager {
   private emitInputEvent(event: InputEvent): void {
     const actionListeners = this.listeners.get(event.action);
     if (actionListeners) {
-      actionListeners.forEach(callback => {
+      actionListeners.forEach((callback) => {
         try {
           callback(event);
         } catch (error) {
@@ -338,20 +345,17 @@ export class InputManager {
 export const inputManager = new InputManager();
 
 // Export convenience functions
-export const bindAction = (action: string, binding: InputBinding) => 
+export const bindAction = (action: string, binding: InputBinding) =>
   inputManager.bindAction(action, binding);
 
-export const unbindAction = (action: string) => 
-  inputManager.unbindAction(action);
+export const unbindAction = (action: string) => inputManager.unbindAction(action);
 
-export const onInput = (action: string, callback: (event: InputEvent) => void) => 
+export const onInput = (action: string, callback: (event: InputEvent) => void) =>
   inputManager.on(action, callback);
 
-export const offInput = (action: string, callback: (event: InputEvent) => void) => 
+export const offInput = (action: string, callback: (event: InputEvent) => void) =>
   inputManager.off(action, callback);
 
-export const enableInput = () => 
-  inputManager.enable();
+export const enableInput = () => inputManager.enable();
 
-export const disableInput = () => 
-  inputManager.disable();
+export const disableInput = () => inputManager.disable();

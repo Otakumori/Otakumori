@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/app/hooks/hooks/useLocalStorage';
 
@@ -22,11 +22,11 @@ export const usePetals = () => {
   const [showReward, setShowReward] = useState<string | null>(null);
 
   const addPetal = () => {
-    setTotalPetals(prev => prev + 1);
+    setTotalPetals((prev) => prev + 1);
   };
 
   const checkRewards = (count: number) => {
-    const newRewards = rewards.map(reward => {
+    const newRewards = rewards.map((reward) => {
       if (count >= reward.count && !reward.claimed) {
         setShowReward(reward.reward);
         return { ...reward, claimed: true };

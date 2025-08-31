@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useUser } from '@clerk/nextjs';
@@ -33,7 +33,7 @@ export default function MiniGamesPage() {
     // Add more games as needed
   ];
 
-  const handleGameSelect = game => {
+  const handleGameSelect = (game) => {
     setSelectedGame(game);
   };
 
@@ -43,7 +43,7 @@ export default function MiniGamesPage() {
       // Assuming the intent was to remove the dependency on setPetals or that
       // the user context is no longer available.
       // For now, removing the line as setPetals is not imported.
-      // setPetals(petals + selectedGame.reward); 
+      // setPetals(petals + selectedGame.reward);
       setSelectedGame(null);
     }
   };
@@ -52,10 +52,13 @@ export default function MiniGamesPage() {
     <div className="container mx-auto p-4">
       <h1 className="mb-4 text-2xl font-bold">Mini Games</h1>
       <div className="mb-4">
-        <p>Your Petals: {/* The original code had 'petals' here, but 'petals' was removed from imports. */}</p>
+        <p>
+          Your Petals:{' '}
+          {/* The original code had 'petals' here, but 'petals' was removed from imports. */}
+        </p>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {games.map(game => (
+        {games.map((game) => (
           <div key={game.id} className="rounded-lg border p-4">
             <h2 className="text-xl font-semibold">{game.name}</h2>
             <p className="text-gray-600">{game.description}</p>

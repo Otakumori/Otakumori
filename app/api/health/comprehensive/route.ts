@@ -1,14 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { NextResponse } from "next/server";
-import { env } from "@/env.mjs";
-import { prisma } from "@/app/lib/prisma";
-import { getShops } from "@/app/lib/printify/printifyClient";
-import Stripe from "stripe";
+/* eslint-disable-line @next/next/no-img-element */
+import { NextResponse } from 'next/server';
+import { env } from '@/env.mjs';
+import { prisma } from '@/app/lib/prisma';
+import { getShops } from '@/app/lib/printify/printifyClient';
+import Stripe from 'stripe';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
-function ms(start: number) { return Math.round(performance.now() - start); }
+function ms(start: number) {
+  return Math.round(performance.now() - start);
+}
 
 export async function GET() {
   const started = performance.now();
@@ -27,7 +29,7 @@ export async function GET() {
       env.UPSTASH_REDIS_REST_URL,
       env.UPSTASH_REDIS_REST_TOKEN,
     ];
-    if (needed.some((x) => !x)) throw new Error("missing envs");
+    if (needed.some((x) => !x)) throw new Error('missing envs');
     checks.env = { ok: true, ms: ms(envStart) };
   } catch (e: any) {
     checks.env = { ok: false, ms: ms(envStart), error: e?.message };
@@ -45,7 +47,7 @@ export async function GET() {
   // Stripe
   const stripeStart = performance.now();
   try {
-    const stripe = new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" });
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
     await stripe.prices.list({ limit: 1 });
     checks.stripe = { ok: true, ms: ms(stripeStart) };
   } catch (e: any) {
@@ -66,7 +68,7 @@ export async function GET() {
   try {
     const res = await fetch(`${env.UPSTASH_REDIS_REST_URL}/GET/otakumori_healthcheck`, {
       headers: { Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN}` },
-      cache: "no-store",
+      cache: 'no-store',
     });
     if (!res.ok) throw new Error(`status ${res.status}`);
     checks.redis = { ok: true, ms: ms(redisStart) };
@@ -74,5 +76,9 @@ export async function GET() {
     checks.redis = { ok: false, ms: ms(redisStart), error: e?.message };
   }
 
-  return NextResponse.json({ ok: Object.values(checks).every((c) => c.ok), took: ms(started), checks });
+  return NextResponse.json({
+    ok: Object.values(checks).every((c) => c.ok),
+    took: ms(started),
+    checks,
+  });
 }

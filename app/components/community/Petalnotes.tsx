@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -138,8 +138,8 @@ export default function Petalnotes({ className }: PetalnotesProps) {
   }, []);
 
   const handleLike = (noteId: string) => {
-    setPetalnotes(prev =>
-      prev.map(note => {
+    setPetalnotes((prev) =>
+      prev.map((note) => {
         if (note.id === noteId) {
           return {
             ...note,
@@ -148,18 +148,18 @@ export default function Petalnotes({ className }: PetalnotesProps) {
           };
         }
         return note;
-      })
+      }),
     );
   };
 
   const handleShare = (noteId: string) => {
-    setPetalnotes(prev =>
-      prev.map(note => {
+    setPetalnotes((prev) =>
+      prev.map((note) => {
         if (note.id === noteId) {
           return { ...note, shares: note.shares + 1 };
         }
         return note;
-      })
+      }),
     );
   };
 
@@ -173,7 +173,7 @@ export default function Petalnotes({ className }: PetalnotesProps) {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const filteredPetalnotes = petalnotes.filter(note => {
+  const filteredPetalnotes = petalnotes.filter((note) => {
     const matchesSearch =
       note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       note.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -219,16 +219,16 @@ export default function Petalnotes({ className }: PetalnotesProps) {
           <Input
             placeholder="Search petalnotes..."
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
         </div>
         <select
           value={selectedCategory}
-          onChange={e => setSelectedCategory(e.target.value)}
+          onChange={(e) => setSelectedCategory(e.target.value)}
           className="rounded-md border px-3 py-2"
         >
-          {categories.map(category => (
+          {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
@@ -238,7 +238,7 @@ export default function Petalnotes({ className }: PetalnotesProps) {
 
       {/* Category Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {categories.map(category => {
+        {categories.map((category) => {
           const Icon = category.icon;
           return (
             <button
@@ -259,7 +259,7 @@ export default function Petalnotes({ className }: PetalnotesProps) {
 
       {/* Petalnotes Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredPetalnotes.map(note => (
+        {filteredPetalnotes.map((note) => (
           <Card key={note.id} className="cursor-pointer transition-shadow hover:shadow-lg">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
@@ -289,7 +289,7 @@ export default function Petalnotes({ className }: PetalnotesProps) {
 
               {/* Tags */}
               <div className="mb-3 flex flex-wrap gap-1">
-                {note.tags.slice(0, 3).map(tag => (
+                {note.tags.slice(0, 3).map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-xs">
                     <Tag className="mr-1 h-3 w-3" />
                     {tag}
@@ -317,7 +317,7 @@ export default function Petalnotes({ className }: PetalnotesProps) {
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       handleLike(note.id);
                     }}
@@ -329,7 +329,7 @@ export default function Petalnotes({ className }: PetalnotesProps) {
                     {note.likes}
                   </button>
                   <button
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       handleShare(note.id);
                     }}

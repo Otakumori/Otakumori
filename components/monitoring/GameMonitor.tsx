@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useEffect, useState } from 'react';
 import { monitor } from '@/lib/monitor';
 
@@ -43,16 +43,16 @@ export function GameMonitor() {
   }, [activeSessions, totalErrors]);
 
   const startGameSession = (gameId: string) => {
-    setActiveSessions(prev =>
+    setActiveSessions((prev) =>
       new Map(prev).set(gameId, {
         startTime: Date.now(),
         errors: 0,
-      })
+      }),
     );
   };
 
   const endGameSession = (gameId: string) => {
-    setActiveSessions(prev => {
+    setActiveSessions((prev) => {
       const newSessions = new Map(prev);
       const session = newSessions.get(gameId);
       if (session) {
@@ -66,8 +66,8 @@ export function GameMonitor() {
   };
 
   const recordGameError = (gameId: string) => {
-    setTotalErrors(prev => prev + 1);
-    setActiveSessions(prev => {
+    setTotalErrors((prev) => prev + 1);
+    setActiveSessions((prev) => {
       const newSessions = new Map(prev);
       const session = newSessions.get(gameId);
       if (session) {

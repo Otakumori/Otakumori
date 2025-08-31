@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -25,9 +25,10 @@ export function SoapstoneFooter() {
   const getToken = useSessionToken();
 
   // Check for reduced motion preference
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +39,7 @@ export function SoapstoneFooter() {
     try {
       // Check if user is authenticated
       const token = await getToken();
-      
+
       if (token) {
         // Send to API
         const response = await fetch('/api/soapstones', {
@@ -76,7 +77,7 @@ export function SoapstoneFooter() {
 
     const container = containerRef.current;
     const rect = container.getBoundingClientRect();
-    
+
     // Random position within safe container bounds
     const x = Math.random() * (rect.width - 100) + 50;
     const y = Math.random() * (rect.height - 100) + 50;
@@ -90,12 +91,15 @@ export function SoapstoneFooter() {
       timestamp: Date.now(),
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
 
     // Remove message after animation
-    setTimeout(() => {
-      setMessages(prev => prev.filter(m => m.id !== newMessage.id));
-    }, prefersReducedMotion ? 3000 : 5000);
+    setTimeout(
+      () => {
+        setMessages((prev) => prev.filter((m) => m.id !== newMessage.id));
+      },
+      prefersReducedMotion ? 3000 : 5000,
+    );
   };
 
   const generateRuneSprite = (text: string): string => {
@@ -104,10 +108,10 @@ export function SoapstoneFooter() {
       a = ((a << 5) - a + b.charCodeAt(0)) & 0xffffffff;
       return a;
     }, 0);
-    
+
     const runeType = Math.abs(hash) % 5;
     const color = ['#ff69b4', '#ff1493', '#ff69b4', '#ff1493', '#ff69b4'][runeType];
-    
+
     const svg = `
       <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
         <circle cx="16" cy="16" r="14" fill="${color}" opacity="0.8"/>
@@ -116,7 +120,7 @@ export function SoapstoneFooter() {
         </text>
       </svg>
     `;
-    
+
     return `data:image/svg+xml;base64,${btoa(svg)}`;
   };
 
@@ -124,7 +128,7 @@ export function SoapstoneFooter() {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
-      setMessages(prev => prev.filter(m => now - m.timestamp < 10000)); // Keep for 10 seconds
+      setMessages((prev) => prev.filter((m) => now - m.timestamp < 10000)); // Keep for 10 seconds
     }, 1000);
 
     return () => clearInterval(interval);
@@ -140,9 +144,10 @@ export function SoapstoneFooter() {
             Leave a Soapstone Message
           </h3>
           <p className="text-neutral-400 mb-6 max-w-2xl mx-auto">
-            Share your thoughts with the community. Messages become magical runes that float across the site.
+            Share your thoughts with the community. Messages become magical runes that float across
+            the site.
           </p>
-          
+
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
             <div className="flex gap-2">
               <input
@@ -173,44 +178,44 @@ export function SoapstoneFooter() {
         </div>
 
         {/* Floating Messages Container */}
-        <div 
+        <div
           ref={containerRef}
           className="relative h-64 border border-pink-500/20 rounded-lg bg-neutral-900/50 overflow-hidden"
         >
           <div className="absolute inset-0 flex items-center justify-center text-neutral-600">
             <p className="text-sm">Your runes will appear here...</p>
           </div>
-          
+
           <AnimatePresence>
             {messages.map((msg) => (
               <motion.div
                 key={msg.id}
                 className="absolute"
                 style={{ left: msg.x, top: msg.y }}
-                initial={{ 
-                  scale: 0, 
-                  opacity: 0, 
-                  y: 20 
+                initial={{
+                  scale: 0,
+                  opacity: 0,
+                  y: 20,
                 }}
-                animate={{ 
-                  scale: 1, 
-                  opacity: 1, 
-                  y: prefersReducedMotion ? 0 : -20 
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                  y: prefersReducedMotion ? 0 : -20,
                 }}
-                exit={{ 
-                  scale: 0, 
-                  opacity: 0, 
-                  y: -40 
+                exit={{
+                  scale: 0,
+                  opacity: 0,
+                  y: -40,
                 }}
-                transition={{ 
+                transition={{
                   duration: prefersReducedMotion ? 0.3 : 1.2,
-                  ease: "easeOut"
+                  ease: 'easeOut',
                 }}
               >
                 <div className="relative group">
-                  <img 
-                    src={msg.runeUrl} 
-                    alt="Rune" 
+                  <img
+                    src={msg.runeUrl}
+                    alt="Rune"
                     className="w-8 h-8 cursor-pointer hover:scale-110 transition-transform"
                     title={msg.message}
                   />
@@ -231,35 +236,69 @@ export function SoapstoneFooter() {
             <div>
               <h4 className="text-white font-semibold mb-3">Shop</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
-                <li><a href="/shop/apparel" className="hover:text-pink-400 transition-colors">Apparel</a></li>
-                <li><a href="/shop/accessories" className="hover:text-pink-400 transition-colors">Accessories</a></li>
-                <li><a href="/shop/home-decor" className="hover:text-pink-400 transition-colors">Home Decor</a></li>
+                <li>
+                  <a href="/shop/apparel" className="hover:text-pink-400 transition-colors">
+                    Apparel
+                  </a>
+                </li>
+                <li>
+                  <a href="/shop/accessories" className="hover:text-pink-400 transition-colors">
+                    Accessories
+                  </a>
+                </li>
+                <li>
+                  <a href="/shop/home-decor" className="hover:text-pink-400 transition-colors">
+                    Home Decor
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-3">Community</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
-                <li><a href="/mini-games" className="hover:text-pink-400 transition-colors">Mini-Games</a></li>
-                <li><a href="/blog" className="hover:text-pink-400 transition-colors">Blog</a></li>
-                <li><a href="/about" className="hover:text-pink-400 transition-colors">About</a></li>
+                <li>
+                  <a href="/mini-games" className="hover:text-pink-400 transition-colors">
+                    Mini-Games
+                  </a>
+                </li>
+                <li>
+                  <a href="/blog" className="hover:text-pink-400 transition-colors">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="/about" className="hover:text-pink-400 transition-colors">
+                    About
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-3">Support</h4>
               <ul className="space-y-2 text-sm text-neutral-400">
-                <li><a href="/terms" className="hover:text-pink-400 transition-colors">Terms</a></li>
-                <li><a href="/privacy" className="hover:text-pink-400 transition-colors">Privacy</a></li>
-                <li><a href="/data-deletion" className="hover:text-pink-400 transition-colors">Data Deletion</a></li>
+                <li>
+                  <a href="/terms" className="hover:text-pink-400 transition-colors">
+                    Terms
+                  </a>
+                </li>
+                <li>
+                  <a href="/privacy" className="hover:text-pink-400 transition-colors">
+                    Privacy
+                  </a>
+                </li>
+                <li>
+                  <a href="/data-deletion" className="hover:text-pink-400 transition-colors">
+                    Data Deletion
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-3">Connect</h4>
-              <p className="text-sm text-neutral-400">
-                Join our community of otaku enthusiasts
-              </p>
+              <p className="text-sm text-neutral-400">Join our community of otaku enthusiasts</p>
             </div>
           </div>
-          
+
           <div className="mt-8 text-center">
             <p className="text-neutral-500 text-sm">
               © 2024 Otakumori. Made with ❤️ for the otaku community.

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
@@ -15,7 +15,7 @@ export default function ContactForm() {
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     if (e.target.type === 'file') {
       setFormData({ ...formData, file: e.target.files[0] });
     } else {
@@ -23,7 +23,7 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -46,10 +46,16 @@ export default function ContactForm() {
       const result = await response.json();
 
       if (response.ok) {
-        setStatus({ type: 'success', message: 'Message sent successfully! We\'ll get back to you soon.' });
+        setStatus({
+          type: 'success',
+          message: "Message sent successfully! We'll get back to you soon.",
+        });
         setFormData({ name: '', email: '', message: '', file: null });
       } else {
-        setStatus({ type: 'error', message: result.error || 'Failed to send message. Please try again.' });
+        setStatus({
+          type: 'error',
+          message: result.error || 'Failed to send message. Please try again.',
+        });
       }
     } catch (error) {
       console.error('Error sending message:', error);

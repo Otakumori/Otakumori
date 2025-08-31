@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { motion } from 'framer-motion';
@@ -62,7 +62,7 @@ export default function AbyssLayout({ children }) {
                 The Abyss
               </Link>
               <div className="hidden space-x-6 md:flex">
-                {navItems.map(item => (
+                {navItems.map((item) => (
                   <Link
                     key={item.path}
                     href={item.path}

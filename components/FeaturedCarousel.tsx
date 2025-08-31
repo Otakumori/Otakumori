@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -30,10 +30,10 @@ export default function FeaturedCarousel() {
       console.log('🛍️ Fetching featured products...');
       const response = await fetch('/api/v1/shop/products?limit=6');
       console.log('📡 Response status:', response.status);
-      
+
       const data = await response.json();
       console.log('📦 API response data:', data);
-      
+
       if (data.ok && data.data && data.data.products) {
         console.log('✅ Setting products:', data.data.products.length, 'products');
         setProducts(data.data.products);
@@ -52,15 +52,13 @@ export default function FeaturedCarousel() {
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => 
-      prev === 0 ? Math.ceil(products.length / 3) - 1 : prev - 1
-    );
+    setCurrentSlide((prev) => (prev === 0 ? Math.ceil(products.length / 3) - 1 : prev - 1));
   };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(price);
   };
 
@@ -108,7 +106,7 @@ export default function FeaturedCarousel() {
 
       {/* Carousel Container */}
       <div className="overflow-hidden">
-        <div 
+        <div
           className="flex transition-transform duration-500 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
@@ -128,7 +126,7 @@ export default function FeaturedCarousel() {
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      
+
                       {/* Quick Actions */}
                       <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <Link
@@ -152,7 +150,7 @@ export default function FeaturedCarousel() {
                           <span className="text-xs text-neutral-400">4.8</span>
                         </div>
                       </div>
-                      
+
                       {product.category && (
                         <span className="inline-block px-2 py-1 bg-pink-600/20 text-pink-400 text-xs rounded-full mb-2">
                           {product.category}
@@ -195,9 +193,7 @@ export default function FeaturedCarousel() {
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                index === currentSlide
-                  ? 'bg-pink-500 w-8'
-                  : 'bg-neutral-600 hover:bg-neutral-500'
+                index === currentSlide ? 'bg-pink-500 w-8' : 'bg-neutral-600 hover:bg-neutral-500'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

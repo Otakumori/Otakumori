@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock user data
@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const data = await req.json();
   // TODO: Update user in real database
-  users = users.map(u => (u.id === data.id ? { ...u, ...data } : u));
+  users = users.map((u) => (u.id === data.id ? { ...u, ...data } : u));
   return NextResponse.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest) {
   const { id } = await req.json();
   // TODO: Remove user from real database
-  users = users.filter(u => u.id !== id);
+  users = users.filter((u) => u.id !== id);
   return NextResponse.json({ success: true });
 }

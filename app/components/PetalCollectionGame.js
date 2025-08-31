@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useRef } from 'react';
@@ -15,7 +15,7 @@ export default function PetalCollectionGame() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const containerRef = useRef(null);
 
-  const handlePetalClick = async e => {
+  const handlePetalClick = async (e) => {
     if (!isGameActive) return;
 
     // Get click coordinates relative to the container
@@ -86,7 +86,7 @@ export default function PetalCollectionGame() {
           >
             <motion.div
               className="w-96 rounded-lg bg-gray-800 p-6"
-              onClick={e => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
             >
               <h2 className="mb-4 text-2xl font-bold text-pink-400">Leaderboard</h2>
               <div className="space-y-2">

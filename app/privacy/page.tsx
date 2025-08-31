@@ -1,132 +1,243 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-export default function PrivacyPage() {
+'use client';
+
+import { motion } from 'framer-motion';
+import GlassCard from '@/app/components/ui/GlassCard';
+import GlassButton from '@/app/components/ui/GlassButton';
+
+export default function PrivacyPolicy() {
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 py-10">
-      <div className="mx-auto max-w-4xl px-4">
-        <h1 className="text-4xl font-bold text-pink-400 mb-8">Privacy Policy</h1>
-        
-        <div className="prose prose-invert prose-pink max-w-none">
-          <p className="text-neutral-300 mb-6">
-            <strong>Last updated:</strong> {new Date().toLocaleDateString()}
-          </p>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">1. Information We Collect</h2>
-            <p className="text-neutral-300 mb-4">
-              We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              <strong>Personal Information:</strong> Name, email address, shipping address, payment information, and profile preferences.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              <strong>Usage Information:</strong> How you interact with our platform, including pages visited, features used, and time spent on the site.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">2. How We Use Your Information</h2>
-            <p className="text-neutral-300 mb-4">We use the information we collect to:</p>
-            <ul className="list-disc list-inside text-neutral-300 ml-6 mb-4">
-              <li>Provide, maintain, and improve our services</li>
-              <li>Process transactions and send related information</li>
-              <li>Send technical notices, updates, and support messages</li>
-              <li>Respond to your comments and questions</li>
-              <li>Personalize your experience and deliver relevant content</li>
-            </ul>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">3. Information Sharing</h2>
-            <p className="text-neutral-300 mb-4">
-              We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              <strong>Service Providers:</strong> We may share information with trusted third-party service providers who assist us in operating our platform.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              <strong>Legal Requirements:</strong> We may disclose information if required by law or to protect our rights and safety.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">4. Data Security</h2>
-            <p className="text-neutral-300 mb-4">
-              We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              However, no method of transmission over the internet or electronic storage is 100% secure, and we cannot guarantee absolute security.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">5. Cookies and Tracking</h2>
-            <p className="text-neutral-300 mb-4">
-              We use cookies and similar tracking technologies to enhance your experience, analyze usage patterns, and personalize content.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              You can control cookie settings through your browser preferences, though disabling cookies may affect some functionality.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">6. Third-Party Services</h2>
-            <p className="text-neutral-300 mb-4">
-              Our platform may contain links to third-party websites or integrate with third-party services. We are not responsible for their privacy practices.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              <strong>Social Login:</strong> When you sign in through Facebook or Google, they may collect and share certain information with us as described in their privacy policies.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">7. Data Retention</h2>
-            <p className="text-neutral-300 mb-4">
-              We retain your personal information for as long as necessary to provide our services and fulfill the purposes outlined in this policy.
-            </p>
-            <p className="text-neutral-300 mb-4">
-              You may request deletion of your account and associated data at any time through your account settings or by contacting us.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">8. Your Rights</h2>
-            <p className="text-neutral-300 mb-4">You have the right to:</p>
-            <ul className="list-disc list-inside text-neutral-300 ml-6 mb-4">
-              <li>Access and update your personal information</li>
-              <li>Request deletion of your data</li>
-              <li>Opt out of marketing communications</li>
-              <li>Request data portability</li>
-              <li>Lodge a complaint with supervisory authorities</li>
-            </ul>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">9. Children's Privacy</h2>
-            <p className="text-neutral-300 mb-4">
-              Our services are not intended for children under 13. We do not knowingly collect personal information from children under 13.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">10. Changes to This Policy</h2>
-            <p className="text-neutral-300 mb-4">
-              We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page and updating the "Last updated" date.
-            </p>
-          </section>
-          
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-pink-300 mb-4">11. Contact Us</h2>
-            <p className="text-neutral-300 mb-4">
-              If you have questions about this privacy policy or our data practices, please contact us at:
-            </p>
-            <p className="text-neutral-300">
-              Email: privacy@otaku-mori.com<br />
-              Address: [Your Business Address]
-            </p>
-          </section>
-        </div>
+    <main className="relative mx-auto max-w-4xl px-6 py-16 text-pink-100">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-12"
+      >
+        <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-pink-300 drop-shadow-sm">
+          Privacy Policy
+        </h1>
+        <p className="text-lg text-pink-200/90">Last updated: {new Date().toLocaleDateString()}</p>
+      </motion.div>
+
+      {/* Content */}
+      <div className="space-y-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">1. Information We Collect</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <div>
+                <h3 className="text-lg font-semibold text-pink-200 mb-2">Personal Information</h3>
+                <p>We collect information you provide directly to us, such as:</p>
+                <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
+                  <li>Account information (username, email address, display name)</li>
+                  <li>Profile information and preferences</li>
+                  <li>Communication data when you contact us</li>
+                  <li>Payment information for purchases (processed securely through Stripe)</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-pink-200 mb-2">Usage Information</h3>
+                <p>We automatically collect certain information about your use of our services:</p>
+                <ul className="list-disc list-inside ml-4 mt-2 space-y-1">
+                  <li>Game scores, achievements, and progress</li>
+                  <li>Social interactions and friend connections</li>
+                  <li>Device information and browser type</li>
+                  <li>IP address and general location data</li>
+                  <li>Cookies and similar tracking technologies</li>
+                </ul>
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">
+              2. How We Use Your Information
+            </h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>We use the information we collect to:</p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>Provide, maintain, and improve our services</li>
+                <li>Process transactions and send related information</li>
+                <li>Send technical notices, updates, and support messages</li>
+                <li>Respond to your comments and questions</li>
+                <li>Monitor and analyze trends and usage</li>
+                <li>Personalize your experience and content</li>
+                <li>Detect, investigate, and prevent security incidents</li>
+              </ul>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">3. Information Sharing</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>
+                We do not sell, trade, or otherwise transfer your personal information to third
+                parties except:
+              </p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>With your explicit consent</li>
+                <li>To trusted service providers who assist us in operating our platform</li>
+                <li>When required by law or to protect our rights</li>
+                <li>In connection with a business transfer or acquisition</li>
+              </ul>
+              <p className="mt-4">
+                <strong>Note:</strong> Some information, such as your username and public profile,
+                may be visible to other users as part of our community features.
+              </p>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">4. Data Security</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>
+                We implement appropriate security measures to protect your personal information
+                against unauthorized access, alteration, disclosure, or destruction. This includes:
+              </p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>Encryption of sensitive data in transit and at rest</li>
+                <li>Regular security assessments and updates</li>
+                <li>Access controls and authentication measures</li>
+                <li>Secure payment processing through Stripe</li>
+              </ul>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">5. Your Rights</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>You have the right to:</p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>Access and update your personal information</li>
+                <li>Delete your account and associated data</li>
+                <li>Opt out of certain communications</li>
+                <li>Request a copy of your data</li>
+                <li>Object to certain processing activities</li>
+              </ul>
+              <p className="mt-4">
+                To exercise these rights, please contact us at{' '}
+                <a href="mailto:privacy@otaku-mori.com" className="underline hover:text-pink-200">
+                  privacy@otaku-mori.com
+                </a>
+              </p>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">6. Cookies and Tracking</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>
+                We use cookies and similar technologies to enhance your experience, analyze usage
+                patterns, and provide personalized content. You can control cookie settings through
+                your browser, but disabling cookies may affect some functionality.
+              </p>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.4 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">7. Children's Privacy</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>
+                Our services are not directed to children under 13. We do not knowingly collect
+                personal information from children under 13. If you believe we have collected
+                information from a child under 13, please contact us immediately.
+              </p>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.6 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">8. Changes to This Policy</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>
+                We may update this Privacy Policy from time to time. We will notify you of any
+                material changes by posting the new policy on this page and updating the "Last
+                updated" date.
+              </p>
+            </div>
+          </GlassCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.8 }}
+        >
+          <GlassCard className="p-8">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">9. Contact Us</h2>
+            <div className="space-y-4 text-pink-100/95 leading-relaxed">
+              <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+              <div className="bg-pink-900/20 p-4 rounded-lg">
+                <p>
+                  <strong>Email:</strong> privacy@otaku-mori.com
+                </p>
+                <p>
+                  <strong>General Contact:</strong> adi@otaku-mori.com
+                </p>
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
       </div>
+
+      {/* Back Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 2.0 }}
+        className="text-center mt-12"
+      >
+        <GlassButton href="/" variant="secondary">
+          Back to Home
+        </GlassButton>
+      </motion.div>
     </main>
   );
 }

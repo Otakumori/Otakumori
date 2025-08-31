@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -227,7 +227,7 @@ export function MonitoringDashboard() {
                 {latestMetrics?.activeUsers > metrics[metrics.length - 2]?.activeUsers ? '+' : '-'}
                 {Math.abs(
                   (latestMetrics?.activeUsers || 0) -
-                    (metrics[metrics.length - 2]?.activeUsers || 0)
+                    (metrics[metrics.length - 2]?.activeUsers || 0),
                 )}{' '}
                 from last check
               </p>
@@ -257,7 +257,7 @@ export function MonitoringDashboard() {
                   : '-'}
                 {Math.abs(
                   (latestMetrics?.avgResponseTime || 0) -
-                    (metrics[metrics.length - 2]?.avgResponseTime || 0)
+                    (metrics[metrics.length - 2]?.avgResponseTime || 0),
                 )}
                 ms from last check
               </p>
@@ -309,7 +309,7 @@ export function MonitoringDashboard() {
               <p className="text-muted-foreground text-xs">
                 {latestMetrics?.memory < metrics[metrics.length - 2]?.memory ? '+' : '-'}
                 {Math.abs(
-                  (latestMetrics?.memory || 0) - (metrics[metrics.length - 2]?.memory || 0)
+                  (latestMetrics?.memory || 0) - (metrics[metrics.length - 2]?.memory || 0),
                 )}
                 % from last check
               </p>
@@ -347,10 +347,10 @@ export function MonitoringDashboard() {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                           dataKey="timestamp"
-                          tickFormatter={value => new Date(value).toLocaleTimeString()}
+                          tickFormatter={(value) => new Date(value).toLocaleTimeString()}
                         />
                         <YAxis />
-                        <Tooltip labelFormatter={value => new Date(value).toLocaleString()} />
+                        <Tooltip labelFormatter={(value) => new Date(value).toLocaleString()} />
                         <Line
                           type="monotone"
                           dataKey="activeUsers"

@@ -17,7 +17,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Unauthorized',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -33,7 +33,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Rune ID is required',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -48,7 +48,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Rune not found',
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -63,7 +63,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
           ok: false,
           error: 'Cannot delete rune that is assigned to users',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

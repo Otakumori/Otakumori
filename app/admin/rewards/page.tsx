@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -93,7 +93,7 @@ export default function AdminRewardsPage() {
   };
 
   const updateConfig = (path: string, value: any) => {
-    setConfig(prev => {
+    setConfig((prev) => {
       const newConfig = { ...prev };
       const keys = path.split('.');
       let current: any = newConfig;
@@ -194,7 +194,7 @@ export default function AdminRewardsPage() {
                 <input
                   type="number"
                   value={config.baseRateCents}
-                  onChange={e => updateConfig('baseRateCents', parseInt(e.target.value) || 300)}
+                  onChange={(e) => updateConfig('baseRateCents', parseInt(e.target.value) || 300)}
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                   min="100"
                   max="1000"
@@ -213,7 +213,7 @@ export default function AdminRewardsPage() {
                   <input
                     type="number"
                     value={config.minPerOrder}
-                    onChange={e => updateConfig('minPerOrder', parseInt(e.target.value) || 5)}
+                    onChange={(e) => updateConfig('minPerOrder', parseInt(e.target.value) || 5)}
                     className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                     min="1"
                     max="50"
@@ -227,7 +227,7 @@ export default function AdminRewardsPage() {
                   <input
                     type="number"
                     value={config.maxPerOrder}
-                    onChange={e => updateConfig('maxPerOrder', parseInt(e.target.value) || 120)}
+                    onChange={(e) => updateConfig('maxPerOrder', parseInt(e.target.value) || 120)}
                     className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                     min="50"
                     max="500"
@@ -242,7 +242,9 @@ export default function AdminRewardsPage() {
                 <input
                   type="number"
                   value={config.firstPurchaseBonus}
-                  onChange={e => updateConfig('firstPurchaseBonus', parseInt(e.target.value) || 20)}
+                  onChange={(e) =>
+                    updateConfig('firstPurchaseBonus', parseInt(e.target.value) || 20)
+                  }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                   min="0"
                   max="100"
@@ -264,7 +266,7 @@ export default function AdminRewardsPage() {
                   type="checkbox"
                   id="streakEnabled"
                   checked={config.streak.enabled}
-                  onChange={e => updateConfig('streak.enabled', e.target.checked)}
+                  onChange={(e) => updateConfig('streak.enabled', e.target.checked)}
                   className="rounded border-neutral-600 bg-neutral-800 text-blue-500"
                 />
                 <label htmlFor="streakEnabled" className="text-sm text-neutral-300">
@@ -281,10 +283,10 @@ export default function AdminRewardsPage() {
                     <input
                       type="number"
                       value={config.streak.dailyBonusPct * 100}
-                      onChange={e =>
+                      onChange={(e) =>
                         updateConfig(
                           'streak.dailyBonusPct',
-                          (parseFloat(e.target.value) || 0) / 100
+                          (parseFloat(e.target.value) || 0) / 100,
                         )
                       }
                       className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -304,7 +306,7 @@ export default function AdminRewardsPage() {
                     <input
                       type="number"
                       value={config.streak.maxPct * 100}
-                      onChange={e =>
+                      onChange={(e) =>
                         updateConfig('streak.maxPct', (parseFloat(e.target.value) || 0) / 100)
                       }
                       className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -334,7 +336,7 @@ export default function AdminRewardsPage() {
                 <input
                   type="number"
                   value={config.daily.softCap}
-                  onChange={e => updateConfig('daily.softCap', parseInt(e.target.value) || 200)}
+                  onChange={(e) => updateConfig('daily.softCap', parseInt(e.target.value) || 200)}
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                   min="50"
                   max="500"
@@ -351,7 +353,7 @@ export default function AdminRewardsPage() {
                 <input
                   type="number"
                   value={config.daily.postSoftRatePct * 100}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('daily.postSoftRatePct', (parseFloat(e.target.value) || 0) / 100)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -369,7 +371,7 @@ export default function AdminRewardsPage() {
                 <input
                   type="number"
                   value={config.daily.hardCap}
-                  onChange={e => updateConfig('daily.hardCap', parseInt(e.target.value) || 400)}
+                  onChange={(e) => updateConfig('daily.hardCap', parseInt(e.target.value) || 400)}
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                   min="100"
                   max="1000"
@@ -396,7 +398,7 @@ export default function AdminRewardsPage() {
                 <input
                   type="number"
                   value={config.seasonal.multiplier}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('seasonal.multiplier', parseFloat(e.target.value) || 1.0)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -45,7 +45,7 @@ export function CommunityGallery() {
   }, []);
 
   const filteredPosts =
-    selectedType === 'all' ? posts : posts.filter(post => post.type === selectedType);
+    selectedType === 'all' ? posts : posts.filter((post) => post.type === selectedType);
 
   if (isLoading) {
     return (

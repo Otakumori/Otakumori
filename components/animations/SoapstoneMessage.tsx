@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,7 +30,7 @@ export default function SoapstoneMessage() {
         },
         isRevealed: false,
       };
-      setMessages(prev => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]);
     };
 
     // Create a message every 30 seconds (adjust as needed)
@@ -39,8 +39,8 @@ export default function SoapstoneMessage() {
   }, []);
 
   const handleMessageClick = (messageId: string) => {
-    setMessages(prev =>
-      prev.map(msg => (msg.id === messageId ? { ...msg, isRevealed: true } : msg))
+    setMessages((prev) =>
+      prev.map((msg) => (msg.id === messageId ? { ...msg, isRevealed: true } : msg)),
     );
 
     // Play runic reveal sound
@@ -55,7 +55,7 @@ export default function SoapstoneMessage() {
   return (
     <div className="pointer-events-none fixed inset-0 z-40">
       <AnimatePresence>
-        {messages.map(message => (
+        {messages.map((message) => (
           <motion.div
             key={message.id}
             className="pointer-events-auto absolute cursor-pointer"

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState } from 'react';
 
@@ -13,7 +13,7 @@ export default function ContactForm() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     if (e.target.type === 'file') {
       setFormData({ ...formData, file: e.target.files[0] });
     } else {
@@ -21,7 +21,7 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -29,7 +29,10 @@ export default function ContactForm() {
     // For now, just show success message
     console.log('Contact form would be submitted:', formData);
 
-    setStatus({ type: 'success', message: 'Contact system temporarily disabled during migration. Please try again later.' });
+    setStatus({
+      type: 'success',
+      message: 'Contact system temporarily disabled during migration. Please try again later.',
+    });
     setFormData({ name: '', email: '', message: '', file: null });
     setLoading(false);
   };

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -89,7 +89,7 @@ export default function AdminBurstPage() {
   };
 
   const updateConfig = (path: string, value: any) => {
-    setConfig(prev => {
+    setConfig((prev) => {
       const newConfig = { ...prev };
       const keys = path.split('.');
       let current: any = newConfig;
@@ -173,7 +173,7 @@ export default function AdminBurstPage() {
                   type="checkbox"
                   id="burstEnabled"
                   checked={config.enabled}
-                  onChange={e => updateConfig('enabled', e.target.checked)}
+                  onChange={(e) => updateConfig('enabled', e.target.checked)}
                   className="rounded border-neutral-600 bg-neutral-800 text-blue-500"
                 />
                 <label htmlFor="burstEnabled" className="text-sm text-neutral-300">
@@ -190,7 +190,9 @@ export default function AdminBurstPage() {
                     <input
                       type="number"
                       value={config.minCooldownSec}
-                      onChange={e => updateConfig('minCooldownSec', parseInt(e.target.value) || 15)}
+                      onChange={(e) =>
+                        updateConfig('minCooldownSec', parseInt(e.target.value) || 15)
+                      }
                       className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                       min="5"
                       max="60"
@@ -208,7 +210,7 @@ export default function AdminBurstPage() {
                     <input
                       type="number"
                       value={config.maxPerMinute}
-                      onChange={e => updateConfig('maxPerMinute', parseInt(e.target.value) || 3)}
+                      onChange={(e) => updateConfig('maxPerMinute', parseInt(e.target.value) || 3)}
                       className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
                       min="1"
                       max="10"
@@ -237,7 +239,7 @@ export default function AdminBurstPage() {
                 <input
                   type="number"
                   value={config.particleCount.small}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('particleCount.small', parseInt(e.target.value) || 20)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -257,7 +259,7 @@ export default function AdminBurstPage() {
                 <input
                   type="number"
                   value={config.particleCount.medium}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('particleCount.medium', parseInt(e.target.value) || 40)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -277,7 +279,7 @@ export default function AdminBurstPage() {
                 <input
                   type="number"
                   value={config.particleCount.large}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('particleCount.large', parseInt(e.target.value) || 80)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -307,7 +309,7 @@ export default function AdminBurstPage() {
                 <input
                   type="number"
                   value={config.rarityWeights.small * 100}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('rarityWeights.small', (parseFloat(e.target.value) || 0) / 100)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -327,7 +329,7 @@ export default function AdminBurstPage() {
                 <input
                   type="number"
                   value={config.rarityWeights.medium * 100}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('rarityWeights.medium', (parseFloat(e.target.value) || 0) / 100)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -347,7 +349,7 @@ export default function AdminBurstPage() {
                 <input
                   type="number"
                   value={config.rarityWeights.large * 100}
-                  onChange={e =>
+                  onChange={(e) =>
                     updateConfig('rarityWeights.large', (parseFloat(e.target.value) || 0) / 100)
                   }
                   className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"

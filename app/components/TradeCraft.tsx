@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState, useEffect } from 'react';
 
 interface Item {
@@ -96,8 +96,8 @@ export default function TradeCraft() {
 
   const craftItem = (recipe: Recipe) => {
     // Check if we have enough materials
-    const canCraft = recipe.materials.every(material => {
-      const inventoryItem = inventory.find(item => item.id === material.id);
+    const canCraft = recipe.materials.every((material) => {
+      const inventoryItem = inventory.find((item) => item.id === material.id);
       return inventoryItem && inventoryItem.quantity >= material.quantity;
     });
 
@@ -108,8 +108,8 @@ export default function TradeCraft() {
     }
 
     // Remove materials
-    const updatedInventory = inventory.map(item => {
-      const material = recipe.materials.find(m => m.id === item.id);
+    const updatedInventory = inventory.map((item) => {
+      const material = recipe.materials.find((m) => m.id === item.id);
       if (material) {
         return { ...item, quantity: item.quantity - material.quantity };
       }
@@ -117,14 +117,14 @@ export default function TradeCraft() {
     });
 
     // Add crafted item
-    const resultItem = updatedInventory.find(item => item.id === recipe.result.id);
+    const resultItem = updatedInventory.find((item) => item.id === recipe.result.id);
     if (resultItem) {
       setInventory(
-        updatedInventory.map(item =>
+        updatedInventory.map((item) =>
           item.id === recipe.result.id
             ? { ...item, quantity: item.quantity + recipe.result.quantity }
-            : item
-        )
+            : item,
+        ),
       );
     } else {
       setInventory([
@@ -164,7 +164,7 @@ export default function TradeCraft() {
     <div className="mx-auto w-full max-w-4xl p-6">
       {/* Tabs */}
       <div className="mb-6 flex gap-4">
-        {(['inventory', 'crafting', 'trading'] as const).map(tab => (
+        {(['inventory', 'crafting', 'trading'] as const).map((tab) => (
           <button
             key={tab}
             className={`shadow-glow whitespace-nowrap rounded-lg px-4 py-2 font-bold transition-all ${
@@ -189,7 +189,7 @@ export default function TradeCraft() {
       {/* Inventory Tab */}
       {activeTab === 'inventory' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {inventory.map(item => (
+          {inventory.map((item) => (
             <div
               key={item.id}
               className="shadow-glow flex flex-col items-center rounded-xl border-2 border-pink-900 bg-black/60 p-4 text-center"
@@ -218,7 +218,7 @@ export default function TradeCraft() {
       {/* Crafting Tab */}
       {activeTab === 'crafting' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {recipes.map(recipe => (
+          {recipes.map((recipe) => (
             <div
               key={recipe.id}
               className={`shadow-glow flex flex-col items-center rounded-xl border-2 p-4 text-center transition-all duration-300 ${
@@ -233,8 +233,8 @@ export default function TradeCraft() {
               <p className="mb-4 text-sm italic text-pink-200">{recipe.description}</p>
               <div className="mb-4 w-full">
                 <h4 className="mb-2 font-bold text-pink-300">Materials Required:</h4>
-                {recipe.materials.map(material => {
-                  const inventoryItem = inventory.find(item => item.id === material.id);
+                {recipe.materials.map((material) => {
+                  const inventoryItem = inventory.find((item) => item.id === material.id);
                   const hasEnough = inventoryItem && inventoryItem.quantity >= material.quantity;
                   return (
                     <div key={material.id} className="mb-1 flex items-center justify-center gap-2">

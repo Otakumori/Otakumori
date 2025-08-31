@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
@@ -52,7 +52,10 @@ export function AchievementNotification({ achievement, onClose }: AchievementNot
             <span className="mr-2">Reward:</span>
             <span className="flex items-center">
               <img src="/assets/achievements/petal.png" alt="Petal" className="mr-1 h-4 w-4" />
-              {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'} {achievement.reward?.type === 'points' ? 'points' : (achievement.reward?.type || 'reward')}
+              {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'}{' '}
+              {achievement.reward?.type === 'points'
+                ? 'points'
+                : achievement.reward?.type || 'reward'}
             </span>
           </div>
         </div>

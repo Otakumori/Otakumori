@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useUser } from '@clerk/nextjs';
@@ -73,8 +73,8 @@ export default function AbyssPage() {
     }, 2000);
 
     // Add sample quests
-    sampleQuests.forEach(quest => {
-      if (!quests.find(q => q.id === quest.id)) {
+    sampleQuests.forEach((quest) => {
+      if (!quests.find((q) => q.id === quest.id)) {
         addQuest(quest);
       }
     });
@@ -90,12 +90,12 @@ export default function AbyssPage() {
     return <div>Please sign in to access the Abyss</div>;
   }
 
-  const handleStartQuest = quest => {
+  const handleStartQuest = (quest) => {
     // Simulate quest completion
     setTimeout(() => {
       addPetals(quest.reward);
       // Remove quest from list
-      const updatedQuests = quests.filter(q => q.id !== quest.id);
+      const updatedQuests = quests.filter((q) => q.id !== quest.id);
       // Update quests in store
       useOverlordStore.setState({ quests: updatedQuests });
     }, 2000);
@@ -154,7 +154,7 @@ export default function AbyssPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
           <h2 className="mb-4 text-2xl font-bold text-white">Active Quests</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {quests.map(quest => (
+            {quests.map((quest) => (
               <div
                 key={quest.id}
                 className="rounded-lg border border-white/10 bg-white/5 p-4 backdrop-blur-sm"

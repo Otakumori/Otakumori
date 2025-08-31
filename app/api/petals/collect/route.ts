@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
           error: 'Rate limited',
           retryAfter: Math.ceil(RATE_LIMIT.windowMs / 1000),
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             error: 'User not found',
           },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
               message: 'Sign in to bank your petals forever',
             },
           },
-          { status: 403 }
+          { status: 403 },
         );
       }
 
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
         ok: false,
         error: 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

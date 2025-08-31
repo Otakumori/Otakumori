@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 // importProducts.js - Prisma Implementation
 
 require('dotenv').config();
@@ -25,7 +25,7 @@ console.log(`Reading CSV file from ${csvFilePath}...`);
 // Read and parse the CSV file
 fs.createReadStream(csvFilePath)
   .pipe(csv())
-  .on('data', data => {
+  .on('data', (data) => {
     // Debug: log each row as it comes in (optional, comment out if too verbose)
     console.log('Row:', data);
 
@@ -35,7 +35,7 @@ fs.createReadStream(csvFilePath)
     }
     products.push(data);
   })
-  .on('error', err => {
+  .on('error', (err) => {
     console.error('Error reading CSV file:', err);
   })
   .on('end', async () => {
@@ -49,7 +49,7 @@ fs.createReadStream(csvFilePath)
     try {
       // Insert/Upsert products into Prisma database
       console.log('Importing products to database...');
-      
+
       let successCount = 0;
       let errorCount = 0;
 
@@ -62,10 +62,10 @@ fs.createReadStream(csvFilePath)
             description: product.description || null,
             price: product.price || 0,
             image: product.image || product.imageUrl || null,
-            tags: product.tags ? product.tags.split(',').map(tag => tag.trim()) : [],
+            tags: product.tags ? product.tags.split(',').map((tag) => tag.trim()) : [],
             isActive: product.isActive !== 'false', // Default to true unless explicitly false
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           };
 
           // Use upsert to create or update products
@@ -78,9 +78,9 @@ fs.createReadStream(csvFilePath)
               image: productData.image,
               tags: productData.tags,
               isActive: productData.isActive,
-              updatedAt: new Date()
+              updatedAt: new Date(),
             },
-            create: productData
+            create: productData,
           });
 
           console.log(`✅ Imported/Updated: ${result.name} (ID: ${result.id})`);
@@ -101,7 +101,6 @@ fs.createReadStream(csvFilePath)
       } else {
         console.log('\n🎉 All products imported successfully!');
       }
-
     } catch (error) {
       console.error('❌ Database error during import:', error);
     } finally {

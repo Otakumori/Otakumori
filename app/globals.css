@@ -13,6 +13,17 @@
   font-family: 'Runic', sans-serif;
 }
 
+@layer base {
+  .font-princeps {
+    font-family: var(--font-optimus-princeps), serif;
+    font-weight: 400;
+  }
+  .font-princeps-bold {
+    font-family: var(--font-optimus-princeps), serif;
+    font-weight: 700;
+  }
+}
+
 @layer utilities {
   .animate-spin-slow {
     animation: spin 3s linear infinite;
@@ -216,9 +227,15 @@ body {
 
 /* GameCube specific styles */
 @keyframes gc-ripple {
-  0% { --r: 0deg; }
-  50% { --r: 180deg; }
-  100% { --r: 360deg; }
+  0% {
+    --r: 0deg;
+  }
+  50% {
+    --r: 180deg;
+  }
+  100% {
+    --r: 360deg;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -233,19 +250,35 @@ body {
 
 .gc-mask {
   --core: rgba(255, 255, 255, 0.18);
-  --soft: rgba(255, 255, 255, 0.10);
+  --soft: rgba(255, 255, 255, 0.1);
   --base: rgba(0, 0, 0, 0);
   --x: 50%;
   --y: 60%;
-  -webkit-mask-image: 
+  -webkit-mask-image:
     radial-gradient(circle at var(--x) var(--y), var(--core), var(--base) 32%),
-    radial-gradient(circle at calc(var(--x) + 4%) calc(var(--y) - 2%), var(--soft), var(--base) 48%),
-    radial-gradient(circle at calc(var(--x) - 3%) calc(var(--y) + 1%), var(--soft), var(--base) 68%),
+    radial-gradient(
+      circle at calc(var(--x) + 4%) calc(var(--y) - 2%),
+      var(--soft),
+      var(--base) 48%
+    ),
+    radial-gradient(
+      circle at calc(var(--x) - 3%) calc(var(--y) + 1%),
+      var(--soft),
+      var(--base) 68%
+    ),
     radial-gradient(circle at var(--x) calc(var(--y) + 4%), var(--soft), var(--base) 86%);
-  mask-image: 
+  mask-image:
     radial-gradient(circle at var(--x) var(--y), var(--core), var(--base) 32%),
-    radial-gradient(circle at calc(var(--x) + 4%) calc(var(--y) - 2%), var(--soft), var(--base) 48%),
-    radial-gradient(circle at calc(var(--x) - 3%) calc(var(--y) + 1%), var(--soft), var(--base) 68%),
+    radial-gradient(
+      circle at calc(var(--x) + 4%) calc(var(--y) - 2%),
+      var(--soft),
+      var(--base) 48%
+    ),
+    radial-gradient(
+      circle at calc(var(--x) - 3%) calc(var(--y) + 1%),
+      var(--soft),
+      var(--base) 68%
+    ),
     radial-gradient(circle at var(--x) calc(var(--y) + 4%), var(--soft), var(--base) 86%);
 }
 
@@ -258,14 +291,34 @@ body {
   perspective: 1000px;
 }
 
-.rotate-y-0 { transform: rotateY(0deg); }
-.rotate-y-90 { transform: rotateY(90deg); }
-.rotate-y-180 { transform: rotateY(180deg); }
-.rotate-y-270 { transform: rotateY(270deg); }
-.rotate-x-90 { transform: rotateX(90deg); }
+.rotate-y-0 {
+  transform: rotateY(0deg);
+}
+.rotate-y-90 {
+  transform: rotateY(90deg);
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+.rotate-y-270 {
+  transform: rotateY(270deg);
+}
+.rotate-x-90 {
+  transform: rotateX(90deg);
+}
 
-.translate-z-48 { transform: translateZ(48px); }
-.translate-z-neg-48 { transform: translateZ(-48px); }
-.translate-x-48 { transform: translateX(48px); }
-.translate-x-neg-48 { transform: translateX(-48px); }
-.translate-y-neg-48 { transform: translateY(-48px); }
+.translate-z-48 {
+  transform: translateZ(48px);
+}
+.translate-z-neg-48 {
+  transform: translateZ(-48px);
+}
+.translate-x-48 {
+  transform: translateX(48px);
+}
+.translate-x-neg-48 {
+  transform: translateX(-48px);
+}
+.translate-y-neg-48 {
+  transform: translateY(-48px);
+}

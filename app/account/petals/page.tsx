@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -35,7 +35,7 @@ const CATEGORIES = [
   { id: 'COSMETIC', name: 'Cosmetics', icon: '✨' },
   { id: 'OVERLAY', name: 'Overlays', icon: '🌈' },
   { id: 'TEXT', name: 'Text Effects', icon: '💬' },
-  { id: 'CURSOR', name: 'Cursors', icon: '👆' }
+  { id: 'CURSOR', name: 'Cursors', icon: '👆' },
 ];
 
 export default function PetalStorePage() {
@@ -61,10 +61,10 @@ export default function PetalStorePage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`/api/v1/petals/shop?category=${selectedCategory}`);
       const data: PetalStoreResponse = await response.json();
-      
+
       if (data.ok && data.data) {
         setItems(data.data.items);
       } else {
@@ -100,27 +100,26 @@ export default function PetalStorePage() {
 
     try {
       setPurchasing(item.id);
-      
+
       const response = await fetch('/api/v1/petals/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           itemId: item.id,
-          idempotencyKey: `purchase_${item.id}_${Date.now()}`
-        })
+          idempotencyKey: `purchase_${item.id}_${Date.now()}`,
+        }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.ok && data.data) {
         // Update local state
         setPetalBalance(data.data.newBalance);
-        setItems(prev => prev.filter(i => i.id !== item.id));
+        setItems((prev) => prev.filter((i) => i.id !== item.id));
         alert(`Successfully purchased ${item.name}!`);
       } else {
         throw new Error(data.error || 'Purchase failed');
       }
-      
     } catch (err) {
       alert('Purchase failed. Please try again.');
       console.error('Error purchasing item:', err);
@@ -159,9 +158,10 @@ export default function PetalStorePage() {
     }
   };
 
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.metadata.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredItems = items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.metadata.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -305,8 +305,8 @@ export default function PetalStorePage() {
                         petalBalance < item.pricePetals
                           ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
                           : purchasing === item.id
-                          ? 'bg-blue-600 text-white cursor-wait'
-                          : 'bg-pink-600 hover:bg-pink-700 text-white hover:scale-105'
+                            ? 'bg-blue-600 text-white cursor-wait'
+                            : 'bg-pink-600 hover:bg-pink-700 text-white hover:scale-105'
                       }`}
                     >
                       {purchasing === item.id ? (
@@ -329,9 +329,7 @@ export default function PetalStorePage() {
         ) : (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🛍️</div>
-            <h3 className="text-xl font-semibold text-neutral-400 mb-2">
-              No items found
-            </h3>
+            <h3 className="text-xl font-semibold text-neutral-400 mb-2">No items found</h3>
             <p className="text-neutral-500">
               {searchQuery ? 'Try adjusting your search terms.' : 'Check back later for new items!'}
             </p>
@@ -342,13 +340,16 @@ export default function PetalStorePage() {
         <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">How to Earn More Petals</h2>
           <p className="text-neutral-300 mb-6">
-            Complete daily challenges, unlock achievements, and improve your high scores to earn more petals!
+            Complete daily challenges, unlock achievements, and improve your high scores to earn
+            more petals!
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="text-center">
               <div className="text-4xl mb-3">🎮</div>
               <h3 className="font-semibold text-white mb-2">Play Mini-Games</h3>
-              <p className="text-sm text-neutral-400">Earn petals by playing and improving your scores</p>
+              <p className="text-sm text-neutral-400">
+                Earn petals by playing and improving your scores
+              </p>
             </div>
             <div className="text-center">
               <div className="text-4xl mb-3">🏆</div>

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useFriendSystemStore, Friend } from '@/lib/store/friendSystemStore';
@@ -60,20 +60,20 @@ export const FriendList: React.FC = () => {
   }, []);
 
   const handleAcceptRequest = (requestId: string) => {
-    setFriendRequests(prev => prev.filter(req => req.id !== requestId));
+    setFriendRequests((prev) => prev.filter((req) => req.id !== requestId));
     // Add to friends list
-    const request = friendRequests.find(req => req.id === requestId);
+    const request = friendRequests.find((req) => req.id === requestId);
     if (request) {
-      setFriends(prev => [...prev, request.fromUser]);
+      setFriends((prev) => [...prev, request.fromUser]);
     }
   };
 
   const handleDeclineRequest = (requestId: string) => {
-    setFriendRequests(prev => prev.filter(req => req.id !== requestId));
+    setFriendRequests((prev) => prev.filter((req) => req.id !== requestId));
   };
 
-  const filteredFriends = friends.filter(friend =>
-    friend.username.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFriends = friends.filter((friend) =>
+    friend.username.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -82,7 +82,7 @@ export const FriendList: React.FC = () => {
         <div className="animate-pulse">
           <div className="mb-4 h-4 w-1/4 rounded bg-gray-200"></div>
           <div className="space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-12 rounded bg-gray-200"></div>
             ))}
           </div>
@@ -98,7 +98,7 @@ export const FriendList: React.FC = () => {
           type="text"
           placeholder="Search friends..."
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -108,7 +108,7 @@ export const FriendList: React.FC = () => {
         <div className="mb-6">
           <h3 className="mb-3 text-lg font-semibold">Friend Requests ({friendRequests.length})</h3>
           <div className="space-y-2">
-            {friendRequests.map(request => (
+            {friendRequests.map((request) => (
               <div
                 key={request.id}
                 className="flex items-center justify-between rounded-lg border border-yellow-200 bg-yellow-50 p-3"
@@ -141,7 +141,7 @@ export const FriendList: React.FC = () => {
       <div>
         <h3 className="mb-3 text-lg font-semibold">Friends ({filteredFriends.length})</h3>
         <div className="space-y-2">
-          {filteredFriends.map(friend => (
+          {filteredFriends.map((friend) => (
             <div
               key={friend.id}
               className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50"

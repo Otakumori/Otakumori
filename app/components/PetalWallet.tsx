@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useEffect, useRef, useState } from 'react';
 import { usePetalContext, eventBus } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,7 +17,7 @@ const PetalWallet: React.FC = () => {
   // Listen for petal earning events
   useEffect(() => {
     const handler = (amount: any) => {
-      setLog(prev => [{ amount, timestamp: Date.now() }, ...prev].slice(0, MAX_LOG));
+      setLog((prev) => [{ amount, timestamp: Date.now() }, ...prev].slice(0, MAX_LOG));
       setAnimate(true);
       setTimeout(() => setAnimate(false), 600);
     };
@@ -63,9 +63,18 @@ const PetalWallet: React.FC = () => {
             <div className="mb-2 text-pink-300 font-semibold">Petal History</div>
             <ul className="max-h-48 overflow-y-auto pr-1">
               {log.map((entry, idx) => (
-                <li key={entry.timestamp} className="flex justify-between py-1 border-b border-pink-800/40 last:border-0">
+                <li
+                  key={entry.timestamp}
+                  className="flex justify-between py-1 border-b border-pink-800/40 last:border-0"
+                >
                   <span>{entry.amount > 0 ? `+${entry.amount}` : entry.amount} petals</span>
-                  <span className="text-xs text-gray-400">{new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                  <span className="text-xs text-gray-400">
+                    {new Date(entry.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -76,4 +85,4 @@ const PetalWallet: React.FC = () => {
   );
 };
 
-export default PetalWallet; 
+export default PetalWallet;

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -52,11 +52,11 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
 
     // Load audio
     Promise.all([
-      new Promise(resolve => {
+      new Promise((resolve) => {
         ambient.addEventListener('canplaythrough', resolve, { once: true });
         ambient.load();
       }),
-      new Promise(resolve => {
+      new Promise((resolve) => {
         whisper.addEventListener('canplaythrough', resolve, { once: true });
         whisper.load();
       }),
@@ -99,7 +99,7 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      particles.current.forEach(particle => {
+      particles.current.forEach((particle) => {
         particle.x += particle.vx;
         particle.y += particle.vy;
 
@@ -136,24 +136,24 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
 
     const bootSequence = async () => {
       // Stage 0: Initial black screen with pulsing pixel
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setStage(1);
 
       // Stage 1: Particle swirl forming "O"
       ambientAudio?.play();
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       setStage(2);
 
       // Stage 2: Cube formation
-      await new Promise(resolve => setTimeout(resolve, 4000));
+      await new Promise((resolve) => setTimeout(resolve, 4000));
       setStage(3);
 
       // Stage 3: Logo fade in
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setStage(4);
 
       // Stage 4: Complete
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       onBootComplete();
     };
 
@@ -165,7 +165,7 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
   }, [audioLoaded, isFirstVisit, onBootComplete]);
 
   const handleInteraction = () => {
-    setInteractionCount(prev => prev + 1);
+    setInteractionCount((prev) => prev + 1);
     if (interactionCount >= 3) {
       // Secret interaction unlocked
       controls.start({
@@ -180,7 +180,7 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    setSecretPhrase(prev => {
+    setSecretPhrase((prev) => {
       const newPhrase = prev + e.key;
       if (newPhrase.includes('bloom me')) {
         // Trigger special effect

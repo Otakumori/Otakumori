@@ -1,5 +1,5 @@
-#!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh" 2>/dev/null || true
 
-# run lint/format/test (adjust to your scripts)
-npm run lint-staged || exit 1 
+echo "Running lint-staged sequentially…"
+npx lint-staged --concurrent false
