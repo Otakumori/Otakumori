@@ -8,14 +8,14 @@ import { prisma } from '@/app/lib/prisma';
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const page = await prisma.contentPage.findUnique({
     where: { slug: params.slug },
-    select: { title: true }
+    select: { title: true },
   });
   return { title: page?.title ?? 'Otaku-Mori' };
 }
 
 export default async function StaticPage({ params }: { params: { slug: string } }) {
   const page = await prisma.contentPage.findUnique({
-    where: { slug: params.slug }
+    where: { slug: params.slug },
   });
   if (!page || !page.published) return notFound();
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useEffect, useRef, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { useInView } from 'react-intersection-observer';
@@ -57,8 +57,8 @@ export const CherryBlossomTree = () => {
     if (!inView) return;
 
     const interval = setInterval(() => {
-      setPetals(currentPetals =>
-        currentPetals.map(petal => {
+      setPetals((currentPetals) =>
+        currentPetals.map((petal) => {
           if (petal.collected) return petal;
 
           return {
@@ -67,7 +67,7 @@ export const CherryBlossomTree = () => {
             x: petal.x + Math.sin(petal.y * 0.1) * 0.5,
             rotation: petal.rotation + 1,
           };
-        })
+        }),
       );
     }, 50);
 
@@ -77,11 +77,11 @@ export const CherryBlossomTree = () => {
   const handlePetalClick = (petal: Petal) => {
     if (petal.collected) return;
 
-    setPetals(currentPetals =>
-      currentPetals.map(p => (p.id === petal.id ? { ...p, collected: true } : p))
+    setPetals((currentPetals) =>
+      currentPetals.map((p) => (p.id === petal.id ? { ...p, collected: true } : p)),
     );
 
-    setCollectedCount(prev => {
+    setCollectedCount((prev) => {
       const newCount = prev + 1;
       addPetal();
       checkAchievements(newCount);
@@ -108,7 +108,7 @@ export const CherryBlossomTree = () => {
         />
 
         {/* Interactive Petals */}
-        {petals.map(petal => (
+        {petals.map((petal) => (
           <animated.div
             key={petal.id}
             onClick={() => handlePetalClick(petal)}

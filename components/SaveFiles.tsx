@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -53,7 +53,7 @@ export default function SaveFiles() {
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {saveFiles.map(saveFile => (
+      {saveFiles.map((saveFile) => (
         <motion.div
           key={saveFile.id}
           initial={{ opacity: 0, y: 20 }}

@@ -1,0 +1,87 @@
+{
+  "clusters": [
+    { "prefix": "site", "items": ["first_visit", "daily_visitor"] },
+    { "prefix": "profile", "items": ["complete", "avatar_upload"] },
+    { "prefix": "shop", "items": ["first_purchase", "shopping_spree"] },
+    { "prefix": "community", "items": ["first_comment", "comment_master"] },
+    { "prefix": "lore", "items": ["explorer", "master", "easter_egg_finder", "chaos_master"] },
+    {
+      "prefix": "event",
+      "items": ["seasonal_participant", "event_champion", "beta_tester", "founder"]
+    },
+
+    {
+      "prefix": "puzzle_reveal",
+      "items": [
+        "loreseeker",
+        "shatter",
+        "secretkept",
+        "sadist",
+        "layerslayer",
+        "archivist",
+        "herefortheplot"
+      ]
+    },
+    {
+      "prefix": "brick_breaker",
+      "items": ["paddledaddy", "breakme", "pixelpervert", "toohard", "omnismash", "lift"]
+    },
+    {
+      "prefix": "bubble_girl",
+      "items": [
+        "popthat",
+        "floatmedaddy",
+        "shelikesitrough",
+        "pantyraid",
+        "upskirt",
+        "oops",
+        "nsfwqueen"
+      ]
+    },
+    {
+      "prefix": "memory_matrix",
+      "items": ["novice", "perfect", "deathnote", "glitch", "speed", "combo", "nsfw"]
+    },
+    {
+      "prefix": "glitch_crawl",
+      "items": ["datadiver", "runner", "404", "psyops", "speed", "fragments", "nsfw"]
+    },
+    {
+      "prefix": "thighs_time",
+      "items": ["initiate", "rhythmgod", "waifu", "killlacombo", "nsfw", "speed", "perfectchain"]
+    },
+    {
+      "prefix": "bento_boss",
+      "items": ["beginner", "aesthetic", "sailorsnack", "speed", "combo", "nsfw", "perfectday"]
+    },
+    {
+      "prefix": "love_letter",
+      "items": ["firstlove", "poet", "jojo", "heartbreaker", "nsfw", "speed", "perfect"]
+    },
+    {
+      "prefix": "maid_mayhem",
+      "items": ["training", "butlerboss", "flustered", "witchblade", "nsfw", "speed", "perfect"]
+    },
+    {
+      "prefix": "otaku_drift",
+      "items": ["firstdrift", "king", "initiald", "silenthill", "speed", "combo", "nsfw"]
+    },
+    {
+      "prefix": "rune_alchemy",
+      "items": ["rookie", "fullmetal", "combo", "elderscrolls", "speed", "nsfw", "perfect"]
+    }
+  ],
+
+  "tiers": [
+    { "key": "tier-1-fallen-leaf", "label": "Fallen Leaf" },
+    { "key": "tier-2-budding-warden", "label": "Budding Warden" },
+    { "key": "tier-3-bloomtouched", "label": "Bloomtouched" },
+    { "key": "tier-4-petalforged", "label": "Petalforged" },
+    { "key": "tier-5-rootkeeper", "label": "Rootkeeper" },
+    { "key": "tier-6-warden-bloom", "label": "Warden of Bloom" },
+    { "key": "tier-7-veilbloom", "label": "Veilbloom" },
+    { "key": "tier-8-thornbound", "label": "Thornbound" },
+    { "key": "tier-9-aetherpetal", "label": "Aetherpetal" },
+    { "key": "tier-10-eclipse", "label": "Eclipse" }
+  ]
+}

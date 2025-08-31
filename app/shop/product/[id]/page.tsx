@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-"use client";
+'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
@@ -34,7 +34,7 @@ interface Product {
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params.id as string;
-  
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,23 +49,27 @@ export default function ProductDetailPage() {
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
         const products = data.products || data;
         const foundProduct = products.find((p: Product) => p.id === productId);
-        
+
         if (foundProduct) {
           setProduct(foundProduct);
           // Set default variant
           if (foundProduct.variants && foundProduct.variants.length > 0) {
-            const defaultVariant = foundProduct.variants.find((v: ProductVariant) => v.is_default) || foundProduct.variants[0];
+            const defaultVariant =
+              foundProduct.variants.find((v: ProductVariant) => v.is_default) ||
+              foundProduct.variants[0];
             setSelectedVariant(defaultVariant);
           }
         } else {
           setError('Product not found');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred while fetching the product');
+        setError(
+          err instanceof Error ? err.message : 'An error occurred while fetching the product',
+        );
         console.error('Error fetching product:', err);
       } finally {
         setLoading(false);
@@ -79,7 +83,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!selectedVariant || !product) return;
-    
+
     try {
       // You can implement cart functionality here
       console.log('Adding to cart:', {
@@ -110,8 +114,13 @@ export default function ProductDetailPage() {
         <div className="text-center py-12">
           <div className="text-6xl mb-4">😔</div>
           <h3 className="text-xl font-semibold mb-2">Product not found</h3>
-          <p className="text-white/60 mb-4">{error || 'The product you are looking for does not exist.'}</p>
-          <Link href="/shop" className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">
+          <p className="text-white/60 mb-4">
+            {error || 'The product you are looking for does not exist.'}
+          </p>
+          <Link
+            href="/shop"
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+          >
             Back to Shop
           </Link>
         </div>
@@ -128,7 +137,11 @@ export default function ProductDetailPage() {
       {/* Breadcrumb */}
       <nav className="mb-8">
         <ol className="flex items-center space-x-2 text-sm text-white/60">
-          <li><Link href="/shop" className="hover:text-white">Shop</Link></li>
+          <li>
+            <Link href="/shop" className="hover:text-white">
+              Shop
+            </Link>
+          </li>
           <li>/</li>
           <li className="text-white">{product.title}</li>
         </ol>
@@ -141,15 +154,9 @@ export default function ProductDetailPage() {
         {/* Product Image */}
         <div className="space-y-4">
           <div className="relative aspect-square overflow-hidden rounded-lg border border-white/20">
-            <Image
-              src={imageUrl}
-              alt={product.title}
-              fill
-              className="object-cover"
-              priority
-            />
+            <Image src={imageUrl} alt={product.title} fill className="object-cover" priority />
           </div>
-          
+
           {/* Tags */}
           {product.tags && product.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -169,9 +176,7 @@ export default function ProductDetailPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">{product.title}</h1>
-            {product.category && (
-              <p className="text-pink-400 text-sm">{product.category}</p>
-            )}
+            {product.category && <p className="text-pink-400 text-sm">{product.category}</p>}
           </div>
 
           {/* Price */}
@@ -207,9 +212,7 @@ export default function ProductDetailPage() {
                     <div className="text-xs opacity-60">
                       {product.currency || 'USD'} {variant.price.toFixed(2)}
                     </div>
-                    {!variant.is_enabled && (
-                      <div className="text-xs text-red-400">Unavailable</div>
-                    )}
+                    {!variant.is_enabled && <div className="text-xs text-red-400">Unavailable</div>}
                   </button>
                 ))}
               </div>
@@ -247,10 +250,7 @@ export default function ProductDetailPage() {
 
           {/* Back to Shop */}
           <div className="text-center">
-            <Link
-              href="/shop"
-              className="text-pink-400 hover:text-pink-300 transition-colors"
-            >
+            <Link href="/shop" className="text-pink-400 hover:text-pink-300 transition-colors">
               ← Back to Shop
             </Link>
           </div>

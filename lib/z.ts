@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { z } from "zod";
+/* eslint-disable-line @next/next/no-img-element */
+import { z } from 'zod';
 
 export const Product = z.object({
   id: z.string(),
   slug: z.string(),
   title: z.string(),
-  description: z.string().default(""),
+  description: z.string().default(''),
   price: z.number(),
   images: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
@@ -17,7 +17,7 @@ export type Product = z.infer<typeof Product>;
 export const TradeItem = z.object({
   id: z.string(),
   name: z.string(),
-  rarity: z.enum(["Common", "Rare", "Legendary"]),
+  rarity: z.enum(['Common', 'Rare', 'Legendary']),
   ownerId: z.string(),
 });
 

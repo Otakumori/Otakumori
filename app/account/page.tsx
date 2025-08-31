@@ -1,13 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
-import { UsernameSuggestion } from "@/components/UsernameSuggestion";
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import { UserButton } from '@clerk/nextjs';
+import { UsernameSuggestion } from '@/components/UsernameSuggestion';
 
 export default async function AccountPage() {
   const { userId } = await auth();
-  
+
   if (!userId) {
-    redirect("/sign-in");
+    redirect('/sign-in');
   }
 
   return (
@@ -22,7 +22,7 @@ export default async function AccountPage() {
           {/* Profile Section */}
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold text-gray-900">Profile</h2>
-            <UsernameSuggestion 
+            <UsernameSuggestion
               onUsernameSelect={(username) => {
                 console.log('Username selected:', username);
                 // TODO: Implement username update logic
@@ -33,7 +33,9 @@ export default async function AccountPage() {
           {/* Settings Section */}
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold text-gray-900">Settings</h2>
-            <p className="text-gray-600">Account settings and preferences will be available here.</p>
+            <p className="text-gray-600">
+              Account settings and preferences will be available here.
+            </p>
           </div>
 
           {/* Orders Section */}
@@ -49,7 +51,9 @@ export default async function AccountPage() {
               <span className="text-2xl">🌸</span>
               <span className="text-lg font-medium text-gray-900">Loading...</span>
             </div>
-            <p className="mt-2 text-sm text-gray-600">Collect petals by completing orders and playing games.</p>
+            <p className="mt-2 text-sm text-gray-600">
+              Collect petals by completing orders and playing games.
+            </p>
           </div>
         </div>
       </div>

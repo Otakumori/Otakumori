@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { auth } from '@clerk/nextjs/server';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 export const maxDuration = 10;
 
 const prisma = new PrismaClient();
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   try {
     const { userId } = auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const order = await prisma.order.findFirst({
@@ -27,18 +27,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     });
 
     if (!order) {
-      return NextResponse.json({ ok: false, error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: 'Order not found' }, { status: 404 });
     }
 
     return NextResponse.json({
       ok: true,
-      data: { order }
+      data: { order },
     });
   } catch (error) {
     console.error('Error fetching order:', error);
-    return NextResponse.json(
-      { ok: false, error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

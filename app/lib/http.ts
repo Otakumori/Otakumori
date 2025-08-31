@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { z } from 'zod';
 
 export interface HttpOptions {
@@ -21,7 +21,7 @@ export class HttpError extends Error {
   constructor(
     message: string,
     public status: number,
-    public response?: Response
+    public response?: Response,
   ) {
     super(message);
     this.name = 'HttpError';
@@ -42,11 +42,11 @@ class HttpClient {
   async request<T>(
     endpoint: string,
     options: HttpOptions = {},
-    schema?: z.ZodType<T>
+    schema?: z.ZodType<T>,
   ): Promise<HttpResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     const method = options.method || 'GET';
-    
+
     const headers = new Headers({
       ...this.defaultHeaders,
       ...options.headers,
@@ -75,7 +75,7 @@ class HttpClient {
         throw new HttpError(
           responseData.error || `HTTP ${response.status}`,
           response.status,
-          response
+          response,
         );
       }
 
@@ -94,7 +94,7 @@ class HttpClient {
             throw new HttpError(
               `Response validation failed: ${validationError.message}`,
               response.status,
-              response
+              response,
             );
           }
           throw validationError;
@@ -116,16 +116,13 @@ class HttpClient {
         throw new HttpError('Network error', 0);
       }
 
-      throw new HttpError(
-        error instanceof Error ? error.message : 'Unknown error',
-        0
-      );
+      throw new HttpError(error instanceof Error ? error.message : 'Unknown error', 0);
     }
   }
 
   private async parseResponse(response: Response): Promise<any> {
     const contentType = response.headers.get('content-type');
-    
+
     if (contentType?.includes('application/json')) {
       try {
         return await response.json();
@@ -146,19 +143,11 @@ class HttpClient {
     return this.request<T>(endpoint, { method: 'GET' }, schema);
   }
 
-  async post<T>(
-    endpoint: string,
-    body: any,
-    schema?: z.ZodType<T>
-  ): Promise<HttpResponse<T>> {
+  async post<T>(endpoint: string, body: any, schema?: z.ZodType<T>): Promise<HttpResponse<T>> {
     return this.request<T>(endpoint, { method: 'POST', body }, schema);
   }
 
-  async put<T>(
-    endpoint: string,
-    body: any,
-    schema?: z.ZodType<T>
-  ): Promise<HttpResponse<T>> {
+  async put<T>(endpoint: string, body: any, schema?: z.ZodType<T>): Promise<HttpResponse<T>> {
     return this.request<T>(endpoint, { method: 'PUT', body }, schema);
   }
 
@@ -166,11 +155,7 @@ class HttpClient {
     return this.request<T>(endpoint, { method: 'DELETE' }, schema);
   }
 
-  async patch<T>(
-    endpoint: string,
-    body: any,
-    schema?: z.ZodType<T>
-  ): Promise<HttpResponse<T>> {
+  async patch<T>(endpoint: string, body: any, schema?: z.ZodType<T>): Promise<HttpResponse<T>> {
     return this.request<T>(endpoint, { method: 'PATCH', body }, schema);
   }
 
@@ -195,50 +180,48 @@ export const httpClient = new HttpClient();
 
 // Export convenience functions
 export const http = {
-  get: <T>(endpoint: string, schema?: z.ZodType<T>) => 
-    httpClient.get<T>(endpoint, schema),
-  
-  post: <T>(endpoint: string, body: any, schema?: z.ZodType<T>) => 
+  get: <T>(endpoint: string, schema?: z.ZodType<T>) => httpClient.get<T>(endpoint, schema),
+
+  post: <T>(endpoint: string, body: any, schema?: z.ZodType<T>) =>
     httpClient.post<T>(endpoint, body, schema),
-  
-  put: <T>(endpoint: string, body: any, schema?: z.ZodType<T>) => 
+
+  put: <T>(endpoint: string, body: any, schema?: z.ZodType<T>) =>
     httpClient.put<T>(endpoint, body, schema),
-  
-  delete: <T>(endpoint: string, schema?: z.ZodType<T>) => 
-    httpClient.delete<T>(endpoint, schema),
-  
-  patch: <T>(endpoint: string, body: any, schema?: z.ZodType<T>) => 
+
+  delete: <T>(endpoint: string, schema?: z.ZodType<T>) => httpClient.delete<T>(endpoint, schema),
+
+  patch: <T>(endpoint: string, body: any, schema?: z.ZodType<T>) =>
     httpClient.patch<T>(endpoint, body, schema),
-  
+
   setAuthToken: (token: string) => httpClient.setAuthToken(token),
   clearAuthToken: () => httpClient.clearAuthToken(),
-  setDefaultHeaders: (headers: Record<string, string>) => httpClient.setDefaultHeaders(headers)
+  setDefaultHeaders: (headers: Record<string, string>) => httpClient.setDefaultHeaders(headers),
 };
 
 // Game-specific API helpers
 export const gameApi = {
   start: (gameKey: string, idempotencyKey: string) =>
     http.post('/api/v1/games/start', { gameKey, idempotencyKey }),
-  
+
   finish: (runId: string, score: number, statsHash: string, meta?: any, idempotencyKey?: string) =>
     http.post('/api/v1/games/finish', { runId, score, statsHash, meta, idempotencyKey }),
-  
+
   progress: (runId: string, checkpoint: string, data: any, idempotencyKey: string) =>
     http.post('/api/v1/games/progress', { runId, checkpoint, data, idempotencyKey }),
-  
+
   stats: () => http.get('/api/v1/games/stats'),
   inventory: () => http.get('/api/v1/games/inventory'),
   coupons: () => http.get('/api/v1/games/coupons'),
-  achievements: () => http.get('/api/v1/games/achievements')
+  achievements: () => http.get('/api/v1/games/achievements'),
 };
 
 export const adminApi = {
   updateGameFlag: (gameKey: string, enabled: boolean, idempotencyKey: string) =>
     http.post('/api/v1/admin/games/flag', { gameKey, enabled, idempotencyKey }),
-  
+
   updateDailyLimit: (newLimit: number, idempotencyKey: string) =>
     http.post('/api/v1/admin/games/daily-limit', { newLimit, idempotencyKey }),
-  
+
   getGameFlags: () => http.get('/api/v1/admin/games/flags'),
-  getDailyLimits: () => http.get('/api/v1/admin/games/daily-limits')
+  getDailyLimits: () => http.get('/api/v1/admin/games/daily-limits'),
 };

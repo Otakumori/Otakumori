@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 // app/api/admin/printify-sync/route.ts  (admin-only)
 import { requireAdminOrThrow } from '@/lib/adminGuard';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/app/lib/db';
+import { printifyService } from '@/app/lib/printify';
 
 export const runtime = 'nodejs';
 
@@ -13,89 +14,89 @@ export async function POST() {
 }
 
 async function syncPrintify() {
-  const base = `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}`;
-  const headers = {
-    'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY!}`,
-    'Content-Type': 'application/json',
-  };
+  try {
+    const result = await printifyService.syncProducts();
 
-  // 1) list products
-  const list = await fetch(`${base}/products.json`, { headers });
-  if (!list.ok) throw new Error(`Printify list error: ${list.status}`);
-  const { data: products } = await list.json();
+    // Process the products and upsert to database
+    const products = await printifyService.getProducts();
 
-  let upserted = 0, hidden = 0;
+    for (const product of products) {
+      const visible = product.visible && product.variants.some((v) => v.is_enabled);
 
-  for (const p of products as any[]) {
-    // 2) details
-    const det = await fetch(`${base}/products/${p.id}.json`, { headers });
-    if (!det.ok) continue;
-    const full = await det.json();
-
-    const visible = !full.visible ? false : (full.variants?.some((v: any) => v.is_enabled !== false) ?? true);
-    if (!visible) hidden++;
-
-    await prisma.product.upsert({
-      where: { id: String(full.id) },
-      update: {
-        name: full.title,
-        description: full.description ?? '',
-        category: mapCategory(full),
-        primaryImageUrl: full.images?.[0]?.src ?? null,
-        active: visible,
-        printifyProductId: String(full.id),
-      },
-      create: {
-        id: String(full.id),
-        name: full.title,
-        description: full.description ?? '',
-        category: mapCategory(full),
-        primaryImageUrl: full.images?.[0]?.src ?? null,
-        active: visible,
-        printifyProductId: String(full.id),
-      }
-    });
-
-    for (const v of (full.variants ?? [])) {
-      await prisma.productVariant.upsert({
-        where: { 
-          productId_printifyVariantId: { 
-            productId: String(full.id), 
-            printifyVariantId: v.id 
-          } 
-        },
+      await db.product.upsert({
+        where: { id: String(product.id) },
         update: {
-          priceCents: toCents(v.price ?? firstPrice(full) ?? 0),
-          isEnabled: v.is_enabled !== false,
-          inStock: true,
+          name: product.title,
+          description: product.description ?? '',
+          category: mapCategory(product),
+          primaryImageUrl: product.images?.[0]?.src ?? null,
+          active: visible,
+          printifyProductId: String(product.id),
         },
         create: {
-          id: `${full.id}-${v.id}`,
-          productId: String(full.id),
-          printifyVariantId: v.id,
-          priceCents: toCents(v.price ?? firstPrice(full) ?? 0),
-          isEnabled: v.is_enabled !== false,
-          inStock: true,
-        }
+          id: String(product.id),
+          name: product.title,
+          description: product.description ?? '',
+          category: mapCategory(product),
+          primaryImageUrl: product.images?.[0]?.src ?? null,
+          active: visible,
+          printifyProductId: String(product.id),
+        },
       });
+
+      for (const variant of product.variants) {
+        await db.productVariant.upsert({
+          where: {
+            productId_printifyVariantId: {
+              productId: String(product.id),
+              printifyVariantId: parseInt(variant.id),
+            },
+          },
+          update: {
+            priceCents: toCents(variant.price),
+            isEnabled: variant.is_enabled,
+            inStock: variant.in_stock,
+          },
+          create: {
+            id: `${product.id}-${variant.id}`,
+            productId: String(product.id),
+            printifyVariantId: parseInt(variant.id),
+            priceCents: toCents(variant.price),
+            isEnabled: variant.is_enabled,
+            inStock: variant.in_stock,
+          },
+        });
+      }
     }
-    upserted++;
+
+    return {
+      upserted: result.upserted,
+      hidden: result.hidden,
+      count: result.count,
+      errors: result.errors,
+    };
+  } catch (error) {
+    console.error('Printify sync failed:', error);
+    throw error;
   }
-
-  return { upserted, hidden, count: products.length };
 }
 
-function toCents(n: number) { return Math.round(Number(n) * 100); }
-function firstPrice(full: any) {
-  const v = (full.variants ?? []).find((x: any) => x.is_enabled !== false);
-  return v?.price ? toCents(v.price) : null;
+function toCents(n: number) {
+  return Math.round(Number(n) * 100);
 }
+
 // Very simple mappers — refine as you like
-function mapCategory(full: any): string {
-  const name = (full.tags ?? []).join(' ').toLowerCase();
+function mapCategory(product: any): string {
+  const name = (product.tags ?? []).join(' ').toLowerCase();
   if (name.includes('shirt') || name.includes('hoodie') || name.includes('tee')) return 'apparel';
   if (name.includes('hat') || name.includes('pin') || name.includes('bow')) return 'accessories';
-  if (name.includes('cup') || name.includes('mug') || name.includes('pillow') || name.includes('sticker')) return 'home-decor';
+  if (
+    name.includes('cup') ||
+    name.includes('mug') ||
+    name.includes('pillow') ||
+    name.includes('sticker')
+  )
+    return 'home-decor';
   return 'apparel';
 }
 function mapSubcategory(full: any): string {

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { ReactNode } from 'react';
 
 export default function PlasmicButton({ children }: { children: ReactNode }) {

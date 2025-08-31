@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -51,8 +51,8 @@ const InteractiveCherryBlossom: React.FC = () => {
 
     // Add new petals over time
     const interval = setInterval(() => {
-      setPetals(prev => [
-        ...prev.filter(p => !p.collected && p.y <= containerSize.height + p.size), // Keep active petals within bounds
+      setPetals((prev) => [
+        ...prev.filter((p) => !p.collected && p.y <= containerSize.height + p.size), // Keep active petals within bounds
         createPetal(),
       ]);
     }, 500); // Add a new petal every 500ms
@@ -63,7 +63,7 @@ const InteractiveCherryBlossom: React.FC = () => {
   // Remove petals that have fallen off screen
   useEffect(() => {
     const cleanupInterval = setInterval(() => {
-      setPetals(prev => prev.filter(p => p.y <= containerSize.height + p.size));
+      setPetals((prev) => prev.filter((p) => p.y <= containerSize.height + p.size));
     }, 1000);
     return () => clearInterval(cleanupInterval);
   }, [containerSize]);
@@ -79,7 +79,7 @@ const InteractiveCherryBlossom: React.FC = () => {
 
       <AnimatePresence>
         {petals.map(
-          petal =>
+          (petal) =>
             !petal.collected && (
               <motion.div
                 key={petal.id}
@@ -105,7 +105,7 @@ const InteractiveCherryBlossom: React.FC = () => {
               >
                 <div className="h-full w-full rounded-full bg-pink-300"></div>
               </motion.div>
-            )
+            ),
         )}
       </AnimatePresence>
     </div>

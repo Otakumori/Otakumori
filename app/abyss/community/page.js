@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useUser } from '@clerk/nextjs';
@@ -35,11 +35,11 @@ export default function CommunityPage() {
     return <div>Please sign in to access the community</div>;
   }
 
-  const handleLike = postId => {
-    setPosts(posts.map(post => (post.id === postId ? { ...post, likes: post.likes + 1 } : post)));
+  const handleLike = (postId) => {
+    setPosts(posts.map((post) => (post.id === postId ? { ...post, likes: post.likes + 1 } : post)));
   };
 
-  const handleComment = postId => {
+  const handleComment = (postId) => {
     // Implement comment functionality
   };
 
@@ -50,7 +50,7 @@ export default function CommunityPage() {
         <p>Your Petals: {petals}</p>
       </div>
       <div className="space-y-4">
-        {posts.map(post => (
+        {posts.map((post) => (
           <div key={post.id} className="rounded-lg border p-4">
             <div className="mb-2 flex items-center">
               <div className="mr-2 h-8 w-8 rounded-full bg-gray-300" />

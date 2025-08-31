@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 // lib/adminGuard.ts (server utilities)
 import { auth, currentUser } from '@clerk/nextjs/server';
 

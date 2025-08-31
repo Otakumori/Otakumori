@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { Achievement } from '../app/types/achievements';
 
 export const achievements: Achievement[] = [
@@ -219,7 +219,7 @@ export const achievements: Achievement[] = [
   {
     id: 'puzzle_reveal_shatter',
     name: 'Shatter the Glass',
-    description: 'Reveal a puzzle\'s true image in under 30 seconds.',
+    description: "Reveal a puzzle's true image in under 30 seconds.",
     category: 'Lore Discovery',
     icon: '/assets/achievements/puzzle_reveal_shatter.png',
     petals: 1000,
@@ -230,7 +230,7 @@ export const achievements: Achievement[] = [
   {
     id: 'puzzle_reveal_secretkept',
     name: 'Secret Kept',
-    description: 'View a lore image and don\'t download/share it.',
+    description: "View a lore image and don't download/share it.",
     category: 'Special and Hidden',
     icon: '/assets/achievements/puzzle_reveal_secretkept.png',
     petals: 1000,
@@ -319,7 +319,7 @@ export const achievements: Achievement[] = [
   },
   {
     id: 'brick_breaker_toohard',
-    name: 'Too Hard, Didn\'t Bounce',
+    name: "Too Hard, Didn't Bounce",
     description: 'Lose within 5 seconds.',
     category: 'Mystery and Chaos',
     icon: '/assets/achievements/brick_breaker_toohard.png',
@@ -1095,7 +1095,7 @@ export const achievements: Achievement[] = [
   },
   {
     id: 'it_wasnt_a_phase',
-    name: 'It Wasn\'t a Phase',
+    name: "It Wasn't a Phase",
     description: 'Return to Otakumori 10 days in a row',
     category: 'Site Interaction',
     icon: '',
@@ -1105,7 +1105,7 @@ export const achievements: Achievement[] = [
   },
   {
     id: 'weve_met_before',
-    name: 'We\'ve Met Before...',
+    name: "We've Met Before...",
     description: 'Click on a corrupted save file',
     category: 'Special and Hidden',
     icon: '',
@@ -1125,7 +1125,7 @@ export const achievements: Achievement[] = [
   },
   {
     id: 'dont_touch_that',
-    name: 'Don\'t Touch That',
+    name: "Don't Touch That",
     description: 'Click a hidden or unclickable element',
     category: 'Site Interaction',
     icon: '',
@@ -1236,7 +1236,7 @@ export const achievements: Achievement[] = [
   },
   {
     id: 'dont_touch_my_petals',
-    name: 'Don\'t Touch My Petals',
+    name: "Don't Touch My Petals",
     description: 'Miss 0 petals in a full session',
     category: 'Mystery and Chaos',
     icon: '',
@@ -1258,7 +1258,7 @@ export const achievements: Achievement[] = [
   {
     id: 'shatter_the_glass',
     name: 'Shatter the Glass',
-    description: 'Reveal a puzzle\'s true image in under 30 seconds',
+    description: "Reveal a puzzle's true image in under 30 seconds",
     category: 'Lore Discovery',
     icon: '',
     target: 1,
@@ -1268,7 +1268,7 @@ export const achievements: Achievement[] = [
   {
     id: 'secret_kept',
     name: 'Secret Kept',
-    description: 'View a lore image and don\'t download/share it',
+    description: "View a lore image and don't download/share it",
     category: 'Lore Discovery',
     icon: '',
     target: 1,
@@ -1348,7 +1348,7 @@ export const achievements: Achievement[] = [
   },
   {
     id: 'too_hard_didnt_bounce',
-    name: 'Too Hard, Didn\'t Bounce',
+    name: "Too Hard, Didn't Bounce",
     description: 'Lose within 5 seconds',
     category: 'Mystery and Chaos',
     icon: '',
@@ -1501,7 +1501,7 @@ export const achievements: Achievement[] = [
   {
     id: 'forgive_me',
     name: 'Forgive Me',
-    description: 'Decrypt something you maybe shouldn\'t have',
+    description: "Decrypt something you maybe shouldn't have",
     category: 'Special and Hidden',
     icon: '',
     target: 1,
@@ -1511,7 +1511,7 @@ export const achievements: Achievement[] = [
   {
     id: 'behind_the_curtain',
     name: 'Behind the Curtain',
-    description: 'View a developer\'s personal note or memory',
+    description: "View a developer's personal note or memory",
     category: 'Special and Hidden',
     icon: '',
     target: 1,

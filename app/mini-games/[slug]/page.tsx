@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-"use client";
+'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -68,12 +68,8 @@ export default function GamePage() {
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">❌</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            Game Not Found
-          </h3>
-          <p className="text-gray-500 mb-4">
-            The requested game could not be found.
-          </p>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Game Not Found</h3>
+          <p className="text-gray-500 mb-4">The requested game could not be found.</p>
           <button
             onClick={() => router.push('/mini-games')}
             className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
@@ -92,9 +88,7 @@ export default function GamePage() {
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🚧</div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">
-            Game Under Development
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Game Under Development</h3>
           <p className="text-gray-500 mb-4">
             {gameDef.name} is currently being developed. Check back soon!
           </p>
@@ -125,23 +119,21 @@ export default function GamePage() {
             </button>
 
             {/* Game Title */}
-            <h1 className="text-xl font-bold text-gray-800">
-              {gameDef.name}
-            </h1>
+            <h1 className="text-xl font-bold text-gray-800">{gameDef.name}</h1>
 
             {/* Game Info */}
             <div className="flex items-center gap-4">
-              <div className={`
+              <div
+                className={`
                 px-2 py-1 rounded-full text-xs font-medium
                 ${gameDef.difficulty === 'easy' ? 'bg-green-100 text-green-700' : ''}
                 ${gameDef.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' : ''}
                 ${gameDef.difficulty === 'hard' ? 'bg-red-100 text-red-700' : ''}
-              `}>
+              `}
+              >
                 {gameDef.difficulty}
               </div>
-              <div className="text-sm text-gray-600">
-                Max: {gameDef.maxRewardPerRun} 🌸
-              </div>
+              <div className="text-sm text-gray-600">Max: {gameDef.maxRewardPerRun} 🌸</div>
             </div>
           </div>
         </div>

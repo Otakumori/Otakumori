@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -61,7 +61,7 @@ export default function InteractiveCherryBlossom() {
         collected: false,
         isSpecial: Math.random() < 0.05, // 5% chance for special petals
       };
-      setPetals(prev => [...prev, petal]);
+      setPetals((prev) => [...prev, petal]);
     };
 
     const interval = setInterval(createPetal, 1000);
@@ -69,8 +69,10 @@ export default function InteractiveCherryBlossom() {
   }, []);
 
   const handlePetalClick = (id: number) => {
-    setPetals(prev => prev.map(petal => (petal.id === id ? { ...petal, collected: true } : petal)));
-    setCollectedCount(prev => prev + 1);
+    setPetals((prev) =>
+      prev.map((petal) => (petal.id === id ? { ...petal, collected: true } : petal)),
+    );
+    setCollectedCount((prev) => prev + 1);
     setShowProgress(true);
 
     // Play petal collect sound
@@ -82,7 +84,7 @@ export default function InteractiveCherryBlossom() {
   return (
     <div className="pointer-events-none fixed inset-0 z-50">
       <AnimatePresence>
-        {petals.map(petal => (
+        {petals.map((petal) => (
           <motion.div
             key={petal.id}
             className="pointer-events-auto absolute cursor-pointer"
@@ -150,7 +152,7 @@ export default function InteractiveCherryBlossom() {
           <div className="rounded-lg bg-black/50 p-4 backdrop-blur-sm">
             <h3 className="mb-2 text-sm text-white">Top Collectors</h3>
             <div className="space-y-2">
-              {leaderboard.map(entry => (
+              {leaderboard.map((entry) => (
                 <div key={entry.rank} className="flex items-center justify-between">
                   <span className="text-sm text-white">{entry.username}</span>
                   <span className="text-sm text-pink-400">{entry.petals} petals</span>

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { put, del, list } from '@vercel/blob';
 
 export interface AssetManifest {
@@ -35,7 +35,10 @@ class AssetManager {
   }
 
   // Sprite management
-  async getSprite(key: string, fallback?: 'circle' | 'square' | 'triangle' | 'star'): Promise<string> {
+  async getSprite(
+    key: string,
+    fallback?: 'circle' | 'square' | 'triangle' | 'star',
+  ): Promise<string> {
     if (this.spriteCache.has(key)) {
       return this.spriteCache.get(key)!;
     }
@@ -53,7 +56,10 @@ class AssetManager {
     }
   }
 
-  private generateProceduralSprite(key: string, shape: 'circle' | 'square' | 'triangle' | 'star'): string {
+  private generateProceduralSprite(
+    key: string,
+    shape: 'circle' | 'square' | 'triangle' | 'star',
+  ): string {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d')!;
     canvas.width = 64;
@@ -99,8 +105,15 @@ class AssetManager {
     return canvas.toDataURL();
   }
 
-  private drawStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, spikes: number, outerRadius: number, innerRadius: number) {
-    let rot = Math.PI / 2 * 3;
+  private drawStar(
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    spikes: number,
+    outerRadius: number,
+    innerRadius: number,
+  ) {
+    let rot = (Math.PI / 2) * 3;
     let x = cx;
     let y = cy;
     const step = Math.PI / spikes;
@@ -126,7 +139,7 @@ class AssetManager {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash);
@@ -249,7 +262,8 @@ class AssetManager {
       console.warn('Could not load music:', key, error);
       // Return a silent audio element
       const silentAudio = new Audio();
-      silentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+      silentAudio.src =
+        'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
       return silentAudio;
     }
   }
@@ -262,13 +276,13 @@ class AssetManager {
     }
 
     // Update all cached audio
-    this.audioCache.forEach(asset => {
+    this.audioCache.forEach((asset) => {
       if (asset.loaded) {
         asset.element.volume = this.volume;
       }
     });
 
-    this.musicCache.forEach(audio => {
+    this.musicCache.forEach((audio) => {
       audio.volume = this.volume * 0.5;
     });
   }
@@ -280,13 +294,13 @@ class AssetManager {
     }
 
     // Mute/unmute all audio
-    this.audioCache.forEach(asset => {
+    this.audioCache.forEach((asset) => {
       if (asset.loaded) {
         asset.element.muted = muted;
       }
     });
 
-    this.musicCache.forEach(audio => {
+    this.musicCache.forEach((audio) => {
       audio.muted = muted;
     });
   }
@@ -308,7 +322,7 @@ class AssetManager {
 
   // Cleanup
   dispose(): void {
-    this.audioCache.forEach(asset => {
+    this.audioCache.forEach((asset) => {
       if (asset.loaded) {
         asset.element.pause();
         asset.element.src = '';
@@ -316,7 +330,7 @@ class AssetManager {
     });
     this.audioCache.clear();
 
-    this.musicCache.forEach(audio => {
+    this.musicCache.forEach((audio) => {
       audio.pause();
       audio.src = '';
     });
@@ -330,26 +344,19 @@ class AssetManager {
 export const assetManager = new AssetManager();
 
 // Export convenience functions
-export const getSprite = (key: string, fallback?: 'circle' | 'square' | 'triangle' | 'star') => 
+export const getSprite = (key: string, fallback?: 'circle' | 'square' | 'triangle' | 'star') =>
   assetManager.getSprite(key, fallback);
 
-export const getAudio = (key: string, preload?: boolean) => 
-  assetManager.getAudio(key, preload);
+export const getAudio = (key: string, preload?: boolean) => assetManager.getAudio(key, preload);
 
-export const getMusic = (key: string) => 
-  assetManager.getMusic(key);
+export const getMusic = (key: string) => assetManager.getMusic(key);
 
-export const playSfx = (key: string) => 
-  assetManager.playSfx(key);
+export const playSfx = (key: string) => assetManager.playSfx(key);
 
-export const setVolume = (volume: number) => 
-  assetManager.setVolume(volume);
+export const setVolume = (volume: number) => assetManager.setVolume(volume);
 
-export const setMuted = (muted: boolean) => 
-  assetManager.setMuted(muted);
+export const setMuted = (muted: boolean) => assetManager.setMuted(muted);
 
-export const getVolume = () => 
-  assetManager.getVolume();
+export const getVolume = () => assetManager.getVolume();
 
-export const isMuted = () => 
-  assetManager.isMutedState();
+export const isMuted = () => assetManager.isMutedState();

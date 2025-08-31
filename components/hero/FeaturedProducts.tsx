@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -24,11 +24,11 @@ export function FeaturedProducts() {
       try {
         setError(null);
         const response = await fetch('/api/shop/products');
-        
+
         if (response.ok) {
           const data = await response.json();
           console.log('API Response:', data); // Debug log
-          
+
           if (data.products && Array.isArray(data.products)) {
             // Transform Printify data and limit to 8 items
             const transformedProducts = data.products
@@ -41,7 +41,7 @@ export function FeaturedProducts() {
                 image: p.images?.[0]?.src || p.images?.[0] || '/placeholder-product.jpg',
                 url: `/shop/product/${p.id}`,
               }));
-            
+
             if (transformedProducts.length > 0) {
               setProducts(transformedProducts);
             } else {
@@ -151,7 +151,7 @@ export function FeaturedProducts() {
     <section id="featured-products" className="bg-white py-16">
       <div className="container mx-auto px-4">
         <h2 className="mb-12 text-center text-3xl font-bold text-gray-800">Featured</h2>
-        
+
         {error && (
           <div className="mb-8 text-center">
             <p className="text-amber-600 bg-amber-50 px-4 py-2 rounded-lg inline-block">
@@ -159,9 +159,9 @@ export function FeaturedProducts() {
             </p>
           </div>
         )}
-        
+
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-          {products.map(product => (
+          {products.map((product) => (
             <Link key={product.id} href={product.url} className="group">
               <div className="overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-xl">
                 <div className="relative h-48 bg-gray-100">

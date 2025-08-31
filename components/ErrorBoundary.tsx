@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { env } from '@/env';
 import { motion } from 'framer-motion';
 
 interface Props {
@@ -33,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
     });
 
     // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (env.NODE_ENV === 'development') {
       console.error('Error caught by boundary:', error, errorInfo);
     }
 
@@ -64,7 +65,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === 'development' && this.state.error && ( // eslint-disable-line no-restricted-syntax
               <details className="mt-4 text-left">
                 <summary className="text-red-400 cursor-pointer text-sm font-medium">
                   Error Details (Development)
@@ -93,7 +94,9 @@ export class ErrorBoundary extends Component<Props, State> {
                 Refresh Page
               </button>
               <button
-                onClick={() => this.setState({ hasError: false, error: undefined, errorInfo: undefined })}
+                onClick={() =>
+                  this.setState({ hasError: false, error: undefined, errorInfo: undefined })
+                }
                 className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 Try Again
@@ -116,7 +119,7 @@ export class ErrorBoundary extends Component<Props, State> {
 export function useErrorHandler() {
   return (error: Error, errorInfo?: ErrorInfo) => {
     console.error('Error caught by hook:', error, errorInfo);
-    
+
     // In production, you might want to log to an error reporting service
     // logErrorToService(error, errorInfo);
   };
@@ -125,7 +128,7 @@ export function useErrorHandler() {
 // Higher-order component for wrapping components with error boundaries
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  fallback?: ReactNode
+  fallback?: ReactNode,
 ) {
   return function WrappedComponent(props: P) {
     return (

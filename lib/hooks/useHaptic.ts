@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 export function useHaptic() {
   const vibrate = (pattern: number | number[] | string = 200) => {
     if (typeof window !== 'undefined' && navigator.vibrate) {

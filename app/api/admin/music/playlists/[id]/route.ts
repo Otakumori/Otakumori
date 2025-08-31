@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma";
-import { requireAdmin } from "@/app/lib/authz";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/app/lib/prisma';
+import { requireAdmin } from '@/app/lib/authz';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const admin = await requireAdmin();
@@ -13,7 +13,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const { name, isPublic } = await req.json();
   const pl = await prisma.musicPlaylist.update({
     where: { id: params.id },
-    data: { ...(name && { name }), ...(typeof isPublic === "boolean" && { isPublic }) },
+    data: { ...(name && { name }), ...(typeof isPublic === 'boolean' && { isPublic }) },
   });
   return NextResponse.json({ ok: true, playlist: pl });
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -128,7 +128,7 @@ export const Tutorial = () => {
 
   const handleStepComplete = () => {
     if (currentStep < TUTORIAL_STEPS.length - 1) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     } else {
       // Tutorial complete
       localStorage.setItem('hasSeenTutorial', 'true');

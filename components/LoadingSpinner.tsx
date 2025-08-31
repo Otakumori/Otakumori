@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React from 'react';
@@ -26,11 +26,11 @@ const colorClasses = {
   pink: 'border-pink-400 border-t-transparent',
 };
 
-export function LoadingSpinner({ 
-  size = 'md', 
-  color = 'primary', 
+export function LoadingSpinner({
+  size = 'md',
+  color = 'primary',
   text,
-  className = '' 
+  className = '',
 }: LoadingSpinnerProps) {
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
@@ -88,18 +88,14 @@ export function LoadingCard({ text = 'Loading...' }: { text?: string }) {
   );
 }
 
-export function LoadingButton({ 
-  loading, 
-  children, 
+export function LoadingButton({
+  loading,
+  children,
   className = '',
-  ...props 
+  ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { loading?: boolean }) {
   return (
-    <button
-      className={`relative ${className}`}
-      disabled={loading}
-      {...props}
-    >
+    <button className={`relative ${className}`} disabled={loading} {...props}>
       {loading && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -109,9 +105,7 @@ export function LoadingButton({
           <LoadingSpinner size="sm" color="white" />
         </motion.div>
       )}
-      <span className={loading ? 'opacity-0' : ''}>
-        {children}
-      </span>
+      <span className={loading ? 'opacity-0' : ''}>{children}</span>
     </button>
   );
 }

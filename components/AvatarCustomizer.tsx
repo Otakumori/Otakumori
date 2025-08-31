@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
@@ -98,7 +98,7 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
       skinTone,
       hairColor,
       eyeColor,
-    ]
+    ],
   );
 
   return (
@@ -157,21 +157,21 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
               <Slider
                 label="Position X"
                 value={crop.x * 100}
-                onChange={v => setCrop({ x: v / 100, y: crop.y })}
+                onChange={(v) => setCrop({ x: v / 100, y: crop.y })}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Position Y"
                 value={crop.y * 100}
-                onChange={v => setCrop({ x: crop.x, y: v / 100 })}
+                onChange={(v) => setCrop({ x: crop.x, y: v / 100 })}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Zoom"
                 value={zoom * 100}
-                onChange={v => setZoom(v / 100)}
+                onChange={(v) => setZoom(v / 100)}
                 min={100}
                 max={300}
               />
@@ -184,49 +184,49 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
               <Slider
                 label="Height"
                 value={height}
-                onChange={v => handleSliderChange(setHeight, v)}
+                onChange={(v) => handleSliderChange(setHeight, v)}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Weight"
                 value={weight}
-                onChange={v => handleSliderChange(setWeight, v)}
+                onChange={(v) => handleSliderChange(setWeight, v)}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Muscle"
                 value={muscle}
-                onChange={v => handleSliderChange(setMuscle, v)}
+                onChange={(v) => handleSliderChange(setMuscle, v)}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Hips"
                 value={hips}
-                onChange={v => handleSliderChange(setHips, v)}
+                onChange={(v) => handleSliderChange(setHips, v)}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Waist"
                 value={waist}
-                onChange={v => handleSliderChange(setWaist, v)}
+                onChange={(v) => handleSliderChange(setWaist, v)}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Boob Size"
                 value={boobSize}
-                onChange={v => handleSliderChange(setBoobSize, v)}
+                onChange={(v) => handleSliderChange(setBoobSize, v)}
                 min={0}
                 max={100}
               />
               <Slider
                 label="Dick Size"
                 value={dickSize}
-                onChange={v => handleSliderChange(setDickSize, v)}
+                onChange={(v) => handleSliderChange(setDickSize, v)}
                 min={0}
                 max={100}
               />
@@ -238,35 +238,35 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
               <Slider
                 label="Brightness"
                 value={brightness}
-                onChange={v => handleSliderChange(setBrightness, v)}
+                onChange={(v) => handleSliderChange(setBrightness, v)}
                 min={50}
                 max={150}
               />
               <Slider
                 label="Contrast"
                 value={contrast}
-                onChange={v => handleSliderChange(setContrast, v)}
+                onChange={(v) => handleSliderChange(setContrast, v)}
                 min={50}
                 max={150}
               />
               <Slider
                 label="Saturation"
                 value={saturation}
-                onChange={v => handleSliderChange(setSaturation, v)}
+                onChange={(v) => handleSliderChange(setSaturation, v)}
                 min={0}
                 max={200}
               />
               <Slider
                 label="Hue"
                 value={hue}
-                onChange={v => handleSliderChange(setHue, v)}
+                onChange={(v) => handleSliderChange(setHue, v)}
                 min={0}
                 max={360}
               />
               <Slider
                 label="Blur"
                 value={blur}
-                onChange={v => handleSliderChange(setBlur, v)}
+                onChange={(v) => handleSliderChange(setBlur, v)}
                 min={0}
                 max={10}
                 step={0.5}
@@ -274,7 +274,7 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
               <Slider
                 label="Sharpness"
                 value={sharpness}
-                onChange={v => handleSliderChange(setSharpness, v)}
+                onChange={(v) => handleSliderChange(setSharpness, v)}
                 min={-100}
                 max={100}
               />
@@ -286,21 +286,21 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
               <Slider
                 label="Skin Tone"
                 value={skinTone}
-                onChange={v => handleSliderChange(setSkinTone, v)}
+                onChange={(v) => handleSliderChange(setSkinTone, v)}
                 min={0}
                 max={360}
               />
               <Slider
                 label="Hair Color"
                 value={hairColor}
-                onChange={v => handleSliderChange(setHairColor, v)}
+                onChange={(v) => handleSliderChange(setHairColor, v)}
                 min={0}
                 max={360}
               />
               <Slider
                 label="Eye Color"
                 value={eyeColor}
-                onChange={v => handleSliderChange(setEyeColor, v)}
+                onChange={(v) => handleSliderChange(setEyeColor, v)}
                 min={0}
                 max={360}
               />
@@ -349,7 +349,7 @@ const Slider = ({ label, value, onChange, min, max, step = 1 }: SliderProps) => 
       max={max}
       step={step}
       value={value}
-      onChange={e => onChange(parseFloat(e.target.value))}
+      onChange={(e) => onChange(parseFloat(e.target.value))}
       className="thumb:h-4 thumb:w-4 thumb:bg-pink-500 thumb:rounded-full h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-700"
     />
   </div>

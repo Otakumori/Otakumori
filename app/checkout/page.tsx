@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
@@ -94,7 +94,7 @@ export default function CheckoutPage() {
     if (!r.ok) return;
     const data = await r.json();
     if (data.type === 'coupon') setCouponPct(data.amount || 0);
-    if (data.type === 'item' && data.item) setCart(prev => [...prev, data.item]);
+    if (data.type === 'item' && data.item) setCart((prev) => [...prev, data.item]);
   }
 
   async function createSession() {
@@ -118,7 +118,7 @@ export default function CheckoutPage() {
       {/* Stage 1: Cart */}
       {step === 0 && (
         <section className="grid gap-4">
-          {cart.map(it => (
+          {cart.map((it) => (
             <article
               key={it.id}
               className="grid grid-cols-[96px_1fr_auto] gap-3 rounded-2xl border border-slate-700 bg-cube-900/90 p-3 shadow-glow"
@@ -130,7 +130,7 @@ export default function CheckoutPage() {
                 <h3 className="font-medium text-slatey-200">{it.name}</h3>
                 <p className="mt-1 text-xs italic text-slatey-400">"{it.flavor}"</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {(it.traits || []).map(t => (
+                  {(it.traits || []).map((t) => (
                     <span
                       key={t}
                       className="rounded-full border border-slate-700 bg-cube-900 px-2 py-0.5 text-[11px] text-slatey-200"
@@ -146,8 +146,10 @@ export default function CheckoutPage() {
                   <button
                     className="btn"
                     onClick={() =>
-                      setCart(prev =>
-                        prev.map(p => (p.id === it.id ? { ...p, qty: Math.max(1, p.qty - 1) } : p))
+                      setCart((prev) =>
+                        prev.map((p) =>
+                          p.id === it.id ? { ...p, qty: Math.max(1, p.qty - 1) } : p,
+                        ),
                       )
                     }
                   >
@@ -157,8 +159,8 @@ export default function CheckoutPage() {
                   <button
                     className="btn"
                     onClick={() =>
-                      setCart(prev =>
-                        prev.map(p => (p.id === it.id ? { ...p, qty: p.qty + 1 } : p))
+                      setCart((prev) =>
+                        prev.map((p) => (p.id === it.id ? { ...p, qty: p.qty + 1 } : p)),
                       )
                     }
                   >
@@ -167,7 +169,7 @@ export default function CheckoutPage() {
                 </div>
                 <button
                   className="btn"
-                  onClick={() => setCart(prev => prev.filter(p => p.id !== it.id))}
+                  onClick={() => setCart((prev) => prev.filter((p) => p.id !== it.id))}
                 >
                   Drop
                 </button>
@@ -200,7 +202,7 @@ export default function CheckoutPage() {
           <div className="rounded-2xl border border-slate-700 bg-cube-900 p-4">
             <h2 className="mb-2 text-lg text-slatey-200">Examine Your Haul</h2>
             <ul className="divide-y divide-slate-800">
-              {cart.map(it => (
+              {cart.map((it) => (
                 <li key={it.id} className="flex items-center justify-between py-2 text-sm">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 overflow-hidden rounded border border-cube-800 bg-cube-900">
@@ -232,7 +234,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <Recommended onAdd={item => setCart(prev => [...prev, item])} />
+          <Recommended onAdd={(item) => setCart((prev) => [...prev, item])} />
 
           <div className="flex justify-between">
             <button className="btn" onClick={() => setStep(0)}>
@@ -275,7 +277,7 @@ export default function CheckoutPage() {
               <input
                 className="input flex-1"
                 value={coupon}
-                onChange={e => setCoupon(e.target.value)}
+                onChange={(e) => setCoupon(e.target.value)}
                 placeholder="use-potion / limit-break / god-roll"
               />
               <button
@@ -288,7 +290,7 @@ export default function CheckoutPage() {
                         ? 0.2
                         : coupon === 'use-potion'
                           ? 0.05
-                          : 0
+                          : 0,
                   )
                 }
               >
@@ -366,7 +368,7 @@ function XPBar({ stages, current }: { stages: string[]; current: number }) {
   );
 }
 
-function AssetImage({ id, alt }: { id?: string; alt: string }) {
+function AssetImage({ id: _id, alt: _alt }: { id?: string; alt: string }) {
   // Simplified to avoid dynamic import complexity
   return (
     <span aria-hidden className="text-2xl">
@@ -375,7 +377,7 @@ function AssetImage({ id, alt }: { id?: string; alt: string }) {
   );
 }
 
-function Recommended({ onAdd }: { onAdd: (i: CartItem) => void }) {
+function Recommended({ onAdd }: { onAdd: (_i: CartItem) => void }) {
   const items: CartItem[] = [
     {
       id: 'icons-kawaii-pack',
@@ -400,7 +402,7 @@ function Recommended({ onAdd }: { onAdd: (i: CartItem) => void }) {
     <div className="rounded-2xl border border-slate-700 bg-cube-900 p-4">
       <h2 className="mb-2 text-lg text-slatey-200">Recommended Quests & Companion Items</h2>
       <div className="grid gap-3">
-        {items.map(it => (
+        {items.map((it) => (
           <article
             key={it.id}
             className="grid grid-cols-[64px_1fr_auto] items-center gap-3 rounded-xl border border-slate-700 bg-cube-900 p-3"

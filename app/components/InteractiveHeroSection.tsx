@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CherryBlossom from '@/components/animations/CherryBlossom';
@@ -104,7 +104,7 @@ function getSeasonalPetals(season: string, burstActive: boolean): PetalTypeKey[]
 }
 
 function weightedRandom(types: PetalTypeKey[]): PetalTypeKey {
-  const weights = types.map(type => PetalTypes[type].rarity);
+  const weights = types.map((type) => PetalTypes[type].rarity);
   const total = weights.reduce((a, b) => a + b);
   const rand = Math.random() * total;
   let sum = 0;
@@ -146,10 +146,10 @@ const LATE_NIGHT_KEY = 'late_night_mode';
 // Late night Senpai lines
 const lateNightLines = [
   "It's late... do you really want to keep playing with me?",
-  "Midnight secrets are the sweetest. What will you do now?",
+  'Midnight secrets are the sweetest. What will you do now?',
   "Cherryfall hits differently after dark, doesn't it?",
-  "You know, I get a little bolder after midnight...",
-  "The petals are restless. Are you?",
+  'You know, I get a little bolder after midnight...',
+  'The petals are restless. Are you?',
 ];
 
 const InteractiveHeroSection: React.FC = () => {
@@ -167,11 +167,13 @@ const InteractiveHeroSection: React.FC = () => {
   const [recentClicks, setRecentClicks] = useState<number[]>([]);
   const [showTooltip, setShowTooltip] = useState(false);
   const [cooldownLine, setCooldownLine] = useState('');
-  const [trails, setTrails] = useState<{
-    id: string;
-    from: { x: number; y: number };
-    to: { x: number; y: number };
-  }[]>([]);
+  const [trails, setTrails] = useState<
+    {
+      id: string;
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+    }[]
+  >([]);
   const counterRef = useRef<HTMLDivElement>(null);
   const [idlePetals, setIdlePetals] = useState(0);
   const [idleTooltip, setIdleTooltip] = useState(false);
@@ -182,7 +184,7 @@ const InteractiveHeroSection: React.FC = () => {
   const [showBloomModal, setShowBloomModal] = useState(false);
   const [bloomBonus, setBloomBonus] = useState(0);
   const [bloomStreak, setBloomStreak] = useState(0);
-  
+
   // Late night mode state
   const [lateNight, setLateNight] = useState(false);
   const [lateNightEnabled, setLateNightEnabled] = useState(() => {
@@ -203,7 +205,7 @@ const InteractiveHeroSection: React.FC = () => {
 
   // Toggle for user comfort (temporary button for now)
   const toggleLateNight = () => {
-    setLateNightEnabled(v => {
+    setLateNightEnabled((v) => {
       localStorage.setItem(LATE_NIGHT_KEY, v ? '0' : '1');
       return !v;
     });
@@ -212,7 +214,7 @@ const InteractiveHeroSection: React.FC = () => {
     "Careful, traveler. At this rate, you'll break my petal counter.",
     "That one looked special. You're on a roll...",
     "You're making this look easy...",
-    "So many petals, so little time.",
+    'So many petals, so little time.',
     "You're not even breaking a sweat, are you?",
     "Keep going, I'm watching...",
   ];
@@ -235,10 +237,14 @@ const InteractiveHeroSection: React.FC = () => {
 
   useEffect(() => {
     if (burstMode && burstTimer > 0) {
-      const interval = setInterval(() => setBurstTimer(t => t - 1), 1000);
+      const interval = setInterval(() => setBurstTimer((t) => t - 1), 1000);
       if (burstTimer <= 1) {
         setBurstMode(false);
-        setCooldownLine(Math.random() > 0.5 ? '"Mmm... was it good for you too?"' : '"I\'ll remember this bloom forever."');
+        setCooldownLine(
+          Math.random() > 0.5
+            ? '"Mmm... was it good for you too?"'
+            : '"I\'ll remember this bloom forever."',
+        );
         setTimeout(() => setCooldownLine(''), 5000);
       }
       return () => clearInterval(interval);
@@ -265,11 +271,12 @@ const InteractiveHeroSection: React.FC = () => {
   // Schedule next idle award
   const scheduleIdleAward = useCallback(() => {
     if (idlePetals >= IDLE_SESSION_CAP) return;
-    const interval = Math.floor(Math.random() * (IDLE_INTERVAL_MAX - IDLE_INTERVAL_MIN)) + IDLE_INTERVAL_MIN;
+    const interval =
+      Math.floor(Math.random() * (IDLE_INTERVAL_MAX - IDLE_INTERVAL_MIN)) + IDLE_INTERVAL_MIN;
     idleTimeout.current = setTimeout(() => {
       if (idlePetals < IDLE_SESSION_CAP) {
         addPetals(IDLE_PETAL_AMOUNT);
-        setIdlePetals(p => p + IDLE_PETAL_AMOUNT);
+        setIdlePetals((p) => p + IDLE_PETAL_AMOUNT);
         setIdleTooltip(true);
         setTimeout(() => setIdleTooltip(false), 2500);
         scheduleIdleAward();
@@ -286,75 +293,89 @@ const InteractiveHeroSection: React.FC = () => {
   }, []);
 
   // Reset idle on petal click or reload
-  useEffect(() => {
-    resetIdle();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [/* reload or session change triggers here if needed */]);
+  useEffect(
+    () => {
+      resetIdle();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [
+      /* reload or session change triggers here if needed */
+    ],
+  );
 
-  const handlePetalClick = useCallback((id: string) => {
-    resetIdle();
-    const now = Date.now();
-    if (now - lastClick.current < CLICK_THROTTLE) return;
-    lastClick.current = now;
-    setPetals(prev => prev.map(p => (p.id === id ? { ...p, animating: true } : p)));
-    const petal = petals.find(p => p.id === id);
-    if (!petal) return;
-    // Burst click tracking
-    setRecentClicks(clicks => {
-      const updated = [...clicks.filter(ts => now - ts < 10000), now];
-      if (!burstMode && updated.length >= 10) activateBurstMode();
-      return updated;
-    });
-    // Petal reward logic
-    let reward = petal.reward || 1;
-    if (burstMode) reward = getRandomInt(3, 5);
-    addPetals(reward);
-    setClickCount(c => c + 1);
-    // Modal for rare or burst
-    if (petal.type !== 'normal' || burstMode) setShowModal(true);
-    // Petal trail FX
-    const petalEl = document.getElementById(`petal-${petal.id}`);
-    const counterEl = counterRef.current;
-    if (petalEl && counterEl) {
-      const from = getElementCenter(petalEl);
-      const to = getElementCenter(counterEl);
-      setTrails(trails => [
-        ...trails,
-        { id: `${petal.id}-${now}`, from, to },
-      ]);
-    }
-    setTrailCount(c => {
-      const next = c + 1;
-      if (next % 10 === 0) {
-        const line = senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)];
-        setSenpaiTrailTip(line);
-        setTimeout(() => setSenpaiTrailTip(''), 3500);
+  const handlePetalClick = useCallback(
+    (id: string) => {
+      resetIdle();
+      const now = Date.now();
+      if (now - lastClick.current < CLICK_THROTTLE) return;
+      lastClick.current = now;
+      setPetals((prev) => prev.map((p) => (p.id === id ? { ...p, animating: true } : p)));
+      const petal = petals.find((p) => p.id === id);
+      if (!petal) return;
+      // Burst click tracking
+      setRecentClicks((clicks) => {
+        const updated = [...clicks.filter((ts) => now - ts < 10000), now];
+        if (!burstMode && updated.length >= 10) activateBurstMode();
+        return updated;
+      });
+      // Petal reward logic
+      let reward = petal.reward || 1;
+      if (burstMode) reward = getRandomInt(3, 5);
+      addPetals(reward);
+      setClickCount((c) => c + 1);
+      // Modal for rare or burst
+      if (petal.type !== 'normal' || burstMode) setShowModal(true);
+      // Petal trail FX
+      const petalEl = document.getElementById(`petal-${petal.id}`);
+      const counterEl = counterRef.current;
+      if (petalEl && counterEl) {
+        const from = getElementCenter(petalEl);
+        const to = getElementCenter(counterEl);
+        setTrails((trails) => [...trails, { id: `${petal.id}-${now}`, from, to }]);
       }
-      return next;
-    });
-  }, [petals, burstMode, petalStore, setPetals, setRecentClicks, setClickCount, setShowModal, setTrails]);
+      setTrailCount((c) => {
+        const next = c + 1;
+        if (next % 10 === 0) {
+          const line = senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)];
+          setSenpaiTrailTip(line);
+          setTimeout(() => setSenpaiTrailTip(''), 3500);
+        }
+        return next;
+      });
+    },
+    [
+      petals,
+      burstMode,
+      petalStore,
+      setPetals,
+      setRecentClicks,
+      setClickCount,
+      setShowModal,
+      setTrails,
+    ],
+  );
 
   // Petal spawn logic (seasonal + burst)
   useEffect(() => {
-    const interval = setInterval(() => {
-      setPetals(prev => {
-        if (prev.length >= MAX_PETALS) return prev;
-        const allowedTypes = getSeasonalPetals(season, burstMode);
-        const chosenType = weightedRandom(allowedTypes);
-        return [
-          ...prev,
-          createPetal(chosenType),
-        ];
-      });
-    }, burstMode ? 250 : 800);
+    const interval = setInterval(
+      () => {
+        setPetals((prev) => {
+          if (prev.length >= MAX_PETALS) return prev;
+          const allowedTypes = getSeasonalPetals(season, burstMode);
+          const chosenType = weightedRandom(allowedTypes);
+          return [...prev, createPetal(chosenType)];
+        });
+      },
+      burstMode ? 250 : 800,
+    );
     return () => clearInterval(interval);
   }, [season, burstMode]);
 
   // Remove petals that have animated
   useEffect(() => {
-    if (petals.some(p => p.animating)) {
+    if (petals.some((p) => p.animating)) {
       const timeout = setTimeout(() => {
-        setPetals(prev => prev.filter(p => !p.animating));
+        setPetals((prev) => prev.filter((p) => !p.animating));
       }, 700);
       return () => clearTimeout(timeout);
     }
@@ -379,7 +400,7 @@ const InteractiveHeroSection: React.FC = () => {
   useEffect(() => {
     if (trails.length > 0) {
       const timeout = setTimeout(() => {
-        setTrails(trails => trails.slice(1));
+        setTrails((trails) => trails.slice(1));
       }, 700);
       return () => clearTimeout(timeout);
     }
@@ -412,9 +433,17 @@ const InteractiveHeroSection: React.FC = () => {
   }, []);
 
   return (
-    <section ref={heroRef} className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-b from-gray-900 to-black">
+    <section
+      ref={heroRef}
+      className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-b from-gray-900 to-black"
+    >
       {/* Skip to content for accessibility */}
-      <a href="#main-content" className="sr-only absolute left-2 top-2 z-50 rounded bg-pink-400/80 px-3 py-1 text-white focus:not-sr-only">Skip to main content</a>
+      <a
+        href="#main-content"
+        className="sr-only absolute left-2 top-2 z-50 rounded bg-pink-400/80 px-3 py-1 text-white focus:not-sr-only"
+      >
+        Skip to main content
+      </a>
       <CherryBlossom />
       {/* Petal Tracker UI */}
       <motion.div
@@ -430,7 +459,7 @@ const InteractiveHeroSection: React.FC = () => {
         <span className="tabular-nums">{petalCount}</span>
       </motion.div>
       {/* Clickable Petals */}
-      {petals.map(petal => {
+      {petals.map((petal) => {
         const { img } = PETAL_TYPE_PROPS[petal.type || 'normal'];
         return (
           <motion.div
@@ -506,9 +535,12 @@ const InteractiveHeroSection: React.FC = () => {
                     ];
                     return burstLines[Math.floor(Math.random() * burstLines.length)];
                   }
-                  if (petals.find(p => p.type === 'blackLotus' && p.animating)) return '"You\'ve touched the void and it whispered your name."';
-                  if (petals.find(p => p.type === 'glitch' && p.animating)) return '"This doesn\'t belong... and yet, it\'s here."';
-                  if (petals.find(p => p.type === 'golden' && p.animating)) return '"That glow... you\'re meant for something rarer."';
+                  if (petals.find((p) => p.type === 'blackLotus' && p.animating))
+                    return '"You\'ve touched the void and it whispered your name."';
+                  if (petals.find((p) => p.type === 'glitch' && p.animating))
+                    return '"This doesn\'t belong... and yet, it\'s here."';
+                  if (petals.find((p) => p.type === 'golden' && p.animating))
+                    return '"That glow... you\'re meant for something rarer."';
                   return '"You really like clicking those petals, huh? Keep going, wanderer."';
                 })()}
               </div>
@@ -536,9 +568,9 @@ const InteractiveHeroSection: React.FC = () => {
         </div>
       )}
       {/* Render trails */}
-      {trails.map(trail => {
+      {trails.map((trail) => {
         // Determine color/FX based on petal type
-        const petal = petals.find(p => trail.id.startsWith(p.id));
+        const petal = petals.find((p) => trail.id.startsWith(p.id));
         let color = 'bg-pink-400/80';
         let extra = '';
         if (petal) {
@@ -605,8 +637,12 @@ const InteractiveHeroSection: React.FC = () => {
             >
               <div className="mb-4 text-3xl font-bold text-pink-300">Senpai.exe</div>
               <div className="mb-2 text-lg">“You came back. The garden's been waiting…”</div>
-              <div className="mb-4 text-xl text-pink-200">Cherryfall Streak: {bloomStreak} days</div>
-              <div className="mb-4 text-2xl font-bold text-pink-400 animate-pulse">+{bloomBonus} petals</div>
+              <div className="mb-4 text-xl text-pink-200">
+                Cherryfall Streak: {bloomStreak} days
+              </div>
+              <div className="mb-4 text-2xl font-bold text-pink-400 animate-pulse">
+                +{bloomBonus} petals
+              </div>
               <div className="flex justify-center gap-2">
                 {[...Array(8)].map((_, i) => (
                   <motion.div
@@ -633,4 +669,4 @@ const InteractiveHeroSection: React.FC = () => {
   );
 };
 
-export default InteractiveHeroSection; 
+export default InteractiveHeroSection;

@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import useSWR from "swr";
-import Filters from "./Filters";
-import ShopItemCard from "./ShopItemCard";
-import EquipTray from "./EquipTray";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import useSWR from 'swr';
+import Filters from './Filters';
+import ShopItemCard from './ShopItemCard';
+import EquipTray from './EquipTray';
 
-const fetcher = (u:string)=> fetch(u).then(r=>r.json());
+const fetcher = (u: string) => fetch(u).then((r) => r.json());
 
-export default function Shop(){
-  const { data, mutate } = useSWR("/api/shop", fetcher);
+export default function Shop() {
+  const { data, mutate } = useSWR('/api/shop', fetcher);
   const items = data?.items ?? [];
   const inv = data?.inventory ?? [];
-  const balances = data?.balances ?? { petals:0, runes:0 };
+  const balances = data?.balances ?? { petals: 0, runes: 0 };
 
   const handlePurchase = async (sku: string) => {
     // TODO: Implement purchase logic
@@ -28,7 +28,7 @@ export default function Shop(){
         <Filters />
         <div className="sep" />
         <div className="grid-items">
-          {items.map((it:any)=>(
+          {items.map((it: any) => (
             <ShopItemCard key={it.sku} item={it} onPurchase={handlePurchase} />
           ))}
         </div>

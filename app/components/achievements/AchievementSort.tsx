@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 
 interface AchievementSortProps {
@@ -12,7 +12,7 @@ export const AchievementSort: React.FC<AchievementSortProps> = ({ sortBy, onSort
     <label className="mr-2">Sort by:</label>
     <select
       value={sortBy}
-      onChange={e => onSortChange(e.target.value as 'name' | 'date' | 'category' | 'progress')}
+      onChange={(e) => onSortChange(e.target.value as 'name' | 'date' | 'category' | 'progress')}
       className="rounded border px-2 py-1"
     >
       <option value="name">Name</option>

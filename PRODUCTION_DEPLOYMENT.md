@@ -3,6 +3,7 @@
 ## ✅ **Pre-Deployment Checklist**
 
 ### 1. **Environment Variables**
+
 Ensure these are set in your Vercel project:
 
 ```bash
@@ -48,11 +49,13 @@ NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
 ### 2. **Database Setup**
+
 - ✅ Prisma schema is up to date
 - ✅ Database migrations applied
 - ✅ Connection tested
 
 ### 3. **Build Verification**
+
 - ✅ `npm run build` succeeds
 - ✅ No TypeScript errors
 - ✅ All dependencies resolved
@@ -60,6 +63,7 @@ NEXT_PUBLIC_APP_URL=https://your-domain.com
 ## 🚀 **Deployment Steps**
 
 ### Step 1: Push to Production Branch
+
 ```bash
 git add .
 git commit -m "🚀 Production ready: Complete Prisma migration"
@@ -67,12 +71,14 @@ git push origin main
 ```
 
 ### Step 2: Vercel Deployment
+
 1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
 2. Select your project
 3. Deploy from main branch
 4. Monitor build process
 
 ### Step 3: Verify Deployment
+
 - ✅ Build succeeds
 - ✅ All routes accessible
 - ✅ Database connections working
@@ -81,6 +87,7 @@ git push origin main
 ## 🔧 **Post-Deployment Tasks**
 
 ### 1. **Database Verification**
+
 ```bash
 # Check database connection
 curl https://your-domain.com/api/health
@@ -90,6 +97,7 @@ npx prisma db pull
 ```
 
 ### 2. **Feature Testing**
+
 - [ ] User registration/login
 - [ ] Petal collection system
 - [ ] Soapstone messages
@@ -99,6 +107,7 @@ npx prisma db pull
 - [ ] Admin panel
 
 ### 3. **Performance Monitoring**
+
 - [ ] Page load times
 - [ ] API response times
 - [ ] Database query performance
@@ -116,16 +125,19 @@ npx prisma db pull
 ## 📊 **Monitoring & Analytics**
 
 ### 1. **Error Tracking**
+
 - Sentry integration active
 - Error logging configured
 - Performance monitoring enabled
 
 ### 2. **Health Checks**
+
 - Database connectivity
 - External service status
 - API endpoint availability
 
 ### 3. **Performance Metrics**
+
 - Core Web Vitals
 - API response times
 - Database query performance
@@ -135,6 +147,7 @@ npx prisma db pull
 If issues arise:
 
 1. **Immediate Rollback**
+
    ```bash
    # Revert to previous deployment
    git revert HEAD
@@ -142,6 +155,7 @@ If issues arise:
    ```
 
 2. **Database Rollback**
+
    ```bash
    # Restore from backup
    npx prisma db push --force-reset
@@ -154,11 +168,13 @@ If issues arise:
 ## 📞 **Support & Maintenance**
 
 ### **Emergency Contacts**
+
 - **Developer**: [Your Contact]
 - **DevOps**: [DevOps Contact]
 - **Database Admin**: [DB Admin Contact]
 
 ### **Monitoring Tools**
+
 - Vercel Analytics
 - Sentry Error Tracking
 - Database Monitoring

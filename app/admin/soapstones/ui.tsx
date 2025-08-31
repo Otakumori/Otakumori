@@ -1,28 +1,28 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import useSWR from "swr";
+import useSWR from 'swr';
 
-const fetcher = (u: string) => fetch(u).then(r => r.json());
+const fetcher = (u: string) => fetch(u).then((r) => r.json());
 
 export default function AdminSoapstones() {
-  const { data, mutate } = useSWR("/api/soapstones?all=1", fetcher);
+  const { data, mutate } = useSWR('/api/soapstones?all=1', fetcher);
   const list = data?.list ?? [];
   const meLikes: Record<string, true> = data?.meLikes ?? {};
 
   async function act(id: string, data: any) {
     const res = await fetch(`/api/soapstones/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
     });
     if (res.ok) mutate();
   }
 
   async function del(id: string) {
-    if (!confirm("Delete this rune?")) return;
-    const res = await fetch(`/api/soapstones/${id}`, { method: "DELETE" });
+    if (!confirm('Delete this rune?')) return;
+    const res = await fetch(`/api/soapstones/${id}`, { method: 'DELETE' });
     if (res.ok) mutate();
   }
 
@@ -41,10 +41,13 @@ export default function AdminSoapstones() {
         </thead>
         <tbody>
           {list.map((m: any) => (
-            <tr key={m.id} className={`rounded-xl ${meLikes[m.id] ? 'bg-pink-500/20 border border-pink-400/40' : 'bg-[#121016]/80'}`}>
+            <tr
+              key={m.id}
+              className={`rounded-xl ${meLikes[m.id] ? 'bg-pink-500/20 border border-pink-400/40' : 'bg-[#121016]/80'}`}
+            >
               <td className="px-3 py-3">{m.content}</td>
               <td className="px-3">{m.upvotes ?? 0}</td>
-              <td className="px-3">{m.isFlagged ? "⚑" : ""}</td>
+              <td className="px-3">{m.isFlagged ? '⚑' : ''}</td>
               <td className="px-3">
                 {meLikes[m.id] && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-pink-500/20 px-2 py-1 text-xs text-pink-300">
@@ -58,13 +61,13 @@ export default function AdminSoapstones() {
                     onClick={() => act(m.id, { isHidden: !m.isHidden })}
                     className="rounded-lg border border-pink-300/30 px-2 py-1 hover:bg-pink-300/10"
                   >
-                    {m.isHidden ? "Unhide" : "Hide"}
+                    {m.isHidden ? 'Unhide' : 'Hide'}
                   </button>
                   <button
                     onClick={() => act(m.id, { isFlagged: !m.isFlagged })}
                     className="rounded-lg border border-pink-300/30 px-2 py-1 hover:bg-pink-300/10"
                   >
-                    {m.isFlagged ? "Unflag" : "Flag"}
+                    {m.isFlagged ? 'Unflag' : 'Flag'}
                   </button>
                   <button
                     onClick={() => del(m.id)}

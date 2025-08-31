@@ -1,40 +1,40 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { prisma } from "@/app/lib/prisma";
+/* eslint-disable-line @next/next/no-img-element */
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { prisma } from '@/app/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: "UNAUTHENTICATED" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'UNAUTHENTICATED' }, { status: 401 });
     }
 
     const { title, reason } = await req.json();
     if (!title) {
-      return NextResponse.json({ ok: false, error: "Missing title" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Missing title' }, { status: 400 });
     }
 
     // Check if user already has this title
     const existingTitle = await prisma.userTitle.findFirst({
-      where: { 
+      where: {
         userId,
-        title 
-      }
+        title,
+      },
     });
 
     if (existingTitle) {
-      return NextResponse.json({ ok: false, error: "Title already awarded" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Title already awarded' }, { status: 400 });
     }
 
     // Award the title
     const newTitle = await prisma.userTitle.create({
-      data: { 
+      data: {
         userId,
         title,
-        awardedAt: new Date()
-      }
+        awardedAt: new Date(),
+      },
     });
 
     // Log the award in petal ledger if reason is provided
@@ -42,16 +42,16 @@ export async function POST(req: NextRequest) {
       await prisma.petalLedger.create({
         data: {
           userId,
-          type: "earn",
+          type: 'earn',
           amount: 0, // No petals for titles, just logging
-          reason: `Title awarded: ${title} - ${reason}`
-        }
+          reason: `Title awarded: ${title} - ${reason}`,
+        },
       });
     }
 
     return NextResponse.json({ ok: true, title: newTitle });
   } catch (err) {
-    console.error("Title award error:", err);
-    return NextResponse.json({ ok: false, error: "AWARD_ERROR" }, { status: 500 });
+    console.error('Title award error:', err);
+    return NextResponse.json({ ok: false, error: 'AWARD_ERROR' }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
@@ -50,7 +50,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     startTime: 0,
     timeToClear: 0,
     leftHanded: false,
-    muted: false
+    muted: false,
   });
 
   const [gameState, setGameState] = useState({
@@ -61,7 +61,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     misses: 0,
     longestCombo: 0,
     currentCombo: 0,
-    timeToClear: 0
+    timeToClear: 0,
   });
 
   const [runId, setRunId] = useState<string | null>(null);
@@ -88,7 +88,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       // Start game run
       const idempotencyKey = `samurai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const response = await gameApi.start(gameDef.key, idempotencyKey);
-      
+
       if (response.ok && response.data) {
         setRunId((response.data as any).runId);
         setSeed((response.data as any).seed);
@@ -101,7 +101,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
         backgroundColor: 0xf8f9fa,
         antialias: true,
         resolution: window.devicePixelRatio || 1,
-        autoDensity: true
+        autoDensity: true,
       });
 
       canvasRef.current.appendChild(app.view as any);
@@ -118,14 +118,13 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
         targetFPS: 60,
         onUpdate: updateGame,
         onRender: renderGame,
-        onError: (error) => console.error('Game loop error:', error)
+        onError: (error) => console.error('Game loop error:', error),
       });
 
       gameLoopRef.current.start();
 
       // Start the game
       startGame();
-
     } catch (error) {
       console.error('Failed to initialize game:', error);
     }
@@ -142,7 +141,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     // Dojo background elements
     const dojoElements = new PIXI.Graphics();
     dojoElements.lineStyle(2, 0xe9ecef);
-    
+
     // Simple dojo design
     for (let i = 0; i < 5; i++) {
       dojoElements.moveTo(0, 100 + i * 100);
@@ -164,7 +163,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x495057,
-      stroke: { color: 0xffffff, width: 2 }
+      stroke: { color: 0xffffff, width: 2 },
     });
     scoreTextRef.current.x = 20;
     scoreTextRef.current.y = 20;
@@ -175,7 +174,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       fontFamily: 'Arial',
       fontSize: 18,
       fill: 0x6f42c1,
-      stroke: { color: 0xffffff, width: 1 }
+      stroke: { color: 0xffffff, width: 1 },
     });
     comboTextRef.current.x = 20;
     comboTextRef.current.y = 50;
@@ -240,11 +239,11 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
 
   const handleSlice = () => {
     if (!isMouseDown.current) return;
-    
+
     const dx = mousePos.current.x - lastMousePos.current.x;
     const dy = mousePos.current.y - lastMousePos.current.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    
+
     if (distance > 10) {
       performSlice(lastMousePos.current, mousePos.current);
     }
@@ -264,16 +263,13 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     if (!appRef.current) return;
 
     gameStateRef.current.swings++;
-    setGameState(prev => ({ ...prev, swings: gameStateRef.current.swings }));
+    setGameState((prev) => ({ ...prev, swings: gameStateRef.current.swings }));
 
     // Create slice trail
     const trail: SliceTrail = {
-      points: [
-        new PIXI.Point(start.x, start.y),
-        new PIXI.Point(end.x, end.y)
-      ],
+      points: [new PIXI.Point(start.x, start.y), new PIXI.Point(end.x, end.y)],
       alpha: 1.0,
-      width: 4
+      width: 4,
     };
     sliceTrailsRef.current.push(trail);
 
@@ -281,12 +277,10 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     const sliceAngle = Math.atan2(end.y - start.y, end.x - start.x);
     let hitCount = 0;
 
-    petalsRef.current.forEach(petal => {
+    petalsRef.current.forEach((petal) => {
       if (petal.sliced) return;
 
-      const distance = Math.sqrt(
-        Math.pow(petal.x - start.x, 2) + Math.pow(petal.y - start.y, 2)
-      );
+      const distance = Math.sqrt(Math.pow(petal.x - start.x, 2) + Math.pow(petal.y - start.y, 2));
 
       if (distance < 50) {
         const angleDiff = Math.abs(sliceAngle - petal.targetAngle);
@@ -296,7 +290,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
           gameStateRef.current.perfectArcs++;
           hitCount++;
           petal.sliced = true;
-          
+
           // Perfect slice effect
           createSliceEffect(petal.x, petal.y, true);
           playSfx('petal-burst');
@@ -308,28 +302,28 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       gameStateRef.current.currentCombo += hitCount;
       gameStateRef.current.longestCombo = Math.max(
         gameStateRef.current.longestCombo,
-        gameStateRef.current.currentCombo
+        gameStateRef.current.currentCombo,
       );
-      
+
       const comboBonus = Math.floor(gameStateRef.current.currentCombo / 3) * 10;
       gameStateRef.current.score += hitCount * 100 + comboBonus;
-      
-      setGameState(prev => ({
+
+      setGameState((prev) => ({
         ...prev,
         perfectArcs: gameStateRef.current.perfectArcs,
         currentCombo: gameStateRef.current.currentCombo,
         longestCombo: gameStateRef.current.longestCombo,
-        score: gameStateRef.current.score
+        score: gameStateRef.current.score,
       }));
 
       playSfx('combo-chime');
     } else {
       gameStateRef.current.currentCombo = 0;
       gameStateRef.current.misses++;
-      setGameState(prev => ({
+      setGameState((prev) => ({
         ...prev,
         currentCombo: 0,
-        misses: gameStateRef.current.misses
+        misses: gameStateRef.current.misses,
       }));
     }
 
@@ -369,26 +363,26 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
 
     const petalTexture = await getSprite('petals', 'circle');
     const petal = new PIXI.Sprite(PIXI.Texture.from(petalTexture));
-    
+
     petal.anchor.set(0.5, 0.5);
     petal.width = 30;
     petal.height = 30;
-    
+
     // Random spawn position
     petal.x = Math.random() * 700 + 50;
     petal.y = -50;
-    
+
     // Random velocity
     const vx = (Math.random() - 0.5) * 2;
     const vy = Math.random() * 2 + 1;
-    
+
     // Random rotation
     const rotation = Math.random() * Math.PI * 2;
     const vr = (Math.random() - 0.5) * 0.2;
-    
+
     // Random scale
     const scale = 0.8 + Math.random() * 0.4;
-    
+
     // Target angle for perfect slice
     const targetAngle = Math.random() * Math.PI * 2;
 
@@ -402,7 +396,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       vr,
       scale,
       targetAngle,
-      sliced: false
+      sliced: false,
     };
 
     petalsRef.current.push(petalObj);
@@ -417,7 +411,8 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     if (!gameStateRef.current.isPlaying) return;
 
     // Spawn petals
-    if (Math.random() < 0.02) { // 2% chance per frame
+    if (Math.random() < 0.02) {
+      // 2% chance per frame
       spawnPetal().catch(console.error);
     }
 
@@ -437,9 +432,9 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       if (petal.y > 650 || petal.x < -50 || petal.x > 850) {
         if (!petal.sliced) {
           gameStateRef.current.misses++;
-          setGameState(prev => ({ ...prev, misses: gameStateRef.current.misses }));
+          setGameState((prev) => ({ ...prev, misses: gameStateRef.current.misses }));
         }
-        
+
         appRef.current?.stage.removeChild(petal.sprite);
         petalsRef.current.splice(index, 1);
       }
@@ -459,7 +454,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     if (scoreTextRef.current) {
       scoreTextRef.current.text = `Score: ${gameStateRef.current.score}`;
     }
-    
+
     if (comboTextRef.current) {
       comboTextRef.current.text = `Combo: ${gameStateRef.current.currentCombo}`;
       comboTextRef.current.visible = gameStateRef.current.currentCombo > 0;
@@ -475,7 +470,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     if (!appRef.current) return;
 
     // Render slice trails
-    sliceTrailsRef.current.forEach(trail => {
+    sliceTrailsRef.current.forEach((trail) => {
       const graphics = new PIXI.Graphics();
       graphics.lineStyle(trail.width, 0xff6b6b, trail.alpha);
       graphics.moveTo(trail.points[0].x, trail.points[0].y);
@@ -494,7 +489,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
   const startGame = () => {
     gameStateRef.current.isPlaying = true;
     gameStateRef.current.startTime = Date.now();
-    setGameState(prev => ({ ...prev, isPlaying: true }));
+    setGameState((prev) => ({ ...prev, isPlaying: true }));
     playSfx('sword-draw');
   };
 
@@ -503,8 +498,8 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
 
     gameStateRef.current.isPlaying = false;
     gameStateRef.current.timeToClear = Date.now() - gameStateRef.current.startTime;
-    
-    setGameState(prev => ({ ...prev, isPlaying: false }));
+
+    setGameState((prev) => ({ ...prev, isPlaying: false }));
     setIsGameOver(true);
 
     // Stop game loop
@@ -515,29 +510,26 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     // Send results to server
     if (runId) {
       try {
-        const statsHash = btoa(JSON.stringify({
-          score: gameStateRef.current.score,
-          swings: gameStateRef.current.swings,
-          perfectArcs: gameStateRef.current.perfectArcs,
-          misses: gameStateRef.current.misses,
-          longestCombo: gameStateRef.current.longestCombo,
-          timeToClear: gameStateRef.current.timeToClear
-        }));
-
-        const response = await gameApi.finish(
-          runId,
-          gameStateRef.current.score,
-          statsHash,
-          {
+        const statsHash = btoa(
+          JSON.stringify({
+            score: gameStateRef.current.score,
             swings: gameStateRef.current.swings,
             perfectArcs: gameStateRef.current.perfectArcs,
             misses: gameStateRef.current.misses,
             longestCombo: gameStateRef.current.longestCombo,
             timeToClear: gameStateRef.current.timeToClear,
-            leftHanded: gameStateRef.current.leftHanded,
-            muted: gameStateRef.current.muted
-          }
+          }),
         );
+
+        const response = await gameApi.finish(runId, gameStateRef.current.score, statsHash, {
+          swings: gameStateRef.current.swings,
+          perfectArcs: gameStateRef.current.perfectArcs,
+          misses: gameStateRef.current.misses,
+          longestCombo: gameStateRef.current.longestCombo,
+          timeToClear: gameStateRef.current.timeToClear,
+          leftHanded: gameStateRef.current.leftHanded,
+          muted: gameStateRef.current.muted,
+        });
 
         if (response.ok && response.data) {
           setShowResults(true);
@@ -552,7 +544,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
 
   const resetGame = () => {
     // Clear petals
-    petalsRef.current.forEach(petal => {
+    petalsRef.current.forEach((petal) => {
       if (petal.sprite.parent) {
         petal.sprite.parent.removeChild(petal.sprite);
       }
@@ -574,7 +566,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       startTime: 0,
       timeToClear: 0,
       leftHanded: gameStateRef.current.leftHanded,
-      muted: gameStateRef.current.muted
+      muted: gameStateRef.current.muted,
     };
 
     setGameState({
@@ -585,7 +577,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       misses: 0,
       longestCombo: 0,
       currentCombo: 0,
-      timeToClear: 0
+      timeToClear: 0,
     });
 
     setIsGameOver(false);
@@ -613,13 +605,11 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
   }, [initializeGame]);
 
   if (showResults) {
-  return (
+    return (
       <div className="flex items-center justify-center min-h-[600px]">
         <div className="bg-white rounded-xl p-8 shadow-lg max-w-md w-full mx-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Game Complete!
-          </h2>
-          
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Game Complete!</h2>
+
           <div className="space-y-4 mb-6">
             <div className="flex justify-between">
               <span className="text-gray-600">Final Score:</span>
@@ -646,13 +636,13 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
             >
               Play Again
             </button>
-        <button 
-              onClick={() => window.location.href = '/mini-games'}
+            <button
+              onClick={() => (window.location.href = '/mini-games')}
               className="flex-1 py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-        >
+            >
               Back to Games
-        </button>
-      </div>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -662,12 +652,8 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     <div className="flex flex-col items-center justify-center min-h-[600px] p-4">
       {!gameState.isPlaying && !isGameOver && (
         <div className="text-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
-            {gameDef.name}
-          </h3>
-          <p className="text-gray-600 mb-4 max-w-md">
-            {gameDef.howToPlay}
-          </p>
+          <h3 className="text-xl font-semibold text-gray-700 mb-4">{gameDef.name}</h3>
+          <p className="text-gray-600 mb-4 max-w-md">{gameDef.howToPlay}</p>
           <div className="space-y-2 text-sm text-gray-500">
             <p>• Swipe to slice petals with perfect timing</p>
             <p>• Chain combos for bonus rewards</p>
@@ -684,12 +670,8 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
 
       {isGameOver && !showResults && (
         <div className="text-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
-            Game Over!
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Final Score: {gameState.score}
-          </p>
+          <h3 className="text-xl font-semibold text-gray-700 mb-4">Game Over!</h3>
+          <p className="text-gray-600 mb-4">Final Score: {gameState.score}</p>
           <button
             onClick={resetGame}
             className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors font-medium"
@@ -700,7 +682,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       )}
 
       {/* Game Canvas */}
-      <div 
+      <div
         ref={canvasRef}
         className="border-2 border-pink-200 rounded-lg overflow-hidden"
         style={{ width: '800px', height: '600px' }}

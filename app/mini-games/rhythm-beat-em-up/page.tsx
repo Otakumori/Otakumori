@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useUser } from "@clerk/nextjs"; // Clerk client
-import { useEffect, useState } from "react";
-import GameShell from "../_shared/GameShell";
-import Scene from "./Scene";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useUser } from '@clerk/nextjs'; // Clerk client
+import { useEffect, useState } from 'react';
+import GameShell from '../_shared/GameShell';
+import Scene from './Scene';
 
-export default function Page(){
+export default function Page() {
   const { isSignedIn } = useUser();
   const [mapOverride, setMapOverride] = useState<string | null>(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     if (!isSignedIn) return;
-    const u = new URLSearchParams(location.search).get("map");
-    if (u && u.startsWith("/assets/maps/")) setMapOverride(u);
+    const u = new URLSearchParams(location.search).get('map');
+    if (u && u.startsWith('/assets/maps/')) setMapOverride(u);
   }, [isSignedIn]);
 
   return (

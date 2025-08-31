@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';
@@ -49,15 +49,17 @@ const PETAL_REWARDS: PetalReward[] = [
 export const eventBus = mitt();
 
 // Unified Zustand store for petals with persistence
-const usePetalStore = create<PetalState & {
-  rewards: PetalReward[];
-  showReward: string | null;
-  addPetals: (amount: number) => void;
-  claimReward: (code: string) => void;
-  syncPetals: (userId: string) => Promise<void>;
-  setPetals: (amount: number) => void;
-  checkRewards: (count: number) => void;
-}>((set, get) => ({
+const usePetalStore = create<
+  PetalState & {
+    rewards: PetalReward[];
+    showReward: string | null;
+    addPetals: (amount: number) => void;
+    claimReward: (code: string) => void;
+    syncPetals: (userId: string) => Promise<void>;
+    setPetals: (amount: number) => void;
+    checkRewards: (count: number) => void;
+  }
+>((set, get) => ({
   petals: 0,
   dailyLimit: 50,
   rewards: PETAL_REWARDS,
@@ -71,7 +73,7 @@ const usePetalStore = create<PetalState & {
   },
   setPetals: (amount) => set({ petals: amount }),
   checkRewards: (count: number) => {
-    const newRewards = get().rewards.map(reward => {
+    const newRewards = get().rewards.map((reward) => {
       if (count >= reward.count && !reward.claimed) {
         set({ showReward: reward.reward });
         return { ...reward, claimed: true };
@@ -83,14 +85,14 @@ const usePetalStore = create<PetalState & {
   claimReward: async (code: string) => {
     try {
       // Validate reward code
-      const reward = get().rewards.find(r => r.count === parseInt(code));
+      const reward = get().rewards.find((r) => r.count === parseInt(code));
       if (!reward || reward.claimed) {
         throw new Error('Invalid or already claimed reward code');
       }
 
       // Mark reward as claimed
-      const updatedRewards = get().rewards.map(r => 
-        r.count === parseInt(code) ? { ...r, claimed: true } : r
+      const updatedRewards = get().rewards.map((r) =>
+        r.count === parseInt(code) ? { ...r, claimed: true } : r,
       );
       set({ rewards: updatedRewards, showReward: null });
 
@@ -100,13 +102,13 @@ const usePetalStore = create<PetalState & {
 
       // TODO: Send to analytics/achievement system
       console.log(`Reward claimed: ${code} for ${petalReward} petals`);
-      
+
       return { success: true, petals: petalReward };
     } catch (error) {
       console.error('Error claiming reward:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
       };
     }
   },
@@ -119,13 +121,13 @@ const usePetalStore = create<PetalState & {
 }));
 
 // Create a store for the AI Overlord
-const useOverlordStore = create<OverlordState>(set => ({
+const useOverlordStore = create<OverlordState>((set) => ({
   isActive: false,
   lastInteraction: null,
   quests: [],
   activate: () => set({ isActive: true }),
   deactivate: () => set({ isActive: false }),
-  addQuest: quest => set(state => ({ quests: [...state.quests, quest] })),
+  addQuest: (quest) => set((state) => ({ quests: [...state.quests, quest] })),
 }));
 
 const queryClient = new QueryClient();
@@ -148,7 +150,7 @@ export function PetalProvider({ children }: { children: React.ReactNode }) {
 
   // Persist petals to localStorage only
   useEffect(() => {
-    const unsub = store.current.subscribe(state => {
+    const unsub = store.current.subscribe((state) => {
       setLocalPetals(state.petals);
       setLocalRewards(state.rewards);
     });

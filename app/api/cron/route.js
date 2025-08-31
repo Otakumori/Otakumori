@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -8,8 +8,8 @@ import { prisma } from '../../lib/prisma';
 // Environment validation
 function validateEnv() {
   const required = ['CRON_SECRET', 'PRINTIFY_API_KEY', 'PRINTIFY_SHOP_ID'];
-  const missing = required.filter(key => !process.env[key]);
-  
+  const missing = required.filter((key) => !process.env[key]);
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
@@ -22,17 +22,17 @@ function log(message, level = 'INFO', error = null) {
     timestamp,
     level,
     message,
-    ...(error && { error: error.message, stack: error.stack })
+    ...(error && { error: error.message, stack: error.stack }),
   };
-  
+
   console.log(`[${timestamp}] ${level}: ${message}`, error ? error : '');
-  
+
   // Write to log file
   const logDir = path.join(process.cwd(), 'logs');
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
   }
-  
+
   const logFile = path.join(logDir, 'api-cron.log');
   fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
 }
@@ -40,14 +40,17 @@ function log(message, level = 'INFO', error = null) {
 // Fetch products from Printify
 async function fetchPrintifyProducts() {
   const PRINTIFY_API_URL = 'https://api.printify.com/v1';
-  
+
   try {
-    const response = await fetch(`${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`, {
-      headers: {
-        Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Printify API error: ${response.status} ${response.statusText}`);
@@ -71,7 +74,7 @@ async function updateAbyssProducts(products) {
     for (const product of products) {
       try {
         // Filter for Abyss products
-        if (!product.tags.some(tag => tag.includes('abyss') || tag.includes('r18'))) {
+        if (!product.tags.some((tag) => tag.includes('abyss') || tag.includes('r18'))) {
           continue;
         }
 
@@ -83,7 +86,7 @@ async function updateAbyssProducts(products) {
           image: product.images[0]?.src || null,
           tags: product.tags || [],
           isActive: true,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
 
         // Use upsert to create or update
@@ -92,8 +95,8 @@ async function updateAbyssProducts(products) {
           update: productData,
           create: {
             ...productData,
-            createdAt: new Date()
-          }
+            createdAt: new Date(),
+          },
         });
 
         if (result.createdAt.getTime() === result.updatedAt.getTime()) {
@@ -132,8 +135,10 @@ export async function GET(request) {
     // Update Abyss products in database
     log('Updating Abyss products in database...');
     const updateResult = await updateAbyssProducts(products);
-    
-    log(`Database update completed: ${updateResult.createdCount} created, ${updateResult.updatedCount} updated, ${updateResult.errorCount} errors`);
+
+    log(
+      `Database update completed: ${updateResult.createdCount} created, ${updateResult.updatedCount} updated, ${updateResult.errorCount} errors`,
+    );
 
     // Clean up old inactive products (older than 30 days)
     log('Cleaning up old inactive products...');
@@ -141,8 +146,8 @@ export async function GET(request) {
     const cleanupResult = await prisma.abyssProduct.deleteMany({
       where: {
         isActive: false,
-        updatedAt: { lt: thirtyDaysAgo }
-      }
+        updatedAt: { lt: thirtyDaysAgo },
+      },
     });
     log(`Cleaned up ${cleanupResult.count} old inactive products`);
 
@@ -158,15 +163,15 @@ export async function GET(request) {
           productsCreated: updateResult.createdCount,
           productsUpdated: updateResult.updatedCount,
           errors: updateResult.errorCount,
-          oldProductsCleaned: cleanupResult.count
-        }
+          oldProductsCleaned: cleanupResult.count,
+        },
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
   } catch (error) {
     log('Unhandled error in cron endpoint', 'ERROR', error);
@@ -181,7 +186,7 @@ export async function GET(request) {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
   }
 }

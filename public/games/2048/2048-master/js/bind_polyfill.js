@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 Function.prototype.bind = Function.prototype.bind || function (target) {
   var self = this;
   return function (args) {

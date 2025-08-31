@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import GameShell from "../_shared/GameShell";
-import Scene from "./Scene";
+/* eslint-disable-line @next/next/no-img-element */
+import GameShell from '../_shared/GameShell';
+import Scene from './Scene';
 
-export const metadata = { title: "Bubble Ragdoll" };
+export const metadata = { title: 'Bubble Ragdoll' };
 
 export default function Page() {
   return (

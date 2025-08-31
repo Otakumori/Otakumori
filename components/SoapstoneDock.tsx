@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import useSWR from "swr";
-import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
+import useSWR from 'swr';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
-const fetcher = (u: string) => fetch(u).then(r => r.json());
+const fetcher = (u: string) => fetch(u).then((r) => r.json());
 
 export default function SoapstoneDock() {
-  const { data, mutate } = useSWR("/api/soapstones", fetcher, {
-    refreshInterval: 15_000
+  const { data, mutate } = useSWR('/api/soapstones', fetcher, {
+    refreshInterval: 15_000,
   });
 
   const list = data?.list ?? [];
@@ -18,7 +18,7 @@ export default function SoapstoneDock() {
 
   // Masonry-ish: 3 columns with gentle random rotation (from server)
   const cols = 3;
-  const buckets: typeof list[] = Array.from({ length: cols }, () => []);
+  const buckets: (typeof list)[] = Array.from({ length: cols }, () => []);
 
   list.forEach((m: any, i: number) => buckets[i % cols].push(m));
 
@@ -34,9 +34,9 @@ export default function SoapstoneDock() {
                   initial={{ y: 40, opacity: 0, rotate: m.rotation }}
                   animate={{ y: 0, opacity: 1, rotate: m.rotation }}
                   exit={{ y: 40, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 26 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 26 }}
                   className="pointer-events-auto relative rounded-2xl border border-pink-300/30 bg-[#121016]/90 p-3 text-pink-100 shadow-lg"
-                  style={{ transformOrigin: "50% 100%" }}
+                  style={{ transformOrigin: '50% 100%' }}
                 >
                   {/* overlay filter for rune look (optional) */}
                   <Image
@@ -52,17 +52,17 @@ export default function SoapstoneDock() {
                       onClick={async (e) => {
                         e.stopPropagation();
                         const prev = data;
-                        mutate("/api/soapstones", { 
-                          ...prev, 
-                          list: prev.list.map((x: any) => 
-                            x.id === m.id ? { ...x, upvotes: (x.upvotes || 0) + 1 } : x
+                        mutate('/api/soapstones', {
+                          ...prev,
+                          list: prev.list.map((x: any) =>
+                            x.id === m.id ? { ...x, upvotes: (x.upvotes || 0) + 1 } : x,
                           ),
-                          meLikes: { ...prev.meLikes, [m.id]: true }
+                          meLikes: { ...prev.meLikes, [m.id]: true },
                         });
-                        const res = await fetch(`/api/soapstones/${m.id}/like`, { method: "POST" });
-                        if (!res.ok) mutate("/api/soapstones");
+                        const res = await fetch(`/api/soapstones/${m.id}/like`, { method: 'POST' });
+                        if (!res.ok) mutate('/api/soapstones');
                       }}
-                      className={`absolute right-2 top-2 rounded-lg border px-2 py-1 text-xs ${meLikes[m.id] ? "border-pink-400 bg-pink-400/20" : "border-pink-300/30 bg-pink-300/10 hover:bg-pink-300/20"}`}
+                      className={`absolute right-2 top-2 rounded-lg border px-2 py-1 text-xs ${meLikes[m.id] ? 'border-pink-400 bg-pink-400/20' : 'border-pink-300/30 bg-pink-300/10 hover:bg-pink-300/20'}`}
                       aria-label="Upvote"
                       title="Upvote"
                     >

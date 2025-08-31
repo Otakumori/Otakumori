@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSoundSettings } from './useSoundSettings';
 
@@ -45,7 +45,7 @@ export const useAudio = ({ src, volume = 1, loop = false }: UseAudioProps) => {
 
   const play = useCallback(() => {
     if (audioRef.current && audioLoaded && !isMuted) {
-      audioRef.current.play().catch(error => {
+      audioRef.current.play().catch((error) => {
         console.error('Error playing audio:', error);
       });
       setIsPlaying(true);
@@ -73,7 +73,7 @@ export const useAudio = ({ src, volume = 1, loop = false }: UseAudioProps) => {
         audioRef.current.volume = isMuted ? 0 : newVolume * globalVolume;
       }
     },
-    [globalVolume, isMuted]
+    [globalVolume, isMuted],
   );
 
   return { isPlaying, play, pause, stop, setVolume, audioLoaded };

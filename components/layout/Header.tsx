@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useState } from 'react';
@@ -31,7 +31,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden items-center space-x-8 md:flex">
-            {navItems.map(item => (
+            {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
@@ -82,7 +82,7 @@ export default function Header() {
               className="md:hidden"
             >
               <div className="space-y-1 px-2 pb-3 pt-2">
-                {navItems.map(item => (
+                {navItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}

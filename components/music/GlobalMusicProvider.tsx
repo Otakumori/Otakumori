@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 type Track = { id: string; title: string; artist: string; url: string };
 type Playlist = { id: string; name: string; tracks: Track[] };
@@ -24,7 +24,7 @@ const MusicCtx = createContext<Ctx | null>(null);
 
 export function useMusic() {
   const c = useContext(MusicCtx);
-  if (!c) throw new Error("useMusic must be used within GlobalMusicProvider");
+  if (!c) throw new Error('useMusic must be used within GlobalMusicProvider');
   return c;
 }
 
@@ -39,17 +39,17 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
   // Load localStorage values only on client side
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedVolume = localStorage.getItem("music:vol");
-      const savedOptIn = localStorage.getItem("music:optin");
+      const savedVolume = localStorage.getItem('music:vol');
+      const savedOptIn = localStorage.getItem('music:optin');
       if (savedVolume) setVolume(Number(savedVolume));
-      if (savedOptIn === "1") setOptIn(true);
+      if (savedOptIn === '1') setOptIn(true);
     }
   }, []);
 
   useEffect(() => {
-    fetch("/api/music/playlist", { cache: "no-store" })
-      .then(r => r.json())
-      .then(d => {
+    fetch('/api/music/playlist', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => {
         const pl = d?.playlist;
         if (pl && Array.isArray(pl.tracks) && pl.tracks.length > 0) {
           setPlaylist(pl);
@@ -61,12 +61,12 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("music:vol", String(volume));
+    localStorage.setItem('music:vol', String(volume));
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume]);
 
   useEffect(() => {
-    localStorage.setItem("music:optin", optIn ? "1" : "0");
+    localStorage.setItem('music:optin', optIn ? '1' : '0');
     if (!optIn && audioRef.current) {
       audioRef.current.pause();
       setPlaying(false);
@@ -77,13 +77,13 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
     const a = audioRef.current;
     if (!a) return;
     const onEnded = () => next();
-    a.addEventListener("ended", onEnded);
-    return () => a.removeEventListener("ended", onEnded);
+    a.addEventListener('ended', onEnded);
+    return () => a.removeEventListener('ended', onEnded);
   }, [current, playlist]);
 
   const src = useMemo(() => {
     const t = playlist?.tracks?.[current];
-    return t?.url ?? "";
+    return t?.url ?? '';
   }, [playlist, current]);
 
   const toggle = () => {
@@ -94,7 +94,9 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
       a.pause();
       setPlaying(false);
     } else {
-      a.play().then(() => setPlaying(true)).catch(() => {});
+      a.play()
+        .then(() => setPlaying(true))
+        .catch(() => {});
     }
   };
 
@@ -108,7 +110,9 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
   };
 
   return (
-    <MusicCtx.Provider value={{ playlist, current, playing, volume, setVolume, toggle, next, prev, optIn, setOptIn }}>
+    <MusicCtx.Provider
+      value={{ playlist, current, playing, volume, setVolume, toggle, next, prev, optIn, setOptIn }}
+    >
       {children}
       {/* Hidden audio element */}
       <audio ref={audioRef} src={src} preload="none" />

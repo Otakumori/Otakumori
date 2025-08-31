@@ -6,7 +6,9 @@ import { PetalHUD } from './PetalHUD';
 import { useEffect, useState } from 'react';
 
 export function HeroShrine() {
-  const [petals, setPetals] = useState<Array<{id: number, x: number, y: number, delay: number}>>([]);
+  const [petals, setPetals] = useState<Array<{ id: number; x: number; y: number; delay: number }>>(
+    [],
+  );
 
   // Generate flowing petals
   useEffect(() => {
@@ -14,7 +16,7 @@ export function HeroShrine() {
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      delay: Math.random() * 10
+      delay: Math.random() * 10,
     }));
     setPetals(newPetals);
   }, []);
@@ -30,13 +32,22 @@ export function HeroShrine() {
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,79,163,0.1)_1px,transparent_0)] bg-[length:50px_50px] animate-pulse-slow" />
         </div>
-        
+
         {/* Floating geometric shapes */}
         <div className="absolute inset-0">
           <div className="absolute left-10 top-20 h-32 w-32 animate-float rounded-full bg-otm-pink/10 blur-xl" />
-          <div className="absolute right-20 top-40 h-24 w-24 animate-float rounded-full bg-otm-rose/10 blur-xl" style={{ animationDelay: '2s' }} />
-          <div className="absolute left-1/3 bottom-1/4 h-20 w-20 animate-float rounded-full bg-otm-pink/5 blur-lg" style={{ animationDelay: '4s' }} />
-          <div className="absolute right-1/3 top-1/3 h-16 w-16 animate-float rounded-full bg-otm-rose/5 blur-lg" style={{ animationDelay: '6s' }} />
+          <div
+            className="absolute right-20 top-40 h-24 w-24 animate-float rounded-full bg-otm-rose/10 blur-xl"
+            style={{ animationDelay: '2s' }}
+          />
+          <div
+            className="absolute left-1/3 bottom-1/4 h-20 w-20 animate-float rounded-full bg-otm-pink/5 blur-lg"
+            style={{ animationDelay: '4s' }}
+          />
+          <div
+            className="absolute right-1/3 top-1/3 h-16 w-16 animate-float rounded-full bg-otm-rose/5 blur-lg"
+            style={{ animationDelay: '6s' }}
+          />
         </div>
       </div>
 
@@ -49,11 +60,12 @@ export function HeroShrine() {
             left: `${petal.x}%`,
             top: `${petal.y}%`,
             animationDelay: `${petal.delay}s`,
-            animationDuration: '8s'
+            animationDuration: '8s',
           }}
         >
-          <img 
-            src="/assets/images/petal1.png" 
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/images/petal1.png"
             alt="Cherry blossom petal"
             className="w-8 h-8 opacity-60"
           />
@@ -66,16 +78,17 @@ export function HeroShrine() {
         <div className="mb-8 relative">
           <div className="relative">
             {/* Cherry Tree Image */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/assets/images/CherryTree.png"
               alt="Cherry Blossom Tree"
               className="mx-auto max-w-2xl h-auto drop-shadow-2xl"
             />
-            
+
             {/* PS2 Overlay Effect */}
             <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-otm-pink/20 mix-blend-overlay" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,79,163,0.1)_0%,transparent_70%)]" />
-            
+
             {/* Scan lines effect */}
             <div className="absolute inset-0 opacity-30">
               <div className="h-full bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,79,163,0.1)_2px,rgba(255,79,163,0.1)_4px)]" />
@@ -106,12 +119,7 @@ export function HeroShrine() {
 
         {/* Petal HUD */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 transform">
-          <PetalHUD 
-            petalCount={0}
-            guestPetalCount={0}
-            guestCap={50}
-            isGuest={true}
-          />
+          <PetalHUD petalCount={0} guestPetalCount={0} guestCap={50} isGuest={true} />
         </div>
       </div>
 

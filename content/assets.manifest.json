@@ -1,0 +1,24 @@
+{
+  "og": {
+    "default": { "url": "/og/default-og.png", "alt": "Otakumori — Anime & Gaming Store" },
+    "productTemplate": { "url": "/og/product-og-template.png", "alt": "Product OG Template" }
+  },
+  "categories": {
+    "t-shirts": { "banner": { "url": "/banners/t-shirts.jpg", "alt": "T-Shirts" } },
+    "hoodies-sweatshirts": {
+      "banner": { "url": "/banners/hoodies-sweatshirts.jpg", "alt": "Hoodies & Sweatshirts" }
+    },
+    "long-sleeves": { "banner": { "url": "/banners/long-sleeves.jpg", "alt": "Long sleeves" } },
+    "tank-tops": { "banner": { "url": "/banners/tank-tops.jpg", "alt": "Tank tops" } },
+    "hats": { "banner": { "url": "/banners/hats.jpg", "alt": "Hats & beanies" } },
+    "stickers": { "banner": { "url": "/banners/stickers.jpg", "alt": "Stickers" } },
+    "posters": { "banner": { "url": "/banners/posters.jpg", "alt": "Posters" } },
+    "phone-cases": { "banner": { "url": "/banners/phone-cases.jpg", "alt": "Phone cases" } },
+    "mugs-drinkware": {
+      "banner": { "url": "/banners/mugs-drinkware.jpg", "alt": "Mugs & drinkware" }
+    },
+    "bags": { "banner": { "url": "/banners/bags.jpg", "alt": "Bags & totes" } },
+    "accessories": { "banner": { "url": "/banners/accessories.jpg", "alt": "Accessories" } },
+    "home-living": { "banner": { "url": "/banners/home-living.jpg", "alt": "Home & living" } }
+  }
+}

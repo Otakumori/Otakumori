@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { create } from 'zustand';
 
 interface User {
@@ -18,12 +18,12 @@ interface UserStoreState {
   updateAvatar: (avatar: string) => void;
 }
 
-export const useUserStore = create<UserStoreState>(set => ({
+export const useUserStore = create<UserStoreState>((set) => ({
   user: null,
-  setUser: user => set({ user }),
+  setUser: (user) => set({ user }),
   clearUser: () => set({ user: null }),
-  updateAvatar: avatar =>
-    set(state => ({
+  updateAvatar: (avatar) =>
+    set((state) => ({
       user: state.user ? { ...state.user, avatar } : null,
     })),
 }));

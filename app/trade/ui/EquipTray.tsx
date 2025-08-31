@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -104,8 +104,8 @@ export default function EquipTray() {
           >
             <div className="w-12 h-12 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-lg flex items-center justify-center">
               {equippedState.frame.imageUrl ? (
-                <img 
-                  src={equippedState.frame.imageUrl} 
+                <img
+                  src={equippedState.frame.imageUrl}
                   alt={equippedState.frame.name}
                   className="w-8 h-8 object-contain"
                 />
@@ -116,7 +116,9 @@ export default function EquipTray() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-medium text-white">{equippedState.frame.name}</span>
-                <span className={`text-xs px-2 py-1 rounded-full border ${getRarityColor(equippedState.frame.rarity)}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full border ${getRarityColor(equippedState.frame.rarity)}`}
+                >
                   {getRarityIcon(equippedState.frame.rarity)}
                 </span>
               </div>
@@ -135,8 +137,8 @@ export default function EquipTray() {
           >
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg flex items-center justify-center">
               {equippedState.overlay.imageUrl ? (
-                <img 
-                  src={equippedState.overlay.imageUrl} 
+                <img
+                  src={equippedState.overlay.imageUrl}
                   alt={equippedState.overlay.name}
                   className="w-8 h-8 object-contain"
                 />
@@ -147,7 +149,9 @@ export default function EquipTray() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-medium text-white">{equippedState.overlay.name}</span>
-                <span className={`text-xs px-2 py-1 rounded-full border ${getRarityColor(equippedState.overlay.rarity)}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full border ${getRarityColor(equippedState.overlay.rarity)}`}
+                >
                   {getRarityIcon(equippedState.overlay.rarity)}
                 </span>
               </div>
@@ -170,7 +174,9 @@ export default function EquipTray() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-medium text-white">{equippedState.title.name}</span>
-                <span className={`text-xs px-2 py-1 rounded-full border ${getRarityColor(equippedState.title.rarity)}`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full border ${getRarityColor(equippedState.title.rarity)}`}
+                >
                   {getRarityIcon(equippedState.title.rarity)}
                 </span>
               </div>
@@ -199,7 +205,9 @@ export default function EquipTray() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-white truncate">{badge.name}</div>
-                    <span className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(badge.rarity)}`}>
+                    <span
+                      className={`text-xs px-1 py-0.5 rounded border ${getRarityColor(badge.rarity)}`}
+                    >
                       {getRarityIcon(badge.rarity)}
                     </span>
                   </div>
@@ -210,17 +218,20 @@ export default function EquipTray() {
         )}
 
         {/* No items equipped */}
-        {!equippedState?.frame && !equippedState?.overlay && !equippedState?.title && (!equippedState?.badges || equippedState.badges.length === 0) && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-8 text-neutral-500"
-          >
-            <div className="text-4xl mb-3">🎭</div>
-            <p className="text-sm">No items equipped yet</p>
-            <p className="text-xs text-neutral-600 mt-1">Visit the petal store to get started!</p>
-          </motion.div>
-        )}
+        {!equippedState?.frame &&
+          !equippedState?.overlay &&
+          !equippedState?.title &&
+          (!equippedState?.badges || equippedState.badges.length === 0) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-8 text-neutral-500"
+            >
+              <div className="text-4xl mb-3">🎭</div>
+              <p className="text-sm">No items equipped yet</p>
+              <p className="text-xs text-neutral-600 mt-1">Visit the petal store to get started!</p>
+            </motion.div>
+          )}
       </div>
 
       {/* Preview Button */}

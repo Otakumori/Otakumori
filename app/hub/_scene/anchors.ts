@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { create } from "zustand";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { create } from 'zustand';
 
-export type AnchorKey = "games" | "trade" | "avatar" | "music" | "drawerTop" | "drawerBottom";
+export type AnchorKey = 'games' | 'trade' | 'avatar' | 'music' | 'drawerTop' | 'drawerBottom';
 export type Pt = { x: number; y: number; visible: boolean };
 
 type AnchorState = {
@@ -14,6 +14,10 @@ type AnchorState = {
 
 export const useAnchors = create<AnchorState>((set) => ({
   anchors: {},
-  setAnchor(k, pt) { set(s => ({ anchors: { ...s.anchors, [k]: pt } })); },
-  setMany(m) { set(s => ({ anchors: { ...s.anchors, ...m } })); }
+  setAnchor(k, pt) {
+    set((s) => ({ anchors: { ...s.anchors, [k]: pt } }));
+  },
+  setMany(m) {
+    set((s) => ({ anchors: { ...s.anchors, ...m } }));
+  },
 }));

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
@@ -45,7 +45,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   const addToast = (toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
     const newToast = { ...toast, id };
-    setToasts(prev => [...prev, newToast]);
+    setToasts((prev) => [...prev, newToast]);
 
     // Auto-dismiss after duration
     if (toast.duration !== 0) {
@@ -56,7 +56,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   };
 
   const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   };
 
   const clearToasts = () => {
@@ -78,7 +78,7 @@ function ToastContainer() {
 
   return (
     <div className="fixed right-4 top-4 z-50 max-w-sm space-y-2">
-      {toasts.map(toast => (
+      {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
       ))}
     </div>
@@ -134,13 +134,13 @@ function ToastItem({ toast, onRemove }: ToastItemProps) {
     <div
       className={cn(
         'transform transition-all duration-300 ease-in-out',
-        isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+        isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0',
       )}
     >
       <div
         className={cn(
           'flex items-start gap-3 rounded-lg border p-4 shadow-lg backdrop-blur-sm',
-          getStyles()
+          getStyles(),
         )}
       >
         {getIcon()}

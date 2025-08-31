@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { db } from '@/lib/db';
 import {
   type CanonicalRuneId,
@@ -76,7 +76,7 @@ async function getAvailableRunesForGacha(): Promise<RuneDef[]> {
 
   // Return runes that have no UPCs assigned yet
   return runeDefs.filter(
-    (r: RuneDef) => r.isActive && (!r.printifyUPCs || r.printifyUPCs.length === 0)
+    (r: RuneDef) => r.isActive && (!r.printifyUPCs || r.printifyUPCs.length === 0),
   );
 }
 
@@ -137,7 +137,7 @@ export async function grantPetalsForOrder({
         amountGrantedNow: 0,
       },
       newTotal: 0, // Will be calculated below
-      runes: userRunes.map(ur => ur.rune.canonicalId as CanonicalRuneId),
+      runes: userRunes.map((ur) => ur.rune.canonicalId as CanonicalRuneId),
       combos: [],
     };
   }
@@ -180,7 +180,7 @@ export async function grantPetalsForOrder({
     const streakDays = await calculateStreakDays(userId);
     const streakMultiplier = Math.min(
       streakDays * rewardsConfig.streak.dailyBonusPct,
-      rewardsConfig.streak.maxPct
+      rewardsConfig.streak.maxPct,
     );
     streakBonus = Math.round(rawPetals * streakMultiplier);
   }
@@ -196,8 +196,8 @@ export async function grantPetalsForOrder({
 
   // Map UPCs to runes
   const upcs = lineItems
-    .filter(item => item.upc)
-    .map(item => item.upc!)
+    .filter((item) => item.upc)
+    .map((item) => item.upc!)
     .filter((upc, index, arr) => arr.indexOf(upc) === index); // Remove duplicates
 
   const runes = await mapUPCsToRunes(upcs);
@@ -284,7 +284,7 @@ async function calculateStreakDays(userId: string): Promise<number> {
 async function applyDailyCaps(
   userId: string,
   requestedPetals: number,
-  rewardsConfig: RewardsConfig
+  rewardsConfig: RewardsConfig,
 ): Promise<{ granted: number; hitSoftCap: boolean; hitHardCap: boolean }> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -329,7 +329,7 @@ async function applyDailyCaps(
  */
 async function checkComboCompletions(
   userId: string,
-  newRunes: CanonicalRuneId[]
+  newRunes: CanonicalRuneId[],
 ): Promise<RuneComboDef[]> {
   const siteConfig = await db.siteConfig.findUnique({
     where: { id: 'singleton' },
@@ -351,7 +351,7 @@ async function checkComboCompletions(
       include: { rune: true },
     });
 
-    const userRuneIds = userRunes.map(ur => ur.rune.canonicalId);
+    const userRuneIds = userRunes.map((ur) => ur.rune.canonicalId);
     const allUserRunes = [...userRuneIds, ...newRunes];
 
     // Check if combo is completed

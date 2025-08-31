@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useFriendSystemStore, Friend } from '@/lib/store/friendSystemStore';
@@ -51,7 +51,7 @@ export const FriendActivity: React.FC = () => {
         <div className="animate-pulse">
           <div className="mb-4 h-4 w-1/4 rounded bg-gray-200"></div>
           <div className="space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-10 rounded bg-gray-200"></div>
             ))}
           </div>

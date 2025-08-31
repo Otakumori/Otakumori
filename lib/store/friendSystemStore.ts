@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { create } from 'zustand';
 
 export interface Friend {
@@ -18,18 +18,18 @@ interface FriendSystemState {
   updateFriendStatus: (friendId: string, status: Friend['status']) => void;
 }
 
-export const useFriendSystemStore = create<FriendSystemState>(set => ({
+export const useFriendSystemStore = create<FriendSystemState>((set) => ({
   friends: [],
-  addFriend: friend =>
-    set(state => ({
+  addFriend: (friend) =>
+    set((state) => ({
       friends: [...state.friends, friend],
     })),
-  removeFriend: friendId =>
-    set(state => ({
-      friends: state.friends.filter(f => f.id !== friendId),
+  removeFriend: (friendId) =>
+    set((state) => ({
+      friends: state.friends.filter((f) => f.id !== friendId),
     })),
   updateFriendStatus: (friendId, status) =>
-    set(state => ({
-      friends: state.friends.map(f => (f.id === friendId ? { ...f, status } : f)),
+    set((state) => ({
+      friends: state.friends.map((f) => (f.id === friendId ? { ...f, status } : f)),
     })),
 }));

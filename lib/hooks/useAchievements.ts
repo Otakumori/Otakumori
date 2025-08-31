@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { useState } from 'react';
 import { achievements as allAchievements } from '@/data/achievements';
 import { Achievement } from '@/app/types/achievements';
@@ -9,21 +9,35 @@ export function useAchievements() {
   const [achievements, setAchievements] = useState<Achievement[]>(allAchievements);
 
   const unlock = (id: string) => {
-    setAchievements(prev =>
-      prev.map(a => (a.id === id ? { ...a, isUnlocked: true, unlockedAt: new Date().toISOString() } : a))
+    setAchievements((prev) =>
+      prev.map((a) =>
+        a.id === id ? { ...a, isUnlocked: true, unlockedAt: new Date().toISOString() } : a,
+      ),
     );
   };
 
   const unlockAchievement = (id: string) => {
-    setAchievements(prev =>
-      prev.map(a => (a.id === id ? { ...a, isUnlocked: true, unlockedAt: new Date().toISOString() } : a))
+    setAchievements((prev) =>
+      prev.map((a) =>
+        a.id === id ? { ...a, isUnlocked: true, unlockedAt: new Date().toISOString() } : a,
+      ),
     );
   };
 
   // Check achievements for petals, profile, shopping, comments, lore, etc.
   const checkAchievements = (context: any) => {
     // Example: context = { petalCount, profileComplete, purchaseCount, commentCount, loreReadCount, ... }
-    const { petalCount, profileComplete, purchaseCount, commentCount, loreReadCount, avatarUploaded, dailyVisits, eventParticipation, easterEggsFound } = context;
+    const {
+      petalCount,
+      profileComplete,
+      purchaseCount,
+      commentCount,
+      loreReadCount,
+      avatarUploaded,
+      dailyVisits,
+      eventParticipation,
+      easterEggsFound,
+    } = context;
 
     // Petal collection achievements (example IDs, update as needed)
     if (petalCount !== undefined) {

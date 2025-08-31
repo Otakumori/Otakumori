@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -8,11 +8,14 @@ import { env } from '@/env.mjs';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { CartProvider } from '../components/cart/CartProvider';
 import { PetalProvider } from '../providers';
+import { WorldProvider } from './world/WorldProvider';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
 import DockedGacha from '../components/DockedGacha';
-import { NavBar } from '../components/NavBar';
+import Navbar from '../app/components/layout/Navbar';
+import BackdropAbyssMystique from '../components/BackdropAbyssMystique';
+import QuakeHUD from './components/hud/QuakeHUD';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,13 +40,19 @@ export const metadata: Metadata = {
     title: 'Otaku-Mori ❤︎',
     description: 'Welcome to Otaku-Mori, where anime and gaming <co-exist>!',
   },
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#ec4899',
   manifest: '/manifest.json',
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+};
+
+export const viewport = {
+  themeColor: '#ec4899',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 // Boot logging for Clerk instance detection
@@ -83,17 +92,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           >
-            <PetalProvider>
-              <CartProvider>
-                <GlobalMusicProvider>
-                  <NavBar />
-                  {children}
-                  <GlobalMusicBar />
-                  <SoapstoneDock />
-                  <DockedGacha />
-                </GlobalMusicProvider>
-              </CartProvider>
-            </PetalProvider>
+            <WorldProvider>
+              <PetalProvider>
+                <CartProvider>
+                  <GlobalMusicProvider>
+                    {/* Site-wide background (fixed, behind everything) */}
+                    <BackdropAbyssMystique />
+                    {/* Navigation */}
+                    <Navbar />
+                    {children}
+                    <GlobalMusicBar />
+                    <SoapstoneDock />
+                    <DockedGacha />
+                    <QuakeHUD />
+                  </GlobalMusicProvider>
+                </CartProvider>
+              </PetalProvider>
+            </WorldProvider>
           </ClerkProvider>
         </ErrorBoundary>
       </body>

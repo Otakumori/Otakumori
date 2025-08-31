@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function PetalClicker() {
   const [score, setScore] = useState(0);
@@ -13,7 +13,7 @@ export default function PetalClicker() {
         <h1 className="text-4xl font-bold mb-4">Petal Clicker</h1>
         <p className="text-xl mb-8">Click to collect petals.</p>
         <div className="text-2xl mb-4">Score: {score}</div>
-        <button 
+        <button
           className="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-lg font-bold"
           onClick={() => setScore(score + 1)}
         >

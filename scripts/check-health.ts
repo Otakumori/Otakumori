@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { monitor } from '../lib/monitor';
 import { logger } from '../app/lib/logger';
 
@@ -59,7 +59,9 @@ async function checkHealth() {
 
     logger.info('Health check completed successfully');
   } catch (error) {
-    logger.error('Error checking system health', { extra: { error: error instanceof Error ? error.message : String(error) } });
+    logger.error('Error checking system health', {
+      extra: { error: error instanceof Error ? error.message : String(error) },
+    });
   }
 }
 
@@ -67,7 +69,9 @@ async function checkHealth() {
 setInterval(checkHealth, 5 * 60 * 1000);
 
 // Initial health check
-checkHealth().catch(error => {
-  logger.error('Failed to perform initial health check', { extra: { error: error instanceof Error ? error.message : String(error) } });
+checkHealth().catch((error) => {
+  logger.error('Failed to perform initial health check', {
+    extra: { error: error instanceof Error ? error.message : String(error) },
+  });
   process.exit(1);
 });

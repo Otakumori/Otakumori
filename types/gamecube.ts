@@ -1,31 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-export type FaceKey = 
-  | "top-petal-store"
-  | "top-trade" 
-  | "left-games" 
-  | "right-community" 
-  | "down-music" 
-  | "front-about";
+/* eslint-disable-line @next/next/no-img-element */
+export type FaceKey =
+  | 'top-petal-store'
+  | 'top-trade'
+  | 'left-games'
+  | 'right-community'
+  | 'down-music'
+  | 'front-about';
 
-export type FaceType = "store" | "trade" | "games" | "community" | "music" | "about";
+export type FaceType = 'store' | 'trade' | 'games' | 'community' | 'music' | 'about';
 
-export type GameKey = 
-  | "samurai_petal_slice"
-  | "anime_memory_match"
-  | "bubble_pop_gacha"
-  | "rhythm_beat_em_up"
-  | "waifu_trials"
-  | "otaku_memo"
-  | "petal_clicker"
-  | "shadow_path";
+export type GameKey =
+  | 'samurai_petal_slice'
+  | 'anime_memory_match'
+  | 'bubble_pop_gacha'
+  | 'rhythm_beat_em_up'
+  | 'waifu_trials'
+  | 'otaku_memo'
+  | 'petal_clicker'
+  | 'shadow_path';
 
 export interface CubeFace {
   slot: 0 | 1 | 2 | 3 | 4 | 5;
   key: FaceKey;
   type: FaceType;
   label: string;
-  slug: "petal-store" | "trade" | "mini-games" | "community" | "music" | "about";
+  slug: 'petal-store' | 'trade' | 'mini-games' | 'community' | 'music' | 'about';
   enabled: boolean;
   faceTooltip?: string;
 }

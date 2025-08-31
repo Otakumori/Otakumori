@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-export type AssetType = "image" | "audio" | "video" | "font" | "shader" | "zip" | "other";
+/* eslint-disable-line @next/next/no-img-element */
+export type AssetType = 'image' | 'audio' | 'video' | 'font' | 'shader' | 'zip' | 'other';
 
 export interface AssetConfigItem {
   id: string;
@@ -17,7 +17,7 @@ export interface AssetConfigItem {
 
 export interface AssetRecord {
   id: string;
-  type: AssetType | "game";
+  type: AssetType | 'game';
   src: string;
   file: string;
   license?: string;

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const fs = require('fs');
 const path = require('path');
 const { createGzip } = require('zlib');
@@ -43,7 +43,7 @@ async function rotateLogs() {
     }
 
     // Remove old compressed logs
-    const compressedFiles = files.filter(file => file.endsWith('.gz'));
+    const compressedFiles = files.filter((file) => file.endsWith('.gz'));
     for (const file of compressedFiles) {
       const filePath = path.join(LOGS_DIR, file);
       const stats = fs.statSync(filePath);
@@ -63,7 +63,7 @@ async function rotateLogs() {
 }
 
 // Run log rotation
-rotateLogs().catch(error => {
+rotateLogs().catch((error) => {
   logger.error('Failed to rotate logs', { error });
   process.exit(1);
 });

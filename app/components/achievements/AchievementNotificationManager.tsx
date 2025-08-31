@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
@@ -14,7 +14,7 @@ export const AchievementNotificationManager: React.FC = () => {
 
   useEffect(() => {
     const handleAchievementUnlock = (achievement: Achievement) => {
-      setNotifications(prev => [...prev, achievement]);
+      setNotifications((prev) => [...prev, achievement]);
       achievementSoundInstance.play();
     };
 
@@ -31,13 +31,13 @@ export const AchievementNotificationManager: React.FC = () => {
   }, [achievements]);
 
   const handleClose = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col space-y-4">
       <AnimatePresence>
-        {notifications.map(achievement => (
+        {notifications.map((achievement) => (
           <AchievementNotification
             key={achievement.id}
             achievement={achievement}

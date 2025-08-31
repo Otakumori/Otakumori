@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import Image from 'next/image';
@@ -167,7 +167,7 @@ export default function Footer() {
         <div className="flex flex-col items-center gap-4">
           <FooterNewsletterForm />
           <nav className="mt-2 flex flex-wrap justify-center gap-4">
-            {navLinks.map(link => (
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

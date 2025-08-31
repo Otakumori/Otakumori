@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const cron = require('node-cron');
 const { spawn } = require('child_process');
 const path = require('path');
@@ -17,11 +17,11 @@ cron.schedule('0 0 * * *', () => {
     },
   });
 
-  rotateLogs.on('error', error => {
+  rotateLogs.on('error', (error) => {
     logger.error('Failed to start log rotation:', error);
   });
 
-  rotateLogs.on('exit', code => {
+  rotateLogs.on('exit', (code) => {
     if (code !== 0) {
       logger.error(`Log rotation exited with code ${code}`);
     } else {

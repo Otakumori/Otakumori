@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -12,21 +12,18 @@ export async function GET() {
     // Check if Clerk is properly configured
     if (!env.CLERK_SECRET_KEY) {
       return NextResponse.json(
-        { 
+        {
           error: 'Clerk not configured',
-          message: 'Please set CLERK_SECRET_KEY in your environment variables'
+          message: 'Please set CLERK_SECRET_KEY in your environment variables',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // TODO: Fetch user profile from your database
@@ -44,14 +41,11 @@ export async function GET() {
 
     return NextResponse.json({
       user: userProfile,
-      message: 'Profile retrieved successfully'
+      message: 'Profile retrieved successfully',
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -60,21 +54,18 @@ export async function PUT(request: NextRequest) {
     // Check if Clerk is properly configured
     if (!env.CLERK_SECRET_KEY) {
       return NextResponse.json(
-        { 
+        {
           error: 'Clerk not configured',
-          message: 'Please set CLERK_SECRET_KEY in your environment variables'
+          message: 'Please set CLERK_SECRET_KEY in your environment variables',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const { userId } = auth();
-    
+
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -94,13 +85,10 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       user: updatedProfile,
-      message: 'Profile updated successfully'
+      message: 'Profile updated successfully',
     });
   } catch (error) {
     console.error('Error updating user profile:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

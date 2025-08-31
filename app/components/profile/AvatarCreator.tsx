@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React, { useState } from 'react';
 
 // Placeholder SVG layers for demo
@@ -45,7 +45,7 @@ export const AvatarCreator: React.FC = () => {
   const [ageVerified, setAgeVerified] = useState(false);
 
   const handleSlider = (key: keyof AvatarState, value: any) => {
-    setAvatar(prev => ({ ...prev, [key]: value }));
+    setAvatar((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleAgeCheck = () => {
@@ -92,7 +92,7 @@ export const AvatarCreator: React.FC = () => {
           <input
             type="color"
             value={avatar.bodyColor}
-            onChange={e => handleSlider('bodyColor', e.target.value)}
+            onChange={(e) => handleSlider('bodyColor', e.target.value)}
             className="ml-2"
           />
         </label>
@@ -101,7 +101,7 @@ export const AvatarCreator: React.FC = () => {
           <input
             type="color"
             value={avatar.hairColor}
-            onChange={e => handleSlider('hairColor', e.target.value)}
+            onChange={(e) => handleSlider('hairColor', e.target.value)}
             className="ml-2"
           />
         </label>
@@ -109,7 +109,7 @@ export const AvatarCreator: React.FC = () => {
           Hair Style
           <select
             value={avatar.hairStyle}
-            onChange={e => handleSlider('hairStyle', e.target.value as 'short' | 'long')}
+            onChange={(e) => handleSlider('hairStyle', e.target.value as 'short' | 'long')}
             className="ml-2 rounded bg-pink-400/10 text-pink-100"
           >
             <option value="short">Short</option>
@@ -121,7 +121,7 @@ export const AvatarCreator: React.FC = () => {
           <input
             type="color"
             value={avatar.eyeColor}
-            onChange={e => handleSlider('eyeColor', e.target.value)}
+            onChange={(e) => handleSlider('eyeColor', e.target.value)}
             className="ml-2"
           />
         </label>
@@ -129,7 +129,7 @@ export const AvatarCreator: React.FC = () => {
           Outfit
           <select
             value={avatar.outfit}
-            onChange={e => handleSlider('outfit', e.target.value as 'dress' | 'nude')}
+            onChange={(e) => handleSlider('outfit', e.target.value as 'dress' | 'nude')}
             className="ml-2 rounded bg-pink-400/10 text-pink-100"
             disabled={!avatar.nsfw}
           >
@@ -144,7 +144,7 @@ export const AvatarCreator: React.FC = () => {
               type="number"
               placeholder="Age"
               value={age}
-              onChange={e => setAge(e.target.value)}
+              onChange={(e) => setAge(e.target.value)}
               className="w-16 rounded bg-pink-400/10 px-2 text-pink-100"
             />
             <button
@@ -154,7 +154,7 @@ export const AvatarCreator: React.FC = () => {
               Verify Age
             </button>
             <button
-              onClick={() => setAvatar(a => ({ ...a, nsfw: ageVerified }))}
+              onClick={() => setAvatar((a) => ({ ...a, nsfw: ageVerified }))}
               disabled={!ageVerified}
               className="rounded bg-pink-400/20 px-2 py-1 text-pink-100 transition hover:bg-pink-400/40 disabled:opacity-50"
             >
@@ -163,7 +163,7 @@ export const AvatarCreator: React.FC = () => {
           </div>
         ) : (
           <button
-            onClick={() => setAvatar(a => ({ ...a, nsfw: false, outfit: 'dress' }))}
+            onClick={() => setAvatar((a) => ({ ...a, nsfw: false, outfit: 'dress' }))}
             className="rounded bg-pink-400/20 px-2 py-1 text-pink-100 transition hover:bg-pink-400/40"
           >
             Disable NSFW

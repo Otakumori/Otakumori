@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -54,7 +54,7 @@ export default function Shop() {
   const filteredProducts =
     selectedCategory === 'all'
       ? products
-      : products.filter(product => product.category === selectedCategory);
+      : products.filter((product) => product.category === selectedCategory);
 
   if (error) {
     return (
@@ -70,7 +70,7 @@ export default function Shop() {
 
       {/* Category Navigation */}
       <div className="mt-8 flex flex-wrap justify-center gap-4">
-        {categories.map(category => (
+        {categories.map((category) => (
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
@@ -89,7 +89,7 @@ export default function Shop() {
         <div className="mt-8 text-center text-white">Loading products...</div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map(product => (
+          {filteredProducts.map((product) => (
             <div
               key={product.id}
               className="group relative overflow-hidden rounded-lg bg-gray-800 transition hover:shadow-lg"

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { Suspense } from 'react';
 import BlogIndex from './BlogIndex';
 
@@ -13,12 +13,14 @@ export default function BlogPage() {
             Discover the latest insights, stories, and community highlights
           </p>
         </div>
-        
-        <Suspense fallback={
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-          </div>
-        }>
+
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+            </div>
+          }
+        >
           <BlogIndex />
         </Suspense>
       </div>

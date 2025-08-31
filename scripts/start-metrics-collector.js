@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -12,12 +12,12 @@ const collector = spawn('ts-node', [path.join(__dirname, 'collect-metrics.ts')],
   },
 });
 
-collector.on('error', error => {
+collector.on('error', (error) => {
   console.error('Failed to start metrics collector:', error);
   process.exit(1);
 });
 
-collector.on('exit', code => {
+collector.on('exit', (code) => {
   if (code !== 0) {
     console.error(`Metrics collector exited with code ${code}`);
     process.exit(code);

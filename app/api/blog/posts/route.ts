@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published') !== 'false'; // Default to true
 
     const where: any = {};
-    
+
     if (published) {
       where.published = true;
     }
@@ -49,4 +49,4 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching blog posts:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

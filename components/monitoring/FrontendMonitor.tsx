@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useEffect, useState } from 'react';
 import { monitor } from '@/lib/monitor';
@@ -29,7 +29,7 @@ export function FrontendMonitor() {
     const collectFrontendMetrics = async () => {
       // Get performance metrics
       const performanceMetrics = performance.getEntriesByType(
-        'navigation'
+        'navigation',
       )[0] as PerformanceNavigationTiming;
       const memory = (performance as any).memory;
       const domNodes = document.getElementsByTagName('*').length;

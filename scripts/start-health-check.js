@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -12,12 +12,12 @@ const healthChecker = spawn('ts-node', [path.join(__dirname, 'check-health.ts')]
   },
 });
 
-healthChecker.on('error', error => {
+healthChecker.on('error', (error) => {
   console.error('Failed to start health checker:', error);
   process.exit(1);
 });
 
-healthChecker.on('exit', code => {
+healthChecker.on('exit', (code) => {
   if (code !== 0) {
     console.error(`Health checker exited with code ${code}`);
     process.exit(code);

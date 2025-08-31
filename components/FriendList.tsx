@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,11 +15,11 @@ export const FriendList = () => {
   const { playSound } = useSound();
   const { vibrate } = useHaptic();
 
-  const filteredFriends = friends.filter(friend =>
-    friend.username.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFriends = friends.filter((friend) =>
+    friend.username.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const pendingRequests = friendRequests.filter(request => request.status === 'pending');
+  const pendingRequests = friendRequests.filter((request) => request.status === 'pending');
 
   const handleAcceptRequest = (requestId: string) => {
     acceptFriendRequest(requestId);
@@ -71,7 +71,7 @@ export const FriendList = () => {
           placeholder="Search friends..."
           className="w-full rounded-lg bg-white/20 px-4 py-2 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
 
@@ -84,7 +84,7 @@ export const FriendList = () => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-2"
           >
-            {filteredFriends.map(friend => (
+            {filteredFriends.map((friend) => (
               <motion.div
                 key={friend.id}
                 layout
@@ -131,7 +131,7 @@ export const FriendList = () => {
             exit={{ opacity: 0, y: -20 }}
             className="space-y-2"
           >
-            {pendingRequests.map(request => (
+            {pendingRequests.map((request) => (
               <motion.div
                 key={request.id}
                 layout

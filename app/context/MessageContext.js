@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -28,7 +28,7 @@ export function MessageProvider({ children }) {
     loadMessages();
   }, []);
 
-  const addMessage = async message => {
+  const addMessage = async (message) => {
     try {
       const response = await fetch('/api/messages', {
         method: 'POST',
@@ -43,7 +43,7 @@ export function MessageProvider({ children }) {
       }
 
       const newMessage = await response.json();
-      setMessages(prev => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]);
       return newMessage;
     } catch (error) {
       console.error('Error adding message:', error);

@@ -1,24 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { prisma } from '../../../lib/prisma';
 
 export async function getChatMessages(limit = 50) {
   try {
     const messages = await prisma.chatMessage.findMany({
       where: { isActive: true },
-      include: { 
+      include: {
         author: {
           select: {
             id: true,
             username: true,
-            avatarUrl: true
-          }
-        }
+            avatarUrl: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
-      take: limit
+      take: limit,
     });
-    
+
     return messages;
   } catch (error) {
     console.error('Error fetching chat messages:', error);
@@ -32,19 +32,19 @@ export async function sendChatMessage(userId, content) {
       data: {
         authorId: userId,
         content,
-        isActive: true
+        isActive: true,
       },
       include: {
         author: {
           select: {
             id: true,
             username: true,
-            avatarUrl: true
-          }
-        }
-      }
+            avatarUrl: true,
+          },
+        },
+      },
     });
-    
+
     return message;
   } catch (error) {
     console.error('Error sending chat message:', error);
@@ -64,22 +64,22 @@ export async function deleteChatMessage(messageId, userId) {
     // First check if the user is the author of the message
     const message = await prisma.chatMessage.findUnique({
       where: { id: messageId },
-      select: { authorId: true }
+      select: { authorId: true },
     });
-    
+
     if (!message) {
       throw new Error('Message not found');
     }
-    
+
     if (message.authorId !== userId) {
       throw new Error('Unauthorized to delete this message');
     }
-    
+
     await prisma.chatMessage.update({
       where: { id: messageId },
-      data: { isActive: false }
+      data: { isActive: false },
     });
-    
+
     return true;
   } catch (error) {
     console.error('Error deleting chat message:', error);
@@ -96,10 +96,10 @@ export async function reportChatMessage(messageId, userId, reason) {
         contentType: 'chat_message',
         contentId: messageId,
         reason,
-        status: 'pending'
-      }
+        status: 'pending',
+      },
     });
-    
+
     return true;
   } catch (error) {
     console.error('Error reporting chat message:', error);
@@ -113,9 +113,9 @@ export async function moderateChatMessage(messageId, action, moderatorId) {
     // Check if moderator is admin
     const moderator = await prisma.user.findUnique({
       where: { id: moderatorId },
-      select: { isAdmin: true }
+      select: { isAdmin: true },
     });
-    
+
     if (!moderator?.isAdmin) {
       throw new Error('Unauthorized: Only admins can moderate messages');
     }
@@ -124,36 +124,36 @@ export async function moderateChatMessage(messageId, action, moderatorId) {
       case 'delete':
         await prisma.chatMessage.update({
           where: { id: messageId },
-          data: { isActive: false }
+          data: { isActive: false },
         });
         break;
-        
+
       case 'warn':
         // Get the message author
         const message = await prisma.chatMessage.findUnique({
           where: { id: messageId },
-          select: { authorId: true }
+          select: { authorId: true },
         });
-        
+
         if (message) {
           await prisma.userWarning.create({
             data: {
               userId: message.authorId,
               moderatorId: moderatorId,
               reason: 'Inappropriate chat message',
-              severity: 'low'
-            }
+              severity: 'low',
+            },
           });
         }
         break;
-        
+
       case 'ban':
         // Get the message author
         const banMessage = await prisma.chatMessage.findUnique({
           where: { id: messageId },
-          select: { authorId: true }
+          select: { authorId: true },
         });
-        
+
         if (banMessage) {
           await prisma.userBan.create({
             data: {
@@ -161,12 +161,12 @@ export async function moderateChatMessage(messageId, action, moderatorId) {
               moderatorId: moderatorId,
               reason: 'Severe chat violation',
               duration: '7 days',
-              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
-            }
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+            },
           });
         }
         break;
-        
+
       default:
         throw new Error('Invalid moderation action');
     }
@@ -184,32 +184,29 @@ export async function getUserWarnings(userId, requesterId) {
     // Check if requester is admin
     const requester = await prisma.user.findUnique({
       where: { id: requesterId },
-      select: { isAdmin: true }
+      select: { isAdmin: true },
     });
-    
+
     if (!requester?.isAdmin) {
       throw new Error('Unauthorized: Only admins can view user warnings');
     }
 
     const warnings = await prisma.userWarning.findMany({
-      where: { 
+      where: {
         userId,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } }
-        ]
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
       include: {
         moderator: {
           select: {
             id: true,
-            username: true
-          }
-        }
+            username: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
-    
+
     return warnings;
   } catch (error) {
     console.error('Error fetching user warnings:', error);
@@ -221,24 +218,21 @@ export async function getUserWarnings(userId, requesterId) {
 export async function getUserBanStatus(userId) {
   try {
     const activeBan = await prisma.userBan.findFirst({
-      where: { 
+      where: {
         userId,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } }
-        ]
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
       },
       include: {
         moderator: {
           select: {
             id: true,
-            username: true
-          }
-        }
+            username: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
-    
+
     return activeBan;
   } catch (error) {
     console.error('Error fetching user ban status:', error);
@@ -252,9 +246,9 @@ export async function getActiveReports(requesterId) {
     // Check if requester is admin
     const requester = await prisma.user.findUnique({
       where: { id: requesterId },
-      select: { isAdmin: true }
+      select: { isAdmin: true },
     });
-    
+
     if (!requester?.isAdmin) {
       throw new Error('Unauthorized: Only admins can view reports');
     }
@@ -265,13 +259,13 @@ export async function getActiveReports(requesterId) {
         reporter: {
           select: {
             id: true,
-            username: true
-          }
-        }
+            username: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
-    
+
     return reports;
   } catch (error) {
     console.error('Error fetching active reports:', error);

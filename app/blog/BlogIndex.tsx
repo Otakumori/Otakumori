@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ export default function BlogIndex() {
         if (!response.ok) {
           throw new Error('Failed to fetch blog posts');
         }
-        
+
         const result = await response.json();
         setPosts(result.data || []);
       } catch (err) {
@@ -56,7 +56,7 @@ export default function BlogIndex() {
     return (
       <div className="text-center py-12">
         <div className="text-red-400 mb-4">Error: {error}</div>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
         >
@@ -78,7 +78,10 @@ export default function BlogIndex() {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {posts.map((post) => (
-        <article key={post.id} className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:border-pink-400/30 transition-all duration-300 hover:scale-105">
+        <article
+          key={post.id}
+          className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 hover:border-pink-400/30 transition-all duration-300 hover:scale-105"
+        >
           <Link href={`/blog/${post.slug}`} className="block p-6 h-full">
             <div className="mb-4">
               {post.category && (
@@ -87,27 +90,17 @@ export default function BlogIndex() {
                 </span>
               )}
             </div>
-            
-            <h2 className="text-xl font-semibold text-white mb-3 line-clamp-2">
-              {post.title}
-            </h2>
-            
+
+            <h2 className="text-xl font-semibold text-white mb-3 line-clamp-2">{post.title}</h2>
+
             {post.excerpt && (
-              <p className="text-gray-300 text-sm mb-4 line-clamp-3">
-                {post.excerpt}
-              </p>
+              <p className="text-gray-300 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
             )}
-            
+
             <div className="mt-auto pt-4 border-t border-white/10">
               <div className="flex items-center justify-between text-sm text-gray-400">
-                <span>
-                  {post.author?.display_name || post.author?.username || 'Anonymous'}
-                </span>
-                {post.publishedAt && (
-                  <span>
-                    {new Date(post.publishedAt).toLocaleDateString()}
-                  </span>
-                )}
+                <span>{post.author?.display_name || post.author?.username || 'Anonymous'}</span>
+                {post.publishedAt && <span>{new Date(post.publishedAt).toLocaleDateString()}</span>}
               </div>
             </div>
           </Link>

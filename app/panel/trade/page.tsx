@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -47,7 +47,9 @@ export default function TradeCenterPanel() {
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">🔄</div>
             <h3 className="text-xl font-semibold text-white mb-2">Item Trading</h3>
-            <p className="text-neutral-300 mb-4">Trade cosmetics, overlays, and other items with other players</p>
+            <p className="text-neutral-300 mb-4">
+              Trade cosmetics, overlays, and other items with other players
+            </p>
             <Link
               href="/panel/trade/items"
               className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
@@ -60,7 +62,9 @@ export default function TradeCenterPanel() {
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">🌸</div>
             <h3 className="text-xl font-semibold text-white mb-2">Petal Exchange</h3>
-            <p className="text-neutral-300 mb-4">Exchange petals for items or services with other players</p>
+            <p className="text-neutral-300 mb-4">
+              Exchange petals for items or services with other players
+            </p>
             <Link
               href="/panel/trade/petals"
               className="inline-block px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-medium rounded-lg transition-colors"
@@ -112,7 +116,9 @@ export default function TradeCenterPanel() {
           <div className="bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">📋</div>
             <h3 className="text-xl font-semibold text-white mb-2">Trade Rules</h3>
-            <p className="text-neutral-300 mb-4">Learn about trading policies and safety guidelines</p>
+            <p className="text-neutral-300 mb-4">
+              Learn about trading policies and safety guidelines
+            </p>
             <Link
               href="/panel/trade/rules"
               className="inline-block px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
@@ -155,8 +161,8 @@ export default function TradeCenterPanel() {
         <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">🚧 Trading System Coming Soon</h2>
           <p className="text-neutral-300 mb-6">
-            We're working hard to bring you a comprehensive trading system. In the meantime, 
-            you can visit the Petal Store to purchase items with your petals!
+            We're working hard to bring you a comprehensive trading system. In the meantime, you can
+            visit the Petal Store to purchase items with your petals!
           </p>
           <Link
             href="/panel/petal-store"

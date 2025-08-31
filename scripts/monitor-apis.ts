@@ -26,7 +26,7 @@ class APIMonitor {
     this.isRunning = true;
     console.log('🚀 Starting API Monitoring...');
     console.log(
-      `📊 Checking ${this.config.endpoints.length} endpoints every ${this.config.checkInterval / 1000}s`
+      `📊 Checking ${this.config.endpoints.length} endpoints every ${this.config.checkInterval / 1000}s`,
     );
 
     while (this.isRunning) {
@@ -108,7 +108,7 @@ class APIMonitor {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   getStatus(): object {

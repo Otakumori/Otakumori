@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useEffect, useState } from "react";
-import { appUrl } from "@/lib/canonical";
+import { useEffect, useState } from 'react';
+import { appUrl } from '@/lib/canonical';
 
 type Review = {
   id: string;
@@ -24,11 +24,11 @@ export default function AdminReviewsClient() {
 
   async function loadPage(next?: string | null) {
     setLoading(true);
-    const url = new URL("/api/admin/reviews", appUrl());
-    url.searchParams.set("take", String(take));
-    if (next) url.searchParams.set("cursor", next);
+    const url = new URL('/api/admin/reviews', appUrl());
+    url.searchParams.set('take', String(take));
+    if (next) url.searchParams.set('cursor', next);
 
-    const res = await fetch(url.toString(), { cache: "no-store" });
+    const res = await fetch(url.toString(), { cache: 'no-store' });
     const json = await res.json();
     if (json.ok) {
       if (!next) setItems(json.items);
@@ -38,16 +38,18 @@ export default function AdminReviewsClient() {
     setLoading(false);
   }
 
-  useEffect(() => { loadPage(null); }, [null]);
+  useEffect(() => {
+    loadPage(null);
+  }, [null]);
 
   async function approve(id: string) {
-    const res = await fetch(`/api/admin/reviews/${id}/approve`, { method: "POST" });
-    if (res.ok) setItems(prev => prev.filter(r => r.id !== id));
+    const res = await fetch(`/api/admin/reviews/${id}/approve`, { method: 'POST' });
+    if (res.ok) setItems((prev) => prev.filter((r) => r.id !== id));
   }
 
   async function remove(id: string) {
-    const res = await fetch(`/api/admin/reviews/${id}`, { method: "DELETE" });
-    if (res.ok) setItems(prev => prev.filter(r => r.id !== id));
+    const res = await fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+    if (res.ok) setItems((prev) => prev.filter((r) => r.id !== id));
   }
 
   return (
@@ -63,9 +65,9 @@ export default function AdminReviewsClient() {
               <div>
                 <div className="text-sm text-zinc-400">
                   <span className="font-mono text-xs">#{r.id.slice(0, 8)}</span>
-                  {" · "}product:
+                  {' · '}product:
                   <span className="ml-1 font-mono text-xs">{r.productId}</span>
-                  {" · "}user:
+                  {' · '}user:
                   <span className="ml-1 font-mono text-xs">{r.userId}</span>
                 </div>
                 <div className="mt-1 text-yellow-400">{r.rating} ★</div>
@@ -114,7 +116,7 @@ export default function AdminReviewsClient() {
           onClick={() => loadPage(cursor)}
           className="rounded-md border border-zinc-700 px-3 py-1.5 text-sm hover:bg-zinc-900"
         >
-          {loading ? "Loading…" : "Load more"}
+          {loading ? 'Loading…' : 'Load more'}
         </button>
       )}
     </div>

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { createContext, useState, useContext } from 'react';
@@ -9,7 +9,7 @@ const GameCubeContext = createContext();
 export function GameCubeProvider({ children }) {
   const [unlocks, setUnlocks] = useState([]);
 
-  const unlockItem = item => {
+  const unlockItem = (item) => {
     setUnlocks([...unlocks, item]);
   };
 

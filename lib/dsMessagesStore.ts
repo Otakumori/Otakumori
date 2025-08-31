@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { redis } from "@/lib/redis";
-import { DSMessage } from "@/lib/z";
-import { randomUUID } from "crypto";
+/* eslint-disable-line @next/next/no-img-element */
+import { redis } from '@/lib/redis';
+import { DSMessage } from '@/lib/z';
+import { randomUUID } from 'crypto';
 
 const mem = new Map<string, DSMessage[]>();
 const key = (slug: string) => `dsmsg:${slug}`;
@@ -14,7 +14,10 @@ export async function listDSMessages(slug: string) {
 }
 
 async function save(slug: string, arr: DSMessage[]) {
-  if (!redis) { mem.set(slug, arr); return; }
+  if (!redis) {
+    mem.set(slug, arr);
+    return;
+  }
   await redis.setex(key(slug), 86400, JSON.stringify(arr));
 }
 
@@ -35,11 +38,12 @@ export async function addDSMessage(slug: string, phrase: string, userId: string 
   return parsed;
 }
 
-export async function voteDSMessage(slug: string, id: string, kind: "up"|"down") {
+export async function voteDSMessage(slug: string, id: string, kind: 'up' | 'down') {
   const arr = await listDSMessages(slug);
-  const i = arr.findIndex(x => x.id === id);
+  const i = arr.findIndex((x) => x.id === id);
   if (i < 0) return null;
-  if (kind === "up") arr[i].appraisals += 1; else arr[i].disparages += 1;
+  if (kind === 'up') arr[i].appraisals += 1;
+  else arr[i].disparages += 1;
   await save(slug, arr);
   return arr[i];
 }

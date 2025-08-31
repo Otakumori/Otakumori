@@ -1,9 +1,9 @@
-import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
 
 export const env = createEnv({
   server: {
-    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     DATABASE_URL: z.string().url(),
     STRIPE_SECRET_KEY: z.string(),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
@@ -16,10 +16,18 @@ export const env = createEnv({
     PETAL_SALT: z.string().optional(),
     VERCEL: z.string().optional(),
     AUTHORIZED_PARTIES: z.string().optional(),
+    NEXT_TELEMETRY_DISABLED: z.string().optional(),
+    NODE_OPTIONS: z.string().optional(),
+    RESEND_API_KEY: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
     NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -33,10 +41,18 @@ export const env = createEnv({
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     PETAL_SALT: process.env.PETAL_SALT,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
     VERCEL: process.env.VERCEL,
     AUTHORIZED_PARTIES: process.env.AUTHORIZED_PARTIES,
+    NEXT_TELEMETRY_DISABLED: process.env.NEXT_TELEMETRY_DISABLED,
+    NODE_OPTIONS: process.env.NODE_OPTIONS,
   },
   skipValidation: !!process.env.CI,
 });

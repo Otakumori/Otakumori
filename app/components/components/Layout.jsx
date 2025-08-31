@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import CherryBlossomEffect from '../../app/components/CherryBlossomEffect';
 
 export default function Hero() {

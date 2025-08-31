@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -13,8 +13,8 @@ import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/' },
-  { 
-    name: 'Shop', 
+  {
+    name: 'Shop',
     href: '/shop',
     dropdown: [
       {
@@ -24,7 +24,7 @@ const navigation = [
           { name: 'Bottoms', href: '/shop?category=bottoms' },
           { name: 'Unmentionables', href: '/shop?category=unmentionables' },
           { name: 'Kicks', href: '/shop?category=kicks' },
-        ]
+        ],
       },
       {
         category: 'Accessories',
@@ -32,7 +32,7 @@ const navigation = [
           { name: 'Pins', href: '/shop?category=pins' },
           { name: 'Hats', href: '/shop?category=hats' },
           { name: 'Bows', href: '/shop?category=bows' },
-        ]
+        ],
       },
       {
         category: 'Home Decor',
@@ -40,9 +40,9 @@ const navigation = [
           { name: 'Cups', href: '/shop?category=cups' },
           { name: 'Pillows', href: '/shop?category=pillows' },
           { name: 'Stickers', href: '/shop?category=stickers' },
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   { name: 'Blog', href: '/blog' },
   { name: 'Mini-Games', href: '/mini-games' },
@@ -82,9 +82,7 @@ export default function Navigation() {
       {/* Desktop Navigation */}
       <nav
         className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? 'bg-black/80 backdrop-blur-md border-b border-pink-500/20'
-            : 'bg-transparent'
+          scrolled ? 'bg-black/80 backdrop-blur-md border-b border-pink-500/20' : 'bg-transparent'
         }`}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -111,7 +109,7 @@ export default function Navigation() {
                     >
                       <span>{item.name}</span>
                       <ChevronDown className="h-4 w-4" />
-                      
+
                       {/* Shop Dropdown */}
                       <AnimatePresence>
                         {shopDropdownOpen && (
@@ -126,7 +124,9 @@ export default function Navigation() {
                             <div className="p-4 space-y-4">
                               {item.dropdown.map((category) => (
                                 <div key={category.category}>
-                                  <h3 className="text-pink-400 font-semibold mb-2">{category.category}</h3>
+                                  <h3 className="text-pink-400 font-semibold mb-2">
+                                    {category.category}
+                                  </h3>
                                   <div className="space-y-1">
                                     {category.items.map((subItem) => (
                                       <Link
@@ -193,12 +193,20 @@ export default function Navigation() {
                 />
               ) : (
                 <div className="hidden md:flex items-center space-x-3">
-                  <SignInButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
+                  <SignInButton
+                    mode="modal"
+                    afterSignInUrl={appUrl('/')}
+                    afterSignUpUrl={appUrl('/onboarding')}
+                  >
                     <button className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-pink-400 transition-colors">
                       Sign In
                     </button>
                   </SignInButton>
-                  <SignUpButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
+                  <SignUpButton
+                    mode="modal"
+                    afterSignInUrl={appUrl('/')}
+                    afterSignUpUrl={appUrl('/onboarding')}
+                  >
                     <button className="px-4 py-2 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
                       Join the quest
                     </button>
@@ -294,12 +302,20 @@ export default function Navigation() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <SignInButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
+                      <SignInButton
+                        mode="modal"
+                        afterSignInUrl={appUrl('/')}
+                        afterSignUpUrl={appUrl('/onboarding')}
+                      >
                         <button className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-pink-500/30 hover:bg-pink-500/10 rounded-lg transition-colors">
                           Sign In
                         </button>
                       </SignInButton>
-                      <SignUpButton mode="modal" afterSignInUrl={appUrl("/")} afterSignUpUrl={appUrl("/onboarding")}>
+                      <SignUpButton
+                        mode="modal"
+                        afterSignInUrl={appUrl('/')}
+                        afterSignUpUrl={appUrl('/onboarding')}
+                      >
                         <button className="w-full px-4 py-3 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
                           Join the quest
                         </button>

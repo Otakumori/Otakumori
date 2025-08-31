@@ -1,30 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-const PROD_ORIGIN =
-  (process.env.NEXT_PUBLIC_CANONICAL_ORIGIN || "https://otaku-mori.com").replace(/\/$/, "");
+/* eslint-disable-line @next/next/no-img-element */
+import { env } from '@/env';
+
+const PROD_ORIGIN = (env.NEXT_PUBLIC_SITE_URL || 'https://otaku-mori.com').replace(/\/$/, '');
 
 export function canonicalOrigin() {
   // Always canonical in prod
-  if (process.env.NODE_ENV === "production") return PROD_ORIGIN;
+  if (env.NODE_ENV === 'production') return PROD_ORIGIN;
 
   // Infer in dev/preview
-  if (typeof window !== "undefined") return window.location.origin;
-  
+  if (typeof window !== 'undefined') return window.location.origin;
+
   // Server-side fallback
-  return "http://localhost:3000";
+  return 'http://localhost:3000';
 }
 
-export function appUrl(path = "/") {
+export function appUrl(path = '/') {
   const base = canonicalOrigin();
   return new URL(path, base).toString();
 }
 
-export function hostedSignInUrl(pathAfterSignIn: string = "/") {
+export function hostedSignInUrl(pathAfterSignIn: string = '/') {
   const redirect = encodeURIComponent(appUrl(pathAfterSignIn));
   return `https://accounts.otaku-mori.com/sign-in?redirect_url=${redirect}`;
 }
 
-export function hostedSignUpUrl(pathAfterSignUp: string = "/onboarding") {
+export function hostedSignUpUrl(pathAfterSignUp: string = '/onboarding') {
   const redirect = encodeURIComponent(appUrl(pathAfterSignUp));
   return `https://accounts.otaku-mori.com/sign-up?redirect_url=${redirect}`;
 }

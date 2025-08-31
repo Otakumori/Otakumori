@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 
 interface AchievementCategoriesProps {
   selectedCategory: string | null;
-  onSelectCategory: (category: string | null) => void;
+  onSelectCategory: (_category: string | null) => void;
 }
 
 export const AchievementCategories: React.FC<AchievementCategoriesProps> = ({

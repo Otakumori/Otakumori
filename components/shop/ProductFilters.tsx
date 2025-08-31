@@ -1,17 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 interface ProductFiltersProps {
   placeholder?: string;
 }
 
-export default function ProductFilters({ placeholder = "Search products..." }: ProductFiltersProps) {
+export default function ProductFilters({
+  placeholder = 'Search products...',
+}: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
   const updateSearchParams = (newParams: Record<string, string>) => {
     const params = new URLSearchParams(searchParams);
@@ -35,10 +37,10 @@ export default function ProductFilters({ placeholder = "Search products..." }: P
   };
 
   const handlePriceRangeChange = (min: string, max: string) => {
-    updateSearchParams({ 
-      minPrice: min || "", 
-      maxPrice: max || "",
-      q: searchQuery 
+    updateSearchParams({
+      minPrice: min || '',
+      maxPrice: max || '',
+      q: searchQuery,
     });
   };
 
@@ -65,15 +67,15 @@ export default function ProductFilters({ placeholder = "Search products..." }: P
       <div>
         <h3 className="text-lg font-semibold text-white mb-3">Categories</h3>
         <div className="space-y-2">
-          {["All", "Apparel", "Accessories", "Collectibles", "Gaming"].map((category) => (
+          {['All', 'Apparel', 'Accessories', 'Collectibles', 'Gaming'].map((category) => (
             <button
               key={category}
-              onClick={() => handleCategoryChange(category === "All" ? "" : category)}
+              onClick={() => handleCategoryChange(category === 'All' ? '' : category)}
               className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
-                searchParams.get("category") === category || 
-                (!searchParams.get("category") && category === "All")
-                  ? "bg-pink-500/20 text-pink-200 border border-pink-500/30"
-                  : "bg-white/5 text-white/70 hover:bg-white/10"
+                searchParams.get('category') === category ||
+                (!searchParams.get('category') && category === 'All')
+                  ? 'bg-pink-500/20 text-pink-200 border border-pink-500/30'
+                  : 'bg-white/5 text-white/70 hover:bg-white/10'
               }`}
             >
               {category}
@@ -91,8 +93,10 @@ export default function ProductFilters({ placeholder = "Search products..." }: P
             placeholder="Min"
             min="0"
             step="0.01"
-            defaultValue={searchParams.get("minPrice") || ""}
-            onChange={(e) => handlePriceRangeChange(e.target.value, searchParams.get("maxPrice") || "")}
+            defaultValue={searchParams.get('minPrice') || ''}
+            onChange={(e) =>
+              handlePriceRangeChange(e.target.value, searchParams.get('maxPrice') || '')
+            }
             className="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-500/50"
           />
           <input
@@ -100,17 +104,22 @@ export default function ProductFilters({ placeholder = "Search products..." }: P
             placeholder="Max"
             min="0"
             step="0.01"
-            defaultValue={searchParams.get("maxPrice") || ""}
-            onChange={(e) => handlePriceRangeChange(searchParams.get("minPrice") || "", e.target.value)}
+            defaultValue={searchParams.get('maxPrice') || ''}
+            onChange={(e) =>
+              handlePriceRangeChange(searchParams.get('minPrice') || '', e.target.value)
+            }
             className="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-500/50"
           />
         </div>
       </div>
 
       {/* Clear Filters */}
-      {(searchParams.get("q") || searchParams.get("category") || searchParams.get("minPrice") || searchParams.get("maxPrice")) && (
+      {(searchParams.get('q') ||
+        searchParams.get('category') ||
+        searchParams.get('minPrice') ||
+        searchParams.get('maxPrice')) && (
         <button
-          onClick={() => router.push("/shop")}
+          onClick={() => router.push('/shop')}
           className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors"
         >
           Clear All Filters

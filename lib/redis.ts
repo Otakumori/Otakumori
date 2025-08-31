@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { Redis } from '@upstash/redis';
 import { env } from '@/env.mjs';
 
@@ -68,49 +68,53 @@ export const cache = {
     } catch (error) {
       console.warn('Redis expire error:', error);
     }
-  }
+  },
 };
 
 // Rate limiting helper
 export const rateLimit = {
-  async check(key: string, limit: number, windowSeconds: number): Promise<{
+  async check(
+    key: string,
+    limit: number,
+    windowSeconds: number,
+  ): Promise<{
     allowed: boolean;
     remaining: number;
     resetTime: number;
   }> {
     const current = await cache.incr(key);
-    
+
     if (current === 1) {
       await cache.expire(key, windowSeconds);
     }
 
     const allowed = current <= limit;
     const remaining = Math.max(0, limit - current);
-    const resetTime = Date.now() + (windowSeconds * 1000);
+    const resetTime = Date.now() + windowSeconds * 1000;
 
     return { allowed, remaining, resetTime };
-  }
+  },
 };
 
 // Cache keys for different data types
 export const cacheKeys = {
   shop: {
-    products: (category?: string, limit?: number, offset?: number) => 
+    products: (category?: string, limit?: number, offset?: number) =>
       `shop:products:${category || 'all'}:${limit || 50}:${offset || 0}`,
     product: (id: string) => `shop:product:${id}`,
-    categories: () => 'shop:categories'
+    categories: () => 'shop:categories',
   },
   games: {
     stats: (userId: string) => `games:stats:${userId}`,
-    leaderboard: (game: string, difficulty?: string) => 
-      `games:leaderboard:${game}:${difficulty || 'all'}`
+    leaderboard: (game: string, difficulty?: string) =>
+      `games:leaderboard:${game}:${difficulty || 'all'}`,
   },
   achievements: {
     user: (userId: string) => `achievements:user:${userId}`,
-    all: () => 'achievements:all'
+    all: () => 'achievements:all',
   },
   petals: {
     balance: (userId: string) => `petals:balance:${userId}`,
-    ledger: (userId: string) => `petals:ledger:${userId}`
-  }
+    ledger: (userId: string) => `petals:ledger:${userId}`,
+  },
 };

@@ -1,7 +1,9 @@
 # 🚀 Inngest Integration Setup Guide for Otakumori
 
 ## **Overview**
+
 Inngest is a powerful background job processor that will make your Otakumori project production-ready by handling:
+
 - **Webhook processing** (Clerk, Stripe, Printify)
 - **Background jobs** (product updates, inventory sync)
 - **Scheduled tasks** (daily/weekly operations)
@@ -11,17 +13,21 @@ Inngest is a powerful background job processor that will make your Otakumori pro
 ## **🔧 Installation & Setup**
 
 ### 1. Install Dependencies
+
 ```bash
 npm install inngest
 ```
 
 ### 2. Start Inngest Dev Server
+
 ```bash
 npx inngest-cli@latest dev
 ```
 
 ### 3. Environment Variables
+
 Add to your `.env.local`:
+
 ```bash
 # Inngest Configuration
 INNGEST_EVENT_KEY=your_event_key_here
@@ -45,66 +51,76 @@ INNGEST_SERVE_URL=http://localhost:8288
 ## **📋 Available Functions**
 
 ### **User Management**
+
 - `syncUserToSupabase` - Syncs Clerk users to Supabase
 - `userProfileUpdate` - Handles profile changes
 
 ### **Product Management**
+
 - `updatePrintifyProducts` - Syncs products from Printify
 - `syncInventory` - Updates inventory levels
 - `dailyInventorySync` - Scheduled daily sync (2 AM)
 - `weeklyProductUpdate` - Scheduled weekly update (Monday 3 AM)
 
 ### **Order Processing**
+
 - `processOrder` - Multi-step order processing
 - `sendOrderConfirmation` - Email confirmations
 - `handlePaymentWebhook` - Stripe webhook processing
 
 ### **Utility Functions**
+
 - `retryFailedOperation` - Automatic retry with backoff
 - `cleanupOldData` - Scheduled cleanup (Sunday 4 AM)
 
 ## **🔗 Webhook Integration**
 
 ### **Clerk Webhooks**
+
 ```typescript
 // Triggers when user signs up/updates
 await inngest.send({
   name: 'clerk/user.created',
-  data: { userId: 'user_123', email: 'user@example.com' }
+  data: { userId: 'user_123', email: 'user@example.com' },
 });
 ```
 
 ### **Stripe Webhooks**
+
 ```typescript
 // Triggers when payment succeeds/fails
 await inngest.send({
   name: 'stripe/webhook',
-  data: { type: 'payment_intent.succeeded', orderId: 'order_123' }
+  data: { type: 'payment_intent.succeeded', orderId: 'order_123' },
 });
 ```
 
 ### **Printify Webhooks**
+
 ```typescript
 // Triggers when products change
 await inngest.send({
   name: 'printify/products.update',
-  data: { shopId: 'shop_123', productCount: 50 }
+  data: { shopId: 'shop_123', productCount: 50 },
 });
 ```
 
 ## **📅 Scheduled Jobs**
 
 ### **Daily Operations (2 AM)**
+
 - Inventory synchronization
 - Order status updates
 - Database maintenance
 
 ### **Weekly Operations (Monday 3 AM)**
+
 - Product catalog updates
 - Analytics aggregation
 - System health checks
 
 ### **Monthly Operations (1st of month 5 AM)**
+
 - Data archiving
 - Performance optimization
 - Security audits
@@ -112,11 +128,13 @@ await inngest.send({
 ## **🚨 Error Handling & Retries**
 
 ### **Automatic Retries**
+
 - Failed operations retry with exponential backoff
 - Maximum 3 retry attempts
 - Dead letter queue for permanently failed jobs
 
 ### **Monitoring**
+
 - Real-time function execution logs
 - Error rate tracking
 - Performance metrics
@@ -124,11 +142,13 @@ await inngest.send({
 ## **🔒 Security Features**
 
 ### **Webhook Verification**
+
 - Signature validation for all incoming webhooks
 - Rate limiting to prevent abuse
 - IP whitelisting for production
 
 ### **Function Isolation**
+
 - Each function runs in isolated environment
 - No shared state between executions
 - Secure environment variable access
@@ -136,22 +156,24 @@ await inngest.send({
 ## **📊 Monitoring & Debugging**
 
 ### **Inngest Dashboard**
+
 - Real-time function execution
 - Error logs and stack traces
 - Performance metrics
 - Function history
 
 ### **Logging**
+
 ```typescript
 // Structured logging in functions
-await step.run("operation-name", async () => {
-  console.log("Processing operation", { 
-    operationId: "op_123", 
-    timestamp: new Date().toISOString() 
+await step.run('operation-name', async () => {
+  console.log('Processing operation', {
+    operationId: 'op_123',
+    timestamp: new Date().toISOString(),
   });
-  
+
   // Your logic here
-  
+
   return { success: true };
 });
 ```
@@ -159,15 +181,18 @@ await step.run("operation-name", async () => {
 ## **🚀 Production Deployment**
 
 ### **1. Deploy to Vercel/Netlify**
+
 - Inngest functions automatically deploy with your app
 - No additional infrastructure needed
 
 ### **2. Configure Production Webhooks**
+
 - Update webhook URLs to production domain
 - Set production environment variables
 - Enable monitoring and alerts
 
 ### **3. Scale Configuration**
+
 - Set function concurrency limits
 - Configure timeout settings
 - Set up rate limiting
@@ -175,6 +200,7 @@ await step.run("operation-name", async () => {
 ## **🧪 Testing Functions**
 
 ### **Local Testing**
+
 ```bash
 # Start Inngest dev server
 npx inngest-cli@latest dev
@@ -186,6 +212,7 @@ curl -X POST http://localhost:8288/api/inngest \
 ```
 
 ### **Function Testing**
+
 ```typescript
 // Test individual functions
 import { syncUserToSupabase } from '../inngest/functions';
@@ -193,7 +220,7 @@ import { syncUserToSupabase } from '../inngest/functions';
 // Mock event data
 const testEvent = {
   name: 'clerk/user.created',
-  data: { userId: 'test_user', email: 'test@example.com' }
+  data: { userId: 'test_user', email: 'test@example.com' },
 };
 
 // Test function execution
@@ -204,11 +231,13 @@ console.log('Function result:', result);
 ## **📈 Performance Optimization**
 
 ### **Function Optimization**
+
 - Use step.run() for complex operations
 - Implement proper error handling
 - Avoid blocking operations
 
 ### **Database Optimization**
+
 - Use connection pooling
 - Implement caching strategies
 - Optimize queries for background jobs
@@ -233,6 +262,7 @@ console.log('Function result:', result);
    - Review external API response times
 
 ### **Debug Commands**
+
 ```bash
 # Check Inngest status
 npx inngest-cli@latest status

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -31,9 +31,9 @@ export default function MessageManager() {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) throw new Error('Failed to fetch messages');
-      
+
       const data = await response.json();
       setMessages(data.messages || []);
     } catch (error) {
@@ -51,19 +51,19 @@ export default function MessageManager() {
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) throw new Error('Failed to delete message');
-      
-      setMessages(messages.filter(msg => msg.id !== id));
+
+      setMessages(messages.filter((msg) => msg.id !== id));
     } catch (error) {
       console.error('Error deleting message:', error);
     }
   };
 
   const filteredMessages = messages.filter(
-    msg =>
+    (msg) =>
       msg.content.toLowerCase().includes(search.toLowerCase()) ||
-      msg.author.toLowerCase().includes(search.toLowerCase())
+      msg.author.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -75,7 +75,7 @@ export default function MessageManager() {
             type="text"
             placeholder="Search messages..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
           />
         </div>
@@ -123,7 +123,7 @@ export default function MessageManager() {
           ) : filteredMessages.length === 0 ? (
             <div className="py-8 text-center text-gray-400">No messages found</div>
           ) : (
-            filteredMessages.map(message => (
+            filteredMessages.map((message) => (
               <motion.div
                 key={message.id}
                 initial={{ opacity: 0, y: 20 }}

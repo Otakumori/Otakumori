@@ -1,36 +1,99 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { NextRequest, NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
-import { log } from "@/lib/logger";
+/* eslint-disable-line @next/next/no-img-element */
+import { NextRequest, NextResponse } from 'next/server';
+import { redis } from '@/lib/redis';
+import { log } from '@/lib/logger';
+import { DatabaseAccess } from '@/app/lib/db';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 export const maxDuration = 10;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const q = (searchParams.get("q") || "").toLowerCase().trim();
+  const q = searchParams.get('q') || '';
 
   try {
-    // Replace with real source or Printify adapter
-    const all = await getSeededProducts(); // bounded, in-process, < 100 items
-    const filtered = q ? all.filter(p => p.title.toLowerCase().includes(q) || p.tags?.some((t: string) => t.includes(q))) : all;
+    let products;
+
+    if (q.trim()) {
+      products = await DatabaseAccess.searchProducts(q);
+    } else {
+      products = await DatabaseAccess.getActiveProducts();
+    }
+
+    // Transform products to match expected format
+    const transformedProducts = products.map((product) => ({
+      id: product.id,
+      slug: product.id, // Using ID as slug for now
+      title: product.name,
+      description: product.description || '',
+      price: product.ProductVariant[0]?.priceCents ? product.ProductVariant[0].priceCents / 100 : 0,
+      images: product.primaryImageUrl ? [product.primaryImageUrl] : [],
+      tags: [product.category || 'apparel'],
+      stock: product.ProductVariant.filter((v) => v.inStock).length,
+      category: product.category || 'apparel',
+      variants: product.ProductVariant.map((variant) => ({
+        id: variant.id,
+        price: variant.priceCents ? variant.priceCents / 100 : 0,
+        inStock: variant.inStock,
+        enabled: variant.isEnabled,
+      })),
+    }));
 
     // Optional short TTL cache key
-    if (redis) await redis.setex(`products:${q || "all"}`, 30, JSON.stringify(filtered));
+    if (redis) {
+      const cacheKey = `products:${q || 'all'}`;
+      await redis.setex(cacheKey, 30, JSON.stringify(transformedProducts));
+    }
 
-    return NextResponse.json({ ok: true, items: filtered });
+    return NextResponse.json({ ok: true, items: transformedProducts });
   } catch (e) {
-    log("products_error", { message: String(e) });
-    return NextResponse.json({ ok: false, items: [] }, { status: 200 });
+    log('products_error', { message: String(e) });
+
+    // Fallback to seeded products if database fails
+    const fallbackProducts = getSeededProducts();
+    return NextResponse.json({ ok: true, items: fallbackProducts });
   }
 }
 
-// TODO: swap for Printify/DB
-async function getSeededProducts() {
+// Fallback seeded products
+function getSeededProducts() {
   return [
-    { id: "1", slug: "oni-tee", title: "Oni Tee", description: "Gothic Y2K anime drip", price: 29.0, images: [], tags: ["anime","oni"], stock: 12 },
-    { id: "2", slug: "souls-hoodie", title: "Souls Hoodie", description: "Dark Souls inspired comfort", price: 45.0, images: [], tags: ["gaming","dark-souls"], stock: 8 },
-    { id: "3", slug: "anime-pin-set", title: "Anime Pin Set", description: "Collectible enamel pins", price: 15.0, images: [], tags: ["anime","collectibles"], stock: 25 },
+    {
+      id: '1',
+      slug: 'oni-tee',
+      title: 'Oni Tee',
+      description: 'Gothic Y2K anime drip',
+      price: 29.0,
+      images: [],
+      tags: ['anime', 'oni'],
+      stock: 12,
+      category: 'apparel',
+      variants: [{ id: '1-1', price: 29.0, inStock: true, enabled: true }],
+    },
+    {
+      id: '2',
+      slug: 'souls-hoodie',
+      title: 'Souls Hoodie',
+      description: 'Dark Souls inspired comfort',
+      price: 45.0,
+      images: [],
+      tags: ['gaming', 'dark-souls'],
+      stock: 8,
+      category: 'apparel',
+      variants: [{ id: '2-1', price: 45.0, inStock: true, enabled: true }],
+    },
+    {
+      id: '3',
+      slug: 'anime-pin-set',
+      title: 'Anime Pin Set',
+      description: 'Collectible enamel pins',
+      price: 15.0,
+      images: [],
+      tags: ['anime', 'collectibles'],
+      stock: 25,
+      category: 'accessories',
+      variants: [{ id: '3-1', price: 15.0, inStock: true, enabled: true }],
+    },
   ];
 }

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
@@ -11,12 +11,12 @@ export async function POST() {
       return NextResponse.json({ ok: true }); // guest: ignore
     }
 
-    await prisma.user.update({ 
-      where: { clerkId: userId }, 
-      data: { 
+    await prisma.user.update({
+      where: { clerkId: userId },
+      data: {
         nsfwAffirmedAt: new Date(),
-        nsfwAffirmationVer: { increment: 1 }
-      } 
+        nsfwAffirmationVer: { increment: 1 },
+      },
     });
 
     return NextResponse.json({ ok: true });

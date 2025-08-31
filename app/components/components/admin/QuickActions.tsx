@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -214,7 +214,7 @@ export default function QuickActions() {
           if (response.ok) {
             const health = await response.json();
             alert(
-              `System Status: ${health.status}\nDatabase: ${health.database}\nRedis: ${health.redis}`
+              `System Status: ${health.status}\nDatabase: ${health.database}\nRedis: ${health.redis}`,
             );
           } else {
             throw new Error('Health check failed');
@@ -265,7 +265,7 @@ export default function QuickActions() {
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {quickActions.map(action => (
+      {quickActions.map((action) => (
         <motion.button
           key={action.id}
           onClick={action.action}

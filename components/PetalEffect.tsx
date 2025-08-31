@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { useSound } from '@/lib/hooks/useSound';
@@ -12,7 +12,7 @@ const petalFloat = {
     opacity: [0, 1, 1, 0],
     y: [0, -100, -200, -300],
     rotate: [0, 180, 360, 540],
-    transition: { duration: 3, ease: "easeOut" as const },
+    transition: { duration: 3, ease: 'easeOut' as const },
   },
 };
 
@@ -66,8 +66,16 @@ export const PetalEffect = ({
   }, [controls, interactive]);
 
   // Calculate transforms outside of the map
-  const x = useTransform(mouseX, [0, typeof window !== 'undefined' ? window.innerWidth : 1920], [-20, 20]);
-  const y = useTransform(mouseY, [0, typeof window !== 'undefined' ? window.innerHeight : 1080], [-20, 20]);
+  const x = useTransform(
+    mouseX,
+    [0, typeof window !== 'undefined' ? window.innerWidth : 1920],
+    [-20, 20],
+  );
+  const y = useTransform(
+    mouseY,
+    [0, typeof window !== 'undefined' ? window.innerHeight : 1080],
+    [-20, 20],
+  );
 
   return (
     <div
@@ -75,7 +83,6 @@ export const PetalEffect = ({
       onMouseMove={handleMouseMove}
     >
       {Array.from({ length: count }).map((_, index) => {
-
         return (
           <motion.div
             key={index}

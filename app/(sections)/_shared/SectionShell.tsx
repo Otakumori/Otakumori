@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import "./section.css";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { ReactNode, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import './section.css';
 
 interface SectionShellProps {
   title: string;
@@ -17,14 +17,20 @@ export default function SectionShell({ title, subtitle, onBack, children }: Sect
 
   useEffect(() => {
     // Prevent body scroll-jump during zoom
-    document.body.style.overflowX = "hidden";
-    return () => { document.body.style.overflowX = ""; };
+    document.body.style.overflowX = 'hidden';
+    return () => {
+      document.body.style.overflowX = '';
+    };
   }, []);
 
   return (
     <div className="section-root">
       <div className="section-status">
-        <button className="section-back" aria-label="Back" onClick={() => (onBack ? onBack() : router.back())}>
+        <button
+          className="section-back"
+          aria-label="Back"
+          onClick={() => (onBack ? onBack() : router.back())}
+        >
           ←
         </button>
         <div className="section-titles">
@@ -33,9 +39,7 @@ export default function SectionShell({ title, subtitle, onBack, children }: Sect
         </div>
       </div>
       <div className="section-frame">
-        <div className="section-canvas">
-          {children}
-        </div>
+        <div className="section-canvas">{children}</div>
       </div>
     </div>
   );

@@ -5,10 +5,12 @@ This document provides a comprehensive guide for the completed Clerk + Supabase 
 ## ✅ What's Been Implemented
 
 ### 1. Environment Configuration
+
 - Updated `env.example` with required Clerk and Supabase variables
 - Configured for RS256 JWT flow with Clerk as issuer
 
 ### 2. App Structure
+
 - Updated `app/layout.tsx` with proper ClerkProvider configuration
 - Enhanced `components/layout/Navigation.tsx` with shop dropdown and auth CTAs
 - Updated `app/page.tsx` with search placeholder and fallback links
@@ -17,12 +19,14 @@ This document provides a comprehensive guide for the completed Clerk + Supabase 
 - Created `components/TestSupabaseButton.tsx` for development testing
 
 ### 3. Supabase Integration
+
 - Enhanced `app/lib/supabaseClient.ts` with Clerk token support
 - Created `supabase/setup-rls.sql` for Row Level Security policies
 
 ## 🚀 Next Steps to Complete Setup
 
 ### 1. Environment Variables
+
 Create `.env.local` with your actual values:
 
 ```bash
@@ -40,6 +44,7 @@ DATABASE_URL=your_supabase_database_url_here
 ```
 
 ### 2. Supabase Database Setup
+
 Run the SQL script in your Supabase SQL editor:
 
 1. Go to your Supabase dashboard
@@ -50,16 +55,19 @@ Run the SQL script in your Supabase SQL editor:
 ### 3. Clerk Configuration
 
 #### A. Connect with Supabase
+
 1. In Clerk Dashboard → Connect with Supabase
 2. Enable the connection
 3. Set Clerk domain: `https://clerk.otaku-mori.com`
 
 #### B. External JWT Settings
+
 1. In Supabase → Auth → Third-party auth
 2. Enable External JWT
 3. Set Issuer/Provider domain: `https://clerk.otaku-mori.com`
 
 #### C. Social Providers
+
 1. **Facebook OAuth:**
    - App Domains: `clerk.otaku-mori.com`
    - Privacy Policy: `https://www.otaku-mori.com/privacy`
@@ -72,6 +80,7 @@ Run the SQL script in your Supabase SQL editor:
    - Add your production domain when ready
 
 #### D. Account Portal Redirects
+
 1. In Clerk → Account Portal → User redirects
 2. Set:
    - After sign-up fallback: `https://www.otaku-mori.com/profile`
@@ -81,6 +90,7 @@ Run the SQL script in your Supabase SQL editor:
 ### 4. Test the Integration
 
 #### A. Basic Auth Flow
+
 1. Start your development server: `npm run dev`
 2. Visit the home page
 3. Click "Join the quest" → should open Clerk sign-up modal
@@ -88,14 +98,17 @@ Run the SQL script in your Supabase SQL editor:
 5. Sign out → should redirect to `/`
 
 #### B. Supabase Integration Test
+
 1. Sign in to your account
 2. Look for the blue "Test DB" button in bottom-left corner
 3. Click it and check browser console for results
 4. Should see successful connection or specific error details
 
 #### C. Token Verification
+
 1. Open browser console
 2. Sign in and check the token:
+
 ```javascript
 // In console, the TestSupabaseButton logs should show:
 // - Token structure with iss: https://clerk.otaku-mori.com
@@ -106,11 +119,13 @@ Run the SQL script in your Supabase SQL editor:
 ### 5. Production Deployment
 
 #### A. Update Environment Variables
+
 1. Set production Clerk keys
 2. Update Supabase URLs for production
 3. Ensure all redirect URIs use production domain
 
 #### B. Legal Pages
+
 1. Update contact information in legal pages
 2. Verify all links work in production
 3. Test Facebook app review requirements
@@ -120,21 +135,25 @@ Run the SQL script in your Supabase SQL editor:
 ### Common Issues
 
 #### 1. "JWT verification failed" in Supabase
+
 - Verify External JWT is enabled in Supabase
 - Check issuer domain matches exactly: `https://clerk.otaku-mori.com`
 - Ensure Clerk domain is correct in connection settings
 
 #### 2. Auth redirects not working
+
 - Check `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` and `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`
 - Verify Account Portal redirects are set correctly
 - Test with both development and production URLs
 
 #### 3. Supabase RLS blocking queries
+
 - Run the RLS setup SQL script
 - Verify policies are created correctly
 - Check that `clerk_id` matches the JWT `sub` claim
 
 #### 4. Social login errors
+
 - Verify OAuth redirect URIs are correct
 - Check Facebook app is in live mode
 - Ensure legal pages are accessible over HTTPS

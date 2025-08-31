@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: process.env.SENTRY_DSN, // eslint-disable-line no-restricted-syntax
   tracesSampleRate: 1.0, // Adjust for production
   // You can add more options here (release, environment, etc.)
 });

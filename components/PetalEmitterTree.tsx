@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 /**
  * Petals only spawn on pixels of the tree image (alpha>0),
@@ -10,13 +10,13 @@ import { useEffect, useRef } from "react";
  * Click on a petal => award progress and remove it.
  */
 export default function PetalEmitterTree({
-  treeSrc = "/assets/ui/tree-sakura.svg",
-  petalSrc = "/assets/ui/petal.svg",
+  treeSrc = '/assets/ui/tree-sakura.svg',
+  petalSrc = '/assets/ui/petal.svg',
   spawnPerSec = 22,
   windBase = 0.55, // average wind
   maxPetals = 140, // perf cap
   onCollect, // optional callback
-  className = ""
+  className = '',
 }: {
   treeSrc?: string;
   petalSrc?: string;
@@ -32,7 +32,7 @@ export default function PetalEmitterTree({
   useEffect(() => {
     const wrap = wrapRef.current!;
     const c = canvasRef.current!;
-    const ctx = c.getContext("2d")!;
+    const ctx = c.getContext('2d')!;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     // images
@@ -42,22 +42,26 @@ export default function PetalEmitterTree({
     petalImg.src = petalSrc;
 
     // offscreen for tree alpha sampling
-    const off = document.createElement("canvas");
-    const octx = off.getContext("2d")!;
+    const off = document.createElement('canvas');
+    const octx = off.getContext('2d')!;
 
     // state
-    let W = 1, H = 1, groundY = 1; // groundY: where petals settle
+    let W = 1,
+      H = 1,
+      groundY = 1; // groundY: where petals settle
     let running = true;
     let last = performance.now();
     let spawnAcc = 0;
     const petals: Petal[] = [];
     let pointerDown = false;
-    let px = 0, py = 0;
+    let px = 0,
+      py = 0;
 
     // prefers-reduced-motion -> reduce spawn
-    const prefersReducedMotion = typeof window !== "undefined" && 
-      window.matchMedia && 
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const SPAWN = prefersReducedMotion ? Math.max(6, spawnPerSec * 0.4) : spawnPerSec;
 
     type Petal = {
@@ -107,7 +111,7 @@ export default function PetalEmitterTree({
     treeImg.onload = onReady;
     petalImg.onload = onReady;
     resize();
-    window.addEventListener("resize", resize);
+    window.addEventListener('resize', resize);
 
     // utilities
     function noise(t: number) {
@@ -141,7 +145,7 @@ export default function PetalEmitterTree({
           s: 0.55 + 0.7 * z,
           settled: false,
           life: 0,
-          maxLife: 10000
+          maxLife: 10000,
         });
       }
     }
@@ -150,9 +154,9 @@ export default function PetalEmitterTree({
     function hitPetal(x: number, y: number): number | null {
       for (let i = petals.length - 1; i >= 0; i--) {
         const p = petals[i];
-        const w = 18 * p.s, h = 12 * p.s;
-        if (x > p.x - w/2 && x < p.x + w/2 && 
-            y > p.y - h/2 && y < p.y + h/2) {
+        const w = 18 * p.s,
+          h = 12 * p.s;
+        if (x > p.x - w / 2 && x < p.x + w / 2 && y > p.y - h / 2 && y < p.y + h / 2) {
           return i;
         }
       }
@@ -163,8 +167,8 @@ export default function PetalEmitterTree({
     const onPointerDown = (e: PointerEvent) => {
       pointerDown = true;
       const rect = c.getBoundingClientRect();
-      px = (e.clientX - rect.left);
-      py = (e.clientY - rect.top);
+      px = e.clientX - rect.left;
+      py = e.clientY - rect.top;
       const idx = hitPetal(px, py);
       if (idx !== null) collect(idx);
     };
@@ -173,15 +177,15 @@ export default function PetalEmitterTree({
       pointerDown = false;
     };
 
-    c.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("pointerup", onPointerUp);
+    c.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointerup', onPointerUp);
 
     async function collect(idx: number) {
       const p = petals[idx];
       // pop effect: mark settled quickly; remove after
       petals.splice(idx, 1);
       try {
-        await (onCollect ? onCollect() : fetch("/api/petals/click", { method: "POST" }));
+        await (onCollect ? onCollect() : fetch('/api/petals/click', { method: 'POST' }));
       } catch {}
     }
 
@@ -231,12 +235,13 @@ export default function PetalEmitterTree({
           }
         } else {
           // gentle slide along ground to create a pile that looks fluid
-          p.x += (gust * 0.02) + (Math.sin((p.id + tNoise) * 1.7) * 0.1);
+          p.x += gust * 0.02 + Math.sin((p.id + tNoise) * 1.7) * 0.1;
         }
 
         // draw opaque petal (no global fade)
         if (petalImg.complete) {
-          const wPet = 18 * p.s, hPet = 12 * p.s;
+          const wPet = 18 * p.s,
+            hPet = 12 * p.s;
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.r);
@@ -253,9 +258,9 @@ export default function PetalEmitterTree({
     return () => {
       running = false;
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      c.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener('resize', resize);
+      c.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerup', onPointerUp);
     };
   }, [treeSrc, petalSrc, spawnPerSec, windBase, maxPetals, onCollect]);
 

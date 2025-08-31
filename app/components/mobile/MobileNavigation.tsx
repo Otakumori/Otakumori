@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -106,7 +106,7 @@ export default function MobileNavigation({ className }: MobileNavigationProps) {
                   Quick Actions
                 </h3>
                 <div className="space-y-1">
-                  {quickActions.map(action => {
+                  {quickActions.map((action) => {
                     const Icon = action.icon;
                     return (
                       <button
@@ -127,7 +127,7 @@ export default function MobileNavigation({ className }: MobileNavigationProps) {
                   Navigation
                 </h3>
                 <div className="space-y-1">
-                  {navigationItems.map(item => {
+                  {navigationItems.map((item) => {
                     const Icon = item.icon;
                     return (
                       <button
@@ -157,7 +157,7 @@ export default function MobileNavigation({ className }: MobileNavigationProps) {
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
         <div className="flex items-center justify-around py-2">
-          {navigationItems.map(item => {
+          {navigationItems.map((item) => {
             const Icon = item.icon;
             return (
               <button

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React from 'react';
@@ -134,7 +134,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
         <div className="container mx-auto px-4 text-center">
           {/* Social Icons Above Text */}
           <div className="mb-4 flex justify-center space-x-6">
-            {socialLinks.map(link => (
+            {socialLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.url}

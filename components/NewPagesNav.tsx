@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 export default function NewPagesNav() {
@@ -21,7 +21,7 @@ export default function NewPagesNav() {
             <a href="/" className="text-slatey-200 font-bold text-lg">
               Otakumori
             </a>
-            
+
             <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => (
                 <a
@@ -35,7 +35,7 @@ export default function NewPagesNav() {
               ))}
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <a
               href="/starter-pack"

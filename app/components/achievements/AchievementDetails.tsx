@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Achievement } from './AchievementProvider';
@@ -52,7 +52,8 @@ export function AchievementDetails({ achievement }: AchievementDetailsProps) {
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Rewards</h3>
         <div className="mt-2 flex items-center space-x-2">
           <span className="text-sm text-gray-700 dark:text-gray-300">
-            {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'} {achievement.reward?.type === 'points' ? 'Points' : achievement.reward?.type}
+            {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'}{' '}
+            {achievement.reward?.type === 'points' ? 'Points' : achievement.reward?.type}
           </span>
           {achievement.reward?.type === 'badge' && (
             <span className="inline-flex items-center rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
@@ -65,9 +66,7 @@ export function AchievementDetails({ achievement }: AchievementDetailsProps) {
       {isUnlocked && (
         <div className="mt-6">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">Status</h3>
-          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-            ✓ Unlocked
-          </p>
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">✓ Unlocked</p>
         </div>
       )}
     </motion.div>

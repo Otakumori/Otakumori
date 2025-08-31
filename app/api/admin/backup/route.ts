@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 // import { redis } from '../../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       backups: backups.sort(
-        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
       ),
     });
   } catch (error) {

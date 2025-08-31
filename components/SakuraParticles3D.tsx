@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useRef, useEffect } from 'react';
@@ -27,7 +27,7 @@ export default function SakuraParticles3D({
       75,
       currentMount.clientWidth / currentMount.clientHeight,
       0.1,
-      1000
+      1000,
     );
     const renderer = new THREE.WebGLRenderer({ alpha: true });
     renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);

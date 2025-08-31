@@ -1,32 +1,39 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
-import React, { useMemo, useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useMemo, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import FriendsButton from '@/app/components/FriendsButton';
+import NotificationBell from '@/app/components/NotificationBell';
+import CharacterReaction from '@/app/components/CharacterReaction';
 
 // ---- Experience flags (could be fed by proxy) ----
 const experience = {
-  season: "spring",
-  motd: "Cherry blossoms drift across the abyss. Limited pin perk today only.",
-  perk: { name: "Sakura Drop", desc: "5% off Pins — Pin‑thusiast Center", ends: "Tonight" },
+  season: 'spring',
+  motd: 'Cherry blossoms drift across the abyss. Limited pin perk today only.',
+  perk: { name: 'Sakura Drop', desc: '5% off Pins — Pin‑thusiast Center', ends: 'Tonight' },
   petalsIntensity: 0.7,
   dsTip: "Visions of deal… try exploring 'Pins'.",
   eventCTA: {
-    title: "Enter AI Overlord Mode",
-    subtitle: "A playful, lore‑tied control room. Completionists welcome.",
+    title: 'Enter AI Overlord Mode',
+    subtitle: 'A playful, lore‑tied control room. Completionists welcome.',
   },
 };
 
 function classNames(...xs: (string | undefined | false | null)[]): string {
-  return xs.filter(Boolean).join(" ");
+  return xs.filter(Boolean).join(' ');
 }
 
 // ---- Petals overlay ----
-function Petals({ intensity = 0.5, gameMode = false, onCollect }: { 
-  intensity?: number; 
-  gameMode?: boolean; 
-  onCollect?: () => void; 
+function Petals({
+  intensity = 0.5,
+  gameMode = false,
+  onCollect,
+}: {
+  intensity?: number;
+  gameMode?: boolean;
+  onCollect?: () => void;
 }) {
   const count = Math.round(10 + intensity * 30);
   const petals = useMemo(
@@ -40,7 +47,7 @@ function Petals({ intensity = 0.5, gameMode = false, onCollect }: {
         drift: -30 + Math.random() * 60,
         rotate: -25 + Math.random() * 50,
       })),
-    [count]
+    [count],
   );
 
   const PetalTag = gameMode ? motion.button : motion.span;
@@ -50,11 +57,11 @@ function Petals({ intensity = 0.5, gameMode = false, onCollect }: {
       {petals.map((p) => (
         <PetalTag
           key={p.id}
-          initial={{ y: -40, x: p.left + "%", rotate: 0 }}
-          animate={{ y: "110vh", x: `calc(${p.left}vw + ${p.drift}px)`, rotate: p.rotate }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: "linear" }}
-          className={classNames("absolute", gameMode && "cursor-pointer")}
-          aria-label={gameMode ? "petal" : undefined}
+          initial={{ y: -40, x: p.left + '%', rotate: 0 }}
+          animate={{ y: '110vh', x: `calc(${p.left}vw + ${p.drift}px)`, rotate: p.rotate }}
+          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: 'linear' }}
+          className={classNames('absolute', gameMode && 'cursor-pointer')}
+          aria-label={gameMode ? 'petal' : undefined}
           onClick={
             gameMode
               ? (e) => {
@@ -68,9 +75,9 @@ function Petals({ intensity = 0.5, gameMode = false, onCollect }: {
             width: p.size,
             height: p.size * 0.9,
             backgroundImage:
-              "radial-gradient(circle at 35% 35%, rgba(255,192,203,0.95), rgba(255,192,203,0.25))",
-            borderRadius: "60% 60% 60% 0 / 60% 60% 60% 0",
-            boxShadow: "0 0 8px rgba(255,182,193,0.35)",
+              'radial-gradient(circle at 35% 35%, rgba(255,192,203,0.95), rgba(255,192,203,0.25))',
+            borderRadius: '60% 60% 60% 0 / 60% 60% 60% 0',
+            boxShadow: '0 0 8px rgba(255,182,193,0.35)',
             opacity: 0.85,
           }}
         />
@@ -124,25 +131,25 @@ function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
-export default function SiteLayout({ 
-  children, 
-  showPetals = true 
-}: { 
-  children: React.ReactNode; 
+export default function SiteLayout({
+  children,
+  showPetals = true,
+}: {
+  children: React.ReactNode;
   showPetals?: boolean;
 }) {
   const [showLogin, setShowLogin] = useState(false);
   const [collected, setCollected] = useState(0);
 
   const seasonBg = {
-    spring: "from-neutral-950 via-neutral-950 to-neutral-900",
-    summer: "from-neutral-950 via-neutral-900 to-neutral-800",
-    spooky: "from-neutral-950 via-black to-neutral-900",
-    holiday: "from-neutral-950 via-neutral-900 to-neutral-950",
+    spring: 'from-neutral-950 via-neutral-950 to-neutral-900',
+    summer: 'from-neutral-950 via-neutral-900 to-neutral-800',
+    spooky: 'from-neutral-950 via-black to-neutral-900',
+    holiday: 'from-neutral-950 via-neutral-900 to-neutral-950',
   }[experience.season];
 
   return (
-    <div className={classNames("min-h-screen text-neutral-100", "bg-gradient-to-b", seasonBg)}>
+    <div className={classNames('min-h-screen text-neutral-100', 'bg-gradient-to-b', seasonBg)}>
       {/* Petals decorative */}
       {showPetals && (
         <Petals
@@ -217,17 +224,33 @@ export default function SiteLayout({
             <a className="hover:text-pink-200" href="/about">
               About me
             </a>
+            <a className="hover:text-pink-200" href="/settings">
+              Settings
+            </a>
           </nav>
 
           {/* Search + Auth + Cart */}
           <div className="ml-auto flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-neutral-900/70 px-3 py-2 text-sm text-neutral-300">
-              <span>Search:</span>
-              <input
-                placeholder="What're ya buyin?"
-                className="bg-transparent outline-none placeholder-neutral-500 w-48"
-              />
-            </div>
+            <a
+              href="/search"
+              className="hidden sm:flex items-center gap-2 rounded-2xl border border-white/10 bg-neutral-900/70 px-3 py-2 text-sm text-neutral-300 hover:border-pink-400/50 transition-colors"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+              <span>Search</span>
+            </a>
+
+            {/* Friends Button */}
+            <FriendsButton />
+
+            {/* Notification Bell */}
+            <NotificationBell />
 
             <div className="relative group">
               <button
@@ -254,9 +277,7 @@ export default function SiteLayout({
       </header>
 
       {/* Main Content */}
-      <main className="relative z-20">
-        {children}
-      </main>
+      <main className="relative z-20">{children}</main>
 
       {/* Footer */}
       <footer className="relative z-20 border-t border-white/10 bg-neutral-950/70">
@@ -273,10 +294,26 @@ export default function SiteLayout({
           <div>
             <h4 className="font-semibold text-neutral-200">Explore</h4>
             <ul className="mt-2 text-sm text-neutral-400 space-y-1">
-              <li><a className="hover:text-pink-200" href="/shop?category=pins">Pins</a></li>
-              <li><a className="hover:text-pink-200" href="/shop?category=kicks">Kicks</a></li>
-              <li><a className="hover:text-pink-200" href="/shop?category=unmentionables">Unmentionables</a></li>
-              <li><a className="hover:text-pink-200" href="/about">Otakumori Insiders</a></li>
+              <li>
+                <a className="hover:text-pink-200" href="/shop?category=pins">
+                  Pins
+                </a>
+              </li>
+              <li>
+                <a className="hover:text-pink-200" href="/shop?category=kicks">
+                  Kicks
+                </a>
+              </li>
+              <li>
+                <a className="hover:text-pink-200" href="/shop?category=unmentionables">
+                  Unmentionables
+                </a>
+              </li>
+              <li>
+                <a className="hover:text-pink-200" href="/about">
+                  Otakumori Insiders
+                </a>
+              </li>
             </ul>
           </div>
           <div>
@@ -302,6 +339,9 @@ export default function SiteLayout({
 
       {/* Overlays */}
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+
+      {/* Character Reactions */}
+      <CharacterReaction />
     </div>
   );
 }

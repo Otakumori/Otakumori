@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { NextRequest } from 'next/server';
@@ -47,7 +47,7 @@ export const UPLOAD_CONFIGS = {
 export class UploadError extends Error {
   constructor(
     message: string,
-    public code: string
+    public code: string,
   ) {
     super(message);
     this.name = 'UploadError';
@@ -59,7 +59,7 @@ export async function validateFile(file: File, config: UploadConfig): Promise<vo
   if (file.size > config.maxSize) {
     throw new UploadError(
       `File size exceeds maximum allowed size of ${config.maxSize / (1024 * 1024)}MB`,
-      'FILE_TOO_LARGE'
+      'FILE_TOO_LARGE',
     );
   }
 
@@ -67,7 +67,7 @@ export async function validateFile(file: File, config: UploadConfig): Promise<vo
   if (!config.allowedTypes.includes(file.type)) {
     throw new UploadError(
       `File type ${file.type} is not allowed. Allowed types: ${config.allowedTypes.join(', ')}`,
-      'INVALID_FILE_TYPE'
+      'INVALID_FILE_TYPE',
     );
   }
 }
@@ -94,7 +94,7 @@ export async function processImage(buffer: Buffer, config: UploadConfig): Promis
 export async function saveFile(
   buffer: Buffer,
   filename: string,
-  directory: string
+  directory: string,
 ): Promise<string> {
   const uploadDir = join(process.cwd(), 'public', 'uploads', directory);
 
@@ -120,7 +120,7 @@ export async function handleFileUpload(
   request: NextRequest,
   config: UploadConfig,
   directory: string,
-  prefix?: string
+  prefix?: string,
 ): Promise<{ url: string; filename: string }> {
   try {
     const formData = await request.formData();
@@ -162,7 +162,7 @@ export async function handleFileUpload(
 export async function uploadToCloud(
   buffer: Buffer,
   filename: string,
-  directory: string
+  directory: string,
 ): Promise<string> {
   // This is a placeholder for cloud storage integration
   // In production, you would use AWS S3, Cloudinary, or similar
@@ -174,7 +174,7 @@ export async function uploadToCloud(
 // Cleanup function for removing old files
 export async function cleanupOldFiles(
   directory: string,
-  maxAge: number = 24 * 60 * 60 * 1000 // 24 hours
+  maxAge: number = 24 * 60 * 60 * 1000, // 24 hours
 ): Promise<void> {
   // This would clean up old temporary files
   // Implementation depends on your storage solution

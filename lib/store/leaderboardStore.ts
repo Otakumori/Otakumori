@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { create } from 'zustand';
 
 export interface LeaderboardEntry {
@@ -19,7 +19,7 @@ interface LeaderboardState {
   setEntries: (entries: LeaderboardEntry[]) => void;
 }
 
-export const useLeaderboardStore = create<LeaderboardState>(set => ({
+export const useLeaderboardStore = create<LeaderboardState>((set) => ({
   entries: [],
-  setEntries: entries => set({ entries }),
+  setEntries: (entries) => set({ entries }),
 }));

@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-export const dynamic = "force-dynamic";
+/* eslint-disable-line @next/next/no-img-element */
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-import { safeFetch } from "@/lib/fetcher";
-import { Product } from "@/lib/z";
-import ProductGrid from "@/components/shop/ProductGrid";
-import ProductFilters from "@/components/shop/ProductFilters";
+import { safeFetch } from '@/lib/fetcher';
+import { Product } from '@/lib/z';
+import ProductGrid from '@/components/shop/ProductGrid';
+import ProductFilters from '@/components/shop/ProductFilters';
 
 async function loadProducts(q: string | undefined) {
-  const url = q ? `/api/products?q=${encodeURIComponent(q)}` : "/api/products";
+  const url = q ? `/api/products?q=${encodeURIComponent(q)}` : '/api/products';
   const res = await safeFetch<{ items: unknown[] }>(url);
   if (!res.ok) return [];
   return res.data.items.map((p) => Product.parse(p));

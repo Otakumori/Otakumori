@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { motion } from 'framer-motion';
@@ -25,19 +25,15 @@ export default function UnrecognizedDevicePage() {
           </div>
 
           {/* Message */}
-          <h1 className="text-4xl font-bold text-red-400 mb-6">
-            Unrecognized Device
-          </h1>
-          
+          <h1 className="text-4xl font-bold text-red-400 mb-6">Unrecognized Device</h1>
+
           <p className="text-xl text-neutral-300 mb-8 leading-relaxed">
-            We've detected that you're accessing Otakumori from a device we don't recognize. 
-            This is a security measure to protect your account and ensure a safe experience.
+            We've detected that you're accessing Otakumori from a device we don't recognize. This is
+            a security measure to protect your account and ensure a safe experience.
           </p>
 
           <div className="bg-gray-800/50 border border-red-500/30 rounded-lg p-6 mb-8">
-            <h2 className="text-lg font-semibold text-red-300 mb-4">
-              What This Means
-            </h2>
+            <h2 className="text-lg font-semibold text-red-300 mb-4">What This Means</h2>
             <ul className="text-neutral-300 text-left space-y-2">
               <li>• Your account security is our priority</li>
               <li>• This is a normal security check</li>
@@ -54,7 +50,7 @@ export default function UnrecognizedDevicePage() {
                 Return to Home
               </Button>
             </Link>
-            
+
             <p className="text-sm text-neutral-400">
               If you believe this is an error, please contact our support team.
             </p>
@@ -63,7 +59,7 @@ export default function UnrecognizedDevicePage() {
           {/* Additional Info */}
           <div className="mt-12 text-sm text-neutral-500">
             <p>
-              For security reasons, we may require additional verification for unrecognized devices. 
+              For security reasons, we may require additional verification for unrecognized devices.
               This helps protect your account from unauthorized access.
             </p>
           </div>

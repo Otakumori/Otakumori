@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -9,12 +9,14 @@ function shouldShowToday() {
   try {
     const k = 'gacha:lastShown';
     const last = localStorage.getItem(k);
-    const today = new Date().toISOString().slice(0,10);
+    const today = new Date().toISOString().slice(0, 10);
     if (last === today) return false;
     // show once/day after 10s on page
-    setTimeout(()=>localStorage.setItem(k, today), 0);
+    setTimeout(() => localStorage.setItem(k, today), 0);
     return true;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export default function DockedGacha() {
@@ -33,29 +35,33 @@ export default function DockedGacha() {
   if (!visible) return null;
 
   async function roll() {
-    setLoading(true); 
+    setLoading(true);
     setMsg(null);
-    
+
     try {
       // Track gacha roll for quests
       await trackQuest('gacha-roll');
-      
+
       const r = await fetch('/api/gacha', { method: 'POST' });
       const data = await r.json();
-      
+
       if (!r.ok) throw new Error(data?.error || 'roll failed');
-      
+
       if (data.type === 'coupon') {
         setMsg(`You earned a ${Math.round((data.amount ?? 0) * 100)}% voucher!`);
         // Dispatch event for cart to listen to
-        window.dispatchEvent(new CustomEvent('coupon:earned', { 
-          detail: { pct: data.amount } 
-        }));
+        window.dispatchEvent(
+          new CustomEvent('coupon:earned', {
+            detail: { pct: data.amount },
+          }),
+        );
       } else if (data.type === 'item') {
         setMsg(`Bonus Loot: ${data.item?.name} added to your bag!`);
-        window.dispatchEvent(new CustomEvent('cart:add', { 
-          detail: { item: data.item } 
-        }));
+        window.dispatchEvent(
+          new CustomEvent('cart:add', {
+            detail: { item: data.item },
+          }),
+        );
       } else {
         setMsg('A curious silence… try again later.');
       }
@@ -67,7 +73,8 @@ export default function DockedGacha() {
   }
 
   return (
-    <aside aria-label="Lucky Draw"
+    <aside
+      aria-label="Lucky Draw"
       className="fixed bottom-4 right-4 z-40 select-none"
       style={{ pointerEvents: 'auto' }}
     >
@@ -83,9 +90,9 @@ export default function DockedGacha() {
         <div className="w-72 rounded-2xl border border-slate-700 bg-cube-900/95 p-3 shadow-glow backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <strong className="text-slatey-200">Lucky Draw</strong>
-            <button 
-              aria-label="Close" 
-              onClick={() => setOpen(false)} 
+            <button
+              aria-label="Close"
+              onClick={() => setOpen(false)}
               className="text-slatey-400 hover:text-slatey-200 transition-colors"
             >
               ✕
@@ -102,9 +109,7 @@ export default function DockedGacha() {
             {loading ? 'Rolling…' : 'Roll'}
           </button>
           {msg && (
-            <p className="mt-2 text-sm text-slatey-200 bg-slate-800/50 rounded-lg p-2">
-              {msg}
-            </p>
+            <p className="mt-2 text-sm text-slatey-200 bg-slate-800/50 rounded-lg p-2">{msg}</p>
           )}
         </div>
       )}

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -58,7 +58,7 @@ export default function GameCubeBoot({ onBootComplete }) {
     });
 
     const interval = setInterval(() => {
-      setPetals(prev => [
+      setPetals((prev) => [
         ...prev.slice(-SEASONAL_PETALS[currentSeason].particles),
         generatePetal(),
       ]);
@@ -86,12 +86,12 @@ export default function GameCubeBoot({ onBootComplete }) {
     setAbyssParticles(particles);
 
     const interval = setInterval(() => {
-      setAbyssParticles(prev =>
-        prev.map(particle => ({
+      setAbyssParticles((prev) =>
+        prev.map((particle) => ({
           ...particle,
           rotation: particle.rotation + particle.speed,
           opacity: Math.max(0, particle.opacity - 0.01),
-        }))
+        })),
       );
     }, 16);
 
@@ -109,17 +109,17 @@ export default function GameCubeBoot({ onBootComplete }) {
       }
 
       // Black screen
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Show cube
       setStage('cube');
       setShowCube(true);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Show interface
       setStage('interface');
       setShowInterface(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Complete boot sequence
       onBootComplete?.();

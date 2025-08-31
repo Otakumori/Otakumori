@@ -1,7 +1,8 @@
-import { z } from "zod";
-import { http } from "./http";
+import { z } from 'zod';
+import { http } from './http';
+import { env } from '@/env';
 
-const PRINTIFY_BASE = "https://api.printify.com/v1";
+const PRINTIFY_BASE = 'https://api.printify.com/v1';
 
 // Zod schemas for Printify API responses
 export const PrintifyImageSchema = z.object({
@@ -47,20 +48,20 @@ export const PrintifyShopSchema = z.object({
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const apiKey = process.env.PRINTIFY_API_KEY;
+  const apiKey = env.PRINTIFY_API_KEY;
   if (!apiKey) {
-    console.error("PRINTIFY_API_KEY environment variable is not set");
-    throw new Error("PRINTIFY_API_KEY environment variable is not set");
+    console.error('PRINTIFY_API_KEY environment variable is not set');
+    throw new Error('PRINTIFY_API_KEY environment variable is not set');
   }
   return { Authorization: `Bearer ${apiKey}` };
 };
 
 // Helper function to get shop ID
 const getShopId = () => {
-  const shopId = process.env.PRINTIFY_SHOP_ID;
+  const shopId = env.PRINTIFY_SHOP_ID;
   if (!shopId) {
-    console.error("PRINTIFY_SHOP_ID environment variable is not set");
-    throw new Error("PRINTIFY_SHOP_ID environment variable is not set");
+    console.error('PRINTIFY_SHOP_ID environment variable is not set');
+    throw new Error('PRINTIFY_SHOP_ID environment variable is not set');
   }
   return shopId;
 };
@@ -70,22 +71,22 @@ export async function getCatalog(page = 1, limit = 50) {
   try {
     const shopId = getShopId();
     const url = `${PRINTIFY_BASE}/shops/${shopId}/products.json?page=${page}&limit=${limit}`;
-    
+
     console.log(`Fetching Printify catalog from: ${url}`);
     console.log(`Shop ID: ${shopId}`);
-    console.log(`API Key present: ${!!process.env.PRINTIFY_API_KEY}`);
+    console.log(`API Key present: ${!!env.PRINTIFY_API_KEY}`);
 
     const result = await http.get(url, PrintifyCatalogSchema, {
       headers: getAuthHeaders(),
       timeoutMs: 15000,
       retries: 2,
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     console.log(`Printify catalog fetched successfully: ${result.data.length} products`);
     return result;
   } catch (error) {
-    console.error("Error fetching Printify catalog:", error);
+    console.error('Error fetching Printify catalog:', error);
     throw error;
   }
 }
@@ -99,7 +100,7 @@ export async function getProduct(productId: string) {
       headers: getAuthHeaders(),
       timeoutMs: 15000,
       retries: 2,
-      cache: "no-store",
+      cache: 'no-store',
     });
   } catch (error) {
     console.error(`Error fetching Printify product ${productId}:`, error);
@@ -116,10 +117,10 @@ export async function getShopInfo() {
       headers: getAuthHeaders(),
       timeoutMs: 10000,
       retries: 1,
-      cache: "no-store",
+      cache: 'no-store',
     });
   } catch (error) {
-    console.error("Error fetching Printify shop info:", error);
+    console.error('Error fetching Printify shop info:', error);
     throw error;
   }
 }
@@ -129,11 +130,16 @@ export async function publishProduct(productId: string) {
     const shopId = getShopId();
     const url = `${PRINTIFY_BASE}/shops/${shopId}/products/${productId}/publish.json`;
 
-    return await http.post(url, z.object({ success: z.boolean() }), {}, {
-      headers: getAuthHeaders(),
-      timeoutMs: 20000,
-      retries: 2,
-    });
+    return await http.post(
+      url,
+      z.object({ success: z.boolean() }),
+      {},
+      {
+        headers: getAuthHeaders(),
+        timeoutMs: 20000,
+        retries: 2,
+      },
+    );
   } catch (error) {
     console.error(`Error publishing Printify product ${productId}:`, error);
     throw error;
@@ -143,23 +149,25 @@ export async function publishProduct(productId: string) {
 // Health check function with detailed diagnostics
 export async function checkPrintifyHealth() {
   try {
-    console.log("Starting Printify health check...");
+    console.log('Starting Printify health check...');
     console.log(`Environment check:`, {
-      NODE_ENV: process.env.NODE_ENV,
-      VERCEL_ENV: process.env.VERCEL_ENVIRONMENT,
-      hasApiKey: !!process.env.PRINTIFY_API_KEY,
-      hasShopId: !!process.env.PRINTIFY_SHOP_ID,
-      apiKeyLength: process.env.PRINTIFY_API_KEY?.length || 0,
-      shopId: process.env.PRINTIFY_SHOP_ID || 'Not set'
+      NODE_ENV: env.NODE_ENV,
+      VERCEL_ENV: env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
+      hasApiKey: !!env.PRINTIFY_API_KEY,
+      hasShopId: !!env.PRINTIFY_SHOP_ID,
+      apiKeyLength: env.PRINTIFY_API_KEY?.length || 0,
+      shopId: env.PRINTIFY_SHOP_ID || 'Not set',
     });
 
     // Test basic connectivity first
     const testResponse = await fetch('https://api.printify.com/v1/health', {
       method: 'GET',
-      cache: 'no-store'
+      cache: 'no-store',
     });
-    
-    console.log(`Printify API connectivity test: ${testResponse.status} ${testResponse.statusText}`);
+
+    console.log(
+      `Printify API connectivity test: ${testResponse.status} ${testResponse.statusText}`,
+    );
 
     if (!testResponse.ok) {
       return {
@@ -171,24 +179,24 @@ export async function checkPrintifyHealth() {
 
     // Test shop info
     const shopInfo = await getShopInfo();
-    console.log("Shop info retrieved successfully:", shopInfo);
-    
+    console.log('Shop info retrieved successfully:', shopInfo);
+
     return {
       healthy: true,
       shopId: shopInfo.id,
       shopTitle: shopInfo.title,
       timestamp: new Date().toISOString(),
-      connectivity: "OK",
-      shopAccess: "OK"
+      connectivity: 'OK',
+      shopAccess: 'OK',
     };
   } catch (error) {
-    console.error("Printify health check failed:", error);
+    console.error('Printify health check failed:', error);
     return {
       healthy: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString(),
-      connectivity: "Failed",
-      shopAccess: "Failed"
+      connectivity: 'Failed',
+      shopAccess: 'Failed',
     };
   }
 }

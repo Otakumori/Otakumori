@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { useEffect, useMemo, useState } from "react";
-import { useAnchors } from "./anchors";
-import { useHub, ORDER } from "./store";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { useEffect, useMemo, useState } from 'react';
+import { useAnchors } from './anchors';
+import { useHub, ORDER } from './store';
 
 // Fallback icons - you can replace these with actual icon paths later
 const iconMap: Record<string, string> = {
-  games: "🎮",
-  trade: "💎", 
-  avatar: "👤",
-  music: "🎵",
-  drawerTop: "💾",
-  drawerBottom: "📝"
+  games: '🎮',
+  trade: '💎',
+  avatar: '👤',
+  music: '🎵',
+  drawerTop: '💾',
+  drawerBottom: '📝',
 };
 
 export default function FrontSelector() {
@@ -25,25 +25,29 @@ export default function FrontSelector() {
       setCenter({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
     }
     refreshCenter();
-    window.addEventListener("resize", refreshCenter);
-    return () => window.removeEventListener("resize", refreshCenter);
+    window.addEventListener('resize', refreshCenter);
+    return () => window.removeEventListener('resize', refreshCenter);
   }, []);
 
   // only render chips while front is focused
-  if (face !== "front") return null;
+  if (face !== 'front') return null;
 
   return (
     <div className="pointer-events-none absolute inset-0 z-[4]">
       {ORDER.map((key, i) => {
-        const a = anchors[key]; if (!a?.visible) return null;
+        const a = anchors[key];
+        if (!a?.visible) return null;
         const isHot = i === selectorIndex;
         return (
           <button
             key={key}
-            className={`gc-chip ${isHot ? "hot" : ""}`}
+            className={`gc-chip ${isHot ? 'hot' : ''}`}
             style={{ left: a.x, top: a.y }}
             onMouseEnter={() => focusChip(i)}
-            onClick={() => { focusChip(i); setTimeout(() => confirm(), 0); }}
+            onClick={() => {
+              focusChip(i);
+              setTimeout(() => confirm(), 0);
+            }}
           >
             <span className="gc-chip-ico">{iconMap[key]}</span>
             <span className="gc-chip-label">{label(key)}</span>
@@ -55,13 +59,20 @@ export default function FrontSelector() {
         );
       })}
       {/* drawers */}
-      {["drawerTop", "drawerBottom"].map((k) => {
-        const a = (anchors as any)[k]; if (!a?.visible) return null;
+      {['drawerTop', 'drawerBottom'].map((k) => {
+        const a = (anchors as any)[k];
+        if (!a?.visible) return null;
         return (
-          <a key={k} className="gc-chip gc-chip--drawer" style={{ left: a.x, top: a.y }}
-            href={k === "drawerTop" ? "/achievements" : "/soapstones"}>
+          <a
+            key={k}
+            className="gc-chip gc-chip--drawer"
+            style={{ left: a.x, top: a.y }}
+            href={k === 'drawerTop' ? '/achievements' : '/soapstones'}
+          >
             <span className="gc-chip-ico">{iconMap[k]}</span>
-            <span className="gc-chip-label">{k === "drawerTop" ? "Memory Card" : "Soapstones"}</span>
+            <span className="gc-chip-label">
+              {k === 'drawerTop' ? 'Memory Card' : 'Soapstones'}
+            </span>
           </a>
         );
       })}
@@ -69,8 +80,15 @@ export default function FrontSelector() {
   );
 }
 
-function label(k: "games" | "trade" | "avatar" | "music") {
-  return ({ games: "Mini-Games", trade: "Trade Center", avatar: "Avatar & Community", music: "Music Player" } as const)[k];
+function label(k: 'games' | 'trade' | 'avatar' | 'music') {
+  return (
+    {
+      games: 'Mini-Games',
+      trade: 'Trade Center',
+      avatar: 'Avatar & Community',
+      music: 'Music Player',
+    } as const
+  )[k];
 }
 
 function rippleStyle(x: number, y: number, cx: number, cy: number) {
@@ -80,6 +98,6 @@ function rippleStyle(x: number, y: number, cx: number, cy: number) {
   const ang = (Math.atan2(dy, dx) * 180) / Math.PI; // deg
   return {
     width: `${len}px`,
-    transform: `translate(-50%, -50%) rotate(${ang}deg)`
+    transform: `translate(-50%, -50%) rotate(${ang}deg)`,
   } as React.CSSProperties;
 }

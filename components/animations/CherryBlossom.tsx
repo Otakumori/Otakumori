@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 'use client';
 
@@ -40,7 +40,7 @@ const CherryBlossom = () => {
 
     const animate = (timestamp: number) => {
       if (timestamp - lastSpawnTime >= SPAWN_INTERVAL) {
-        setPetals(prev => {
+        setPetals((prev) => {
           if (prev.length >= MAX_PETALS) {
             return prev;
           }
@@ -61,7 +61,7 @@ const CherryBlossom = () => {
   return (
     <div className="pointer-events-none fixed inset-0">
       <AnimatePresence>
-        {petals.map(petal => (
+        {petals.map((petal) => (
           <motion.div
             key={petal.id}
             initial={{

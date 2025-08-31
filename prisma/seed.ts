@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -274,7 +274,7 @@ async function main() {
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error('❌ Error during seeding:', e);
     process.exit(1);
   })

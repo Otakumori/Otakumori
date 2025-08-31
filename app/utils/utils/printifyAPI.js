@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { printify } from '@/lib/printifyClient';
 import { env } from '@/env.mjs';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const handleApiError = error => {
+const handleApiError = (error) => {
   if (error.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
@@ -18,7 +18,7 @@ const handleApiError = error => {
       headers: error.response.headers,
     });
     throw new Error(
-      `Printify API Error: ${error.response.status} - ${error.response.data.message || 'Unknown error'}`
+      `Printify API Error: ${error.response.status} - ${error.response.data.message || 'Unknown error'}`,
     );
   } else if (error.request) {
     // The request was made but no response was received
@@ -55,30 +55,27 @@ export const fetchProducts = async () => {
   }
 };
 
-export const fetchProductDetails = async productId => {
+export const fetchProductDetails = async (productId) => {
   try {
-    return await fetchWithRetry(
-      `/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}.json`,
-      {
-        method: 'GET',
-      }
-    );
+    return await fetchWithRetry(`/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}.json`, {
+      method: 'GET',
+    });
   } catch (error) {
     console.error(`Failed to fetch product details for ${productId}:`, error);
     throw error;
   }
 };
 
-export const publishProduct = async productId => {
+export const publishProduct = async (productId) => {
   try {
     return await fetchWithRetry(
       `/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}/publish.json`,
       {
         method: 'POST',
-      }
+      },
     );
   } catch (error) {
     console.error(`Failed to publish product ${productId}:`, error);
     throw error;
-    }
+  }
 };

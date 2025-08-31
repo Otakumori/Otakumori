@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { appUrl } from "@/lib/canonical";
+/* eslint-disable-line @next/next/no-img-element */
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { appUrl } from '@/lib/canonical';
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();
-    
+
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'email' }, { status: 400 });
     }
@@ -33,14 +33,12 @@ export async function POST(req: Request) {
     }
 
     // Return the starter pack download URL
-    const starterPackUrl = process.env.STARTER_PACK_URL || 
-      `${appUrl()}/api/starter-pack/download`;
+    const starterPackUrl = process.env.STARTER_PACK_URL || `${appUrl()}/api/starter-pack/download`;
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       url: starterPackUrl,
-      message: 'Starter pack ready for download'
+      message: 'Starter pack ready for download',
     });
-
   } catch (error) {
     console.error('Starter pack error:', error);
     return NextResponse.json({ error: 'internal' }, { status: 500 });

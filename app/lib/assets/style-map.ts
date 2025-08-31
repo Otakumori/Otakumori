@@ -1,16 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 // app/lib/style-map.ts
-export type Vibe = "spicy-male" | "spicy-female" | "neutral";
+export type Vibe = 'spicy-male' | 'spicy-female' | 'neutral';
 
 export const avatarVibes: Record<string, Vibe> = {
-  akira: "spicy-male",
-  yumi: "spicy-female",
-  test: "neutral"
+  akira: 'spicy-male',
+  yumi: 'spicy-female',
+  test: 'neutral',
 };
 
 export function getVibeForAvatar(avatar: string, override?: Vibe): Vibe {
   if (override) return override;
-  const key = (avatar || "").toLowerCase().trim();
-  return avatarVibes[key] ?? "neutral";
+  const key = (avatar || '').toLowerCase().trim();
+  return avatarVibes[key] ?? 'neutral';
 }

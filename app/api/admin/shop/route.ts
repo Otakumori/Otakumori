@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock data for shop management
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       case 'analytics':
         const totalRevenue = mockOrders.reduce((sum, order) => sum + order.total, 0);
         const totalOrders = mockOrders.length;
-        const lowStockProducts = mockProducts.filter(p => p.stock < 10);
+        const lowStockProducts = mockProducts.filter((p) => p.stock < 10);
 
         return NextResponse.json({
           success: true,
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
             totalOrders,
             lowStockProducts: lowStockProducts.length,
             topSellingProduct: mockProducts.reduce((top, current) =>
-              current.salesCount > top.salesCount ? current : top
+              current.salesCount > top.salesCount ? current : top,
             ),
           },
         });

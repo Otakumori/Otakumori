@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import { FriendList } from '../../components/FriendList';
@@ -9,7 +9,7 @@ import { AsciiArt } from '../../components/AsciiArt';
 import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
 
 export default function FriendsPage() {
-  const entries = useLeaderboardStore(state => state.entries);
+  const entries = useLeaderboardStore((state) => state.entries);
 
   return (
     <div className="container mx-auto px-4 py-8">

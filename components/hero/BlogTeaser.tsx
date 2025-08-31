@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import Link from 'next/link';
@@ -23,46 +23,49 @@ const SAMPLE_POSTS: BlogPost[] = [
   {
     id: '1',
     title: 'The Cherry Blossom Code: Secrets of the Digital Shrine',
-    excerpt: 'In the depths of the virtual realm, where pixels dance like falling petals, lies a truth that transcends mere code. The shrine speaks in whispers of binary and beauty...',
+    excerpt:
+      'In the depths of the virtual realm, where pixels dance like falling petals, lies a truth that transcends mere code. The shrine speaks in whispers of binary and beauty...',
     author: 'Digital Monk',
     date: '2024-08-26',
     readTime: '5 min read',
     likes: 42,
     comments: 17,
     category: 'Digital Philosophy',
-    image: '/blog/cherry-blossom-code.jpg'
+    image: '/blog/cherry-blossom-code.jpg',
   },
   {
     id: '2',
     title: 'Petal Collection: The Art of Mindful Gaming',
-    excerpt: 'Beyond the screen, beyond the controller, there exists a space where every action becomes a meditation. Each petal caught is a moment of presence...',
+    excerpt:
+      'Beyond the screen, beyond the controller, there exists a space where every action becomes a meditation. Each petal caught is a moment of presence...',
     author: 'Zen Gamer',
     date: '2024-08-25',
     readTime: '3 min read',
     likes: 38,
     comments: 23,
     category: 'Mindful Gaming',
-    image: '/blog/petal-collection.jpg'
+    image: '/blog/petal-collection.jpg',
   },
   {
     id: '3',
     title: 'Retro Aesthetics in Modern Design: Why Old Souls Matter',
-    excerpt: 'The pixel art of yesteryear wasn\'t just a limitation—it was a choice. A choice to find beauty in constraints, meaning in simplicity...',
+    excerpt:
+      "The pixel art of yesteryear wasn't just a limitation—it was a choice. A choice to find beauty in constraints, meaning in simplicity...",
     author: 'Pixel Sage',
     date: '2024-08-24',
     readTime: '7 min read',
     likes: 56,
     comments: 31,
     category: 'Design Philosophy',
-    image: '/blog/retro-aesthetics.jpg'
-  }
+    image: '/blog/retro-aesthetics.jpg',
+  },
 ];
 
 export function BlogTeaser() {
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
 
   const handleLike = (postId: string) => {
-    setLikedPosts(prev => {
+    setLikedPosts((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(postId)) {
         newSet.delete(postId);
@@ -79,13 +82,17 @@ export function BlogTeaser() {
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-gray-800">Latest Stories</h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600">
-            Discover the latest tales from the Otaku-mori community. Each story is a petal in the digital wind.
+            Discover the latest tales from the Otaku-mori community. Each story is a petal in the
+            digital wind.
           </p>
         </div>
 
         <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {SAMPLE_POSTS.map(post => (
-            <article key={post.id} className="group overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
+          {SAMPLE_POSTS.map((post) => (
+            <article
+              key={post.id}
+              className="group overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+            >
               <div className="relative h-48 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20" />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -97,7 +104,7 @@ export function BlogTeaser() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <div className="mb-3 flex items-center gap-2 text-sm text-gray-500">
                   <span>{post.author}</span>
@@ -106,15 +113,13 @@ export function BlogTeaser() {
                   <span>•</span>
                   <span>{post.readTime}</span>
                 </div>
-                
+
                 <h3 className="mb-3 text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors">
                   {post.title}
                 </h3>
-                
-                <p className="mb-4 text-gray-600 line-clamp-3">
-                  {post.excerpt}
-                </p>
-                
+
+                <p className="mb-4 text-gray-600 line-clamp-3">{post.excerpt}</p>
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <button
@@ -125,17 +130,19 @@ export function BlogTeaser() {
                           : 'bg-gray-100 text-gray-600 hover:bg-red-50'
                       }`}
                     >
-                      <Heart className={`h-4 w-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
+                      <Heart
+                        className={`h-4 w-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`}
+                      />
                       {post.likes + (likedPosts.has(post.id) ? 1 : 0)}
                     </button>
-                    
+
                     <div className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-2 text-sm text-gray-600">
                       <MessageCircle className="h-4 w-4" />
                       {post.comments}
                     </div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
                     aria-label="Share post"
                   >

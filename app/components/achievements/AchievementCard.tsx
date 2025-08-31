@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Achievement } from './AchievementProvider';
@@ -10,7 +10,7 @@ interface AchievementCardProps {
 }
 
 export function AchievementCard({ achievement }: AchievementCardProps) {
-  const { unlockAchievement } = useAchievements();
+  const { unlockAchievement: _unlockAchievement } = useAchievements();
   const isUnlocked = achievement.unlocked;
 
   return (
@@ -33,7 +33,9 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
           <h3 className="truncate text-lg font-medium text-gray-900 dark:text-white">
             {achievement.title}
           </h3>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Progress: {achievement.progress}/{achievement.total}</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Progress: {achievement.progress}/{achievement.total}
+          </p>
           <p className="mt-2 line-clamp-2 text-sm text-gray-700 dark:text-gray-300">
             {achievement.description}
           </p>
@@ -61,7 +63,8 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
       <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-700 dark:text-gray-300">
-            {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'} {achievement.reward?.type === 'points' ? 'Points' : achievement.reward?.type}
+            {achievement.reward?.type === 'points' ? achievement.reward.value : 'Unknown'}{' '}
+            {achievement.reward?.type === 'points' ? 'Points' : achievement.reward?.type}
           </span>
           {achievement.reward?.type === 'badge' && (
             <span className="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
@@ -69,11 +72,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
             </span>
           )}
         </div>
-        {isUnlocked && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            ✓ Unlocked
-          </span>
-        )}
+        {isUnlocked && <span className="text-xs text-gray-500 dark:text-gray-400">✓ Unlocked</span>}
       </div>
     </motion.div>
   );

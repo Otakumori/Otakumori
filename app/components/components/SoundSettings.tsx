@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import React from 'react';
 import { useSoundSettings } from '../../hooks/hooks/useSoundSettings';
 
@@ -21,7 +21,7 @@ export const SoundSettings = () => {
           max="1"
           step="0.01"
           value={volume}
-          onChange={e => setVolume(parseFloat(e.target.value))}
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
           className="h-2 w-24 cursor-pointer appearance-none rounded-lg bg-pink-600 outline-none focus:ring-2 focus:ring-pink-500"
           disabled={isMuted}
         />

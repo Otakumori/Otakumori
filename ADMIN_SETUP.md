@@ -18,6 +18,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 ```
 
 **Get your keys:**
+
 - **Resend**: Sign up at [resend.com](https://resend.com) and get your API key
 - **Supabase Service Role**: Go to Supabase Dashboard → Project Settings → API → Copy the `service_role` key
 
@@ -40,6 +41,7 @@ npm run db:migrate
 ### 4. Grant Admin Role
 
 In your Clerk Dashboard:
+
 1. Go to Users → Find your account
 2. Click Edit → Public Metadata
 3. Add: `{"role": "admin"}`
@@ -64,6 +66,7 @@ In your Clerk Dashboard:
 ### Email Template
 
 The email template is:
+
 - **Dark theme** with pink accents
 - **Inline CSS** (no external dependencies)
 - **Responsive** design
@@ -78,26 +81,31 @@ The email template is:
 ## 🛠️ Admin Dashboard Features
 
 ### Pages Management
+
 - **Create/Edit**: MDX editor with live preview
 - **Publish/Unpublish**: Draft → Published workflow
 - **SEO-friendly**: Slug management and status control
 
 ### Blog Posts
+
 - **Same as pages** + tags and cover images
 - **MDX support** for rich content
 - **Draft system** for content management
 
 ### Mini-games Configuration
+
 - **JSON editor** for game settings
 - **Version control** with automatic bumping
 - **Live updates** without redeployment
 
 ### Soapstones Moderation
+
 - **Hide/Unhide** messages
 - **Delete** inappropriate content
 - **Rate limiting** and profanity filtering
 
 ### Product Sync
+
 - **Printify integration** with automatic categorization
 - **Manual sync** button for admin control
 - **Smart mapping** of products to categories
@@ -105,17 +113,20 @@ The email template is:
 ## 🔒 Security
 
 ### Admin Access
+
 - **Clerk-guarded** routes
 - **Role-based** permissions (`role === "admin"`)
 - **Server-side** validation on all admin actions
 
 ### Database Security
+
 - **Row Level Security (RLS)** enabled on all tables
 - **Public read** access for published content
 - **Admin write** access for management
 - **User isolation** for game data
 
 ### API Protection
+
 - **Admin-only** endpoints
 - **Rate limiting** on public APIs
 - **Input validation** and sanitization
@@ -123,11 +134,13 @@ The email template is:
 ## 🎮 Game Integration
 
 ### Petal Collector
+
 - **Server-side** progress tracking
 - **Daily goals** and achievements
 - **Configurable** spawn rates and colors
 
 ### Soapstones
+
 - **Site-wide** message system
 - **Moderation tools** for admins
 - **Rate limiting** (1 per 30s per user)
@@ -135,11 +148,13 @@ The email template is:
 ## 📊 Monitoring & Observability
 
 ### Webhook Logging
+
 - **Stripe events** logged with details
 - **Printify responses** tracked
 - **Email send results** monitored
 
 ### Error Handling
+
 - **Graceful degradation** if email fails
 - **Retry logic** for Printify API calls
 - **Non-blocking** webhook responses
@@ -147,11 +162,13 @@ The email template is:
 ## 🚀 Deployment
 
 ### Vercel
+
 - **Environment variables** set in Vercel dashboard
 - **Serverless functions** for webhooks and admin APIs
 - **Edge runtime** optimized for performance
 
 ### Supabase
+
 - **RLS policies** automatically applied
 - **Real-time** subscriptions for live updates
 - **Backup** and point-in-time recovery
@@ -195,12 +212,14 @@ npm run db:verify
 ## 📚 Next Steps
 
 ### Immediate
+
 1. Test the admin dashboard
 2. Create a test page/post
 3. Verify email sending works
 4. Test Printify sync
 
 ### Future Enhancements
+
 1. **Media management** for images and files
 2. **Analytics dashboard** for sales and traffic
 3. **Automated backups** and maintenance
@@ -210,6 +229,7 @@ npm run db:verify
 ## 🆘 Support
 
 If you encounter issues:
+
 1. Check the logs first
 2. Verify all environment variables
 3. Test with a simple example

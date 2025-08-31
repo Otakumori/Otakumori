@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -41,19 +41,19 @@ export async function POST(request: NextRequest) {
 
     if (random < 0.6) {
       // 60% chance for common
-      selectedReward = rewards.find(r => r.rarity === 'common');
+      selectedReward = rewards.find((r) => r.rarity === 'common');
     } else if (random < 0.85) {
       // 25% chance for uncommon
-      selectedReward = rewards.find(r => r.rarity === 'uncommon');
+      selectedReward = rewards.find((r) => r.rarity === 'uncommon');
     } else if (random < 0.95) {
       // 10% chance for rare
-      selectedReward = rewards.find(r => r.rarity === 'rare');
+      selectedReward = rewards.find((r) => r.rarity === 'rare');
     } else if (random < 0.99) {
       // 4% chance for epic
-      selectedReward = rewards.find(r => r.rarity === 'epic');
+      selectedReward = rewards.find((r) => r.rarity === 'epic');
     } else {
       // 1% chance for legendary
-      selectedReward = rewards.find(r => r.rarity === 'legendary');
+      selectedReward = rewards.find((r) => r.rarity === 'legendary');
     }
 
     if (!selectedReward) {

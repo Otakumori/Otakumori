@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import { Product } from "@/lib/z";
+/* eslint-disable-line @next/next/no-img-element */
+'use client';
+import { Product } from '@/lib/z';
 
 interface ProductGridProps {
   products: Product[];
@@ -34,20 +34,16 @@ export default function ProductGrid({ products }: ProductGridProps) {
               <div className="text-4xl opacity-50">🎮</div>
             )}
           </div>
-          
+
           <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-pink-200 transition-colors">
             {product.title}
           </h3>
-          
-          <p className="text-sm opacity-70 mb-4 line-clamp-2">
-            {product.description}
-          </p>
-          
+
+          <p className="text-sm opacity-70 mb-4 line-clamp-2">{product.description}</p>
+
           <div className="flex items-center justify-between">
-            <span className="text-xl font-bold text-pink-400">
-              ${product.price.toFixed(2)}
-            </span>
-            
+            <span className="text-xl font-bold text-pink-400">${product.price.toFixed(2)}</span>
+
             <div className="flex items-center gap-2">
               {product.stock > 0 ? (
                 <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
@@ -60,18 +56,15 @@ export default function ProductGrid({ products }: ProductGridProps) {
               )}
             </div>
           </div>
-          
+
           <div className="mt-4 flex flex-wrap gap-2">
             {product.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs bg-white/10 text-white/70 px-2 py-1 rounded-full"
-              >
+              <span key={tag} className="text-xs bg-white/10 text-white/70 px-2 py-1 rounded-full">
                 {tag}
               </span>
             ))}
           </div>
-          
+
           <button className="w-full mt-4 bg-pink-500 hover:bg-pink-600 text-black font-semibold py-2 px-4 rounded-xl transition-colors duration-200">
             Add to Cart
           </button>

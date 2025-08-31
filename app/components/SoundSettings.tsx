@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable-line @next/next/no-img-element */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -33,7 +33,7 @@ export const SoundSettings: React.FC = () => {
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings);
-        setSettings(prev => ({ ...prev, ...parsed }));
+        setSettings((prev) => ({ ...prev, ...parsed }));
       } catch (error) {
         console.error('Failed to parse sound settings:', error);
       }
@@ -51,7 +51,7 @@ export const SoundSettings: React.FC = () => {
   const applySoundSettings = () => {
     // Apply master volume to all audio elements
     const audioElements = document.querySelectorAll('audio');
-    audioElements.forEach(audio => {
+    audioElements.forEach((audio) => {
       const category = audio.dataset.soundCategory || 'sfx';
       let volume = settings.masterVolume / 100;
 
@@ -72,11 +72,11 @@ export const SoundSettings: React.FC = () => {
   };
 
   const handleVolumeChange = (category: keyof SoundSettings, value: number) => {
-    setSettings(prev => ({ ...prev, [category]: value }));
+    setSettings((prev) => ({ ...prev, [category]: value }));
   };
 
   const handleToggle = (category: keyof SoundSettings) => {
-    setSettings(prev => ({ ...prev, [category]: !prev[category] }));
+    setSettings((prev) => ({ ...prev, [category]: !prev[category] }));
   };
 
   const playTestSound = (category: 'music' | 'sfx' | 'voice') => {
@@ -111,7 +111,7 @@ export const SoundSettings: React.FC = () => {
     }
 
     audio.volume = volume;
-    audio.play().catch(error => {
+    audio.play().catch((error) => {
       console.error('Failed to play test sound:', error);
     });
   };
@@ -179,7 +179,7 @@ export const SoundSettings: React.FC = () => {
               min="0"
               max="100"
               value={settings.masterVolume}
-              onChange={e => handleVolumeChange('masterVolume', parseInt(e.target.value))}
+              onChange={(e) => handleVolumeChange('masterVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
             />
           </div>
@@ -222,7 +222,7 @@ export const SoundSettings: React.FC = () => {
               min="0"
               max="100"
               value={settings.musicVolume}
-              onChange={e => handleVolumeChange('musicVolume', parseInt(e.target.value))}
+              onChange={(e) => handleVolumeChange('musicVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
             />
           </div>
@@ -265,7 +265,7 @@ export const SoundSettings: React.FC = () => {
               min="0"
               max="100"
               value={settings.sfxVolume}
-              onChange={e => handleVolumeChange('sfxVolume', parseInt(e.target.value))}
+              onChange={(e) => handleVolumeChange('sfxVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
             />
           </div>
@@ -308,7 +308,7 @@ export const SoundSettings: React.FC = () => {
               min="0"
               max="100"
               value={settings.voiceVolume}
-              onChange={e => handleVolumeChange('voiceVolume', parseInt(e.target.value))}
+              onChange={(e) => handleVolumeChange('voiceVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
             />
           </div>
