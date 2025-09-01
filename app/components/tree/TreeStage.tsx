@@ -6,7 +6,6 @@ import { LayerPlane } from './LayerPlane';
 import { useWorld } from '@/app/world/WorldProvider';
 import Avatar from '../avatar/Avatar';
 import PetalBurst from '../effects/PetalBurst';
-import { env } from '@/env.mjs';
 
 export default function TreeStage() {
   const { settings } = useWorld();
@@ -14,9 +13,8 @@ export default function TreeStage() {
 
   useEffect(() => {
     // Gate to prevent multiple Canvas components from mounting simultaneously
-    if (env.NEXT_PUBLIC_BG_CANVAS !== "off") {
-      setIsMounted(true);
-    }
+    // Always mount for now - can be controlled via environment variable later
+    setIsMounted(true);
   }, []);
 
   // Layer definitions: tweak hue/sat/val bands to your artwork
