@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { CartProvider } from './components/cart/CartProvider';
+import { PetalProvider } from '../providers';
 import { WorldProvider } from './world/WorldProvider';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
@@ -17,19 +18,21 @@ import GlobalBackground from './components/GlobalBackground';
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WorldProvider>
-      <CartProvider>
-        <GlobalMusicProvider>
-          {/* Site-wide background (fixed, behind everything) */}
-          <GlobalBackground />
-          {/* Navigation */}
-          <Navbar />
-          {children}
-          <GlobalMusicBar />
-          <SoapstoneDock />
-          <DockedGacha />
-          <QuakeHUD />
-        </GlobalMusicProvider>
-      </CartProvider>
+      <PetalProvider>
+        <CartProvider>
+          <GlobalMusicProvider>
+            {/* Site-wide background (fixed, behind everything) */}
+            <GlobalBackground />
+            {/* Navigation */}
+            <Navbar />
+            {children}
+            <GlobalMusicBar />
+            <SoapstoneDock />
+            <DockedGacha />
+            <QuakeHUD />
+          </GlobalMusicProvider>
+        </CartProvider>
+      </PetalProvider>
     </WorldProvider>
   );
 }
