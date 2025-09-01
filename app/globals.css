@@ -16,14 +16,75 @@
 }
 
 /* Animation utilities (generated-friendly) */
-.delay-0s{animation-delay:0s}.delay-1s{animation-delay:1s}.delay-2s{animation-delay:2s}
-.delay-3s{animation-delay:3s}.delay-4s{animation-delay:4s}.delay-5s{animation-delay:5s}
-.delay-6s{animation-delay:6s}.delay-7s{animation-delay:7s}.delay-8s{animation-delay:8s}
-.delay-9s{animation-delay:9s}.delay-10s{animation-delay:10s}
-.duration-1s{animation-duration:1s}.duration-2s{animation-duration:2s}.duration-3s{animation-duration:3s}
-.duration-4s{animation-duration:4s}.duration-5s{animation-duration:5s}.duration-6s{animation-duration:6s}
-.duration-7s{animation-duration:7s}.duration-8s{animation-duration:8s}.duration-9s{animation-duration:9s}
-.duration-10s{animation-duration:10s}.duration-11s{animation-duration:11s}.duration-12s{animation-duration:12s}
+.delay-0s {
+  animation-delay: 0s;
+}
+.delay-1s {
+  animation-delay: 1s;
+}
+.delay-2s {
+  animation-delay: 2s;
+}
+.delay-3s {
+  animation-delay: 3s;
+}
+.delay-4s {
+  animation-delay: 4s;
+}
+.delay-5s {
+  animation-delay: 5s;
+}
+.delay-6s {
+  animation-delay: 6s;
+}
+.delay-7s {
+  animation-delay: 7s;
+}
+.delay-8s {
+  animation-delay: 8s;
+}
+.delay-9s {
+  animation-delay: 9s;
+}
+.delay-10s {
+  animation-delay: 10s;
+}
+.duration-1s {
+  animation-duration: 1s;
+}
+.duration-2s {
+  animation-duration: 2s;
+}
+.duration-3s {
+  animation-duration: 3s;
+}
+.duration-4s {
+  animation-duration: 4s;
+}
+.duration-5s {
+  animation-duration: 5s;
+}
+.duration-6s {
+  animation-duration: 6s;
+}
+.duration-7s {
+  animation-duration: 7s;
+}
+.duration-8s {
+  animation-duration: 8s;
+}
+.duration-9s {
+  animation-duration: 9s;
+}
+.duration-10s {
+  animation-duration: 10s;
+}
+.duration-11s {
+  animation-duration: 11s;
+}
+.duration-12s {
+  animation-duration: 12s;
+}
 
 @font-face {
   font-family: 'Runic';
@@ -111,16 +172,63 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 88, 28, 135;
   --background-end-rgb: 219, 39, 119;
+  --tree-url-1x: url('/assets/images/cherry/cherry-tree@1x.webp');
+  --tree-url-2x: url('/assets/images/cherry/cherry-tree@2x.webp');
+  --tree-opacity: 0.95;
+  --tree-x: 0px; /* computed in JS so trunk center sits at x=0 */
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
+  position: relative;
+  background-color: #0b0b0c;
+  color: #e7e7ea;
+}
+
+/* The tree spans the ENTIRE document height, not just viewport */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: -webkit-image-set(var(--tree-url-1x) 1x, var(--tree-url-2x) 2x);
+  background-image: image-set(
+    var(--tree-url-1x) type('image/webp') 1x,
+    var(--tree-url-2x) type('image/webp') 2x
   );
-  min-height: 100vh;
+  background-repeat: no-repeat;
+  background-position: var(--tree-x) top;
+  background-size: auto 100%;
+  opacity: var(--tree-opacity);
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.25));
+}
+
+/* Mobile guardrails */
+@media (max-width: 1024px) {
+  body::before {
+    opacity: 0.9;
+  }
+}
+
+/* Optional footer blend so roots feel grounded */
+footer {
+  position: relative;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -80px;
+  height: 80px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(11, 11, 12, 0) 0%, rgba(11, 11, 12, 0.7) 100%);
 }
 
 @layer components {
