@@ -1,10 +1,9 @@
 'use client';
 import { useEffect } from 'react';
 
-const ORIG_W = 1024,
-  ORIG_H = 1536; // source art size
-const TRUNK_CENTER_PX = 512; // tweak ±10 if needed
-const GUTTER_PX = 0; // set negative to tuck a hair outside
+const ORIG_H = 1536;
+const TRUNK_CENTER_PX = 512;
+const GUTTER_PX = 0;
 
 export default function TreeAligner() {
   useEffect(() => {
