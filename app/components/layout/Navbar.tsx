@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingCart, Menu, X, ChevronDown, Heart } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useCart } from '../cart/CartProvider';
 import { CATEGORIES } from '@/lib/categories';
@@ -89,11 +89,12 @@ const Navbar: React.FC = () => {
         {/* Logo */}
         <Link href="/" aria-label="Home">
           <Image
-            src="/assets/logo.png"
+            src="/assets/images/circlelogo.png"
             alt="Otaku-mori Logo"
             width={40}
             height={40}
             className="rounded-full"
+            priority
           />
         </Link>
 
@@ -196,10 +197,10 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <Link
             href="/wishlist"
-            className="text-white transition-colors hover:text-pink-500"
+            className="text-white transition-colors hover:text-pink-500 text-xl"
             aria-label="Wishlist"
           >
-            <Heart size={20} />
+            ♡
           </Link>
           <Link
             href="/cart"
