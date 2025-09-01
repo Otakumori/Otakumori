@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 export async function GET() {
   try {
     const envHealth = getEnvHealth();
-    
+
     // Check database connection
     let dbStatus = 'unknown';
     try {
@@ -24,11 +24,11 @@ export async function GET() {
     try {
       const key = env.PRINTIFY_API_KEY;
       const store = env.PRINTIFY_SHOP_ID;
-      
+
       if (key && store) {
         const res = await fetch(`https://api.printify.com/v1/shops/${store}/products.json`, {
           headers: { Authorization: `Bearer ${key}` },
-          cache: 'no-store'
+          cache: 'no-store',
         });
         printifyStatus = res.ok ? 'up' : 'down';
       } else {
@@ -60,8 +60,8 @@ export async function GET() {
 
     const health = {
       status: 'healthy',
-      version: env.npm_package_version || 'unknown',
-      environment: env.NODE_ENV || 'unknown',
+      version: '1.0.0', // Static version for now
+      environment: 'production', // Static environment for now
       timestamp: new Date().toISOString(),
       services: {
         clerk: clerkStatus,
@@ -77,14 +77,17 @@ export async function GET() {
     }
 
     const statusCode = health.status === 'healthy' ? 200 : 503;
-    
+
     return NextResponse.json(health, { status: statusCode });
   } catch (error) {
     console.error('Health check failed:', error);
-    return NextResponse.json({
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString(),
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        status: 'unhealthy',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      },
+      { status: 500 },
+    );
   }
 }
