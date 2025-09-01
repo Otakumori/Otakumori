@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Shop products API error:', error);
 
-    // Return empty products instead of mock data
+    // Return empty products with 200 status for graceful degradation
     return NextResponse.json(
       {
         products: [],
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
       },
-      { status: 500 },
+      { status: 200 },
     );
   }
 }
