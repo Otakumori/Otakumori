@@ -60,24 +60,26 @@ const nextConfig = {
             value: [
               "default-src 'self';",
               // Allow inline for Next hydration and small inlined chunks; keep 'unsafe-eval' only if needed for dev tooling
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev https://*.jsdelivr.net;",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://cdn.jsdelivr.net;",
               // Fetch/XHR/SSE/WebSocket
-              "connect-src 'self' https://*.clerk.com https://*.clerkstage.dev https://api.clerk.com https://api.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com;",
+              "connect-src 'self' https://*.clerk.com https://api.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com;",
               // Styles and fonts
-              "style-src 'self' 'unsafe-inline' https://*.clerk.com https://*.clerkstage.dev https://fonts.googleapis.com;",
-              "font-src 'self' data: https://*.clerk.com https://fonts.gstatic.com https://fonts.googleapis.com;",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+              "font-src 'self' data: https://fonts.gstatic.com;",
               // Images, including data/blobs and Clerk assets
               "img-src 'self' data: blob: https://*.clerk.com https://*.printify.com https://*.cloudinary.com https://*.vercel-blob.com https:;",
               // Media (if you stream or load video/audio)
               "media-src 'self' blob:;",
               // Frames (if you ever embed Clerk or other auth iframes)
-              "frame-src 'self' https://*.clerk.com https://*.clerkstage.dev;",
+              "frame-src 'self' https://*.clerk.com;",
               // Workers
               "worker-src 'self' blob:;",
               // Disallow others from iframing your app
               "frame-ancestors 'self';",
               // Strict transport, no mixed content
               "upgrade-insecure-requests;",
+              "base-uri 'self';",
+              "form-action 'self';",
             ].join(' '),
           },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
