@@ -19,7 +19,7 @@ export async function GET() {
           error: 'Configuration incomplete',
           data: [],
         },
-        { status: 500 },
+        { status: 200 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function GET() {
           error: `Printify API error: ${res.status}`,
           data: [],
         },
-        { status: res.status },
+        { status: 200 },
       );
     }
 
@@ -75,7 +75,7 @@ export async function GET() {
         error: 'Failed to fetch products',
         data: [],
       },
-      { status: 500 },
+      { status: 200 },
     );
   }
 }
