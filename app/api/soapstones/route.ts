@@ -1,100 +1,15 @@
- 
- 
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { z } from 'zod';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-const createMessageSchema = z.object({
-  content: z.string().min(1).max(200),
-  rotation: z.number().min(0).max(360).optional(),
-});
-
-export async function POST(request: NextRequest) {
+export async function GET() {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const { content, rotation = 0 } = createMessageSchema.parse(body);
-
-    const message = await db.soapstoneMessage.create({
-      data: {
-        content,
-        rotation,
-        userId,
-      },
+    const items = await prisma.soapstone.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
     });
-
-    return NextResponse.json({ data: message });
-  } catch (error) {
-    console.error('Error creating soapstone message:', error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
-    }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const userId = searchParams.get('userId');
-
-    const where: any = {
-      isHidden: false,
-      isFlagged: false,
-    };
-
-    if (userId) {
-      where.userId = userId;
-    }
-
-    const messages = await db.soapstoneMessage.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            username: true,
-            display_name: true,
-          },
-        },
-        likes: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: limit,
-      skip: offset,
-    });
-
-    const total = await db.soapstoneMessage.count({ where });
-
-    return NextResponse.json({
-      data: messages,
-      pagination: {
-        total,
-        limit,
-        offset,
-        hasMore: offset + limit < total,
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching soapstone messages:', error);
-    // Return empty results instead of 500 to prevent cascading failures
-    return NextResponse.json({
-      data: [],
-      pagination: {
-        total: 0,
-        limit: 50,
-        offset: 0,
-        hasMore: false,
-      },
-      error: 'Database temporarily unavailable'
-    }, { status: 200 });
+    return NextResponse.json({ items });
+  } catch (e) {
+    console.error('soapstones:get', e);
+    return NextResponse.json({ items: [] }, { status: 200 });
   }
 }
