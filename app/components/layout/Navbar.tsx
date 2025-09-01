@@ -234,6 +234,8 @@ const Navbar: React.FC = () => {
               </button>
             </SignInButton>
           )}
+
+          <PetalWallet />
         </div>
 
         {/* Mobile Menu Button */}
