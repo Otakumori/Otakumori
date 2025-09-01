@@ -13,12 +13,12 @@ export function middleware(_request: NextRequest) {
   // Content Security Policy
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://*.clerkstage.dev https://js.stripe.com https://*.jsdelivr.net",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://clerk.otaku-mori.com https://*.clerkstage.dev https://js.stripe.com https://*.jsdelivr.net",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https: blob: https://*.clerk.com https://*.clerkstage.dev",
-    "connect-src 'self' https://*.clerk.com https://*.clerkstage.dev https://vyyovmhjtxeddssvfdve.supabase.co https://api.stripe.com https://api.printify.com",
-    "frame-src 'self' https://*.clerk.com https://*.clerkstage.dev https://js.stripe.com",
+    "connect-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.clerkstage.dev https://vyyovmhjtxeddssvfdve.supabase.co https://api.stripe.com https://api.printify.com",
+    "frame-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.clerkstage.dev https://js.stripe.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
