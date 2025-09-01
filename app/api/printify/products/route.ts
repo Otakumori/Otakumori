@@ -4,7 +4,7 @@ import { env } from '@/env.mjs';
 export async function GET() {
   try {
     const key = env.PRINTIFY_API_KEY,
-      store = env.PRINTIFY_STORE_ID;
+      store = env.PRINTIFY_SHOP_ID;
     if (!key || !store)
       return NextResponse.json({ products: [], source: 'missing-env' }, { status: 500 });
 

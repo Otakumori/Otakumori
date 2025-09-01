@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/app/lib/prisma';
 
 export async function GET() {
   try {
-    const items = await prisma.soapstone.findMany({
+    const items = await prisma.soapstoneMessage.findMany({
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
