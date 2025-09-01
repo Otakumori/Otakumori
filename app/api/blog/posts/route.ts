@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
-import { NextRequest, NextResponse } from 'next/server';
+ 
+ 
+import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GameProps } from '../types';
+import { type GameProps } from '../types';
 
 export default function ThighTrap({ onComplete, onFail, duration }: GameProps) {
   const [wiggleCount, setWiggleCount] = useState(0);

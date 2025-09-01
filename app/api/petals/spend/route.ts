@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { NextResponse } from 'next/server';
 import { requireUserId } from '@/app/lib/auth';
 import { petalService } from '@/app/lib/petals';

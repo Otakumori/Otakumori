@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Achievement } from '../../app/types/achievements';
+import { type Achievement } from '../../app/types/achievements';
 import { useAchievements } from '../../app/components/achievements/AchievementProvider';
 
 interface AchievementCardProps {

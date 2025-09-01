@@ -1,7 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { redis } from '@/lib/redis';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds

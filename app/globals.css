@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Accessibility utilities */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Animation utilities (generated-friendly) */
+.delay-0s{animation-delay:0s}.delay-1s{animation-delay:1s}.delay-2s{animation-delay:2s}
+.delay-3s{animation-delay:3s}.delay-4s{animation-delay:4s}.delay-5s{animation-delay:5s}
+.delay-6s{animation-delay:6s}.delay-7s{animation-delay:7s}.delay-8s{animation-delay:8s}
+.delay-9s{animation-delay:9s}.delay-10s{animation-delay:10s}
+.duration-1s{animation-duration:1s}.duration-2s{animation-duration:2s}.duration-3s{animation-duration:3s}
+.duration-4s{animation-duration:4s}.duration-5s{animation-duration:5s}.duration-6s{animation-duration:6s}
+.duration-7s{animation-duration:7s}.duration-8s{animation-duration:8s}.duration-9s{animation-duration:9s}
+.duration-10s{animation-duration:10s}.duration-11s{animation-duration:11s}.duration-12s{animation-duration:12s}
+
 @font-face {
   font-family: 'Runic';
   src: url('/assets/fonts/runic.ttf') format('truetype');

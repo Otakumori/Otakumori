@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
-import { Achievement } from '../app/types/achievements';
+ 
+ 
+import { type Achievement } from '../app/types/achievements';
 
 export const achievements: Achievement[] = [
   // Site Interaction Achievements

@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useFriendSystemStore, Friend } from '@/lib/store/friendSystemStore';
 import { motion } from 'framer-motion';
-import { AsciiArt } from './AsciiArt';
+
 
 interface Activity {
   id: string;
@@ -63,7 +63,6 @@ export const FriendActivity: React.FC = () => {
   return (
     <div className="rounded-lg bg-white/10 p-6 shadow-lg backdrop-blur-lg">
       <div className="mb-6 flex items-center gap-4">
-        <AsciiArt type="chat" className="text-2xl" />
         <h2 className="text-2xl font-bold text-pink-400">Activity Feed</h2>
       </div>
       <div className="space-y-4">

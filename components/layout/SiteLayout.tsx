@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -53,7 +53,7 @@ function Petals({
   const PetalTag = gameMode ? motion.button : motion.span;
 
   return (
-    <div className="fixed inset-0 overflow-hidden z-20" aria-hidden={!gameMode}>
+    <div className="fixed inset-0 overflow-hidden z-20" aria-hidden={!gameMode ? true : undefined}>
       {petals.map((p) => (
         <PetalTag
           key={p.id}

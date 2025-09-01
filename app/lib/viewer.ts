@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { cookies } from 'next/headers';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';

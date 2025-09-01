@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client'; // 👈 THIS IS THE FIX
 export const dynamic = 'force-dynamic';
 

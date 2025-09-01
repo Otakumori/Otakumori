@@ -1,9 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getShopProducts, ShopProduct, ShopFilters, ShopSort } from '@/src/lib/shop';
+import Image from 'next/image';
+import { getShopProducts, type ShopProduct, type ShopFilters, type ShopSort } from '@/src/lib/shop';
 import { addToCart } from '@/src/lib/cart';
 
 interface ShopProductsProps {
@@ -165,9 +166,11 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
               <Link href={`/shop/product/${product.id}`} className="block">
                 {/* Product Image */}
                 <div className="relative w-full aspect-square bg-white/5 overflow-hidden rounded-lg mb-3">
-                  <img
+                  <Image
                     src={imageUrl}
                     alt={product.name}
+                    width={400}
+                    height={400}
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />

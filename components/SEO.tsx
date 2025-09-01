@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import Head from 'next/head';
 import { appUrl } from '@/lib/canonical';
 

@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 
 import * as Sentry from '@sentry/nextjs';
 

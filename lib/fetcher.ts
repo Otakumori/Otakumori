@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 export async function safeFetch<T>(
   input: RequestInfo | URL,
   init: RequestInit & { timeoutMs?: number } = {},

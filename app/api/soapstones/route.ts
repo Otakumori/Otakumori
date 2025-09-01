@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
-import { NextRequest, NextResponse } from 'next/server';
+ 
+ 
+import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
@@ -85,6 +85,16 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching soapstone messages:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    // Return empty results instead of 500 to prevent cascading failures
+    return NextResponse.json({
+      data: [],
+      pagination: {
+        total: 0,
+        limit: 50,
+        offset: 0,
+        hasMore: false,
+      },
+      error: 'Database temporarily unavailable'
+    }, { status: 200 });
   }
 }

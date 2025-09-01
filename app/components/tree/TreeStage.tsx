@@ -1,14 +1,23 @@
 'use client';
 
 import { Canvas, useThree } from '@react-three/fiber';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useEffect, useState } from 'react';
 import { LayerPlane } from './LayerPlane';
 import { useWorld } from '@/app/world/WorldProvider';
 import Avatar from '../avatar/Avatar';
 import PetalBurst from '../effects/PetalBurst';
+import { env } from '@/env.mjs';
 
 export default function TreeStage() {
   const { settings } = useWorld();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    // Gate to prevent multiple Canvas components from mounting simultaneously
+    if (env.NEXT_PUBLIC_BG_CANVAS !== "off") {
+      setIsMounted(true);
+    }
+  }, []);
 
   // Layer definitions: tweak hue/sat/val bands to your artwork
   const layers = useMemo(
@@ -44,6 +53,8 @@ export default function TreeStage() {
     ],
     [settings.reducedMotion],
   );
+
+  if (!isMounted) return null;
 
   return (
     <div className="absolute inset-0">

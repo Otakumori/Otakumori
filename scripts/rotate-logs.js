@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 const fs = require('fs');
 const path = require('path');
 const { createGzip } = require('zlib');

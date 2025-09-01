@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GameProps } from '../types';
+import { type GameProps } from '../types';
 
 export default function PantyRaid({ onComplete, onFail, duration }: GameProps) {
   const [pantyPosition, setPantyPosition] = useState({ x: 50, y: 30 });

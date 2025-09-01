@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import React from 'react';
 
 interface AchievementSortProps {
@@ -13,7 +13,7 @@ export const AchievementSort: React.FC<AchievementSortProps> = ({ sortBy, onSort
     <select
       value={sortBy}
       onChange={(e) => onSortChange(e.target.value as 'name' | 'date' | 'category' | 'progress')}
-      className="rounded border px-2 py-1"
+      className="rounded border px-2 py-1" aria-label="Select"
     >
       <option value="name">Name</option>
       <option value="date">Date</option>

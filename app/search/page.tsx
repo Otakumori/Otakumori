@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import SearchBar from '@/app/components/SearchBar';
 import SearchResults from '@/app/components/SearchResults';
-import { SearchResult } from '@/app/lib/contracts';
+import { type SearchResult } from '@/app/lib/contracts';
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');

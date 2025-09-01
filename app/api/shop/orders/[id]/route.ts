@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+ 
+ 
 // Disabled during Supabase to Prisma migration
 import { NextResponse } from 'next/server';
 

@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import { type Metadata } from 'next';
 import { CATEGORIES, getCategoryBySlug } from '@/lib/categories';
 import { db } from '@/app/lib/db';
 import CategoryHeader from '@/components/shop/CategoryHeader';
 import ProductGrid from '@/components/shop/ProductGrid';
-import { Product } from '@/lib/z';
+import { type Product } from '@/lib/z';
 
 interface CategoryPageProps {
   params: {

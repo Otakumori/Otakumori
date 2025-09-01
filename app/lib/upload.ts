@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server';
 import sharp from 'sharp';
 
 export interface UploadConfig {

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { useRunicText } from '../../hooks/hooks/useRunicText';
 import { cn } from '@/lib/utils';
 import { useAudio } from '@/lib/hooks/useAudio';

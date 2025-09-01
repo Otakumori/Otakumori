@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { env } from '@/env';
 
 const PROD_ORIGIN = (env.NEXT_PUBLIC_SITE_URL || 'https://otaku-mori.com').replace(/\/$/, '');

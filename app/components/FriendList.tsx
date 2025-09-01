@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useFriendSystemStore, Friend } from '@/lib/store/friendSystemStore';
+import { useFriendSystemStore, type Friend } from '@/lib/store/friendSystemStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AsciiArt } from './AsciiArt';
+
 
 interface FriendRequest {
   id: string;

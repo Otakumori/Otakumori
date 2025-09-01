@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ProgressData } from './types';
+import { type ProgressData } from './types';
 
 const STORAGE_KEY = 'otkm_arcade_progress';
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GameProps } from '../types';
+import { type GameProps } from '../types';
 
 export default function BlowTheCartridge({ onComplete, _onFail, _duration }: GameProps) {
   const [_blowCount, setBlowCount] = useState(0);

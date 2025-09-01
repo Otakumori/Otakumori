@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, X, Clock, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  SearchRequest,
-  SearchResponse,
-  SearchSuggestionRequest,
-  SearchSuggestionResponse,
-  SearchResult,
+  type SearchRequest,
+  type SearchResponse,
+  type SearchSuggestionRequest,
+  type SearchSuggestionResponse,
+  type SearchResult,
 } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 

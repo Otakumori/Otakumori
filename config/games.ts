@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 // config/games.ts
 export const GAME_FLAGS = {
   'quick-math': { enabled: false, practice: true }, // practice mode by default

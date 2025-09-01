@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -136,7 +136,7 @@ export default function GameShell({
 
         {/* Scene goes here */}
         <div
-          aria-hidden={paused || !!ended}
+          aria-hidden={paused || !!ended ? true : undefined}
           className={paused || ended ? 'pointer-events-none' : ''}
         >
           {children}

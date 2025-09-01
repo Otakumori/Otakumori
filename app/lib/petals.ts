@@ -1,6 +1,6 @@
 import { db } from '@/app/lib/db';
 import { logger } from '@/app/lib/logger';
-import { PetalTransaction, PetalTransactionSchema } from '@/app/lib/contracts';
+import { type PetalTransaction, PetalTransactionSchema } from '@/app/lib/contracts';
 
 export interface PetalReward {
   type: PetalTransaction['type'];

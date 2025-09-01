@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import GlassCard from '@/app/components/ui/GlassCard';
-import { FriendsPresenceResponse, PresenceResponse } from '@/app/lib/contracts';
+import { FriendsPresenceResponse, type PresenceResponse } from '@/app/lib/contracts';
 
 interface FriendsListProps {
   className?: string;

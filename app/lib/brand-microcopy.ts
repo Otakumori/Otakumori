@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 // Brand microcopy placeholders for Otakumori
 // These are seed texts that can be iterated on later
 

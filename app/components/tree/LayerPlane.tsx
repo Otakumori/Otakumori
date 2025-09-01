@@ -1,7 +1,7 @@
 import { useFrame, useLoader } from '@react-three/fiber';
 import { TextureLoader, SRGBColorSpace, RepeatWrapping } from 'three';
 import { useMemo, useRef } from 'react';
-import { ShaderMaterial, Mesh, Vector2 } from 'three';
+import { type ShaderMaterial, type Mesh, Vector2 } from 'three';
 
 // Shader strings
 const vertexShader = `

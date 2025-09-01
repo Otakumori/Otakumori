@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -7,7 +7,7 @@ const path = require('path');
 const healthChecker = spawn('ts-node', [path.join(__dirname, 'check-health.ts')], {
   stdio: 'inherit',
   env: {
-    ...process.env,
+    ...process.env, // eslint-disable-line no-restricted-syntax
     NODE_ENV: 'production',
   },
 });

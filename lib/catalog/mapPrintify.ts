@@ -3,7 +3,7 @@
  * Handles category mapping and integration reference generation
  */
 
-import { CATEGORIES, isCategory } from '@/lib/categories';
+import { isCategory } from '@/lib/categories';
 
 /**
  * Generate deterministic integration reference for Printify products

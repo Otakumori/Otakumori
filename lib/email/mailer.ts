@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 // lib/email/mailer.ts
 import { Resend } from 'resend';
 import { env } from '@/env';

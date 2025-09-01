@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 // Canonical Rune IDs - stable identifiers for the system
 export type CanonicalRuneId =
   | 'rune_a'

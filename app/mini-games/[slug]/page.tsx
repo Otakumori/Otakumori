@@ -1,12 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getGameDef } from '@/app/lib/games';
-import { GameDefinition } from '@/app/lib/games';
+import { type GameDefinition } from '@/app/lib/games';
 import SamuraiPetalSlice from '@/components/games/SamuraiPetalSlice';
 import AnimeMemoryMatch from '@/components/games/AnimeMemoryMatch';
 import BubblePopGacha from '@/components/games/BubblePopGacha';

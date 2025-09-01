@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Achievement } from './AchievementProvider';
+import { type Achievement } from './AchievementProvider';
 import { useAchievements } from './AchievementProvider';
 import { AchievementNotification } from './AchievementNotification.tsx';
 import { achievementSoundInstance } from '../../utils/achievementSound.ts';

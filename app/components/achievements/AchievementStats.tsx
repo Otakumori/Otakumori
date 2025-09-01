@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import React from 'react';
 export const AchievementStats: React.FC = () => (
   <div className="mb-4">

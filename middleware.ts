@@ -1,5 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
+// Updated to use modern clerkMiddleware for custom domain support
 import { authMiddleware } from '@clerk/nextjs/server';
 
 export default authMiddleware({

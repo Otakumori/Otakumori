@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import React, { useEffect, useState } from 'react';
 
 const BodyLayer = ({ color }: { color: string }) => (

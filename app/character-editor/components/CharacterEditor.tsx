@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, Group } from 'three';
+import { Mesh, type Group } from 'three';
 import * as THREE from 'three';
 
 interface CharacterEditorProps {

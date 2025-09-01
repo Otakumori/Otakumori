@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -20,9 +20,9 @@ interface CartContextType {
   items: CartItem[];
   total: number;
   itemCount: number;
-  addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  addItem: (_item: CartItem) => void;
+  removeItem: (_id: string) => void;
+  updateQuantity: (_id: string, _quantity: number) => void;
   clearCart: () => void;
 }
 
@@ -34,18 +34,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
-    // Load cart from localStorage on mount
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      const parsedCart = JSON.parse(savedCart);
-      setItems(parsedCart);
-      updateTotals(parsedCart);
+    // Load cart from localStorage on mount (client-side only)
+    if (typeof window !== 'undefined') {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart);
+          setItems(parsedCart);
+          updateTotals(parsedCart);
+        } catch (error) {
+          console.error('Error parsing cart from localStorage:', error);
+          localStorage.removeItem('cart');
+        }
+      }
     }
   }, []);
 
   useEffect(() => {
-    // Save cart to localStorage whenever it changes
-    localStorage.setItem('cart', JSON.stringify(items));
+    // Save cart to localStorage whenever it changes (client-side only)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cart', JSON.stringify(items));
+    }
     updateTotals(items);
   }, [items]);
 
@@ -97,7 +106,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
     setTotal(0);
     setItemCount(0);
-    localStorage.removeItem('cart');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cart');
+    }
   };
 
   return (
@@ -120,7 +131,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error('useCart must be used within a CartProvider. Make sure the component is wrapped with CartProvider and has "use client" directive.');
   }
   return context;
 }

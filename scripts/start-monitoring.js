@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -7,7 +7,7 @@ const path = require('path');
 const metricsCollector = spawn('node', [path.join(__dirname, 'start-metrics-collector.js')], {
   stdio: 'inherit',
   env: {
-    ...process.env,
+    ...process.env, // eslint-disable-line no-restricted-syntax
     NODE_ENV: 'production',
   },
 });
@@ -16,7 +16,7 @@ const metricsCollector = spawn('node', [path.join(__dirname, 'start-metrics-coll
 const healthChecker = spawn('node', [path.join(__dirname, 'start-health-check.js')], {
   stdio: 'inherit',
   env: {
-    ...process.env,
+    ...process.env, // eslint-disable-line no-restricted-syntax
     NODE_ENV: 'production',
   },
 });
@@ -25,7 +25,7 @@ const healthChecker = spawn('node', [path.join(__dirname, 'start-health-check.js
 const logScheduler = spawn('node', [path.join(__dirname, 'cron-logs.js')], {
   stdio: 'inherit',
   env: {
-    ...process.env,
+    ...process.env, // eslint-disable-line no-restricted-syntax
     NODE_ENV: 'production',
   },
 });

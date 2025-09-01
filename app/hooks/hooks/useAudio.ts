@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSoundSettings } from './useSoundSettings';
 

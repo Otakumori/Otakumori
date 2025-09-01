@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
-import { Metadata } from 'next';
+ 
+ 
+import { type Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Creator Collaboration - Otakumori',

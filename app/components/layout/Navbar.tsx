@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingCart, Menu, X, ChevronDown, User, Heart, Gift } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, ChevronDown, Heart } from 'lucide-react';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useCart } from '../cart/CartProvider';
 import { CATEGORIES } from '@/lib/categories';
@@ -15,7 +15,7 @@ import { parseQuery } from '@/lib/search/parse';
 import PetalWallet from '../PetalWallet';
 
 const Navbar: React.FC = () => {
-  const { user, isSignedIn } = useUser();
+  const { isSignedIn } = useUser();
   const router = useRouter();
   const { itemCount } = useCart();
 
@@ -112,7 +112,7 @@ const Navbar: React.FC = () => {
               className="flex items-center space-x-1 transition-colors hover:text-pink-500"
               aria-expanded={isCategoryDropdownOpen}
               aria-haspopup="true"
-            >
+              aria-label="Button">
               <span>Shop</span>
               <ChevronDown className="w-4 h-4" />
             </button>
@@ -127,7 +127,7 @@ const Navbar: React.FC = () => {
                         key={category.slug}
                         onClick={() => handleCategorySelect(category.slug)}
                         className="text-left p-2 rounded text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                      >
+                        aria-label="Button">
                         <div className="font-medium">{category.label}</div>
                         {category.description && (
                           <div className="text-xs text-white/60 mt-1">{category.description}</div>
@@ -179,7 +179,7 @@ const Navbar: React.FC = () => {
                           handleSearch({ preventDefault: () => {} } as React.FormEvent);
                         }}
                         className="w-full text-left p-2 rounded text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                      >
+                        aria-label="Button">
                         <span className="font-medium">cat:{category.slug}</span>
                         <span className="text-xs text-white/60 ml-2">{category.label}</span>
                       </button>
@@ -250,7 +250,6 @@ const Navbar: React.FC = () => {
           </button>
         </div>
       </nav>
-
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
@@ -280,7 +279,7 @@ const Navbar: React.FC = () => {
               <button
                 onClick={() => setIsMobileShopOpen(!isMobileShopOpen)}
                 className="flex items-center justify-between w-full text-2xl text-white"
-              >
+                aria-label="Button">
                 <span>Shop</span>
                 <ChevronDown
                   className={`w-6 h-6 transition-transform ${isMobileShopOpen ? 'rotate-180' : ''}`}
@@ -294,7 +293,7 @@ const Navbar: React.FC = () => {
                       key={category.slug}
                       onClick={() => handleCategorySelect(category.slug)}
                       className="block w-full text-left text-lg text-white/70 hover:text-white transition-colors"
-                    >
+                      aria-label="Button">
                       {category.label}
                     </button>
                   ))}

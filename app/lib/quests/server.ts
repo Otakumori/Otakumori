@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { PrismaClient } from '@prisma/client';
 import seedrandom from 'seedrandom';
 import { QUEST_POOL } from './pool';

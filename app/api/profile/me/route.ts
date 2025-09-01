@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';

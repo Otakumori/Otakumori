@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import * as PIXI from 'pixi.js';
-import { GameDefinition } from '@/app/lib/games';
+import { type GameDefinition } from '@/app/lib/games';
 import { createGameLoop } from '@/app/lib/game-loop';
 import { bindAction, onInput, InputEvent } from '@/app/lib/input-manager';
 import { playSfx, getSprite } from '@/app/lib/assets';

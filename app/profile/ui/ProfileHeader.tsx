@@ -1,9 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Crown, Star, Zap, Palette, Sparkles } from 'lucide-react';
 
 interface EquippedItem {
@@ -116,9 +117,11 @@ export default function ProfileHeader() {
         {/* Frame */}
         {equippedState?.frame && (
           <div className="absolute inset-0">
-            <img
+            <Image
               src={equippedState.frame.imageUrl || '/assets/ui/frames/default.png'}
               alt={equippedState.frame.name}
+              width={800}
+              height={450}
               className="w-full h-full object-cover"
             />
           </div>
@@ -127,9 +130,11 @@ export default function ProfileHeader() {
         {/* Overlay */}
         {equippedState?.overlay && (
           <div className="absolute inset-0">
-            <img
+            <Image
               src={equippedState.overlay.imageUrl || '/assets/ui/overlays/default.png'}
               alt={equippedState.overlay.name}
+              width={800}
+              height={450}
               className="w-full h-full object-cover mix-blend-overlay"
             />
           </div>

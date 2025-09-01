@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Flag, AlertTriangle, Shield, UserX } from 'lucide-react';
 import GlassButton from '@/app/components/ui/GlassButton';
 import GlassCard from '@/app/components/ui/GlassCard';
-import { UserReportCreate } from '@/app/lib/contracts';
+import { type UserReportCreate } from '@/app/lib/contracts';
 
 interface ReportButtonProps {
   contentType: 'user' | 'comment' | 'party' | 'party_message' | 'activity';

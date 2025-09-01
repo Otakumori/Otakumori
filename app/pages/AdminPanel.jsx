@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';

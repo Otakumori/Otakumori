@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
@@ -296,7 +296,7 @@ const InteractiveHeroSection: React.FC = () => {
   useEffect(
     () => {
       resetIdle();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+       
     },
     [
       /* reload or session change triggers here if needed */

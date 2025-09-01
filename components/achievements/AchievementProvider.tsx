@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+ 
+ 
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 // Achievement item type
 export type Achievement = {

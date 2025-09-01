@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Shield, Gamepad2, Bell, Eye, Volume2, Palette, Globe, Save } from 'lucide-react';
 import {
-  UserSettings,
-  PrivacySettings,
-  GameSettings,
-  UserSettingsUpdate,
-  PrivacySettingsUpdate,
-  GameSettingsUpdate,
+  type UserSettings,
+  type PrivacySettings,
+  type GameSettings,
+  type UserSettingsUpdate,
+  type PrivacySettingsUpdate,
+  type GameSettingsUpdate,
 } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 
