@@ -60,9 +60,9 @@ const nextConfig = {
             value: [
               "default-src 'self';",
               // Allow inline for Next hydration and small inlined chunks; keep 'unsafe-eval' only if needed for dev tooling
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://cdn.jsdelivr.net;",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://clerk.otaku-mori.com https://cdn.jsdelivr.net;",
               // Fetch/XHR/SSE/WebSocket
-              "connect-src 'self' https://*.clerk.com https://api.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com;",
+              "connect-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://api.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com;",
               // Styles and fonts
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "font-src 'self' data: https://fonts.gstatic.com;",
@@ -71,7 +71,7 @@ const nextConfig = {
               // Media (if you stream or load video/audio)
               "media-src 'self' blob:;",
               // Frames (if you ever embed Clerk or other auth iframes)
-              "frame-src 'self' https://*.clerk.com;",
+              "frame-src 'self' https://*.clerk.com https://clerk.otaku-mori.com;",
               // Workers
               "worker-src 'self' blob:;",
               // Disallow others from iframing your app
