@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Petal } from '../../types';
+import { type Petal } from '../../types';
 
 const InteractiveCherryBlossom: React.FC = () => {
   const [petals, setPetals] = useState<Petal[]>([]);

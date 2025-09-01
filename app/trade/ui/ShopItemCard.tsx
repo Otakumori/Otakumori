@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import { useState } from 'react';
-import { PetalShopItem } from '@prisma/client';
+import { type PetalShopItem } from '@prisma/client';
 
 interface ShopItemCardProps {
   item: PetalShopItem;

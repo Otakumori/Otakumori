@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { useEffect, useState } from 'react';
 import { monitor } from '@/lib/monitor';
 

@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, AgeVerification } from '../app/types/auth';
+import { type User, type AgeVerification } from '../app/types/auth';
 
 interface AuthContextType {
   user: User | null;

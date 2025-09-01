@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 const cron = require('node-cron');
 const { exec } = require('child_process');
 const path = require('path');

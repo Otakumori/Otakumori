@@ -69,7 +69,7 @@ export default function Game({ skin, mode }: Props) {
       cancelAnimationFrame(animationId);
       game.destroy();
     };
-  }, [skin, mode]);
+  }, [skin, mode, gameState.isRunning]);
 
   // Handle game controls
   const handleSpawnBubble = useCallback(() => {

@@ -91,7 +91,7 @@ export default function TradeHallPage() {
         createdAt: new Date(Date.now() - 3600000),
       },
     ]);
-  }, []);
+  }, [inventory]);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { EngineGame, Caption } from './types';
+import { type EngineGame, type Caption } from './types';
 import { useProgress } from './useProgress';
 import { useRewards } from './useRewards';
 import { Caption as CaptionComponent } from './ui/Caption';

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { env } from '@/env';
 
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';

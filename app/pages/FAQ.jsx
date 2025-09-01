@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import ContactForm from '../../app/components/ContactForm'; // Adjust based on actual location
 export default function FAQ() {
   return (

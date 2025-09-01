@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, User, Package, MessageSquare, Users, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { SearchRequest, SearchResponse, SearchResult } from '@/app/lib/contracts';
+import { type SearchRequest, type SearchResponse, type SearchResult } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 
 interface SearchResultsProps {

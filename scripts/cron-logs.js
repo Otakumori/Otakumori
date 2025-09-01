@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 const cron = require('node-cron');
 const { spawn } = require('child_process');
 const path = require('path');
@@ -12,7 +12,7 @@ cron.schedule('0 0 * * *', () => {
   const rotateLogs = spawn('node', [path.join(__dirname, 'rotate-logs.js')], {
     stdio: 'inherit',
     env: {
-      ...process.env,
+      ...process.env, // eslint-disable-line no-restricted-syntax
       NODE_ENV: 'production',
     },
   });

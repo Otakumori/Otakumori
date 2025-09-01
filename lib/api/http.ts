@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { type z } from 'zod';
 
 type FetchOpts = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';

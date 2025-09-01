@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import GlassCard from '@/app/components/ui/GlassCard';
 import GlassButton from '@/app/components/ui/GlassButton';
-import { Comment, CommentCreate } from '@/app/lib/contracts';
+import { type Comment, type CommentCreate } from '@/app/lib/contracts';
 
 interface CommentsSectionProps {
   contentType: 'profile' | 'achievement' | 'leaderboard' | 'activity';

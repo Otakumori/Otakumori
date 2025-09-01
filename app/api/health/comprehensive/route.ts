@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 import { prisma } from '@/app/lib/prisma';

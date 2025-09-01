@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GameProps } from '../types';
+import { type GameProps } from '../types';
 
 export default function SlapTheOni({ onComplete, onFail, duration }: GameProps) {
   const [oniPosition, setOniPosition] = useState({ x: 50, y: 50 });

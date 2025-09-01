@@ -1,6 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
-import { ReactNode } from 'react';
+ 
+ 
+import { type ReactNode } from 'react';
 
 export interface Petal {
   id: number;

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
 import { appUrl } from '@/lib/canonical';
-import { useCart } from '../cart/CartProvider';
+import { useCart } from '../../app/components/cart/CartProvider';
 import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
 
 const navigation = [
@@ -64,7 +64,7 @@ export default function Navigation() {
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const pathname = usePathname();
   const { user, isSignedIn } = useUser();
-  const { totalItems } = useCart();
+  const { itemCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -174,9 +174,9 @@ export default function Navigation() {
                 className="relative p-2 text-gray-300 hover:text-pink-400 transition-colors"
               >
                 <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && (
+                {itemCount > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center">
-                    {totalItems}
+                    {itemCount}
                   </span>
                 )}
               </Link>

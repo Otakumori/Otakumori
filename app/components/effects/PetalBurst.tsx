@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, InstancedMesh } from 'three';
+import { Mesh, type InstancedMesh } from 'three';
 import { useWorldEvent } from '@/app/world/WorldProvider';
 
 export default function PetalBurst() {

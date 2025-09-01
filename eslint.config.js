@@ -2,6 +2,7 @@ import tseslint from '@typescript-eslint/eslint-plugin';
 import tseslintParser from '@typescript-eslint/parser';
 import drizzle from 'eslint-plugin-drizzle';
 import reactHooks from 'eslint-plugin-react-hooks';
+import nextPlugin from '@next/eslint-plugin-next';
 
 export default [
   {
@@ -23,6 +24,7 @@ export default [
       '@typescript-eslint': tseslint,
       drizzle,
       'react-hooks': reactHooks,
+      '@next/next': nextPlugin,
     },
     rules: {
       ...tseslint.configs['flat/recommended'].rules,
@@ -34,7 +36,7 @@ export default [
         'warn',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-var-requires': 'warn',
       '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-misused-promises': 'off', // Disabled due to type information requirements
@@ -50,6 +52,8 @@ export default [
       // Reduce noise during development
       'react/no-unescaped-entities': 'off',
       'react-hooks/exhaustive-deps': 'warn',
+      // Next.js rules
+      '@next/next/no-img-element': 'warn',
     },
   },
   {

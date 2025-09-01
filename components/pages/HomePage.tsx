@@ -1,12 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import InteractiveCherryBlossom from '@/components/animations/InteractiveCherryBlossom';
-import { Product, BlogPost, SocialLink } from '../../app/types/index';
+import { type Product, type BlogPost, type SocialLink } from '../../app/types/index';
 import Header from '@/components/layout/Header';
 
 const socialLinks: SocialLink[] = [
@@ -64,9 +65,11 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
               >
                 <Link href={`/shop/${product.id}`}>
                   {product.images && product.images.length > 0 ? (
-                    <img
+                    <Image
                       src={product.images[0]}
                       alt={product.title || 'Product image'}
+                      width={400}
+                      height={192}
                       className="h-48 w-full object-cover"
                     />
                   ) : (
@@ -111,7 +114,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
                   whileHover={{ y: -5 }}
                 >
                   <Link href={`/blog/${post.id}`}>
-                    <img src={post.image} alt={post.title} className="h-48 w-full object-cover" />
+                    <Image src={post.image} alt={post.title} width={400} height={192} className="h-48 w-full object-cover" />
                     <div className="p-4">
                       <h3 className="mb-2 text-xl font-semibold">{post.title}</h3>
                       <p className="mb-4 text-gray-400">{post.excerpt}</p>

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 // Quest definitions - easily editable without code deploy
 export type QuestDef = {
   key: string;

@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh } from 'three';
+import { type Mesh } from 'three';
 
 export default function Avatar() {
   const meshRef = useRef<Mesh>(null);

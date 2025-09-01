@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import GlassCard from '@/app/components/ui/GlassCard';
-import { NotificationResponse, Notification } from '@/app/lib/contracts';
+import { NotificationResponse, type Notification } from '@/app/lib/contracts';
 
 interface NotificationBellProps {
   className?: string;

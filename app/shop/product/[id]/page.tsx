@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @next/next/no-img-element */
+ 
+ 
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';

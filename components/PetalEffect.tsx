@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { useSound } from '@/lib/hooks/useSound';

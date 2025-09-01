@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function isAdmin(): Promise<boolean> {

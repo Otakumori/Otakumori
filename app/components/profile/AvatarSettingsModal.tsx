@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import React, { useState } from 'react';
 
 interface AvatarSettingsModalProps {
@@ -75,7 +75,7 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
           <select
             value={pose}
             onChange={(e) => setPose(e.target.value)}
-            className="w-full rounded bg-pink-400/10 p-2 text-pink-100"
+            className="w-full rounded bg-pink-400/10 p-2 text-pink-100" aria-label="Select"
           >
             {poseOptions.map((opt) => (
               <option key={opt.value} value={opt.value} disabled={opt.nsfw && !deepAccess}>
@@ -90,7 +90,7 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
           <select
             value={outfit}
             onChange={(e) => setOutfit(e.target.value)}
-            className="w-full rounded bg-pink-400/10 p-2 text-pink-100"
+            className="w-full rounded bg-pink-400/10 p-2 text-pink-100" aria-label="Select"
           >
             {outfitOptions.map((opt) => (
               <option key={opt.value} value={opt.value} disabled={opt.nsfw && !deepAccess}>

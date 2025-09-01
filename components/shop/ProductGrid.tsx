@@ -1,7 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
-import { Product } from '@/lib/z';
+import { type Product } from '@/lib/z';
 
 interface ProductGridProps {
   products: Product[];

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GameProps } from '../types';
+import { type GameProps } from '../types';
 
 export default function ButtonMashersKiss({ onComplete, onFail, duration }: GameProps) {
   const [mashCount, setMashCount] = useState(0);

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { COPY } from '@/app/lib/copy';
+
 
 type Props = {
   mode: 'classic' | 'blitz' | 'precision';

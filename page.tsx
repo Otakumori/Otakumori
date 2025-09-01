@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { Suspense } from 'react';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 

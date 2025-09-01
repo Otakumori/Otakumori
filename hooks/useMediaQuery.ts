@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {

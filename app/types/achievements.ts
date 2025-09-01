@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 export type AchievementCategory =
   | 'Site Interaction'
   | 'Profile Growth'

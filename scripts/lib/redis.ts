@@ -1,13 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { createClient } from 'redis';
-
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-const redisPassword = process.env.REDIS_PASSWORD || undefined;
+import { env } from '@/env';
 
 export const redis = createClient({
-  url: redisUrl,
-  password: redisPassword,
+  url: env.UPSTASH_REDIS_REST_URL,
+  password: env.UPSTASH_REDIS_REST_TOKEN,
 });
 
 redis.on('error', (err) => console.error('Redis Client Error', err));

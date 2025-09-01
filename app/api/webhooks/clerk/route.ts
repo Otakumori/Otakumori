@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
-import { WebhookEvent } from '@clerk/nextjs/server';
+import { type WebhookEvent } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 

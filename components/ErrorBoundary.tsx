@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, type ErrorInfo, type ReactNode } from 'react';
 import { env } from '@/env';
 import { motion } from 'framer-motion';
 
@@ -65,7 +65,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </p>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && ( // eslint-disable-line no-restricted-syntax
+            {typeof window !== 'undefined' && this.state.error && (
               <details className="mt-4 text-left">
                 <summary className="text-red-400 cursor-pointer text-sm font-medium">
                   Error Details (Development)

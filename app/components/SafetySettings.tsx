@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Shield, Users, MessageSquare, Bell, Filter, UserX } from 'lucide-react';
 import GlassCard from '@/app/components/ui/GlassCard';
 import GlassButton from '@/app/components/ui/GlassButton';
-import { UserSafetySettings, UserSafetySettingsUpdate } from '@/app/lib/contracts';
+import { type UserSafetySettings, type UserSafetySettingsUpdate } from '@/app/lib/contracts';
 
 interface SafetySettingsProps {
   className?: string;

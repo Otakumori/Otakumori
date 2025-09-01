@@ -1,21 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { env } from '@/env.mjs';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { CartProvider } from '../components/cart/CartProvider';
-import { PetalProvider } from '../providers';
-import { WorldProvider } from './world/WorldProvider';
-import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
-import GlobalMusicBar from '../components/music/GlobalMusicBar';
-import SoapstoneDock from '../components/SoapstoneDock';
-import DockedGacha from '../components/DockedGacha';
-import Navbar from '../app/components/layout/Navbar';
-import BackdropAbyssMystique from '../components/BackdropAbyssMystique';
-import QuakeHUD from './components/hud/QuakeHUD';
+import { ErrorBoundary as DevErrorBoundary } from '../components/dev/ErrorBoundary';
+import ClientErrorTrap from '../components/dev/ClientErrorTrap';
+import Providers from './Providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -55,17 +46,22 @@ export const viewport = {
   userScalable: false,
 };
 
-// Boot logging for Clerk instance detection
+// Boot logging for Clerk instance detection (server-only)
 if (typeof window === 'undefined') {
-  const isTest = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_test_');
-  const isLive = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_live_');
-  console.log(`🚀 Clerk Boot: Using ${isTest ? 'TEST' : isLive ? 'LIVE' : 'UNKNOWN'} instance`);
-  console.log(`🌐 APP_URL: ${env.NEXT_PUBLIC_APP_URL || 'Not set'}`);
+  try {
+    const isTest = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_test_');
+    const isLive = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_live_');
+    console.log(`🚀 Clerk Boot: Using ${isTest ? 'TEST' : isLive ? 'LIVE' : 'UNKNOWN'} instance`);
+    console.log(`🌐 APP_URL: ${env.NEXT_PUBLIC_APP_URL || 'Not set'}`);
+  } catch (error) {
+    // Silently fail if env is not available (e.g., during build)
+    console.log('🚀 Clerk Boot: Environment not available during build');
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth bg-black text-gray-100">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -79,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <ErrorBoundary>
           <ClerkProvider
+            publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
             appearance={{
               elements: {
                 formButtonPrimary: 'bg-pink-600 hover:bg-pink-700 text-white',
@@ -92,23 +89,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           >
-            <WorldProvider>
-              <PetalProvider>
-                <CartProvider>
-                  <GlobalMusicProvider>
-                    {/* Site-wide background (fixed, behind everything) */}
-                    <BackdropAbyssMystique />
-                    {/* Navigation */}
-                    <Navbar />
-                    {children}
-                    <GlobalMusicBar />
-                    <SoapstoneDock />
-                    <DockedGacha />
-                    <QuakeHUD />
-                  </GlobalMusicProvider>
-                </CartProvider>
-              </PetalProvider>
-            </WorldProvider>
+            <DevErrorBoundary>
+              <ClientErrorTrap />
+              <Providers>
+                {children}
+              </Providers>
+            </DevErrorBoundary>
           </ClerkProvider>
         </ErrorBoundary>
       </body>

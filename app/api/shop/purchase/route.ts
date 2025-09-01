@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
-import { InventoryKind } from '@prisma/client';
+import { type InventoryKind } from '@prisma/client';
 
 export async function POST(req: Request) {
   const { userId: clerkId } = auth();

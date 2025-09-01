@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 // app/api/admin/printify-sync/route.ts  (admin-only)
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { db } from '@/app/lib/db';

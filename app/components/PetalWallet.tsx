@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import React, { useEffect, useRef, useState } from 'react';
 import { usePetalContext, eventBus } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';

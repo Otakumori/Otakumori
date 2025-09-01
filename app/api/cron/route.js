@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';

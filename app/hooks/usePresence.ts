@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { PresenceUpdate, PresenceResponse } from '@/app/lib/contracts';
+import { type PresenceUpdate, type PresenceResponse } from '@/app/lib/contracts';
 
 export function usePresence() {
   const { user } = useUser();

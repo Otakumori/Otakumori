@@ -1,9 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Star, ShoppingBag } from 'lucide-react';
 
 interface FeaturedProduct {
@@ -120,9 +121,11 @@ export default function FeaturedCarousel() {
                   >
                     {/* Product Image */}
                     <div className="aspect-square bg-neutral-800 relative overflow-hidden">
-                      <img
+                      <Image
                         src={product.images[0] || '/images/products/placeholder.svg'}
                         alt={product.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />

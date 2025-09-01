@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 export interface InputEvent {
   type: 'keydown' | 'keyup' | 'gamepad' | 'touchstart' | 'touchend' | 'touchmove';
   action: string;

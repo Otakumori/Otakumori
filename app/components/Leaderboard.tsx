@@ -1,10 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable-line @next/next/no-img-element */
+ 
+ 
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
 import { motion } from 'framer-motion';
-import { AsciiArt } from './AsciiArt';
+
 
 interface LeaderboardEntry {
   id: string;
