@@ -17,8 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider
       publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      signInUrl={env.NEXT_PUBLIC_CLERK_SIGN_IN_URL}
-      signUpUrl={env.NEXT_PUBLIC_CLERK_SIGN_UP_URL}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
     >
       <html lang="en" suppressHydrationWarning>
         <body className="bg-black text-gray-100">
