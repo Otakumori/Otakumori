@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
-import Header from '@/app/components/Header';
+import Navigation from '@/components/layout/Navigation';
 import Footer from '@/app/components/Footer';
 import PetalLayer from '@/app/components/PetalLayer';
 import TreeAligner from '@/app/components/TreeAligner';
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartProvider>
             <TreeAligner />
             <div className="stars-bg" aria-hidden="true" />
-            <Header />
+            <Navigation />
             <main id="content" className="relative z-10">
               {children}
             </main>

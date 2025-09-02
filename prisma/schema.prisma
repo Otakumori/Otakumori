@@ -313,6 +313,18 @@ model ProductReview {
   @@index([isApproved, createdAt])
 }
 
+model ProductView {
+  id        String   @id @default(cuid())
+  productId String
+  userId    String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([productId, createdAt])
+  @@index([userId, createdAt])
+}
+
 model MusicPlaylist {
   id        String       @id @default(cuid())
   name      String
