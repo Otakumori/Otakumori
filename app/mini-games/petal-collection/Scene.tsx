@@ -41,11 +41,13 @@ export default function PetalCollection() {
   const sMiss = getAsset('petal-collection', 'missSfx') ?? '';
 
   const bgImg = useMemo(() => {
+    if (typeof window === 'undefined') return null;
     const im = new Image();
     if (bgUrl) im.src = bgUrl;
     return im;
   }, [bgUrl]);
   const petalImg = useMemo(() => {
+    if (typeof window === 'undefined') return null;
     const im = new Image();
     if (petalUrl) im.src = petalUrl;
     return im;
@@ -174,7 +176,7 @@ export default function PetalCollection() {
 
     function draw(now: number) {
       // bg
-      if (bgImg.complete && bgImg.naturalWidth) {
+      if (bgImg && bgImg.complete && bgImg.naturalWidth) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
         const iw = bgImg.naturalWidth * s,
           ih = bgImg.naturalHeight * s;
@@ -199,7 +201,7 @@ export default function PetalCollection() {
       for (const p of petals) {
         if (!p.alive) continue;
         const size = Math.min(W, H) * 0.025 * p.r;
-        if (petalImg.complete) {
+        if (petalImg && petalImg.complete) {
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot);

@@ -39,11 +39,13 @@ export default function BubbleRagdoll() {
   const sThud = getAsset('bubble-ragdoll', 'failSfx') ?? '';
 
   const bubbleImg = useMemo(() => {
+    if (typeof window === 'undefined') return null;
     const im = new Image();
     if (bubbleSprite) im.src = bubbleSprite;
     return im;
   }, [bubbleSprite]);
   const bgImg = useMemo(() => {
+    if (typeof window === 'undefined') return null;
     const im = new Image();
     if (bgUrl) im.src = bgUrl;
     return im;
@@ -226,7 +228,7 @@ export default function BubbleRagdoll() {
 
     // draw helpers
     function drawBG() {
-      if (bgImg.complete && bgImg.naturalWidth > 0) {
+      if (bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);
         const iw = bgImg.naturalWidth * s,
           ih = bgImg.naturalHeight * s;
@@ -252,7 +254,7 @@ export default function BubbleRagdoll() {
         if (b.y + b.r < -10) b.popped = true;
 
         ctx.save();
-        if (bubbleImg.complete) {
+        if (bubbleImg && bubbleImg.complete) {
           const s = b.r * 2;
           ctx.globalAlpha = 0.9;
           ctx.drawImage(bubbleImg, b.x - b.r, b.y - b.r, s, s);

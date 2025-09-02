@@ -30,7 +30,7 @@ type Body = {
 const MAX_TOP = 25;
 
 export async function POST(req: Request) {
-  const { userId } = auth();
+  const { userId  } = await auth();
   const body = (await req.json().catch(() => null)) as Body | null;
   if (!body?.game || typeof body.score !== 'number') {
     return NextResponse.json({ ok: false, error: 'bad_input' }, { status: 400 });

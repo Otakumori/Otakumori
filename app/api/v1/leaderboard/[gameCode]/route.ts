@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest, { params }: { params: { gameCode: string } }) {
   try {
-    const { userId } = auth();
+    const { userId  } = await auth();
     const { gameCode } = params;
     const { searchParams } = new URL(request.url);
 

@@ -4,7 +4,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { ShoppingCart, Search } from 'lucide-react';
 
 export const Header: React.FC = () => {

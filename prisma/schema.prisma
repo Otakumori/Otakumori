@@ -1377,4 +1377,50 @@ model HomeRail {
   @@index([startsAt, endsAt])
 }
 
+// New models for the comprehensive system
+model Rune {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  power       Int      @default(50)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  unlocks     RuneUnlock[]
+  
+  @@index([slug])
+  @@index([power])
+}
+
+model RuneUnlock {
+  id        String   @id @default(cuid())
+  userId    String
+  slug      String
+  unlockedAt DateTime @default(now())
+  
+  // Relations
+  rune      Rune     @relation(fields: [slug], references: [slug], onDelete: Cascade)
+  
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([slug])
+  @@index([unlockedAt])
+}
+
+model PetalCollection {
+  id            String   @id @default(cuid())
+  userId        String?
+  count         Int
+  positionX     Float
+  positionY     Float
+  isAuthenticated Boolean @default(false)
+  createdAt     DateTime @default(now())
+  
+  @@index([userId])
+  @@index([isAuthenticated])
+  @@index([createdAt])
+}
+
 

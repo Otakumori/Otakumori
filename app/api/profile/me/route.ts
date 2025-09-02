@@ -6,7 +6,7 @@ import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET() {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) return NextResponse.json({ ok: false, error: 'auth' }, { status: 401 });
 
   const u = await prisma.user.findUnique({ where: { clerkId: userId } });

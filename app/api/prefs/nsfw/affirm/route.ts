@@ -6,7 +6,7 @@ import { prisma } from '@/app/lib/prisma';
 
 export async function POST() {
   try {
-    const { userId } = auth();
+    const { userId  } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: true }); // guest: ignore
     }

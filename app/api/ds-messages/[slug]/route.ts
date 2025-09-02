@@ -19,7 +19,7 @@ export async function GET(_: NextRequest, { params }: { params: { slug: string }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
-  const { userId } = auth();
+  const { userId  } = await auth();
   const { phrase } = Body.parse(await req.json());
   const lower = phrase.toLowerCase();
   if (BLOCKLIST.some((b) => lower.includes(b))) {

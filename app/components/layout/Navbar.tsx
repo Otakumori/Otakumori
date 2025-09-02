@@ -227,6 +227,7 @@ const Navbar: React.FC = () => {
                 },
               }}
               userProfileMode="navigation"
+              userProfileUrl="/profile"
             />
           ) : (
             <SignInButton mode="modal">

@@ -9,7 +9,7 @@ export const maxDuration = 10;
 
 export async function POST(req: Request) {
   try {
-    const userId = requireUserId();
+    const userId = await requireUserId();
     const { amount, reason, metadata } = await req.json();
 
     const result = await petalService.spendPetals(

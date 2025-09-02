@@ -304,7 +304,7 @@ const InteractiveHeroSection: React.FC = () => {
   );
 
   const handlePetalClick = useCallback(
-    (id: string) => {
+    async (id: string) => {
       resetIdle();
       const now = Date.now();
       if (now - lastClick.current < CLICK_THROTTLE) return;
@@ -312,19 +312,44 @@ const InteractiveHeroSection: React.FC = () => {
       setPetals((prev) => prev.map((p) => (p.id === id ? { ...p, animating: true } : p)));
       const petal = petals.find((p) => p.id === id);
       if (!petal) return;
+      
       // Burst click tracking
       setRecentClicks((clicks) => {
         const updated = [...clicks.filter((ts) => now - ts < 10000), now];
         if (!burstMode && updated.length >= 10) activateBurstMode();
         return updated;
       });
+      
       // Petal reward logic
       let reward = petal.reward || 1;
       if (burstMode) reward = getRandomInt(3, 5);
       addPetals(reward);
       setClickCount((c) => c + 1);
+      
+      // Send to API for persistence
+      try {
+        const response = await fetch('/api/petals/collect', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            count: reward,
+            x: petal.x / 100,
+            y: petal.y / 100,
+          }),
+        });
+        
+        if (!response.ok) {
+          console.warn('Failed to persist petal collection');
+        }
+      } catch (error) {
+        console.warn('Petal collection API error:', error);
+      }
+      
       // Modal for rare or burst
       if (petal.type !== 'normal' || burstMode) setShowModal(true);
+      
       // Petal trail FX
       const petalEl = document.getElementById(`petal-${petal.id}`);
       const counterEl = counterRef.current;

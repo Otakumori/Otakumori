@@ -10,7 +10,7 @@ const MAX_BYTES = 3 * 1024 * 1024; // 3MB
 const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 export async function POST(req: Request) {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }

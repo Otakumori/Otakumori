@@ -1,0 +1,144 @@
+{
+  "brand": {
+    "siteName": "Otaku-mori",
+    "senpai": "Senpai",
+    "tagline": "Don't you dare go hollow."
+  },
+
+  "home": {
+    "label": "Where the fire burns"
+  },
+
+  "about": {
+    "lore": "Lore",
+    "contactFirekeepers": "Contact the firekeepers."
+  },
+
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "miniGames": "Mini-Games",
+    "blog": "Blog",
+    "about": "About"
+  },
+
+  "search": {
+    "placeholder": "What're you buying?",
+    "suggesting": "Suggestions"
+  },
+
+  "cta": {
+    "signUp1": "Start Your Journey",
+    "signUp2": "Join the Bloom",
+    "signUp3": "Awaken Your Inner Spirit",
+    "download1": "Claim Your Loot",
+    "download2": "Summon the File",
+    "download3": "Receive This Blessing",
+    "share1": "Spread the Story",
+    "share2": "Tell Your Companions",
+    "share3": "Share the Petals",
+    "newPost1": "A New Blossom Appears",
+    "newPost2": "The Latest Arc Begins",
+    "newPost3": "A New Chapter Unfolds",
+    "success1": "Your Bloom is Complete!",
+    "success2": "Your Quest is Successful!",
+    "achievement": "Achievement unlocked",
+    "questComplete": "Quest complete!",
+    "senpaiNoticed": "Senpai has noticed you!"
+  },
+
+  "loading": {
+    "generic1": "Summoning the content…",
+    "generic2": "Please wait while the opening theme plays…",
+    "generic3": "Charging up your power level.",
+    "slow": "Plot development in progress. Don't touch that dial."
+  },
+
+  "forms": {
+    "submitting1": "Sending your transmission…",
+    "submitting2": "Transmitting coordinates.",
+    "transmittingToDeck": "Transmitting the message to the command deck.",
+    "confirm": "Data has been logged! Arigatou gozaimasu!",
+    "required": "Got a problem, stranger? This field can't be empty.",
+    "usernameTaken": "Great minds think alike! Someone already has this username. If it's you, log in.",
+    "errorGeneric": "Oops! That didn't work. Let's try again.",
+    "selfDeprecation": "Sign up… if you even care."
+  },
+
+  "password": {
+    "meterOver9000": "Power level: 9000!",
+    "weakShinji": "Your password is as weak as Shinji.",
+    "strong": "Now that's a formidable defense.",
+    "secure": "Impenetrable."
+  },
+
+  "cart": {
+    "gatherGear": "Gather Your Gear",
+    "dispatchPackage": "Dispatch Your Package",
+    "checkoutClarity": "Checkout",
+    "checkoutFlavor": "Execute the exchange",
+    "purchaseJoke": "Purchase this magnificent item with the money we don't have.",
+    "empty": "Your character is currently broke. Time for some side quests."
+  },
+
+  "shop": {
+    "soldOut": "This item is sold out. Cursed."
+  },
+
+  "support": {
+    "contactUs1": "Signal a Support Beacon",
+    "contactUs2": "Send a Message Scroll",
+    "contactUs3": "Dispatch a Carrier Pigeon",
+    "help": "Ask for a hint."
+  },
+
+  "portfolio": {
+    "title1": "Our Collection of Completed Quests",
+    "title2": "A Gallery of Fleeting Moments"
+  },
+
+  "updates": {
+    "newFeature": "A new villain has appeared! And by villain, we mean this new feature."
+  },
+
+  "community": {
+    "forums": "Talk to other Chosen Undead",
+    "discussLore": "Discuss the lore… or just what happened to your favorite character."
+  },
+
+  "status": {
+    "emptyInventory": "Your inventory is empty. Time to gear up!",
+    "newsletterAssurance": "We hate spam as much as you do. We'll only send you relevant updates."
+  },
+
+  "errors": {
+    "youDied": "You Died",
+    "youDied404": "You Died: Page not found.",
+    "gameOver404": "Game Over",
+    "wrongTurn": "You've taken a wrong turn on the road.",
+    "princessAnotherCastle": "The princess is in another castle.",
+    "pressF": "Press F to pay respects",
+    "minorCute": "A minor blunder. Still, it's… quite cute.",
+    "subtleCute": "You've made a subtle, yet effective move. Quite cute.",
+    "tinyBugHollow": "Our programmers have gone hollow. Sorry for the tiny bug."
+  },
+
+  "maintenance": {
+    "bossFight": "Our heroes are currently fighting a final boss."
+  },
+
+  "encouragement": {
+    "dontGoHollow": "Don't you dare go hollow.",
+    "welcomeBack": "Welcome back, Chosen Undead. Don't you dare go hollow.",
+    "heartOfCards": "Don't give up, pal! Just believe in the Heart of the Cards!",
+    "joeyHeartOfCards": "Believe in the heart of the cards!"
+  },
+
+  "terms": {
+    "briefing": "Hunnigan, what's my mission briefing on this?"
+  },
+
+  "zeldalove": {
+    "dangerousAlone": "It's dangerous to go alone! Take this."
+  }
+}

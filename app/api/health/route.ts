@@ -1,20 +1,25 @@
 import { NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+
+export const runtime = 'nodejs';
 
 export async function GET() {
-  const out: any = { time: new Date().toISOString() };
-
   try {
-    const r = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/printify/products`, {
-      cache: 'no-store',
-    });
-    out.printify = r.ok ? 'up' : 'down';
-  } catch {
-    out.printify = 'down';
+    const health = {
+      ok: true,
+      time: new Date().toISOString(),
+      versions: {
+        node: process.version,
+        next: process.env.npm_package_version || 'unknown',
+      },
+      environment: process.env.NODE_ENV,
+    };
+
+    return NextResponse.json(health, { status: 200 });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    return NextResponse.json(
+      { ok: false, error: 'Health check failed' },
+      { status: 500 }
+    );
   }
-
-  out.clerk = !!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'configured' : 'missing';
-  out.db = !!env.DATABASE_URL ? 'configured' : 'missing';
-
-  return NextResponse.json(out);
 }

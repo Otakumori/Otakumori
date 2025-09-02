@@ -13,7 +13,7 @@ function assertEnv() {
 }
 
 async function requireAdmin() {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) throw new Error('Unauthorized');
   const user = await currentUser();
   const isAdmin = user?.publicMetadata?.role === 'admin';

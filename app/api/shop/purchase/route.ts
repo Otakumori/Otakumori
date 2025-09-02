@@ -7,7 +7,7 @@ import { auth } from '@clerk/nextjs/server';
 import { type InventoryKind } from '@prisma/client';
 
 export async function POST(req: Request) {
-  const { userId: clerkId } = auth();
+  const { userId: clerkId  } = await auth();
   if (!clerkId) return NextResponse.json({ ok: false, error: 'auth' }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
