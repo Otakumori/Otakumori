@@ -1,6 +1,6 @@
-import { SignIn } from "@clerk/nextjs";
-import AuthShell from "@/app/(public)/auth-shell";
-import { otakumoriClerkAppearance } from "@/app/lib/clerkTheme";
+import { SignIn } from '@clerk/nextjs';
+import AuthShell from '@/app/components/auth/auth-shell';
+import { otakumoriClerkAppearance } from '@/app/lib/clerkTheme';
 
 export default function Page() {
   return (
@@ -15,12 +15,8 @@ export default function Page() {
           </div>
         </div>
       </div>
-      
-      <SignIn 
-        routing="path" 
-        path="/sign-in"
-        appearance={otakumoriClerkAppearance}
-      />
+
+      <SignIn routing="path" path="/sign-in" appearance={otakumoriClerkAppearance} />
     </AuthShell>
   );
 }
