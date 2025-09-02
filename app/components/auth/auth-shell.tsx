@@ -26,16 +26,16 @@ function PetalField() {
         <motion.span
           key={p.id}
           initial={{ y: -30, x: p.left + '%', rotate: 0 }}
-          animate={{ 
-            y: '110vh', 
-            x: `calc(${p.left}vw + ${p.drift}px)`, 
-            rotate: p.rotate 
+          animate={{
+            y: '110vh',
+            x: `calc(${p.left}vw + ${p.drift}px)`,
+            rotate: p.rotate,
           }}
-          transition={{ 
-            duration: p.duration, 
-            delay: p.delay, 
-            repeat: Infinity, 
-            ease: 'linear' 
+          transition={{
+            duration: p.duration,
+            delay: p.delay,
+            repeat: Infinity,
+            ease: 'linear',
           }}
           className="absolute"
           style={{
@@ -62,7 +62,7 @@ export default function AuthShell({ children }: AuthShellProps) {
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-black relative overflow-hidden">
       {/* PetalField for cosmetic sakura petals */}
       <PetalField />
-      
+
       {/* Main content */}
       <div className="relative z-10 min-h-screen flex">
         {/* Left column - Welcome message and hint */}
@@ -70,16 +70,20 @@ export default function AuthShell({ children }: AuthShellProps) {
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             <h1 className="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-50">
               Welcome home, <span className="text-pink-400">wanderer</span>
             </h1>
-            
+
             {/* Soapstone hint */}
             <div className="mt-6 text-sm text-zinc-300">
               <span className="inline-flex items-center gap-2 rounded-lg border border-zinc-700/70 bg-zinc-900/60 px-3 py-1">
-                <img src="/overlay/soapstone.png" alt="" className="h-4 w-4 object-contain opacity-90" />
+                <img
+                  src="/overlay/soapstone.png"
+                  alt=""
+                  className="h-4 w-4 object-contain opacity-90"
+                />
                 <span>Secret Ahead</span>
               </span>
             </div>
@@ -91,7 +95,7 @@ export default function AuthShell({ children }: AuthShellProps) {
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
             className="w-full max-w-md mx-auto"
           >
             {children}
