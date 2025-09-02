@@ -1,31 +1,11 @@
 /**
- * Prisma Accelerate Cache Strategies
+ * Database Query Utilities
  *
- * This file demonstrates different caching strategies for common database operations
- * using Prisma Accelerate extension.
+ * This file provides utility functions for common database operations.
+ * Note: Caching strategies have been removed as Prisma Accelerate is not currently enabled.
  */
 
 import { db } from './db';
-
-/**
- * Cache strategies for different types of data
- */
-export const CACHE_STRATEGIES = {
-  // User data - cache for 5 minutes
-  USER: { ttl: 300 },
-
-  // Product data - cache for 10 minutes (products don't change often)
-  PRODUCT: { ttl: 600 },
-
-  // Search results - cache for 2 minutes
-  SEARCH: { ttl: 120 },
-
-  // Real-time data - cache for 30 seconds
-  REALTIME: { ttl: 30 },
-
-  // Static data - cache for 1 hour
-  STATIC: { ttl: 3600 },
-} as const;
 
 /**
  * Example: Cached user lookup with email search
@@ -37,7 +17,6 @@ export async function findUserByEmail(email: string) {
         contains: email,
       },
     },
-    cacheStrategy: CACHE_STRATEGIES.USER,
   });
 }
 
@@ -57,14 +36,14 @@ export async function searchProductsWithFilters(filters: {
       ...(filters.minPrice && {
         ProductVariant: {
           some: {
-            price: { gte: filters.minPrice },
+            priceCents: { gte: filters.minPrice * 100 },
           },
         },
       }),
       ...(filters.maxPrice && {
         ProductVariant: {
           some: {
-            price: { lte: filters.maxPrice },
+            priceCents: { lte: filters.maxPrice * 100 },
           },
         },
       }),
@@ -81,7 +60,6 @@ export async function searchProductsWithFilters(filters: {
         where: { isEnabled: true },
       },
     },
-    cacheStrategy: CACHE_STRATEGIES.SEARCH,
   });
 }
 
@@ -93,7 +71,7 @@ export async function getUserOrdersPaginated(userId: string, page: number = 1, l
 
   return await db.order.findMany({
     where: {
-      user: { clerkId: userId },
+      User: { clerkId: userId },
     },
     include: {
       OrderItem: {
@@ -106,7 +84,6 @@ export async function getUserOrdersPaginated(userId: string, page: number = 1, l
     orderBy: { createdAt: 'desc' },
     skip,
     take: limit,
-    cacheStrategy: CACHE_STRATEGIES.USER,
   });
 }
 
@@ -114,35 +91,26 @@ export async function getUserOrdersPaginated(userId: string, page: number = 1, l
  * Example: Cached analytics data
  */
 export async function getProductAnalytics(productId: string) {
-  const [views, orders, revenue] = await Promise.all([
-    // Product views (cached for 5 minutes)
-    db.productView.count({
-      where: { productId },
-      cacheStrategy: CACHE_STRATEGIES.REALTIME,
-    }),
-
+  const [orders, revenue] = await Promise.all([
     // Order count (cached for 5 minutes)
     db.orderItem.count({
       where: {
         productId,
-        order: { status: 'completed' },
+        Order: { status: 'shipped' },
       },
-      cacheStrategy: CACHE_STRATEGIES.REALTIME,
     }),
 
     // Revenue calculation (cached for 5 minutes)
     db.orderItem.aggregate({
       where: {
         productId,
-        order: { status: 'completed' },
+        Order: { status: 'shipped' },
       },
       _sum: { unitAmount: true },
-      cacheStrategy: CACHE_STRATEGIES.REALTIME,
     }),
   ]);
 
   return {
-    views,
     orders,
     revenue: revenue._sum.unitAmount || 0,
   };
@@ -168,16 +136,14 @@ export async function getUserProfileWithStats(userId: string) {
         xp: true,
         createdAt: true,
       },
-      cacheStrategy: CACHE_STRATEGIES.USER,
     }),
 
     // User orders (cached for 5 minutes)
     db.order.count({
       where: {
-        user: { clerkId: userId },
-        status: 'completed',
+        User: { clerkId: userId },
+        status: 'shipped',
       },
-      cacheStrategy: CACHE_STRATEGIES.USER,
     }),
 
     // Petal collections (cached for 2 minutes)
@@ -186,7 +152,6 @@ export async function getUserProfileWithStats(userId: string) {
         userId,
         isAuthenticated: true,
       },
-      cacheStrategy: CACHE_STRATEGIES.REALTIME,
     }),
   ]);
 
@@ -206,8 +171,8 @@ export async function getProductRecommendations(userId: string, limit: number = 
   // Get user's purchase history
   const userOrders = await db.order.findMany({
     where: {
-      user: { clerkId: userId },
-      status: 'completed',
+      User: { clerkId: userId },
+      status: 'shipped',
     },
     include: {
       OrderItem: {
@@ -220,14 +185,13 @@ export async function getProductRecommendations(userId: string, limit: number = 
         },
       },
     },
-    cacheStrategy: CACHE_STRATEGIES.USER,
   });
 
   // Extract categories from purchase history
   const purchasedCategories = userOrders
     .flatMap((order) => order.OrderItem)
     .map((item) => item.Product.category)
-    .filter(Boolean);
+    .filter((category): category is string => Boolean(category));
 
   // Get recommended products from same categories
   return await db.product.findMany({
@@ -246,6 +210,5 @@ export async function getProductRecommendations(userId: string, limit: number = 
       },
     },
     take: limit,
-    cacheStrategy: CACHE_STRATEGIES.SEARCH,
   });
 }
