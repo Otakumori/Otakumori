@@ -62,7 +62,7 @@ const nextConfig = {
             value: [
               "default-src 'self';",
               // Allow inline for Next hydration and small inlined chunks; keep 'unsafe-eval' only if needed for dev tooling
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev https://cdn.jsdelivr.net;",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://cdn.jsdelivr.net;",
               // Fetch/XHR/SSE/WebSocket
               "connect-src 'self' https://api.clerk.com https://*.clerk.com https://*.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com;",
               // Styles and fonts

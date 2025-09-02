@@ -8,7 +8,7 @@ import { CartProvider } from '@/app/components/cart/CartProvider';
 import { Providers } from '@/providers';
 
 export const metadata: Metadata = {
-  title: 'Otakumori',
+  title: 'Otaku-mori',
   description: 'Your anime-inspired digital sanctuary',
 };
 

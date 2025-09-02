@@ -235,6 +235,11 @@ model User {
   userSettings         UserSettings?
   privacySettings      PrivacySettings?
   gameSettings         GameSettings[]
+  
+  // Webhook and Payment relations
+  wallet               Wallet?
+  profile              Profile?
+  stripe               StripeCustomer?
 
   @@index([clerkId])
 }
@@ -1433,6 +1438,36 @@ model PetalCollection {
   @@index([userId])
   @@index([isAuthenticated])
   @@index([createdAt])
+}
+
+// Webhook and Payment models for Clerk and Stripe integration
+model Wallet {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id])
+  petals    Int     @default(0)
+  runes     Int     @default(0)
+}
+
+model Profile {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id])
+  // add any display name / avatar / flags you want seeded on create
+}
+
+model StripeCustomer {
+  id         String @id @default(cuid())
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id])
+  customerId String @unique        // Stripe customer id
+}
+
+model WebhookEvent {
+  id        String   @id                    // use upstream event id for idempotency
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
 }
 
 
