@@ -1,9 +1,8 @@
-import { Suspense } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-// Force dynamic rendering to prevent build-time API calls
-export const dynamic = 'force-dynamic';
 
 interface Product {
   id: string;
@@ -28,11 +27,7 @@ interface ProductsResponse {
 
 async function fetchProducts(): Promise<Product[]> {
   try {
-    // During build time, NEXT_PUBLIC_SITE_URL might not be available
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/printify/products`, {
-      next: { revalidate: 60 },
-    });
+    const response = await fetch('/api/printify/products');
     
     if (!response.ok) {
       throw new Error('Failed to fetch products');
@@ -42,7 +37,6 @@ async function fetchProducts(): Promise<Product[]> {
     return data.ok ? data.data.products : [];
   } catch (error) {
     console.error('Error fetching products:', error);
-    // Return empty array during build time if API is not available
     return [];
   }
 }
@@ -126,12 +120,25 @@ function ProductsSkeleton() {
   );
 }
 
-async function ProductsContent() {
-  const products = await fetchProducts();
-  return <ProductsGrid products={products} />;
-}
-
 export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const fetchedProducts = await fetchProducts();
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-black pt-20">
       <div className="container mx-auto px-4 py-8">
@@ -143,9 +150,7 @@ export default function ProductsPage() {
           </p>
         </div>
         
-        <Suspense fallback={<ProductsSkeleton />}>
-          <ProductsContent />
-        </Suspense>
+        {loading ? <ProductsSkeleton /> : <ProductsGrid products={products} />}
       </div>
     </div>
   );
