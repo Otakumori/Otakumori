@@ -497,3 +497,19 @@ footer::before {
 .translate-y-neg-48 {
   transform: translateY(-48px);
 }
+
+/* Force Clerk primary button text to "Leave a mark" when present */
+.cl-formButtonPrimary > span { 
+  color: transparent !important; 
+}
+.cl-formButtonPrimary::after {
+  content: "Leave a mark";
+  color: #fff;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
