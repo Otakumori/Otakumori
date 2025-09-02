@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
   try {
-    const { userId } = auth();
+    const { userId  } = await auth();
     const { username } = params;
 
     if (!username) {

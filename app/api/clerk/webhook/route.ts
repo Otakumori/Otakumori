@@ -76,7 +76,8 @@ export async function POST(req: NextRequest) {
           accessories: [],
         };
 
-        await clerkClient.users.updateUserMetadata(id, {
+        const client = await clerkClient();
+        await client.users.updateUserMetadata(id, {
           publicMetadata: {
             ...public_metadata,
             avatarPreset: defaultPreset,

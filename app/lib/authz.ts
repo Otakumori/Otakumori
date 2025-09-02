@@ -3,7 +3,7 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function isAdmin(): Promise<boolean> {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) return false;
 
   // Check Clerk metadata for admin role
@@ -19,7 +19,7 @@ export async function isAdmin(): Promise<boolean> {
 }
 
 export async function getUserRole(): Promise<string | null> {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) return null;
 
   try {
@@ -31,7 +31,7 @@ export async function getUserRole(): Promise<string | null> {
 }
 
 export async function requireAdmin() {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) return { ok: false as const, status: 401 as const };
 
   try {

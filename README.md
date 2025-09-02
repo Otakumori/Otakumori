@@ -1,307 +1,274 @@
-# 🌸 Otaku-mori - Anime Community Platform
+# Otakumori - Edge-Proof, Zero-Error, Fully Wired
 
-A comprehensive anime community platform built with Next.js, featuring user profiles, achievements, admin tools, community features, and more.
+A comprehensive Next.js application with production-grade features including Clerk authentication, Printify integration, interactive petals, secret runes, and Microsoft Edge compatibility.
 
-## ✨ Features
-
-### 🎮 Core Features
-
-- **Memory Cube Boot Sequence** - Interactive startup animation with audio
-- **Achievement System** - Comprehensive achievement tracking with custom icons and petal tiers
-- **Profile System** - Rich user profiles with avatar customization and stats
-- **NSFW Gating** - Age verification and content filtering system
-- **Cherry Blossom Effects** - Beautiful sakura petal animations throughout the site
-
-### 👥 Community Features
-
-- **Echo Well** - Social media-style community interactions
-- **Petalnotes** - Collaborative knowledge sharing platform
-- **Friend System** - User connections and activity tracking
-- **Community Gallery** - User-generated content showcase
-
-### 🛍️ E-commerce
-
-- **Shop Management** - Product catalog with inventory tracking
-- **Cart System** - Shopping cart with persistent state
-- **Order Management** - Complete order processing workflow
-- **Printify Integration** - Print-on-demand product fulfillment
-
-### 🛠️ Admin Dashboard
-
-- **User Management** - Complete user administration with bulk actions
-- **Content Moderation** - Flagged content and user report management
-- **Analytics Dashboard** - Comprehensive site analytics and metrics
-- **Blog Management** - Content creation and publishing tools
-- **Shop Administration** - Product and order management
-- **Bulk Actions** - Mass operations for efficiency
-
-### 📊 Analytics & Monitoring
-
-- **Real-time Metrics** - User activity, revenue, and engagement tracking
-- **Performance Monitoring** - System health and error tracking
-- **SEO Optimization** - Search engine optimization tools
-- **Export Capabilities** - Data export for external analysis
-
-### 🌍 Internationalization
-
-- **Multi-language Support** - English, Japanese, Korean, Chinese, Spanish, French, German, Portuguese
-- **Language Switcher** - Easy language selection with native names
-- **Localized Content** - Region-specific content and formatting
-
-### 📱 Mobile Experience
-
-- **Mobile Navigation** - Bottom navigation and side menu
-- **Responsive Design** - Optimized for all screen sizes
-- **Touch Interactions** - Mobile-friendly gestures and interactions
-- **Progressive Web App** - App-like experience on mobile devices
-
-### 🔔 Notifications & Feedback
-
-- **Toast System** - Comprehensive notification system
-- **Achievement Notifications** - Real-time achievement unlocks
-- **Sound Effects** - Audio feedback for interactions
-- **Haptic Feedback** - Mobile vibration feedback
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-- Supabase account (for database)
-
-### Installation
-
-1. **Clone the repository**
+## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/yourusername/Otakumori.git
-cd Otakumori
-```
-
-2. **Install dependencies**
-
-```bash
+# Install dependencies
 npm install
-```
 
-3. **Set up environment variables**
-
-```bash
+# Set up environment variables
 cp .env.example .env.local
-```
+# Edit .env.local with your API keys
 
-Fill in your environment variables:
+# Generate Prisma client
+npm run prisma:generate
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
-```
-
-4. **Set up the database**
-
-```bash
-npm run db:setup
-npm run db:migrate
-```
-
-5. **Start the development server**
-
-```bash
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+## 📋 Available Commands
 
-## 🏗️ Project Structure
+### Development
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run clean` - Clean build artifacts
 
-```
-Otakumori/
-├── app/                          # Next.js 13+ app directory
-│   ├── (auth)/                   # Authentication routes
-│   ├── (client)/                 # Client-side routes
-│   ├── admin/                    # Admin dashboard
-│   ├── api/                      # API routes
-│   ├── components/               # Reusable components
-│   │   ├── achievements/         # Achievement system
-│   │   ├── analytics/            # Analytics dashboard
-│   │   ├── community/            # Community features
-│   │   ├── i18n/                 # Internationalization
-│   │   ├── mobile/               # Mobile components
-│   │   ├── notifications/        # Notification system
-│   │   └── ui/                   # UI components
-│   ├── contexts/                 # React contexts
-│   ├── hooks/                    # Custom hooks
-│   ├── lib/                      # Utility libraries
-│   └── types/                    # TypeScript types
-├── public/                       # Static assets
-├── supabase/                     # Database migrations
-└── scripts/                      # Utility scripts
-```
+### Code Quality
+- `npm run lint` - Run ESLint (must be 0 errors)
+- `npm run typecheck` - Run TypeScript check (must be 0 errors)
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
 
-## 🎨 Key Components
+### Testing & Validation
+- `npm run test` - Run unit tests
+- `npm run test:coverage` - Run tests with coverage
+- `npm run preflight` - Run pre-deployment checks
+- `npm run verify` - Run all validation checks
 
-### Achievement System
+### Database
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:studio` - Open Prisma Studio
+- `npm run db:seed` - Seed database with initial data
 
-- **AchievementCard** - Individual achievement display
-- **AchievementCategories** - Achievement organization
-- **AchievementDetails** - Detailed achievement information
-- **AchievementContext** - Global achievement state management
+## 🏗️ Architecture
 
-### Admin Dashboard
+### Core Technologies
+- **Framework**: Next.js 14 with App Router
+- **Authentication**: Clerk
+- **Database**: Prisma + Neon (PostgreSQL)
+- **Storage**: Vercel Blob
+- **Payments**: Stripe
+- **Background Jobs**: Inngest
+- **Data Fetching**: React Query (@tanstack/react-query)
 
-- **User Management** - Complete user administration
-- **Content Moderation** - Flagged content handling
-- **Analytics Dashboard** - Site metrics and charts
-- **Shop Management** - Product and order administration
+### Key Features
 
-### Community Features
+#### 🔐 Production-Grade Authentication
+- Clerk integration with secure cookies
+- CSP-compliant for Microsoft Edge
+- Sign in/out flows with proper redirects
 
-- **Echo Well** - Social media interactions
-- **Petalnotes** - Collaborative knowledge sharing
-- **Friend System** - User connections
-- **Community Gallery** - Content showcase
+#### 🌸 Interactive Petals System
+- Clickable petals with gravitational physics
+- Persistent storage (authenticated users + guest sessions)
+- Debounced API calls to prevent spam
+- Seasonal variants and burst modes
 
-### Mobile Experience
+#### ⚡ Secret Runes System
+- Hidden runes throughout the site
+- Unlock mechanism with rate limiting
+- Telemetry and logging
+- Accessible via "boring pages" (FAQ, Terms, Privacy)
 
-- **MobileNavigation** - Mobile-optimized navigation
-- **Bottom Navigation** - App-like bottom navigation
-- **Side Menu** - Slide-out navigation menu
-- **Touch Interactions** - Mobile-friendly interactions
+#### 🛍️ Printify Integration
+- SSR-safe product rendering
+- Suspense boundaries with skeletons
+- Graceful fallbacks for API failures
+- Stale-while-revalidate caching
 
-## 🔧 API Endpoints
+#### 🌟 Purple Star Background
+- CSS-based animation (no canvas blocking)
+- Respects `prefers-reduced-motion`
+- Fixed positioning with proper z-index layering
 
-### Admin APIs
+#### 🛡️ Microsoft Edge Hardening
+- Comprehensive CSP headers
+- Source maps for debugging
+- Cookie security (SameSite=Lax, Secure in prod)
+- Polyfills for older Edge versions
 
-- `GET/POST /api/admin/users` - User management
-- `GET/POST /api/admin/blog` - Blog management
-- `GET/POST /api/admin/shop` - Shop management
-- `GET/POST /api/admin/moderation` - Content moderation
+## 🔧 Configuration
 
-### User APIs
-
-- `GET/POST /api/auth/[...nextauth]` - Authentication
-- `GET/POST /api/profile` - Profile management
-- `GET/POST /api/achievements` - Achievement system
-
-### Community APIs
-
-- `GET/POST /api/community/echoes` - Echo Well
-- `GET/POST /api/community/petalnotes` - Petalnotes
-- `GET/POST /api/community/friends` - Friend system
-
-## 🎯 Achievement System
-
-The achievement system features:
-
-- **Custom Icons** - Unique achievement artwork
-- **Petal Tiers** - Bronze, Silver, Gold, Platinum, Diamond
-- **Categories** - Community, Gaming, Collection, Social
-- **Progress Tracking** - Real-time achievement progress
-- **Sound Effects** - Achievement unlock audio
-- **Notifications** - Toast notifications for unlocks
-
-## 🌸 Cherry Blossom Theme
-
-The site features a beautiful cherry blossom aesthetic:
-
-- **Petal Animations** - Drifting sakura petals
-- **Seasonal Changes** - Dynamic theming based on seasons
-- **Mood System** - Different petal behaviors based on user mood
-- **Interactive Elements** - Clickable petals with effects
-
-## 📱 Mobile Optimization
-
-Mobile features include:
-
-- **Bottom Navigation** - Easy thumb navigation
-- **Side Menu** - Comprehensive navigation menu
-- **Touch Gestures** - Swipe and tap interactions
-- **Responsive Design** - Optimized for all screen sizes
-- **Progressive Web App** - App-like experience
-
-## 🌍 Internationalization
-
-Multi-language support includes:
-
-- **8 Languages** - English, Japanese, Korean, Chinese, Spanish, French, German, Portuguese
-- **Native Names** - Language names in their native script
-- **Flag Icons** - Visual language identification
-- **Easy Switching** - One-click language changes
-
-## 🔔 Notification System
-
-Comprehensive notification features:
-
-- **Toast Notifications** - Non-intrusive message display
-- **Multiple Types** - Success, error, warning, info
-- **Auto-dismiss** - Automatic notification cleanup
-- **Action Buttons** - Interactive notification actions
-- **Sound Integration** - Audio notification support
-
-## 🛠️ Development
-
-### Available Scripts
+### Environment Variables
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript checks
-npm run db:setup     # Setup database
-npm run db:migrate   # Run database migrations
-npm run db:seed      # Seed database with sample data
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+
+# Database
+DATABASE_URL=postgresql://...
+
+# Printify
+PRINTIFY_API_KEY=...
+PRINTIFY_SHOP_ID=...
+
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-### Code Style
+### TypeScript Configuration
+- Strict mode enabled
+- `noUncheckedIndexedAccess: true`
+- `noImplicitOverride: true`
+- `exactOptionalPropertyTypes: true`
 
-- **TypeScript** - Full type safety
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Tailwind CSS** - Utility-first styling
+### ESLint Rules
+- `no-unused-vars`: Error (with `_` prefix exception)
+- `@typescript-eslint/consistent-type-imports`: Error
+- `@next/next/no-img-element`: Warning
+
+## 🧪 Testing & Quality Assurance
+
+### Preflight Checks
+The preflight script (`scripts/preflight.ts`) performs comprehensive checks:
+
+- ✅ Header and footer visibility
+- ✅ Authentication buttons rendered
+- ✅ Purple stars background present
+- ✅ Product cards visible (on products page)
+- ✅ Petals container clickable
+- ✅ No console errors
+- ✅ No CSP violations
+- ✅ Proper cookies set
+
+### CI Pipeline
+GitHub Actions workflow includes:
+1. Lint and type checking
+2. Unit tests
+3. Production build
+4. Preflight checks with Puppeteer
+5. Security scanning
+
+## 📁 Project Structure
+
+```
+app/
+├── api/v1/           # Versioned API routes
+├── components/       # Reusable components
+├── (shop)/          # Shop-related pages
+├── (info)/          # Information pages (FAQ, Terms, etc.)
+├── runes/           # Secret rune pages
+└── layout.tsx       # Root layout with Header/Main/Footer
+
+lib/
+├── contracts.ts     # Zod validation schemas
+├── http.ts          # HTTP wrapper utilities
+├── db.ts            # Database singleton
+└── microcopy.ts     # Internationalization
+
+scripts/
+├── preflight.ts     # Pre-deployment checks
+└── seed-*.ts        # Database seeding scripts
+```
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Automated Deployment
 
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+```bash
+npm run deploy
+```
 
-### Other Platforms
+This script will:
+1. Check git status and commit changes
+2. Run build verification
+3. Deploy to your configured platform (Vercel/Netlify)
+4. Push to remote repository
 
-- **Netlify** - Static site hosting
-- **Railway** - Full-stack deployment
-- **Docker** - Containerized deployment
+### Manual Deployment
+
+1. **Build the application**: `npm run build`
+2. **Push to repository**: `git push origin main`
+3. **Deploy via platform**: Use your deployment platform's interface
+4. **Configure environment variables** in your deployment platform
+
+### Platform-Specific Setup
+
+#### Vercel
+```bash
+npm i -g vercel
+vercel --prod
+```
+
+#### Netlify
+```bash
+npm i -g netlify-cli
+netlify deploy --prod
+```
+
+### Production Checklist
+- [ ] All environment variables set
+- [ ] Database migrations applied
+- [ ] Clerk production keys configured
+- [ ] CSP headers tested in Edge
+- [ ] Preflight checks passing
+- [ ] No TypeScript errors
+- [ ] No ESLint errors
+
+### Commands for Production
+```bash
+# Full validation
+npm run verify
+
+# Pre-deployment checks
+npm run preflight
+
+# Production build
+npm run build
+
+# Deploy
+npm run deploy
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**CSP Violations in Edge**
+- Check `next.config.mjs` CSP configuration
+- Ensure all Clerk domains are whitelisted
+- Verify no inline scripts are blocked
+
+**Authentication Not Working**
+- Verify Clerk keys are correct
+- Check CSP allows Clerk domains
+- Ensure cookies are set with proper SameSite
+
+**Petals Not Persisting**
+- Check database connection
+- Verify API routes are accessible
+- Check rate limiting isn't blocking requests
+
+**Build Failures**
+- Run `npm run typecheck` to identify TypeScript errors
+- Run `npm run lint` to identify ESLint errors
+- Check for missing environment variables
+
+## 📊 Monitoring
+
+### Health Endpoints
+- `/api/health` - Basic health check
+- `/api/health/clerk` - Clerk configuration check
+- `/api/printify/health` - Printify API status
+
+### Logging
+- Structured logging with request IDs
+- Error tracking with Sentry
+- Performance monitoring
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Follow the established patterns
+2. Ensure all tests pass
+3. Run preflight checks before submitting
+4. Maintain zero TypeScript/ESLint errors
+5. Update documentation as needed
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Next.js** - React framework
-- **Supabase** - Backend as a service
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Beautiful icons
-- **Framer Motion** - Animation library
-
-## 📞 Support
-
-For support, email support@otaku-mori.com or join our Discord community.
-
----
-
-**Built with ❤️ for the anime community**
+Private - All rights reserved.

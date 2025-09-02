@@ -16,7 +16,7 @@ const Q = z.object({
 
 export async function GET(req: Request) {
   try {
-    const userId = requireUserId();
+    const userId = await requireUserId();
     const url = new URL(req.url);
     const parsed = Q.parse({
       limit: url.searchParams.get('limit') ?? undefined,

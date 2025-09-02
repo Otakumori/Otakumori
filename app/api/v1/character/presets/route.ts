@@ -12,7 +12,7 @@ import { CharacterPresetRequestSchema } from '@/app/lib/contracts';
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = auth();
+    const { userId  } = await auth();
     const { searchParams } = new URL(request.url);
 
     const queryParams = {

@@ -1,9 +1,17 @@
 'use client';
 
-import { WorldProvider, useWorld } from '@/app/world/WorldProvider';
-import TreeStage from '@/app/components/tree/TreeStage';
-import Avatar from '@/app/components/avatar/Avatar';
-// import { SettingsPanel } from "@/app/components/debug/SettingsPanel"; // To be created
+import dynamic from 'next/dynamic';
+import { WorldProvider } from '@/app/world/WorldProvider';
+
+// Dynamically import R3F components to prevent SSR issues
+const TreeStage = dynamic(() => import('@/app/components/tree/TreeStage'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center h-full">Loading 3D World...</div>
+});
+
+const Avatar = dynamic(() => import('@/app/components/avatar/Avatar'), {
+  ssr: false,
+});
 
 export default function DebugWorld() {
   return (

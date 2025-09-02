@@ -7,7 +7,7 @@ import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) return NextResponse.json({ ok: false }, { status: 401 });
 
   const msgId = params.id;

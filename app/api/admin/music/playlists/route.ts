@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   if (!admin.ok) return NextResponse.json({ ok: false }, { status: admin.status });
 
   const { name, isPublic = true } = await req.json();
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!name || !userId)
     return NextResponse.json({ ok: false, error: 'Missing fields' }, { status: 400 });
 

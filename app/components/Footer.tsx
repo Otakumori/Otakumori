@@ -40,12 +40,13 @@ export function BottomLogoAndSocials() {
           height={48}
           className="mb-2 rounded-full border-2 border-pink-400"
         />
-        <div className="mt-2 flex space-x-4">
+        <div className="mt-2 flex space-x-4" role="list" aria-label="Social media links">
           <a
             href="https://www.facebook.com/Otakumorii"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Facebook"
+            aria-label="Follow us on Facebook"
+            role="listitem"
           >
             <svg
               width="28"

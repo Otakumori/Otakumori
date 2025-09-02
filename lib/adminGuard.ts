@@ -4,7 +4,7 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 
 export async function requireAdminOrThrow() {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) throw new Response('Unauthorized', { status: 401 });
   const user = await currentUser();
   const role = (user?.publicMetadata as any)?.role;

@@ -7,7 +7,7 @@ import { prisma } from '@/app/lib/prisma';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
-  const { userId } = auth();
+  const { userId  } = await auth();
   if (!userId) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
 
   const { displayName } = (await req.json()) as { displayName?: string };

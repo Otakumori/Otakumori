@@ -1,0 +1,3372 @@
+{
+  "page": {
+    "winner": "app\\test-visual\\page.tsx",
+    "losers": [
+      "app\\about\\page.tsx",
+      "app\\page.tsx",
+      "app\\mini-games\\page.tsx",
+      "app\\wishlist\\page.tsx",
+      "app\\settings\\page.tsx",
+      "app\\admin\\runes\\page.tsx",
+      "app\\admin\\burst\\page.tsx",
+      "app\\admin\\rewards\\page.tsx",
+      "app\\checkout\\page.tsx",
+      "app\\mini-games\\trade-hall\\page.tsx",
+      "app\\account\\petals\\page.tsx",
+      "app\\shop\\checkout\\page.tsx",
+      "app\\profile\\[username]\\page.tsx",
+      "app\\collections\\[slug]\\page.tsx",
+      "app\\thank-you\\page.tsx",
+      "app\\play\\page.tsx",
+      "app\\collab\\page.tsx",
+      "app\\shop\\product\\[id]\\page.tsx",
+      "app\\panel\\music\\page.tsx",
+      "app\\admin\\flags\\page.tsx",
+      "app\\starter-pack\\page.tsx",
+      "app\\panel\\community\\page.tsx",
+      "app\\abyss\\page.js",
+      "app\\admin\\media\\page.tsx",
+      "app\\panel\\trade\\page.tsx",
+      "app\\data-deletion\\page.tsx",
+      "app\\panel\\[slug]\\page.tsx",
+      "app\\shop\\c\\[category]\\page.tsx",
+      "app\\mini-games\\[slug]\\page.tsx",
+      "app\\shop\\cart\\page.tsx",
+      "app\\search\\page.tsx",
+      "app\\faq\\page.js",
+      "app\\(client)\\join-the-blossom\\page.tsx",
+      "app\\abyss\\games\\mini-games\\page.js",
+      "app\\abyss\\community\\page.js",
+      "app\\hub\\page.tsx",
+      "app\\abyss\\gallery\\page.js",
+      "app\\shop\\[category]\\[subcategory]\\page.tsx",
+      "app\\Not_one_of_us_unrecognized_device\\page.tsx",
+      "app\\cart\\page.tsx",
+      "app\\shop\\checkout\\success\\page.tsx",
+      "app\\profile\\page.tsx",
+      "app\\abyss\\games\\page.js",
+      "app\\(client)\\community\\page.tsx",
+      "app\\login\\page.tsx",
+      "app\\abyss\\shop\\page.js",
+      "app\\mini-games\\rhythm-beat-em-up\\page.tsx",
+      "app\\(client)\\friends\\page.tsx",
+      "app\\shop\\[category]\\page.tsx",
+      "app\\[slug]\\page.tsx",
+      "app\\abyss\\games\\petal-collection\\page.js",
+      "app\\blog\\page.tsx",
+      "app\\gamecube\\page.tsx",
+      "app\\shop\\page.tsx",
+      "app\\account\\storage\\page.tsx",
+      "app\\mini-games\\petal-collection\\page.tsx",
+      "app\\(client)\\bonfire\\page.tsx",
+      "app\\(client)\\save-files\\page.tsx",
+      "app\\games\\[slug]\\page.tsx",
+      "app\\trade\\page.tsx",
+      "app\\mini-games\\bubble-ragdoll\\page.tsx",
+      "app\\mini-games\\quick-math\\page.tsx",
+      "app\\mini-games\\samurai-petal-slice\\page.tsx",
+      "app\\blog\\[slug]\\page.tsx",
+      "page.tsx",
+      "app\\admin\\music\\page.tsx",
+      "app\\admin\\reviews\\page.tsx",
+      "app\\admin\\page.tsx",
+      "app\\test\\page.tsx",
+      "app\\admin\\soapstones\\page.tsx",
+      "app\\panel\\mini-games\\page.tsx",
+      "app\\panel\\petal-store\\page.tsx",
+      "app\\health\\page.tsx",
+      "app\\mini-games\\leaderboard\\page.tsx",
+      "app\\mini-games\\achievements\\page.tsx",
+      "app\\terms\\page.tsx",
+      "app\\character-editor\\page.tsx",
+      "app\\orders\\page.tsx",
+      "app\\cookies\\page.tsx",
+      "app\\privacy\\page.tsx",
+      "app\\mini-games\\bubble-girl\\page.tsx",
+      "app\\mini-games\\memory-match\\page.tsx",
+      "app\\mini-games\\puzzle-reveal\\page.tsx",
+      "app\\mini-games\\petal-samurai\\page.tsx",
+      "app\\account\\page.tsx",
+      "app\\parties\\page.tsx",
+      "app\\too-many-requests\\page.tsx",
+      "app\\sign-in\\[[...sign-in]]\\page.tsx",
+      "app\\sign-up\\[[...sign-up]]\\page.tsx",
+      "app\\safety\\page.tsx",
+      "app\\debug\\world\\page.tsx",
+      "app\\mini-games\\dungeon-of-desire\\page.tsx",
+      "app\\mini-games\\maid-cafe-manager\\page.tsx",
+      "app\\mini-games\\petal-storm-rhythm\\page.tsx",
+      "app\\mini-games\\thigh-coliseum\\page.tsx",
+      "app\\mini-games\\blossomware\\page.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\test-visual\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756755347,
+        "lineCount": 13
+      },
+      {
+        "file": "app\\about\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756753916,
+        "lineCount": 246
+      },
+      {
+        "file": "app\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756753916,
+        "lineCount": 47
+      },
+      {
+        "file": "app\\mini-games\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756752248,
+        "lineCount": 17
+      },
+      {
+        "file": "app\\wishlist\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756746468,
+        "lineCount": 27
+      },
+      {
+        "file": "app\\settings\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 890
+      },
+      {
+        "file": "app\\admin\\runes\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 673
+      },
+      {
+        "file": "app\\admin\\burst\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 464
+      },
+      {
+        "file": "app\\admin\\rewards\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 459
+      },
+      {
+        "file": "app\\checkout\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 429
+      },
+      {
+        "file": "app\\mini-games\\trade-hall\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 415
+      },
+      {
+        "file": "app\\account\\petals\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 381
+      },
+      {
+        "file": "app\\shop\\checkout\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 345
+      },
+      {
+        "file": "app\\profile\\[username]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 339
+      },
+      {
+        "file": "app\\collections\\[slug]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 312
+      },
+      {
+        "file": "app\\thank-you\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 306
+      },
+      {
+        "file": "app\\play\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 271
+      },
+      {
+        "file": "app\\collab\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 263
+      },
+      {
+        "file": "app\\shop\\product\\[id]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 262
+      },
+      {
+        "file": "app\\panel\\music\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 258
+      },
+      {
+        "file": "app\\admin\\flags\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 227
+      },
+      {
+        "file": "app\\starter-pack\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 188
+      },
+      {
+        "file": "app\\panel\\community\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 184
+      },
+      {
+        "file": "app\\abyss\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 181
+      },
+      {
+        "file": "app\\admin\\media\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 181
+      },
+      {
+        "file": "app\\panel\\trade\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 179
+      },
+      {
+        "file": "app\\data-deletion\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 166
+      },
+      {
+        "file": "app\\panel\\[slug]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 163
+      },
+      {
+        "file": "app\\shop\\c\\[category]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 162
+      },
+      {
+        "file": "app\\mini-games\\[slug]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 149
+      },
+      {
+        "file": "app\\shop\\cart\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 149
+      },
+      {
+        "file": "app\\search\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 140
+      },
+      {
+        "file": "app\\faq\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 134
+      },
+      {
+        "file": "app\\(client)\\join-the-blossom\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 97
+      },
+      {
+        "file": "app\\abyss\\games\\mini-games\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 97
+      },
+      {
+        "file": "app\\abyss\\community\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 80
+      },
+      {
+        "file": "app\\hub\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 78
+      },
+      {
+        "file": "app\\abyss\\gallery\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 75
+      },
+      {
+        "file": "app\\shop\\[category]\\[subcategory]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 74
+      },
+      {
+        "file": "app\\Not_one_of_us_unrecognized_device\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 71
+      },
+      {
+        "file": "app\\cart\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 57
+      },
+      {
+        "file": "app\\shop\\checkout\\success\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 56
+      },
+      {
+        "file": "app\\profile\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 47
+      },
+      {
+        "file": "app\\abyss\\games\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 43
+      },
+      {
+        "file": "app\\(client)\\community\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 38
+      },
+      {
+        "file": "app\\login\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      },
+      {
+        "file": "app\\abyss\\shop\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 34
+      },
+      {
+        "file": "app\\mini-games\\rhythm-beat-em-up\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 34
+      },
+      {
+        "file": "app\\(client)\\friends\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      },
+      {
+        "file": "app\\shop\\[category]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\[slug]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\abyss\\games\\petal-collection\\page.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\blog\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\gamecube\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 29
+      },
+      {
+        "file": "app\\shop\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 29
+      },
+      {
+        "file": "app\\account\\storage\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 22
+      },
+      {
+        "file": "app\\mini-games\\petal-collection\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 22
+      },
+      {
+        "file": "app\\(client)\\bonfire\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\(client)\\save-files\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 20
+      },
+      {
+        "file": "app\\games\\[slug]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 20
+      },
+      {
+        "file": "app\\trade\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 18
+      },
+      {
+        "file": "app\\mini-games\\bubble-ragdoll\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 17
+      },
+      {
+        "file": "app\\mini-games\\quick-math\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 17
+      },
+      {
+        "file": "app\\mini-games\\samurai-petal-slice\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 17
+      },
+      {
+        "file": "app\\blog\\[slug]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\admin\\music\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 15
+      },
+      {
+        "file": "app\\admin\\reviews\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 15
+      },
+      {
+        "file": "app\\admin\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 13
+      },
+      {
+        "file": "app\\test\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 11
+      },
+      {
+        "file": "app\\admin\\soapstones\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 10
+      },
+      {
+        "file": "app\\panel\\mini-games\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 8
+      },
+      {
+        "file": "app\\panel\\petal-store\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 8
+      },
+      {
+        "file": "app\\health\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 6
+      },
+      {
+        "file": "app\\mini-games\\leaderboard\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 428
+      },
+      {
+        "file": "app\\mini-games\\achievements\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 412
+      },
+      {
+        "file": "app\\terms\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 294
+      },
+      {
+        "file": "app\\character-editor\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 252
+      },
+      {
+        "file": "app\\orders\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 252
+      },
+      {
+        "file": "app\\cookies\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 246
+      },
+      {
+        "file": "app\\privacy\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 244
+      },
+      {
+        "file": "app\\mini-games\\bubble-girl\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 124
+      },
+      {
+        "file": "app\\mini-games\\memory-match\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 94
+      },
+      {
+        "file": "app\\mini-games\\puzzle-reveal\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 93
+      },
+      {
+        "file": "app\\mini-games\\petal-samurai\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 92
+      },
+      {
+        "file": "app\\account\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 63
+      },
+      {
+        "file": "app\\parties\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 46
+      },
+      {
+        "file": "app\\too-many-requests\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 37
+      },
+      {
+        "file": "app\\sign-in\\[[...sign-in]]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\sign-up\\[[...sign-up]]\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\safety\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\debug\\world\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 22
+      },
+      {
+        "file": "app\\mini-games\\dungeon-of-desire\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 22
+      },
+      {
+        "file": "app\\mini-games\\maid-cafe-manager\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\mini-games\\petal-storm-rhythm\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\mini-games\\thigh-coliseum\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\mini-games\\blossomware\\page.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 19
+      }
+    ]
+  },
+  "profileheader": {
+    "winner": "app\\profile\\ui\\ProfileHeader.tsx",
+    "losers": [
+      "app\\(client)\\profile\\ProfileHeader.tsx",
+      "app\\components\\profile\\ProfileHeader.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\profile\\ui\\ProfileHeader.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 276
+      },
+      {
+        "file": "app\\(client)\\profile\\ProfileHeader.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      },
+      {
+        "file": "app\\components\\profile\\ProfileHeader.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 103
+      }
+    ]
+  },
+  "layout": {
+    "winner": "app\\components\\components\\Layout.jsx",
+    "losers": [
+      "app\\layout.tsx",
+      "app\\abyss\\layout.js",
+      "app\\abyss\\games\\layout.js",
+      "app\\layout.js",
+      "app\\mini-games\\layout.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\components\\Layout.jsx",
+        "imports": 3,
+        "commitDate": 1756737732,
+        "lineCount": 13
+      },
+      {
+        "file": "app\\layout.tsx",
+        "imports": 0,
+        "commitDate": 1756752137,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\abyss\\layout.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 97
+      },
+      {
+        "file": "app\\abyss\\games\\layout.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 43
+      },
+      {
+        "file": "app\\layout.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 26
+      },
+      {
+        "file": "app\\mini-games\\layout.tsx",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 6
+      }
+    ]
+  },
+  "printify": {
+    "winner": "app\\abyss\\shop\\api\\printify.js",
+    "losers": [
+      "app\\lib\\printify.ts",
+      "lib\\api\\printify.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\abyss\\shop\\api\\printify.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 209
+      },
+      {
+        "file": "app\\lib\\printify.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 210
+      },
+      {
+        "file": "lib\\api\\printify.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 203
+      }
+    ]
+  },
+  "route": {
+    "winner": "app\\api\\v1\\printify\\products\\route.ts",
+    "losers": [
+      "app\\api\\shop\\products\\route.ts",
+      "app\\api\\printify\\products\\route.ts",
+      "app\\api\\soapstones\\route.ts",
+      "app\\api\\search\\route.ts",
+      "app\\api\\health\\route.ts",
+      "app\\api\\clerk-proxy\\[...path]\\route.ts",
+      "app\\api\\v1\\search\\route.ts",
+      "app\\api\\v1\\games\\finish\\route.ts",
+      "app\\api\\admin\\rewards\\route.ts",
+      "app\\api\\stripe\\webhook\\route.ts",
+      "app\\api\\admin\\burst\\route.ts",
+      "app\\api\\v1\\coop\\sessions\\[id]\\route.ts",
+      "app\\api\\v1\\moderation\\actions\\route.ts",
+      "app\\api\\admin\\moderation\\route.ts",
+      "app\\api\\v1\\comments\\route.ts",
+      "app\\api\\v1\\parties\\invitations\\route.ts",
+      "app\\api\\petals\\collect\\route.ts",
+      "app\\api\\v1\\parties\\[id]\\route.ts",
+      "app\\api\\v1\\coop\\sessions\\route.ts",
+      "app\\api\\v1\\character\\config\\route.ts",
+      "app\\api\\v1\\moderation\\reports\\route.ts",
+      "app\\api\\v1\\leaderboard\\submit\\route.ts",
+      "app\\api\\cron\\route.js",
+      "app\\api\\petals\\click\\route.ts",
+      "app\\api\\webhooks\\clerk\\route.ts",
+      "app\\api\\v1\\moderation\\reports\\[id]\\route.ts",
+      "app\\api\\v1\\search\\suggestions\\route.ts",
+      "app\\api\\admin\\shop\\route.ts",
+      "app\\api\\v1\\profile\\[username]\\route.ts",
+      "app\\api\\v1\\leaderboard\\[gameCode]\\route.ts",
+      "app\\api\\v1\\social\\follow\\route.ts",
+      "app\\api\\admin\\runes\\combos\\route.ts",
+      "app\\api\\v1\\parties\\invitations\\[id]\\route.ts",
+      "app\\api\\v1\\achievements\\unlock\\route.ts",
+      "app\\api\\checkout\\session\\route.ts",
+      "app\\api\\v1\\parties\\route.ts",
+      "app\\api\\petals\\merge\\route.ts",
+      "app\\api\\v1\\comments\\[id]\\route.ts",
+      "app\\api\\admin\\runes\\route.ts",
+      "app\\api\\v1\\character\\presets\\unlock\\route.ts",
+      "app\\api\\v1\\feed\\route.ts",
+      "app\\api\\v1\\settings\\games\\route.ts",
+      "app\\api\\v1\\games\\start\\route.ts",
+      "app\\api\\v1\\notifications\\route.ts",
+      "app\\api\\v1\\petals\\purchase\\route.ts",
+      "app\\api\\webhooks\\stripe\\route.ts",
+      "app\\api\\petals\\route.ts",
+      "app\\api\\games\\finish\\route.ts",
+      "app\\api\\reviews\\route.ts",
+      "app\\api\\gacha\\route.ts",
+      "app\\api\\quests\\claim\\route.ts",
+      "app\\api\\v1\\safety\\block\\route.ts",
+      "app\\api\\v1\\search\\history\\route.ts",
+      "app\\api\\admin\\printify-sync\\route.ts",
+      "app\\api\\admin\\flags\\route.ts",
+      "app\\api\\v1\\settings\\privacy\\route.ts",
+      "app\\api\\v1\\search\\analytics\\route.ts",
+      "app\\api\\clerk\\webhook\\route.ts",
+      "app\\api\\admin\\notifications\\route.ts",
+      "app\\api\\v1\\settings\\user\\route.ts",
+      "app\\api\\community\\posts\\route.ts",
+      "app\\api\\quests\\track\\route.ts",
+      "app\\api\\v1\\safety\\settings\\route.ts",
+      "app\\api\\checkout\\route.ts",
+      "app\\api\\products\\route.ts",
+      "app\\api\\v1\\games\\stats\\route.ts",
+      "app\\api\\admin\\runes\\[id]\\route.ts",
+      "app\\api\\v1\\character\\presets\\route.ts",
+      "app\\api\\user\\profile\\route.ts",
+      "app\\api\\v1\\games\\achievements\\route.ts",
+      "app\\api\\v1\\comments\\like\\route.ts",
+      "app\\api\\v1\\petals\\shop\\route.ts",
+      "app\\api\\webhooks\\inngest\\route.ts",
+      "app\\api\\v1\\comments\\report\\route.ts",
+      "app\\api\\v1\\petals\\spend\\route.ts",
+      "app\\api\\health\\comprehensive\\route.ts",
+      "app\\api\\orders\\route.ts",
+      "app\\api\\admin\\runes\\combos\\[id]\\route.ts",
+      "app\\api\\test-inngest\\route.ts",
+      "app\\api\\webhooks\\printify\\route.ts",
+      "app\\api\\v1\\shop\\products\\route.ts",
+      "app\\api\\contact\\route.ts",
+      "app\\api\\profile\\me\\route.ts",
+      "app\\api\\products\\featured\\route.ts",
+      "app\\api\\v1\\presence\\friends\\route.ts",
+      "app\\api\\debug\\printify\\route.ts",
+      "app\\api\\user\\state\\route.ts",
+      "app\\api\\v1\\games\\coupons\\route.ts",
+      "app\\api\\v1\\profile\\update\\route.ts",
+      "app\\api\\admin\\backup\\route.ts",
+      "app\\api\\admin\\maintenance\\route.ts",
+      "app\\api\\shop\\orders\\route.ts",
+      "app\\api\\shop\\route.ts",
+      "app\\api\\admin\\cache\\clear\\route.ts",
+      "app\\api\\shop\\purchase\\route.ts",
+      "app\\api\\titles\\award\\route.ts",
+      "app\\api\\v1\\presence\\heartbeat\\route.ts",
+      "app\\api\\petals\\ledger.csv\\route.ts",
+      "app\\api\\quests\\list\\route.ts",
+      "app\\api\\storage\\upload-url\\route.ts",
+      "app\\api\\v1\\games\\inventory\\route.ts",
+      "app\\api\\admin\\media\\upload\\route.ts",
+      "app\\api\\blog\\posts\\route.ts",
+      "app\\api\\shop\\products\\[id]\\route.ts",
+      "app\\api\\admin\\music\\playlists\\[id]\\tracks\\route.ts",
+      "app\\api\\petals\\ledger\\route.ts",
+      "app\\api\\inventory\\equip\\route.ts",
+      "app\\api\\starter-pack\\route.ts",
+      "app\\api\\v1\\petals\\balance\\route.ts",
+      "app\\api\\leaderboard\\[game]\\route.ts",
+      "app\\api\\orders\\[id]\\route.ts",
+      "app\\api\\reviews\\upload\\route.ts",
+      "app\\api\\soapstones\\[id]\\like\\route.ts",
+      "app\\api\\metrics\\route.ts",
+      "app\\api\\admin\\users\\route.ts",
+      "app\\api\\admin\\blog\\route.ts",
+      "app\\api\\v1\\petals\\ledger\\route.ts",
+      "app\\api\\admin\\music\\playlists\\route.ts",
+      "app\\api\\inngest\\route.ts",
+      "app\\api\\trade\\route.ts",
+      "app\\api\\admin\\media\\list\\route.ts",
+      "app\\api\\storage\\delete\\route.ts",
+      "app\\api\\system-check\\route.ts",
+      "app\\api\\petals\\earn\\route.ts",
+      "app\\api\\profile\\equip\\route.ts",
+      "app\\api\\checkout\\coupons\\route.ts",
+      "app\\api\\ds-messages\\[slug]\\route.ts",
+      "app\\api\\petals\\spend\\route.ts",
+      "app\\api\\profile\\presets\\route.ts",
+      "app\\api\\admin\\media\\delete\\route.ts",
+      "app\\api\\user\\files\\route.ts",
+      "app\\api\\user\\titles\\route.ts",
+      "app\\api\\v1\\account\\me\\route.ts",
+      "app\\api\\admin\\music\\playlists\\[id]\\route.ts",
+      "app\\api\\admin\\reviews\\route.ts",
+      "app\\api\\soapstones\\[id]\\route.ts",
+      "app\\api\\admin\\music\\blob-upload-token\\route.ts",
+      "app\\api\\debug-printify\\route.ts",
+      "app\\api\\prefs\\nsfw\\affirm\\route.ts",
+      "app\\api\\trade\\offer\\route.ts",
+      "app\\api\\test-simple\\route.ts",
+      "app\\api\\log-client-error\\route.ts",
+      "app\\api\\newsletter\\signup\\route.ts",
+      "app\\api\\account\\display-name\\route.ts",
+      "app\\api\\route.ts",
+      "app\\api\\ds-messages\\[slug]\\vote\\route.ts",
+      "app\\api\\admin\\reviews\\[id]\\approve\\route.ts",
+      "app\\api\\music\\playlist\\route.ts",
+      "app\\api\\soapstones\\[id]\\flag\\route.ts",
+      "app\\api\\trade\\inventory\\route.ts",
+      "app\\api\\debug-env\\route.ts",
+      "app\\api\\equip\\route.ts",
+      "app\\api\\admin\\music\\tracks\\[id]\\route.ts",
+      "app\\api\\admin\\reviews\\[id]\\route.ts",
+      "app\\api\\debug-env-simple\\route.ts",
+      "app\\api\\products\\[id]\\reviews\\route.ts",
+      "app\\api\\shop\\test-connection\\route.ts",
+      "app\\api\\v1\\account\\display-name\\route.ts",
+      "app\\api\\shop\\orders\\[id]\\route.ts",
+      "app\\api\\test-supabase\\route.ts",
+      "app\\api\\webhooks\\printify\\test\\route.ts",
+      "app\\api\\orders\\by-session\\route.ts",
+      "app\\api\\admin\\dashboard\\route.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\api\\v1\\printify\\products\\route.ts",
+        "imports": 0,
+        "commitDate": 1756754984,
+        "lineCount": 82
+      },
+      {
+        "file": "app\\api\\shop\\products\\route.ts",
+        "imports": 0,
+        "commitDate": 1756754984,
+        "lineCount": 71
+      },
+      {
+        "file": "app\\api\\printify\\products\\route.ts",
+        "imports": 0,
+        "commitDate": 1756752665,
+        "lineCount": 39
+      },
+      {
+        "file": "app\\api\\soapstones\\route.ts",
+        "imports": 0,
+        "commitDate": 1756752665,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\search\\route.ts",
+        "imports": 0,
+        "commitDate": 1756752248,
+        "lineCount": 37
+      },
+      {
+        "file": "app\\api\\health\\route.ts",
+        "imports": 0,
+        "commitDate": 1756752248,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\api\\clerk-proxy\\[...path]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756745139,
+        "lineCount": 68
+      },
+      {
+        "file": "app\\api\\v1\\search\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 415
+      },
+      {
+        "file": "app\\api\\v1\\games\\finish\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 398
+      },
+      {
+        "file": "app\\api\\admin\\rewards\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 271
+      },
+      {
+        "file": "app\\api\\stripe\\webhook\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 258
+      },
+      {
+        "file": "app\\api\\admin\\burst\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 251
+      },
+      {
+        "file": "app\\api\\v1\\coop\\sessions\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 234
+      },
+      {
+        "file": "app\\api\\v1\\moderation\\actions\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 225
+      },
+      {
+        "file": "app\\api\\admin\\moderation\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 219
+      },
+      {
+        "file": "app\\api\\v1\\comments\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 217
+      },
+      {
+        "file": "app\\api\\v1\\parties\\invitations\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 217
+      },
+      {
+        "file": "app\\api\\petals\\collect\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 215
+      },
+      {
+        "file": "app\\api\\v1\\parties\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 208
+      },
+      {
+        "file": "app\\api\\v1\\coop\\sessions\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 206
+      },
+      {
+        "file": "app\\api\\v1\\character\\config\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 203
+      },
+      {
+        "file": "app\\api\\v1\\moderation\\reports\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 202
+      },
+      {
+        "file": "app\\api\\v1\\leaderboard\\submit\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 197
+      },
+      {
+        "file": "app\\api\\cron\\route.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 193
+      },
+      {
+        "file": "app\\api\\petals\\click\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 192
+      },
+      {
+        "file": "app\\api\\webhooks\\clerk\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 192
+      },
+      {
+        "file": "app\\api\\v1\\moderation\\reports\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 189
+      },
+      {
+        "file": "app\\api\\v1\\search\\suggestions\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 183
+      },
+      {
+        "file": "app\\api\\admin\\shop\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 180
+      },
+      {
+        "file": "app\\api\\v1\\profile\\[username]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 179
+      },
+      {
+        "file": "app\\api\\v1\\leaderboard\\[gameCode]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 170
+      },
+      {
+        "file": "app\\api\\v1\\social\\follow\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 170
+      },
+      {
+        "file": "app\\api\\admin\\runes\\combos\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 165
+      },
+      {
+        "file": "app\\api\\v1\\parties\\invitations\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 164
+      },
+      {
+        "file": "app\\api\\v1\\achievements\\unlock\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 163
+      },
+      {
+        "file": "app\\api\\checkout\\session\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 158
+      },
+      {
+        "file": "app\\api\\v1\\parties\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 157
+      },
+      {
+        "file": "app\\api\\petals\\merge\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 156
+      },
+      {
+        "file": "app\\api\\v1\\comments\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 156
+      },
+      {
+        "file": "app\\api\\admin\\runes\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 149
+      },
+      {
+        "file": "app\\api\\v1\\character\\presets\\unlock\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 148
+      },
+      {
+        "file": "app\\api\\v1\\feed\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 148
+      },
+      {
+        "file": "app\\api\\v1\\settings\\games\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 148
+      },
+      {
+        "file": "app\\api\\v1\\games\\start\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 147
+      },
+      {
+        "file": "app\\api\\v1\\notifications\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 144
+      },
+      {
+        "file": "app\\api\\v1\\petals\\purchase\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 143
+      },
+      {
+        "file": "app\\api\\webhooks\\stripe\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 143
+      },
+      {
+        "file": "app\\api\\petals\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 137
+      },
+      {
+        "file": "app\\api\\games\\finish\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 130
+      },
+      {
+        "file": "app\\api\\reviews\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 129
+      },
+      {
+        "file": "app\\api\\gacha\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 123
+      },
+      {
+        "file": "app\\api\\quests\\claim\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 119
+      },
+      {
+        "file": "app\\api\\v1\\safety\\block\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 119
+      },
+      {
+        "file": "app\\api\\v1\\search\\history\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 118
+      },
+      {
+        "file": "app\\api\\admin\\printify-sync\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 116
+      },
+      {
+        "file": "app\\api\\admin\\flags\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 113
+      },
+      {
+        "file": "app\\api\\v1\\settings\\privacy\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 112
+      },
+      {
+        "file": "app\\api\\v1\\search\\analytics\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 109
+      },
+      {
+        "file": "app\\api\\clerk\\webhook\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 107
+      },
+      {
+        "file": "app\\api\\admin\\notifications\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 103
+      },
+      {
+        "file": "app\\api\\v1\\settings\\user\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 103
+      },
+      {
+        "file": "app\\api\\community\\posts\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 102
+      },
+      {
+        "file": "app\\api\\quests\\track\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 101
+      },
+      {
+        "file": "app\\api\\v1\\safety\\settings\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 101
+      },
+      {
+        "file": "app\\api\\checkout\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 100
+      },
+      {
+        "file": "app\\api\\products\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 100
+      },
+      {
+        "file": "app\\api\\v1\\games\\stats\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 100
+      },
+      {
+        "file": "app\\api\\admin\\runes\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 99
+      },
+      {
+        "file": "app\\api\\v1\\character\\presets\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 97
+      },
+      {
+        "file": "app\\api\\user\\profile\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 95
+      },
+      {
+        "file": "app\\api\\v1\\games\\achievements\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 95
+      },
+      {
+        "file": "app\\api\\v1\\comments\\like\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 93
+      },
+      {
+        "file": "app\\api\\v1\\petals\\shop\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 93
+      },
+      {
+        "file": "app\\api\\webhooks\\inngest\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 90
+      },
+      {
+        "file": "app\\api\\v1\\comments\\report\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 87
+      },
+      {
+        "file": "app\\api\\v1\\petals\\spend\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 86
+      },
+      {
+        "file": "app\\api\\health\\comprehensive\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 85
+      },
+      {
+        "file": "app\\api\\orders\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 85
+      },
+      {
+        "file": "app\\api\\admin\\runes\\combos\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 84
+      },
+      {
+        "file": "app\\api\\test-inngest\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 84
+      },
+      {
+        "file": "app\\api\\webhooks\\printify\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 79
+      },
+      {
+        "file": "app\\api\\v1\\shop\\products\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 78
+      },
+      {
+        "file": "app\\api\\contact\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 76
+      },
+      {
+        "file": "app\\api\\profile\\me\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 74
+      },
+      {
+        "file": "app\\api\\products\\featured\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 73
+      },
+      {
+        "file": "app\\api\\v1\\presence\\friends\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 72
+      },
+      {
+        "file": "app\\api\\debug\\printify\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 69
+      },
+      {
+        "file": "app\\api\\user\\state\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 68
+      },
+      {
+        "file": "app\\api\\v1\\games\\coupons\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 65
+      },
+      {
+        "file": "app\\api\\v1\\profile\\update\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 64
+      },
+      {
+        "file": "app\\api\\admin\\backup\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 63
+      },
+      {
+        "file": "app\\api\\admin\\maintenance\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 62
+      },
+      {
+        "file": "app\\api\\shop\\orders\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 62
+      },
+      {
+        "file": "app\\api\\shop\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 62
+      },
+      {
+        "file": "app\\api\\admin\\cache\\clear\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 61
+      },
+      {
+        "file": "app\\api\\shop\\purchase\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 58
+      },
+      {
+        "file": "app\\api\\titles\\award\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 58
+      },
+      {
+        "file": "app\\api\\v1\\presence\\heartbeat\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 58
+      },
+      {
+        "file": "app\\api\\petals\\ledger.csv\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 56
+      },
+      {
+        "file": "app\\api\\quests\\list\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 56
+      },
+      {
+        "file": "app\\api\\storage\\upload-url\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 56
+      },
+      {
+        "file": "app\\api\\v1\\games\\inventory\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 56
+      },
+      {
+        "file": "app\\api\\admin\\media\\upload\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 55
+      },
+      {
+        "file": "app\\api\\blog\\posts\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 53
+      },
+      {
+        "file": "app\\api\\shop\\products\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 52
+      },
+      {
+        "file": "app\\api\\admin\\music\\playlists\\[id]\\tracks\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 50
+      },
+      {
+        "file": "app\\api\\petals\\ledger\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 49
+      },
+      {
+        "file": "app\\api\\inventory\\equip\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 48
+      },
+      {
+        "file": "app\\api\\starter-pack\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 47
+      },
+      {
+        "file": "app\\api\\v1\\petals\\balance\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 45
+      },
+      {
+        "file": "app\\api\\leaderboard\\[game]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 42
+      },
+      {
+        "file": "app\\api\\orders\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 42
+      },
+      {
+        "file": "app\\api\\reviews\\upload\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 42
+      },
+      {
+        "file": "app\\api\\soapstones\\[id]\\like\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 40
+      },
+      {
+        "file": "app\\api\\metrics\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 39
+      },
+      {
+        "file": "app\\api\\admin\\users\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 38
+      },
+      {
+        "file": "app\\api\\admin\\blog\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 37
+      },
+      {
+        "file": "app\\api\\v1\\petals\\ledger\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 37
+      },
+      {
+        "file": "app\\api\\admin\\music\\playlists\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      },
+      {
+        "file": "app\\api\\inngest\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      },
+      {
+        "file": "app\\api\\trade\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      },
+      {
+        "file": "app\\api\\admin\\media\\list\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 34
+      },
+      {
+        "file": "app\\api\\storage\\delete\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 34
+      },
+      {
+        "file": "app\\api\\system-check\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      },
+      {
+        "file": "app\\api\\petals\\earn\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 32
+      },
+      {
+        "file": "app\\api\\profile\\equip\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 32
+      },
+      {
+        "file": "app\\api\\checkout\\coupons\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\api\\ds-messages\\[slug]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\api\\petals\\spend\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\api\\profile\\presets\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\api\\admin\\media\\delete\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\api\\user\\files\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\api\\user\\titles\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\api\\v1\\account\\me\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 30
+      },
+      {
+        "file": "app\\api\\admin\\music\\playlists\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 29
+      },
+      {
+        "file": "app\\api\\admin\\reviews\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 29
+      },
+      {
+        "file": "app\\api\\soapstones\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 29
+      },
+      {
+        "file": "app\\api\\admin\\music\\blob-upload-token\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 28
+      },
+      {
+        "file": "app\\api\\debug-printify\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 28
+      },
+      {
+        "file": "app\\api\\prefs\\nsfw\\affirm\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 28
+      },
+      {
+        "file": "app\\api\\trade\\offer\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 26
+      },
+      {
+        "file": "app\\api\\test-simple\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 25
+      },
+      {
+        "file": "app\\api\\log-client-error\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 24
+      },
+      {
+        "file": "app\\api\\newsletter\\signup\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 23
+      },
+      {
+        "file": "app\\api\\account\\display-name\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 22
+      },
+      {
+        "file": "app\\api\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 22
+      },
+      {
+        "file": "app\\api\\ds-messages\\[slug]\\vote\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\api\\admin\\reviews\\[id]\\approve\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 20
+      },
+      {
+        "file": "app\\api\\music\\playlist\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 20
+      },
+      {
+        "file": "app\\api\\soapstones\\[id]\\flag\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 20
+      },
+      {
+        "file": "app\\api\\trade\\inventory\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 20
+      },
+      {
+        "file": "app\\api\\debug-env\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 19
+      },
+      {
+        "file": "app\\api\\equip\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 17
+      },
+      {
+        "file": "app\\api\\admin\\music\\tracks\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\admin\\reviews\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\debug-env-simple\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\products\\[id]\\reviews\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\shop\\test-connection\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\v1\\account\\display-name\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 16
+      },
+      {
+        "file": "app\\api\\shop\\orders\\[id]\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 14
+      },
+      {
+        "file": "app\\api\\test-supabase\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 14
+      },
+      {
+        "file": "app\\api\\webhooks\\printify\\test\\route.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 11
+      },
+      {
+        "file": "app\\api\\orders\\by-session\\route.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 136
+      },
+      {
+        "file": "app\\api\\admin\\dashboard\\route.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 102
+      }
+    ]
+  },
+  "achievementcard": {
+    "winner": "app\\components\\achievements\\AchievementCard.tsx",
+    "losers": [
+      "components\\achievements\\AchievementCard.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\achievements\\AchievementCard.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 80
+      },
+      {
+        "file": "components\\achievements\\AchievementCard.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 68
+      }
+    ]
+  },
+  "achievementprovider": {
+    "winner": "app\\components\\achievements\\AchievementProvider.tsx",
+    "losers": [
+      "components\\achievements\\AchievementProvider.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\achievements\\AchievementProvider.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 159
+      },
+      {
+        "file": "components\\achievements\\AchievementProvider.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 144
+      }
+    ]
+  },
+  "achievements": {
+    "winner": "app\\components\\Achievements.tsx",
+    "losers": [
+      "data\\achievements.ts",
+      "app\\types\\achievements.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\Achievements.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 101
+      },
+      {
+        "file": "data\\achievements.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 1522
+      },
+      {
+        "file": "app\\types\\achievements.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 170
+      }
+    ]
+  },
+  "messagemanager": {
+    "winner": "app\\components\\components\\admin\\MessageManager.tsx",
+    "losers": [
+      "components\\admin\\MessageManager.tsx",
+      "app\\components\\admin\\MessageManager.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\components\\admin\\MessageManager.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 160
+      },
+      {
+        "file": "components\\admin\\MessageManager.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      },
+      {
+        "file": "app\\components\\admin\\MessageManager.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 13
+      }
+    ]
+  },
+  "quickactions": {
+    "winner": "app\\components\\components\\admin\\QuickActions.tsx",
+    "losers": [
+      "app\\components\\admin\\QuickActions.tsx",
+      "components\\admin\\QuickActions.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\components\\admin\\QuickActions.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 294
+      },
+      {
+        "file": "app\\components\\admin\\QuickActions.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 72
+      },
+      {
+        "file": "components\\admin\\QuickActions.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      }
+    ]
+  },
+  "interactivecherryblossom": {
+    "winner": "components\\animations\\InteractiveCherryBlossom.tsx",
+    "losers": [
+      "app\\components\\animations\\InteractiveCherryBlossom.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\animations\\InteractiveCherryBlossom.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 168
+      },
+      {
+        "file": "app\\components\\animations\\InteractiveCherryBlossom.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 116
+      }
+    ]
+  },
+  "avatarcreator": {
+    "winner": "app\\components\\profile\\AvatarCreator.tsx",
+    "losers": [
+      "app\\components\\AvatarCreator.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\profile\\AvatarCreator.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 176
+      },
+      {
+        "file": "app\\components\\AvatarCreator.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 128
+      }
+    ]
+  },
+  "cherryblossomeffect": {
+    "winner": "app\\components\\CherryBlossomEffect.js",
+    "losers": [
+      "app\\components\\CherryBlossomEffect.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\CherryBlossomEffect.js",
+        "imports": 3,
+        "commitDate": 1756737732,
+        "lineCount": 131
+      },
+      {
+        "file": "app\\components\\CherryBlossomEffect.tsx",
+        "imports": 3,
+        "commitDate": 1756737732,
+        "lineCount": 109
+      }
+    ]
+  },
+  "cherryblossomtree": {
+    "winner": "app\\components\\components\\CherryBlossomTree.tsx",
+    "losers": [
+      "components\\games\\CherryBlossomTree.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\components\\CherryBlossomTree.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 136
+      },
+      {
+        "file": "components\\games\\CherryBlossomTree.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 7
+      }
+    ]
+  },
+  "soapstonemessage": {
+    "winner": "app\\components\\components\\SoapstoneMessage.tsx",
+    "losers": [
+      "components\\animations\\SoapstoneMessage.tsx",
+      "components\\SoapstoneMessage.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\components\\SoapstoneMessage.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 78
+      },
+      {
+        "file": "components\\animations\\SoapstoneMessage.tsx",
+        "imports": 5,
+        "commitDate": 1756737732,
+        "lineCount": 89
+      },
+      {
+        "file": "components\\SoapstoneMessage.tsx",
+        "imports": 5,
+        "commitDate": 1756737732,
+        "lineCount": 80
+      }
+    ]
+  },
+  "soundsettings": {
+    "winner": "components\\SoundSettings.tsx",
+    "losers": [
+      "app\\components\\components\\SoundSettings.tsx",
+      "app\\components\\SoundSettings.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\SoundSettings.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 74
+      },
+      {
+        "file": "app\\components\\components\\SoundSettings.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 32
+      },
+      {
+        "file": "app\\components\\SoundSettings.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 352
+      }
+    ]
+  },
+  "loadingbonfire": {
+    "winner": "app\\components\\components\\ui\\LoadingBonfire.tsx",
+    "losers": [
+      "components\\ui\\LoadingBonfire.tsx",
+      "app\\components\\ui\\LoadingBonfire.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\components\\ui\\LoadingBonfire.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 81
+      },
+      {
+        "file": "components\\ui\\LoadingBonfire.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 31
+      },
+      {
+        "file": "app\\components\\ui\\LoadingBonfire.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 13
+      }
+    ]
+  },
+  "contactform": {
+    "winner": "app\\components\\ContactForm.jsx",
+    "losers": [
+      "app\\components\\ContactForm.js",
+      "app\\pages\\ContactForm.js"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\ContactForm.jsx",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 122
+      },
+      {
+        "file": "app\\components\\ContactForm.js",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 94
+      },
+      {
+        "file": "app\\pages\\ContactForm.js",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 94
+      }
+    ]
+  },
+  "footer": {
+    "winner": "components\\layout\\Footer.tsx",
+    "losers": [
+      "app\\components\\Footer.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\layout\\Footer.tsx",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 128
+      },
+      {
+        "file": "app\\components\\Footer.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 219
+      }
+    ]
+  },
+  "friendactivity": {
+    "winner": "app\\components\\FriendActivity.tsx",
+    "losers": [
+      "components\\FriendActivity.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\FriendActivity.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 90
+      },
+      {
+        "file": "components\\FriendActivity.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 71
+      }
+    ]
+  },
+  "friendchat": {
+    "winner": "app\\components\\FriendChat.tsx",
+    "losers": [
+      "components\\FriendChat.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\FriendChat.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 405
+      },
+      {
+        "file": "components\\FriendChat.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 129
+      }
+    ]
+  },
+  "friendlist": {
+    "winner": "app\\components\\FriendList.tsx",
+    "losers": [
+      "components\\FriendList.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\FriendList.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 184
+      },
+      {
+        "file": "components\\FriendList.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 176
+      }
+    ]
+  },
+  "gamecubeboot": {
+    "winner": "app\\components\\GameCubeBoot.js",
+    "losers": [
+      "app\\components\\GameCubeBoot.tsx",
+      "app\\mini-games\\_shared\\GameCubeBoot.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\GameCubeBoot.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 175
+      },
+      {
+        "file": "app\\components\\GameCubeBoot.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 141
+      },
+      {
+        "file": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 134
+      }
+    ]
+  },
+  "header": {
+    "winner": "components\\layout\\Header.tsx",
+    "losers": [
+      "app\\components\\Header.js",
+      "app\\components\\layout\\Header.tsx",
+      "components\\Header.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\layout\\Header.tsx",
+        "imports": 5,
+        "commitDate": 1756737732,
+        "lineCount": 107
+      },
+      {
+        "file": "app\\components\\Header.js",
+        "imports": 5,
+        "commitDate": 1756737732,
+        "lineCount": 73
+      },
+      {
+        "file": "app\\components\\layout\\Header.tsx",
+        "imports": 5,
+        "commitDate": 1756737732,
+        "lineCount": 63
+      },
+      {
+        "file": "components\\Header.tsx",
+        "imports": 4,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      }
+    ]
+  },
+  "toast": {
+    "winner": "app\\components\\Toast.tsx",
+    "losers": [
+      "app\\components\\notifications\\Toast.tsx",
+      "components\\Toast.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\Toast.tsx",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      },
+      {
+        "file": "app\\components\\notifications\\Toast.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 185
+      },
+      {
+        "file": "components\\Toast.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 65
+      }
+    ]
+  },
+  "searchbar": {
+    "winner": "app\\components\\SearchBar.tsx",
+    "losers": [
+      "src\\components\\hero\\SearchBar.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\SearchBar.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 295
+      },
+      {
+        "file": "src\\components\\hero\\SearchBar.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 44
+      }
+    ]
+  },
+  "productfilters": {
+    "winner": "components\\shop\\ProductFilters.tsx",
+    "losers": [
+      "app\\components\\shop\\ProductFilters.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\shop\\ProductFilters.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 131
+      },
+      {
+        "file": "app\\components\\shop\\ProductFilters.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 46
+      }
+    ]
+  },
+  "productgrid": {
+    "winner": "components\\shop\\ProductGrid.tsx",
+    "losers": [
+      "app\\components\\shop\\ProductGrid.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\shop\\ProductGrid.tsx",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 76
+      },
+      {
+        "file": "app\\components\\shop\\ProductGrid.tsx",
+        "imports": 2,
+        "commitDate": 1756737732,
+        "lineCount": 69
+      }
+    ]
+  },
+  "badge": {
+    "winner": "components\\ui\\badge.tsx",
+    "losers": [
+      "app\\components\\ui\\badge.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\ui\\badge.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 38
+      },
+      {
+        "file": "app\\components\\ui\\badge.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      }
+    ]
+  },
+  "button": {
+    "winner": "app\\components\\ui\\button.tsx",
+    "losers": [
+      "components\\ui\\button.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\ui\\button.tsx",
+        "imports": 135,
+        "commitDate": 1756737732,
+        "lineCount": 69
+      },
+      {
+        "file": "components\\ui\\button.tsx",
+        "imports": 134,
+        "commitDate": 1756737732,
+        "lineCount": 38
+      }
+    ]
+  },
+  "card": {
+    "winner": "app\\components\\ui\\card.tsx",
+    "losers": [
+      "components\\ui\\card.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\ui\\card.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 60
+      },
+      {
+        "file": "components\\ui\\card.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 58
+      }
+    ]
+  },
+  "input": {
+    "winner": "components\\ui\\input.tsx",
+    "losers": [
+      "app\\components\\ui\\input.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\ui\\input.tsx",
+        "imports": 46,
+        "commitDate": 1756737732,
+        "lineCount": 36
+      },
+      {
+        "file": "app\\components\\ui\\input.tsx",
+        "imports": 46,
+        "commitDate": 1756737732,
+        "lineCount": 26
+      }
+    ]
+  },
+  "loading": {
+    "winner": "app\\components\\ui\\loading.tsx",
+    "losers": [
+      "app\\loading.tsx",
+      "app\\mini-games\\loading.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\ui\\loading.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 14
+      },
+      {
+        "file": "app\\loading.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 10
+      },
+      {
+        "file": "app\\mini-games\\loading.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 7
+      }
+    ]
+  },
+  "select": {
+    "winner": "app\\components\\ui\\select.tsx",
+    "losers": [
+      "components\\ui\\select.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\ui\\select.tsx",
+        "imports": 22,
+        "commitDate": 1756737732,
+        "lineCount": 120
+      },
+      {
+        "file": "components\\ui\\select.tsx",
+        "imports": 21,
+        "commitDate": 1756737732,
+        "lineCount": 39
+      }
+    ]
+  },
+  "tabs": {
+    "winner": "app\\components\\ui\\tabs.tsx",
+    "losers": [
+      "components\\ui\\tabs.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\components\\ui\\tabs.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 55
+      },
+      {
+        "file": "components\\ui\\tabs.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 55
+      }
+    ]
+  },
+  "authcontext": {
+    "winner": "contexts\\AuthContext.tsx",
+    "losers": [
+      "app\\context\\context\\AuthContext.js"
+    ],
+    "scores": [
+      {
+        "file": "contexts\\AuthContext.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 108
+      },
+      {
+        "file": "app\\context\\context\\AuthContext.js",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 22
+      }
+    ]
+  },
+  "fonts": {
+    "winner": "app\\fonts.ts",
+    "losers": [
+      "lib\\fonts.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\fonts.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 11
+      },
+      {
+        "file": "lib\\fonts.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 15
+      }
+    ]
+  },
+  "api": {
+    "winner": "app\\hooks\\api.ts",
+    "losers": [
+      "types\\api.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\hooks\\api.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 70
+      },
+      {
+        "file": "types\\api.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 42
+      }
+    ]
+  },
+  "useachievements": {
+    "winner": "app\\hooks\\hooks\\useAchievements.ts",
+    "losers": [
+      "lib\\hooks\\useAchievements.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\hooks\\hooks\\useAchievements.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 87
+      },
+      {
+        "file": "lib\\hooks\\useAchievements.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 82
+      }
+    ]
+  },
+  "useaudio": {
+    "winner": "app\\hooks\\hooks\\useAudio.ts",
+    "losers": [
+      "lib\\hooks\\useAudio.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\hooks\\hooks\\useAudio.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 81
+      },
+      {
+        "file": "lib\\hooks\\useAudio.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 12
+      }
+    ]
+  },
+  "cubehub": {
+    "winner": "app\\hub\\_scene\\CubeHub.tsx",
+    "losers": [
+      "app\\mini-games\\components\\CubeHub.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\hub\\_scene\\CubeHub.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 153
+      },
+      {
+        "file": "app\\mini-games\\components\\CubeHub.tsx",
+        "imports": 1,
+        "commitDate": 1756667919,
+        "lineCount": 347
+      }
+    ]
+  },
+  "index": {
+    "winner": "app\\types\\index.ts",
+    "losers": [
+      "components\\games\\index.ts",
+      "app\\lib\\assets\\index.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\types\\index.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 76
+      },
+      {
+        "file": "components\\games\\index.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 15
+      },
+      {
+        "file": "app\\lib\\assets\\index.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 6
+      }
+    ]
+  },
+  "manifest": {
+    "winner": "app\\lib\\assets\\manifest.ts",
+    "losers": [
+      "app\\lib\\manifest.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\assets\\manifest.ts",
+        "imports": 3,
+        "commitDate": 1756737732,
+        "lineCount": 277
+      },
+      {
+        "file": "app\\lib\\manifest.ts",
+        "imports": 3,
+        "commitDate": 1756737732,
+        "lineCount": 48
+      }
+    ]
+  },
+  "style-map": {
+    "winner": "app\\lib\\style-map.ts",
+    "losers": [
+      "app\\lib\\assets\\style-map.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\style-map.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 38
+      },
+      {
+        "file": "app\\lib\\assets\\style-map.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 17
+      }
+    ]
+  },
+  "types": {
+    "winner": "app\\types.ts",
+    "losers": [
+      "app\\lib\\assets\\types.ts",
+      "app\\lib\\printify\\types.ts",
+      "components\\arcade\\types.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\types.ts",
+        "imports": 7,
+        "commitDate": 1756737732,
+        "lineCount": 42
+      },
+      {
+        "file": "app\\lib\\assets\\types.ts",
+        "imports": 7,
+        "commitDate": 1756737732,
+        "lineCount": 36
+      },
+      {
+        "file": "app\\lib\\printify\\types.ts",
+        "imports": 7,
+        "commitDate": 1756737732,
+        "lineCount": 33
+      },
+      {
+        "file": "components\\arcade\\types.ts",
+        "imports": 7,
+        "commitDate": 1756667919,
+        "lineCount": 37
+      }
+    ]
+  },
+  "assets": {
+    "winner": "app\\lib\\assets.ts",
+    "losers": [
+      "scripts\\assets.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\assets.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 363
+      },
+      {
+        "file": "scripts\\assets.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 250
+      }
+    ]
+  },
+  "auth": {
+    "winner": "app\\types\\auth.ts",
+    "losers": [
+      "app\\lib\\auth.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\types\\auth.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 56
+      },
+      {
+        "file": "app\\lib\\auth.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 15
+      }
+    ]
+  },
+  "db": {
+    "winner": "lib\\db.ts",
+    "losers": [
+      "app\\lib\\db.ts"
+    ],
+    "scores": [
+      {
+        "file": "lib\\db.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 5
+      },
+      {
+        "file": "app\\lib\\db.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 219
+      }
+    ]
+  },
+  "env": {
+    "winner": "app\\lib\\env.ts",
+    "losers": [
+      "env.ts",
+      "lib\\env.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\env.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 120
+      },
+      {
+        "file": "env.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 5
+      },
+      {
+        "file": "lib\\env.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 3
+      }
+    ]
+  },
+  "games": {
+    "winner": "app\\lib\\games.ts",
+    "losers": [
+      "config\\games.ts",
+      "app\\lib\\state\\games.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\games.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 236
+      },
+      {
+        "file": "config\\games.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 21
+      },
+      {
+        "file": "app\\lib\\state\\games.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 38
+      }
+    ]
+  },
+  "http": {
+    "winner": "app\\lib\\http.ts",
+    "losers": [
+      "lib\\api\\http.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\http.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 228
+      },
+      {
+        "file": "lib\\api\\http.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 105
+      }
+    ]
+  },
+  "utils": {
+    "winner": "app\\lib\\lib\\utils.ts",
+    "losers": [
+      "lib\\utils.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\lib\\utils.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 9
+      },
+      {
+        "file": "lib\\utils.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 9
+      }
+    ]
+  },
+  "logger": {
+    "winner": "app\\lib\\logger.ts",
+    "losers": [
+      "lib\\logger.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\logger.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 174
+      },
+      {
+        "file": "lib\\logger.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 7
+      }
+    ]
+  },
+  "printifyclient": {
+    "winner": "app\\lib\\printify\\printifyClient.ts",
+    "losers": [
+      "lib\\printifyClient.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\printify\\printifyClient.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      },
+      {
+        "file": "lib\\printifyClient.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 17
+      }
+    ]
+  },
+  "ratelimit": {
+    "winner": "app\\lib\\rateLimit.ts",
+    "losers": [
+      "middleware\\rateLimit.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\lib\\rateLimit.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 225
+      },
+      {
+        "file": "middleware\\rateLimit.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 49
+      }
+    ]
+  },
+  "redis": {
+    "winner": "lib\\redis.ts",
+    "losers": [
+      "app\\lib\\redis.ts",
+      "scripts\\lib\\redis.ts"
+    ],
+    "scores": [
+      {
+        "file": "lib\\redis.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 121
+      },
+      {
+        "file": "app\\lib\\redis.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 19
+      },
+      {
+        "file": "scripts\\lib\\redis.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 18
+      }
+    ]
+  },
+  "game": {
+    "winner": "app\\mini-games\\bubble-girl\\Game.tsx",
+    "losers": [
+      "app\\mini-games\\petal-samurai\\Game.tsx",
+      "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "app\\mini-games\\memory-match\\Game.tsx",
+      "public\\games\\breakout\\html5-breakout-master\\web\\res\\js\\game.js"
+    ],
+    "scores": [
+      {
+        "file": "app\\mini-games\\bubble-girl\\Game.tsx",
+        "imports": 28,
+        "commitDate": 1756737732,
+        "lineCount": 742
+      },
+      {
+        "file": "app\\mini-games\\petal-samurai\\Game.tsx",
+        "imports": 28,
+        "commitDate": 1756737732,
+        "lineCount": 560
+      },
+      {
+        "file": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+        "imports": 28,
+        "commitDate": 1756737732,
+        "lineCount": 464
+      },
+      {
+        "file": "app\\mini-games\\memory-match\\Game.tsx",
+        "imports": 28,
+        "commitDate": 1756737732,
+        "lineCount": 444
+      },
+      {
+        "file": "public\\games\\breakout\\html5-breakout-master\\web\\res\\js\\game.js",
+        "imports": 1,
+        "commitDate": 1756667919,
+        "lineCount": 1007
+      }
+    ]
+  },
+  "scene": {
+    "winner": "app\\mini-games\\bubble-ragdoll\\Scene.tsx",
+    "losers": [
+      "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "app\\mini-games\\quick-math\\Scene.tsx",
+      "app\\mini-games\\petal-collection\\Scene.tsx",
+      "app\\mini-games\\rhythm-beat-em-up\\Scene.tsx",
+      "app\\mini-games\\memory-match\\Scene.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\mini-games\\bubble-ragdoll\\Scene.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 387
+      },
+      {
+        "file": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 346
+      },
+      {
+        "file": "app\\mini-games\\quick-math\\Scene.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 335
+      },
+      {
+        "file": "app\\mini-games\\petal-collection\\Scene.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 314
+      },
+      {
+        "file": "app\\mini-games\\rhythm-beat-em-up\\Scene.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 105
+      },
+      {
+        "file": "app\\mini-games\\memory-match\\Scene.tsx",
+        "imports": 6,
+        "commitDate": 1756737732,
+        "lineCount": 99
+      }
+    ]
+  },
+  "gamecube": {
+    "winner": "app\\mini-games\\_components\\GameCube.tsx",
+    "losers": [
+      "types\\gamecube.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\mini-games\\_components\\GameCube.tsx",
+        "imports": 3,
+        "commitDate": 1756752385,
+        "lineCount": 54
+      },
+      {
+        "file": "types\\gamecube.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 46
+      }
+    ]
+  },
+  "shop": {
+    "winner": "app\\pages\\Shop.jsx",
+    "losers": [
+      "app\\trade\\ui\\Shop.tsx",
+      "src\\lib\\shop.ts",
+      "lib\\shop.ts"
+    ],
+    "scores": [
+      {
+        "file": "app\\pages\\Shop.jsx",
+        "imports": 11,
+        "commitDate": 1756737732,
+        "lineCount": 120
+      },
+      {
+        "file": "app\\trade\\ui\\Shop.tsx",
+        "imports": 10,
+        "commitDate": 1756737732,
+        "lineCount": 44
+      },
+      {
+        "file": "src\\lib\\shop.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 149
+      },
+      {
+        "file": "lib\\shop.ts",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 75
+      }
+    ]
+  },
+  "providers": {
+    "winner": "app\\Providers.tsx",
+    "losers": [
+      "providers.tsx"
+    ],
+    "scores": [
+      {
+        "file": "app\\Providers.tsx",
+        "imports": 0,
+        "commitDate": 1756749123,
+        "lineCount": 39
+      },
+      {
+        "file": "providers.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 197
+      }
+    ]
+  },
+  "printifyapi": {
+    "winner": "app\\utils\\utils\\printifyAPI.js",
+    "losers": [
+      "utils\\printifyAPI.js"
+    ],
+    "scores": [
+      {
+        "file": "app\\utils\\utils\\printifyAPI.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 82
+      },
+      {
+        "file": "utils\\printifyAPI.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 3
+      }
+    ]
+  },
+  "errorboundary": {
+    "winner": "components\\dev\\ErrorBoundary.tsx",
+    "losers": [
+      "components\\ErrorBoundary.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\dev\\ErrorBoundary.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 82
+      },
+      {
+        "file": "components\\ErrorBoundary.tsx",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 141
+      }
+    ]
+  },
+  "featuredproducts": {
+    "winner": "components\\hero\\FeaturedProducts.tsx",
+    "losers": [
+      "components\\shop\\FeaturedProducts.tsx"
+    ],
+    "scores": [
+      {
+        "file": "components\\hero\\FeaturedProducts.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 195
+      },
+      {
+        "file": "components\\shop\\FeaturedProducts.tsx",
+        "imports": 1,
+        "commitDate": 1756737732,
+        "lineCount": 98
+      }
+    ]
+  },
+  "schema": {
+    "winner": "drizzle\\schema.ts",
+    "losers": [
+      "lib\\assets\\schema.ts"
+    ],
+    "scores": [
+      {
+        "file": "drizzle\\schema.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 24
+      },
+      {
+        "file": "lib\\assets\\schema.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 20
+      }
+    ]
+  },
+  "runes": {
+    "winner": "lib\\runes.ts",
+    "losers": [
+      "types\\runes.ts"
+    ],
+    "scores": [
+      {
+        "file": "lib\\runes.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 387
+      },
+      {
+        "file": "types\\runes.ts",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 206
+      }
+    ]
+  },
+  "tailwind-config": {
+    "winner": "tailwind.config.js",
+    "losers": [
+      "tailwind.config.ts"
+    ],
+    "scores": [
+      {
+        "file": "tailwind.config.js",
+        "imports": 0,
+        "commitDate": 1756737732,
+        "lineCount": 35
+      },
+      {
+        "file": "tailwind.config.ts",
+        "imports": 0,
+        "commitDate": 1756667919,
+        "lineCount": 127
+      }
+    ]
+  }
+}

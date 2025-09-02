@@ -6,7 +6,7 @@ import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET(req: Request) {
-  const { userId } = auth();
+  const { userId  } = await auth();
   // optional filters
   const url = new URL(req.url);
   const kind = url.searchParams.get('kind'); // "cosmetic" | "overlay" | "text" | "cursor"

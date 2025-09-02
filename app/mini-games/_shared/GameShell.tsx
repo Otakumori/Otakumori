@@ -126,7 +126,7 @@ export default function GameShell({
         )}
 
         {/* Practice Mode Indicator */}
-        {isPractice(gameKey as keyof typeof import('@/config/games').GAME_FLAGS) && (
+        {isPractice(gameKey as any) && (
           <div className="absolute top-4 right-4 z-10">
             <div className="bg-yellow-500/90 text-black text-xs px-2 py-1 rounded-full font-medium">
               Practice Mode
