@@ -6,6 +6,12 @@ import { useAchievements } from '../components/achievements/AchievementProvider'
 export function useLoreAchievements() {
   const { unlockAchievement } = useAchievements();
 
+  // Initialize lore tracking
+  useEffect(() => {
+    // Set up any initial lore tracking logic here
+    // For example, tracking hidden elements, secret interactions, etc.
+  }, [unlockAchievement]);
+
   // Track hidden link clicks
   const trackHiddenLinkClick = () => {
     unlockAchievement('hidden_link_clicks');

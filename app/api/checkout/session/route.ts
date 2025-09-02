@@ -4,7 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { env } from '@/env';
-import { db } from '@/app/lib/db';
+import { db, DatabaseAccess } from '@/app/lib/db';
 import { withRateLimit, rateLimitConfigs } from '@/app/lib/rateLimit';
 
 export const runtime = 'nodejs';
@@ -30,9 +30,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Get user from database
-      const user = await db.user.findUnique({
-        where: { clerkId: userId },
-      });
+      const user = await DatabaseAccess.getCurrentUser();
 
       if (!user) {
         return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });

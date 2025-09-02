@@ -1,6 +1,6 @@
  
  
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAchievements } from './hooks/useAchievements';
 import { useCommunityAchievements } from './useCommunityAchievements';
 

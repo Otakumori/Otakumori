@@ -6,6 +6,12 @@ import { useAchievements } from '../components/achievements/AchievementProvider'
 export function useSeasonalAchievements() {
   const { unlockAchievement } = useAchievements();
 
+  // Initialize seasonal tracking
+  useEffect(() => {
+    // Set up any initial seasonal tracking logic here
+    // For example, checking current season, setting up event listeners, etc.
+  }, [unlockAchievement]);
+
   // Track seasonal interactions
   const trackSeasonalInteraction = () => {
     const month = new Date().getMonth();
@@ -43,7 +49,7 @@ export function useSeasonalAchievements() {
   const trackDecemberVisit = () => {
     const date = new Date();
     const month = date.getMonth();
-    const day = date.getDate();
+    const _day = date.getDate();
 
     if (month === 11) {
       unlockAchievement('december_daily_visits');
@@ -51,7 +57,7 @@ export function useSeasonalAchievements() {
   };
 
   // Track special event participation
-  const trackSpecialEvent = (eventId: string) => {
+  const trackSpecialEvent = (_eventId: string) => {
     unlockAchievement('special_event_participation');
   };
 

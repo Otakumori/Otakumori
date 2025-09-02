@@ -73,7 +73,7 @@ export async function POST(request: Request) {
               .findUnique({
                 where: { clerkId: userId },
                 select: { petalBalance: true },
-                cacheStrategy: { ttl: 60 }, // Cache for 1 minute
+
               })
               .then((u) => u?.petalBalance || 0)
           : null,
