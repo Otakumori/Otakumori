@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { ClerkProvider } from '@clerk/nextjs';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/app/components/Footer';
 import PetalLayer from '@/app/components/PetalLayer';
 import TreeAligner from '@/app/components/TreeAligner';
 import { CartProvider } from '@/app/components/cart/CartProvider';
-import { env } from '@/env';
+import { Providers } from '@/providers';
 
 export const metadata: Metadata = {
   title: 'Otakumori',
@@ -15,13 +14,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
-      publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-    >
-      <html lang="en" suppressHydrationWarning>
-        <body className="bg-black text-gray-100">
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-black text-gray-100">
+        <Providers>
           <CartProvider>
             <TreeAligner />
             <div className="stars-bg" aria-hidden="true" />
@@ -32,8 +27,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
             <PetalLayer />
           </CartProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </Providers>
+      </body>
+    </html>
   );
 }
