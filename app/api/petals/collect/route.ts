@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     if (recentCollection) {
       return NextResponse.json(
         { ok: false, error: 'Please wait before collecting more petals' },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -68,26 +68,24 @@ export async function POST(request: Request) {
       data: {
         collectionId: collection.id,
         count,
-        totalPetals: userId ? await db.user.findUnique({
-          where: { clerkId: userId },
-          select: { petalBalance: true },
-        }).then(u => u?.petalBalance || 0) : null,
+        totalPetals: userId
+          ? await db.user
+              .findUnique({
+                where: { clerkId: userId },
+                select: { petalBalance: true },
+                cacheStrategy: { ttl: 60 }, // Cache for 1 minute
+              })
+              .then((u) => u?.petalBalance || 0)
+          : null,
       },
     });
-
   } catch (error) {
     console.error('Petals collection failed:', error);
-    
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { ok: false, error: 'Invalid request data' },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
 
-    return NextResponse.json(
-      { ok: false, error: 'Failed to collect petals' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Failed to collect petals' }, { status: 500 });
   }
 }
