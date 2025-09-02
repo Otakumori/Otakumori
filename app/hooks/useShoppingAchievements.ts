@@ -6,24 +6,30 @@ import { useAchievements } from '../components/achievements/AchievementProvider'
 export function useShoppingAchievements() {
   const { unlockAchievement } = useAchievements();
 
+  // Initialize shopping tracking
+  useEffect(() => {
+    // Set up any initial shopping tracking logic here
+    // For example, tracking cart state, wishlist state, etc.
+  }, [unlockAchievement]);
+
   // Track cart items
-  const trackCartItems = (itemCount: number) => {
+  const trackCartItems = (_itemCount: number) => {
     unlockAchievement('cart_items');
   };
 
   // Track wishlist items
-  const trackWishlistItems = (itemCount: number) => {
+  const trackWishlistItems = (_itemCount: number) => {
     unlockAchievement('wishlist_items');
   };
 
   // Track purchases
-  const trackPurchase = (orderId: string) => {
+  const trackPurchase = (_orderId: string) => {
     unlockAchievement('first_purchase');
     unlockAchievement('total_purchases');
   };
 
   // Track mystery box orders
-  const trackMysteryBox = (orderId: string) => {
+  const trackMysteryBox = (_orderId: string) => {
     unlockAchievement('mystery_box_orders');
   };
 

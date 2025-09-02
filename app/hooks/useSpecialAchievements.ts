@@ -6,6 +6,12 @@ import { useAchievements } from '../components/achievements/AchievementProvider'
 export function useSpecialAchievements() {
   const { unlockAchievement } = useAchievements();
 
+  // Initialize special tracking
+  useEffect(() => {
+    // Set up any initial special tracking logic here
+    // For example, tracking error states, special interactions, etc.
+  }, [unlockAchievement]);
+
   // Track error triggers
   const trackError = () => {
     unlockAchievement('error');
@@ -22,7 +28,7 @@ export function useSpecialAchievements() {
   };
 
   // Track special actions
-  const trackSpecialAction = (actionId: string) => {
+  const trackSpecialAction = (_actionId: string) => {
     unlockAchievement('special_actions');
   };
 

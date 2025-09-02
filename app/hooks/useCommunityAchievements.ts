@@ -6,13 +6,19 @@ import { useAchievements } from '../components/achievements/AchievementProvider'
 export function useCommunityAchievements() {
   const { unlockAchievement } = useAchievements();
 
+  // Initialize community tracking
+  useEffect(() => {
+    // Set up any initial community tracking logic here
+    // For example, tracking page visits, user interactions, etc.
+  }, [unlockAchievement]);
+
   // Track structured comments
   const trackStructuredComment = () => {
     unlockAchievement('structured_comments');
   };
 
   // Track total comments
-  const trackTotalComments = (count: number) => {
+  const trackTotalComments = (_count: number) => {
     unlockAchievement('total_comments');
   };
 

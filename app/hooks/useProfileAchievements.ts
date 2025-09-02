@@ -6,13 +6,19 @@ import { useAchievements } from '../components/achievements/AchievementProvider'
 export function useProfileAchievements() {
   const { unlockAchievement } = useAchievements();
 
+  // Initialize profile tracking
+  useEffect(() => {
+    // Set up any initial profile tracking logic here
+    // For example, tracking profile views, completion status, etc.
+  }, [unlockAchievement]);
+
   // Track avatar changes
   const trackAvatarChange = () => {
     unlockAchievement('avatar_changes');
   };
 
   // Track profile field completion
-  const trackProfileFields = (completedFields: number) => {
+  const trackProfileFields = (_completedFields: number) => {
     unlockAchievement('profile_fields');
   };
 

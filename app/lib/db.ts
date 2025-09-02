@@ -1,11 +1,10 @@
-import { PrismaClient } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
 
 // Database singleton for server-side use only
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const db = globalForPrisma.prisma ?? new PrismaClient().$extends(withAccelerate());
+export const db = globalForPrisma.prisma ?? new PrismaClient();
 
 if (globalThis.process?.env?.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 
@@ -43,7 +42,7 @@ export class DatabaseAccess {
         xp: true,
         createdAt: true,
       },
-      cacheStrategy: { ttl: 300 }, // Cache for 5 minutes
+
     });
 
     if (!user) {
@@ -179,7 +178,7 @@ export class DatabaseAccess {
           where: { isEnabled: true, inStock: true },
         },
       },
-      cacheStrategy: { ttl: 300 }, // Cache for 5 minutes
+
     });
   }
 
@@ -194,7 +193,7 @@ export class DatabaseAccess {
           where: { isEnabled: true, inStock: true },
         },
       },
-      cacheStrategy: { ttl: 600 }, // Cache for 10 minutes
+
     });
   }
 
