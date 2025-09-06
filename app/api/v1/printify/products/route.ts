@@ -1,82 +1,107 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+import { type NextRequest, NextResponse } from 'next/server';
+import { printifyService } from '@/app/lib/printify/service';
+import { z } from 'zod';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-export async function GET() {
+const QuerySchema = z.object({
+  page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 1)),
+  per_page: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 100)),
+  sync: z
+    .string()
+    .optional()
+    .transform((val) => val === 'true'),
+});
+
+export async function GET(request: NextRequest) {
   try {
-    const key = env.PRINTIFY_API_KEY;
-    const store = env.PRINTIFY_SHOP_ID;
+    const { searchParams } = new URL(request.url);
+    const query = QuerySchema.parse(Object.fromEntries(searchParams));
 
-    if (!key || !store) {
-      console.error('Printify API: Missing environment variables', {
-        hasKey: !!key,
-        hasStore: !!store,
+    // If sync is requested, trigger a background sync
+    if (query.sync) {
+      // Don't await this - let it run in background
+      syncProductsInBackground().catch((error) => {
+        console.error('Background sync failed:', error);
       });
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Configuration incomplete',
-          data: [],
-        },
-        { status: 200 },
-      );
     }
 
-    const res = await fetch(`https://api.printify.com/v1/shops/${store}/products.json`, {
-      headers: {
-        Authorization: `Bearer ${key}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    });
-
-    if (!res.ok) {
-      console.error('Printify API error:', res.status, res.statusText);
-      return NextResponse.json(
-        {
-          ok: false,
-          error: `Printify API error: ${res.status}`,
-          data: [],
-        },
-        { status: 200 },
-      );
-    }
-
-    const data = await res.json();
+    const result = await printifyService.getProducts(query.page, query.per_page);
 
     // Transform products to match expected format
-    const products =
-      data.data?.map((product: any) => ({
-        id: product.id,
-        title: product.title,
-        description: product.description,
-        price: product.variants?.[0]?.price || 0,
-        image: product.images?.[0]?.src || '',
-        tags: product.tags || [],
-        variants: product.variants || [],
-        createdAt: product.created_at,
-        updatedAt: product.updated_at,
-      })) || [];
-
-    console.log(`Printify API: Fetched ${products.length} products from live API`);
+    const products = result.data.map((product) => ({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0, // Convert cents to dollars
+      image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
+      tags: product.tags || [],
+      variants:
+        product.variants?.map((v) => ({
+          id: v.id,
+          price: v.price / 100, // Convert cents to dollars
+          is_enabled: v.is_enabled,
+          in_stock: v.in_stock,
+        })) || [],
+      available: product.variants?.some((v) => v.is_enabled && v.in_stock) || false,
+      visible: product.visible,
+      createdAt: product.created_at,
+      updatedAt: product.updated_at,
+    }));
 
     return NextResponse.json({
       ok: true,
-      data: products,
+      data: {
+        products,
+        pagination: {
+          currentPage: query.page,
+          totalPages: result.last_page,
+          total: result.total,
+          perPage: query.per_page,
+        },
+      },
       source: 'live-api',
-      count: products.length,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Printify API error:', error);
+    console.error('Printify products API error:', error);
+
     return NextResponse.json(
       {
         ok: false,
-        error: 'Failed to fetch products',
-        data: [],
+        error: error instanceof Error ? error.message : 'Failed to fetch products',
+        data: {
+          products: [],
+          pagination: {
+            currentPage: 1,
+            totalPages: 0,
+            total: 0,
+            perPage: 100,
+          },
+        },
       },
-      { status: 200 },
+      { status: 500 },
     );
+  }
+}
+
+// Background sync function
+async function syncProductsInBackground() {
+  try {
+    console.log('Starting background Printify sync...');
+    const products = await printifyService.getAllProducts();
+    console.log(`Background sync completed: ${products.length} products fetched`);
+
+    // Here you would save to your database
+    // await saveProductsToDatabase(products);
+  } catch (error) {
+    console.error('Background sync failed:', error);
   }
 }
