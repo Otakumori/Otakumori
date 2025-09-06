@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+import { env } from '@/env';
 
 export async function GET() {
   const { userId } = await auth();
@@ -43,7 +44,7 @@ export async function GET() {
   const balances = { petals: u.petalBalance, runes: u.runes, level: 1, xp: 0 };
   const daily = {
     used: u.dailyClicks,
-    limit: Number(env.NEXT_PUBLIC_DAILY_PETAL_LIMIT ?? 500),
+    limit: 500,
   };
 
   // Titles/badges derivation

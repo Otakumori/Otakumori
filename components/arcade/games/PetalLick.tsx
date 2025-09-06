@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function PetalLick({ onComplete, _onFail, _duration }: GameProps) {
+export default function PetalLick({ onComplete, onFail, _duration }: GameProps) {
   const [petalY, setPetalY] = useState(0);
   const [tongueY, setTongueY] = useState(80);
   const [isLicking, setIsLicking] = useState(false);
@@ -114,9 +114,15 @@ export default function PetalLick({ onComplete, _onFail, _duration }: GameProps)
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-4xl">
-              <span role="img" aria-label="Cherry blossom">🌸</span>
-              <span role="img" aria-label="Cherry blossom">🌸</span>
-              <span role="img" aria-label="Cherry blossom">🌸</span>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>
             </div>
           </motion.div>
         )}
@@ -131,11 +137,11 @@ export default function PetalLick({ onComplete, _onFail, _duration }: GameProps)
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handleLick}
-          aria-label="Lick to catch the falling petal"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handleLick}
+        aria-label="Lick to catch the falling petal"
+      />
     </div>
   );
 }

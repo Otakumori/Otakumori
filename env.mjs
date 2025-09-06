@@ -20,6 +20,8 @@ export const env = createEnv({
     NODE_OPTIONS: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     EMAIL_FROM: z.string().email().optional(),
+    INNGEST_SERVE_URL: z.string().url().optional(),
+    BASE_URL: z.string().url().optional(),
   },
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
@@ -46,6 +48,8 @@ export const env = createEnv({
     PETAL_SALT: process.env.PETAL_SALT,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
+    BASE_URL: process.env.BASE_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,

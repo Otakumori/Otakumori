@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
       access: 'public',
       contentType: file.type || 'application/octet-stream',
       addRandomSuffix: false,
-      token: env.BLOB_READ_WRITE_TOKEN,
     });
 
     // Save record
