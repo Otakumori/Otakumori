@@ -1,12 +1,11 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET(req: Request) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   // optional filters
   const url = new URL(req.url);
   const kind = url.searchParams.get('kind'); // "cosmetic" | "overlay" | "text" | "cursor"

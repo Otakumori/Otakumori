@@ -30,6 +30,7 @@ The `CherryTree` component automatically cycles through these images every 30 se
 ## Seasonal Palettes
 
 Each season has its own color palette that affects:
+
 - Petal colors
 - Burst effects
 - Site-wide accents

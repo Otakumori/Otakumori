@@ -1,12 +1,11 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/app/lib/db';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const page = await prisma.contentPage.findUnique({
+  const page = await db.contentPage.findUnique({
     where: { slug: params.slug },
     select: { title: true },
   });
@@ -14,7 +13,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function StaticPage({ params }: { params: { slug: string } }) {
-  const page = await prisma.contentPage.findUnique({
+  const page = await db.contentPage.findUnique({
     where: { slug: params.slug },
   });
   if (!page || !page.published) return notFound();

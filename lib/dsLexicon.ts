@@ -1,5 +1,3 @@
- 
- 
 export const OPENERS = [
   'Try',
   'Be wary of',

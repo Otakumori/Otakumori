@@ -1,12 +1,11 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 
 export async function POST() {
   try {
-    const { userId  } = await auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: true }); // guest: ignore
     }

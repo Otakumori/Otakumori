@@ -1,5 +1,3 @@
- 
- 
 import React from 'react';
 export const AchievementHeader: React.FC = () => (
   <div className="mb-6">

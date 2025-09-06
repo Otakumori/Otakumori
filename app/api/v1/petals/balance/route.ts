@@ -1,42 +1,50 @@
- 
- 
-export const dynamic = 'force-dynamic'; // tells Next this cannot be statically analyzed
-export const runtime = 'nodejs'; // keep on Node runtime (not edge)
-export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
-export const maxDuration = 10; // optional guard
-
-import { type NextRequest, NextResponse } from 'next/server';
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@/app/lib/prisma';
+import { db as prisma } from '@/lib/db';
+import { PetalBalanceSchema } from '@/app/lib/contracts';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(_req: NextRequest) {
   try {
-    // Verify authentication
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        petalBalance: true,
-      },
+    // Compute current balance from ledger
+    const result = await prisma.petalLedger.aggregate({
+      where: { userId },
+      _sum: { amount: true },
     });
 
-    if (!user) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
-    }
+    const balance = result._sum.amount ?? 0;
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        petalBalance: user.petalBalance || 0,
-        userId: user.id,
+    // Check if user needs daily grant
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const lastGrant = await prisma.petalLedger.findFirst({
+      where: {
+        userId,
+        type: 'earn',
+        reason: 'DAILY_LOGIN_GRANT',
+        createdAt: { gte: today },
       },
+      orderBy: { createdAt: 'desc' },
     });
+
+    const needsDailyGrant = !lastGrant;
+
+    const response = PetalBalanceSchema.parse({
+      balance,
+      needsDailyGrant,
+      lastGrantDate: lastGrant?.createdAt ?? null,
+    });
+
+    return NextResponse.json({ ok: true, data: response });
   } catch (error) {
     console.error('Error fetching petal balance:', error);
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });

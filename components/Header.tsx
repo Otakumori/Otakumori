@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\Header.js instead.
 'use client';
 
 import { useState, useEffect } from 'react';

@@ -27,7 +27,7 @@ const Sakura = function (selector, options) {
 
   // Merge defaults with user options.
   const extend = function (originalObj, newObj) {
-    Object.keys(originalObj).forEach(key => {
+    Object.keys(originalObj).forEach((key) => {
       if (newObj && Object.prototype.hasOwnProperty.call(newObj, key)) {
         const origin = originalObj;
         origin[key] = newObj[key];
@@ -159,7 +159,7 @@ const Sakura = function (selector, options) {
     petal.style.animation = animations;
     petal.style.borderRadius = `${randomInt(
       this.settings.maxSize,
-      this.settings.maxSize + Math.floor(Math.random() * 10)
+      this.settings.maxSize + Math.floor(Math.random() * 10),
     )}px ${randomInt(1, Math.floor(width / 4))}px`;
     petal.style.height = `${height}px`;
     petal.style.left = `${Math.random() * document.documentElement.clientWidth - 100}px`;

@@ -1,4 +1,5 @@
-import { NextResponse} from "next/server";
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+import { NextResponse } from 'next/server';
 
 export const revalidate = 300; // 5 min
 

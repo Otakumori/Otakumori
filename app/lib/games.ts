@@ -1,5 +1,3 @@
- 
- 
 export interface GameDefinition {
   key: string;
   name: string;

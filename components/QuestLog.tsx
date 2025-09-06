@@ -1,5 +1,3 @@
- 
- 
 'use client';
 import { useState } from 'react';
 import useSWR from 'swr';
@@ -49,14 +47,14 @@ export default function QuestLog() {
     );
   }
 
-  const { today, backlog, petalBalance, currentDay } = data;
+  const { today, backlog, petalBalance, currentDay: _currentDay } = data;
 
   return (
     <div className="rounded-2xl border border-slate-700 bg-cube-900 p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-slatey-200 text-lg font-semibold">Daily Quests</h3>
         <div className="flex items-center gap-2 text-sakura-500">
-          <span className="text-sm">🌸</span>
+          <span className="text-sm" role="img" aria-label="Cherry blossom">🌸</span>
           <span className="font-medium">{petalBalance}</span>
         </div>
       </div>
@@ -163,7 +161,7 @@ function QuestRow({
         </div>
         <div className="text-right">
           <div className="text-sakura-500 font-semibold flex items-center gap-1">
-            +{totalReward} 🌸
+            +{totalReward} <span role="img" aria-label="Cherry blossom">🌸</span>
           </div>
           {bonusReward > 0 && <div className="text-xs text-sakura-400">+{bonusReward} bonus</div>}
         </div>

@@ -1,5 +1,3 @@
- 
- 
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 
@@ -166,14 +164,21 @@ jest.mock('./app/lib/prisma', () => ({
   },
 }));
 
-// Mock NextAuth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({
-    data: null,
-    status: 'unauthenticated',
+// Mock Clerk (this project uses Clerk, not NextAuth)
+jest.mock('@clerk/nextjs', () => ({
+  useUser: jest.fn(() => ({
+    user: null,
+    isLoaded: true,
   })),
-  signIn: jest.fn(),
-  signOut: jest.fn(),
+  useAuth: jest.fn(() => ({
+    isSignedIn: false,
+    userId: null,
+  })),
+  SignInButton: ({ children }) => children,
+  SignUpButton: ({ children }) => children,
+  UserButton: () => null,
+  SignedIn: ({ children }) => null,
+  SignedOut: ({ children }) => children,
 }));
 
 // Mock Socket.IO

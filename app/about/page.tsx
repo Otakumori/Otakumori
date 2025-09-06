@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import type React from 'react';
@@ -9,7 +10,7 @@ import PetalLayer from '@/app/components/PetalLayer';
 export default function AboutMe() {
   return (
     <>
-      <PetalLayer mode="gentle" density={0.35} />
+      <PetalLayer />
       <main className="relative mx-auto max-w-6xl px-6 py-16 text-pink-100">
         {/* Hero Section */}
         <section className="relative z-10 mb-16">

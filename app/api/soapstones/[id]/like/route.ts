@@ -1,37 +1,54 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { db as prisma } from '@/lib/db';
 import { auth } from '@clerk/nextjs/server';
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ ok: false }, { status: 401 });
 
   const msgId = params.id;
 
-  // toggle: if like exists -> remove; else -> create
-  const existing = await prisma.soapstoneLike.findUnique({
-    where: { messageId_userId: { messageId: msgId, userId } },
+  // toggle: if reaction exists -> remove; else -> create
+  // Use the Reaction model for soapstone likes
+  const existing = await prisma.reaction.findUnique({
+    where: { 
+      messageId_userId_type: { 
+        messageId: msgId, 
+        userId, 
+        type: 'HEART' 
+      } 
+    },
   });
 
   if (existing) {
     await prisma.$transaction([
-      prisma.soapstoneLike.delete({ where: { id: existing.id } }),
+      prisma.reaction.delete({ where: { id: existing.id } }),
       prisma.soapstoneMessage.update({
         where: { id: msgId },
-        data: { upvotes: { decrement: 1 } },
+        data: { 
+          appraises: { decrement: 1 }
+        },
       }),
     ]);
     return NextResponse.json({ ok: true, liked: false });
   } else {
+    // Create new heart reaction
     await prisma.$transaction([
-      prisma.soapstoneLike.create({ data: { messageId: msgId, userId } }),
+      prisma.reaction.create({ 
+        data: { 
+          messageId: msgId, 
+          userId,
+          type: 'HEART'
+        } 
+      }),
       prisma.soapstoneMessage.update({
         where: { id: msgId },
-        data: { upvotes: { increment: 1 } },
+        data: { 
+          appraises: { increment: 1 }
+        },
       }),
     ]);
     return NextResponse.json({ ok: true, liked: true });

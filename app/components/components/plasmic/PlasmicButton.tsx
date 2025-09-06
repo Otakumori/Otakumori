@@ -1,5 +1,3 @@
- 
- 
 import { type ReactNode } from 'react';
 
 export default function PlasmicButton({ children }: { children: ReactNode }) {

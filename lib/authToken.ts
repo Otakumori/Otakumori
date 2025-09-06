@@ -1,5 +1,3 @@
- 
- 
 import { useAuth } from '@clerk/nextjs';
 
 /**

@@ -1,9 +1,7 @@
- 
- 
 'use client';
 
 import { motion } from 'framer-motion';
-import { Play, Settings, Home, Trophy, Info } from 'lucide-react';
+import { Play, Settings, Home, Trophy } from 'lucide-react';
 
 interface PauseOverlayProps {
   gameKey: string;

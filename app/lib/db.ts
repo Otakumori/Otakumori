@@ -42,7 +42,6 @@ export class DatabaseAccess {
         xp: true,
         createdAt: true,
       },
-
     });
 
     if (!user) {
@@ -178,7 +177,6 @@ export class DatabaseAccess {
           where: { isEnabled: true, inStock: true },
         },
       },
-
     });
   }
 
@@ -193,7 +191,6 @@ export class DatabaseAccess {
           where: { isEnabled: true, inStock: true },
         },
       },
-
     });
   }
 

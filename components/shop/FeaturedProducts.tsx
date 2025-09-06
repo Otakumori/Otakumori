@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\hero\FeaturedProducts.tsx instead.
 'use client';
 
 import React from 'react';

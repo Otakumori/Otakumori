@@ -1,98 +1,71 @@
- 
- 
-import { PrismaClient } from '@prisma/client';
+import { db } from '../app/lib/db';
 
-const prisma = new PrismaClient();
+const samplePosts = [
+  {
+    id: 'blog-1',
+    slug: 'welcome-to-otaku-mori',
+    title: 'Welcome to Otaku-mori: Your Digital Sanctuary',
+    excerpt: 'Discover the magic of our anime-inspired platform and the community that makes it special.',
+    body: 'Welcome to Otaku-mori, where anime culture meets digital innovation. Our platform is designed to be your digital sanctuary, a place where you can express your love for anime through interactive experiences, collectibles, and community engagement.',
+    published: true,
+    updatedAt: new Date(),
+  },
+  {
+    id: 'blog-2',
+    slug: 'petal-system-guide',
+    title: 'Understanding the Petal System',
+    excerpt: 'Learn how to earn and spend petals in our unique reward system.',
+    body: 'The petal system is at the heart of Otaku-mori. Earn petals through various activities and spend them on exclusive items, experiences, and more. This guide will help you maximize your petal earnings.',
+    published: true,
+    updatedAt: new Date(),
+  },
+  {
+    id: 'blog-3',
+    slug: 'community-spotlight',
+    title: 'Community Spotlight: Featured Creators',
+    excerpt: 'Meet the talented creators who are shaping the Otaku-mori community.',
+    body: 'Our community is full of amazing creators who bring their unique perspectives to anime culture. In this spotlight, we feature some of our most active and inspiring community members.',
+    published: true,
+    updatedAt: new Date(),
+  },
+  {
+    id: 'blog-4',
+    slug: 'upcoming-features',
+    title: 'Upcoming Features: What to Expect',
+    excerpt: 'A sneak peek at the exciting features coming to Otaku-mori.',
+    body: 'We have many exciting features in development that will enhance your experience on Otaku-mori. From new mini-games to enhanced social features, there\'s always something new to look forward to.',
+    published: true,
+    updatedAt: new Date(),
+  },
+  {
+    id: 'blog-5',
+    slug: 'anime-recommendations',
+    title: 'Staff Picks: Must-Watch Anime Series',
+    excerpt: 'Our team\'s top anime recommendations for different genres and moods.',
+    body: 'Looking for your next anime obsession? Our team has curated a list of must-watch series across different genres, from heartwarming slice-of-life to epic adventures.',
+    published: true,
+    updatedAt: new Date(),
+  },
+];
 
 async function seedBlogPosts() {
   try {
-    console.log('🌱 Seeding blog posts...');
-
-    // Create sample blog posts
-    const posts = [
-      {
-        title: 'Welcome to Otakumori: Your Anime Fashion Journey Begins',
-        slug: 'welcome-to-otakumori',
-        excerpt:
-          "Discover the story behind Otakumori and how we're bringing anime culture to fashion.",
-        content:
-          "Welcome to Otakumori! We're excited to share our passion for anime-inspired fashion with you...",
-        published: true,
-        type: 'blog',
-        metaTitle: 'Welcome to Otakumori - Anime Fashion Journey',
-        metaDescription:
-          "Discover the story behind Otakumori and how we're bringing anime culture to fashion.",
-      },
-      {
-        title: 'Top 5 Anime Fashion Trends for 2024',
-        slug: 'anime-fashion-trends-2024',
-        excerpt:
-          'Explore the hottest anime fashion trends that are taking the world by storm this year.',
-        content:
-          '2024 is bringing some incredible anime fashion trends that blend Japanese street style with pop culture...',
-        published: true,
-        type: 'blog',
-        metaTitle: 'Top 5 Anime Fashion Trends 2024',
-        metaDescription:
-          'Explore the hottest anime fashion trends that are taking the world by storm this year.',
-      },
-      {
-        title: 'How to Style Your Otakumori Collection',
-        slug: 'style-otakumori-collection',
-        excerpt: 'Learn expert tips on how to mix and match your favorite anime-inspired pieces.',
-        content:
-          'Your Otakumori collection is more versatile than you might think! Here are some styling tips...',
-        published: true,
-        type: 'blog',
-        metaTitle: 'How to Style Your Otakumori Collection',
-        metaDescription:
-          'Learn expert tips on how to mix and match your favorite anime-inspired pieces.',
-      },
-      {
-        title: 'The Art of Subtle Anime References in Fashion',
-        slug: 'subtle-anime-references-fashion',
-        excerpt:
-          'Discover how to incorporate anime elements into your wardrobe without being too obvious.',
-        content: 'Sometimes the best anime fashion is the kind that only fellow fans can spot...',
-        published: true,
-        type: 'blog',
-        metaTitle: 'Subtle Anime References in Fashion',
-        metaDescription:
-          'Discover how to incorporate anime elements into your wardrobe without being too obvious.',
-      },
-      {
-        title: 'Community Spotlight: Meet Our Top Designers',
-        slug: 'community-spotlight-designers',
-        excerpt:
-          'Get to know the talented artists and designers behind your favorite Otakumori pieces.',
-        content:
-          'Our community is full of incredible artists who bring their unique vision to life...',
-        published: true,
-        type: 'blog',
-        metaTitle: 'Community Spotlight: Meet Our Top Designers',
-        metaDescription:
-          'Get to know the talented artists and designers behind your favorite Otakumori pieces.',
-      },
-    ];
-
-    for (const post of posts) {
-      await prisma.contentPage.upsert({
-        where: { slug: post.slug },
+    console.log('Seeding blog posts...');
+    
+    for (const post of samplePosts) {
+      await db.contentPage.upsert({
+        where: { id: post.id },
         update: post,
-        create: {
-          ...post,
-          id: post.slug, // Use slug as ID
-          updatedAt: new Date(),
-        },
+        create: post,
       });
-      console.log(`✅ Created/Updated: ${post.title}`);
+      console.log(`Created/updated blog post: ${post.title}`);
     }
-
-    console.log('🎉 Blog posts seeded successfully!');
+    
+    console.log('Blog posts seeded successfully!');
   } catch (error) {
-    console.error('❌ Error seeding blog posts:', error);
+    console.error('Error seeding blog posts:', error);
   } finally {
-    await prisma.$disconnect();
+    await db.$disconnect();
   }
 }
 

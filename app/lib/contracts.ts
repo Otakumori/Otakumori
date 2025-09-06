@@ -1,6 +1,95 @@
- 
- 
 import { z } from 'zod';
+
+// API envelope
+export const ApiSuccess = <T extends z.ZodTypeAny>(data: T) =>
+  z.object({ ok: z.literal(true), data });
+export const ApiError = z.object({ ok: z.literal(false), error: z.string() });
+export type ApiEnvelope<T> = { ok: true; data: T } | { ok: false; error: string };
+
+// Product schemas (normalized to DB fields)
+export const ProductVariantSchema = z.object({
+  id: z.string(),
+  productId: z.string(),
+  previewImageUrl: z.string().nullable().optional(),
+  printifyVariantId: z.number(),
+  isEnabled: z.boolean(),
+  inStock: z.boolean(),
+  priceCents: z.number().int().nullable().optional(),
+  currency: z.string().nullable().optional(),
+});
+
+export const ProductSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  primaryImageUrl: z.string().nullable().optional(),
+  active: z.boolean().default(true),
+  category: z.string().nullable().optional(),
+  variants: z.array(ProductVariantSchema).default([]),
+});
+export type Product = z.infer<typeof ProductSchema>;
+export type ProductVariant = z.infer<typeof ProductVariantSchema>;
+
+// Query params
+export const ProductListQuery = z.object({
+  q: z.string().optional(),
+  category: z.string().optional(),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().positive().max(100).default(20),
+});
+
+export const ProductListResponse = z.object({
+  items: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      description: z.string().optional().nullable(),
+      images: z.array(z.string()).default([]),
+      price: z.number(),
+      category: z.string().optional().nullable(),
+      variants: z.array(ProductVariantSchema).default([]),
+    }),
+  ),
+  count: z.number().int(),
+  pageSize: z.number().int(),
+});
+
+export const ProductDetailQuery = z.object({ id: z.string() });
+export const ProductDetailResponse = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional().nullable(),
+  images: z.array(z.string()).default([]),
+  price: z.number(),
+  category: z.string().optional().nullable(),
+  variants: z.array(ProductVariantSchema).default([]),
+});
+
+// Checkout session payload
+export const CheckoutItem = z.object({
+  productId: z.string(),
+  variantId: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  quantity: z.number().int().positive(),
+  priceCents: z.number().int().positive(),
+  sku: z.string().optional(),
+  printifyProductId: z.string().optional(),
+  printifyVariantId: z.number().optional(),
+});
+export const CheckoutRequest = z.object({
+  items: z.array(CheckoutItem).min(1),
+  successUrl: z.string().url().optional(),
+  cancelUrl: z.string().url().optional(),
+  shippingInfo: z
+    .object({
+      email: z.string().email().optional(),
+      firstName: z.string().optional(),
+      lastName: z.string().optional(),
+    })
+    .optional(),
+});
 
 // Base schemas
 export const IdSchema = z.string().min(1);
@@ -26,25 +115,7 @@ export const UserProfileSchema = z.object({
 
 export const UserUpdateSchema = UserProfileSchema.partial();
 
-// Product schemas
-export const ProductVariantSchema = z.object({
-  id: IdSchema,
-  priceCents: z.number().int().min(0),
-  inStock: z.boolean(),
-  enabled: z.boolean(),
-});
-
-export const ProductSchema = z.object({
-  id: IdSchema,
-  name: z.string().min(1).max(200),
-  description: z.string().max(1000).optional(),
-  price: z.number().min(0).max(10000),
-  images: z.array(z.string().url()).optional(),
-  tags: z.array(z.string()).optional(),
-  stock: z.number().int().min(0),
-  category: z.string().min(1).max(50),
-  variants: z.array(ProductVariantSchema).optional(),
-});
+// Product schemas (legacy types retained below; do not redefine ProductVariantSchema/ProductSchema)
 
 export const ProductSearchSchema = z.object({
   q: z.string().optional(),
@@ -73,7 +144,9 @@ export const CartItemSchema = z.object({
 });
 
 export const CartUpdateSchema = z.object({
-  items: z.array(CartItemSchema),
+  productId: z.string().min(1),
+  variantId: z.string().optional(),
+  quantity: z.number().int().min(1),
 });
 
 // Checkout schemas
@@ -209,6 +282,9 @@ export const AdminActionSchema = z.object({
 
 // Petal system schemas
 export const PetalTransactionSchema = z.object({
+  id: z.string(),
+  userId: z.string().nullable(),
+  guestSessionId: z.string().nullable(),
   type: z.enum([
     'earn',
     'spend',
@@ -223,10 +299,13 @@ export const PetalTransactionSchema = z.object({
   ]),
   amount: z.number().int(),
   reason: z.string().min(1).max(200),
+  createdAt: z.date(),
 });
 
 export const PetalBalanceSchema = z.object({
   balance: z.number().int().min(0),
+  needsDailyGrant: z.boolean(),
+  lastGrantDate: z.date().nullable(),
   transactions: z.array(PetalTransactionSchema),
 });
 
@@ -402,7 +481,6 @@ export const GetGameStatsResponseSchema = z.object({
 
 // Type exports
 export type UserProfile = z.infer<typeof UserProfileSchema>;
-export type Product = z.infer<typeof ProductSchema>;
 export type CartItem = z.infer<typeof CartItemSchema>;
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>;
 export type CheckoutSession = z.infer<typeof CheckoutSessionSchema>;

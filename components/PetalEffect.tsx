@@ -1,5 +1,3 @@
- 
- 
 'use client';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { useSound } from '@/lib/hooks/useSound';

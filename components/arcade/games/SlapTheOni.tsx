@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function SlapTheOni({ onComplete, onFail, duration }: GameProps) {
+export default function SlapTheOni({ onComplete, _onFail, _duration }: GameProps) {
   const [oniPosition, setOniPosition] = useState({ x: 50, y: 50 });
   const [isSlapped, setIsSlapped] = useState(false);
   const [showTarget, setShowTarget] = useState(false);
-  const [score, setScore] = useState(0);
+  const [_score, setScore] = useState(0);
   const gameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,11 +45,12 @@ export default function SlapTheOni({ onComplete, onFail, duration }: GameProps) 
   };
 
   return (
-    <div
+    <button
       ref={gameRef}
-      className="w-full h-full relative bg-gradient-to-br from-purple-900 to-red-900 cursor-pointer"
+      className="w-full h-full relative bg-gradient-to-br from-purple-900 to-red-900 cursor-pointer border-none p-0"
       onClick={handleSlap}
       onMouseLeave={handleMiss}
+      aria-label="Slap the oni demon when it appears"
     >
       {/* Background elements */}
       <div className="absolute inset-0 bg-black/20" />
@@ -70,7 +71,9 @@ export default function SlapTheOni({ onComplete, onFail, duration }: GameProps) 
           >
             {/* Oni face */}
             <div className="w-full h-full flex items-center justify-center">
-              <div className="text-2xl">👹</div>
+              <div className="text-2xl">
+                <span role="img" aria-label="Oni demon">👹</span>
+              </div>
             </div>
           </motion.div>
         )}
@@ -99,6 +102,6 @@ export default function SlapTheOni({ onComplete, onFail, duration }: GameProps) 
           {!showTarget ? 'Get ready...' : !isSlapped ? 'SLAP THE ONI!' : 'Too slow, Senpai.'}
         </p>
       </div>
-    </div>
+    </button>
   );
 }

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\profile\AvatarCreator.tsx instead.
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';

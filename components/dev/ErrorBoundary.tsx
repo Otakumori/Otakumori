@@ -1,5 +1,5 @@
-"use client";
-import React from "react";
+'use client';
+import React from 'react';
 
 interface ErrorBoundaryState {
   error: Error | null;
@@ -21,13 +21,13 @@ export class ErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     this.setState({ error, errorInfo });
-    
+
     // Ship to API for logs
-    fetch("/api/log-client-error", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    fetch('/api/log-client-error', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        type: "react-error-boundary",
+        type: 'react-error-boundary',
         error: {
           message: error.message,
           stack: error.stack,
@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      
+
       // Minimal error UI for development
       if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
         return (
@@ -65,13 +65,15 @@ export class ErrorBoundary extends React.Component<
             {this.state.errorInfo && (
               <details className="text-xs mt-2">
                 <summary className="cursor-pointer">Component Stack</summary>
-                <pre className="mt-2 whitespace-pre-wrap">{this.state.errorInfo.componentStack}</pre>
+                <pre className="mt-2 whitespace-pre-wrap">
+                  {this.state.errorInfo.componentStack}
+                </pre>
               </details>
             )}
           </div>
         );
       }
-      
+
       // Production: return null to avoid breaking the page
       return null;
     }

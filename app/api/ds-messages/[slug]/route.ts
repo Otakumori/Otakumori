@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const runtime = 'nodejs';
@@ -19,7 +18,7 @@ export async function GET(_: NextRequest, { params }: { params: { slug: string }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   const { phrase } = Body.parse(await req.json());
   const lower = phrase.toLowerCase();
   if (BLOCKLIST.some((b) => lower.includes(b))) {

@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -283,7 +281,8 @@ export default function EchoWell({ className }: EchoWellProps) {
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="rounded-md border px-3 py-2" aria-label="Select"
+          className="rounded-md border px-3 py-2"
+          aria-label="Select"
         >
           <option value="all">All Echoes</option>
           <option value="anime">Anime</option>

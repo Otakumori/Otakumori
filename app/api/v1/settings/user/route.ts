@@ -1,18 +1,17 @@
-export const dynamic = "force-dynamic";
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-export const fetchCache = "force-no-store";
-export const runtime = "nodejs";
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { logger } from '@/app/lib/logger';
-import { UserSettingsUpdateSchema, type UserSettingsUpdate } from '@/app/lib/contracts';
+import { UserSettingsUpdateSchema } from '@/app/lib/contracts';
 import { auth } from '@clerk/nextjs/server';
 
-
-
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {

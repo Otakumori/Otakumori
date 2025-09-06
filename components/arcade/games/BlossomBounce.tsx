@@ -66,7 +66,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
               transition={{ duration: 0.4, ease: 'easeOut' }}
               className="text-6xl"
             >
-              🌸
+              <span role="img" aria-label="Cherry blossom">🌸</span>
             </motion.div>
             <motion.div
               animate={{
@@ -76,7 +76,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
               transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
               className="text-6xl"
             >
-              🌸
+              <span role="img" aria-label="Cherry blossom">🌸</span>
             </motion.div>
           </div>
         )}
@@ -99,7 +99,11 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleBounce} />
+      <button 
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full" 
+        onClick={handleBounce}
+        aria-label="Bounce the cherry blossoms"
+      />
     </div>
   );
 }

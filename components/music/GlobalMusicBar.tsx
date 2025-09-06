@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useMusic } from './GlobalMusicProvider';
@@ -9,7 +7,7 @@ export default function GlobalMusicBar() {
   const { playlist, current, playing, volume, setVolume, toggle, next, prev, optIn, setOptIn } =
     useMusic();
   const track = playlist?.tracks?.[current];
-  const [shown, setShown] = useState(true);
+  const [_shown, setShown] = useState(true);
 
   // Don't autoplay; ask once
   useEffect(() => {
@@ -39,14 +37,14 @@ export default function GlobalMusicBar() {
           </>
         ) : (
           <>
-            <button onClick={prev} className="rounded px-2 py-1 hover:bg-zinc-900">
-              ⏮
+            <button onClick={prev} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Previous track">
+              <span role="img" aria-label="Previous">⏮</span>
             </button>
-            <button onClick={toggle} className="rounded px-2 py-1 hover:bg-zinc-900">
-              {playing ? '⏸' : '▶️'}
+            <button onClick={toggle} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label={playing ? "Pause" : "Play"}>
+              <span role="img" aria-label={playing ? "Pause" : "Play"}>{playing ? '⏸' : '▶️'}</span>
             </button>
-            <button onClick={next} className="rounded px-2 py-1 hover:bg-zinc-900">
-              ⏭
+            <button onClick={next} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Next track">
+              <span role="img" aria-label="Next">⏭</span>
             </button>
             <div className="min-w-[200px] text-sm">
               <div className="truncate font-medium">{track?.title ?? 'Untitled'}</div>
@@ -62,8 +60,8 @@ export default function GlobalMusicBar() {
               className="h-1 w-28"
               aria-label="Volume"
             />
-            <button onClick={() => setOptIn(false)} className="rounded px-2 py-1 hover:bg-zinc-900">
-              🔇
+            <button onClick={() => setOptIn(false)} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Mute">
+              <span role="img" aria-label="Muted speaker">🔇</span>
             </button>
           </>
         )}

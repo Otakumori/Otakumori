@@ -1,5 +1,3 @@
- 
- 
 export type Rarity = 'Common' | 'Rare' | 'Epic' | 'Legendary';
 
 export interface ShopItem {

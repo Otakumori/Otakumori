@@ -1,5 +1,3 @@
- 
- 
 import { MedievalSharp } from 'next/font/google';
 
 export const medievalFont = MedievalSharp({

@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -158,6 +159,7 @@ export default function CharacterEditorPage() {
                         ? 'bg-pink-500/20 border border-pink-500/50'
                         : 'bg-white/5 hover:bg-white/10 border border-transparent'
                     }`}
+                    aria-label={`Select ${category.name} category`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{category.icon}</span>
@@ -194,9 +196,9 @@ export default function CharacterEditorPage() {
                           <div className="text-sm text-gray-400 capitalize">{preset.rarity}</div>
                         </div>
                         {preset.isUnlocked ? (
-                          <span className="text-green-400 text-sm">✓</span>
+                          <span className="text-green-400 text-sm" role="img" aria-label="unlocked">✓</span>
                         ) : (
-                          <span className="text-gray-500 text-sm">🔒</span>
+                          <span className="text-gray-500 text-sm" role="img" aria-label="locked">🔒</span>
                         )}
                       </div>
                     </button>
@@ -212,11 +214,12 @@ export default function CharacterEditorPage() {
             <h3 className="text-lg font-semibold mb-4">Character Info</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="character-name" className="block text-sm font-medium text-gray-300 mb-2">
                   Character Name
                 </label>
                 <input
                   type="text"
+                  id="character-name"
                   value={characterConfig.name || ''}
                   onChange={(e) =>
                     setCharacterConfig({

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
 import { auth, currentUser } from '@clerk/nextjs/server';
@@ -7,7 +6,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 export const runtime = 'nodejs';
 
 async function requireAdmin() {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
   const user = await currentUser();
   const isAdmin = user?.publicMetadata?.role === 'admin';

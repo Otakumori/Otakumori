@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -130,15 +128,15 @@ export function FeaturedProducts() {
 
   if (loading) {
     return (
-      <section id="featured-products" className="bg-white py-16">
+      <section id="featured-products" className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-gray-800">Featured</h2>
+          <h2 className="mb-12 text-center text-3xl font-bold text-white">Featured</h2>
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="mb-3 h-48 rounded-lg bg-gray-200"></div>
-                <div className="mb-2 h-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-1/2 rounded bg-gray-200"></div>
+                <div className="mb-3 h-48 rounded-lg glass-card-dark"></div>
+                <div className="mb-2 h-4 rounded glass-card-dark"></div>
+                <div className="h-4 w-1/2 rounded glass-card-dark"></div>
               </div>
             ))}
           </div>
@@ -148,14 +146,14 @@ export function FeaturedProducts() {
   }
 
   return (
-    <section id="featured-products" className="bg-white py-16">
+    <section id="featured-products" className="py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-3xl font-bold text-gray-800">Featured</h2>
+        <h2 className="mb-12 text-center text-3xl font-bold text-white">Featured</h2>
 
         {error && (
           <div className="mb-8 text-center">
-            <p className="text-amber-600 bg-amber-50 px-4 py-2 rounded-lg inline-block">
-              ⚠️ {error} - Showing sample products
+            <p className="text-amber-300 glass-card-dark px-4 py-2 rounded-lg inline-block">
+              {error} - Showing sample products
             </p>
           </div>
         )}
@@ -163,8 +161,8 @@ export function FeaturedProducts() {
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {products.map((product) => (
             <Link key={product.id} href={product.url} className="group">
-              <div className="overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <div className="relative h-48 bg-gray-100">
+              <div className="overflow-hidden rounded-lg glass-card-dark transition-all duration-300 hover:shadow-xl">
+                <div className="relative h-48 bg-white/5">
                   <Image
                     src={product.image}
                     alt={product.title}
@@ -173,8 +171,8 @@ export function FeaturedProducts() {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="mb-2 line-clamp-2 font-medium text-gray-800">{product.title}</h3>
-                  <p className="text-lg font-bold text-purple-600">${product.price.toFixed(2)}</p>
+                  <h3 className="mb-2 line-clamp-2 font-medium text-white">{product.title}</h3>
+                  <p className="text-lg font-bold text-pink-400">${product.price.toFixed(2)}</p>
                 </div>
               </div>
             </Link>
@@ -183,7 +181,7 @@ export function FeaturedProducts() {
         <div className="mt-8 text-center">
           <Link
             href="/shop"
-            className="inline-block rounded-full bg-purple-600 px-8 py-3 font-semibold text-white transition-colors duration-200 hover:bg-purple-700"
+            className="inline-block rounded-full bg-gradient-to-r from-pink-500 to-purple-500 px-8 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg"
           >
             View All Products
           </Link>

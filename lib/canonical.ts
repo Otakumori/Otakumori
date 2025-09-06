@@ -1,12 +1,13 @@
- 
- 
-import { env } from '@/env';
-
-const PROD_ORIGIN = (env.NEXT_PUBLIC_SITE_URL || 'https://otaku-mori.com').replace(/\/$/, '');
+// Client-safe canonical URL functions
+const PROD_ORIGIN = 'https://otaku-mori.com';
 
 export function canonicalOrigin() {
-  // Always canonical in prod
-  if (env.NODE_ENV === 'production') return PROD_ORIGIN;
+  // Check if we're in production using a client-safe method
+  const isProduction = typeof window !== 'undefined' 
+    ? window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1')
+    : process.env.NODE_ENV === 'production';
+
+  if (isProduction) return PROD_ORIGIN;
 
   // Infer in dev/preview
   if (typeof window !== 'undefined') return window.location.origin;

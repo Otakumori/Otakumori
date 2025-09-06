@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\Providers.tsx instead.
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';
@@ -10,6 +9,7 @@ import React, { createContext, useContext, useRef, useEffect } from 'react';
 import { useLocalStorage } from './app/hooks/hooks/useLocalStorage';
 // import { useUserStore } from './lib/store/userStore';
 import mitt from 'mitt';
+import { CartProvider } from './app/providers/cart';
 
 interface PetalState {
   petals: number;
@@ -185,9 +185,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <QueryClientProvider client={queryClient}>
-        <PetalProvider>
-          <OverlordProvider>{children}</OverlordProvider>
-        </PetalProvider>
+        <CartProvider>
+          <PetalProvider>
+            <OverlordProvider>{children}</OverlordProvider>
+          </PetalProvider>
+        </CartProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );

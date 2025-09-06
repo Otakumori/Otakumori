@@ -5,6 +5,7 @@ This document explains how Prisma Accelerate is integrated into the Otakumori ap
 ## Overview
 
 Prisma Accelerate is a connection pooling and caching service that provides:
+
 - **Connection pooling** for serverless environments
 - **Query caching** to reduce database load
 - **Edge runtime support** for global performance
@@ -48,11 +49,11 @@ Different types of data have different cache durations:
 
 ```typescript
 export const CACHE_STRATEGIES = {
-  USER: { ttl: 300 },        // 5 minutes - user data
-  PRODUCT: { ttl: 600 },     // 10 minutes - product data
-  SEARCH: { ttl: 120 },      // 2 minutes - search results
-  REALTIME: { ttl: 30 },     // 30 seconds - real-time data
-  STATIC: { ttl: 3600 },     // 1 hour - static data
+  USER: { ttl: 300 }, // 5 minutes - user data
+  PRODUCT: { ttl: 600 }, // 10 minutes - product data
+  SEARCH: { ttl: 120 }, // 2 minutes - search results
+  REALTIME: { ttl: 30 }, // 30 seconds - real-time data
+  STATIC: { ttl: 3600 }, // 1 hour - static data
 };
 ```
 
@@ -99,12 +100,14 @@ const recommendations = await db.product.findMany({
 ## Performance Benefits
 
 ### Before Accelerate
+
 - Direct database connections
 - No query caching
 - Higher latency for repeated queries
 - Connection limits in serverless
 
 ### After Accelerate
+
 - Connection pooling
 - Intelligent query caching
 - Reduced database load
@@ -154,6 +157,7 @@ try {
 ### Cache Hit Rates
 
 Monitor cache performance in the Prisma Accelerate dashboard:
+
 - Cache hit percentage
 - Query performance metrics
 - Connection pool status
@@ -161,6 +165,7 @@ Monitor cache performance in the Prisma Accelerate dashboard:
 ### Performance Metrics
 
 Track these metrics:
+
 - Query response times
 - Database connection usage
 - Cache effectiveness
@@ -170,29 +175,32 @@ Track these metrics:
 ### From Standard Prisma
 
 1. **Update imports**:
+
    ```typescript
    // Before
    import { PrismaClient } from '@prisma/client';
-   
+
    // After
    import { PrismaClient } from '@prisma/client/edge';
    import { withAccelerate } from '@prisma/extension-accelerate';
    ```
 
 2. **Extend client**:
+
    ```typescript
    // Before
    const db = new PrismaClient();
-   
+
    // After
    const db = new PrismaClient().$extends(withAccelerate());
    ```
 
 3. **Add caching**:
+
    ```typescript
    // Before
    const users = await db.user.findMany();
-   
+
    // After
    const users = await db.user.findMany({
      cacheStrategy: { ttl: 300 },

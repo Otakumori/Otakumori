@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\lib\assets\manifest.ts instead.
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 

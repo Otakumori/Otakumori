@@ -18,7 +18,9 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
   const [gameOver, setGameOver] = useState(false);
 
   // Game state
-  const [targets, setTargets] = useState<Array<{ id: number; x: number; y: number; clicked: boolean }>>([]);
+  const [targets, setTargets] = useState<
+    Array<{ id: number; x: number; y: number; clicked: boolean }>
+  >([]);
   const [gameArea, setGameArea] = useState({ width: 0, height: 0 });
 
   // Reset game when popup opens
@@ -54,7 +56,7 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
             y: Math.random() * (gameArea.height - 60),
             clicked: false,
           };
-          setTargets(prev => [...prev, newTarget]);
+          setTargets((prev) => [...prev, newTarget]);
         }
       }, 1000);
       return () => clearInterval(interval);
@@ -65,7 +67,7 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
   useEffect(() => {
     if (targets.length > 0) {
       const timer = setTimeout(() => {
-        setTargets(prev => prev.slice(1));
+        setTargets((prev) => prev.slice(1));
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -86,10 +88,10 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
   };
 
   const handleTargetClick = (targetId: number) => {
-    setTargets(prev => prev.map(target => 
-      target.id === targetId ? { ...target, clicked: true } : target
-    ));
-    setScore(prev => prev + 10);
+    setTargets((prev) =>
+      prev.map((target) => (target.id === targetId ? { ...target, clicked: true } : target)),
+    );
+    setScore((prev) => prev + 10);
   };
 
   const getGameMessage = () => {
@@ -138,14 +140,12 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
                     priority
                   />
                 </div>
-                
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Oops! Page Not Found
-                </h2>
-                
+
+                <h2 className="text-2xl font-bold text-white mb-4">Oops! Page Not Found</h2>
+
                 <p className="text-gray-300 mb-6">
-                  Looks like you've wandered into the digital void. But don't worry - 
-                  we've got a fun game to pass the time while you find your way back!
+                  Looks like you've wandered into the digital void. But don't worry - we've got a
+                  fun game to pass the time while you find your way back!
                 </p>
 
                 <button
@@ -160,18 +160,12 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
               /* Game section */
               <div className="text-center">
                 <div className="mb-4">
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    404 Target Practice
-                  </h3>
-                  <p className="text-gray-300 text-sm">
-                    {getGameMessage()}
-                  </p>
+                  <h3 className="text-xl font-bold text-white mb-2">404 Target Practice</h3>
+                  <p className="text-gray-300 text-sm">{getGameMessage()}</p>
                 </div>
 
                 {!gameOver && gameStarted && (
-                  <div 
-                    className="relative bg-gray-800 border border-gray-600 rounded-lg overflow-hidden mb-4 mx-auto w-[400px] h-[300px]"
-                  >
+                  <div className="relative bg-gray-800 border border-gray-600 rounded-lg overflow-hidden mb-4 mx-auto w-[400px] h-[300px]">
                     {targets.map((target) => (
                       <motion.button
                         key={target.id}
@@ -183,10 +177,12 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
                         onClick={() => handleTargetClick(target.id)}
                         disabled={target.clicked}
                         title={target.clicked ? 'Target hit!' : 'Click to score points'}
-                        aria-label={target.clicked ? 'Target already hit' : 'Click target to score points'}
+                        aria-label={
+                          target.clicked ? 'Target already hit' : 'Click target to score points'
+                        }
                         className={`absolute w-12 h-12 rounded-full border-2 transition-all ${
-                          target.clicked 
-                            ? 'bg-green-500 border-green-400' 
+                          target.clicked
+                            ? 'bg-green-500 border-green-400'
                             : 'bg-red-500 border-red-400 hover:bg-red-400'
                         }`}
                         style={{
@@ -210,7 +206,7 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
                       Start Game
                     </button>
                   )}
-                  
+
                   {(gameOver || gameStarted) && (
                     <button
                       onClick={resetGame}

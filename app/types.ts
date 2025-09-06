@@ -1,5 +1,3 @@
- 
- 
 export interface Petal {
   id: number;
   x: number;

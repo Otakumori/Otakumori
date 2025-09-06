@@ -1,4 +1,5 @@
-import Link from 'next/link';
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+// import Link from 'next/link'; // Unused
 import { COPY } from '@/app/lib/copy';
 import GlassButton from '@/app/components/ui/GlassButton';
 import GlassCard from '@/app/components/ui/GlassCard';

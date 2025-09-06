@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\lib\style-map.ts instead.
 // app/lib/style-map.ts
 export type Vibe = 'spicy-male' | 'spicy-female' | 'neutral';
 

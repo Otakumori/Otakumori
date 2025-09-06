@@ -19,7 +19,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  placeholder = 'Search people, products, content...',
+  placeholder = "What're ya Buyin'?",
   onResultClick,
   className = '',
 }: SearchBarProps) {
@@ -183,7 +183,7 @@ export default function SearchBar({
       {/* Search Input */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-4 w-4 text-gray-400" />
+          <Search className="h-4 w-4 text-white/60" />
         </div>
 
         <input
@@ -194,7 +194,7 @@ export default function SearchBar({
           onKeyDown={handleKeyDown}
           onFocus={() => query.length > 0 && setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white/80 backdrop-blur-sm"
+          className="w-full pl-10 pr-10 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent glass-card-dark text-white placeholder-white/60"
         />
 
         {query && (

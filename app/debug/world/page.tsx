@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -6,7 +7,7 @@ import { WorldProvider } from '@/app/world/WorldProvider';
 // Dynamically import R3F components to prevent SSR issues
 const TreeStage = dynamic(() => import('@/app/components/tree/TreeStage'), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center h-full">Loading 3D World...</div>
+  loading: () => <div className="flex items-center justify-center h-full">Loading 3D World...</div>,
 });
 
 const Avatar = dynamic(() => import('@/app/components/avatar/Avatar'), {

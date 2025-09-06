@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\ContactForm.jsx instead.
 'use client';
 import { useState } from 'react';
 

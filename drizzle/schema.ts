@@ -1,5 +1,3 @@
- 
- 
 // Placeholder Drizzle schema - this project uses Prisma instead
 // This file exists to satisfy any remaining imports during the transition
 

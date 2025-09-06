@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -142,10 +140,15 @@ function TrackUploader({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      <label htmlFor="track-file-upload" className="text-sm font-medium">
+        Audio File
+      </label>
       <input
+        id="track-file-upload"
         type="file"
         accept="audio/mpeg,audio/mp3"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        className="block"
       />
       <input
         className="rounded-md border border-zinc-700 bg-black px-3 py-1.5"

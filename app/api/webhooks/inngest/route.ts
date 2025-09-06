@@ -1,8 +1,9 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '../../../../inngest/client';
 import { headers } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
 
 // Handle Clerk webhooks and trigger Inngest functions
 export async function POST(request: NextRequest) {

@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh, type Group } from 'three';
+import { type Group } from 'three';
 import * as THREE from 'three';
 
 interface CharacterEditorProps {
@@ -23,7 +23,7 @@ export default function CharacterEditor({
   const [isAnimating, setIsAnimating] = useState(false);
 
   // PS1/PS2 style low-poly character mesh
-  const createLowPolyMesh = () => {
+  const _createLowPolyMesh = () => {
     // Simple box geometry for PS1 style
     const geometry = new THREE.BoxGeometry(1, 2, 0.5);
     const material = new THREE.MeshLambertMaterial({

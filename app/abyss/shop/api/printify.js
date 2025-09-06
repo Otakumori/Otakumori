@@ -1,5 +1,3 @@
- 
- 
 import { prisma } from '../../../lib/prisma';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';

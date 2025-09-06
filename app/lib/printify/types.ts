@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\types.ts instead.
 export type PrintifyAddress = {
   first_name: string;
   last_name: string;

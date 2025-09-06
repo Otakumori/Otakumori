@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\mini-games\_components\GameCube.tsx instead.
 export type FaceKey =
   | 'top-petal-store'
   | 'top-trade'

@@ -140,7 +140,8 @@ export default function ActivityFeed({
                 setNextCursor(undefined);
                 loadActivities();
               }}
-              className="px-3 py-1 bg-pink-900/30 border border-pink-500/20 rounded-lg text-pink-100 text-sm" aria-label="Select"
+              className="px-3 py-1 bg-pink-900/30 border border-pink-500/20 rounded-lg text-pink-100 text-sm"
+              aria-label="Select"
             >
               <option value="friends">Friends</option>
               <option value="global">Global</option>

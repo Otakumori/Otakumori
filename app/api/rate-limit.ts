@@ -1,5 +1,3 @@
- 
- 
 import { redis } from '@/lib/redis';
 import { type NextRequest, NextResponse } from 'next/server';
 

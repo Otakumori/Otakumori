@@ -21,25 +21,25 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
 
   useEffect(() => {
     const loadSettings = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/v1/safety/settings');
-      const result = await response.json();
+      try {
+        setLoading(true);
+        const response = await fetch('/api/v1/safety/settings');
+        const result = await response.json();
 
-      if (result.ok) {
-        setSettings(result.data);
-        // Load blocked users details
-        if (result.data.blockedUsers.length > 0) {
-          loadBlockedUsers(result.data.blockedUsers);
+        if (result.ok) {
+          setSettings(result.data);
+          // Load blocked users details
+          if (result.data.blockedUsers.length > 0) {
+            loadBlockedUsers(result.data.blockedUsers);
+          }
+        } else {
+          console.error('Failed to load safety settings:', result.error);
         }
-      } else {
-        console.error('Failed to load safety settings:', result.error);
+      } catch (error) {
+        console.error('Error loading safety settings:', error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading safety settings:', error);
-    } finally {
-      setLoading(false);
-    }
     };
     loadSettings();
   }, []);

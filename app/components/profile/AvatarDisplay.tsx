@@ -1,5 +1,3 @@
- 
- 
 import React, { useEffect, useState } from 'react';
 
 const BodyLayer = ({ color }: { color: string }) => (

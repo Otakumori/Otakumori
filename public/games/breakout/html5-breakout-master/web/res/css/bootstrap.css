@@ -5521,7 +5521,8 @@ input[type="submit"].btn.btn-mini {
 .thumbnails {
   margin-left: -20px;
   list-style: none;
-  *zoom: 1;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  zoom: 1;
 }
 
 .thumbnails:before,
@@ -5583,15 +5584,16 @@ a.thumbnail:focus {
 }
 
 .media,
+.media,
 .media-body {
   overflow: hidden;
+  /* For IE6/7 compatibility */
   *overflow: visible;
   zoom: 1;
 }
-
-.media,
 .media .media {
   margin-top: 15px;
+  /* End of Selection */
 }
 
 .media:first-child {

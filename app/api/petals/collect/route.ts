@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -73,7 +74,6 @@ export async function POST(request: Request) {
               .findUnique({
                 where: { clerkId: userId },
                 select: { petalBalance: true },
-
               })
               .then((u) => u?.petalBalance || 0)
           : null,

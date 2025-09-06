@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\CherryBlossomEffect.js instead.
 'use client';
 'use client';
 

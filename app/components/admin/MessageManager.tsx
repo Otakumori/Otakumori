@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\components\admin\MessageManager.tsx instead.
 import React from 'react';
 
 const MessageManager: React.FC = () => (

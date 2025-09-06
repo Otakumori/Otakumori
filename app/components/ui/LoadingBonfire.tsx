@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\components\ui\LoadingBonfire.tsx instead.
 import React from 'react';
 
 const LoadingBonfire: React.FC = () => (

@@ -174,7 +174,8 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
                     onChange={(e) =>
                       setNewParty((prev) => ({ ...prev, maxMembers: parseInt(e.target.value) }))
                     }
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500" aria-label="Select"
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    aria-label="Select"
                   >
                     <option value={2}>2</option>
                     <option value={3}>3</option>
@@ -191,7 +192,8 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
                     onChange={(e) =>
                       setNewParty((prev) => ({ ...prev, gameMode: e.target.value as any }))
                     }
-                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500" aria-label="Select"
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    aria-label="Select"
                   >
                     <option value="mini-games">Mini Games</option>
                     <option value="exploration">Exploration</option>

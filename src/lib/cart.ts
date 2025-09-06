@@ -1,12 +1,10 @@
- 
- 
 'use server';
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function addToCart(productId: string, qty = 1) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('UNAUTHENTICATED');
 
   // For now, just log the cart addition
@@ -25,7 +23,7 @@ export async function addToCart(productId: string, qty = 1) {
 }
 
 export async function getCart() {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) return { items: [] };
 
   // TODO: Implement actual cart retrieval
@@ -38,7 +36,7 @@ export async function getCart() {
 }
 
 export async function removeFromCart(productId: string) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('UNAUTHENTICATED');
 
   // TODO: Implement actual cart removal
@@ -49,7 +47,7 @@ export async function removeFromCart(productId: string) {
 }
 
 export async function updateCartItem(productId: string, qty: number) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('UNAUTHENTICATED');
 
   if (qty <= 0) {

@@ -1,11 +1,10 @@
- 
- 
 'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import { Flower, UserPlus, Crown } from 'lucide-react';
+import Image from 'next/image';
 
 interface PetalHUDProps {
   petalCount: number;
@@ -77,9 +76,11 @@ export function PetalHUD({
               </div>
               {user?.imageUrl && (
                 <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-white/30">
-                  <img
+                  <Image
                     src={user.imageUrl}
                     alt={user.fullName || 'User'}
+                    width={32}
+                    height={32}
                     className="h-full w-full object-cover"
                   />
                 </div>

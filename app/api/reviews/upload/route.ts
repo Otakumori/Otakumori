@@ -1,8 +1,8 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { auth } from '@clerk/nextjs/server';
+import { env } from '@/env';
 
 export const runtime = 'nodejs';
 
@@ -10,7 +10,7 @@ const MAX_BYTES = 3 * 1024 * 1024; // 3MB
 const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 export async function POST(req: Request) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     access: 'public',
     contentType: file.type,
     addRandomSuffix: true,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token: env.BLOB_READ_WRITE_TOKEN,
   });
 
   return NextResponse.json({ ok: true, url });

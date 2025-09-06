@@ -1,5 +1,3 @@
- 
-
 import * as Sentry from '@sentry/nextjs';
 import { Replay } from '@sentry/replay';
 

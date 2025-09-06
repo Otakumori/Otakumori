@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+// DEPRECATED: This component is a duplicate. Use app\types.ts instead.
 
 export interface EngineGame {
   id: string;

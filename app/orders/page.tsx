@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -63,7 +64,7 @@ export default function OrdersPage() {
       } else {
         setError(data.error || 'Failed to fetch orders');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch orders');
     } finally {
       setLoading(false);

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\Achievements.tsx instead.
 import { type Achievement } from '../app/types/achievements';
 
 export const achievements: Achievement[] = [

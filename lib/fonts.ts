@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\fonts.ts instead.
 import localFont from 'next/font/local';
 
 export const optimusPrinceps = localFont({

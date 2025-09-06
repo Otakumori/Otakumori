@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\Achievements.tsx instead.
 export type AchievementCategory =
   | 'Site Interaction'
   | 'Profile Growth'

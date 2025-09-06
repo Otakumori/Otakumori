@@ -1,5 +1,3 @@
- 
- 
 // lib/email/mailer.ts
 import { Resend } from 'resend';
 import { env } from '@/env';

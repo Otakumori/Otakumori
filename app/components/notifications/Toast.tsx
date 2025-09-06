@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\Toast.tsx instead.
 'use client';
 
 import { useState, useEffect, createContext, useContext, type ReactNode } from 'react';

@@ -1,5 +1,3 @@
- 
- 
 import CherryBlossomEffect from '../../app/components/CherryBlossomEffect';
 
 export default function Hero() {

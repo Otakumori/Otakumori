@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const dynamic = 'force-dynamic'; // tells Next this cannot be statically analyzed
 export const runtime = 'nodejs'; // keep on Node runtime (not edge)
 export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
@@ -10,7 +9,7 @@ import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 import { z } from 'zod';
 
-const ShopItemResponseSchema = z.object({
+const _ShopItemResponseSchema = z.object({
   ok: z.boolean(),
   data: z
     .object({

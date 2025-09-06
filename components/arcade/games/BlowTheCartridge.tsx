@@ -21,7 +21,7 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
     }
   }, [cleanliness, onComplete]);
 
-  const handleBlow = () => {
+  const handleBlow = useCallback(() => {
     if (isBlowing) return;
 
     setIsBlowing(true);
@@ -31,14 +31,14 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
     setTimeout(() => {
       setIsBlowing(false);
     }, 500);
-  };
+  }, [isBlowing]);
 
-  const handleKeyPress = (e: KeyboardEvent) => {
+  const handleKeyPress = useCallback((e: KeyboardEvent) => {
     if (e.code === 'Space') {
       e.preventDefault();
       handleBlow();
     }
-  };
+  }, [handleBlow]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
@@ -87,7 +87,9 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
             exit={{ scale: 2, opacity: 0 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-4xl">💨</div>
+            <div className="text-4xl">
+              <span role="img" aria-label="Wind effect">💨</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -120,7 +122,11 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleBlow} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handleBlow}
+          aria-label="Blow on cartridge to clean it"
+        />
     </div>
   );
 }

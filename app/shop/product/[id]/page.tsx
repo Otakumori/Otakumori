@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -8,6 +7,7 @@ import { Button } from '@/app/components/ui/button';
 import { Card } from '@/app/components/ui/card';
 import Link from 'next/link';
 import NSFWAffirmNote from '@/components/NSFWAffirmNote';
+import { t } from '@/lib/microcopy';
 
 interface ProductVariant {
   id: string;
@@ -45,26 +45,35 @@ export default function ProductDetailPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/shop/products`);
+        const response = await fetch(`/api/v1/products/${productId}`);
         if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.statusText}`);
+          throw new Error(`Failed to fetch product: ${response.statusText}`);
         }
-
-        const data = await response.json();
-        const products = data.products || data;
-        const foundProduct = products.find((p: Product) => p.id === productId);
-
-        if (foundProduct) {
-          setProduct(foundProduct);
-          // Set default variant
-          if (foundProduct.variants && foundProduct.variants.length > 0) {
-            const defaultVariant =
-              foundProduct.variants.find((v: ProductVariant) => v.is_default) ||
-              foundProduct.variants[0];
-            setSelectedVariant(defaultVariant);
-          }
-        } else {
+        const json = await response.json();
+        const p = json?.data;
+        if (!p) {
           setError('Product not found');
+          return;
+        }
+        const shaped: Product = {
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          image_url: p.images?.[0],
+          price: p.price,
+          currency: 'USD',
+          variants: (p.variants ?? []).map((v: any) => ({
+            id: v.id,
+            title: String(v.printifyVariantId ?? 'Variant'),
+            price: (v.priceCents ?? 0) / 100,
+            is_enabled: v.isEnabled,
+            is_default: false,
+            sku: String(v.printifyVariantId ?? v.id),
+          })),
+        };
+        setProduct(shaped);
+        if (shaped.variants && shaped.variants.length > 0) {
+          setSelectedVariant(shaped.variants[0]);
         }
       } catch (err) {
         setError(
@@ -77,7 +86,7 @@ export default function ProductDetailPage() {
     };
 
     if (productId) {
-      fetchProduct();
+      void fetchProduct();
     }
   }, [productId]);
 
@@ -139,7 +148,7 @@ export default function ProductDetailPage() {
         <ol className="flex items-center space-x-2 text-sm text-white/60">
           <li>
             <Link href="/shop" className="hover:text-white">
-              Shop
+              {t("nav", "shop")}
             </Link>
           </li>
           <li>/</li>
@@ -186,16 +195,16 @@ export default function ProductDetailPage() {
 
           {/* Description */}
           {product.description && (
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">Description</h3>
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-2">{t("shop", "description")}</h3>
               <p className="text-white/80 leading-relaxed">{product.description}</p>
-            </div>
+            </Card>
           )}
 
           {/* Variants */}
           {product.variants && product.variants.length > 1 && (
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-3">Options</h3>
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-3">{t("shop", "options")}</h3>
               <div className="grid grid-cols-2 gap-3">
                 {product.variants.map((variant) => (
                   <button
@@ -212,11 +221,11 @@ export default function ProductDetailPage() {
                     <div className="text-xs opacity-60">
                       {product.currency || 'USD'} {variant.price.toFixed(2)}
                     </div>
-                    {!variant.is_enabled && <div className="text-xs text-red-400">Unavailable</div>}
+                    {!variant.is_enabled && <div className="text-xs text-red-400">{t("shop", "unavailable")}</div>}
                   </button>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Quantity */}

@@ -5,17 +5,17 @@ export const envSchema = z.object({
   // Clerk (required)
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   CLERK_SECRET_KEY: z.string().min(1),
-  
+
   // Database (required)
   DATABASE_URL: z.string().url(),
-  
+
   // Printify (required)
   PRINTIFY_API_KEY: z.string().min(1),
   PRINTIFY_SHOP_ID: z.string().min(1),
-  
+
   // Stripe (required)
   STRIPE_SECRET_KEY: z.string().min(1),
-  
+
   // Optional but recommended
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   CLERK_WEBHOOK_SECRET: z.string().optional(),
@@ -23,7 +23,7 @@ export const envSchema = z.object({
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
-  
+
   // Build-time
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   VERCEL: z.string().optional(),
@@ -37,15 +37,15 @@ export function validateEnv(): EnvSchema {
     return envSchema.parse(process.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map(e => e.path.join('.')).join(', ');
+      const missingVars = error.errors.map((e) => e.path.join('.')).join(', ');
       console.error(`❌ Environment validation failed. Missing or invalid: ${missingVars}`);
-      
+
       // In production, throw to prevent app from starting with invalid config
       if (process.env.NODE_ENV === 'production') {
         throw new Error(`Environment validation failed: ${missingVars}`);
       }
     }
-    
+
     // In development, return partial config and log warnings
     console.warn('⚠️ Environment validation failed, continuing with partial config');
     return process.env as any;

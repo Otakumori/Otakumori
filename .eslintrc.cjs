@@ -1,22 +1,21 @@
 /* eslint-env node */
 module.exports = {
-  extends: [
-    'next/core-web-vitals',
-    'plugin:jsx-a11y/recommended',
-    'plugin:jsx-a11y/strict',
-  ],
+  extends: ['next/core-web-vitals', 'plugin:jsx-a11y/recommended', 'plugin:jsx-a11y/strict'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'jsx-a11y', 'filenames'],
   rules: {
     // TypeScript rules
     'no-unused-vars': 'off', // Turn off base rule
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true }],
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+    ],
     '@typescript-eslint/consistent-type-imports': 'error',
-    
+
     // Next.js rules
     '@next/next/no-img-element': 'warn',
     'react/no-unescaped-entities': 'off',
-    
+
     // Accessibility rules - focus on critical issues first
     'jsx-a11y/alt-text': 'warn', // Critical for images
     'jsx-a11y/anchor-has-content': 'warn',
@@ -50,7 +49,7 @@ module.exports = {
     'jsx-a11y/prefer-tag-over-role': 'warn',
     'jsx-a11y/accessible-emoji': 'warn', // Common issue - make warning for now
     'jsx-a11y/autocomplete-valid': 'warn',
-    
+
     // File naming conventions - relaxed for now
     'filenames/match-regex': 'off', // Disable for now to focus on accessibility
     'filenames/match-exported': 'off', // Disable for now

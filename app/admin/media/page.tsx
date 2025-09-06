@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import React from 'react';
@@ -98,7 +97,11 @@ export default function AdminMediaPage() {
           Use for blog headers, hero art, and site images. Public CDN URLs are returned.
         </p>
         <div className="flex items-center gap-3">
+          <label htmlFor="media-upload-input" className="sr-only">
+            Upload media file
+          </label>
           <input
+            id="media-upload-input"
             ref={inputRef}
             type="file"
             accept="image/*,video/*"

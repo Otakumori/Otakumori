@@ -1,56 +1,54 @@
- 
- 
-'use client';
-import { useEffect, useState } from 'react';
+import { Metadata } from 'next';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import NavBar from '../components/NavBar';
+import FooterDark from '../components/FooterDark';
+import CartContent from '../components/shop/CartContent';
+import { t } from '@/lib/microcopy';
 
-export default function CartPage() {
-  const [items, setItems] = useState<any[]>([]);
+export const metadata: Metadata = {
+  title: 'Cart — Otaku-mori',
+  description: 'Review your items before checkout.',
+};
 
-  useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem('om_cart') ?? '[]');
-    setItems(cart);
-  }, []);
-
-  const checkout = async () => {
-    const res = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items }),
+async function getCartItems() {
+  try {
+    const { getToken } = await auth();
+    const token = await getToken({ template: 'otakumori-jwt' });
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/shop/cart`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      cache: 'no-store',
     });
-    const { url } = await res.json();
-    window.location.href = url;
-  };
 
-  const totalQty = items.reduce((a, b) => a + b.quantity, 0);
+    if (!response.ok) return { items: [], subtotal: 0, tax: 0, shipping: 0, total: 0 };
+    return response.json();
+  } catch {
+    return { items: [], subtotal: 0, tax: 0, shipping: 0, total: 0 };
+  }
+}
+
+export default async function CartPage() {
+  const cartData = await getCartItems();
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100">
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <h1 className="text-2xl font-semibold">Cart</h1>
-        {items.length === 0 ? (
-          <p className="text-neutral-400 mt-2">Your cart is empty.</p>
-        ) : (
-          <>
-            <ul className="mt-4 grid gap-2">
-              {items.map((i, idx) => (
-                <li
-                  key={idx}
-                  className="flex justify-between text-sm border-b border-white/10 py-2"
-                >
-                  <div>Variant {i.variant_id}</div>
-                  <div>× {i.quantity}</div>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={checkout}
-              className="mt-6 rounded-xl bg-pink-500/90 hover:bg-pink-500 px-4 py-2"
-            >
-              Checkout ({totalQty})
-            </button>
-          </>
-        )}
-      </div>
-    </main>
+    <>
+      <NavBar />
+      <main className="relative z-10 min-h-screen bg-[#080611]">
+        <div className="mx-auto max-w-4xl px-4 py-8 md:px-6">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-white md:text-4xl">
+              {t("cart", "gatherGear")}
+            </h1>
+            <p className="mt-2 text-zinc-300/90">
+              Review your items before proceeding to checkout
+            </p>
+          </div>
+          
+          <CartContent cartData={cartData} />
+        </div>
+      </main>
+      <FooterDark />
+    </>
   );
 }

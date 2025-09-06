@@ -1,5 +1,3 @@
- 
- 
 class AchievementSound {
   private static instance: AchievementSound;
   private audio: HTMLAudioElement;

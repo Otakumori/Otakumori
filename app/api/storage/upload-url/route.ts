@@ -1,14 +1,14 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { prisma } from '@/app/lib/prisma';
 import { v4 as uuidv4 } from 'uuid';
+import { env } from '@/env';
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId  } = await auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'UNAUTHENTICATED' }, { status: 401 });
     }
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       access: 'public',
       contentType: file.type || 'application/octet-stream',
       addRandomSuffix: false,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: env.BLOB_READ_WRITE_TOKEN,
     });
 
     // Save record

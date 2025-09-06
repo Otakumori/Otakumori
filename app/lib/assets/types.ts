@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\types.ts instead.
 export type AssetType = 'image' | 'audio' | 'video' | 'font' | 'shader' | 'zip' | 'other';
 
 export interface AssetConfigItem {

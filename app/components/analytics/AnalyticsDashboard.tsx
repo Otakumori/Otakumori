@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -164,7 +162,8 @@ export default function AnalyticsDashboard() {
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value)}
-            className="rounded-md border bg-white px-3 py-2 dark:bg-gray-800" aria-label="Select"
+            className="rounded-md border bg-white px-3 py-2 dark:bg-gray-800"
+            aria-label="Select"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>

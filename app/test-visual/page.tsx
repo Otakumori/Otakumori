@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 export default function VisualTest() {
   return (
     <div className="min-h-[120vh] grid place-items-center text-center">

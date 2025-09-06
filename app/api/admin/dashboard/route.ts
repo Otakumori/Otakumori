@@ -1,14 +1,12 @@
-
-export const dynamic = "force-dynamic";
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-export const fetchCache = "force-no-store";
-export const runtime = "nodejs";
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-
-
 
 // GET: Fetch dashboard statistics
 export async function GET() {

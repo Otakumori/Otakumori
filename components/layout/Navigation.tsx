@@ -1,15 +1,16 @@
- 
- 
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
 import { appUrl } from '@/lib/canonical';
-import { useCart } from '../../app/components/cart/CartProvider';
-import { Menu, X, ShoppingCart, User, Search, ChevronDown } from 'lucide-react';
+import { useCart } from '../../app/providers/cart';
+import PetalChip from '@/app/components/nav/PetalChip';
+import { Menu, X, ShoppingCart, Search, ChevronDown } from 'lucide-react';
+import { motionVariants } from '@/app/components/motion/MotionProvider';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -80,7 +81,10 @@ export default function Navigation() {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
           scrolled ? 'bg-black/80 backdrop-blur-md border-b border-pink-500/20' : 'bg-transparent'
         }`}
@@ -88,19 +92,37 @@ export default function Navigation() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center">
+            <motion.div 
+              className="flex items-center"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
               <Link href="/" className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">🌸</span>
-                </div>
+                <Image 
+                  src="/assets/images/circlelogo.png" 
+                  alt="Otakumori logo" 
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 rounded-full"
+                />
                 <span className="text-xl font-bold text-white">Otakumori</span>
               </Link>
-            </div>
+            </motion.div>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden md:flex md:items-center md:space-x-8">
-              {navigation.map((item) => (
-                <div key={item.name} className="relative">
+            <motion.div 
+              className="hidden md:flex md:items-center md:space-x-8"
+              variants={motionVariants.staggerContainer}
+              initial="initial"
+              animate="animate"
+            >
+              {navigation.map((item, index) => (
+                <motion.div 
+                  key={item.name} 
+                  className="relative"
+                  variants={motionVariants.staggerItem}
+                  custom={index}
+                >
                   {item.dropdown ? (
                     <div
                       className="flex items-center space-x-1 cursor-pointer text-sm font-medium transition-colors text-gray-300 hover:text-pink-400"
@@ -157,29 +179,59 @@ export default function Navigation() {
                       {item.name}
                     </Link>
                   )}
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Right side actions */}
-            <div className="flex items-center space-x-4">
+            <motion.div 
+              className="flex items-center space-x-4"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               {/* Search */}
-              <button className="hidden md:flex p-2 text-gray-300 hover:text-pink-400 transition-colors">
+              <motion.button 
+                className="hidden md:flex p-2 text-gray-300 hover:text-pink-400 transition-colors" 
+                aria-label="Search"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
                 <Search className="h-5 w-5" />
-              </button>
+              </motion.button>
 
               {/* Cart */}
-              <Link
-                href="/cart"
-                className="relative p-2 text-gray-300 hover:text-pink-400 transition-colors"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
-                <ShoppingCart className="h-5 w-5" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center">
-                    {itemCount}
-                  </span>
-                )}
-              </Link>
+                <Link
+                  href="/cart"
+                  className="relative p-2 text-gray-300 hover:text-pink-400 transition-colors"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <motion.span 
+                      className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                      {itemCount}
+                    </motion.span>
+                  )}
+                </Link>
+              </motion.div>
+
+              {/* Petal Balance */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <PetalChip />
+              </motion.div>
 
               {/* User Menu */}
               {isSignedIn ? (
@@ -215,16 +267,20 @@ export default function Navigation() {
               )}
 
               {/* Mobile menu button */}
-              <button
+              <motion.button
                 onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden p-2 text-gray-300 hover:text-pink-400 transition-colors"
+                aria-label={isOpen ? "Close menu" : "Open menu"}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
               >
                 {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Mobile Navigation */}
       <AnimatePresence>
@@ -239,6 +295,14 @@ export default function Navigation() {
             <div
               className="absolute inset-0 bg-black/50 backdrop-blur-sm"
               onClick={closeMobileMenu}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  closeMobileMenu();
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Close mobile menu"
             />
 
             {/* Mobile menu */}
@@ -256,6 +320,7 @@ export default function Navigation() {
                   <button
                     onClick={closeMobileMenu}
                     className="p-2 text-gray-300 hover:text-pink-400 transition-colors"
+                    aria-label="Close menu"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -263,22 +328,32 @@ export default function Navigation() {
 
                 {/* Navigation items */}
                 <nav className="flex-1 px-6 py-6">
-                  <div className="space-y-4">
-                    {mobileNavigation.map((item) => (
-                      <Link
+                  <motion.div 
+                    className="space-y-4"
+                    variants={motionVariants.staggerContainer}
+                    initial="initial"
+                    animate="animate"
+                  >
+                    {mobileNavigation.map((item, index) => (
+                      <motion.div
                         key={item.name}
-                        href={item.href}
-                        onClick={closeMobileMenu}
-                        className={`block text-lg font-medium transition-colors ${
-                          pathname === item.href
-                            ? 'text-pink-400'
-                            : 'text-gray-300 hover:text-pink-400'
-                        }`}
+                        variants={motionVariants.staggerItem}
+                        custom={index}
                       >
-                        {item.name}
-                      </Link>
+                        <Link
+                          href={item.href}
+                          onClick={closeMobileMenu}
+                          className={`block text-lg font-medium transition-colors ${
+                            pathname === item.href
+                              ? 'text-pink-400'
+                              : 'text-gray-300 hover:text-pink-400'
+                          }`}
+                        >
+                          {item.name}
+                        </Link>
+                      </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                 </nav>
 
                 {/* Footer */}

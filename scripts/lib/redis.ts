@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use lib\redis.ts instead.
 import { createClient } from 'redis';
 import { env } from '@/env';
 

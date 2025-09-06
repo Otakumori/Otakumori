@@ -1,5 +1,3 @@
- 
- 
 import { prisma } from '../../../lib/prisma';
 
 export async function getChatMessages(limit = 50) {

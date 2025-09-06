@@ -17,12 +17,12 @@ console.log('Current sign-up URL:', envContent.match(/NEXT_PUBLIC_CLERK_SIGN_UP_
 // Replace production URLs with localhost URLs
 envContent = envContent.replace(
   /NEXT_PUBLIC_CLERK_SIGN_IN_URL=https:\/\/otaku-mori\.com\/sign-in/g,
-  'NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in'
+  'NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in',
 );
 
 envContent = envContent.replace(
   /NEXT_PUBLIC_CLERK_SIGN_UP_URL=https:\/\/otaku-mori\.com\/sign-up/g,
-  'NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up'
+  'NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up',
 );
 
 // Write the updated content back

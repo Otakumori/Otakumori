@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\components\admin\QuickActions.tsx instead.
 import React, { useEffect, useState } from 'react';
 
 const API_KEY = process.env.NEXT_PUBLIC_ADMIN_API_KEY;

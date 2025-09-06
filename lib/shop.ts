@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\pages\Shop.jsx instead.
 import { prisma } from '@/app/lib/prisma';
 
 // Shop functions using Prisma

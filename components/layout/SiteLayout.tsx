@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -175,7 +173,7 @@ export default function SiteLayout({
         <div className="mx-auto max-w-6xl px-3 sm:px-6 py-4 flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-xl bg-pink-500/90 grid place-items-center shadow-lg select-none">
-              ⚔️
+              <span role="img" aria-label="Crossed swords">⚔️</span>
             </div>
             <a href="/" className="text-lg font-semibold tracking-wide hover:text-pink-200">
               Otakumori
@@ -284,7 +282,7 @@ export default function SiteLayout({
         <div className="mx-auto max-w-6xl px-3 sm:px-6 py-10 grid md:grid-cols-3 gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-pink-500/90 grid place-items-center">⚔️</div>
+              <div className="h-7 w-7 rounded-lg bg-pink-500/90 grid place-items-center"><span role="img" aria-label="Crossed swords">⚔️</span></div>
               <span className="font-semibold">Otakumori</span>
             </div>
             <p className="mt-3 text-neutral-400 text-sm max-w-xs">

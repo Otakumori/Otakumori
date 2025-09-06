@@ -1,5 +1,3 @@
- 
- 
 import { env } from '@/env';
 
 export const GA_ID = env.NEXT_PUBLIC_GA_ID || '';

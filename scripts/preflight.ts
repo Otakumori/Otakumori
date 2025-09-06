@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 
+// @ts-ignore - Puppeteer types not installed
 import puppeteer from 'puppeteer';
 import { promises as fs } from 'fs';
 import path from 'path';
@@ -22,8 +23,10 @@ interface PreflightResult {
   };
 }
 
+import { env } from '@/env';
+
 const ARTIFACTS_DIR = path.join(process.cwd(), 'artifacts', 'preflight');
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const BASE_URL = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 async function ensureArtifactsDir() {
   await fs.mkdir(ARTIFACTS_DIR, { recursive: true });
@@ -89,7 +92,7 @@ async function testPage(browser: any, page: string): Promise<PreflightResult> {
   try {
     const url = `${BASE_URL}${page}`;
     console.log(`Testing: ${url}`);
-    
+
     const response = await pageInstance.goto(url, {
       waitUntil: 'networkidle2',
       timeout: 30000,
@@ -115,7 +118,9 @@ async function testPage(browser: any, page: string): Promise<PreflightResult> {
       assertions.footerVisible = !!footer;
 
       // Auth button (either SignInButton or UserButton)
-      const authButton = await pageInstance.$('[data-clerk-element="signInButton"], [data-clerk-element="userButton"]');
+      const authButton = await pageInstance.$(
+        '[data-clerk-element="signInButton"], [data-clerk-element="userButton"]',
+      );
       assertions.authButtonRendered = !!authButton;
 
       // Purple stars background
@@ -152,7 +157,6 @@ async function testPage(browser: any, page: string): Promise<PreflightResult> {
         assertions.noCSPViolations = false;
         errors.push(`CSP violations: ${logs.join(', ')}`);
       }
-
     } catch (e) {
       errors.push(`Assertion error: ${e}`);
     }
@@ -177,7 +181,6 @@ async function testPage(browser: any, page: string): Promise<PreflightResult> {
       warnings,
       assertions,
     };
-
   } catch (error) {
     await pageInstance.close();
     return {
@@ -197,8 +200,10 @@ async function generateReport(results: PreflightResult[]) {
     results,
     summary: {
       totalPages: results.length,
-      passed: results.filter(r => r.status >= 200 && r.status < 400 && r.errors.length === 0).length,
-      failed: results.filter(r => r.status < 200 || r.status >= 400 || r.errors.length > 0).length,
+      passed: results.filter((r) => r.status >= 200 && r.status < 400 && r.errors.length === 0)
+        .length,
+      failed: results.filter((r) => r.status < 200 || r.status >= 400 || r.errors.length > 0)
+        .length,
       warnings: results.reduce((sum, r) => sum + r.warnings.length, 0),
     },
   };
@@ -241,7 +246,9 @@ async function generateReport(results: PreflightResult[]) {
       <th>Petals</th>
       <th>Errors</th>
     </tr>
-    ${results.map(r => `
+    ${results
+      .map(
+        (r) => `
       <tr>
         <td>${r.url}</td>
         <td class="${r.status >= 200 && r.status < 400 ? 'pass' : 'fail'}">${r.status}</td>
@@ -253,7 +260,9 @@ async function generateReport(results: PreflightResult[]) {
         <td class="${r.assertions.petalsContainerClickable ? 'pass' : 'fail'}">${r.assertions.petalsContainerClickable ? '✓' : '✗'}</td>
         <td class="${r.errors.length === 0 ? 'pass' : 'fail'}">${r.errors.length}</td>
       </tr>
-    `).join('')}
+    `,
+      )
+      .join('')}
   </table>
 </body>
 </html>
@@ -269,36 +278,36 @@ async function main() {
   try {
     console.log('🚀 Starting preflight checks...');
     await ensureArtifactsDir();
-    
+
     const results = await runPreflight();
     const report = await generateReport(results);
-    
+
     console.log(`\n📊 Preflight Summary:`);
     console.log(`   Total pages: ${report.summary.totalPages}`);
     console.log(`   Passed: ${report.summary.passed}`);
     console.log(`   Failed: ${report.summary.failed}`);
     console.log(`   Warnings: ${report.summary.warnings}`);
-    
+
     // Check if any critical assertions failed
-    const criticalFailures = results.filter(r => 
-      !r.assertions.headerVisible || 
-      !r.assertions.footerVisible || 
-      !r.assertions.authButtonRendered ||
-      !r.assertions.purpleStarsPresent ||
-      r.errors.length > 0
+    const criticalFailures = results.filter(
+      (r) =>
+        !r.assertions.headerVisible ||
+        !r.assertions.footerVisible ||
+        !r.assertions.authButtonRendered ||
+        !r.assertions.purpleStarsPresent ||
+        r.errors.length > 0,
     );
-    
+
     if (criticalFailures.length > 0) {
       console.log('\n❌ Critical failures detected:');
-      criticalFailures.forEach(failure => {
+      criticalFailures.forEach((failure) => {
         console.log(`   ${failure.url}: ${failure.errors.join(', ')}`);
       });
       process.exit(1);
     }
-    
+
     console.log('\n✅ All preflight checks passed!');
     console.log(`📁 Reports saved to: ${ARTIFACTS_DIR}`);
-    
   } catch (error) {
     console.error('❌ Preflight failed:', error);
     process.exit(1);

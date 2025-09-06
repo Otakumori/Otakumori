@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function PetalLick({ onComplete, onFail, duration }: GameProps) {
+export default function PetalLick({ onComplete, _onFail, _duration }: GameProps) {
   const [petalY, setPetalY] = useState(0);
   const [tongueY, setTongueY] = useState(80);
   const [isLicking, setIsLicking] = useState(false);
@@ -63,7 +63,7 @@ export default function PetalLick({ onComplete, onFail, duration }: GameProps) {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-pink-200 to-purple-300">
@@ -113,7 +113,11 @@ export default function PetalLick({ onComplete, onFail, duration }: GameProps) {
             animate={{ scale: 1, opacity: 1 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-4xl">🌸🌸🌸</div>
+            <div className="text-4xl">
+              <span role="img" aria-label="Cherry blossom">🌸</span>
+              <span role="img" aria-label="Cherry blossom">🌸</span>
+              <span role="img" aria-label="Cherry blossom">🌸</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -127,7 +131,11 @@ export default function PetalLick({ onComplete, onFail, duration }: GameProps) {
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleLick} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handleLick}
+          aria-label="Lick to catch the falling petal"
+        />
     </div>
   );
 }

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\Header.js instead.
 'use client';
 
 import React from 'react';
@@ -39,7 +38,10 @@ export const Header: React.FC = () => {
 
           {/* Right Side Icons */}
           <div className="flex items-center space-x-4">
-            <button className="text-gray-300 transition-colors hover:text-white">
+            <button 
+              className="text-gray-300 transition-colors hover:text-white"
+              aria-label="Search"
+            >
               <Search className="h-5 w-5" />
             </button>
             <Link href="/shop/cart" className="text-gray-300 transition-colors hover:text-white">

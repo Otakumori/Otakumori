@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\pages\Shop.jsx instead.
 'use client';
 import useSWR from 'swr';
 import Filters from './Filters';

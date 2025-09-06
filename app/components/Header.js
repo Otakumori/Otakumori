@@ -1,5 +1,3 @@
- 
- 
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -25,11 +23,13 @@ export default function Header() {
 
         {/* Navigation */}
         <nav className="hidden space-x-8 text-lg text-white md:flex" aria-label="Main navigation">
-          <Link href="/" className="hover:text-purple-400 transition-colors">Home</Link>
+          <Link href="/" className="hover:text-purple-400 transition-colors">
+            Home
+          </Link>
 
           {/* Shop Dropdown */}
           <div className="group relative">
-            <button 
+            <button
               className="focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black hover:text-purple-400 transition-colors"
               aria-expanded="false"
               aria-haspopup="true"
@@ -37,32 +37,60 @@ export default function Header() {
             >
               Shop
             </button>
-            <div 
+            <div
               className="absolute left-0 mt-2 hidden w-52 rounded-lg bg-black/90 p-2 shadow-lg group-hover:block"
               role="menu"
               aria-label="Shop submenu"
             >
-              <Link href="/shop" className="block px-3 py-1 hover:bg-gray-800 transition-colors" role="menuitem">
+              <Link
+                href="/shop"
+                className="block px-3 py-1 hover:bg-gray-800 transition-colors"
+                role="menuitem"
+              >
                 Shop All
               </Link>
               <div className="my-1 border-b border-gray-600" role="separator"></div>
-              <Link href="/shop/apparel" className="block px-3 py-1 hover:bg-gray-800 transition-colors" role="menuitem">
+              <Link
+                href="/shop/apparel"
+                className="block px-3 py-1 hover:bg-gray-800 transition-colors"
+                role="menuitem"
+              >
                 Apparel
               </Link>
-              <Link href="/shop/homedecor" className="block px-3 py-1 hover:bg-gray-800 transition-colors" role="menuitem">
+              <Link
+                href="/shop/homedecor"
+                className="block px-3 py-1 hover:bg-gray-800 transition-colors"
+                role="menuitem"
+              >
                 Home Decor
               </Link>
-              <Link href="/shop/accessories" className="block px-3 py-1 hover:bg-gray-800 transition-colors" role="menuitem">
+              <Link
+                href="/shop/accessories"
+                className="block px-3 py-1 hover:bg-gray-800 transition-colors"
+                role="menuitem"
+              >
                 Accessories
               </Link>
-              <Link href="/shop/theabyss" className="block px-3 py-1 text-red-500 hover:bg-red-700 transition-colors" role="menuitem" aria-label="The Abyss - Adult content">
-                The Abyss <span role="img" aria-label="Adult content warning">🔞</span>
+              <Link
+                href="/shop/theabyss"
+                className="block px-3 py-1 text-red-500 hover:bg-red-700 transition-colors"
+                role="menuitem"
+                aria-label="The Abyss - Adult content"
+              >
+                The Abyss{' '}
+                <span role="img" aria-label="Adult content warning">
+                  🔞
+                </span>
               </Link>
             </div>
           </div>
 
-          <Link href="/blog" className="hover:text-purple-400 transition-colors">Blog</Link>
-          <Link href="/mini-games" className="hover:text-purple-400 transition-colors">Mini Games</Link>
+          <Link href="/blog" className="hover:text-purple-400 transition-colors">
+            Blog
+          </Link>
+          <Link href="/mini-games" className="hover:text-purple-400 transition-colors">
+            Mini Games
+          </Link>
 
           {/* Search Bar */}
           <div className="relative">

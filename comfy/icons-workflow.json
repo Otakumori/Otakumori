@@ -6,12 +6,12 @@
   "2": {
     "class_type": "CLIPTextEncode",
     "_meta": { "title": "CLIPTextEncode (positive)" },
-    "inputs": { "text": "", "clip": [ "1", "CLIP" ] }
+    "inputs": { "text": "", "clip": ["1", "CLIP"] }
   },
   "3": {
     "class_type": "CLIPTextEncode",
     "_meta": { "title": "CLIPTextEncode (negative)" },
-    "inputs": { "text": "", "clip": [ "1", "CLIP" ] }
+    "inputs": { "text": "", "clip": ["1", "CLIP"] }
   },
   "4": {
     "class_type": "EmptyLatentImage",
@@ -20,10 +20,10 @@
   "5": {
     "class_type": "KSampler",
     "inputs": {
-      "model": [ "1", "MODEL" ],
-      "positive": [ "2", "CONDITIONING" ],
-      "negative": [ "3", "CONDITIONING" ],
-      "latent_image": [ "4", "LATENT" ],
+      "model": ["1", "MODEL"],
+      "positive": ["2", "CONDITIONING"],
+      "negative": ["3", "CONDITIONING"],
+      "latent_image": ["4", "LATENT"],
       "steps": 20,
       "cfg": 6.5,
       "sampler_name": "euler",
@@ -32,10 +32,10 @@
   },
   "6": {
     "class_type": "VAEDecode",
-    "inputs": { "samples": [ "5", "SAMPLES" ], "vae": [ "1", "VAE" ] }
+    "inputs": { "samples": ["5", "SAMPLES"], "vae": ["1", "VAE"] }
   },
   "7": {
     "class_type": "SaveImage",
-    "inputs": { "images": [ "6", "IMAGE" ] }
+    "inputs": { "images": ["6", "IMAGE"] }
   }
 }

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\FriendActivity.tsx instead.
 'use client';
 import { motion } from 'framer-motion';
 import { useFriendStore } from '@/lib/store/friendStore';

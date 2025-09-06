@@ -1,14 +1,15 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 /* eslint-disable react-hooks/exhaustive-deps */
- 
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Music, Play, Pause, SkipBack, SkipForward, Volume2, Heart, List } from 'lucide-react';
+import { Music, Play, Pause, SkipBack, SkipForward, Heart, List } from 'lucide-react';
 import Link from 'next/link';
 
 export default function MusicPanel() {
-  const { user } = useUser();
+  const { user: _user } = useUser();
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(0);
@@ -16,7 +17,7 @@ export default function MusicPanel() {
   useEffect(() => {
     // Simulate loading
     setTimeout(() => setLoading(false), 500);
-  }, [false, 500]);
+  }, []);
 
   const playlist = [
     {
@@ -105,6 +106,7 @@ export default function MusicPanel() {
             <button
               onClick={prevTrack}
               className="p-3 rounded-full bg-neutral-800 hover:bg-neutral-700 transition-colors"
+              aria-label="Previous track"
             >
               <SkipBack className="h-6 w-6 text-white" />
             </button>
@@ -112,6 +114,7 @@ export default function MusicPanel() {
             <button
               onClick={togglePlay}
               className="p-4 rounded-full bg-purple-600 hover:bg-purple-700 transition-colors"
+              aria-label={isPlaying ? "Pause" : "Play"}
             >
               {isPlaying ? (
                 <Pause className="h-8 w-8 text-white" />
@@ -123,6 +126,7 @@ export default function MusicPanel() {
             <button
               onClick={nextTrack}
               className="p-3 rounded-full bg-neutral-800 hover:bg-neutral-700 transition-colors"
+              aria-label="Next track"
             >
               <SkipForward className="h-6 w-6 text-white" />
             </button>
@@ -176,7 +180,7 @@ export default function MusicPanel() {
 
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-neutral-400">{track.duration}</span>
-                  <button className="p-2 rounded hover:bg-neutral-700 transition-colors">
+                  <button className="p-2 rounded hover:bg-neutral-700 transition-colors" aria-label="Add to favorites">
                     <Heart className="h-4 w-4 text-neutral-400 hover:text-pink-400" />
                   </button>
                 </div>
@@ -189,7 +193,7 @@ export default function MusicPanel() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {/* Custom Playlists */}
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🎵</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="musical note">🎵</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Custom Playlists</h3>
             <p className="text-neutral-300 mb-4">Create and share your own playlists</p>
             <Link
@@ -202,7 +206,7 @@ export default function MusicPanel() {
 
           {/* Music Discovery */}
           <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🔍</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="magnifying glass">🔍</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Music Discovery</h3>
             <p className="text-neutral-300 mb-4">Discover new music based on your taste</p>
             <Link
@@ -215,7 +219,7 @@ export default function MusicPanel() {
 
           {/* Music Settings */}
           <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">⚙️</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="gear">⚙️</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Music Settings</h3>
             <p className="text-neutral-300 mb-4">Customize your music experience</p>
             <Link
@@ -229,7 +233,7 @@ export default function MusicPanel() {
 
         {/* Coming Soon Notice */}
         <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">🎵 Full Music Experience Coming Soon</h2>
+          <h2 className="text-2xl font-bold mb-4"><span role="img" aria-label="musical note">🎵</span> Full Music Experience Coming Soon</h2>
           <p className="text-neutral-300 mb-6">
             We're working on bringing you a complete music streaming experience with custom
             playlists, music discovery, and social features!

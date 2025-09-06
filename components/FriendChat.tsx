@@ -1,8 +1,7 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\FriendChat.tsx instead.
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useFriendStore } from '@/lib/store/friendStore';
 import { useSound } from '@/lib/hooks/useSound';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -17,7 +16,7 @@ interface Message {
 export const FriendChat = ({ friendId }: { friendId: string }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [_isTyping, _setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { friends } = useFriendStore();
   const { playSound } = useSound();

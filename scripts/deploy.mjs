@@ -22,11 +22,11 @@ try {
   if (gitStatus.trim()) {
     console.log('📝 Found uncommitted changes:');
     console.log(gitStatus);
-    
+
     // Add all changes
     console.log('\n➕ Adding all changes...');
     execSync('git add .', { stdio: 'inherit' });
-    
+
     // Commit with timestamp
     const timestamp = new Date().toISOString();
     const commitMessage = `Deploy: ${timestamp}`;
@@ -48,23 +48,23 @@ try {
 
   // Step 4: Check for deployment platform
   console.log('\n📋 Step 4: Checking deployment platform...');
-  
+
   // Check for Vercel
   try {
     execSync('vercel --version', { stdio: 'pipe' });
     console.log('✅ Vercel CLI found');
-    
+
     console.log('\n🚀 Deploying to Vercel...');
     execSync('vercel --prod', { stdio: 'inherit' });
     console.log('✅ Deployment to Vercel completed!');
   } catch (error) {
     console.log('⚠️  Vercel CLI not found. Checking for other platforms...');
-    
+
     // Check for Netlify
     try {
       execSync('netlify --version', { stdio: 'pipe' });
       console.log('✅ Netlify CLI found');
-      
+
       console.log('\n🚀 Deploying to Netlify...');
       execSync('netlify deploy --prod', { stdio: 'inherit' });
       console.log('✅ Deployment to Netlify completed!');
@@ -95,7 +95,6 @@ try {
   console.log('2. Check environment variables are set correctly');
   console.log('3. Monitor for any runtime errors');
   console.log('4. Test all major functionality');
-
 } catch (error) {
   console.error('❌ Deployment failed:', error.message);
   process.exit(1);

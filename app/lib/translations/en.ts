@@ -1,5 +1,3 @@
- 
- 
 export const en = {
   // Navigation
   nav: {

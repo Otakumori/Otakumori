@@ -22,24 +22,28 @@ npm run dev
 ## 📋 Available Commands
 
 ### Development
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run clean` - Clean build artifacts
 
 ### Code Quality
+
 - `npm run lint` - Run ESLint (must be 0 errors)
 - `npm run typecheck` - Run TypeScript check (must be 0 errors)
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 
 ### Testing & Validation
+
 - `npm run test` - Run unit tests
 - `npm run test:coverage` - Run tests with coverage
 - `npm run preflight` - Run pre-deployment checks
 - `npm run verify` - Run all validation checks
 
 ### Database
+
 - `npm run prisma:generate` - Generate Prisma client
 - `npm run prisma:studio` - Open Prisma Studio
 - `npm run db:seed` - Seed database with initial data
@@ -47,6 +51,7 @@ npm run dev
 ## 🏗️ Architecture
 
 ### Core Technologies
+
 - **Framework**: Next.js 14 with App Router
 - **Authentication**: Clerk
 - **Database**: Prisma + Neon (PostgreSQL)
@@ -58,34 +63,40 @@ npm run dev
 ### Key Features
 
 #### 🔐 Production-Grade Authentication
+
 - Clerk integration with secure cookies
 - CSP-compliant for Microsoft Edge
 - Sign in/out flows with proper redirects
 
 #### 🌸 Interactive Petals System
+
 - Clickable petals with gravitational physics
 - Persistent storage (authenticated users + guest sessions)
 - Debounced API calls to prevent spam
 - Seasonal variants and burst modes
 
 #### ⚡ Secret Runes System
+
 - Hidden runes throughout the site
 - Unlock mechanism with rate limiting
 - Telemetry and logging
 - Accessible via "boring pages" (FAQ, Terms, Privacy)
 
 #### 🛍️ Printify Integration
+
 - SSR-safe product rendering
 - Suspense boundaries with skeletons
 - Graceful fallbacks for API failures
 - Stale-while-revalidate caching
 
 #### 🌟 Purple Star Background
+
 - CSS-based animation (no canvas blocking)
 - Respects `prefers-reduced-motion`
 - Fixed positioning with proper z-index layering
 
 #### 🛡️ Microsoft Edge Hardening
+
 - Comprehensive CSP headers
 - Source maps for debugging
 - Cookie security (SameSite=Lax, Secure in prod)
@@ -112,12 +123,14 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
 ### TypeScript Configuration
+
 - Strict mode enabled
 - `noUncheckedIndexedAccess: true`
 - `noImplicitOverride: true`
 - `exactOptionalPropertyTypes: true`
 
 ### ESLint Rules
+
 - `no-unused-vars`: Error (with `_` prefix exception)
 - `@typescript-eslint/consistent-type-imports`: Error
 - `@next/next/no-img-element`: Warning
@@ -125,6 +138,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ## 🧪 Testing & Quality Assurance
 
 ### Preflight Checks
+
 The preflight script (`scripts/preflight.ts`) performs comprehensive checks:
 
 - ✅ Header and footer visibility
@@ -137,7 +151,9 @@ The preflight script (`scripts/preflight.ts`) performs comprehensive checks:
 - ✅ Proper cookies set
 
 ### CI Pipeline
+
 GitHub Actions workflow includes:
+
 1. Lint and type checking
 2. Unit tests
 3. Production build
@@ -175,6 +191,7 @@ npm run deploy
 ```
 
 This script will:
+
 1. Check git status and commit changes
 2. Run build verification
 3. Deploy to your configured platform (Vercel/Netlify)
@@ -190,18 +207,21 @@ This script will:
 ### Platform-Specific Setup
 
 #### Vercel
+
 ```bash
 npm i -g vercel
 vercel --prod
 ```
 
 #### Netlify
+
 ```bash
 npm i -g netlify-cli
 netlify deploy --prod
 ```
 
 ### Production Checklist
+
 - [ ] All environment variables set
 - [ ] Database migrations applied
 - [ ] Clerk production keys configured
@@ -211,6 +231,7 @@ netlify deploy --prod
 - [ ] No ESLint errors
 
 ### Commands for Production
+
 ```bash
 # Full validation
 npm run verify
@@ -230,21 +251,25 @@ npm run deploy
 ### Common Issues
 
 **CSP Violations in Edge**
+
 - Check `next.config.mjs` CSP configuration
 - Ensure all Clerk domains are whitelisted
 - Verify no inline scripts are blocked
 
 **Authentication Not Working**
+
 - Verify Clerk keys are correct
 - Check CSP allows Clerk domains
 - Ensure cookies are set with proper SameSite
 
 **Petals Not Persisting**
+
 - Check database connection
 - Verify API routes are accessible
 - Check rate limiting isn't blocking requests
 
 **Build Failures**
+
 - Run `npm run typecheck` to identify TypeScript errors
 - Run `npm run lint` to identify ESLint errors
 - Check for missing environment variables
@@ -252,11 +277,13 @@ npm run deploy
 ## 📊 Monitoring
 
 ### Health Endpoints
+
 - `/api/health` - Basic health check
 - `/api/health/clerk` - Clerk configuration check
 - `/api/printify/health` - Printify API status
 
 ### Logging
+
 - Structured logging with request IDs
 - Error tracking with Sentry
 - Performance monitoring

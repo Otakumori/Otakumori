@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/authz';
 import { put } from '@vercel/blob';
@@ -7,8 +6,12 @@ import { put } from '@vercel/blob';
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
-  const admin = await requireAdmin();
-  if (!admin.ok) return NextResponse.json({ ok: false }, { status: admin.status });
+  try {
+    const admin = await requireAdmin();
+    // admin is { id: string } on success
+  } catch (error) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
 
   const { filename, contentType } = await req.json();
   if (!filename || !contentType) {

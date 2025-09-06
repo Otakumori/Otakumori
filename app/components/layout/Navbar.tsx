@@ -109,9 +109,9 @@ const Navbar: React.FC = () => {
             <button
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
               className="flex items-center space-x-1 transition-colors hover:text-pink-500"
-              aria-expanded={isCategoryDropdownOpen ? 'true' : 'false'}
+              aria-expanded={isCategoryDropdownOpen}
               aria-haspopup="true"
-              aria-label="Button"
+              aria-label="Shop categories"
             >
               <span>Shop</span>
               <ChevronDown className="w-4 h-4" />
@@ -127,7 +127,7 @@ const Navbar: React.FC = () => {
                         key={category.slug}
                         onClick={() => handleCategorySelect(category.slug)}
                         className="text-left p-2 rounded text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                        aria-label="Button"
+                        aria-label={`View ${category.label} category`}
                       >
                         <div className="font-medium">{category.label}</div>
                         {category.description && (
@@ -180,7 +180,7 @@ const Navbar: React.FC = () => {
                           handleSearch({ preventDefault: () => {} } as React.FormEvent);
                         }}
                         className="w-full text-left p-2 rounded text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                        aria-label="Button"
+                        aria-label={`Search ${category.label} category`}
                       >
                         <span className="font-medium">cat:{category.slug}</span>
                         <span className="text-xs text-white/60 ml-2">{category.label}</span>
@@ -246,7 +246,7 @@ const Navbar: React.FC = () => {
             onClick={toggleMenu}
             className="text-white"
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isMenuOpen ? 'true' : 'false'}
+            aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -282,7 +282,8 @@ const Navbar: React.FC = () => {
               <button
                 onClick={() => setIsMobileShopOpen(!isMobileShopOpen)}
                 className="flex items-center justify-between w-full text-2xl text-white"
-                aria-label="Button"
+                aria-label="Shop categories"
+                aria-expanded={isMobileShopOpen ? "true" : "false"}
               >
                 <span>Shop</span>
                 <ChevronDown
@@ -297,7 +298,7 @@ const Navbar: React.FC = () => {
                       key={category.slug}
                       onClick={() => handleCategorySelect(category.slug)}
                       className="block w-full text-left text-lg text-white/70 hover:text-white transition-colors"
-                      aria-label="Button"
+                      aria-label={`View ${category.label} category`}
                     >
                       {category.label}
                     </button>

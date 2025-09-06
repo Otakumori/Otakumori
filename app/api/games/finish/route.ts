@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 export const maxDuration = 10;
 
@@ -30,7 +29,7 @@ type Body = {
 const MAX_TOP = 25;
 
 export async function POST(req: Request) {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   const body = (await req.json().catch(() => null)) as Body | null;
   if (!body?.game || typeof body.score !== 'number') {
     return NextResponse.json({ ok: false, error: 'bad_input' }, { status: 400 });

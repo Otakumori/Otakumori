@@ -1,10 +1,14 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
 function readLabelMap(p) {
   if (!p) return {};
   const abs = path.isAbsolute(p) ? p : path.join(process.cwd(), p);
-  try { return JSON.parse(fs.readFileSync(abs, "utf8")); } catch { return {}; }
+  try {
+    return JSON.parse(fs.readFileSync(abs, 'utf8'));
+  } catch {
+    return {};
+  }
 }
 
 module.exports = function transformer(file, api, opts) {
@@ -14,24 +18,31 @@ module.exports = function transformer(file, api, opts) {
   let touched = false;
 
   const hasText = (el) =>
-    el.children?.some((ch) =>
-      (ch.type === "JSXText" && ch.value.trim() !== "") ||
-      (ch.type === "JSXExpressionContainer" && ch.expression.type === "StringLiteral")
+    el.children?.some(
+      (ch) =>
+        (ch.type === 'JSXText' && ch.value.trim() !== '') ||
+        (ch.type === 'JSXExpressionContainer' && ch.expression.type === 'StringLiteral'),
     );
 
   const hasAttr = (attrs, name) =>
-    (attrs || []).some((a) => a.type === "JSXAttribute" && a.name?.name === name);
+    (attrs || []).some((a) => a.type === 'JSXAttribute' && a.name?.name === name);
 
   const inferName = () => map[path.basename(file.path, path.extname(file.path))];
 
-  root.find(j.JSXElement, { openingElement: { name: { type: "JSXIdentifier", name: "button" } } })
+  root
+    .find(j.JSXElement, { openingElement: { name: { type: 'JSXIdentifier', name: 'button' } } })
     .forEach((p) => {
       const open = p.value.openingElement;
       const attrs = open.attributes || [];
-      if (hasAttr(attrs, "aria-label") || hasAttr(attrs, "aria-labelledby") || hasAttr(attrs, "title")) return;
+      if (
+        hasAttr(attrs, 'aria-label') ||
+        hasAttr(attrs, 'aria-labelledby') ||
+        hasAttr(attrs, 'title')
+      )
+        return;
       if (hasText(p.value)) return; // already has visible label
       open.attributes = attrs.concat([
-        j.jsxAttribute(j.jsxIdentifier("aria-label"), j.stringLiteral(inferName() || "Button")),
+        j.jsxAttribute(j.jsxIdentifier('aria-label'), j.stringLiteral(inferName() || 'Button')),
       ]);
       touched = true;
     });

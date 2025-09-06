@@ -1,46 +1,60 @@
- 
- 
+import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import NavBar from '../components/NavBar';
+import FooterDark from '../components/FooterDark';
+import ProfileHub from '../components/profile/ProfileHub';
+import { t } from '@/lib/microcopy';
 
-export default async function Profile() {
-  const { userId  } = await auth();
-  if (!userId) redirect('/sign-in?redirect_url=/profile');
+export const metadata: Metadata = {
+  title: 'Profile — Otaku-mori',
+  description: 'Your personal shrine and profile management.',
+};
+
+async function getProfileData() {
+  try {
+    const { getToken } = await auth();
+    const token = await getToken({ template: 'otakumori-jwt' });
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/profile/me`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      cache: 'no-store',
+    });
+
+    if (!response.ok) return null;
+    return response.json();
+  } catch {
+    return null;
+  }
+}
+
+export default async function ProfilePage() {
+  const { userId } = await auth();
+  
+  if (!userId) {
+    redirect('/sign-in?redirect_url=/profile');
+  }
+
+  const profileData = await getProfileData();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="mb-8 text-4xl font-bold text-white">Your Shrine</h1>
-
-        <div className="rounded-lg border border-gray-700 bg-gray-800 p-6">
-          <h2 className="mb-4 text-2xl font-semibold text-white">Profile Information</h2>
-          <p className="text-gray-300">
-            Welcome to your personal shrine. This page is protected and only visible to
-            authenticated users.
-          </p>
-
-          <div className="mt-6 rounded-md bg-gray-700 p-4">
-            <p className="text-gray-300">
-              <strong>User ID:</strong> {userId}
-            </p>
-            <p className="mt-2 text-gray-300">
-              <strong>Status:</strong> <span className="text-green-400">Authenticated</span>
+    <>
+      <NavBar />
+      <main className="relative z-10 min-h-screen bg-[#080611]">
+        <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-white md:text-4xl">
+              Your Shrine
+            </h1>
+            <p className="mt-2 text-zinc-300/90">
+              {t("encouragement", "welcomeBack")}
             </p>
           </div>
+          
+          <ProfileHub profileData={profileData} />
         </div>
-
-        <div className="mt-8 rounded-lg border border-gray-700 bg-gray-800 p-6">
-          <h2 className="mb-4 text-2xl font-semibold text-white">Coming Soon</h2>
-          <p className="text-gray-300">Your shrine will include:</p>
-          <ul className="mt-3 list-inside list-disc space-y-2 text-gray-300">
-            <li>Personal petal collection and statistics</li>
-            <li>Rune collection and combo progress</li>
-            <li>Order history and achievements</li>
-            <li>Customizable avatar and profile</li>
-            <li>Friends and community connections</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+      </main>
+      <FooterDark />
+    </>
   );
 }

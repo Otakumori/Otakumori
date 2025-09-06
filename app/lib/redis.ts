@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use lib\redis.ts instead.
 import { Redis } from '@upstash/redis';
 import { env } from '@/env';
 

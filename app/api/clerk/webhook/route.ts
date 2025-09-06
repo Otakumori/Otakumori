@@ -1,8 +1,11 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { type WebhookEvent } from '@clerk/nextjs/server';
 import { env } from '@/env';
+
+export const dynamic = 'force-dynamic';
 
 /**
  * Clerk webhook handler

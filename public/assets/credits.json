@@ -1,23 +1,23 @@
 [
-	{
-		"kind": "ui",
-		"title": "Fantasy UI Borders",
-		"creator": "Kenney",
-		"license": "CC0 / Public Domain",
-		"source": "https://kenney.nl/assets/fantasy-ui-borders"
-	},
-	{
-		"kind": "vfx",
-		"title": "Particle Pack (bubble)",
-		"creator": "Kenney",
-		"license": "CC0 / Public Domain",
-		"source": "https://kenney.nl/assets/particle-pack"
-	},
-	{
-		"kind": "art",
-		"title": "GothicVania Patreon Collection",
-		"creator": "Ansimuz",
-		"license": "Royalty-free (see creator terms), attribution required",
-		"source": "https://ansimuz.itch.io/gothicvania-patreon-collection"
-	}
+  {
+    "kind": "ui",
+    "title": "Fantasy UI Borders",
+    "creator": "Kenney",
+    "license": "CC0 / Public Domain",
+    "source": "https://kenney.nl/assets/fantasy-ui-borders"
+  },
+  {
+    "kind": "vfx",
+    "title": "Particle Pack (bubble)",
+    "creator": "Kenney",
+    "license": "CC0 / Public Domain",
+    "source": "https://kenney.nl/assets/particle-pack"
+  },
+  {
+    "kind": "art",
+    "title": "GothicVania Patreon Collection",
+    "creator": "Ansimuz",
+    "license": "Royalty-free (see creator terms), attribution required",
+    "source": "https://ansimuz.itch.io/gothicvania-patreon-collection"
+  }
 ]

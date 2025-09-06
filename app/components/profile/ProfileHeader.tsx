@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\profile\ui\ProfileHeader.tsx instead.
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';

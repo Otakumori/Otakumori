@@ -1,5 +1,3 @@
- 
- 
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -104,8 +102,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
         <h3 className="text-sm font-medium mb-3">Price Range</h3>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs text-white/60 mb-1">Min Price</label>
+            <label htmlFor="minPrice" className="block text-xs text-white/60 mb-1">Min Price</label>
             <input
+              id="minPrice"
               type="number"
               placeholder="0"
               min="0"
@@ -117,8 +116,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
             />
           </div>
           <div>
-            <label className="block text-xs text-white/60 mb-1">Max Price</label>
+            <label htmlFor="maxPrice" className="block text-xs text-white/60 mb-1">Max Price</label>
             <input
+              id="maxPrice"
               type="number"
               placeholder="1000"
               min="0"

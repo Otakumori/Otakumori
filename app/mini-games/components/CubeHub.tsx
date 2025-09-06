@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\hub\_scene\CubeHub.tsx instead.
 'use client';
 
 import { useRef, useEffect, useState } from 'react';

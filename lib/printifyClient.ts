@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\lib\printify\printifyClient.ts instead.
 import axios from 'axios';
 import { env } from '@/env.mjs';
 

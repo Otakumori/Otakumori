@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\ui\card.tsx instead.
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 

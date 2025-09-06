@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use lib\runes.ts instead.
 // Canonical Rune IDs - stable identifiers for the system
 export type CanonicalRuneId =
   | 'rune_a'

@@ -1,5 +1,3 @@
- 
- 
 export async function safeFetch<T>(
   input: RequestInfo | URL,
   init: RequestInit & { timeoutMs?: number } = {},
