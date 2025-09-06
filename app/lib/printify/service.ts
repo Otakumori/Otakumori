@@ -73,7 +73,7 @@ export class PrintifyService {
 
     this.apiKey = apiKey;
     this.shopId = shopId;
-    this.baseUrl = `https://api.printify.com/v1/shops/${this.shopId}`;
+    this.baseUrl = 'https://api.printify.com/v1';
   }
 
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -118,7 +118,7 @@ export class PrintifyService {
         total: number;
         last_page: number;
         current_page: number;
-      }>(`/products.json?page=${page}&per_page=${perPage}`);
+      }>(`/shops/${this.shopId}/products.json?page=${page}&per_page=${perPage}`);
 
       return {
         data: result.data || [],
@@ -166,7 +166,7 @@ export class PrintifyService {
   }
 
   async getProduct(productId: string): Promise<PrintifyProduct> {
-    return this.makeRequest<PrintifyProduct>(`/products/${productId}.json`);
+    return this.makeRequest<PrintifyProduct>(`/shops/${this.shopId}/products/${productId}.json`);
   }
 
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
@@ -176,10 +176,13 @@ export class PrintifyService {
         itemCount: orderData.line_items.length,
       });
 
-      const result = await this.makeRequest<{ id: string; status: string }>('/orders.json', {
-        method: 'POST',
-        body: JSON.stringify(orderData),
-      });
+      const result = await this.makeRequest<{ id: string; status: string }>(
+        `/shops/${this.shopId}/orders.json`,
+        {
+          method: 'POST',
+          body: JSON.stringify(orderData),
+        },
+      );
 
       log('printify_order_created_success', {
         orderId: result.id,
@@ -198,12 +201,12 @@ export class PrintifyService {
   }
 
   async getOrder(orderId: string): Promise<any> {
-    return this.makeRequest(`/orders/${orderId}.json`);
+    return this.makeRequest(`/shops/${this.shopId}/orders/${orderId}.json`);
   }
 
   async getShippingMethods(): Promise<any[]> {
     try {
-      const result = await this.makeRequest<{ data: any[] }>('/shipping.json');
+      const result = await this.makeRequest<{ data: any[] }>(`/shops/${this.shopId}/shipping.json`);
       return result.data || [];
     } catch (error) {
       log('printify_shipping_fetch_failed', { error: String(error) });
@@ -213,7 +216,9 @@ export class PrintifyService {
 
   async getPrintProviders(): Promise<any[]> {
     try {
-      const result = await this.makeRequest<{ data: any[] }>('/print_providers.json');
+      const result = await this.makeRequest<{ data: any[] }>(
+        `/shops/${this.shopId}/print_providers.json`,
+      );
       return result.data || [];
     } catch (error) {
       log('printify_providers_fetch_failed', { error: String(error) });
@@ -223,10 +228,11 @@ export class PrintifyService {
 
   async testConnection(): Promise<{ success: boolean; error?: string; shopId?: string }> {
     try {
+      // Test with a simple endpoint that doesn't require shop ID
       const result = await this.makeRequest<{ id: string; title: string }>('/shops.json');
       return {
         success: true,
-        shopId: result.id,
+        shopId: this.shopId,
       };
     } catch (error) {
       return {
