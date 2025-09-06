@@ -20,5 +20,5 @@
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "powershell.sideBar.CommandExplorerVisibility": true,
-  "cSpell.words": ["INNGEST", "Otakumori", "PRINTIFY", "SUPABASE"]
+  "cSpell.words": ["INNGEST", "Otakumori", "PRINTIFY", "SUPABASE", "upserted"]
 }

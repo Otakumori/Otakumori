@@ -13,6 +13,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function StaticPage({ params }: { params: { slug: string } }) {
+  // Don't handle API routes or other system routes
+  if (
+    params.slug.startsWith('api/') ||
+    params.slug.startsWith('_next/') ||
+    params.slug.startsWith('admin/')
+  ) {
+    return notFound();
+  }
+
   const page = await db.contentPage.findUnique({
     where: { slug: params.slug },
   });
