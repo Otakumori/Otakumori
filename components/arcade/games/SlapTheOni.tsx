@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function SlapTheOni({ onComplete, _onFail, _duration }: GameProps) {
+export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps) {
   const [oniPosition, setOniPosition] = useState({ x: 50, y: 50 });
   const [isSlapped, setIsSlapped] = useState(false);
   const [showTarget, setShowTarget] = useState(false);
   const [_score, setScore] = useState(0);
-  const gameRef = useRef<HTMLDivElement>(null);
+  const gameRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Show target after a brief delay
@@ -72,7 +72,9 @@ export default function SlapTheOni({ onComplete, _onFail, _duration }: GameProps
             {/* Oni face */}
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-2xl">
-                <span role="img" aria-label="Oni demon">👹</span>
+                <span role="img" aria-label="Oni demon">
+                  👹
+                </span>
               </div>
             </div>
           </motion.div>

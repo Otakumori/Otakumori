@@ -82,7 +82,34 @@
   },
 
   "shop": {
-    "soldOut": "This item is sold out. Cursed."
+    "soldOut": "This item is sold out. Cursed.",
+    "description": "Description",
+    "options": "Options",
+    "unavailable": "Unavailable"
+  },
+
+  "leaderboards": {
+    "title": "Leaderboards",
+    "subtitle": "See who's on top"
+  },
+
+  "achievements": {
+    "title": "Achievements",
+    "subtitle": "Unlock your potential"
+  },
+
+  "orders": {
+    "title": "Orders",
+    "subtitle": "Your purchase history"
+  },
+
+  "petals": {
+    "title": "Petals",
+    "subtitle": "Your petal collection"
+  },
+
+  "profile": {
+    "petals_subtitle": "Your petal collection"
   },
 
   "support": {

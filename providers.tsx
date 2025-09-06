@@ -9,7 +9,7 @@ import React, { createContext, useContext, useRef, useEffect } from 'react';
 import { useLocalStorage } from './app/hooks/hooks/useLocalStorage';
 // import { useUserStore } from './lib/store/userStore';
 import mitt from 'mitt';
-import { CartProvider } from './app/providers/cart';
+import { CartProvider } from './app/components/cart/CartProvider';
 
 interface PetalState {
   petals: number;

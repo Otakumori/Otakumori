@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
 import { appUrl } from '@/lib/canonical';
-import { useCart } from '../../app/providers/cart';
+import { useCart } from '../../app/components/cart/CartProvider';
 import PetalChip from '@/app/components/nav/PetalChip';
 import { Menu, X, ShoppingCart, Search, ChevronDown } from 'lucide-react';
 import { motionVariants } from '@/app/components/motion/MotionProvider';
@@ -92,15 +92,15 @@ export default function Navigation() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <motion.div 
+            <motion.div
               className="flex items-center"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
               <Link href="/" className="flex items-center space-x-2">
-                <Image 
-                  src="/assets/images/circlelogo.png" 
-                  alt="Otakumori logo" 
+                <Image
+                  src="/assets/images/circlelogo.png"
+                  alt="Otakumori logo"
                   width={32}
                   height={32}
                   className="h-8 w-8 rounded-full"
@@ -110,15 +110,15 @@ export default function Navigation() {
             </motion.div>
 
             {/* Desktop Navigation Links */}
-            <motion.div 
+            <motion.div
               className="hidden md:flex md:items-center md:space-x-8"
               variants={motionVariants.staggerContainer}
               initial="initial"
               animate="animate"
             >
               {navigation.map((item, index) => (
-                <motion.div 
-                  key={item.name} 
+                <motion.div
+                  key={item.name}
                   className="relative"
                   variants={motionVariants.staggerItem}
                   custom={index}
@@ -184,15 +184,15 @@ export default function Navigation() {
             </motion.div>
 
             {/* Right side actions */}
-            <motion.div 
+            <motion.div
               className="flex items-center space-x-4"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
               {/* Search */}
-              <motion.button 
-                className="hidden md:flex p-2 text-gray-300 hover:text-pink-400 transition-colors" 
+              <motion.button
+                className="hidden md:flex p-2 text-gray-300 hover:text-pink-400 transition-colors"
                 aria-label="Search"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -213,11 +213,11 @@ export default function Navigation() {
                 >
                   <ShoppingCart className="h-5 w-5" />
                   {itemCount > 0 && (
-                    <motion.span 
+                    <motion.span
                       className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-pink-500 text-xs text-white flex items-center justify-center"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     >
                       {itemCount}
                     </motion.span>
@@ -226,10 +226,7 @@ export default function Navigation() {
               </motion.div>
 
               {/* Petal Balance */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
+              <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
                 <PetalChip />
               </motion.div>
 
@@ -270,7 +267,7 @@ export default function Navigation() {
               <motion.button
                 onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden p-2 text-gray-300 hover:text-pink-400 transition-colors"
-                aria-label={isOpen ? "Close menu" : "Open menu"}
+                aria-label={isOpen ? 'Close menu' : 'Open menu'}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.2 }}
@@ -328,7 +325,7 @@ export default function Navigation() {
 
                 {/* Navigation items */}
                 <nav className="flex-1 px-6 py-6">
-                  <motion.div 
+                  <motion.div
                     className="space-y-4"
                     variants={motionVariants.staggerContainer}
                     initial="initial"

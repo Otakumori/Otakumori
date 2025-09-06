@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Return the starter pack download URL
-    const starterPackUrl = env.STARTER_PACK_URL || `${appUrl()}/api/starter-pack/download`;
+    const starterPackUrl = `${appUrl()}/api/starter-pack/download`;
 
     return NextResponse.json({
       url: starterPackUrl,

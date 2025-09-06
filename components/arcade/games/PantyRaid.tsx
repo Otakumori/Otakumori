@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function PantyRaid({ onComplete, _onFail, _duration }: GameProps) {
+export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) {
   const [pantyPosition, setPantyPosition] = useState({ x: 50, y: 30 });
   const [isDragging, setIsDragging] = useState(false);
   const [isCaught, setIsCaught] = useState(false);
@@ -65,19 +65,24 @@ export default function PantyRaid({ onComplete, _onFail, _duration }: GameProps)
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onKeyDown={(e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        if (
+          e.key === 'ArrowLeft' ||
+          e.key === 'ArrowRight' ||
+          e.key === 'ArrowUp' ||
+          e.key === 'ArrowDown'
+        ) {
           e.preventDefault();
           const step = 5;
           let newX = pantyPosition.x;
           let newY = pantyPosition.y;
-          
+
           if (e.key === 'ArrowLeft') newX = Math.max(0, newX - step);
           if (e.key === 'ArrowRight') newX = Math.min(100, newX + step);
           if (e.key === 'ArrowUp') newY = Math.max(0, newY - step);
           if (e.key === 'ArrowDown') newY = Math.min(100, newY + step);
-          
+
           setPantyPosition({ x: newX, y: newY });
-          
+
           if (newY > 70) {
             setIsCaught(true);
             onComplete(100, 25);
@@ -108,7 +113,9 @@ export default function PantyRaid({ onComplete, _onFail, _duration }: GameProps)
             {/* Panty details */}
             <div className="w-full h-full bg-pink-200 rounded-md flex items-center justify-center">
               <div className="text-xs">
-                <span role="img" aria-label="Underwear">👙</span>
+                <span role="img" aria-label="Underwear">
+                  👙
+                </span>
               </div>
             </div>
           </motion.div>
@@ -124,10 +131,14 @@ export default function PantyRaid({ onComplete, _onFail, _duration }: GameProps)
             className="absolute top-4 right-4 flex space-x-2"
           >
             <div className="text-2xl">
-              <span role="img" aria-label="Crow">🐦</span>
+              <span role="img" aria-label="Crow">
+                🐦
+              </span>
             </div>
             <div className="text-2xl">
-              <span role="img" aria-label="Crow">🐦</span>
+              <span role="img" aria-label="Crow">
+                🐦
+              </span>
             </div>
           </motion.div>
         )}
