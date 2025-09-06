@@ -19,5 +19,6 @@
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "powershell.sideBar.CommandExplorerVisibility": true
+  "powershell.sideBar.CommandExplorerVisibility": true,
+  "cSpell.words": ["INNGEST", "Otakumori", "PRINTIFY", "SUPABASE"]
 }

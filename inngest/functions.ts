@@ -1,5 +1,6 @@
 import { inngest } from './client';
 import { env } from '@/env';
+import { syncPrintifyProducts, manualPrintifySync, syncOnProductChange } from './printify-sync';
 
 // ============================================================================
 // USER MANAGEMENT FUNCTIONS
@@ -265,3 +266,10 @@ export const cleanupOldData = inngest.createFunction(
     });
   },
 );
+
+// ============================================================================
+// PRINTIFY SYNC FUNCTIONS
+// ============================================================================
+
+// Export Printify sync functions
+export { syncPrintifyProducts, manualPrintifySync, syncOnProductChange };
