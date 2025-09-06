@@ -372,7 +372,7 @@
 /* Petal spawn anchor positioning */
 .petal-spawn-anchor {
   left: 26vw; /* slightly right of trunk center */
-  top: 12vh;  /* upper canopy */
+  top: 12vh; /* upper canopy */
   width: 16vw;
   height: 20vh;
 }
@@ -855,11 +855,11 @@ footer::before {
 }
 
 /* Universal space-purple + stars background (site-wide) */
-:root{
-  --space-from: #0b0412;   /* deep plum */
-  --space-to:   #1a0f2b;   /* space purple */
-  --star:       rgba(255,255,255,0.9);
-  --star-dim:   rgba(255,255,255,0.35);
+:root {
+  --space-from: #0b0412; /* deep plum */
+  --space-to: #1a0f2b; /* space purple */
+  --star: rgba(255, 255, 255, 0.9);
+  --star-dim: rgba(255, 255, 255, 0.35);
 }
 
 /* layered gradients + animated twinkle */
@@ -874,8 +874,8 @@ footer::before {
 
 /* starfield via pseudo elements so content stays clean */
 .bg-otaku-space::before,
-.bg-otaku-space::after{
-  content: "";
+.bg-otaku-space::after {
+  content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -890,15 +890,20 @@ footer::before {
   animation: twinkle 6s linear infinite;
   opacity: 0.5;
 }
-.bg-otaku-space::after{
+.bg-otaku-space::after {
   filter: blur(0.5px);
   animation-duration: 9s;
   opacity: 0.35;
 }
 
-@keyframes twinkle{
-  0%,100% { opacity: .45 }
-  50% { opacity: .7 }
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Tree Layer - Fixed position, unaffected by parallax */
@@ -919,7 +924,9 @@ footer::before {
 }
 
 /* keep Clerk panes transparent over space bg */
-.cl-card, .cl-modal, .cl-page {
+.cl-card,
+.cl-modal,
+.cl-page {
   background: transparent !important;
   backdrop-filter: blur(6px);
 }
@@ -950,15 +957,71 @@ footer::before {
 }
 
 .canopy-image {
-  transform: scaleX(2.0) scaleY(1.5);
+  transform: scaleX(2) scaleY(1.5);
   transform-origin: left center;
   margin-left: -30%;
 }
 
 .canopy-mask {
-  background: linear-gradient(135deg, 
-    rgba(0,0,0,0.1) 0%, 
-    rgba(0,0,0,0.05) 30%, 
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.05) 30%,
     transparent 60%
   );
+}
+
+/* --- SOAPSTONE STYLES --- */
+.soapstone-card {
+  position: absolute;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  color: #f5f5f5;
+  background: rgba(18, 18, 18, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(2px);
+  will-change: transform, opacity;
+}
+
+/* overlay filter image */
+.soapstone-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/images/soapstonefilter.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.soapstone-card:hover {
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 192, 203, 0.18);
+}
+
+/* "stick to page" entrance animation */
+@keyframes soapstone-stick {
+  0% {
+    transform: scale(0.92) rotate(var(--entry-rot, 0deg));
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.04) rotate(var(--entry-rot, 0deg));
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(var(--entry-rot, 0deg));
+    opacity: 1;
+  }
+}
+.soapstone-enter {
+  animation: soapstone-stick 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
