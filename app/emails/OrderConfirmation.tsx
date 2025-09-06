@@ -130,7 +130,7 @@ export const OrderConfirmationEmail = ({
         </Text>
 
         <Section style={footer}>
-          <Link href="https://otaku-mori.com" style={link}>
+          <Link href="https://www.otaku-mori.com" style={link}>
             Visit Otaku-mori
           </Link>
           <Text style={footerText}>

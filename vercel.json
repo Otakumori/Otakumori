@@ -32,6 +32,11 @@
       "source": "/home",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "https://otaku-mori.com/:path*",
+      "destination": "https://www.otaku-mori.com/:path*",
+      "permanent": true
     }
   ],
   "rewrites": [
