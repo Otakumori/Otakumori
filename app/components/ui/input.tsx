@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\ui\input.tsx instead.
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 

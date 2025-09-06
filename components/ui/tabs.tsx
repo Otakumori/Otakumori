@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\ui\tabs.tsx instead.
 import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cn } from '@/lib/utils';

@@ -1,0 +1,29 @@
+# Otaku-mori • Guardrails (DO NOT VIOLATE)
+
+## Hard rules
+- Never delete, rename, or move a file unless explicitly instructed **in this session**.
+- Modify only files necessary to fulfill the spec; prefer additive edits over destructive changes.
+- Do not duplicate pages/components. If something exists, improve it in-place.
+- Keep all public asset paths and filenames exactly as-is (`/public/assets/**` is immutable).
+- Before writing, search the repo for existing implementations and reuse them.
+- If you change an import path (only with explicit approval), update **all** importers.
+
+## Output requirements
+- At the end, print a `CHANGESET` block listing every created/edited file with a one-line reason.
+- If a task implies delete/rename, STOP and ask for confirmation after listing:
+  1) files affected, 2) all importers/usages, 3) proposed new paths.
+
+## Quality gates (must pass before you say "done")
+- `pnpm typecheck` has **zero** errors.
+- `pnpm lint` has **zero** warnings.
+- `pnpm build` succeeds.
+- No console warnings in dev/preview.
+- No CSP violations.
+- No duplicate components/pages.
+- No changes to `/public/assets/**`.
+
+## Definition of Done (sitewide)
+- Real data from `/api/v1/...` (no mocks) across all routes.
+- Home: fixed tree (no parallax), trunk center aligned left, invisible petal anchor; petals POST to `/api/v1/petals/collect`.
+- Visual system: purple abyss, glass panels, no emojis, accessible, responsive.
+- Shop→Cart→Checkout works with Clerk/Stripe; Admin gated; Blog & Games correct.

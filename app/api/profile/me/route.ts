@@ -1,12 +1,11 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET() {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ ok: false, error: 'auth' }, { status: 401 });
 
   const u = await prisma.user.findUnique({ where: { clerkId: userId } });
@@ -14,16 +13,16 @@ export async function GET() {
 
   // Your posts (Soapstones) + counts
   const posts = await prisma.soapstoneMessage.findMany({
-    where: { userId: u.id },
+    where: { authorId: u.id },
     orderBy: { createdAt: 'desc' },
     take: 50,
     select: {
       id: true,
-      content: true,
+      text: true,
       createdAt: true,
-      upvotes: true,
-      isHidden: true,
-      isFlagged: true,
+      appraises: true,
+      reports: true,
+      status: true,
     },
   });
 
@@ -44,7 +43,7 @@ export async function GET() {
   const balances = { petals: u.petalBalance, runes: u.runes, level: 1, xp: 0 };
   const daily = {
     used: u.dailyClicks,
-    limit: Number(process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT ?? 500),
+    limit: Number(env.NEXT_PUBLIC_DAILY_PETAL_LIMIT ?? 500),
   };
 
   // Titles/badges derivation

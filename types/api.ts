@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\hooks\api.ts instead.
 export interface ApiResult<T> {
   ok: true;
   data: T;

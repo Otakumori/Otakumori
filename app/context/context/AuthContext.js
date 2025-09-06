@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use contexts\AuthContext.tsx instead.
 'use client';
 
 import { useEffect, useState, createContext } from 'react';

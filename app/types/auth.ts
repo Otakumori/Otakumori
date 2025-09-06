@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\lib\auth.ts instead.
 export interface User {
   id: string;
   email: string;

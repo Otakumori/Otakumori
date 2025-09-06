@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\lib\games.ts instead.
 import { create } from 'zustand';
 
 export type HubPanel = 'mini-games' | 'trade-hall' | 'achievements' | 'profile' | null;

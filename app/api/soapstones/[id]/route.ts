@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
@@ -14,8 +13,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const msg = await prisma.soapstoneMessage.update({
     where: { id: params.id },
     data: {
-      ...(typeof isHidden === 'boolean' ? { isHidden } : {}),
-      ...(typeof isFlagged === 'boolean' ? { isFlagged } : {}),
+      ...(typeof isHidden === 'boolean' ? { status: isHidden ? 'HIDDEN' : 'PUBLIC' } : {}),
+      ...(typeof isFlagged === 'boolean' ? { status: isFlagged ? 'HIDDEN' : 'PUBLIC' } : {}),
     },
   });
   return NextResponse.json({ ok: true, msg });

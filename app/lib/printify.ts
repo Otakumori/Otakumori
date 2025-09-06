@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\abyss\shop\api\printify.js instead.
 import { log } from '@/lib/logger';
 import { env } from '@/env';
 

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\shop\ProductFilters.tsx instead.
 'use client';
 
 import { useState } from 'react';

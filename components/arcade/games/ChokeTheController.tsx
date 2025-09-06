@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function ChokeTheController({ onComplete, onFail, duration }: GameProps) {
+export default function ChokeTheController({ onComplete, _onFail, _duration }: GameProps) {
   const [vibration, setVibration] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [mashCount, setMashCount] = useState(0);
@@ -39,7 +39,7 @@ export default function ChokeTheController({ onComplete, onFail, duration }: Gam
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-gray-800 to-gray-900">
@@ -68,7 +68,7 @@ export default function ChokeTheController({ onComplete, onFail, duration }: Gam
 
               {/* Vibration indicator */}
               <div
-                className="absolute inset-0 bg-red-500/20 rounded-lg"
+                className="absolute inset-0 bg-red-500/20 rounded-lg transition-opacity duration-100"
                 style={{ opacity: vibration / 100 }}
               />
             </div>
@@ -84,7 +84,9 @@ export default function ChokeTheController({ onComplete, onFail, duration }: Gam
             animate={{ scale: 1, opacity: 1 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-4xl">🌸</div>
+            <div className="text-4xl">
+              <span role="img" aria-label="Cherry blossom">🌸</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -102,7 +104,11 @@ export default function ChokeTheController({ onComplete, onFail, duration }: Gam
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleMash} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handleMash}
+          aria-label="Mash the controller to increase vibration"
+        />
     </div>
   );
 }

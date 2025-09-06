@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\ui\badge.tsx instead.
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';

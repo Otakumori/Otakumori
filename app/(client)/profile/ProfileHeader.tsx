@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\profile\ui\ProfileHeader.tsx instead.
 'use client';
 import useSWR from 'swr';
 

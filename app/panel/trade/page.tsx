@@ -1,10 +1,11 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 /* eslint-disable react-hooks/exhaustive-deps */
- 
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { ArrowLeftRight, Coins, Users, TrendingUp, MessageCircle } from 'lucide-react';
+import { ArrowLeftRight, Coins } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TradeCenterPanel() {
@@ -14,7 +15,7 @@ export default function TradeCenterPanel() {
   useEffect(() => {
     // Simulate loading
     setTimeout(() => setLoading(false), 500);
-  }, [false, 500]);
+  }, []);
 
   if (loading) {
     return (
@@ -45,7 +46,7 @@ export default function TradeCenterPanel() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {/* Item Trading */}
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🔄</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="counterclockwise arrows">🔄</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Item Trading</h3>
             <p className="text-neutral-300 mb-4">
               Trade cosmetics, overlays, and other items with other players
@@ -60,7 +61,7 @@ export default function TradeCenterPanel() {
 
           {/* Petal Exchange */}
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🌸</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="cherry blossom">🌸</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Petal Exchange</h3>
             <p className="text-neutral-300 mb-4">
               Exchange petals for items or services with other players
@@ -75,7 +76,7 @@ export default function TradeCenterPanel() {
 
           {/* Community Market */}
           <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🏪</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="convenience store">🏪</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Community Market</h3>
             <p className="text-neutral-300 mb-4">Browse community-created items and services</p>
             <Link
@@ -88,7 +89,7 @@ export default function TradeCenterPanel() {
 
           {/* Trade History */}
           <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">📊</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="bar chart">📊</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Trade History</h3>
             <p className="text-neutral-300 mb-4">View your trading history and statistics</p>
             <Link
@@ -101,7 +102,7 @@ export default function TradeCenterPanel() {
 
           {/* Trade Chat */}
           <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">💬</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="speech bubble">💬</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Trade Chat</h3>
             <p className="text-neutral-300 mb-4">Chat with other traders and negotiate deals</p>
             <Link
@@ -134,22 +135,22 @@ export default function TradeCenterPanel() {
             <h2 className="text-2xl font-bold mb-6 text-center">Your Trading Stats</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-3xl mb-2">🔄</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="counterclockwise arrows">🔄</span></div>
                 <div className="text-2xl font-bold text-blue-400">0</div>
                 <div className="text-sm text-neutral-400">Trades Completed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-2">⭐</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="star">⭐</span></div>
                 <div className="text-2xl font-bold text-yellow-400">0</div>
                 <div className="text-sm text-neutral-400">Trade Rating</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-2">🌸</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="cherry blossom">🌸</span></div>
                 <div className="text-2xl font-bold text-pink-400">0</div>
                 <div className="text-sm text-neutral-400">Petals Traded</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-2">👥</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="people">👥</span></div>
                 <div className="text-2xl font-bold text-green-400">0</div>
                 <div className="text-sm text-neutral-400">Trade Partners</div>
               </div>
@@ -159,7 +160,7 @@ export default function TradeCenterPanel() {
 
         {/* Coming Soon Notice */}
         <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">🚧 Trading System Coming Soon</h2>
+          <h2 className="text-2xl font-bold mb-4"><span role="img" aria-label="construction">🚧</span> Trading System Coming Soon</h2>
           <p className="text-neutral-300 mb-6">
             We're working hard to bring you a comprehensive trading system. In the meantime, you can
             visit the Petal Store to purchase items with your petals!

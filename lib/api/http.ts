@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\lib\http.ts instead.
 import { type z } from 'zod';
 
 type FetchOpts = {

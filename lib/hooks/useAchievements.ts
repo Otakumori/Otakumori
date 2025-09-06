@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\hooks\hooks\useAchievements.ts instead.
 import { useState } from 'react';
 import { achievements as allAchievements } from '@/data/achievements';
 import { type Achievement } from '@/app/types/achievements';

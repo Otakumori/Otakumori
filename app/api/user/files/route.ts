@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const dynamic = 'force-dynamic'; // tells Next this cannot be statically analyzed
 export const runtime = 'nodejs'; // keep on Node runtime (not edge)
 export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
@@ -11,7 +10,7 @@ import { prisma } from '@/app/lib/prisma';
 
 export async function GET() {
   try {
-    const { userId  } = await auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'UNAUTHENTICATED' }, { status: 401 });
     }

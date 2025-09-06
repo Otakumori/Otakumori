@@ -1,5 +1,3 @@
- 
- 
 import ContactForm from '../../app/components/ContactForm'; // Adjust based on actual location
 export default function FAQ() {
   return (

@@ -1,4 +1,5 @@
-import { NextResponse} from "next/server";
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   const ok = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !!process.env.CLERK_SECRET_KEY;

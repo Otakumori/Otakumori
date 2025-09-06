@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 import { SignUp } from '@clerk/nextjs';
 import AuthShell from '@/app/components/auth/auth-shell';
 import { otakumoriClerkAppearance } from '@/app/lib/clerkTheme';

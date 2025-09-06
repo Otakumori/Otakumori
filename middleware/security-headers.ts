@@ -13,15 +13,18 @@ export function middleware(_request: NextRequest) {
   // Content Security Policy
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://clerk.otaku-mori.com https://*.clerkstage.dev https://js.stripe.com https://*.jsdelivr.net",
+    "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.clerk.com https://*.clerkstage.dev https://js.stripe.com https://*.jsdelivr.net https://*.printify.com",
+    "script-src-elem 'self' 'unsafe-inline' https://*.clerk.com https://*.clerkstage.dev https://js.stripe.com https://*.jsdelivr.net https://*.printify.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https: blob: https://*.clerk.com https://*.clerkstage.dev",
-    "connect-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.clerkstage.dev https://vyyovmhjtxeddssvfdve.supabase.co https://api.stripe.com https://api.printify.com",
-    "frame-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.clerkstage.dev https://js.stripe.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: https: blob: https://*.clerk.com https://*.clerkstage.dev https://*.printify.com https://images.printify.com https://*.cloudinary.com https://*.vercel-blob.com",
+    "connect-src 'self' https://*.clerk.com https://*.clerkstage.dev https://vyyovmhjtxeddssvfdve.supabase.co https://api.stripe.com https://api.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com",
+    "frame-src 'self' https://*.clerk.com https://*.clerkstage.dev https://js.stripe.com https://*.printify.com",
+    "media-src 'self' blob:",
+    "worker-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    "form-action 'self' https://*.clerk.com https://*.printify.com",
     'upgrade-insecure-requests',
   ].join('; ');
 

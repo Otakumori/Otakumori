@@ -1,8 +1,8 @@
+// DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-girl\Game.tsx instead.
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-
 
 type Props = {
   mode: 'classic' | 'blitz' | 'precision';

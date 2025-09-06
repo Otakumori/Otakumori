@@ -1,0 +1,361 @@
+/* Global Motion & Styling Rules */
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Glass Recipe */
+.glass-panel {
+  @apply bg-white/5 border border-white/10 backdrop-blur-xl;
+  box-shadow: 0 0 60px -15px rgba(200, 120, 255, 0.25);
+}
+
+.glass-button {
+  @apply bg-white/5 border border-white/10 backdrop-blur-xl;
+  box-shadow: 0 0 20px -8px rgba(200, 120, 255, 0.15);
+}
+
+/* Focus & Hover States */
+.focus-ring {
+  @apply outline-2 outline-fuchsia-300/60 outline-offset-2;
+}
+
+.hover-lift {
+  @apply transition-all duration-200 ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px -8px rgba(200, 120, 255, 0.3);
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 ease-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-scale:active {
+  transform: scale(0.98);
+}
+
+/* Button States */
+.btn-primary {
+  @apply glass-button rounded-xl px-6 py-3 text-white font-medium;
+  @apply hover-scale focus-ring;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+.btn-secondary {
+  @apply glass-panel rounded-xl px-6 py-3 text-white font-medium;
+  @apply hover-scale focus-ring;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+/* Card Animations */
+.card-hover {
+  @apply transition-all duration-250 ease-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px -12px rgba(200, 120, 255, 0.4);
+}
+
+/* Form Focus States */
+.form-input {
+  @apply bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white;
+  @apply focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-300/50;
+  @apply focus:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)];
+}
+
+/* Loading Skeletons */
+.skeleton {
+  @apply bg-white/5 rounded-xl;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1200ms ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Toast Animations */
+.toast-enter {
+  transform: translateY(12px);
+  opacity: 0;
+}
+
+.toast-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 400ms ease-out;
+}
+
+.toast-exit {
+  opacity: 1;
+}
+
+.toast-exit-active {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+/* Dialog Animations */
+.dialog-backdrop {
+  @apply bg-black/50 backdrop-blur-sm;
+}
+
+.dialog-panel-enter {
+  transform: scale(0.98);
+  opacity: 0;
+}
+
+.dialog-panel-enter-active {
+  transform: scale(1);
+  opacity: 1;
+  transition: all 300ms ease-out;
+}
+
+/* Page Header Animations */
+.page-header-enter {
+  transform: translateY(12px);
+  opacity: 0;
+}
+
+.page-header-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 500ms ease-out;
+}
+
+/* Stagger Children */
+.stagger-children > * {
+  animation-delay: calc(var(--stagger-index) * 40ms);
+}
+
+/* Micro Feedback */
+.micro-feedback {
+  @apply transition-all duration-120 ease-out;
+}
+
+.micro-feedback:active {
+  transform: scale(0.95);
+}
+
+/* Petal Collection Animation */
+.petal-collect {
+  animation: petalCollect 160ms ease-out forwards;
+}
+
+@keyframes petalCollect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* Achievement Unlock Animation */
+.achievement-unlock {
+  animation: achievementUnlock 250ms ease-out forwards;
+}
+
+@keyframes achievementUnlock {
+  0% {
+    background: radial-gradient(circle, rgba(240, 171, 252, 0.3) 0%, transparent 70%);
+  }
+  100% {
+    background: radial-gradient(circle, rgba(240, 171, 252, 0) 0%, transparent 70%);
+  }
+}
+
+/* Score Pop Animation */
+.score-pop {
+  animation: scorePop 200ms ease-out forwards;
+}
+
+@keyframes scorePop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Navigation Hover Effects */
+.nav-link {
+  @apply transition-all duration-200 ease-out;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: transparent;
+}
+
+.nav-link:hover {
+  opacity: 1;
+  text-underline-offset: 6px;
+  text-decoration-color: rgba(240, 171, 252, 0.6);
+}
+
+/* Cart Badge Animation */
+.cart-badge {
+  @apply transition-transform duration-200 ease-out;
+}
+
+.cart-badge-update {
+  animation: cartBadgeUpdate 200ms ease-out;
+}
+
+@keyframes cartBadgeUpdate {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Filter Chip Animation */
+.filter-chip {
+  @apply transition-all duration-200 ease-out;
+}
+
+.filter-chip:active {
+  transform: scale(0.98);
+}
+
+.filter-chip-selected {
+  @apply ring-2 ring-fuchsia-300/50;
+}
+
+/* Count Up Animation */
+.count-up {
+  animation: countUp 300ms ease-out;
+}
+
+@keyframes countUp {
+  0% {
+    transform: translateY(4px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Sticky CTA Animation */
+.sticky-cta-enter {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.sticky-cta-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 300ms ease-out;
+}
+
+/* Progress Bar Animation */
+.progress-bar {
+  @apply transition-all duration-300 ease-out;
+}
+
+.progress-bar-fill {
+  @apply transition-all duration-500 ease-out;
+}
+
+/* Tab Underline Animation */
+.tab-underline {
+  @apply transition-all duration-200 ease-out;
+}
+
+/* Image Crossfade */
+.image-crossfade {
+  @apply transition-opacity duration-200 ease-out;
+}
+
+/* Code Copy Button */
+.code-copy-tooltip {
+  @apply transition-opacity duration-150 ease-out;
+}
+
+/* Loading Progress Line */
+.loading-progress {
+  @apply transition-all duration-200 ease-out;
+}
+
+/* Insiders Nudge Animation */
+.insiders-nudge-enter {
+  transform: translateY(-16px);
+  opacity: 0;
+}
+
+.insiders-nudge-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 400ms ease-out;
+  transition-delay: 1200ms;
+}
+
+/* Accessibility Improvements */
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4;
+  @apply focus:z-50 focus:px-4 focus:py-2 focus:bg-fuchsia-500 focus:text-white;
+  @apply focus:rounded-lg focus:outline-none;
+}
+
+/* Performance Optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Mobile Performance Limits */
+@media (max-width: 768px) {
+  .mobile-limit-animations {
+    animation: none !important;
+    transition: none !important;
+  }
+}

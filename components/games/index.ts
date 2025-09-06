@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\types\index.ts instead.
 import { lazy } from 'react';
 
 export const gamesRegistry = {

@@ -1,31 +1,30 @@
- 
- 
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { currentUser } from "@clerk/nextjs/server";
 
-const isProtected = createRouteMatcher(["/account(.*)", "/checkout(.*)"]);
-const isAdmin = createRouteMatcher(["/admin(.*)"]);
+const isPublic = createRouteMatcher([
+  "/",                         // homepage
+  "/sign-in(.*)",              // Clerk
+  "/sign-up(.*)",
+
+  // Printify pages / callbacks / webhooks you might add
+  "/printify(.*)",
+  "/api/printify(.*)",
+
+  // static & assets
+  "/favicon.ico",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/images(.*)",
+  "/overlay(.*)",
+  "/public(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtected(req)) {
-    const { userId, redirectToSignIn } = await auth();
-    if (!userId) return redirectToSignIn();
-  }
-
-  if (isAdmin(req)) {
-    const { userId, redirectToSignIn } = await auth();
-    if (!userId) return redirectToSignIn();
-    
-    // Get user data for role check
-    const user = await currentUser();
-    const role = (user?.publicMetadata as any)?.role;
-    if (role !== "admin") return Response.redirect(new URL("/403", req.url));
-  }
+  if (!isPublic(req)) await auth.protect();
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Skip Next internals + static files unless in search params (Clerk's recommended)
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",

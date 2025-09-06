@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { Webhook } from "svix";
-import { db as prisma } from "@/lib/db";
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import { Webhook } from 'svix';
+import { db as prisma } from '@/lib/db';
 
-export const runtime = "nodejs";       // Node runtime for crypto
-export const dynamic = "force-dynamic";
+export const runtime = 'nodejs'; // Node runtime for crypto
+export const dynamic = 'force-dynamic';
 
 type ClerkEmail = { id: string; email_address: string };
 type ClerkUser = {
@@ -28,27 +29,27 @@ function getPrimaryEmail(u: ClerkUser): string | null {
 }
 
 export async function POST(req: Request) {
-  const svixId = headers().get("svix-id");
-  const svixTimestamp = headers().get("svix-timestamp");
-  const svixSignature = headers().get("svix-signature");
+  const svixId = headers().get('svix-id');
+  const svixTimestamp = headers().get('svix-timestamp');
+  const svixSignature = headers().get('svix-signature');
   if (!svixId || !svixTimestamp || !svixSignature) {
-    return new NextResponse("Missing Svix headers", { status: 400 });
+    return new NextResponse('Missing Svix headers', { status: 400 });
   }
 
   const secret = process.env.CLERK_WEBHOOK_SECRET;
-  if (!secret) return new NextResponse("Missing CLERK_WEBHOOK_SECRET", { status: 500 });
+  if (!secret) return new NextResponse('Missing CLERK_WEBHOOK_SECRET', { status: 500 });
 
   const payload = await req.text();
   let evt: any;
   try {
     const wh = new Webhook(secret);
     evt = wh.verify(payload, {
-      "svix-id": svixId,
-      "svix-timestamp": svixTimestamp,
-      "svix-signature": svixSignature,
+      'svix-id': svixId,
+      'svix-timestamp': svixTimestamp,
+      'svix-signature': svixSignature,
     });
-  } catch (err) {
-    return new NextResponse("Invalid signature", { status: 400 });
+      } catch (_err) {
+    return new NextResponse('Invalid signature', { status: 400 });
   }
 
   // Idempotency: store the event id; if it exists, exit early.
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
   const type: string = evt.type;
 
   // Core user sync
-  if (type === "user.created" || type === "user.updated") {
+  if (type === 'user.created' || type === 'user.updated') {
     const u = evt.data as ClerkUser;
     const email = getPrimaryEmail(u);
     const userData = {
@@ -81,18 +82,20 @@ export async function POST(req: Request) {
       update: {
         email: userData.email || undefined,
         username: userData.username || undefined,
-        display_name: userData.firstName && userData.lastName 
-          ? `${userData.firstName} ${userData.lastName}` 
-          : undefined,
+        display_name:
+          userData.firstName && userData.lastName
+            ? `${userData.firstName} ${userData.lastName}`
+            : undefined,
         avatarUrl: userData.imageUrl || undefined,
       },
       create: {
         clerkId: u.id,
         email: userData.email || '',
         username: userData.username || `user_${u.id.slice(0, 8)}`,
-        display_name: userData.firstName && userData.lastName 
-          ? `${userData.firstName} ${userData.lastName}` 
-          : undefined,
+        display_name:
+          userData.firstName && userData.lastName
+            ? `${userData.firstName} ${userData.lastName}`
+            : undefined,
         avatarUrl: userData.imageUrl || undefined,
         wallet: { create: { petals: 0, runes: 0 } },
         profile: { create: {} },
@@ -103,19 +106,21 @@ export async function POST(req: Request) {
   }
 
   // Email updates (keep primary email in sync)
-  if (type === "email.created" || type === "email.updated") {
+  if (type === 'email.created' || type === 'email.updated') {
     const u = evt.data as ClerkUser;
     const email = getPrimaryEmail(u);
     if (email) {
-      await prisma.user.update({
-        where: { clerkId: u.id },
-        data: { email },
-      }).catch(() => {});
+      await prisma.user
+        .update({
+          where: { clerkId: u.id },
+          data: { email },
+        })
+        .catch(() => {});
     }
     return NextResponse.json({ ok: true });
   }
 
-  if (type === "user.deleted") {
+  if (type === 'user.deleted') {
     const u = evt.data as { id: string };
     // For now, we'll just log the deletion since we don't have a deletedAt field
     console.log(`User deleted: ${u.id}`);

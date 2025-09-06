@@ -1,7 +1,6 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+// import { env } from '@/env.mjs';
 import { logger } from '@/app/lib/logger';
 import { newRequestId } from '@/app/lib/requestId';
 
@@ -45,7 +44,7 @@ export async function POST(req: NextRequest) {
     let payload: any;
     try {
       payload = JSON.parse(raw);
-    } catch (e) {
+    } catch (_e) {
       logger.error('invalid json', { requestId, route }, { rawSnippet: raw.slice(0, 200) });
       return NextResponse.json({ ok: false, error: 'invalid json' }, { status: 400 });
     }

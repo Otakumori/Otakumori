@@ -1,5 +1,3 @@
- 
- 
 import manifest from '@/public/assets/manifest.json';
 import roles from '@/assets-roles.json';
 

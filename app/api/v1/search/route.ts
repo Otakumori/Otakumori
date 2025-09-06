@@ -1,10 +1,11 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { logger } from '@/app/lib/logger';
 import {
   SearchRequestSchema,
-  SearchResponseSchema,
+  // SearchResponseSchema,
   type SearchRequest,
   type SearchResult,
 } from '@/app/lib/contracts';
@@ -98,9 +99,9 @@ export async function POST(request: NextRequest) {
 
 async function searchUsers(
   searchRequest: SearchRequest,
-  currentUserId: string,
+  _currentUserId: string,
 ): Promise<SearchResult[]> {
-  const { query, filters } = searchRequest;
+  const { query, filters: _filters } = searchRequest;
 
   // Build where clause for user search
   const whereClause: any = {
@@ -111,14 +112,14 @@ async function searchUsers(
     ],
     // Exclude blocked users and private profiles
     AND: [
-      { id: { not: currentUserId } }, // Don't show self in search
+      { id: { not: _currentUserId } }, // Don't show self in search
       { visibility: { not: 'private' } },
     ],
   };
 
   // Apply additional filters
-  if (filters?.userId) {
-    whereClause.AND.push({ id: filters.userId });
+  if (_filters?.userId) {
+    whereClause.AND.push({ id: _filters.userId });
   }
 
   const users = await db.user.findMany({
@@ -150,7 +151,7 @@ async function searchUsers(
 }
 
 async function searchProducts(searchRequest: SearchRequest): Promise<SearchResult[]> {
-  const { query, filters } = searchRequest;
+  const { query, filters: _filters } = searchRequest;
 
   const whereClause: any = {
     OR: [

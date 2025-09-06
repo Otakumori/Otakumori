@@ -1,21 +1,17 @@
-import React from "react";
+import React from 'react';
 
 type FormFieldProps = {
   id: string;
   label: string;
   hint?: string;
   error?: string;
-  children: (props: {
-    id: string;
-    describedBy?: string;
-    ariaInvalid?: boolean;
-  }) => React.ReactNode;
+  children: (props: { id: string; describedBy?: string; ariaInvalid?: boolean }) => React.ReactNode;
 };
 
 export function FormField({ id, label, hint, error, children }: FormFieldProps) {
   const hintId = hint ? `${id}-hint` : undefined;
   const errId = error ? `${id}-err` : undefined;
-  const describedBy = [hintId, errId].filter(Boolean).join(" ") || undefined;
+  const describedBy = [hintId, errId].filter(Boolean).join(' ') || undefined;
 
   return (
     <div>

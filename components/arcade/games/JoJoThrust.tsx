@@ -4,14 +4,20 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function JoJoThrust({ onComplete, onFail, duration }: GameProps) {
+export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps) {
   const [thrustCount, setThrustCount] = useState(0);
   const [currentPose, setCurrentPose] = useState(0);
   const [isThrusting, setIsThrusting] = useState(false);
   const [showCharacter, setShowCharacter] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const poses = ['💪', '🔥', '⚡', '🌟', '💥'];
+  const poses = [
+    { emoji: '💪', label: 'Muscle flex' },
+    { emoji: '🔥', label: 'Fire' },
+    { emoji: '⚡', label: 'Lightning' },
+    { emoji: '🌟', label: 'Star' },
+    { emoji: '💥', label: 'Explosion' }
+  ];
 
   useEffect(() => {
     const showTimer = setTimeout(() => setShowCharacter(true), 300);
@@ -53,7 +59,7 @@ export default function JoJoThrust({ onComplete, onFail, duration }: GameProps) 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-yellow-400 to-orange-500">
@@ -71,7 +77,11 @@ export default function JoJoThrust({ onComplete, onFail, duration }: GameProps) 
             transition={{ duration: 0.3 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-8xl">{poses[currentPose]}</div>
+            <div className="text-8xl">
+              <span role="img" aria-label={poses[currentPose].label}>
+                {poses[currentPose].emoji}
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -85,7 +95,9 @@ export default function JoJoThrust({ onComplete, onFail, duration }: GameProps) 
             exit={{ scale: 2, opacity: 0 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-6xl">💥</div>
+            <div className="text-6xl">
+              <span role="img" aria-label="Explosion effect">💥</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -107,7 +119,11 @@ export default function JoJoThrust({ onComplete, onFail, duration }: GameProps) 
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleThrust} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handleThrust}
+          aria-label="Thrust with arrow keys or click"
+        />
     </div>
   );
 }

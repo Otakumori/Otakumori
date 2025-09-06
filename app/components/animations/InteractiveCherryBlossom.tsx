@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\animations\InteractiveCherryBlossom.tsx instead.
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';

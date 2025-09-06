@@ -1,5 +1,3 @@
- 
- 
 import React from 'react';
 import type { Achievement } from './AchievementProvider';
 import { AchievementCard } from './AchievementCard';

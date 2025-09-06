@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\abyss\shop\api\printify.js instead.
 import { z } from 'zod';
 import { http } from './http';
 import { env } from '@/env';

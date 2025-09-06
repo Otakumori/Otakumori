@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\SoundSettings.tsx instead.
 import React from 'react';
 import { useSoundSettings } from '../../hooks/hooks/useSoundSettings';
 

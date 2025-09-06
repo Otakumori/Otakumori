@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -20,7 +18,7 @@ export function SoapstoneFooter() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [messages, setMessages] = useState<SoapstoneMessage[]>([]);
-  const [isVisible, setIsVisible] = useState(false);
+  const [_isVisible, _setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const getToken = useSessionToken();
 
@@ -301,7 +299,7 @@ export function SoapstoneFooter() {
 
           <div className="mt-8 text-center">
             <p className="text-neutral-500 text-sm">
-              © 2024 Otakumori. Made with ❤️ for the otaku community.
+              © 2024 Otakumori. Made with <span role="img" aria-label="Red heart">❤️</span> for the otaku community.
             </p>
           </div>
         </div>

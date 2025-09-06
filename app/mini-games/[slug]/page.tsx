@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -14,6 +13,7 @@ import RhythmBeatEmUp from '@/components/games/RhythmBeatEmUp';
 import MemoryMatch from '@/components/games/MemoryMatch';
 import QuickMath from '@/components/games/QuickMath';
 import PetalCollection from '@/components/games/PetalCollection';
+import GameCubeBoot from '@/app/components/GameCubeBoot';
 
 const gameComponents: Record<string, React.ComponentType<any>> = {
   'samurai-petal-slice': SamuraiPetalSlice,
@@ -31,6 +31,7 @@ export default function GamePage() {
   const { user, isLoaded } = useUser();
   const [gameDef, setGameDef] = useState<GameDefinition | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showBoot, setShowBoot] = useState(true);
 
   const gameSlug = params.slug as string;
 
@@ -101,6 +102,11 @@ export default function GamePage() {
         </div>
       </div>
     );
+  }
+
+  // Show GameCube boot first
+  if (showBoot) {
+    return <GameCubeBoot onBootComplete={() => setShowBoot(false)} />;
   }
 
   return (

@@ -1,7 +1,7 @@
-"use client";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
-import { Suspense, useEffect } from "react";
+'use client';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { Suspense, useEffect } from 'react';
 
 function Box() {
   return (
@@ -16,7 +16,7 @@ function Box() {
 export default function DiagCube() {
   useEffect(() => {
     // Explicit boot signal to the console
-    console.log("%c[DiagCube] mounted → attempting WebGL render", "color:#9AE6B4");
+    console.log('%c[DiagCube] mounted → attempting WebGL render', 'color:#9AE6B4');
   }, []);
 
   return (

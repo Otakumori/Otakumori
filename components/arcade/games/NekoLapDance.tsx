@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function NekoLapDance({ onComplete, onFail, duration }: GameProps) {
-  const [petCount, setPetCount] = useState(0);
+export default function NekoLapDance({ onComplete, _onFail, _duration }: GameProps) {
+  const [_petCount, setPetCount] = useState(0);
   const [isPetting, setIsPetting] = useState(false);
   const [showNeko, setShowNeko] = useState(false);
   const [happiness, setHappiness] = useState(0);
@@ -43,7 +43,7 @@ export default function NekoLapDance({ onComplete, onFail, duration }: GameProps
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-orange-200 to-pink-300">
@@ -75,7 +75,9 @@ export default function NekoLapDance({ onComplete, onFail, duration }: GameProps
             exit={{ scale: 2, opacity: 0 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-4xl">💕</div>
+            <div className="text-4xl">
+              <span role="img" aria-label="Heart">💕</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -104,7 +106,11 @@ export default function NekoLapDance({ onComplete, onFail, duration }: GameProps
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handlePet} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handlePet}
+          aria-label="Pet the neko to increase happiness"
+        />
     </div>
   );
 }

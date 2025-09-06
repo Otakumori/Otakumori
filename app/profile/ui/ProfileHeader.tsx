@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -102,6 +100,7 @@ export default function ProfileHeader() {
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
               colorfulTextEnabled ? 'bg-pink-600' : 'bg-neutral-700'
             }`}
+            aria-label={`${colorfulTextEnabled ? 'Disable' : 'Enable'} colorful text`}
           >
             <span
               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { appUrl } from '@/lib/canonical';

@@ -1,0 +1,143 @@
+/* Canopy and Petal Animation Styles */
+
+/* Canopy sway animation */
+@keyframes canopySway {
+  0%, 100% { 
+    transform: rotate(0deg) scaleX(2.0) scaleY(1.5); 
+  }
+  25% { 
+    transform: rotate(1deg) scaleX(2.0) scaleY(1.5); 
+  }
+  75% { 
+    transform: rotate(-1deg) scaleX(2.0) scaleY(1.5); 
+  }
+}
+
+/* Petal floating animation for aesthetic mode */
+@keyframes petalFloat {
+  0% {
+    transform: translate3d(0, 0, 0) rotateZ(0deg) rotateY(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 100vh, 0) rotateZ(360deg) rotateY(180deg);
+    opacity: 0;
+  }
+}
+
+/* Petal collection animation */
+@keyframes petalCollect {
+  0% {
+    transform: scale(1) rotateZ(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotateZ(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0) rotateZ(360deg);
+    opacity: 0;
+  }
+}
+
+/* Reward notification animation */
+@keyframes rewardFloat {
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.5); 
+  }
+  20% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.1); 
+  }
+  80% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.8) translateY(-20px); 
+  }
+}
+
+/* Petal shop reward notification */
+.petal-reward-notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(247, 191, 211, 0.95);
+  color: #1a1a1a;
+  padding: 12px 24px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1000;
+  pointer-events: none;
+  animation: rewardFloat 2s ease-out forwards;
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Interactive petal hover effect */
+.interactive-petal {
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.interactive-petal:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .canopy-sway {
+    animation: none;
+  }
+  
+  .petal-float {
+    animation: none;
+  }
+  
+  .petal-collect {
+    animation: none;
+  }
+  
+  .reward-float {
+    animation: none;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .canopy-container {
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+  
+  .petal {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .canopy-container {
+    transform: scale(0.6);
+    transform-origin: top left;
+  }
+  
+  .petal {
+    width: 12px;
+    height: 12px;
+  }
+}

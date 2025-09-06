@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\Header.js instead.
 'use client';
 
 import React, { useState } from 'react';
@@ -50,8 +49,17 @@ export default function Header() {
             <button
               className="text-gray-300 hover:text-pink-500 md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              type="button"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                role="img"
+                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              >
                 {isMenuOpen ? (
                   <path
                     strokeLinecap="round"

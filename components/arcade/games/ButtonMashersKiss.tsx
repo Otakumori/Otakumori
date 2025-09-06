@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function ButtonMashersKiss({ onComplete, onFail, duration }: GameProps) {
-  const [mashCount, setMashCount] = useState(0);
+export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: GameProps) {
+  const [_mashCount, setMashCount] = useState(0);
   const [isMashing, setIsMashing] = useState(false);
   const [showSilhouettes, setShowSilhouettes] = useState(false);
   const [kissProgress, setKissProgress] = useState(0);
@@ -43,7 +43,7 @@ export default function ButtonMashersKiss({ onComplete, onFail, duration }: Game
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-red-400 to-pink-500">
@@ -62,7 +62,7 @@ export default function ButtonMashersKiss({ onComplete, onFail, duration }: Game
               transition={{ duration: 0.1 }}
               className="text-6xl"
             >
-              👤
+              <span role="img" aria-label="Person silhouette">👤</span>
             </motion.div>
             <motion.div
               animate={{
@@ -72,7 +72,7 @@ export default function ButtonMashersKiss({ onComplete, onFail, duration }: Game
               transition={{ duration: 0.1 }}
               className="text-6xl"
             >
-              👤
+              <span role="img" aria-label="Person silhouette">👤</span>
             </motion.div>
           </div>
         )}
@@ -86,7 +86,9 @@ export default function ButtonMashersKiss({ onComplete, onFail, duration }: Game
             animate={{ scale: 1, opacity: 1 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-6xl">💋</div>
+            <div className="text-6xl">
+              <span role="img" aria-label="Kiss">💋</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -119,7 +121,11 @@ export default function ButtonMashersKiss({ onComplete, onFail, duration }: Game
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleMash} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handleMash}
+          aria-label="Mash buttons to progress the kiss"
+        />
     </div>
   );
 }

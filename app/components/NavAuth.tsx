@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, SignInButton } from '@clerk/nextjs';
 
 export default function NavAuth() {
   return (

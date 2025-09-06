@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 export default function DataDeletionPage() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 py-10">

@@ -1,5 +1,3 @@
- 
- 
 import { cookies } from 'next/headers';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
@@ -8,7 +6,7 @@ export type Viewer = { id: string; nsfw: boolean } | null;
 
 export async function getViewer(): Promise<Viewer> {
   try {
-    const { userId  } = await auth();
+    const { userId } = await auth();
     if (!userId) return null; // guest
 
     const user = await prisma.user.findUnique({

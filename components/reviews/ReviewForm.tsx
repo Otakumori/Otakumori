@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useRef } from 'react';
@@ -83,8 +81,9 @@ export default function ReviewForm({ productId }: Props) {
       <h3 className="text-lg font-semibold">Write a Review</h3>
 
       <div className="grid gap-2">
-        <label className="text-sm text-zinc-400">Rating</label>
+        <label htmlFor="rating" className="text-sm text-zinc-400">Rating</label>
         <select
+          id="rating"
           value={rating}
           onChange={(e) => setRating(Number(e.target.value))}
           className="rounded-md border border-zinc-700 bg-black p-2"
@@ -98,8 +97,9 @@ export default function ReviewForm({ productId }: Props) {
       </div>
 
       <div className="grid gap-2">
-        <label className="text-sm text-zinc-400">Title (optional)</label>
+        <label htmlFor="title" className="text-sm text-zinc-400">Title (optional)</label>
         <input
+          id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="rounded-md border border-zinc-700 bg-black p-2"
@@ -108,8 +108,9 @@ export default function ReviewForm({ productId }: Props) {
       </div>
 
       <div className="grid gap-2">
-        <label className="text-sm text-zinc-400">Review</label>
+        <label htmlFor="review" className="text-sm text-zinc-400">Review</label>
         <textarea
+          id="review"
           value={body}
           onChange={(e) => setBody(e.target.value)}
           className="min-h-[120px] rounded-md border border-zinc-700 bg-black p-2"
@@ -118,10 +119,11 @@ export default function ReviewForm({ productId }: Props) {
       </div>
 
       <div className="grid gap-2">
-        <label className="text-sm text-zinc-400">
+        <label htmlFor="photos" className="text-sm text-zinc-400">
           Photos (up to {maxImages}) — JPG/PNG/WebP, &lt; 3MB each
         </label>
         <input
+          id="photos"
           ref={inputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
@@ -143,8 +145,9 @@ export default function ReviewForm({ productId }: Props) {
                   type="button"
                   onClick={() => removeImage(url)}
                   className="absolute right-1 top-1 rounded bg-black/70 px-1 text-xs"
+                  aria-label="Remove image"
                 >
-                  ✕
+                  <span role="img" aria-label="Close">✕</span>
                 </button>
               </div>
             ))}

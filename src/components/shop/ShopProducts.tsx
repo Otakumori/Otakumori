@@ -1,5 +1,3 @@
- 
- 
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -99,7 +97,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">😔</div>
+        <div className="text-6xl mb-4"><span role="img" aria-label="Disappointed face">😔</span></div>
         <h3 className="text-xl font-semibold mb-2">Something went wrong</h3>
         <p className="text-white/60 mb-4">{error}</p>
         <button
@@ -115,7 +113,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">🌸</div>
+        <div className="text-6xl mb-4"><span role="img" aria-label="Cherry blossom">🌸</span></div>
         <h3 className="text-xl font-semibold mb-2">No products found</h3>
         <p className="text-white/60">
           {query ? `No products match "${query}"` : 'No products available at the moment'}
@@ -133,7 +131,11 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
         </p>
 
         {/* Sort Options */}
+        <label htmlFor="sort-select" className="sr-only">
+          Sort products
+        </label>
         <select
+          id="sort-select"
           value={sort}
           onChange={(e) => {
             const params = new URLSearchParams(window.location.search);

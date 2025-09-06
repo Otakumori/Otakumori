@@ -1,5 +1,3 @@
- 
- 
 export interface InputEvent {
   type: 'keydown' | 'keyup' | 'gamepad' | 'touchstart' | 'touchend' | 'touchmove';
   action: string;

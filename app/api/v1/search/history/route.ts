@@ -1,8 +1,9 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { logger } from '@/app/lib/logger';
-import { SearchHistoryRequestSchema, type SearchHistoryRequest } from '@/app/lib/contracts';
+import { SearchHistoryRequestSchema } from '@/app/lib/contracts';
 import { auth } from '@clerk/nextjs/server';
 
 export const runtime = 'nodejs';

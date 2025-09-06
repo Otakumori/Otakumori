@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -131,7 +129,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider. Make sure the component is wrapped with CartProvider and has "use client" directive.');
+    throw new Error(
+      'useCart must be used within a CartProvider. Make sure the component is wrapped with CartProvider and has "use client" directive.',
+    );
   }
   return context;
 }

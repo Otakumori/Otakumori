@@ -1,8 +1,8 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { appUrl } from '@/lib/canonical';
+import { env } from '@/env';
 
 const prisma = new PrismaClient();
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Return the starter pack download URL
-    const starterPackUrl = process.env.STARTER_PACK_URL || `${appUrl()}/api/starter-pack/download`;
+    const starterPackUrl = env.STARTER_PACK_URL || `${appUrl()}/api/starter-pack/download`;
 
     return NextResponse.json({
       url: starterPackUrl,

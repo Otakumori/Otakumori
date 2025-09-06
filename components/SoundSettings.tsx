@@ -1,5 +1,3 @@
- 
- 
 'use client';
 'use client';
 
@@ -29,7 +27,7 @@ export const SoundSettings = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="rounded-full bg-gray-800/50 p-3 shadow-lg backdrop-blur-lg"
       >
-        {isMuted ? '🔇' : '🔊'}
+        <span role="img" aria-label={isMuted ? "Muted speaker" : "Speaker"}>{isMuted ? '🔇' : '🔊'}</span>
       </motion.button>
 
       <AnimatePresence>
@@ -49,7 +47,7 @@ export const SoundSettings = () => {
                   onClick={toggleMute}
                   className={`rounded-lg p-2 ${isMuted ? 'bg-red-500/20' : 'bg-green-500/20'}`}
                 >
-                  {isMuted ? '🔇' : '🔊'}
+                  <span role="img" aria-label={isMuted ? "Muted speaker" : "Speaker"}>{isMuted ? '🔇' : '🔊'}</span>
                 </motion.button>
               </div>
 
@@ -61,7 +59,7 @@ export const SoundSettings = () => {
                   onClick={() => vibrate('light')}
                   className="rounded-lg bg-blue-500/20 p-2"
                 >
-                  📳
+                  <span role="img" aria-label="Vibration">📳</span>
                 </motion.button>
               </div>
             </div>

@@ -1,5 +1,3 @@
- 
- 
 export function newRequestId() {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
     ? crypto.randomUUID()

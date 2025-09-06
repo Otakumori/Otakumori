@@ -1,5 +1,3 @@
- 
- 
 // Quest definitions - easily editable without code deploy
 export type QuestDef = {
   key: string;

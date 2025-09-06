@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
@@ -17,7 +16,7 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.auth, async () => {
     try {
-      const { userId  } = await auth();
+      const { userId } = await auth();
       if (!userId) {
         return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
       }

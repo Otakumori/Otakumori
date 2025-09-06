@@ -1,6 +1,4 @@
- 
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\lib\assets.ts instead.
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';

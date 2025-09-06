@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import Link from 'next/link';
@@ -77,11 +75,11 @@ export function BlogTeaser() {
   };
 
   return (
-    <section id="blog-teaser" className="bg-gradient-to-br from-slate-50 to-blue-50 py-16">
+    <section id="blog-teaser" className="py-16">
       <div className="container mx-auto px-4">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-gray-800">Latest Stories</h2>
-          <p className="mx-auto max-w-2xl text-lg text-gray-600">
+          <h2 className="mb-4 text-3xl font-bold text-white">Latest Stories</h2>
+          <p className="mx-auto max-w-2xl text-lg text-white/80">
             Discover the latest tales from the Otaku-mori community. Each story is a petal in the
             digital wind.
           </p>
@@ -91,7 +89,7 @@ export function BlogTeaser() {
           {SAMPLE_POSTS.map((post) => (
             <article
               key={post.id}
-              className="group overflow-hidden rounded-xl bg-white shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+              className="group overflow-hidden rounded-xl glass-card-dark transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
             >
               <div className="relative h-48 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20" />
@@ -106,7 +104,7 @@ export function BlogTeaser() {
               </div>
 
               <div className="p-6">
-                <div className="mb-3 flex items-center gap-2 text-sm text-gray-500">
+                <div className="mb-3 flex items-center gap-2 text-sm text-white/60">
                   <span>{post.author}</span>
                   <span>•</span>
                   <span>{new Date(post.date).toLocaleDateString()}</span>
@@ -114,11 +112,11 @@ export function BlogTeaser() {
                   <span>{post.readTime}</span>
                 </div>
 
-                <h3 className="mb-3 text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors">
+                <h3 className="mb-3 text-xl font-bold text-white group-hover:text-pink-400 transition-colors">
                   {post.title}
                 </h3>
 
-                <p className="mb-4 text-gray-600 line-clamp-3">{post.excerpt}</p>
+                <p className="mb-4 text-white/80 line-clamp-3">{post.excerpt}</p>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -126,8 +124,8 @@ export function BlogTeaser() {
                       onClick={() => handleLike(post.id)}
                       className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors ${
                         likedPosts.has(post.id)
-                          ? 'bg-red-100 text-red-600'
-                          : 'bg-gray-100 text-gray-600 hover:bg-red-50'
+                          ? 'bg-red-500/20 text-red-400'
+                          : 'bg-white/10 text-white/80 hover:bg-red-500/20'
                       }`}
                     >
                       <Heart
@@ -136,14 +134,14 @@ export function BlogTeaser() {
                       {post.likes + (likedPosts.has(post.id) ? 1 : 0)}
                     </button>
 
-                    <div className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-sm text-white/80">
                       <MessageCircle className="h-4 w-4" />
                       {post.comments}
                     </div>
                   </div>
 
                   <button
-                    className="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200 transition-colors"
+                    className="rounded-full bg-white/10 p-2 text-white/80 hover:bg-white/20 transition-colors"
                     aria-label="Share post"
                   >
                     <Share2 className="h-4 w-4" />

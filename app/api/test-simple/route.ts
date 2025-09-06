@@ -1,6 +1,6 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
+import { env } from '@/env';
 
 export async function GET() {
   try {
@@ -8,7 +8,7 @@ export async function GET() {
       success: true,
       message: 'Simple test endpoint working!',
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'unknown',
+      environment: env.NODE_ENV || 'unknown',
     });
   } catch (error) {
     console.error('Error in simple test:', error);

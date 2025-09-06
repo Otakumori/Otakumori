@@ -1,5 +1,3 @@
- 
- 
 // Unified source of truth for avatar → vibe
 export type Vibe = 'spicy-male' | 'spicy-female' | 'neutral';
 

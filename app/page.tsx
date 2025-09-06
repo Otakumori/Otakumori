@@ -1,46 +1,34 @@
-'use client';
-
-import { HeroShrine } from '@/components/hero/HeroShrine';
-import { FeaturedProducts } from '@/components/hero/FeaturedProducts';
-import { SeasonalCollectionBand } from '@/components/hero/SeasonalCollectionBand';
-import { MiniGamesTeaser } from '@/components/hero/MiniGamesTeaser';
-import { BlogTeaser } from '@/components/hero/BlogTeaser';
-import { InsidersSignup } from '@/components/hero/InsidersSignup';
-import { CompactFooter } from '@/components/hero/CompactFooter';
-import TreeAligner from '@/app/components/TreeAligner';
-import HomeTreeToggle from '@/app/components/HomeTreeToggle';
-import PetalLayer from '@/app/components/PetalLayer';
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+import NavBar from './components/NavBar';
+import StarfieldPurple from './components/StarfieldPurple';
+import TreeLeftAligned from './components/TreeLeft';
+import PetalLayer from './components/PetalLayer';
+import HeroIntro from './components/HeroIntro';
+import ShopTeaser from './components/ShopTeaser';
+import BlogTeaser from './components/BlogTeaser';
+import MiniGameTeaser from './components/MiniGameTeaser';
+import FooterDark from './components/FooterDark';
 
 export default function HomePage() {
   return (
     <>
-      <HomeTreeToggle visible />
-      <TreeAligner />
-      <PetalLayer mode="interactive" density={0.6} />
-      <main className="relative">
-        {/* 1. Hero Shrine */}
-        <HeroShrine />
+      {/* Background layers (home only) */}
+      <StarfieldPurple />
+      <TreeLeftAligned src="/assets/images/cherry-tree@2x.webp" trunkCenterPx={380} />
+      <PetalLayer />
 
-        {/* 2. Featured Products */}
-        <FeaturedProducts />
-
-        {/* 3. Seasonal Collection Band */}
-        <SeasonalCollectionBand />
-
-        {/* 4. Mini-Games Teaser */}
-        <MiniGamesTeaser />
-
-        {/* 5. Blog Teaser */}
+      {/* Foreground */}
+      <NavBar />
+      <main className="relative z-10">
+        <HeroIntro />
+        <ShopTeaser />
         <BlogTeaser />
-
-        {/* 6. Insiders Signup */}
-        <InsidersSignup />
-
-        {/* 7. Compact Footer */}
-        <CompactFooter />
+        <MiniGameTeaser />
       </main>
+      <FooterDark />
+
+      {/* extra bottom fade so tree roots blend on short pages */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 -z-[4] h-40 bg-gradient-to-b from-transparent to-[#080611]" />
     </>
   );
 }
-
-export const dynamic = 'force-dynamic';

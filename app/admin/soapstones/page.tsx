@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 import { isAdmin } from '@/app/lib/authz';
 import AdminSoapstones from './ui';
 

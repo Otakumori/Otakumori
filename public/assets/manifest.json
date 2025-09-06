@@ -25,9 +25,9 @@
     },
     "profile": {
       "banner": "/assets/ui/profile/banner_placeholder.png",
-      "frame":  "/assets/ui/profile/avatar_frame.png",
-      "badge":  "/assets/ui/profile/badge_placeholder.png",
-      "title":  "/assets/ui/profile/title_chip.png"
+      "frame": "/assets/ui/profile/avatar_frame.png",
+      "badge": "/assets/ui/profile/badge_placeholder.png",
+      "title": "/assets/ui/profile/title_chip.png"
     }
   },
   "bg": {

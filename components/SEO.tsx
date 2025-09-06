@@ -1,5 +1,3 @@
- 
- 
 import Head from 'next/head';
 import { appUrl } from '@/lib/canonical';
 

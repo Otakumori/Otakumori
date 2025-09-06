@@ -1,5 +1,3 @@
- 
- 
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { type NextRequest } from 'next/server';

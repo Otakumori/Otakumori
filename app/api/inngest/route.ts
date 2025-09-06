@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { serve } from 'inngest/next';
 import { inngest } from '../../../inngest/client';
 import {

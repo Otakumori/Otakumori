@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 import AdminReviewsClient from './review-client';
 
 export const dynamic = 'force-dynamic';

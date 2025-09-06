@@ -470,9 +470,13 @@ export class PetalService {
       ]);
 
       const formattedTransactions: PetalTransaction[] = transactions.map((t) => ({
+        id: t.id,
+        userId: t.userId,
+        guestSessionId: t.guestSessionId,
         type: t.type,
         amount: t.amount,
         reason: t.reason,
+        createdAt: t.createdAt,
       }));
 
       logger.debug('Petal history retrieved', {

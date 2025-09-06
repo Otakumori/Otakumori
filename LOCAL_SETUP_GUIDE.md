@@ -68,6 +68,7 @@ NODE_ENV=development
 ### Option A: Use Existing Supabase Project (Easiest)
 
 If you already have a Supabase project:
+
 1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
 2. Go to Settings → Database
 3. Copy the connection string (it looks like: `postgresql://postgres:[PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)

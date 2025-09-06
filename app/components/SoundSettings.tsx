@@ -1,5 +1,6 @@
+// DEPRECATED: This component is a duplicate. Use components\SoundSettings.tsx instead.
 /* eslint-disable react-hooks/exhaustive-deps */
- 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';

@@ -1,19 +1,17 @@
- 
- 
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { fetchProducts } from '../utils/printifyAPI';
+// import { useRouter } from 'next/router';
+// import { fetchProducts } from '../utils/printifyAPI';
 
-const CATEGORY_MAP = {
-  Women: 'Apparel',
-  Men: 'Apparel',
-  Accessories: 'Accessories',
-  'Home & Living': 'Home Decor',
-  // Add more mappings as needed
-};
+// const CATEGORY_MAP = {
+//   Women: 'Apparel',
+//   Men: 'Apparel',
+//   Accessories: 'Accessories',
+//   'Home & Living': 'Home Decor',
+//   // Add more mappings as needed
+// };
 
 const categories = [
   { id: 'all', name: 'All Products' },
@@ -28,7 +26,7 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -96,9 +94,11 @@ export default function Shop() {
             >
               <Link href={`/shop/product/${product.id}`}>
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
-                  <img
+                  <Image
                     src={product.images[0]}
                     alt={product.title}
+                    width={300}
+                    height={300}
                     className="h-full w-full object-cover transition group-hover:scale-105"
                   />
                 </div>

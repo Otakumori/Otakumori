@@ -18,6 +18,19 @@ model ContentPage {
   createdAt DateTime @default(now())
 }
 
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  imageUrl  String?
+  userId    String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+}
+
 model Order {
   id              String         @id
   userId          String
@@ -86,6 +99,7 @@ model Product {
   OrderItem         OrderItem[]
   ProductVariant    ProductVariant[]
   Reviews           Review[]
+  CartItems         CartItem[]
 
   @@index([categorySlug])
   @@index([integrationRef])
@@ -109,6 +123,7 @@ model ProductVariant {
   stripePriceId     String?     @unique
   OrderItem         OrderItem[]
   Product           Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  CartItems         CartItem[]
 
   @@unique([productId, printifyVariantId])
   @@index([printifyVariantId])
@@ -240,6 +255,15 @@ model User {
   wallet               Wallet?
   profile              Profile?
   stripe               StripeCustomer?
+  cart                 Cart?
+  
+  // Dark Souls comments system relations
+  commentMarks         CommentMark[]
+  appraisals           Appraisal[]
+  commentModerations   CommentModeration[] @relation("CommentModerationModerator")
+  
+  // Contact system relations
+  contactMessages      ContactMessage[]
 
   @@index([clerkId])
 }
@@ -435,31 +459,50 @@ model CouponGrant {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model SoapstoneMessage {
-  id        String          @id @default(cuid())
-  userId    String?
-  content   String
-  rotation  Float           @default(0)
-  createdAt DateTime        @default(now())
-  isHidden  Boolean         @default(false)
-  isFlagged Boolean         @default(false)
-  upvotes   Int             @default(0)
-  likes     SoapstoneLike[]
-  user      User?           @relation(fields: [userId], references: [id])
-
-  @@index([userId, createdAt])
-  @@index([isHidden, createdAt])
-  @@index([isFlagged, createdAt])
+enum Visibility { 
+  PUBLIC 
+  HIDDEN 
+  REMOVED 
 }
 
-model SoapstoneLike {
-  id        String           @id @default(cuid())
-  messageId String
-  userId    String
-  createdAt DateTime         @default(now())
-  message   SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+enum ReactionType { 
+  APPRAISE 
+  DOWNVOTE 
+  LAUGH 
+  HEART 
+  FIRE 
+  SKULL 
+}
 
-  @@unique([messageId, userId])
+model SoapstoneMessage {
+  id          String     @id @default(cuid())
+  authorId    String
+  postId      String?    // optional: attach to a blog post or page slug
+  text        String     @db.Text // FREE TEXT (we'll validate length server-side)
+  overlayURL  String?    // DS-style overlay asset if used
+  x           Int?       // optional on-image placement
+  y           Int?
+  status      Visibility @default(PUBLIC)
+  appraises   Int        @default(0)
+  reports     Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  reactions   Reaction[]
+  user        User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  @@index([postId])
+  @@index([authorId])
+}
+
+model Reaction {
+  id         String       @id @default(cuid())
+  messageId  String
+  userId     String
+  type       ReactionType
+  createdAt  DateTime     @default(now())
+
+  message    SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  @@unique([messageId, userId, type])
 }
 
 model LeaderboardScore {
@@ -1468,6 +1511,208 @@ model WebhookEvent {
   type      String
   payload   Json
   createdAt DateTime @default(now())
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     CartItem[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model CartItem {
+  id                String   @id @default(cuid())
+  cartId            String
+  productId         String
+  productVariantId  String
+  quantity          Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  cart              Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product           Product         @relation(fields: [productId], references: [id])
+  productVariant    ProductVariant  @relation(fields: [productVariantId], references: [id])
+
+  @@unique([cartId, productId, productVariantId])
+  @@index([cartId])
+  @@index([productId])
+  @@index([productVariantId])
+}
+
+// Enhanced Dark Souls-style comments system
+enum CommentKind {
+  SOAPSTONE
+  TEXT
+  HYBRID
+}
+
+enum CommentStatus {
+  ACTIVE
+  HIDDEN
+  SHADOWBANNED
+  DELETED
+}
+
+enum AppraisalValue {
+  GOOD
+  POOR
+}
+
+// Expanded categories to support game + funny content
+enum PhraseCategory {
+  TIP          // "be wary of", "try", "praise the"
+  SUBJECT      // enemy, friend, boss, merchant…
+  ACTION       // rolling, parrying, jumping…
+  DIRECTION    // ahead, left, right, behind…
+  OBJECT       // door, ladder, lever, chest…
+  QUALITY      // strong, weak, secret, dangerous…
+  CONJUNCTION  // therefore, and then, but…
+  EMOTE        // praise the sun, jolly cooperation…
+  ELEMENT      // fire, lightning, holy, poison…
+  ATTACK_TYPE  // slash, strike, thrust…
+  PLACE        // castle, ruins, swamp…
+  TIME         // now, at night…
+  MEME         // secret ahead, horse?, you don't have the right…
+  HUMOR        // fun custom lines: gravity OP, this is fine…
+}
+
+// Core blog model (rename Post if needed)
+model Post {
+  id        String         @id @default(cuid())
+  title     String
+  slug      String         @unique
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  comments  CommentMark[]
+}
+
+model CommentMark {
+  id          String          @id @default(cuid())
+  postId      String?
+  post        Post?           @relation(fields: [postId], references: [id])
+
+  parentId    String?
+  parent      CommentMark?    @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     CommentMark[]   @relation("CommentReplies")
+
+  authorId    String
+  author      User            @relation(fields: [authorId], references: [id])
+
+  kind        CommentKind
+  text        String?         @db.VarChar(180)  // for TEXT/HYBRID
+
+  goodCount   Int             @default(0)
+  poorCount   Int             @default(0)
+  score       Int             @default(0)
+
+  status      CommentStatus   @default(ACTIVE)
+  metadata    Json?
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  fragments   CommentFragment[]
+  appraisals  Appraisal[]
+  moderations CommentModeration[]
+
+  @@index([postId, status, createdAt])
+  @@index([authorId, createdAt])
+  @@index([parentId])
+}
+
+model CommentFragment {
+  id         String        @id @default(cuid())
+  commentId  String
+  comment    CommentMark   @relation(fields: [commentId], references: [id])
+
+  phraseId   String
+  phrase     Phrase        @relation(fields: [phraseId], references: [id])
+
+  position   Int
+
+  @@unique([commentId, position])
+  @@index([phraseId])
+}
+
+model Phrase {
+  id        String         @id @default(cuid())
+  category  PhraseCategory
+  text      String
+  locale    String?        @default("en")
+  isActive  Boolean        @default(true)
+  createdAt DateTime       @default(now())
+
+  fragments CommentFragment[]
+
+  @@unique([category, text, locale])
+}
+
+// One appraisal per user per comment
+model Appraisal {
+  id         String        @id @default(cuid())
+  commentId  String
+  comment    CommentMark   @relation(fields: [commentId], references: [id])
+
+  voterId    String
+  voter      User          @relation(fields: [voterId], references: [id])
+
+  value      AppraisalValue
+  createdAt  DateTime      @default(now())
+
+  @@unique([commentId, voterId])
+  @@index([voterId])
+}
+
+model CommentModeration {
+  id           String        @id @default(cuid())
+  commentId    String
+  comment      CommentMark   @relation(fields: [commentId], references: [id])
+
+  moderatorId  String?
+  moderator    User?         @relation("CommentModerationModerator", fields: [moderatorId], references: [id])
+
+  action       String
+  reason       String?
+  createdAt    DateTime      @default(now())
+
+  @@index([commentId, createdAt])
+}
+
+// Templates to constrain "soapstone" message shapes
+model MessageTemplate {
+  id        String              @id @default(cuid())
+  name      String              @unique
+  pattern   String              // e.g. "be wary of {SUBJECT}"
+  isActive  Boolean             @default(true)
+  slots     MessageTemplateSlot[]
+  createdAt DateTime            @default(now())
+}
+
+model MessageTemplateSlot {
+  id         String            @id @default(cuid())
+  templateId String
+  template   MessageTemplate   @relation(fields: [templateId], references: [id])
+
+  position   Int               // 0..n within pattern
+  optional   Boolean           @default(false)
+
+  accepts    SlotAccepts[]     // which categories this slot can take
+
+  @@unique([templateId, position])
+}
+
+model SlotAccepts {
+  id        String             @id @default(cuid())
+  slotId    String
+  slot      MessageTemplateSlot @relation(fields: [slotId], references: [id])
+  category  PhraseCategory
+
+  @@unique([slotId, category])
+  @@index([category])
 }
 
 

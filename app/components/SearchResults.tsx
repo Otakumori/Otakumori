@@ -25,49 +25,48 @@ export default function SearchResults({
   const [totalCount, setTotalCount] = useState(0);
   const [offset, setOffset] = useState(0);
 
-  const performSearch = useCallback(async (
-    searchQuery: string,
-    searchOffset: number = 0,
-    reset: boolean = false,
-  ) => {
-    try {
-      setIsLoading(true);
+  const performSearch = useCallback(
+    async (searchQuery: string, searchOffset: number = 0, reset: boolean = false) => {
+      try {
+        setIsLoading(true);
 
-      const request: SearchRequest = {
-        query: searchQuery,
-        searchType,
-        limit: 20,
-        offset: searchOffset,
-      };
+        const request: SearchRequest = {
+          query: searchQuery,
+          searchType,
+          limit: 20,
+          offset: searchOffset,
+        };
 
-      const response = await fetch('/api/v1/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-      });
+        const response = await fetch('/api/v1/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(request),
+        });
 
-      if (response.ok) {
-        const data: { ok: boolean; data: SearchResponse } = await response.json();
-        if (data.ok) {
-          if (reset) {
-            setResults(data.data.results);
-            setOffset(20);
-          } else {
-            setResults((prev) => [...prev, ...data.data.results]);
-            setOffset((prev) => prev + 20);
+        if (response.ok) {
+          const data: { ok: boolean; data: SearchResponse } = await response.json();
+          if (data.ok) {
+            if (reset) {
+              setResults(data.data.results);
+              setOffset(20);
+            } else {
+              setResults((prev) => [...prev, ...data.data.results]);
+              setOffset((prev) => prev + 20);
+            }
+            setHasMore(data.data.hasMore);
+            setTotalCount(data.data.totalCount);
           }
-          setHasMore(data.data.hasMore);
-          setTotalCount(data.data.totalCount);
         }
+      } catch (error) {
+        logger.error('Search failed', {
+          extra: { error: error instanceof Error ? error.message : 'Unknown error' },
+        });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      logger.error('Search failed', {
-        extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchType]);
+    },
+    [searchType],
+  );
 
   useEffect(() => {
     if (query.trim()) {

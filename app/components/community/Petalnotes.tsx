@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -226,7 +224,8 @@ export default function Petalnotes({ className }: PetalnotesProps) {
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="rounded-md border px-3 py-2" aria-label="Select"
+          className="rounded-md border px-3 py-2"
+          aria-label="Select"
         >
           {categories.map((category) => (
             <option key={category.id} value={category.id}>

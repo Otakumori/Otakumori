@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use components\layout\Footer.tsx instead.
 'use client';
 
 import Link from 'next/link';
@@ -40,62 +39,65 @@ export function BottomLogoAndSocials() {
           height={48}
           className="mb-2 rounded-full border-2 border-pink-400"
         />
-        <div className="mt-2 flex space-x-4" role="list" aria-label="Social media links">
-          <a
-            href="https://www.facebook.com/Otakumorii"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow us on Facebook"
-            role="listitem"
-          >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 32 32"
-              fill="none"
-              className="text-gray-200 transition hover:text-pink-400"
+        <ul className="mt-2 flex space-x-4" aria-label="Social media links" role="list">
+          <li role="listitem">
+            <a
+              href="https://www.facebook.com/Otakumorii"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow us on Facebook"
             >
-              <text
-                x="7"
-                y="23"
-                fontFamily="Arial, Helvetica, sans-serif"
-                fontWeight="bold"
-                fontSize="24"
-                fill="currentColor"
-              >
-                f
-              </text>
-            </svg>
-          </a>
-          <a
-            href="https://www.instagram.com/otakumoriii"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
-            <svg
-              width="28"
-              height="28"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="text-gray-200 transition hover:text-pink-400"
-            >
-              <rect
-                width="18"
-                height="18"
-                x="3"
-                y="3"
-                rx="5"
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 32 32"
                 fill="none"
+                className="text-gray-200 transition hover:text-pink-400"
+              >
+                <text
+                  x="7"
+                  y="23"
+                  fontFamily="Arial, Helvetica, sans-serif"
+                  fontWeight="bold"
+                  fontSize="24"
+                  fill="currentColor"
+                >
+                  f
+                </text>
+              </svg>
+            </a>
+          </li>
+          <li role="listitem">
+            <a
+              href="https://www.instagram.com/otakumoriii"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <svg
+                width="28"
+                height="28"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth="2"
-              />
-              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
-              <circle cx="17" cy="7" r="1.5" fill="currentColor" />
-            </svg>
-          </a>
-        </div>
+                className="text-gray-200 transition hover:text-pink-400"
+              >
+                <rect
+                  width="18"
+                  height="18"
+                  x="3"
+                  y="3"
+                  rx="5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
+                <circle cx="17" cy="7" r="1.5" fill="currentColor" />
+              </svg>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   );
@@ -160,7 +162,7 @@ export default function Footer() {
         <div className="flex flex-col items-center gap-3 md:items-start">
           <div className="text-xl font-bold tracking-wide">Otaku-mori</div>
           <div className="max-w-xs text-center text-sm italic text-pink-200 md:text-left">
-            Stay a while. Let's blossom together. 🌸
+            Stay a while. Let's blossom together.
           </div>
         </div>
         {/* Center: Newsletter & Nav */}

@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
-export default function ThighTrap({ onComplete, onFail, duration }: GameProps) {
-  const [wiggleCount, setWiggleCount] = useState(0);
+export default function ThighTrap({ onComplete, _onFail, _duration }: GameProps) {
+  const [_wiggleCount, setWiggleCount] = useState(0);
   const [isWiggling, setIsWiggling] = useState(false);
   const [showThighs, setShowThighs] = useState(false);
   const [escapeProgress, setEscapeProgress] = useState(0);
@@ -43,7 +43,7 @@ export default function ThighTrap({ onComplete, onFail, duration }: GameProps) {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [handleKeyPress]);
 
   return (
     <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-purple-500">
@@ -75,7 +75,9 @@ export default function ThighTrap({ onComplete, onFail, duration }: GameProps) {
             exit={{ scale: 2, opacity: 0 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-4xl">💨</div>
+            <div className="text-4xl">
+              <span role="img" aria-label="Wind effect">💨</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -108,7 +110,11 @@ export default function ThighTrap({ onComplete, onFail, duration }: GameProps) {
       </div>
 
       {/* Click area */}
-      <div className="absolute inset-0 cursor-pointer" onClick={handleWiggle} />
+        <button
+          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+          onClick={handleWiggle}
+          aria-label="Wiggle to escape using arrow keys or click"
+        />
     </div>
   );
 }

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 import { getGame } from '@/app/lib/assets/manifest';
 import { notFound } from 'next/navigation';
 

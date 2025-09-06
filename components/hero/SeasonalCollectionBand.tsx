@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import Link from 'next/link';
@@ -8,15 +6,15 @@ export function SeasonalCollectionBand() {
   const currentSeason = getCurrentSeason();
 
   return (
-    <section className="bg-gradient-to-r from-pink-100 to-purple-100 py-8">
+    <section className="py-8">
       <div className="container mx-auto px-4 text-center">
-        <div className="mx-auto max-w-2xl">
-          <h3 className="mb-2 text-xl font-medium text-gray-700">
+        <div className="mx-auto max-w-2xl glass-card-dark rounded-2xl p-6">
+          <h3 className="mb-2 text-xl font-medium text-white">
             {getSeasonalMessage(currentSeason)}
           </h3>
           <Link
             href="/shop"
-            className="inline-block rounded-full bg-purple-600 px-6 py-2 font-medium text-white transition-colors duration-200 hover:bg-purple-700"
+            className="inline-block rounded-full bg-gradient-to-r from-pink-500 to-purple-500 px-6 py-2 font-medium text-white transition-all duration-200 hover:shadow-lg"
           >
             Shop the {currentSeason} Collection
           </Link>

@@ -1,7 +1,8 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
-import { PartyCreateSchema, PartyListRequestSchema, PartySchema } from '@/app/lib/contracts';
+import { PartyCreateSchema, PartyListRequestSchema } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 
 export async function GET(request: NextRequest) {

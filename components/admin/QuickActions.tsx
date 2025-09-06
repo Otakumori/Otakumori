@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\components\admin\QuickActions.tsx instead.
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';

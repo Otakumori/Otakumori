@@ -1,5 +1,3 @@
- 
- 
 const { logger } = require('../lib/logger');
 
 async function viewLogs() {

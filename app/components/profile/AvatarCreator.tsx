@@ -1,5 +1,3 @@
- 
- 
 import React, { useState } from 'react';
 
 // Placeholder SVG layers for demo
@@ -110,7 +108,8 @@ export const AvatarCreator: React.FC = () => {
           <select
             value={avatar.hairStyle}
             onChange={(e) => handleSlider('hairStyle', e.target.value as 'short' | 'long')}
-            className="ml-2 rounded bg-pink-400/10 text-pink-100" aria-label="Select"
+            className="ml-2 rounded bg-pink-400/10 text-pink-100"
+            aria-label="Select"
           >
             <option value="short">Short</option>
             <option value="long">Long</option>
@@ -131,7 +130,8 @@ export const AvatarCreator: React.FC = () => {
             value={avatar.outfit}
             onChange={(e) => handleSlider('outfit', e.target.value as 'dress' | 'nude')}
             className="ml-2 rounded bg-pink-400/10 text-pink-100"
-            disabled={!avatar.nsfw} aria-label="Select"
+            disabled={!avatar.nsfw}
+            aria-label="Select"
           >
             <option value="dress">Dress</option>
             <option value="nude">Nude</option>

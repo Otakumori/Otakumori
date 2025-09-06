@@ -1,13 +1,14 @@
-import { headers } from "next/headers";
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { db as prisma } from "@/lib/db";
+import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { db as prisma } from '@/lib/db';
+import { env } from '@/env';
 
-export const runtime = "nodejs";      // needed for crypto, raw body
-export const dynamic = "force-dynamic";
+export const runtime = 'nodejs'; // needed for crypto, raw body
+export const dynamic = 'force-dynamic';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: '2023-10-16',
 });
 
 async function saveEventOnce(id: string, type: string, payload: any) {
@@ -22,7 +23,7 @@ async function saveEventOnce(id: string, type: string, payload: any) {
 // Helper: find user from session
 async function resolveUser(session: Stripe.Checkout.Session) {
   // 1) Preferred: map via StripeCustomer (customer id)
-  if (session.customer && typeof session.customer === "string") {
+  if (session.customer && typeof session.customer === 'string') {
     const sc = await prisma.stripeCustomer.findUnique({
       where: { customerId: session.customer },
       include: { user: true },
@@ -41,20 +42,68 @@ async function readRawBody(req: Request) {
   return await req.text();
 }
 
-export async function POST(req: Request) {
-  const sig = headers().get("stripe-signature");
-  if (!sig) return new NextResponse("Missing Stripe-Signature", { status: 400 });
+// Simulate Printify order creation
+async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.Session) {
+  // In a real implementation, this would call the Printify API
+  // For now, we'll simulate the order creation and log it
+  
+  const printifyOrderData = {
+    external_id: order.id,
+    line_items: session.line_items?.data.map(item => ({
+      product_id: item.price?.product,
+      variant_id: item.price?.id,
+      quantity: item.quantity,
+    })) ?? [],
+    shipping_method: 1, // Standard shipping
+    send_shipping_notification: true,
+    address_to: {
+      first_name: session.shipping_details?.name?.split(' ')[0] ?? 'Customer',
+      last_name: session.shipping_details?.name?.split(' ').slice(1).join(' ') ?? '',
+      email: session.customer_details?.email ?? '',
+      phone: session.customer_details?.phone ?? '',
+      country: session.shipping_details?.address?.country ?? 'US',
+      region: session.shipping_details?.address?.state ?? '',
+      city: session.shipping_details?.address?.city ?? '',
+      address1: session.shipping_details?.address?.line1 ?? '',
+      address2: session.shipping_details?.address?.line2 ?? '',
+      zip: session.shipping_details?.address?.postal_code ?? '',
+    },
+  };
 
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!secret) return new NextResponse("Missing STRIPE_WEBHOOK_SECRET", { status: 500 });
+  // Log the simulated Printify order creation
+  console.log('Simulated Printify order creation:', {
+    orderId: order.id,
+    printifyData: printifyOrderData,
+    timestamp: new Date().toISOString(),
+  });
+
+  // In production, this would be:
+  // const response = await fetch('https://api.printify.com/v1/shops/{shop_id}/orders.json', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Authorization': `Bearer ${env.PRINTIFY_API_KEY}`,
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify(printifyOrderData),
+  // });
+  
+  return { success: true, simulated: true };
+}
+
+export async function POST(req: Request) {
+  const sig = headers().get('stripe-signature');
+  if (!sig) return new NextResponse('Missing Stripe-Signature', { status: 400 });
+
+  const secret = env.STRIPE_WEBHOOK_SECRET;
+  if (!secret) return new NextResponse('Missing STRIPE_WEBHOOK_SECRET', { status: 500 });
 
   const raw = await readRawBody(req);
 
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
-  } catch (err) {
-    return new NextResponse("Invalid signature", { status: 400 });
+      } catch (_err) {
+    return new NextResponse('Invalid signature', { status: 400 });
   }
 
   // Idempotency guard
@@ -62,29 +111,30 @@ export async function POST(req: Request) {
   if (!firstTime) return NextResponse.json({ ok: true, duplicate: true });
 
   switch (event.type) {
-    case "checkout.session.completed": {
+    case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
 
       // Get line items (to know if it's a petal pack, etc.)
       const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
-        expand: ["line_items.data.price.product"],
+        expand: ['line_items.data.price.product'],
       });
 
       const user = await resolveUser(fullSession);
-      if (!user) return NextResponse.json({ ok: true, note: "no-user" });
+      if (!user) return NextResponse.json({ ok: true, note: 'no-user' });
 
       // Compute order totals
       const total = fullSession.amount_total ?? 0;
-      const currency = fullSession.currency ?? "usd";
-      const paymentIntentId = typeof fullSession.payment_intent === "string" ? fullSession.payment_intent : null;
+      const currency = fullSession.currency ?? 'usd';
+      const paymentIntentId =
+        typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
 
       // Create or update Order using existing model
       const order = await prisma.order.upsert({
         where: { stripeId: fullSession.id },
-        update: { 
-          status: "shipped", // using existing enum value
-          paymentIntentId: paymentIntentId ?? undefined, 
-          totalAmount: total, 
+        update: {
+          status: 'shipped', // using existing enum value
+          paymentIntentId: paymentIntentId ?? undefined,
+          totalAmount: total,
           currency: currency.toUpperCase(),
           paidAt: new Date(),
         },
@@ -95,19 +145,28 @@ export async function POST(req: Request) {
           paymentIntentId: paymentIntentId ?? undefined,
           totalAmount: total,
           currency: currency.toUpperCase(),
-          status: "shipped", // using existing enum value
+          status: 'shipped', // using existing enum value
           paidAt: new Date(),
           updatedAt: new Date(),
         },
       });
+
+      // Simulate Printify order creation
+      try {
+        await simulatePrintifyOrderCreate(order, fullSession);
+      } catch (printifyError) {
+        console.error('Printify order creation failed:', printifyError);
+        // Don't fail the webhook - log and continue
+      }
 
       // Detect petal packs by price/product metadata
       // Set metadata on Stripe dashboard (e.g., price.metadata.petal_amount = "1000")
       let petalToCredit = 0;
       fullSession.line_items?.data.forEach((item) => {
         const price = item.price;
-        const meta = price?.metadata ?? (price?.product && (price.product as Stripe.Product).metadata) ?? {};
-        const str = (meta as any)["petal_amount"];
+        const meta =
+          price?.metadata ?? (price?.product && (price.product as Stripe.Product).metadata) ?? {};
+        const str = (meta as any)['petal_amount'];
         if (str) petalToCredit += parseInt(str, 10) * (item.quantity ?? 1);
       });
 
@@ -123,9 +182,9 @@ export async function POST(req: Request) {
         await prisma.petalLedger.create({
           data: {
             userId: user.id,
-            type: "earn",
+            type: 'earn',
             amount: petalToCredit,
-            reason: "PETAL_PACK_CREDIT",
+            reason: 'PETAL_PACK_CREDIT',
           },
         });
       }
@@ -133,8 +192,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    case "charge.refunded":
-    case "charge.dispute.funds_withdrawn": {
+    case 'charge.refunded':
+    case 'charge.dispute.funds_withdrawn': {
       // Handle refunds / disputes → negative ledger + status update
       const obj: any = event.data.object;
       const paymentIntentId = obj.payment_intent ?? obj.id ?? null;
@@ -147,15 +206,15 @@ export async function POST(req: Request) {
       if (!order?.User) return NextResponse.json({ ok: true });
 
       // Update order status to cancelled for refunds
-      await prisma.order.update({ 
-        where: { id: order.id }, 
-        data: { status: "cancelled" } 
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { status: 'cancelled' },
       });
 
       return NextResponse.json({ ok: true });
     }
 
-    case "customer.created": {
+    case 'customer.created': {
       const customer = event.data.object as Stripe.Customer;
       const clerkId = (customer.metadata?.clerkId as string | undefined) ?? undefined;
       if (!clerkId) return NextResponse.json({ ok: true });

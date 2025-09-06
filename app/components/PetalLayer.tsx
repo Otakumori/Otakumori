@@ -1,98 +1,153 @@
 'use client';
+
 import { useEffect, useRef } from 'react';
+import { useAuth } from '@clerk/nextjs';
 
-type PetalProps = {
-  mode?: 'interactive' | 'gentle'; // gentle = no click/drag; slower spawn/fall
-  density?: number; // 0..1 (ambient amount)
-};
+type Petal = { x: number; y: number; vx: number; vy: number; r: number; spin: number; alive: boolean; id: number };
 
-const SRC = '/assets/images/petal.svg';
+const SPRITE_SRC = '/assets/images/petal.svg'; // your file
 
-export default function PetalLayer({ mode = 'gentle', density = 0.4 }: PetalProps) {
-  const ref = useRef<HTMLDivElement>(null);
+export default function PetalLayer() {
+  const ref = useRef<HTMLCanvasElement | null>(null);
+  const { getToken } = useAuth();
 
   useEffect(() => {
-    const c = ref.current;
-    if (!c) return;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return;
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
 
-    const petals: HTMLImageElement[] = [];
-    const spawn = (x: number, y: number, size = 16, baseYVel = 40) => {
-      const img = new Image();
-      img.src = SRC;
-      img.alt = '';
-      img.width = size;
-      img.style.cssText = `position:absolute;left:${x - size / 2}px;top:${y - size / 2}px;opacity:.95;pointer-events:auto;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));transition:transform .25s ease,opacity .25s ease;will-change:transform,top,left`;
-      c.appendChild(img);
-      petals.push(img);
-      const start = performance.now();
-      let raf = 0;
-      const sway = 8 + Math.random() * 10;
-      const spin = 30 + Math.random() * 50;
-      const tick = (t: number) => {
-        const dt = (t - start) / 1000;
-        const dy = baseYVel * dt; // slower than before
-        const dx = Math.sin((t + Math.random() * 200) / 850) * 0.9; // gentler sway
-        img.style.top = `${y + dy}px`;
-        img.style.left = `${x + dx}px`;
-        img.style.transform = `rotate(${(t / spin) % 360}deg)`;
-        if (parseFloat(img.style.top) > innerHeight + 100) {
-          img.remove();
-          cancelAnimationFrame(raf);
-        } else raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-      if (mode === 'interactive') {
-        img.addEventListener('click', () => {
-          img.style.transform = 'scale(1.6) rotate(18deg)';
-          img.style.opacity = '0';
-          setTimeout(() => img.remove(), 220);
+    let w = window.innerWidth, h = window.innerHeight, DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const fit = () => {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = Math.floor(w * DPR);
+      canvas.height = Math.floor(h * DPR);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+    };
+    fit();
+
+    // Load petal sprite once
+    const img = new Image();
+    img.src = SPRITE_SRC;
+
+    const anchor = document.getElementById('petal-spawn-anchor');
+    const anchorRect = () => anchor?.getBoundingClientRect() ?? { left: 0, top: 0, width: 0, height: 0 };
+
+    let idSeq = 1;
+    const petals: Petal[] = [];
+    function spawn(n = 3) {
+      const r = anchorRect();
+      // bias spawn along the right side of the canopy box
+      const bx = r.left + r.width * 0.65;
+      const by = r.top + r.height * 0.25;
+      for (let i = 0; i < n; i++) {
+        petals.push({
+          id: idSeq++,
+          x: bx + (Math.random() * r.width * 0.4 - r.width * 0.2),
+          y: by + (Math.random() * r.height * 0.4 - r.height * 0.2),
+          vx: (Math.random() * 0.6 - 0.3),
+          vy: (Math.random() * 0.4 + 0.6),
+          r: Math.random() * Math.PI * 2,
+          spin: (Math.random() * 0.02 - 0.01),
+          alive: true
         });
       }
-    };
-
-    // ambient drift
-    const ambient = () => {
-      const amount = Math.max(1, Math.floor(6 * density)); // fewer by default
-      for (let i = 0; i < amount; i++) {
-        spawn(Math.random() * innerWidth, -40, 14 + Math.random() * 6, 38 + Math.random() * 10);
-      }
-    };
-    ambient();
-    const timer = setInterval(() => ambient(), 1600); // calmer cadence
-
-    // optional interactive trail
-    let down = false;
-    const onDown = (e: MouseEvent) => {
-      if (mode !== 'interactive') return;
-      down = true;
-      spawn(e.clientX, e.clientY, 18, 48);
-    };
-    const onMove = (e: MouseEvent) => {
-      if (mode !== 'interactive' || !down) return;
-      spawn(e.clientX, e.clientY, 16, 48);
-    };
-    const onUp = () => {
-      down = false;
-    };
-
-    if (mode === 'interactive') {
-      addEventListener('mousedown', onDown);
-      addEventListener('mousemove', onMove);
-      addEventListener('mouseup', onUp);
     }
 
-    return () => {
-      clearInterval(timer);
-      if (mode === 'interactive') {
-        removeEventListener('mousedown', onDown);
-        removeEventListener('mousemove', onMove);
-        removeEventListener('mouseup', onUp);
-      }
-      petals.forEach((p) => p.remove());
-    };
-  }, [mode, density]);
+    let last = performance.now(), raf = 0;
+    const pref = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const running = !pref.matches;
 
-  return <div ref={ref} aria-hidden className="pointer-events-none fixed inset-0 -z-10" />;
+    const drawPetal = (p: Petal) => {
+      const base = 14 * DPR; // sprite draw size
+      const s = base * (0.85 + Math.random() * 0.3); // slight size variance
+
+      ctx.save();
+      ctx.translate(p.x * DPR, p.y * DPR);
+      ctx.rotate(p.r);
+      if (img.complete) {
+        ctx.drawImage(img, -s * 0.5, -s * 0.5, s, s);
+      } else {
+        // safe fallback if sprite not yet loaded
+        ctx.fillStyle = 'rgba(255,190,235,0.85)';
+        ctx.beginPath();
+        ctx.moveTo(0, -s * 0.35);
+        ctx.quadraticCurveTo(s * 0.6, -s * 0.2, 0, s * 0.8);
+        ctx.quadraticCurveTo(-s * 0.6, -s * 0.2, 0, -s * 0.35);
+        ctx.fill();
+      }
+      ctx.restore();
+    };
+
+    const step = (dt: number) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // gentle wind
+      const wind = Math.sin(performance.now() / 3000) * 0.15;
+      for (let i = 0; i < petals.length; i++) {
+        const p = petals[i];
+        if (!p.alive) continue;
+        p.vx += wind * dt;
+        p.vy += 0.12 * dt; // gravity
+        p.x += p.vx * (60 * dt);
+        p.y += p.vy * (60 * dt);
+        p.r += p.spin;
+        drawPetal(p);
+        if (p.y > h + 40) p.alive = false;
+      }
+      // cleanup
+      for (let i = petals.length - 1; i >= 0; i--) if (!petals[i].alive) petals.splice(i, 1);
+    };
+
+    const frame = (now: number) => {
+      const dt = Math.min(0.033, (now - last) / 1000);
+      last = now;
+      step(dt);
+      raf = requestAnimationFrame(frame);
+    };
+
+    // spawn rhythm
+    const spawnTimer = setInterval(() => spawn(2 + Math.floor(Math.random() * 3)), 1200);
+
+    // click collect
+    async function collectAt(x: number, y: number) {
+      // find topmost petal near point
+      for (let i = petals.length - 1; i >= 0; i--) {
+        const p = petals[i];
+        const dx = p.x - x, dy = p.y - y;
+        if (dx * dx + dy * dy < 24 * 24) { // hit
+          p.alive = false;
+          try {
+            const token = await getToken({ template: 'otakumori-jwt' });
+            await fetch('/api/v1/petals/collect', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({ source: 'tree', petalId: p.id }),
+            });
+          } catch {/* silent */}
+          break;
+        }
+      }
+    }
+
+    const onClick = (e: MouseEvent) => collectAt(e.clientX, e.clientY);
+    const onResize = () => fit();
+
+    window.addEventListener('click', onClick);
+    window.addEventListener('resize', onResize);
+
+    if (running) { last = performance.now(); raf = requestAnimationFrame(frame); }
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(spawnTimer);
+      window.removeEventListener('click', onClick);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [getToken]);
+
+  return <canvas ref={ref} aria-hidden className="fixed inset-0 -z-[4] h-screen w-screen pointer-events-none" />;
 }

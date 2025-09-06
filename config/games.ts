@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\lib\games.ts instead.
 // config/games.ts
 export const GAME_FLAGS = {
   'quick-math': { enabled: false, practice: true }, // practice mode by default

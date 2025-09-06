@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
       title: product.title,
       description: product.description,
       price: product.price || 0,
-      images: product.image ? [product.image] : ['/images/products/placeholder.svg'],
+      images: product.image ? [product.image] : ['/assets/images/placeholder-product.jpg'],
       variants: product.variants || [],
       category: product.tags?.[0] || 'Other',
       tags: product.tags || [],

@@ -14,7 +14,7 @@ export default function PetalsGentle({ density = 12, sway = 0.6 }: PetalsGentleP
     const duration = 9.5 + Math.random() * 2; // 9.5-11.5s duration
     const startX = Math.random() * 100; // 0-100% horizontal position
     const swayAmount = (Math.random() - 0.5) * sway * 20; // sway variation
-    
+
     return (
       <div
         key={i}
@@ -35,9 +35,5 @@ export default function PetalsGentle({ density = 12, sway = 0.6 }: PetalsGentleP
     );
   });
 
-  return (
-    <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
-      {petals}
-    </div>
-  );
+  return <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">{petals}</div>;
 }

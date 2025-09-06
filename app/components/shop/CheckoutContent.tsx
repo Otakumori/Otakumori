@@ -1,0 +1,287 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import GlassPanel from '../GlassPanel';
+import { t } from '@/lib/microcopy';
+
+type CartItem = {
+  id: string;
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  variant?: string;
+};
+
+type CartData = {
+  items: CartItem[];
+  subtotal: number;
+  tax: number;
+  shipping: number;
+  total: number;
+};
+
+type CheckoutContentProps = {
+  cartData: CartData;
+};
+
+export default function CheckoutContent({ cartData }: CheckoutContentProps) {
+  const router = useRouter();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'US',
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleCheckout = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await fetch('/api/v1/checkout/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cartData.items,
+          shippingAddress: formData,
+        }),
+      });
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Checkout failed:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      {/* Checkout Form */}
+      <div className="space-y-6">
+        <GlassPanel className="p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Shipping Information</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-zinc-300 mb-2">
+                First Name
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-zinc-300 mb-2">
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label htmlFor="address" className="block text-sm font-medium text-zinc-300 mb-2">
+                Address
+              </label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your address"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="city" className="block text-sm font-medium text-zinc-300 mb-2">
+                City
+              </label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your city"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="state" className="block text-sm font-medium text-zinc-300 mb-2">
+                State
+              </label>
+              <input
+                type="text"
+                id="state"
+                name="state"
+                value={formData.state}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your state"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="zipCode" className="block text-sm font-medium text-zinc-300 mb-2">
+                ZIP Code
+              </label>
+              <input
+                type="text"
+                id="zipCode"
+                name="zipCode"
+                value={formData.zipCode}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+                placeholder="Enter your ZIP code"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="country" className="block text-sm font-medium text-zinc-300 mb-2">
+                Country
+              </label>
+              <select
+                id="country"
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-fuchsia-400 focus:outline-none"
+                required
+              >
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="GB">United Kingdom</option>
+                <option value="AU">Australia</option>
+              </select>
+            </div>
+          </div>
+        </GlassPanel>
+
+        <GlassPanel className="p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Payment</h2>
+          <p className="text-zinc-400 mb-4">
+            You'll be redirected to Stripe for secure payment processing.
+          </p>
+          <div className="flex items-center gap-2 text-sm text-zinc-400">
+            <span>🔒</span>
+            <span>Secure payment powered by Stripe</span>
+          </div>
+        </GlassPanel>
+      </div>
+
+      {/* Order Summary */}
+      <div className="space-y-6">
+        <GlassPanel className="p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
+          
+          <div className="space-y-4">
+            {cartData.items.map((item) => (
+              <div key={item.id} className="flex items-center gap-3">
+                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-white truncate">{item.name}</h3>
+                  {item.variant && (
+                    <p className="text-sm text-zinc-400">{item.variant}</p>
+                  )}
+                  <p className="text-sm text-zinc-400">Qty: {item.quantity}</p>
+                </div>
+                <div className="text-fuchsia-300 font-semibold">
+                  ${(item.price * item.quantity).toFixed(2)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-white/10 pt-4 space-y-2">
+            <div className="flex justify-between text-zinc-300">
+              <span>Subtotal</span>
+              <span>${cartData.subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-zinc-300">
+              <span>Tax</span>
+              <span>${cartData.tax.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-zinc-300">
+              <span>Shipping</span>
+              <span>{cartData.shipping === 0 ? 'Free' : `$${cartData.shipping.toFixed(2)}`}</span>
+            </div>
+            <div className="border-t border-white/10 pt-2">
+              <div className="flex justify-between text-lg font-semibold text-white">
+                <span>Total</span>
+                <span>${cartData.total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleCheckout}
+            disabled={isProcessing}
+            className="mt-6 w-full rounded-xl bg-fuchsia-500/90 px-6 py-4 font-semibold text-white hover:bg-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+          </button>
+          
+          <p className="mt-4 text-center text-xs text-zinc-400">
+            {t("cart", "purchaseJoke")}
+          </p>
+        </GlassPanel>
+      </div>
+    </div>
+  );
+}

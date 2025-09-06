@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
- 
+
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useRouter } from 'next/navigation';

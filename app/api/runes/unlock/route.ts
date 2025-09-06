@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -15,16 +16,16 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
   const userLimit = rateLimitMap.get(userId);
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     rateLimitMap.set(userId, { count: 1, resetTime: now + 60000 }); // 1 minute
     return true;
   }
-  
+
   if (userLimit.count >= 5) {
     return false;
   }
-  
+
   userLimit.count++;
   return true;
 }
@@ -32,19 +33,16 @@ function checkRateLimit(userId: string): boolean {
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    
+
     if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ ok: false, error: 'Authentication required' }, { status: 401 });
     }
 
     // Check rate limit
     if (!checkRateLimit(userId)) {
       return NextResponse.json(
         { ok: false, error: 'Too many attempts. Please wait before trying again.' },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -57,10 +55,7 @@ export async function POST(request: Request) {
     });
 
     if (!rune) {
-      return NextResponse.json(
-        { ok: false, error: 'Rune not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ ok: false, error: 'Rune not found' }, { status: 404 });
     }
 
     // Check if user already unlocked this rune
@@ -112,20 +107,13 @@ export async function POST(request: Request) {
         },
       },
     });
-
   } catch (error) {
     console.error('Rune unlock failed:', error);
-    
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { ok: false, error: 'Invalid request data' },
-        { status: 400 }
-      );
+      return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
 
-    return NextResponse.json(
-      { ok: false, error: 'Failed to unlock rune' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Failed to unlock rune' }, { status: 500 });
   }
 }

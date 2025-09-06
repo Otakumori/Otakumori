@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 
+// @ts-ignore - Puppeteer types not installed
 import puppeteer from 'puppeteer';
 // import { injectAxe, checkA11y, getViolations } from '@axe-core/puppeteer'; // Temporarily disabled
 import { promises as fs } from 'fs';
@@ -31,8 +32,10 @@ interface A11yResult {
   };
 }
 
+import { env } from '@/env';
+
 const ARTIFACTS_DIR = path.join(process.cwd(), 'artifacts', 'a11y');
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const BASE_URL = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 async function ensureArtifactsDir() {
   await fs.mkdir(ARTIFACTS_DIR, { recursive: true });
@@ -66,11 +69,11 @@ async function runA11yPreflight(): Promise<A11yResult[]> {
 
 async function testPageA11y(browser: any, page: string): Promise<A11yResult> {
   const pageInstance = await browser.newPage();
-  
+
   try {
     const url = `${BASE_URL}${page}`;
     console.log(`Testing A11y: ${url}`);
-    
+
     const response = await pageInstance.goto(url, {
       waitUntil: 'networkidle2',
       timeout: 30000,
@@ -145,7 +148,10 @@ async function testPageA11y(browser: any, page: string): Promise<A11yResult> {
     };
 
     // Take screenshot for documentation
-    const screenshotPath = path.join(ARTIFACTS_DIR, `a11y-${page.replace(/\//g, '_') || 'home'}.png`);
+    const screenshotPath = path.join(
+      ARTIFACTS_DIR,
+      `a11y-${page.replace(/\//g, '_') || 'home'}.png`,
+    );
     await pageInstance.screenshot({ path: screenshotPath, fullPage: true });
 
     await pageInstance.close();
@@ -156,7 +162,6 @@ async function testPageA11y(browser: any, page: string): Promise<A11yResult> {
       violations,
       summary,
     };
-
   } catch (error) {
     await pageInstance.close();
     return {
@@ -237,7 +242,9 @@ async function generateA11yReport(results: A11yResult[]) {
       <th>Minor</th>
       <th>Total</th>
     </tr>
-    ${results.map(r => `
+    ${results
+      .map(
+        (r) => `
       <tr>
         <td>${r.url}</td>
         <td>${r.status}</td>
@@ -247,29 +254,43 @@ async function generateA11yReport(results: A11yResult[]) {
         <td class="minor">${r.summary.minor}</td>
         <td>${r.summary.total}</td>
       </tr>
-    `).join('')}
+    `,
+      )
+      .join('')}
   </table>
   
   <h2>Detailed Violations</h2>
-  ${results.map(result => `
+  ${results
+    .map(
+      (result) => `
     <h3>${result.url}</h3>
-    ${result.violations.map(violation => `
+    ${result.violations
+      .map(
+        (violation) => `
       <div class="violation ${violation.impact}">
         <h4>${violation.description}</h4>
         <p><strong>Impact:</strong> <span class="${violation.impact}">${violation.impact}</span></p>
         <p><strong>Help:</strong> ${violation.help}</p>
         <p><strong>Help URL:</strong> <a href="${violation.helpUrl}" target="_blank">${violation.helpUrl}</a></p>
         <h5>Affected Elements:</h5>
-        ${violation.nodes.map(node => `
+        ${violation.nodes
+          .map(
+            (node) => `
           <div class="node">
             <p><strong>Target:</strong> <span class="target">${node.target.join(' ')}</span></p>
             <p><strong>HTML:</strong> <code>${node.html}</code></p>
             <p><strong>Issue:</strong> ${node.failureSummary}</p>
           </div>
-        `).join('')}
+        `,
+          )
+          .join('')}
       </div>
-    `).join('')}
-  `).join('')}
+    `,
+      )
+      .join('')}
+  `,
+    )
+    .join('')}
 </body>
 </html>
   `;
@@ -284,10 +305,10 @@ async function main() {
   try {
     console.log('🚀 Starting accessibility preflight checks...');
     await ensureArtifactsDir();
-    
+
     const results = await runA11yPreflight();
     const report = await generateA11yReport(results);
-    
+
     console.log(`\n📊 Accessibility Summary:`);
     console.log(`   Total pages: ${report.summary.totalPages}`);
     console.log(`   Total violations: ${report.summary.totalViolations}`);
@@ -295,23 +316,24 @@ async function main() {
     console.log(`   Serious: ${report.summary.seriousViolations}`);
     console.log(`   Moderate: ${report.summary.moderateViolations}`);
     console.log(`   Minor: ${report.summary.minorViolations}`);
-    
+
     // Check if any critical or serious violations exist
-    const criticalOrSerious = results.filter(r => 
-      r.summary.critical > 0 || r.summary.serious > 0
+    const criticalOrSerious = results.filter(
+      (r) => r.summary.critical > 0 || r.summary.serious > 0,
     );
-    
+
     if (criticalOrSerious.length > 0) {
       console.log('\n❌ Critical or serious accessibility violations detected:');
-      criticalOrSerious.forEach(result => {
-        console.log(`   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`);
+      criticalOrSerious.forEach((result) => {
+        console.log(
+          `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`,
+        );
       });
       process.exit(1);
     }
-    
+
     console.log('\n✅ All accessibility checks passed!');
     console.log(`📁 Reports saved to: ${ARTIFACTS_DIR}`);
-    
   } catch (error) {
     console.error('❌ Accessibility preflight failed:', error);
     process.exit(1);

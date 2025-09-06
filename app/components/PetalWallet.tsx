@@ -1,5 +1,3 @@
- 
- 
 import React, { useEffect, useRef, useState } from 'react';
 import { usePetalContext, eventBus } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';

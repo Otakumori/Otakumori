@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import {
   verifyWebhookSignature,
@@ -7,7 +8,11 @@ import {
 } from '@/lib/api/stripe';
 import { db } from '@/app/lib/db';
 import { logger } from '@/app/lib/logger';
-import { printifyService, type PrintifyOrderData, type PrintifyShippingAddress } from '@/app/lib/printify';
+import {
+  printifyService,
+  type PrintifyOrderData,
+  type PrintifyShippingAddress,
+} from '@/app/lib/printify';
 import { env } from '@/env';
 import { petalService } from '@/app/lib/petals';
 

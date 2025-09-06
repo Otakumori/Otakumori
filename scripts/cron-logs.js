@@ -1,5 +1,3 @@
- 
- 
 const cron = require('node-cron');
 const { spawn } = require('child_process');
 const path = require('path');

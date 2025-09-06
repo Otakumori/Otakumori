@@ -11,12 +11,7 @@ const nextConfig = {
   // Enable source maps for Edge Tools debugging
   productionBrowserSourceMaps: true,
   experimental: {
-    optimizePackageImports: [
-      'lucide-react',
-      'date-fns',
-      'framer-motion',
-      '@radix-ui/react-icons',
-    ],
+    optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion', '@radix-ui/react-icons'],
   },
 
   // Image optimization for Printify and CDN assets
@@ -24,7 +19,19 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'images.printify.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: '**.printify.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.clerk.com',
         port: '',
         pathname: '/**',
       },
@@ -62,26 +69,27 @@ const nextConfig = {
             value: [
               "default-src 'self';",
               // Allow inline for Next hydration and small inlined chunks; keep 'unsafe-eval' only if needed for dev tooling
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://cdn.jsdelivr.net;",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://*.printify.com;",
+              "script-src-elem 'self' 'unsafe-inline' https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://*.printify.com;",
               // Fetch/XHR/SSE/WebSocket
-              "connect-src 'self' https://api.clerk.com https://*.clerk.com https://*.printify.com https://*.ingest.sentry.io wss://*.clerk.com https://vitals.vercel-insights.com;",
+              "connect-src 'self' https://api.clerk.com https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://api.printify.com https://*.printify.com https://*.ingest.sentry.io wss://*.clerk.com wss://clerk.otaku-mori.com https://vitals.vercel-insights.com;",
               // Styles and fonts
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "font-src 'self' data: https://fonts.gstatic.com;",
               // Images, including data/blobs and Clerk assets
-              "img-src 'self' data: blob: https://*.clerk.com https://*.printify.com https://*.cloudinary.com https://*.vercel-blob.com https:;",
+              "img-src 'self' data: blob: https://*.clerk.com https://clerk.otaku-mori.com https://*.printify.com https://images.printify.com https://*.cloudinary.com https://*.vercel-blob.com https:;",
               // Media (if you stream or load video/audio)
               "media-src 'self' blob:;",
               // Frames (if you ever embed Clerk or other auth iframes)
-              "frame-src 'self' https://*.clerk.com https://clerk.otaku-mori.com;",
+              "frame-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.printify.com;",
               // Workers
               "worker-src 'self' blob:;",
               // Disallow others from iframing your app
               "frame-ancestors 'self';",
               // Strict transport, no mixed content
-              "upgrade-insecure-requests;",
+              'upgrade-insecure-requests;',
               "base-uri 'self';",
-              "form-action 'self';",
+              "form-action 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.printify.com;",
             ].join(' '),
           },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

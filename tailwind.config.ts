@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use tailwind.config.js instead.
 import type { Config } from 'tailwindcss';
 
 export default {

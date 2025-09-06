@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 import { prisma } from '@/app/lib/prisma';

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-ragdoll\Scene.tsx instead.
 'use client';
 
 import { useEffect, useRef, useState } from 'react';

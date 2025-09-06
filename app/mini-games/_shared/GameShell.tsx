@@ -1,5 +1,3 @@
- 
- 
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -136,7 +134,7 @@ export default function GameShell({
 
         {/* Scene goes here */}
         <div
-          aria-hidden={paused || !!ended ? true : undefined}
+          aria-hidden={paused || !!ended}
           className={paused || ended ? 'pointer-events-none' : ''}
         >
           {children}

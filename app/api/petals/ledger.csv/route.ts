@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
@@ -14,7 +13,7 @@ function toCsvCell(v: unknown) {
 }
 
 export async function GET() {
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
 
   // Pull a reasonable chunk; adjust if you expect huge histories (or paginate by query)

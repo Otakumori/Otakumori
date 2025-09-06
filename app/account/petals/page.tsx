@@ -1,5 +1,6 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 /* eslint-disable react-hooks/exhaustive-deps */
- 
+
 'use client';
 
 import { useState, useEffect } from 'react';

@@ -1,3 +1,1 @@
- 
- 
 declare module 'sakura-js';

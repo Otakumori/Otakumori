@@ -1,10 +1,11 @@
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 /* eslint-disable react-hooks/exhaustive-deps */
- 
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Users, User, MessageCircle, Heart, Star, Trophy, Coins } from 'lucide-react';
+import { Trophy, Coins, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CommunityHubPanel() {
@@ -14,7 +15,7 @@ export default function CommunityHubPanel() {
   useEffect(() => {
     // Simulate loading
     setTimeout(() => setLoading(false), 500);
-  }, [false, 500]);
+  }, []);
 
   if (loading) {
     return (
@@ -45,7 +46,7 @@ export default function CommunityHubPanel() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {/* Avatar Customization */}
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">👤</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="user">👤</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Avatar Customization</h3>
             <p className="text-neutral-300 mb-4">
               Customize your profile with cosmetics and overlays
@@ -60,7 +61,7 @@ export default function CommunityHubPanel() {
 
           {/* Community Chat */}
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">💬</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="speech bubble">💬</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Community Chat</h3>
             <p className="text-neutral-300 mb-4">Chat with other players and make new friends</p>
             <Link
@@ -73,7 +74,7 @@ export default function CommunityHubPanel() {
 
           {/* Community Events */}
           <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🎉</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="party popper">🎉</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Community Events</h3>
             <p className="text-neutral-300 mb-4">Participate in seasonal events and challenges</p>
             <Link
@@ -86,7 +87,7 @@ export default function CommunityHubPanel() {
 
           {/* Leaderboards */}
           <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">🏆</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="trophy">🏆</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Leaderboards</h3>
             <p className="text-neutral-300 mb-4">Compete with other players for top rankings</p>
             <Link
@@ -99,7 +100,7 @@ export default function CommunityHubPanel() {
 
           {/* Friend System */}
           <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">👥</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="people">👥</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Friend System</h3>
             <p className="text-neutral-300 mb-4">Add friends and see their activities</p>
             <Link
@@ -112,7 +113,7 @@ export default function CommunityHubPanel() {
 
           {/* Community Guidelines */}
           <div className="bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
-            <div className="text-4xl mb-4">📋</div>
+            <div className="text-4xl mb-4"><span role="img" aria-label="clipboard">📋</span></div>
             <h3 className="text-xl font-semibold text-white mb-2">Community Guidelines</h3>
             <p className="text-neutral-300 mb-4">Learn about community rules and etiquette</p>
             <Link
@@ -130,22 +131,22 @@ export default function CommunityHubPanel() {
             <h2 className="text-2xl font-bold mb-6 text-center">Your Community Stats</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-3xl mb-2">👥</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="people">👥</span></div>
                 <div className="text-2xl font-bold text-blue-400">0</div>
                 <div className="text-sm text-neutral-400">Friends</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-2">🏆</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="trophy">🏆</span></div>
                 <div className="text-2xl font-bold text-yellow-400">0</div>
                 <div className="text-sm text-neutral-400">Achievements</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-2">🌸</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="cherry blossom">🌸</span></div>
                 <div className="text-2xl font-bold text-pink-400">0</div>
                 <div className="text-sm text-neutral-400">Petals Earned</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl mb-2">⭐</div>
+                <div className="text-3xl mb-2"><span role="img" aria-label="star">⭐</span></div>
                 <div className="text-2xl font-bold text-green-400">0</div>
                 <div className="text-sm text-neutral-400">Community Rating</div>
               </div>
@@ -155,7 +156,7 @@ export default function CommunityHubPanel() {
 
         {/* Coming Soon Notice */}
         <div className="bg-gradient-to-br from-green-500/20 to-blue-500/20 border border-green-500/30 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">🚧 Community Features Coming Soon</h2>
+          <h2 className="text-2xl font-bold mb-4"><span role="img" aria-label="construction">🚧</span> Community Features Coming Soon</h2>
           <p className="text-neutral-300 mb-6">
             We're building an amazing community experience! In the meantime, you can customize your
             avatar and visit the Petal Store.

@@ -1,5 +1,3 @@
- 
- 
 // importProducts.js - Prisma Implementation
 
 require('dotenv').config();

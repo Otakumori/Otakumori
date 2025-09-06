@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use drizzle\schema.ts instead.
 import { z } from 'zod';
 
 export const ImageRef = z.object({

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\achievements\AchievementCard.tsx instead.
 import React from 'react';
 import { motion } from 'framer-motion';
 import { type Achievement } from '../../app/types/achievements';

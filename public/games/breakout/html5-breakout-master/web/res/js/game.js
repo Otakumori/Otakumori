@@ -1,3 +1,4 @@
+// DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-girl\Game.tsx instead.
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable-line @next/next/no-img-element */
 /*=====================*\

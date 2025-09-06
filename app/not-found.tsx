@@ -1,57 +1,75 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// import Link from 'next/link';
-import { COPY } from '@/app/lib/copy';
-import GlassButton from '@/app/components/ui/GlassButton';
-import GlassCard from '@/app/components/ui/GlassCard';
-import NotFoundPopup from '@/components/404/NotFoundPopup';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function NotFound() {
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState(true);
 
+  // auto-close after a short moment if you want
   useEffect(() => {
-    // Show popup after a short delay
-    const timer = setTimeout(() => {
-      setShowPopup(true);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setShowPopup(false), 1800);
+    return () => clearTimeout(t);
   }, []);
 
   return (
-    <>
-      <main className="min-h-screen bg-gradient-to-br from-pink-50 via-gray-50 to-pink-100 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          <GlassCard className="p-8 text-center">
-            <div className="mb-8">
-              <h1 className="text-6xl font-bold text-gray-900 mb-4">{COPY.errors.died404}</h1>
-              <p className="text-xl text-gray-600 mb-2">{COPY.errors.gameOverAlt}</p>
-              <p className="text-gray-500">{COPY.errors.princessElsewhere}</p>
-            </div>
+    <main className="relative min-h-screen bg-[#080611] text-zinc-100">
+      {/* background can reuse your starfield if desired */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_circle_at_50%_35%,#1a0f2a,#120b1f_40%,#080611_100%)]" />
 
-            <div className="space-y-4">
-              <p className="text-gray-600">
-                The page you're looking for doesn't exist in this realm.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <GlassButton href="/" variant="primary">
-                  Return to Home
-                </GlassButton>
-                <GlassButton href="/mini-games" variant="secondary">
-                  Play Mini-Games
-                </GlassButton>
-              </div>
+      {/* Pre-popup */}
+      {showPopup && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_0_60px_-15px_rgba(200,120,255,0.25)]">
+            <div className="relative h-56 w-56 overflow-hidden rounded-xl">
+              <Image
+                src="/assets/images/download.jpg" // your "cute guy" image
+                alt="Surprised traveler"
+                fill
+                sizes="224px"
+                className="object-cover"
+                priority
+              />
             </div>
-          </GlassCard>
+            <p className="mt-3 text-center text-sm text-zinc-200/90">
+              You wandered off the path.
+            </p>
+            <div className="mt-3 flex justify-center gap-3">
+              <button
+                onClick={() => setShowPopup(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10"
+              >
+                Continue
+              </button>
+              <Link
+                href="/games/404"
+                className="rounded-xl bg-fuchsia-500/90 px-3 py-1.5 text-sm text-white hover:bg-fuchsia-500"
+              >
+                Start 404 Game
+              </Link>
+            </div>
+          </div>
         </div>
-      </main>
+      )}
 
-      <NotFoundPopup 
-        isOpen={showPopup} 
-        onClose={() => setShowPopup(false)} 
-      />
-    </>
+      {/* 404 body (when popup hides) */}
+      {!showPopup && (
+        <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
+          <h1 className="text-3xl font-bold md:text-5xl">Lost in the Abyss</h1>
+          <p className="mt-3 text-zinc-300/90">
+            The page you're seeking isn't here.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link href="/" className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">
+              Return Home
+            </Link>
+            <Link href="/games/404" className="rounded-xl bg-fuchsia-500/90 px-4 py-2 text-sm text-white hover:bg-fuchsia-500">
+              Start 404 Game
+            </Link>
+          </div>
+        </section>
+      )}
+    </main>
   );
 }

@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\components\components\Layout.jsx instead.
 import { Inter } from 'next/font/google';
 import { AuthProvider } from './context/AuthContext';
 import { MessageProvider } from './context/MessageContext';

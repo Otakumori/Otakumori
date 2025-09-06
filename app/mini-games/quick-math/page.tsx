@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 // import GameShell from '../_shared/GameShell';
 // import LeaderboardPanel from '../_shared/LeaderboardPanel';
 // import Scene from './Scene';

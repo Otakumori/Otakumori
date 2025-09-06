@@ -97,7 +97,8 @@ export default function EnhancedLeaderboard({
             <select
               value={scope}
               onChange={(e) => setScope(e.target.value as 'global' | 'friends')}
-              className="px-3 py-1 bg-pink-900/30 border border-pink-500/20 rounded-lg text-pink-100 text-sm" aria-label="Select"
+              className="px-3 py-1 bg-pink-900/30 border border-pink-500/20 rounded-lg text-pink-100 text-sm"
+              aria-label="Select"
             >
               <option value="global">Global</option>
               <option value="friends">Friends</option>
@@ -107,7 +108,8 @@ export default function EnhancedLeaderboard({
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value as 'daily' | 'weekly' | 'all')}
-              className="px-3 py-1 bg-pink-900/30 border border-pink-500/20 rounded-lg text-pink-100 text-sm" aria-label="Select"
+              className="px-3 py-1 bg-pink-900/30 border border-pink-500/20 rounded-lg text-pink-100 text-sm"
+              aria-label="Select"
             >
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>

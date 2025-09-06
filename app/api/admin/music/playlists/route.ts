@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
@@ -8,8 +7,12 @@ import { requireAdmin } from '@/app/lib/authz';
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const admin = await requireAdmin();
-  if (!admin.ok) return NextResponse.json({ ok: false }, { status: admin.status });
+  try {
+    const admin = await requireAdmin();
+    // admin is { id: string } on success
+  } catch (error) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
 
   const data = await prisma.musicPlaylist.findMany({
     orderBy: { createdAt: 'desc' },
@@ -19,11 +22,15 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const admin = await requireAdmin();
-  if (!admin.ok) return NextResponse.json({ ok: false }, { status: admin.status });
+  try {
+    const admin = await requireAdmin();
+    // admin is { id: string } on success
+  } catch (error) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
 
   const { name, isPublic = true } = await req.json();
-  const { userId  } = await auth();
+  const { userId } = await auth();
   if (!name || !userId)
     return NextResponse.json({ ok: false, error: 'Missing fields' }, { status: 400 });
 

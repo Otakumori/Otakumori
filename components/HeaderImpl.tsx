@@ -1,19 +1,19 @@
 'use client';
 
-import { t } from "@/lib/microcopy";
+import { t } from '@/lib/microcopy';
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname} from 'next/navigation';
-import { motion, AnimatePresence} from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useUser, useClerk} from '@clerk/nextjs';
+import { useUser, useClerk } from '@clerk/nextjs';
 
 const _navLinks = [
-  { href: '/', label: t("nav", "home") },
-  { href: '/shop', label: t("nav", "shop") },
-  { href: '/blog', label: t("nav", "blog") },
-  { href: '/mini-games', label: t("nav", "miniGames") },
+  { href: '/', label: t('nav', 'home') },
+  { href: '/shop', label: t('nav', 'shop') },
+  { href: '/blog', label: t('nav', 'blog') },
+  { href: '/mini-games', label: t('nav', 'miniGames') },
   { href: '/friends', label: 'Friends' },
   { href: '/profile', label: 'My Account' },
   { href: '/community', label: 'Community' },
@@ -24,8 +24,8 @@ export default function HeaderImpl() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const { user, isLoaded, isSignedIn} = useUser();
-  const { signOut} = useClerk();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,7 +35,8 @@ export default function HeaderImpl() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  return (<header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-sm">
+  return (
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">

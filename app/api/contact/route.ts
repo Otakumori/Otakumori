@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -18,14 +17,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, email, message, imageUrl } = contactSchema.parse(body);
 
-    // TODO: Store contact message in database when model is added
-    // TODO: Send email notification to admin
-    // await sendContactNotification({ name, email, message, imageUrl });
+    // Store contact message in database
+    const contactMessage = await db.contactMessage.create({
+      data: {
+        name,
+        email,
+        message,
+        imageUrl,
+        userId: userId || null,
+      },
+    });
 
     return NextResponse.json({
       data: {
         message: 'Contact message sent successfully',
-        id: 'temp-' + Date.now(),
+        id: contactMessage.id,
       },
     });
   } catch (error) {
@@ -54,18 +60,37 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // TODO: Get contact messages when model is added
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
+    // Get contact messages from database
+    const [messages, total] = await Promise.all([
+      db.contactMessage.findMany({
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          User: {
+            select: {
+              id: true,
+              username: true,
+              display_name: true,
+              avatarUrl: true,
+            },
+          },
+        },
+      }),
+      db.contactMessage.count(),
+    ]);
+
     return NextResponse.json({
-      data: [],
+      data: messages,
       pagination: {
-        total: 0,
+        total,
         limit,
         offset,
-        hasMore: false,
+        hasMore: offset + limit < total,
       },
     });
   } catch (error) {

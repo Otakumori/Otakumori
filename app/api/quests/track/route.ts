@@ -1,5 +1,4 @@
- 
- 
+// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from '@upstash/redis';
@@ -8,9 +7,11 @@ import { auth } from '@clerk/nextjs/server';
 import { userDayNY, ensureDailyAssignments } from '@/app/lib/quests/server';
 
 const prisma = new PrismaClient();
+import { env } from '@/env';
+
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  url: env.UPSTASH_REDIS_REST_URL!,
+  token: env.UPSTASH_REDIS_REST_TOKEN!,
 });
 const limit = new Ratelimit({
   redis,

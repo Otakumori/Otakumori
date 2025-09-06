@@ -1,5 +1,3 @@
- 
- 
 export const monitor = {
   log: (...args: any[]) => console.log(...args),
   error: (error: any) => console.error(error),

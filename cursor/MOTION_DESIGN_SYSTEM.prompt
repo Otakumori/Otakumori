@@ -1,0 +1,226 @@
+# Otaku-mori • Motion Design System (DO NOT VIOLATE)
+
+## Global Motion Rules
+
+### Reduced Motion Support
+- ALL animations gated behind `prefers-reduced-motion`
+- Provide non-animated fallbacks for all motion
+- Use `@media (prefers-reduced-motion: reduce)` in CSS
+- Check `window.matchMedia('(prefers-reduced-motion: reduce)')` in JS
+
+### Timing Palette
+- **Micro interactions**: 200–350ms (button press, hover states)
+- **Entrances**: 450–600ms (page loads, card reveals)
+- **Ambient loops**: 800–1200ms (loading animations, ambient effects)
+- **Always use**: `easeOut`, `easeInOut` - NEVER `bounce`
+
+### Glass Recipe (Sitewide)
+```css
+.glass-panel {
+  @apply bg-white/5 border border-white/10 backdrop-blur-xl;
+  box-shadow: 0 0 60px -15px rgba(200, 120, 255, 0.25);
+}
+```
+- **Panels**: `rounded-2xl`
+- **Buttons**: `rounded-xl`
+- **Consistent across all components**
+
+### Focus & Hover States
+- **Focus ring**: `outline-2 outline-fuchsia-300/60 outline-offset-2`
+- **Hover**: Never shift layout (use `scale`, `opacity`, `shadow` only)
+- **Press**: `scale(0.98)` for 120ms
+- **Disabled**: 25% saturation drop, `cursor: not-allowed`
+
+## Background Layers
+
+### Starfield (Public Pages)
+- **Performance**: DPR ≤ 2, `alpha: false`, pause on `visibilitychange`
+- **Motion**: 60fps target, dt-clamped
+- **Effect**: Lavender-white stars, ambient aurora ≤0.05 opacity
+- **No parallax** (as requested)
+
+### Muted Gradient (Transactional Pages)
+```css
+.bg-gradient-radial-purple {
+  background: radial-gradient(1200px circle at 50% 35%, #1a0f2a, #120b1f 40%, #080611 100%);
+}
+```
+- Use for Cart/Checkout/Admin/Auth pages
+
+### Tree & Petals (Home Only)
+- **Tree**: Fixed left, no parallax, subtle sway optional (±1.25° @ 20s)
+- **Petals**: Gravity + wind, click to collect, 120–160ms scale-up animation
+- **Spawn**: From invisible canopy anchor (`opacity: 0`, `pointer-events: none`)
+
+## Navigation & Headers
+
+### NavBar Glass Hover
+- **Links**: `opacity: 0.8 → 1`, underline offset `2px → 6px` (200ms)
+- **Cart badge**: Springless scale `0.95 → 1` on change
+- **Sticky**: Compress height ~6px + shadow on scroll >12px
+
+### Page Headers
+- **Entrance**: Fade + 12px y-lift (500ms), once per mount
+- **Subheaders**: Stagger children by 40ms
+
+## Component Animations
+
+### Buttons & Links
+```css
+.hover-scale:hover { transform: scale(1.02); }
+.hover-scale:active { transform: scale(0.98); }
+```
+- **Hover**: Scale 1 → 1.02, shadow intensity +10–15%
+- **Press**: Scale 1 → 0.98 (120ms)
+- **Focus**: 2px outline + 2px offset
+
+### Cards & Lists
+- **Product cards**: Image scale 1 → 1.04 (250ms), title lift 2px
+- **Blog cards**: Excerpt fade on hover, underline anim on "Read more"
+- **Games grid**: Tech badges float 0 → -2px on hover
+- **Skeletons**: Shimmering glass blocks (1200ms loop)
+
+### Forms & Inputs
+- **Focus ring**: `outline-2 outline-fuchsia-300/50` + inset glow
+- **Error state**: Color + icon + helper text (NO shake)
+- **Label float**: Move y -6px, scale 0.95 (200ms)
+
+## Toast & Dialog System
+
+### Toast Animations
+- **Entry**: Slide y 12px → 0, fade in 400ms
+- **Exit**: Fade out 200ms
+- **Limit**: Max 2 visible, queue remainder
+- **Types**: Success, error, info, warning with icons
+
+### Dialog Animations
+- **Backdrop**: `bg-black/50` + `backdrop-blur-sm`
+- **Panel**: Scale 0.98 → 1, fade 300ms
+- **Focus trap**: ESC closes, restore focus on close
+
+## Page-Specific Microinteractions
+
+### Shop Catalog
+- **Filter chips**: Press 0.98 scale, selected glow ring
+- **Result count**: Count-up animation 0 → n (300ms)
+- **Product detail**: Variant check ripple (250ms)
+- **Gallery**: Crossfade images (200ms), no layout shift
+
+### Cart & Checkout
+- **Quantity steppers**: +/− pulse scale 1.02 on click
+- **Line total**: Count-up animation (120ms)
+- **Free shipping**: Progress bar, zinc → fuchsia near completion
+- **Section expand**: Height auto-transition (300ms)
+
+### Blog Reading
+- **TOC highlight**: IntersectionObserver on headings
+- **Code blocks**: Copy button tooltip fade (150ms)
+
+### Games
+- **Loading overlay**: Animated progress line (indeterminate)
+- **Score pop**: Scale 1.1 → 1 + fade (200ms)
+- **Disable starfield** if WebGL heavy
+
+### Profile & Achievements
+- **Achievement unlock**: Quick flare ≤250ms (no loop)
+- **Tabs**: Slide underline follows active tab (200ms)
+- **Hover sparkles**: 1s loop on unlocked achievements
+
+### Leaderboards
+- **Row hover**: Glow effect
+- **Your row**: Persistent highlight
+- **Range tabs**: Crossfade content (200ms)
+
+### Soapstones
+- **Composer**: Char count zinc-400 → fuchsia-300 near limit
+- **Post submission**: Optimistic insert with fade-in
+- **Failure**: Red border + retry CTA (NO shake)
+
+## Loading & Error States
+
+### Loading Skeletons
+- **Glass rectangles**: Shimmer gradient left→right (1200ms)
+- **Never jump** on content swap
+- **Pre-built components**: ProductCardSkeleton, BlogCardSkeleton, etc.
+
+### Empty States
+- **One-line quip**: "Don't go hollow." + primary CTA
+- **No emojis** in UI text
+
+### Error States
+- **Dark panel**: Short copy + Retry button
+- **Log details**: To Sentry only
+
+## Accessibility Requirements
+
+### Keyboard Navigation
+- **All interactive elements**: Reachable via keyboard
+- **Skip link**: To `#main`
+- **Focus management**: Dialog open → first control, close → restore trigger
+
+### ARIA Support
+- **Active nav**: `aria-current="page"`
+- **Live regions**: `aria-live="polite"` for toasts/cart changes
+- **Focus rings**: Always visible, never remove
+
+## Performance Constraints
+
+### Animation Limits
+- **No layout-affecting properties**: Use `transform`/`opacity` only
+- **Shadow blur**: ≤40px on large elements
+- **Debounce**: Scroll/resize to RAF, remove listeners on unmount
+- **Mobile limit**: ≤12 concurrent animations
+
+### Canvas Performance
+- **DPR**: ≤2 for all canvases
+- **Alpha**: `false` for performance
+- **Pause**: On `visibilitychange`
+
+## Conversion Nudges (Light-Touch)
+
+### Sticky CTA Dock
+- **Mobile only**: "Shop", "Play", "Sign in"
+- **Slide-in**: At 25% scroll, hide near footer
+
+### Petal Streak
+- **N days signed out**: Gentle Clerk modal
+- **Otherwise**: "Save your streak" link under counter
+
+### Cart Threshold
+- **Progress bar**: To free perk threshold
+- **Copy**: "X away from perk" (no emoji)
+
+## What NOT to Do
+
+- ❌ No bounce, no neon rainbows, no 3D tilt
+- ❌ No parallax on the tree
+- ❌ No opacity flicker on text (readability first)
+- ❌ No blocking modals on page load (except 404 popup)
+- ❌ No emojis in user-facing UI text
+
+## Implementation Notes
+
+- **Use Framer Motion** for complex animations
+- **CSS classes** for simple hover/focus states
+- **Transform/opacity only** for performance
+- **Respect reduced motion** in all cases
+- **Maintain glass consistency** sitewide
+- **Dark theme only** - no light mode
+
+## File Structure
+
+```
+app/
+├── styles/motion.css          # Global motion styles
+├── components/
+│   ├── motion/
+│   │   └── MotionProvider.tsx # Motion variants & utilities
+│   └── ui/
+│       ├── MotionButton.tsx   # Enhanced button component
+│       ├── MotionCard.tsx     # Enhanced card component
+│       ├── Toast.tsx          # Toast system
+│       ├── Dialog.tsx         # Dialog system
+│       └── LoadingSkeleton.tsx # Loading states
+```
+
+This system ensures consistent, performant, and accessible animations across the entire site while maintaining the purple abyss aesthetic and respecting user preferences.

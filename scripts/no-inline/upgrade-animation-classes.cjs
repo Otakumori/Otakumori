@@ -7,12 +7,14 @@
  * USAGE:
  *   npx jscodeshift -t scripts/no-inline/upgrade-animation-classes.cjs app/components/SomeFile.tsx --parser=tsx
  */
-const { Project, SyntaxKind } = require("ts-morph");
-const globby = require("globby");
-const path = require("path");
-const fs = require("fs");
+const { Project, SyntaxKind } = require('ts-morph');
+const globby = require('globby');
+const path = require('path');
+const fs = require('fs');
 
-function readFiles(globs) { return globby.sync(globs, { gitignore: true }); }
+function readFiles(globs) {
+  return globby.sync(globs, { gitignore: true });
+}
 
 function toIntSeconds(node) {
   // Accept string '2s'/'2', template `2s`, or numeric 2
@@ -31,12 +33,16 @@ function toIntSeconds(node) {
 
 async function run() {
   const patterns = process.argv.slice(2);
-  const files = readFiles(patterns.length ? patterns : ["app/**/*.{tsx,jsx}", "components/**/*.{tsx,jsx}"]);
+  const files = readFiles(
+    patterns.length ? patterns : ['app/**/*.{tsx,jsx}', 'components/**/*.{tsx,jsx}'],
+  );
 
   const project = new Project({ skipAddingFilesFromTsConfig: true });
   files.forEach((f) => project.addSourceFileAtPathIfExists(f));
 
-  let changedFiles = 0, updates = 0, skipped = 0;
+  let changedFiles = 0,
+    updates = 0,
+    skipped = 0;
 
   for (const sf of project.getSourceFiles()) {
     let fileChanged = false;
@@ -45,7 +51,7 @@ async function run() {
     for (const open of opens) {
       const attrs = open.getAttributes();
       const styleAttr = attrs.find(
-        (a) => a.getKind?.() === SyntaxKind.JsxAttribute && a.getName?.() === "style"
+        (a) => a.getKind?.() === SyntaxKind.JsxAttribute && a.getName?.() === 'style',
       );
       if (!styleAttr) continue;
 
@@ -53,7 +59,10 @@ async function run() {
       if (!init || !init.asKind || !init.asKind(SyntaxKind.JsxExpressionContainer)) continue;
       const expr = init.asKind(SyntaxKind.JsxExpressionContainer).getExpression();
       const obj = expr.asKind && expr.asKind(SyntaxKind.ObjectLiteralExpression);
-      if (!obj) { skipped++; continue; }
+      if (!obj) {
+        skipped++;
+        continue;
+      }
 
       const props = obj.getProperties();
       if (!props.length) continue;
@@ -65,18 +74,18 @@ async function run() {
       for (const p of props) {
         const pa = p.asKind && p.asKind(SyntaxKind.PropertyAssignment);
         if (!pa) continue;
-        const key = pa.getNameNode().getText().replace(/['"]/g, "");
+        const key = pa.getNameNode().getText().replace(/['"]/g, '');
         const val = pa.getInitializer();
         if (!val) continue;
 
-        if (key === "animationDelay") {
+        if (key === 'animationDelay') {
           const secs = toIntSeconds(val);
           if (secs !== null && secs <= 10) {
             delayClass = `delay-${secs}s`;
             p.remove(); // remove from style obj
             updates++;
           }
-        } else if (key === "animationDuration") {
+        } else if (key === 'animationDuration') {
           const secs = toIntSeconds(val);
           if (secs !== null && secs >= 1 && secs <= 12) {
             durationClass = `duration-${secs}s`;
@@ -89,12 +98,12 @@ async function run() {
       // If we removed any props, patch className
       if (delayClass || durationClass) {
         const classAttr = attrs.find(
-          (a) => a.getKind?.() === SyntaxKind.JsxAttribute && a.getName?.() === "className"
+          (a) => a.getKind?.() === SyntaxKind.JsxAttribute && a.getName?.() === 'className',
         );
-        const toAdd = [delayClass, durationClass].filter(Boolean).join(" ");
+        const toAdd = [delayClass, durationClass].filter(Boolean).join(' ');
 
         if (!classAttr) {
-          open.addAttribute({ name: "className", initializer: `"${toAdd}"` });
+          open.addAttribute({ name: 'className', initializer: `"${toAdd}"` });
         } else {
           const init2 = classAttr.getInitializer();
           if (!init2) {
@@ -117,11 +126,19 @@ async function run() {
       }
     }
 
-    if (fileChanged) { await sf.save(); changedFiles++; }
+    if (fileChanged) {
+      await sf.save();
+      changedFiles++;
+    }
   }
 
   await project.save();
-  console.log(`✔ Animation fix: changed ${changedFiles} files, applied ${updates} updates, skipped ${skipped} dynamic blocks.`);
+  console.log(
+    `✔ Animation fix: changed ${changedFiles} files, applied ${updates} updates, skipped ${skipped} dynamic blocks.`,
+  );
 }
 
-run().catch((e) => { console.error(e); process.exit(1); });
+run().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
