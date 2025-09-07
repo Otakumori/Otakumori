@@ -33,6 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       afterSignUpUrl={env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
       domain={env.NEXT_PUBLIC_CLERK_DOMAIN}
       isSatellite={env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true'}
+      routerPush={(url) => window.history.pushState({}, '', url)}
+      routerReplace={(url) => window.history.replaceState({}, '', url)}
     >
       <html lang="en" suppressHydrationWarning>
         <body className="min-h-screen bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
