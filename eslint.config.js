@@ -68,6 +68,33 @@ export default [
     },
   },
   {
+    // Allow process.env in env.ts file
+    files: ['env.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // Scripts and CJS: allow require(), looser parsing
+    files: ['scripts/**/*.{js,cjs}', '**/*.cjs'],
+    languageOptions: {
+      sourceType: 'script',
+      ecmaVersion: 'latest',
+    },
+    rules: {
+      '@typescript-eslint/no-var-requires': 'off',
+      'no-undef': 'off',
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // Tests can use require in setup
+    files: ['**/__tests__/**/*', 'jest.*', 'jest.setup.js'],
+    rules: {
+      '@typescript-eslint/no-var-requires': 'off',
+    },
+  },
+  {
     linterOptions: {
       reportUnusedDisableDirectives: true,
     },

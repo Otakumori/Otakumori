@@ -1,4 +1,5 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -68,34 +69,7 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self';",
-              // Allow inline for Next hydration and small inlined chunks; keep 'unsafe-eval' only if needed for dev tooling
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://*.printify.com;",
-              "script-src-elem 'self' 'unsafe-inline' https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://*.printify.com;",
-              // Fetch/XHR/SSE/WebSocket
-              "connect-src 'self' https://api.clerk.com https://*.clerk.com https://*.clerkstage.dev https://clerk.otaku-mori.com https://api.printify.com https://*.printify.com https://*.ingest.sentry.io wss://*.clerk.com wss://clerk.otaku-mori.com https://vitals.vercel-insights.com;",
-              // Styles and fonts
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-              "font-src 'self' data: https://fonts.gstatic.com;",
-              // Images, including data/blobs and Clerk assets
-              "img-src 'self' data: blob: https://*.clerk.com https://clerk.otaku-mori.com https://*.printify.com https://images.printify.com https://*.cloudinary.com https://*.vercel-blob.com https:;",
-              // Media (if you stream or load video/audio)
-              "media-src 'self' blob:;",
-              // Frames (if you ever embed Clerk or other auth iframes)
-              "frame-src 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.printify.com;",
-              // Workers
-              "worker-src 'self' blob:;",
-              // Disallow others from iframing your app
-              "frame-ancestors 'self';",
-              // Strict transport, no mixed content
-              'upgrade-insecure-requests;',
-              "base-uri 'self';",
-              "form-action 'self' https://*.clerk.com https://clerk.otaku-mori.com https://*.printify.com;",
-            ].join(' '),
-          },
+        // CSP is now handled by Clerk middleware
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
@@ -107,4 +81,16 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withSentryConfig(
+  withBundleAnalyzer(nextConfig),
+  {
+    org: 'otaku-mori',
+    project: 'javascript-react',
+    // Pass the auth token
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    // Upload a larger set of source maps for prettier stack traces (increases build time)
+    widenClientFileUpload: true,
+    // Disable tunneling for now to avoid 404 errors
+    // tunnelRoute: true, // Generates a random route for each build (recommended)
+  }
+);

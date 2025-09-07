@@ -1,8 +1,5 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
-import NavBar from './components/NavBar';
-import StarfieldPurple from './components/StarfieldPurple';
-import TreeLeftAligned from './components/TreeLeft';
-import PetalLayer from './components/PetalLayer';
+import HomeTree from './components/background/HomeTree';
+import CherryBlossomEffect from './components/CherryBlossomEffect';
 import HeroIntro from './components/HeroIntro';
 import ShopTeaser from './components/ShopTeaser';
 import BlogTeaser from './components/BlogTeaser';
@@ -13,13 +10,11 @@ import FooterDark from './components/FooterDark';
 export default function HomePage() {
   return (
     <>
-      {/* Background layers (home only) */}
-      <StarfieldPurple />
-      <TreeLeftAligned src="/assets/images/cherry-tree@2x.webp" trunkCenterPx={380} />
-      <PetalLayer />
+      {/* Fixed tree and petals (home only) */}
+      <HomeTree />
+      <CherryBlossomEffect />
 
-      {/* Foreground */}
-      <NavBar />
+      {/* Foreground content */}
       <main className="relative z-10">
         <HeroIntro />
         <ShopTeaser />

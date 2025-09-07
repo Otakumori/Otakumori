@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 
 // Create Redis client for caching and rate limiting
 export const redis = new Redis({
@@ -115,4 +115,16 @@ export const cacheKeys = {
     balance: (userId: string) => `petals:balance:${userId}`,
     ledger: (userId: string) => `petals:ledger:${userId}`,
   },
+};
+
+// Rate limiters for different endpoints
+export const rateLimiters = {
+  auth: null, // Will be initialized when needed
+  contact: null,
+  publicWrite: null,
+  gameSubmit: null,
+  search: null,
+  upload: null,
+  checkout: null,
+  api: null,
 };

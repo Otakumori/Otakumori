@@ -1,7 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\Providers.tsx instead.
 'use client';
 
-import { ClerkProvider } from '@clerk/nextjs';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { create } from 'zustand';
 import React, { createContext, useContext, useRef, useEffect } from 'react';
@@ -183,15 +182,13 @@ export const useOverlordContext = () => {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
-      <QueryClientProvider client={queryClient}>
-        <CartProvider>
-          <PetalProvider>
-            <OverlordProvider>{children}</OverlordProvider>
-          </PetalProvider>
-        </CartProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <CartProvider>
+        <PetalProvider>
+          <OverlordProvider>{children}</OverlordProvider>
+        </PetalProvider>
+      </CartProvider>
+    </QueryClientProvider>
   );
 }
 

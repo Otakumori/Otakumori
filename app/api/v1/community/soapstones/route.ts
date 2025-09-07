@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 export const runtime = 'nodejs';
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
   try {
     const { getToken } = await auth();
     const token = await getToken({ template: 'otakumori-jwt' });
-    
+
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

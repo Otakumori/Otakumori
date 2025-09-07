@@ -20,5 +20,24 @@
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "powershell.sideBar.CommandExplorerVisibility": true,
-  "cSpell.words": ["INNGEST", "Otakumori", "PRINTIFY", "SUPABASE", "upserted"]
+  "cSpell.words": [
+    "gacha",
+    "gamecube",
+    "INNGEST",
+    "Kawaii",
+    "Lofi",
+    "mori",
+    "Otaku",
+    "Otakumori",
+    "Pikmin",
+    "PRINTIFY",
+    "sakura",
+    "Signup",
+    "slatey",
+    "soulslike",
+    "Soulslike",
+    "SUPABASE",
+    "testpassword",
+    "upserted"
+  ]
 }

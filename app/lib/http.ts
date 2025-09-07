@@ -223,3 +223,8 @@ export const adminApi = {
   getGameFlags: () => http.get('/api/v1/admin/games/flags'),
   getDailyLimits: () => http.get('/api/v1/admin/games/daily-limits'),
 };
+
+// Generate a unique request ID for tracing
+export function getRequestId(): string {
+  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}

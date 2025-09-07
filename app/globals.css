@@ -575,7 +575,7 @@
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 88, 28, 135;
   --background-end-rgb: 219, 39, 119;
-  --tree-url-1x: url('/assets/images/cherry/cherry-tree@1x.webp');
+  --tree-url-1x: url('/assets/images/cherry-tree@1x.webp');
   --tree-url-2x: url('/assets/images/cherry/cherry-tree@2x.webp');
   --tree-opacity: 0.95;
   --tree-x: 0px; /* computed in JS so trunk center sits at x=0 */
