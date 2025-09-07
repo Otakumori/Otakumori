@@ -60,6 +60,7 @@ export default clerkMiddleware(
               'https://vitals.vercel-insights.com',
             ],
             'img-src': [
+              "'self'",
               'https://*.printify.com',
               'https://images.printify.com',
               'https://*.cloudinary.com',
