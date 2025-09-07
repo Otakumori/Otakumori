@@ -1,26 +1,54 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 import { NextResponse } from 'next/server';
-import { printify } from '@/lib/printifyClient';
+import { env } from '@/env';
 
-const mask = (s?: string) => (s ? s.slice(0, 4) + '********' + s.slice(-4) : null);
+export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const res = await printify.get('/shops.json');
-    const count = Array.isArray(res.data) ? res.data.length : undefined;
-    return NextResponse.json({ ok: true, shops: count });
-  } catch (e: any) {
-    return NextResponse.json(
+    // Check if environment variables are set
+    const hasApiKey = !!env.PRINTIFY_API_KEY;
+    const hasShopId = !!env.PRINTIFY_SHOP_ID;
+
+    if (!hasApiKey || !hasShopId) {
+      return NextResponse.json({
+        error: 'Missing environment variables',
+        hasApiKey,
+        hasShopId,
+        apiKeyLength: env.PRINTIFY_API_KEY?.length || 0,
+        shopIdLength: env.PRINTIFY_SHOP_ID?.length || 0,
+      });
+    }
+
+    // Test the API connection
+    const response = await fetch(
+      `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`,
       {
-        ok: false,
-        status: e?.response?.status,
-        data: e?.response?.data,
-        tokenMasked: mask(process.env.PRINTIFY_API_KEY),
+        headers: {
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
       },
-      { status: 500 },
     );
+
+    const responseText = await response.text();
+
+    return NextResponse.json({
+      status: response.status,
+      statusText: response.statusText,
+      hasApiKey,
+      hasShopId,
+      apiKeyLength: env.PRINTIFY_API_KEY?.length || 0,
+      shopIdLength: env.PRINTIFY_SHOP_ID?.length || 0,
+      response: responseText.substring(0, 500), // First 500 chars
+      headers: Object.fromEntries(response.headers.entries()),
+    });
+  } catch (error) {
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : 'Unknown error',
+      hasApiKey: !!env.PRINTIFY_API_KEY,
+      hasShopId: !!env.PRINTIFY_SHOP_ID,
+      apiKeyLength: env.PRINTIFY_API_KEY?.length || 0,
+      shopIdLength: env.PRINTIFY_SHOP_ID?.length || 0,
+    });
   }
 }
