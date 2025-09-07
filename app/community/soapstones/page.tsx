@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { env } from '@/env';
 import StarfieldPurple from '../../components/StarfieldPurple';
 import NavBar from '../../components/NavBar';
 import FooterDark from '../../components/FooterDark';
