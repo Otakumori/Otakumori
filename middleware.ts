@@ -48,6 +48,9 @@ export default clerkMiddleware(
           directives: {
             // Do NOT set 'script-src' here — Clerk will inject strict-dynamic + nonce
             'connect-src': [
+              "'self'",
+              'https://api.clerk.com',
+              'https://clerk.otaku-mori.com',
               'https://api.printify.com',
               'https://*.printify.com',
               'https://*.ingest.sentry.io',
@@ -55,7 +58,6 @@ export default clerkMiddleware(
               'https://*.sentry.io',
               'https://sentry.io',
               'https://vitals.vercel-insights.com',
-              'https://clerk.otaku-mori.com', // for XHR/fetch; not for scripts
             ],
             'img-src': [
               'https://*.printify.com',
@@ -67,6 +69,7 @@ export default clerkMiddleware(
             ],
             'style-src': ["'self'", 'https://fonts.googleapis.com'],
             'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
+            'frame-src': ["'self'", 'https://clerk.otaku-mori.com', 'https://*.clerk.com'],
           },
         },
       },

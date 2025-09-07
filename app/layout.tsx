@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/nextjs';
 import { ClerkProvider } from '@clerk/nextjs';
 import { headers } from 'next/headers';
 import Starfield from './components/background/Starfield';
+import { env } from '@/env';
 
 export function generateMetadata(): Metadata {
   return {
@@ -22,7 +23,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const nonce = headers().get('x-nonce') ?? undefined;
 
   return (
-    <ClerkProvider dynamic nonce={nonce}>
+    <ClerkProvider
+      dynamic
+      nonce={nonce}
+      publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+    >
       <html lang="en" suppressHydrationWarning>
         <body className="min-h-screen bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
           <Starfield />
