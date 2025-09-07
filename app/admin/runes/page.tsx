@@ -420,15 +420,18 @@ function RuneForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">Canonical ID</label>
+        <label htmlFor="canonicalId" className="mb-2 block text-sm font-medium text-neutral-300">
+          Canonical ID
+        </label>
         <select
+          id="canonicalId"
+          name="canonicalId"
           value={formData.canonicalId}
           onChange={(e) =>
             setFormData({ ...formData, canonicalId: e.target.value as CanonicalRuneId })
           }
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
           required
-          aria-label="Select canonical rune ID"
         >
           {Object.keys(DEFAULT_RUNE_DISPLAYS).map((id) => (
             <option key={id} value={id}>
@@ -439,10 +442,12 @@ function RuneForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">
+        <label htmlFor="displayName" className="mb-2 block text-sm font-medium text-neutral-300">
           Display Name (optional)
         </label>
         <input
+          id="displayName"
+          name="displayName"
           type="text"
           value={formData.displayName || ''}
           onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
@@ -452,8 +457,12 @@ function RuneForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">Glyph (optional)</label>
+        <label htmlFor="glyph" className="mb-2 block text-sm font-medium text-neutral-300">
+          Glyph (optional)
+        </label>
         <input
+          id="glyph"
+          name="glyph"
           type="text"
           value={formData.glyph || ''}
           onChange={(e) => setFormData({ ...formData, glyph: e.target.value })}
@@ -463,8 +472,12 @@ function RuneForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">Lore (optional)</label>
+        <label htmlFor="lore" className="mb-2 block text-sm font-medium text-neutral-300">
+          Lore (optional)
+        </label>
         <textarea
+          id="lore"
+          name="lore"
           value={formData.lore || ''}
           onChange={(e) => setFormData({ ...formData, lore: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -474,10 +487,12 @@ function RuneForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">
+        <label htmlFor="printifyUPCs" className="mb-2 block text-sm font-medium text-neutral-300">
           Printify UPCs (comma-separated)
         </label>
         <input
+          id="printifyUPCs"
+          name="printifyUPCs"
           type="text"
           value={formData.printifyUPCs?.join(', ') || ''}
           onChange={(e) =>

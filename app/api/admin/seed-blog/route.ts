@@ -1,5 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 export const runtime = 'nodejs';
@@ -9,7 +10,8 @@ const samplePosts = [
     id: 'blog-1',
     slug: 'welcome-to-otaku-mori',
     title: 'Welcome to Otaku-mori: Your Digital Sanctuary',
-    excerpt: 'Discover the magic of our anime-inspired platform and the community that makes it special.',
+    excerpt:
+      'Discover the magic of our anime-inspired platform and the community that makes it special.',
     body: 'Welcome to Otaku-mori, where anime culture meets digital innovation. Our platform is designed to be your digital sanctuary, a place where you can express your love for anime through interactive experiences, collectibles, and community engagement.',
     published: true,
     updatedAt: new Date(),
@@ -37,7 +39,7 @@ const samplePosts = [
     slug: 'upcoming-features',
     title: 'Upcoming Features: What to Expect',
     excerpt: 'A sneak peek at the exciting features coming to Otaku-mori.',
-    body: 'We have many exciting features in development that will enhance your experience on Otaku-mori. From new mini-games to enhanced social features, there\'s always something new to look forward to.',
+    body: "We have many exciting features in development that will enhance your experience on Otaku-mori. From new mini-games to enhanced social features, there's always something new to look forward to.",
     published: true,
     updatedAt: new Date(),
   },
@@ -45,7 +47,7 @@ const samplePosts = [
     id: 'blog-5',
     slug: 'anime-recommendations',
     title: 'Staff Picks: Must-Watch Anime Series',
-    excerpt: 'Our team\'s top anime recommendations for different genres and moods.',
+    excerpt: "Our team's top anime recommendations for different genres and moods.",
     body: 'Looking for your next anime obsession? Our team has curated a list of must-watch series across different genres, from heartwarming slice-of-life to epic adventures.',
     published: true,
     updatedAt: new Date(),
@@ -55,7 +57,7 @@ const samplePosts = [
 export async function POST(request: NextRequest) {
   try {
     console.log('Seeding blog posts...');
-    
+
     for (const post of samplePosts) {
       await db.contentPage.upsert({
         where: { id: post.id },
@@ -64,16 +66,19 @@ export async function POST(request: NextRequest) {
       });
       console.log(`Created/updated blog post: ${post.title}`);
     }
-    
-    return NextResponse.json({ 
-      ok: true, 
-      data: { message: 'Blog posts seeded successfully!', count: samplePosts.length }
+
+    return NextResponse.json({
+      ok: true,
+      data: { message: 'Blog posts seeded successfully!', count: samplePosts.length },
     });
   } catch (error) {
     console.error('Error seeding blog posts:', error);
-    return NextResponse.json({ 
-      ok: false, 
-      error: 'Failed to seed blog posts' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'Failed to seed blog posts',
+      },
+      { status: 500 },
+    );
   }
 }

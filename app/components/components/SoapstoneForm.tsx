@@ -50,7 +50,12 @@ export default function SoapstoneForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="relative">
+        <label htmlFor="soapstone-message" className="sr-only">
+          Soapstone Message
+        </label>
         <textarea
+          id="soapstone-message"
+          name="message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Leave your message, Ashen One..."

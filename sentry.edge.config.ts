@@ -9,5 +9,3 @@ Sentry.init({
   // `release` value here - use the environment variable `SENTRY_RELEASE`, so
   // that it will also get attached to your source maps
 });
-
-// Usage: In API routes or server code, use Sentry.captureException(error) to log errors.

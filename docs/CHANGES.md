@@ -103,6 +103,10 @@
 
 #### New Files Created
 
+```text
+Plain text in a code block
+```
+
 ```
 lib/api/
 ├── http.ts          # HTTP client wrapper

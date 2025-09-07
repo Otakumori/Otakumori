@@ -2,6 +2,7 @@
 import { type Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { appUrl } from '@/lib/canonical';
+import { headers } from 'next/headers';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -159,6 +160,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function CollectionPage({ params }: Props) {
   const collection = COLLECTIONS[params.slug];
+  const nonce = headers().get('x-nonce') ?? undefined;
 
   if (!collection) {
     notFound();
@@ -194,6 +196,7 @@ export default function CollectionPage({ params }: Props) {
     <>
       <script
         type="application/ld+json"
+        nonce={nonce}
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 

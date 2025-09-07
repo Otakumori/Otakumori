@@ -1,107 +1,133 @@
-// DEPRECATED: This component is a duplicate. Use app\components\CherryBlossomEffect.js instead.
-'use client';
+// app/components/CherryBlossomEffect.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion, useAnimation } from 'framer-motion';
-import { usePetalContext } from '@/providers';
+import { useEffect, useRef } from 'react';
 
-interface Petal {
-  id: number;
-  x: number;
-  y: number;
-  rotation: number;
-  scale: number;
-  opacity: number;
+type Vec = { x: number; y: number };
+
+const AMBIENT_INTERVAL_MS = 700; // slow + casual
+const AMBIENT_MIN = 1;
+const AMBIENT_MAX = 2;
+const CLICK_BURST_COUNT = 16; // satisfying but not heavy
+const FALL_TIME_MS_MIN = 9000; // dreamy slow
+const FALL_TIME_MS_MAX = 14000;
+
+function rand(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
+function makePetal(root: HTMLElement, start: Vec, zIndex = 6) {
+  const p = document.createElement('div');
+  const size = rand(5, 8);
+  p.className = 'om-petal';
+  Object.assign(p.style, {
+    position: 'fixed',
+    left: `${start.x}px`,
+    top: `${start.y}px`,
+    width: `${size}px`,
+    height: `${size * 0.7}px`,
+    borderRadius: `${size}px ${size}px ${size * 0.2}px ${size * 0.8}px`,
+    background: 'radial-gradient(40% 50% at 40% 50%, rgba(255,175,215,.95), rgba(250,130,190,.8))',
+    boxShadow: '0 0 6px rgba(255,150,210,.25)',
+    pointerEvents: 'none',
+    zIndex: String(zIndex),
+    transform: 'translateZ(0)',
+    willChange: 'transform, opacity',
+  } as CSSStyleDeclaration);
+  root.appendChild(p);
+
+  const driftX = rand(40, 110);
+  const fallY = window.innerHeight + rand(120, 260);
+  const duration = rand(FALL_TIME_MS_MIN, FALL_TIME_MS_MAX);
+  const wobble = rand(0.4, 0.9);
+
+  const startTs = performance.now();
+  let raf = 0;
+
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - startTs) / duration);
+    const xOff = Math.sin(t * Math.PI * 2 * wobble) * driftX * t;
+    const yOff = t * fallY;
+    const rot = t * 220 + Math.sin(t * 6.28) * 10;
+    p.style.transform = `translate(${xOff}px, ${yOff}px) rotate(${rot}deg)`;
+    p.style.opacity = String(1 - t * 0.95);
+    if (t < 1) {
+      raf = requestAnimationFrame(tick);
+    } else {
+      p.remove();
+      cancelAnimationFrame(raf);
+    }
+  };
+
+  requestAnimationFrame(tick);
 }
 
 export default function CherryBlossomEffect() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [petals, setPetals] = useState<Petal[]>([]);
-  const controls = useAnimation();
-  const petalContext = usePetalContext();
+  const originRef = useRef<Vec>({ x: 160, y: 140 });
 
+  // Track canopy position (top-right cluster) as petal origin
   useEffect(() => {
-    const createPetal = () => {
-      const id = Date.now() + Math.random();
-      const x = Math.random() * window.innerWidth;
-      const y = -50;
-      const rotation = Math.random() * 360;
-      const scale = Math.random() * 0.5 + 0.5;
-      const opacity = Math.random() * 0.5 + 0.5;
-
-      return { id, x, y, rotation, scale, opacity };
+    const el = document.querySelector('[data-tree-root]') as HTMLDivElement | null;
+    if (!el) return;
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      originRef.current = {
+        x: r.left + r.width * 0.66,
+        y: r.top + r.height * 0.18,
+      };
     };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, []);
 
-    const interval = setInterval(() => {
-      if (petals.length < 20) {
-        setPetals((prev) => [...prev, createPetal()]);
+  // Ambient gentle spawn
+  useEffect(() => {
+    const root = document.body;
+    const timer = setInterval(() => {
+      const n = Math.round(rand(AMBIENT_MIN, AMBIENT_MAX));
+      for (let i = 0; i < n; i++) {
+        const jitterX = rand(-18, 18);
+        const jitterY = rand(-18, 18);
+        makePetal(
+          root,
+          {
+            x: originRef.current.x + jitterX,
+            y: originRef.current.y + jitterY,
+          },
+          6,
+        );
       }
-    }, 1000);
+    }, AMBIENT_INTERVAL_MS);
 
-    return () => clearInterval(interval);
-  }, [petals.length]);
+    return () => clearInterval(timer);
+  }, []);
 
-  const handlePetalClick = (id: number) => {
-    setPetals((prev) => prev.filter((p) => p.id !== id));
-    controls.start({
-      scale: [1, 1.2, 1],
-      transition: { duration: 0.3 },
-    });
-  };
+  // Click burst near cursor
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const root = document.body;
+      for (let i = 0; i < CLICK_BURST_COUNT; i++) {
+        const angle = (i / CLICK_BURST_COUNT) * Math.PI * 2;
+        const radius = rand(4, 22);
+        makePetal(
+          root,
+          {
+            x: e.clientX + Math.cos(angle) * radius,
+            y: e.clientY + Math.sin(angle) * radius,
+          },
+          9,
+        );
+      }
+    };
+    window.addEventListener('click', handler, { passive: true });
+    return () => window.removeEventListener('click', handler);
+  }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      className="pointer-events-none fixed inset-0 z-0"
-      style={{ overflow: 'hidden' }}
-    >
-      {petals.map((petal) => (
-        <motion.div
-          key={petal.id}
-          className="pointer-events-auto absolute cursor-pointer"
-          style={{
-            x: petal.x,
-            y: petal.y,
-            rotate: petal.rotation,
-            scale: petal.scale,
-            opacity: petal.opacity,
-          }}
-          animate={{
-            y: window.innerHeight + 50,
-            rotate: petal.rotation + 360,
-          }}
-          transition={{
-            duration: Math.random() * 5 + 5,
-            ease: 'linear',
-            repeat: Infinity,
-          }}
-          onClick={() => handlePetalClick(petal.id)}
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-              fill="#FF69B4"
-            />
-            <path
-              d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"
-              fill="#FFB6C1"
-            />
-          </svg>
-        </motion.div>
-      ))}
-      <motion.div
-        className="fixed bottom-4 right-4 rounded-lg bg-black/50 px-4 py-2 text-white"
-        animate={controls}
-      >
-        Petals: {petals.length}
-      </motion.div>
-    </div>
-  );
+  return null;
 }
