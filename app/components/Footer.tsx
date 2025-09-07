@@ -122,12 +122,12 @@ export function FooterNewsletterForm() {
         type="email"
         name="email"
         placeholder="Join the Blossom..."
-        className="w-40 bg-transparent px-2 py-1 text-white placeholder-pink-200 outline-none md:w-56"
+        className="w-40 bg-transparent px-2 py-1 text-white placeholder-blue-200 outline-none md:w-56"
         required
       />
       <button
         type="submit"
-        className="rounded-full bg-pink-500 px-4 py-1 font-semibold text-white transition hover:bg-pink-600"
+        className="rounded-full bg-blue-500 px-4 py-1 font-semibold text-white transition hover:bg-blue-600"
       >
         Unleash
       </button>
@@ -137,8 +137,8 @@ export function FooterNewsletterForm() {
 
 export default function Footer() {
   return (
-    <footer className="relative mt-16 w-full overflow-hidden bg-gradient-to-br from-pink-700/80 to-purple-900/80 px-4 py-12 text-white">
-      {/* Animated Blossom Overlay */}
+    <footer className="relative mt-16 w-full overflow-hidden bg-gradient-to-br from-slate-900/90 to-gray-900/90 px-4 py-12 text-white">
+      {/* Animated Space Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <svg
           width="100%"
@@ -146,7 +146,7 @@ export default function Footer() {
           className="animate-blossom-move absolute"
           style={{ left: '-10%', top: '10%' }}
         >
-          <circle cx="60" cy="60" r="18" fill="#FFB6C1" opacity="0.3" />
+          <circle cx="60" cy="60" r="18" fill="#4A90E2" opacity="0.3" />
         </svg>
         <svg
           width="100%"
@@ -154,15 +154,15 @@ export default function Footer() {
           className="animate-blossom-move2 absolute"
           style={{ right: '-10%', bottom: '10%' }}
         >
-          <circle cx="60" cy="60" r="12" fill="#FF69B4" opacity="0.2" />
+          <circle cx="60" cy="60" r="12" fill="#7B68EE" opacity="0.2" />
         </svg>
       </div>
       <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center gap-8 md:flex-row md:justify-between">
         {/* Left: Logo & Tagline */}
         <div className="flex flex-col items-center gap-3 md:items-start">
           <div className="text-xl font-bold tracking-wide">Otaku-mori</div>
-          <div className="max-w-xs text-center text-sm italic text-pink-200 md:text-left">
-            Stay a while. Let's blossom together.
+          <div className="max-w-xs text-center text-sm italic text-blue-200 md:text-left">
+            Stay a while. Let's explore the cosmos together.
           </div>
         </div>
         {/* Center: Newsletter & Nav */}
@@ -173,7 +173,7 @@ export default function Footer() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium transition hover:text-pink-300"
+                className="text-sm font-medium transition hover:text-blue-300"
               >
                 {link.label}
               </Link>
@@ -182,12 +182,12 @@ export default function Footer() {
         </div>
         {/* Right: Socials & Contact */}
         <div className="flex flex-col items-center gap-3 md:items-end">
-          <Link href="#" className="text-sm text-pink-200 hover:text-pink-100">
+          <Link href="#" className="text-sm text-blue-200 hover:text-blue-100">
             Contact Us
           </Link>
-          <div className="mt-2 text-xs text-pink-300">
+          <div className="mt-2 text-xs text-blue-300">
             &copy; {new Date().getFullYear()} Otaku-mori. Made with{' '}
-            <span className="animate-pulse text-pink-400">♥</span>
+            <span className="animate-pulse text-blue-400">♥</span>
           </div>
         </div>
       </div>

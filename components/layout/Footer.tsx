@@ -11,7 +11,7 @@ export function Footer() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <footer className="border-t border-pink-500/30 bg-gray-900/50">
+    <footer className="border-t border-blue-500/30 bg-gray-900/50">
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand Section */}
@@ -35,7 +35,7 @@ export function Footer() {
                 href="https://twitter.com/otakumori"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 transition-colors hover:text-pink-500"
+                className="text-gray-400 transition-colors hover:text-blue-500"
                 aria-label="Follow us on Twitter"
               >
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -46,7 +46,7 @@ export function Footer() {
                 href="https://instagram.com/otakumori"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 transition-colors hover:text-pink-500"
+                className="text-gray-400 transition-colors hover:text-blue-500"
                 aria-label="Follow us on Instagram"
               >
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -57,7 +57,7 @@ export function Footer() {
                 href="https://discord.gg/otakumori"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 transition-colors hover:text-pink-500"
+                className="text-gray-400 transition-colors hover:text-blue-500"
                 aria-label="Join our Discord server"
               >
                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -84,7 +84,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/community"
-                  className="text-gray-400 transition-colors hover:text-pink-500"
+                  className="text-gray-400 transition-colors hover:text-blue-500"
                 >
                   Community
                 </Link>
@@ -92,7 +92,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/achievements"
-                  className="text-gray-400 transition-colors hover:text-pink-500"
+                  className="text-gray-400 transition-colors hover:text-blue-500"
                 >
                   Achievements
                 </Link>
@@ -117,7 +117,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-pink-500/30 pt-8">
+        <div className="mt-12 border-t border-blue-500/30 pt-8">
           <p className="text-center text-gray-400">
             © {new Date().getFullYear()} Otakumori. All rights reserved. ♡
           </p>

@@ -27,8 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       dynamic
       nonce={nonce}
       publishableKey={env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
+      signInUrl={env.NEXT_PUBLIC_CLERK_SIGN_IN_URL}
+      signUpUrl={env.NEXT_PUBLIC_CLERK_SIGN_UP_URL}
+      afterSignInUrl={env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL}
+      afterSignUpUrl={env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
+      domain={env.NEXT_PUBLIC_CLERK_DOMAIN}
+      isSatellite={env.NEXT_PUBLIC_CLERK_IS_SATELLITE}
     >
       <html lang="en" suppressHydrationWarning>
         <body className="min-h-screen bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
