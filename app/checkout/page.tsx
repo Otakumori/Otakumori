@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
+import { env } from '@/env';
 import NavBar from '../components/NavBar';
 import FooterDark from '../components/FooterDark';
 import CheckoutContent from '../components/shop/CheckoutContent';
