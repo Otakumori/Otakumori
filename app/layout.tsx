@@ -33,7 +33,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       afterSignUpUrl={env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL}
       domain={env.NEXT_PUBLIC_CLERK_DOMAIN || 'clerk.otaku-mori.com'}
       isSatellite={env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true'}
-      proxyUrl={env.NEXT_PUBLIC_CLERK_DOMAIN || 'https://clerk.otaku-mori.com'}
       routerPush={(url) => window.history.pushState({}, '', url)}
       routerReplace={(url) => window.history.replaceState({}, '', url)}
     >
