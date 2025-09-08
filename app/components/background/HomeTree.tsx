@@ -1,5 +1,5 @@
-import Image from "next/image";
-import treePng from "@/public/assets/images/CherryTree.png";
+import Image from 'next/image';
+import treePng from '@/public/assets/images/CherryTree.png';
 
 /**
  * Fixed, non-scrolling cherry tree.
@@ -9,18 +9,15 @@ import treePng from "@/public/assets/images/CherryTree.png";
  */
 export default function HomeTree() {
   return (
-    <div
-      data-tree-root
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-0"
-    >
+    <div data-tree-root aria-hidden className="pointer-events-none fixed inset-0 z-0">
       <Image
         src={treePng}
         alt=""
         priority
         draggable={false}
         fill
-        className="object-cover object-bottom opacity-90"
+        className="object-contain object-bottom opacity-90"
+        sizes="100vw"
       />
     </div>
   );
