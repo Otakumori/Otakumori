@@ -14,9 +14,7 @@ export default function ShadowPath() {
         <button
           className="bg-slate-600 hover:bg-slate-700 px-6 py-3 rounded-lg font-bold"
           onClick={() => setScore(score + 1)}
-        >
-          Navigate!
-        </button>
+        >Navigate!</button>
       </div>
     </div>
   );

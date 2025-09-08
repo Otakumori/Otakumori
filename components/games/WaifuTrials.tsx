@@ -14,9 +14,7 @@ export default function WaifuTrials() {
         <button
           className="bg-pink-600 hover:bg-pink-700 px-6 py-3 rounded-lg font-bold"
           onClick={() => setScore(score + 1)}
-        >
-          Trial!
-        </button>
+        >Trial!</button>
       </div>
     </div>
   );

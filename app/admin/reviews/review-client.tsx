@@ -57,7 +57,6 @@ export default function AdminReviewsClient() {
       {items.length === 0 && !loading && (
         <p className="text-sm text-zinc-500">No pending reviews 🎉</p>
       )}
-
       <ul className="space-y-4">
         {items.map((r) => (
           <li key={r.id} className="rounded-2xl border border-zinc-800/60 p-4">
@@ -77,12 +76,12 @@ export default function AdminReviewsClient() {
                   <div className="mt-3 flex gap-3">
                     {r.imageUrls.map((u) => (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      (<img
                         key={u}
                         src={u}
                         alt="review"
                         className="h-20 w-20 rounded-lg border border-zinc-700 object-cover"
-                      />
+                      />)
                     ))}
                   </div>
                 )}
@@ -109,7 +108,6 @@ export default function AdminReviewsClient() {
           </li>
         ))}
       </ul>
-
       {cursor && (
         <button
           disabled={loading}

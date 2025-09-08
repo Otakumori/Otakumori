@@ -9,6 +9,13 @@
       "problemMatcher": [],
       "label": "npm: build - clerk-react",
       "detail": "react-router build"
+    },
+    {
+      "type": "npm",
+      "script": "test:webhooks",
+      "problemMatcher": [],
+      "label": "npm: test:webhooks",
+      "detail": "curl -X GET http://localhost:3000/api/webhooks/inngest"
     }
   ]
 }

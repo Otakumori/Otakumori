@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAnchors } from './anchors';
 import { useHub, ORDER } from './store';
 
@@ -15,7 +15,7 @@ const iconMap: Record<string, string> = {
 
 export default function FrontSelector() {
   const { anchors } = useAnchors();
-  const { face, selectorIndex, focusChip, setFace, confirm, isZooming } = useHub();
+  const { face, selectorIndex, focusChip, confirm, isZooming } = useHub();
   const [center, setCenter] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {

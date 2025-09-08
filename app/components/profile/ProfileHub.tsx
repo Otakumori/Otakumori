@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
+import ProfileLoadout from './ProfileLoadout';
 import { t } from '../../lib/microcopy';
 
 type ProfileData = {
@@ -80,6 +81,11 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
               <span className="text-zinc-400">
                 {new Date(profileData.joinDate).toLocaleDateString()}
               </span>
+            </div>
+            
+            {/* Loadout Button */}
+            <div className="pt-4 border-t border-white/10">
+              <ProfileLoadout />
             </div>
           </div>
         </GlassPanel>

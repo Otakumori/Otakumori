@@ -7,6 +7,8 @@ export function useSiteInteractionTracking() {
   const { checkAchievements } = useAchievements();
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     let timeOnPage = 0;
     let lastActive = Date.now();
     let tabSwitches = 0;
@@ -149,6 +151,8 @@ export function useMysteryTracking() {
   const { checkAchievements } = useAchievements();
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
     let refreshCount = 0;
     let inspectAttempts = 0;
 

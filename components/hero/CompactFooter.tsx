@@ -15,33 +15,19 @@ export function CompactFooter() {
 
           {/* Quick Links */}
           <div className="flex flex-wrap justify-center gap-6 text-sm">
-            <Link href="/shop" className="text-gray-300 transition-colors hover:text-white">
-              Shop
-            </Link>
-            <Link href="/mini-games" className="text-gray-300 transition-colors hover:text-white">
-              Games
-            </Link>
-            <Link href="/blog" className="text-gray-300 transition-colors hover:text-white">
-              Blog
-            </Link>
-            <Link href="/about" className="text-gray-300 transition-colors hover:text-white">
-              About
-            </Link>
-            <Link href="/profile" className="text-gray-300 transition-colors hover:text-white">
-              Shrine
-            </Link>
+            <Link href="/shop" className="text-gray-300 transition-colors hover:text-white">Shop</Link>
+            <Link href="/mini-games" className="text-gray-300 transition-colors hover:text-white">Games</Link>
+            <Link href="/blog" className="text-gray-300 transition-colors hover:text-white">Blog</Link>
+            <Link href="/about" className="text-gray-300 transition-colors hover:text-white">About</Link>
+            <Link href="/profile" className="text-gray-300 transition-colors hover:text-white">Shrine</Link>
           </div>
 
           {/* Legal */}
           <div className="text-center text-xs text-gray-500 md:text-right">
             <div className="flex flex-wrap justify-center gap-4 md:justify-end">
-              <Link href="/privacy" className="transition-colors hover:text-gray-400">
-                Privacy
-              </Link>
-              <Link href="/terms" className="transition-colors hover:text-gray-400">
-                Terms
-              </Link>
-              <span>© 2024 Otaku-mori</span>
+              <Link href="/privacy" className="transition-colors hover:text-gray-400">Privacy</Link>
+              <Link href="/terms" className="transition-colors hover:text-gray-400">Terms</Link>
+              <span>© 2024 Otakumori</span>
             </div>
           </div>
         </div>

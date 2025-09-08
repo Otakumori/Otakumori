@@ -158,11 +158,11 @@ export default function ProfilePage() {
                 <div className="w-24 h-24 bg-pink-600 rounded-full flex items-center justify-center text-pink-100 text-2xl font-bold">
                   {profile.avatarUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
+                    (<img
                       src={profile.avatarUrl}
                       alt="Profile avatar"
                       className="w-full h-full rounded-full object-cover"
-                    />
+                    />)
                   ) : (
                     profile.display_name?.charAt(0) || profile.username.charAt(0)
                   )}

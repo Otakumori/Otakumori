@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-'use client';
-
+'use client';;
+import Image from 'next/image';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CherryBlossom from '@/components/animations/CherryBlossom';
 import { usePetalContext, eventBus } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';
-
 const MAX_PETALS = 30;
 const CLICK_THROTTLE = 300; // ms
 const MODAL_TRIGGER = 10;
@@ -17,6 +16,7 @@ const SEASON_VARIANTS: Record<string, PetalTypeKey[]> = {
   autumn: ['normal', 'glitch'],
   winter: ['normal', 'blackLotus'],
 };
+
 const PETAL_TYPE_PROPS: Record<PetalTypeKey, { img: string; min: number; max: number }> = {
   normal: { img: '/assets/petal.svg', min: 1, max: 3 },
   golden: { img: '/assets/images/petal-golden.svg', min: 5, max: 10 },
@@ -134,13 +134,11 @@ const IDLE_INTERVAL_MIN = 30 * 1000; // 30 seconds
 const IDLE_INTERVAL_MAX = 60 * 1000; // 60 seconds
 const IDLE_PETAL_AMOUNT = 2;
 const IDLE_SESSION_CAP = 20;
-
 const BLOOM_BONUS_KEY = 'cherryfall_last_visit';
 const BLOOM_STREAK_KEY = 'cherryfall_streak';
 const BLOOM_BONUS_BASE = 10;
 const BLOOM_BONUS_MAX = 50;
 const BLOOM_BONUS_MODAL_TIME = 5000;
-
 const LATE_NIGHT_KEY = 'late_night_mode';
 
 // Late night Senpai lines
@@ -479,7 +477,7 @@ const InteractiveHeroSection: React.FC = () => {
         animate={trackerPulse || idleTooltip ? { scale: 1.1 } : { scale: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
-        <img src="/assets/petal.svg" alt="Petal" width={24} height={24} />
+        <Image src="/assets/petal.svg" alt="Petal" width={24} height={24} />
         <span className="tabular-nums">{petalCount}</span>
       </motion.div>
       {/* Clickable Petals */}
@@ -497,10 +495,9 @@ const InteractiveHeroSection: React.FC = () => {
             onClick={() => handlePetalClick(petal.id)}
             onTouchStart={() => handlePetalClick(petal.id)}
             aria-label={`Collect ${petal.type || 'normal'} petal`}
-            role="button"
             tabIndex={0}
           >
-            <img src={img} alt={`${petal.type || 'normal'} petal`} width={32} height={32} />
+            <Image src={img} alt={`${petal.type || 'normal'} petal`} width={32} height={32} />
           </motion.div>
         );
       })}

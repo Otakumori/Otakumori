@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from 'react';
-import { useHub, ORDER } from './store';
+import { useHub } from './store';
 import { play } from '@/app/mini-games/_shared/audio-bus';
 
 export function useHubInput() {
