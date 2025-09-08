@@ -198,11 +198,11 @@ export default function OrdersPage() {
                       <div className="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
                         {item.product?.primaryImageUrl ? (
                           /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
+                          (<img
                             src={item.product.primaryImageUrl}
                             alt={item.product.name}
                             className="w-full h-full object-cover rounded-lg"
-                          />
+                          />)
                         ) : (
                           <Package className="h-6 w-6 text-pink-300" />
                         )}

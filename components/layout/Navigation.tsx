@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserButton, SignInButton, SignUpButton, useUser } from '@clerk/nextjs';
+import { useUser, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs';
+import UserMenu from '@/app/components/auth/UserMenu';
 import { appUrl } from '@/lib/canonical';
 import { useCart } from '../../app/components/cart/CartProvider';
 import PetalChip from '@/app/components/nav/PetalChip';
@@ -124,10 +125,11 @@ export default function Navigation() {
                   custom={index}
                 >
                   {item.dropdown ? (
-                    <div
+                    <button
                       className="flex items-center space-x-1 cursor-pointer text-sm font-medium transition-colors text-gray-300 hover:text-pink-400"
                       onMouseEnter={() => setShopDropdownOpen(true)}
                       onMouseLeave={() => setShopDropdownOpen(false)}
+                      aria-label={`${item.name} dropdown`}
                     >
                       <span>{item.name}</span>
                       <ChevronDown className="h-4 w-4" />
@@ -166,7 +168,7 @@ export default function Navigation() {
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </div>
+                    </button>
                   ) : (
                     <Link
                       href={item.href}
@@ -231,37 +233,7 @@ export default function Navigation() {
               </motion.div>
 
               {/* User Menu */}
-              {isSignedIn ? (
-                <UserButton
-                  afterSignOutUrl="/"
-                  appearance={{
-                    elements: {
-                      avatarBox: 'h-8 w-8',
-                    },
-                  }}
-                />
-              ) : (
-                <div className="hidden md:flex items-center space-x-3">
-                  <SignInButton
-                    mode="modal"
-                    fallbackRedirectUrl={appUrl('/')}
-                    forceRedirectUrl={appUrl('/onboarding')}
-                  >
-                    <button className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-pink-400 transition-colors">
-                      Sign In
-                    </button>
-                  </SignInButton>
-                  <SignUpButton
-                    mode="modal"
-                    fallbackRedirectUrl={appUrl('/')}
-                    forceRedirectUrl={appUrl('/onboarding')}
-                  >
-                    <button className="px-4 py-2 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
-                      Join the quest
-                    </button>
-                  </SignUpButton>
-                </div>
-              )}
+              <UserMenu />
 
               {/* Mobile menu button */}
               <motion.button
@@ -278,7 +250,6 @@ export default function Navigation() {
           </div>
         </div>
       </motion.nav>
-
       {/* Mobile Navigation */}
       <AnimatePresence>
         {isOpen && (
@@ -289,7 +260,7 @@ export default function Navigation() {
             className="fixed inset-0 z-50 md:hidden"
           >
             {/* Backdrop */}
-            <div
+            <button
               className="absolute inset-0 bg-black/50 backdrop-blur-sm"
               onClick={closeMobileMenu}
               onKeyDown={(e) => {
@@ -297,8 +268,6 @@ export default function Navigation() {
                   closeMobileMenu();
                 }
               }}
-              role="button"
-              tabIndex={0}
               aria-label="Close mobile menu"
             />
 
@@ -379,18 +348,14 @@ export default function Navigation() {
                         fallbackRedirectUrl={appUrl('/')}
                         forceRedirectUrl={appUrl('/onboarding')}
                       >
-                        <button className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-pink-500/30 hover:bg-pink-500/10 rounded-lg transition-colors">
-                          Sign In
-                        </button>
+                        <button className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-pink-500/30 hover:bg-pink-500/10 rounded-lg transition-colors">Sign In</button>
                       </SignInButton>
                       <SignUpButton
                         mode="modal"
                         fallbackRedirectUrl={appUrl('/')}
                         forceRedirectUrl={appUrl('/onboarding')}
                       >
-                        <button className="w-full px-4 py-3 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
-                          Join the quest
-                        </button>
+                        <button className="w-full px-4 py-3 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">Join the quest</button>
                       </SignUpButton>
                     </div>
                   )}

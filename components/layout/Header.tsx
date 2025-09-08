@@ -57,7 +57,6 @@ export default function Header() {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                role="img"
                 aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               >
                 {isMenuOpen ? (

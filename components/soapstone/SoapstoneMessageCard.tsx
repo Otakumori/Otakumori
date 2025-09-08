@@ -23,8 +23,6 @@ export default function SoapstoneMessageCard({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      role="button"
-      tabIndex={0}
     >
       {/* The DS-like overlay */}
       <div

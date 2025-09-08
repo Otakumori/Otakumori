@@ -1,4 +1,4 @@
-import { put, del, list } from '@vercel/blob';
+// import { put, del, list } from '@vercel/blob';
 
 export interface AssetManifest {
   icons: Record<string, string>;
@@ -46,7 +46,7 @@ class AssetManager {
       const url = await this.getBlobUrl(`sprites/${key}.png`);
       this.spriteCache.set(key, url);
       return url;
-    } catch (error) {
+    } catch (_error) {
       // Generate procedural fallback
       const fallbackUrl = this.generateProceduralSprite(key, fallback || 'circle');
       this.spriteCache.set(key, fallbackUrl);
@@ -167,7 +167,7 @@ class AssetManager {
       const asset: AudioAsset = { element: audio, loaded: preload };
       this.audioCache.set(key, asset);
       return audio;
-    } catch (error) {
+    } catch (_error) {
       // Generate fallback audio
       const fallbackAudio = this.generateFallbackAudio(key);
       const asset: AudioAsset = { element: fallbackAudio, loaded: true };

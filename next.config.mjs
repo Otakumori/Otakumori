@@ -65,16 +65,16 @@ const nextConfig = {
 
   // Production-grade security headers with CSP for official Clerk domains
   async headers() {
+    const isProd = process.env.NODE_ENV === "production";
+    
     return [
       {
         source: '/(.*)',
         headers: [
-        // CSP is now handled by Clerk middleware
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-XSS-Protection', value: '0' }, // modern browsers use CSP
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'geolocation=(), microphone=()' },
+          ...(isProd ? [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }] : []),
         ],
       },
     ];

@@ -107,7 +107,7 @@
 Plain text in a code block
 ```
 
-```
+```text
 lib/api/
 ├── http.ts          # HTTP client wrapper
 ├── printify.ts      # Printify API client
@@ -127,7 +127,7 @@ docs/
 
 #### Files Updated
 
-```
+```text
 middleware.ts                 # Clerk-based route protection
 tailwind.config.ts           # Brand tokens and design system
 app/api/shop/products/route.ts  # Uses new Printify client
@@ -137,7 +137,7 @@ components/hero/*.tsx        # Enhanced with better design and functionality
 
 #### Files Removed/Deprecated
 
-```
+```text
 app/(auth)/*                 # Replaced with root-level auth routes
 app/profile/page.tsx         # Moved to /account
 app/utils/utils/printifyAPI.js # Replaced with typed client

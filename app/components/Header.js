@@ -17,15 +17,15 @@ export default function Header() {
               height={50}
               className="rounded-full border-2 border-white"
             />
-            <span className="text-2xl font-bold text-white">Otakumori</span>
+            <span className="text-2xl font-bold text-white">{<><span role='img' aria-label='emoji'>O</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span></>}</span>
           </div>
         </Link>
 
         {/* Navigation */}
         <nav className="hidden space-x-8 text-lg text-white md:flex" aria-label="Main navigation">
-          <Link href="/" className="hover:text-purple-400 transition-colors">
-            Home
-          </Link>
+          <Link href="/" className="hover:text-purple-400 transition-colors">{<>''
+            <span role='img' aria-label='emoji'>H</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span>
+            ''</>}</Link>
 
           {/* Shop Dropdown */}
           <div className="group relative">
@@ -34,9 +34,9 @@ export default function Header() {
               aria-expanded="false"
               aria-haspopup="true"
               aria-label="Shop menu"
-            >
-              Shop
-            </button>
+            >{<>''
+              <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>p</span>
+              ''</>}</button>
             <div
               className="absolute left-0 mt-2 hidden w-52 rounded-lg bg-black/90 p-2 shadow-lg group-hover:block"
               role="menu"
@@ -46,38 +46,38 @@ export default function Header() {
                 href="/shop"
                 className="block px-3 py-1 hover:bg-gray-800 transition-colors"
                 role="menuitem"
-              >
-                Shop All
-              </Link>
+              >{<>''
+                <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>p</span>' '<span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span>
+                ''</>}</Link>
               <div className="my-1 border-b border-gray-600" role="separator"></div>
               <Link
                 href="/shop/apparel"
                 className="block px-3 py-1 hover:bg-gray-800 transition-colors"
                 role="menuitem"
-              >
-                Apparel
-              </Link>
+              >{<>''
+                <span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>l</span>
+                ''</>}</Link>
               <Link
                 href="/shop/homedecor"
                 className="block px-3 py-1 hover:bg-gray-800 transition-colors"
                 role="menuitem"
-              >
-                Home Decor
-              </Link>
+              >{<>''
+                <span role='img' aria-label='emoji'>H</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>D</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span>
+                ''</>}</Link>
               <Link
                 href="/shop/accessories"
                 className="block px-3 py-1 hover:bg-gray-800 transition-colors"
                 role="menuitem"
-              >
-                Accessories
-              </Link>
+              >{<>''
+                <span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span>
+                ''</>}</Link>
               <Link
                 href="/shop/theabyss"
                 className="block px-3 py-1 text-red-500 hover:bg-red-700 transition-colors"
                 role="menuitem"
                 aria-label="The Abyss - Adult content"
-              >
-                The Abyss{' '}
+              >{<>''
+                <span role='img' aria-label='emoji'>T</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span></>}{' '}
                 <span role="img" aria-label="Adult content warning">
                   🔞
                 </span>
@@ -85,18 +85,18 @@ export default function Header() {
             </div>
           </div>
 
-          <Link href="/blog" className="hover:text-purple-400 transition-colors">
-            Blog
-          </Link>
-          <Link href="/mini-games" className="hover:text-purple-400 transition-colors">
-            Mini Games
-          </Link>
+          <Link href="/blog" className="hover:text-purple-400 transition-colors">{<>''
+            <span role='img' aria-label='emoji'>B</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>g</span>
+            ''</>}</Link>
+          <Link href="/mini-games" className="hover:text-purple-400 transition-colors">{<>''
+            <span role='img' aria-label='emoji'>M</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>i</span>' '<span role='img' aria-label='emoji'>G</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span>
+            ''</>}</Link>
 
           {/* Search Bar */}
           <div className="relative">
-            <label htmlFor="search-input" className="sr-only">
-              Search products
-            </label>
+            <label htmlFor="search-input" className="sr-only">{<>''
+              <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>h</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span>
+              ''</>}</label>
             <input
               id="search-input"
               type="text"

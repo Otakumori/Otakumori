@@ -82,11 +82,11 @@ export default function AbyssPage() {
   }, [quests, addQuest]);
 
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return <div>{<><span role='img' aria-label='emoji'>L</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span>...</>}</div>;
   }
 
   if (!user) {
-    return <div>Please sign in to access the Abyss</div>;
+    return <div>{<><span role='img' aria-label='emoji'>P</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span></>}</div>;
   }
 
   const handleStartQuest = (quest) => {
@@ -115,15 +115,14 @@ export default function AbyssPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="mb-4 text-4xl font-bold text-white">
-          Welcome to the Abyss, {user?.firstName}
+        <h1 className="mb-4 text-4xl font-bold text-white">{<>''
+          <span role='img' aria-label='emoji'>W</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span>,' '''</>}{user?.firstName}
         </h1>
-        <p className="text-gray-400">
-          Your journey into the depths begins here. Collect petals, complete quests, and explore the
-          mysteries that await.
-        </p>
+        <p className="text-gray-400">{<>''
+          <span role='img' aria-label='emoji'>Y</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>r</span>' '<span role='img' aria-label='emoji'>j</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>y</span>' '<span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>.' '<span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>s</span>,' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>q</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span>,' '<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span>' '<span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>x</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>
+          <span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>w</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>t</span>.
+          ''</>}</p>
       </motion.div>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {features.map((feature, index) => (
           <motion.div
@@ -141,17 +140,16 @@ export default function AbyssPage() {
               <a
                 href={feature.path}
                 className="inline-block rounded-lg bg-white/10 px-4 py-2 text-white transition-colors hover:bg-white/20"
-              >
-                Explore
-              </a>
+              >{<>''
+                <span role='img' aria-label='emoji'>E</span><span role='img' aria-label='emoji'>x</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>
+                ''</>}</a>
             </div>
           </motion.div>
         ))}
       </div>
-
       {quests.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-8">
-          <h2 className="mb-4 text-2xl font-bold text-white">Active Quests</h2>
+          <h2 className="mb-4 text-2xl font-bold text-white">{<><span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>v</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>Q</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span></>}</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {quests.map((quest) => (
               <div
@@ -161,13 +159,13 @@ export default function AbyssPage() {
                 <h3 className="mb-2 text-lg font-semibold text-white">{quest.title}</h3>
                 <p className="mb-2 text-gray-400">{quest.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-pink-500">Reward: {quest.reward} petals</span>
+                  <span className="text-pink-500">{<><span role='img' aria-label='emoji'>R</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>w</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>:</span>' '''</>}{quest.reward}{<>''' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>s</span></>}</span>
                   <button
                     onClick={() => handleStartQuest(quest)}
                     className="rounded bg-pink-500/20 px-3 py-1 text-white transition-colors hover:bg-pink-500/30"
-                  >
-                    Start Quest
-                  </button>
+                  >{<>''
+                    <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>Q</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span>
+                    ''</>}</button>
                 </div>
               </div>
             ))}

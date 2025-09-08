@@ -1,48 +1,40 @@
-// app/components/CherryBlossomEffect.tsx
-'use client';
-
-import { useEffect, useRef } from 'react';
-
+"use client";
+import { useEffect } from "react";
+type Density = "home" | "site";
 type Vec = { x: number; y: number };
 
-const AMBIENT_INTERVAL_MS = 700; // slow + casual
-const AMBIENT_MIN = 1;
-const AMBIENT_MAX = 2;
-const CLICK_BURST_COUNT = 16; // satisfying but not heavy
-const FALL_TIME_MS_MIN = 9000; // dreamy slow
-const FALL_TIME_MS_MAX = 14000;
+const AMBIENT_MS_HOME = 700;
+const AMBIENT_MS_SITE = 2200;
+const CLICK_BURST_COUNT = 16;
+const FALL_MIN = 9000;
+const FALL_MAX = 14000;
 
-function rand(min: number, max: number) {
-  return Math.random() * (max - min) + min;
-}
+const rnd = (a:number,b:number)=>Math.random()*(b-a)+a;
 
-function makePetal(root: HTMLElement, start: Vec, zIndex = 6) {
-  const p = document.createElement('div');
-  const size = rand(5, 8);
-  p.className = 'om-petal';
+function spawnPetal(root: HTMLElement, start: Vec, z = 6) {
+  const p = document.createElement("div");
+  const size = rnd(5, 8);
   Object.assign(p.style, {
-    position: 'fixed',
+    position: "fixed",
     left: `${start.x}px`,
     top: `${start.y}px`,
     width: `${size}px`,
     height: `${size * 0.7}px`,
     borderRadius: `${size}px ${size}px ${size * 0.2}px ${size * 0.8}px`,
-    background: 'radial-gradient(40% 50% at 40% 50%, rgba(255,175,215,.95), rgba(250,130,190,.8))',
-    boxShadow: '0 0 6px rgba(255,150,210,.25)',
-    pointerEvents: 'none',
-    zIndex: String(zIndex),
-    transform: 'translateZ(0)',
-    willChange: 'transform, opacity',
+    background: "radial-gradient(40% 50% at 40% 50%, rgba(255,175,215,.95), rgba(250,130,190,.8))",
+    boxShadow: "0 0 6px rgba(255,150,210,.25)",
+    pointerEvents: "none",
+    zIndex: String(z),
+    transform: "translateZ(0)",
+    willChange: "transform, opacity",
   } as CSSStyleDeclaration);
   root.appendChild(p);
 
-  const driftX = rand(40, 110);
-  const fallY = window.innerHeight + rand(120, 260);
-  const duration = rand(FALL_TIME_MS_MIN, FALL_TIME_MS_MAX);
-  const wobble = rand(0.4, 0.9);
-
+  const driftX = rnd(40, 110);
+  const fallY = window.innerHeight + rnd(120, 260);
+  const duration = rnd(FALL_MIN, FALL_MAX);
+  const wobble = rnd(0.4, 0.9);
   const startTs = performance.now();
-  let raf = 0;
 
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTs) / duration);
@@ -51,83 +43,57 @@ function makePetal(root: HTMLElement, start: Vec, zIndex = 6) {
     const rot = t * 220 + Math.sin(t * 6.28) * 10;
     p.style.transform = `translate(${xOff}px, ${yOff}px) rotate(${rot}deg)`;
     p.style.opacity = String(1 - t * 0.95);
-    if (t < 1) {
-      raf = requestAnimationFrame(tick);
-    } else {
-      p.remove();
-      cancelAnimationFrame(raf);
-    }
+    t < 1 ? requestAnimationFrame(tick) : p.remove();
   };
-
   requestAnimationFrame(tick);
 }
 
-export default function CherryBlossomEffect() {
-  const originRef = useRef<Vec>({ x: 160, y: 140 });
-
-  // Track canopy position (top-right cluster) as petal origin
+export default function CherryBlossomEffect({ density = "home" }: { density?: Density }) {
+  // Find tree position for canopy anchor
   useEffect(() => {
-    const el = document.querySelector('[data-tree-root]') as HTMLDivElement | null;
+    const el = document.querySelector("[data-tree-root]") as HTMLDivElement | null;
     if (!el) return;
-    const update = () => {
-      const r = el.getBoundingClientRect();
-      originRef.current = {
-        x: r.left + r.width * 0.66,
-        y: r.top + r.height * 0.18,
-      };
-    };
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    window.addEventListener('resize', update);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', update);
-    };
-  }, []);
-
-  // Ambient gentle spawn
-  useEffect(() => {
     const root = document.body;
-    const timer = setInterval(() => {
-      const n = Math.round(rand(AMBIENT_MIN, AMBIENT_MAX));
-      for (let i = 0; i < n; i++) {
-        const jitterX = rand(-18, 18);
-        const jitterY = rand(-18, 18);
-        makePetal(
-          root,
-          {
-            x: originRef.current.x + jitterX,
-            y: originRef.current.y + jitterY,
-          },
-          6,
-        );
-      }
-    }, AMBIENT_INTERVAL_MS);
+    const ms = density === "home" ? AMBIENT_MS_HOME : AMBIENT_MS_SITE;
 
-    return () => clearInterval(timer);
-  }, []);
-
-  // Click burst near cursor
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      const root = document.body;
-      for (let i = 0; i < CLICK_BURST_COUNT; i++) {
-        const angle = (i / CLICK_BURST_COUNT) * Math.PI * 2;
-        const radius = rand(4, 22);
-        makePetal(
-          root,
-          {
-            x: e.clientX + Math.cos(angle) * radius,
-            y: e.clientY + Math.sin(angle) * radius,
-          },
-          9,
-        );
-      }
+    let canopy: Vec = { x: 160, y: 140 };
+    const setFromRect = () => {
+      const r = el.getBoundingClientRect();
+      canopy = { x: r.left + r.width * 0.66, y: r.top + r.height * 0.18 };
     };
-    window.addEventListener('click', handler, { passive: true });
-    return () => window.removeEventListener('click', handler);
-  }, []);
+    setFromRect();
+    const ro = new ResizeObserver(setFromRect);
+    ro.observe(el);
+    const onResize = () => setFromRect();
+    addEventListener("resize", onResize);
+
+    const id = setInterval(() => {
+      const n = Math.round(rnd(1, density === "home" ? 2 : 1));
+      for (let i = 0; i < n; i++) {
+        const jx = rnd(-18, 18), jy = rnd(-18, 18);
+        spawnPetal(root, { x: canopy.x + jx, y: canopy.y + jy }, 6);
+      }
+    }, ms);
+
+    const onClick = (e: MouseEvent) => {
+      const count = density === "home" ? CLICK_BURST_COUNT : Math.round(CLICK_BURST_COUNT * 0.6);
+      for (let i = 0; i < count; i++) {
+        const angle = (i / count) * Math.PI * 2;
+        const r = rnd(4, 22);
+        spawnPetal(root, { x: e.clientX + Math.cos(angle) * r, y: e.clientY + Math.sin(angle) * r }, 9);
+      }
+      // Dispatch petal collect event for HUD
+      window.dispatchEvent(new Event("petal:collect"));
+    };
+    addEventListener("click", onClick, { passive: true });
+
+    return () => {
+      clearInterval(id);
+      removeEventListener("click", onClick);
+      removeEventListener("resize", onResize);
+      ro.disconnect();
+    };
+  }, [density]);
 
   return null;
 }

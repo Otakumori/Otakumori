@@ -1,4 +1,3 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -7,6 +6,7 @@ import { useState } from 'react';
 import { COPY } from '@/app/lib/copy';
 import GlassButton from '@/app/components/ui/GlassButton';
 import GlassCard from '@/app/components/ui/GlassCard';
+import BootScreen from '../../components/games/BootScreen';
 
 const Game = dynamic(() => import('./Game'), {
   ssr: false,
@@ -17,7 +17,8 @@ export default function MemoryMatchPage() {
   const [mode, setMode] = useState<'classic' | 'daily' | 'challenge'>('classic');
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-pink-50 via-gray-50 to-pink-100">
+    <BootScreen gameId="memory-match">
+      <main className="min-h-screen bg-gradient-to-br from-pink-50 via-gray-50 to-pink-100">
       <div className="container mx-auto max-w-5xl p-4">
         {/* Header */}
         <header className="mb-6">
@@ -90,5 +91,6 @@ export default function MemoryMatchPage() {
         </GlassCard>
       </div>
     </main>
+    </BootScreen>
   );
 }

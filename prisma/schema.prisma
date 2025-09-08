@@ -1500,6 +1500,95 @@ model Profile {
   // add any display name / avatar / flags you want seeded on create
 }
 
+// Missing models for the new features
+model UserProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  gamertag         String?
+  gamertagChangedAt DateTime?
+  bannerKey        String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model UserPetals {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  total     Int      @default(0)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+}
+
+model UserInventory {
+  id        String   @id @default(cuid())
+  userId    String
+  itemKey   String
+  count     Int      @default(1)
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, itemKey])
+  @@index([userId])
+}
+
+model GlobalPetals {
+  id        String   @id @default(cuid())
+  total     Int      @default(0)
+  goal      Int?
+  eventName String?
+  active    Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+}
+
+model QuestProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  questId   String
+  date      DateTime
+  count     Int      @default(0)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, date, questId])
+  @@index([userId])
+  @@index([questId])
+}
+
+model QuestClaim {
+  id        String   @id @default(cuid())
+  userId    String
+  questId   String
+  date      DateTime
+  claimedAt DateTime @default(now())
+  
+  @@unique([userId, date, questId])
+  @@index([userId])
+  @@index([questId])
+}
+
+model Soapstone {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String
+  score     Int      @default(0)
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([score])
+  @@index([createdAt])
+}
+
+model SoapstoneVote {
+  id           String   @id @default(cuid())
+  userId       String
+  soapstoneId  String
+  vote         String   // "up" | "down"
+  createdAt    DateTime @default(now())
+  
+  @@unique([userId, soapstoneId])
+  @@index([userId])
+  @@index([soapstoneId])
+}
+
 model StripeCustomer {
   id         String @id @default(cuid())
   userId     String @unique

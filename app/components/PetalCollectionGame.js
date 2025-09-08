@@ -66,12 +66,11 @@ export default function PetalCollectionGame() {
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowLeaderboard(!showLeaderboard)}
             className="rounded-full bg-gray-800 px-4 py-2 font-bold text-white hover:bg-gray-700"
-          >
-            Leaderboard
-          </motion.button>
+          >{<>''
+            <span role='img' aria-label='emoji'>L</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>d</span>
+            ''</>}</motion.button>
         </div>
       </div>
-
       {/* Leaderboard Modal */}
       <AnimatePresence>
         {showLeaderboard && (
@@ -86,17 +85,16 @@ export default function PetalCollectionGame() {
               className="w-96 rounded-lg bg-gray-800 p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="mb-4 text-2xl font-bold text-pink-400">Leaderboard</h2>
+              <h2 className="mb-4 text-2xl font-bold text-pink-400">{<><span role='img' aria-label='emoji'>L</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>d</span></>}</h2>
               <div className="space-y-2">
-                <p className="text-center text-gray-400">
-                  Sign in to view and compete on the leaderboard!
-                </p>
+                <p className="text-center text-gray-400">{<>''
+                  <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>v</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>w</span>' '<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>d</span>!
+                  ''</>}</p>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Notification */}
       <AnimatePresence>
         {showNotification && (

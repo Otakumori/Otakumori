@@ -1,60 +1,33 @@
-import type { Metadata } from 'next';
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import NavBar from '../components/NavBar';
-import FooterDark from '../components/FooterDark';
-import ProfileHub from '../components/profile/ProfileHub';
-import { t } from '@/lib/microcopy';
+import { getProfileData } from "./_data/profile";
+import AchievementsPanel from "../components/profile/AchievementsPanel";
+import OneTapGamertag from "../components/profile/OneTapGamertag";
+import DailyQuests from "../components/quests/DailyQuests";
 
-export const metadata: Metadata = {
-  title: 'Profile — Otaku-mori',
-  description: 'Your personal shrine and profile management.',
-};
-
-async function getProfileData() {
-  try {
-    const { getToken } = await auth();
-    const token = await getToken({ template: 'otakumori-jwt' });
-    
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/profile/me`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      cache: 'no-store',
-    });
-
-    if (!response.ok) return null;
-    return response.json();
-  } catch {
-    return null;
-  }
-}
+export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  const { userId } = await auth();
-  
-  if (!userId) {
-    redirect('/sign-in?redirect_url=/profile');
-  }
-
-  const profileData = await getProfileData();
+  const { user, achievements, ownedCodes, gamertag, canRenameAt } = await getProfileData();
 
   return (
-    <>
-      <NavBar />
-      <main className="relative z-10 min-h-screen bg-[#080611]">
-        <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white md:text-4xl">
-              Your Shrine
-            </h1>
-            <p className="mt-2 text-zinc-300/90">
-              {t("encouragement", "welcomeBack")}
-            </p>
+    <div className="mx-auto max-w-6xl px-6 py-10 space-y-10">
+      {/* Header */}
+      <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-white">Profile</h1>
+            <p className="text-sm text-zinc-300">Your account, progress, and unlocks</p>
           </div>
-          
-          <ProfileHub profileData={profileData} />
         </div>
-      </main>
-      <FooterDark />
-    </>
+      </section>
+
+      {/* Gamertag */}
+      <OneTapGamertag initial={gamertag || undefined} />
+
+      {/* Daily Quests */}
+      <DailyQuests />
+
+      {/* Achievements */}
+      <AchievementsPanel />
+    </div>
   );
 }

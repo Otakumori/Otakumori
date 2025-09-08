@@ -12,7 +12,7 @@ const actions = [
 export default function QuickActions() {
   return (
     <div className="rounded-lg border border-pink-900/40 bg-black/80 p-4 shadow-2xl">
-      <h2 className="mb-4 text-xl font-bold text-pink-400">Quick Actions</h2>
+      <h2 className="mb-4 text-xl font-bold text-pink-400">{<><span role='img' aria-label='emoji'>Q</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>k</span>' '<span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>s</span></>}</h2>
       <div className="space-y-2">
         {actions.map((action) => (
           <motion.button

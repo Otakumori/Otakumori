@@ -14,9 +14,7 @@ export default function PetalClicker() {
         <button
           className="bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-lg font-bold"
           onClick={() => setScore(score + 1)}
-        >
-          Click!
-        </button>
+        >Click!</button>
       </div>
     </div>
   );

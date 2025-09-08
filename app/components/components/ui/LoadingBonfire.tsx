@@ -60,7 +60,6 @@ export default function LoadingBonfire() {
           }}
         />
       </motion.div>
-
       <motion.p
         className="mt-8 font-medium text-pink-400"
         animate={{
@@ -70,9 +69,9 @@ export default function LoadingBonfire() {
           duration: 2,
           repeat: Infinity,
         }}
-      >
-        Kindling the bonfire...
-      </motion.p>
+      >{<>''
+        <span role='img' aria-label='emoji'>K</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>f</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>...
+        ''</>}</motion.p>
     </div>
   );
 }

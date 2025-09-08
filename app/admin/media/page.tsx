@@ -90,7 +90,6 @@ export default function AdminMediaPage() {
           {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </header>
-
       <section className="mb-8 rounded-2xl border p-4">
         <h2 className="mb-2 text-lg font-semibold">Upload</h2>
         <p className="mb-4 text-sm text-neutral-500">
@@ -121,7 +120,6 @@ export default function AdminMediaPage() {
         </div>
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       </section>
-
       <section className="rounded-2xl border p-4">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Library</h2>
@@ -144,18 +142,16 @@ export default function AdminMediaPage() {
                   <div className="mb-2 aspect-video overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900">
                     {isImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={b.url} alt={name} className="h-full w-full object-cover" />
+                      (<img src={b.url} alt={name} className="h-full w-full object-cover" />)
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500">
                         {b.contentType || 'binary'}
                       </div>
                     )}
                   </div>
-
                   <div className="mb-1 truncate text-sm font-medium">{name}</div>
                   <div className="mb-3 truncate text-xs text-neutral-500">{b.url}</div>
                   <div className="mb-3 text-xs text-neutral-500">{uploaded}</div>
-
                   <div className="flex gap-2">
                     <button
                       onClick={() => {

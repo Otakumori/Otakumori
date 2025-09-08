@@ -77,23 +77,20 @@ export default function Hero() {
         style={{ objectFit: 'cover' }}
         className="z-0"
       />
-
       {/* Petal Animation */}
       <CherryBlossomEffect />
-
       {/* Petal Count Bar */}
       <div className="absolute bottom-10 rounded-lg bg-black/80 p-3 text-white shadow-lg">
         <div className="text-center">
-          <div className="text-lg font-semibold">Community Petals Collected</div>
+          <div className="text-lg font-semibold">{<><span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>y</span>' '<span role='img' aria-label='emoji'>P</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>d</span></>}</div>
           <div className="text-2xl font-bold text-pink-400">
-            {collected.toLocaleString()} / 10,000
-          </div>
+            {collected.toLocaleString()}{<>''' '/' '<span role='img' aria-label='emoji'>1</span><span role='img' aria-label='emoji'>0</span>,<span role='img' aria-label='emoji'>0</span><span role='img' aria-label='emoji'>0</span><span role='img' aria-label='emoji'>0</span>
+            ''</>}</div>
         </div>
       </div>
-
       {/* CTA */}
       <div className="absolute top-10 animate-pulse text-3xl text-white text-center">
-        <div className="mb-4">Click the petals to collect rewards!</div>
+        <div className="mb-4">{<><span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>k</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>w</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>s</span>!</>}</div>
         <button
           onClick={handlePetalClick}
           disabled={loading}

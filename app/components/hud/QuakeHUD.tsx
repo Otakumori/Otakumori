@@ -21,9 +21,9 @@ export default function QuakeHUD() {
         </div>
         <div className="hud-metrics">
           <button className="petals">
-            ◦ <b>1,248</b>
+            ◦ <b>{<><span role='img' aria-label='emoji'>1</span>,<span role='img' aria-label='emoji'>2</span><span role='img' aria-label='emoji'>4</span><span role='img' aria-label='emoji'>8</span></>}</b>
           </button>
-          <button className="quest-ticker">Petal Collector 23/50</button>
+          <button className="quest-ticker">{<><span role='img' aria-label='emoji'>P</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>l</span>' '<span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span>' '<span role='img' aria-label='emoji'>2</span><span role='img' aria-label='emoji'>3</span>/<span role='img' aria-label='emoji'>5</span><span role='img' aria-label='emoji'>0</span></>}</button>
         </div>
         <div className="hud-toasts" aria-live="polite" />
       </div>

@@ -74,7 +74,7 @@ export default function CubeHub() {
     };
 
     // Anchor tracking for selector overlay
-    const anchors = useAnchors.getState();
+    const _anchors = useAnchors.getState();
     function screenOf(vec3: THREE.Vector3) {
       const v = vec3.clone().project(camera);
       const w = mount.clientWidth,
@@ -108,7 +108,7 @@ export default function CubeHub() {
     let t = 0;
     function animate(now = 0) {
       requestAnimationFrame(animate);
-      const dt = (now - t) * 0.001;
+      const _dt = (now - t) * 0.001;
       t = now;
 
       // idle wobble (gentle)

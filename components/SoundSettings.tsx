@@ -29,7 +29,6 @@ export const SoundSettings = () => {
       >
         <span role="img" aria-label={isMuted ? "Muted speaker" : "Speaker"}>{isMuted ? '🔇' : '🔊'}</span>
       </motion.button>
-
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -40,7 +39,7 @@ export const SoundSettings = () => {
           >
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <span className="text-white">Sound</span>
+                <span className="text-white">{<><span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span></>}</span>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -52,7 +51,7 @@ export const SoundSettings = () => {
               </div>
 
               <div className="flex items-center space-x-3">
-                <span className="text-white">Haptic</span>
+                <span className="text-white">{<><span role='img' aria-label='emoji'>H</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>c</span></>}</span>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
