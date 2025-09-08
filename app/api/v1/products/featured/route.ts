@@ -25,12 +25,12 @@ export async function GET(request: NextRequest) {
 
     // Transform Printify data to our format
     const featuredProducts = data.data
-      .filter((product: any) => product.visible && product.tags?.includes('featured'))
+      .filter((product: any) => product.visible !== false) // Include all visible products
       .slice(0, 8)
       .map((product: any) => ({
         id: product.id.toString(),
         name: product.title,
-        price: parseFloat(product.variants[0]?.price || '0'),
+        price: parseFloat(product.variants[0]?.price || '0') / 100, // Convert cents to dollars
         image: product.images[0]?.src || '/assets/images/placeholder-product.jpg',
         slug: product.handle || product.id.toString(),
       }));
