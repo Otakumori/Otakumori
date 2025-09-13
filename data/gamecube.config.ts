@@ -4,15 +4,6 @@ const config: GameCubeConfig = {
   faces: [
     {
       slot: 4,
-      key: 'top-petal-store',
-      type: 'store',
-      label: 'Petal Store',
-      slug: 'petal-store',
-      enabled: true,
-      faceTooltip: 'Petal Store • Cosmetics',
-    },
-    {
-      slot: 5,
       key: 'top-trade',
       type: 'trade',
       label: 'Trade Center',
@@ -39,7 +30,7 @@ const config: GameCubeConfig = {
       faceTooltip: 'Avatars • Social',
     },
     {
-      slot: 2,
+      slot: 5,
       key: 'down-music',
       type: 'music',
       label: 'Music / Extras',

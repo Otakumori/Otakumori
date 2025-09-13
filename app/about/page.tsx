@@ -3,9 +3,9 @@
 
 import type React from 'react';
 import { motion } from 'framer-motion';
-import GlassCard from '@/app/components/ui/GlassCard';
-import GlassButton from '@/app/components/ui/GlassButton';
-import PetalLayer from '@/app/components/PetalLayer';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
+import PetalLayer from '../components/PetalLayer';
 
 export default function AboutMe() {
   return (

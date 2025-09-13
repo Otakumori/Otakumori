@@ -1,13 +1,14 @@
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
-import { env } from '@/env';
+import { env } from '@/server/env';
 
 type Game = { id: string; slug: string; title: string; summary?: string };
 
 async function getGames(): Promise<Game[]> {
-  const res = await fetch(`${env.NEXT_PUBLIC_SITE_URL ?? ''}/api/v1/games/teaser?limit=3`, {
-    next: { revalidate: 300 },
+  const baseUrl = env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/v1/games/teaser?limit=3`, {
+    cache: 'no-store',
   });
   if (!res.ok) return [];
   return (await res.json()) as Game[];

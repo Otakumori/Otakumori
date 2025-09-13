@@ -162,7 +162,7 @@ GitHub Actions workflow includes:
 
 ## 📁 Project Structure
 
-```
+```text
 app/
 ├── api/v1/           # Versioned API routes
 ├── components/       # Reusable components
@@ -250,25 +250,25 @@ npm run deploy
 
 ### Common Issues
 
-**CSP Violations in Edge**
+#### CSP Violations in Edge
 
 - Check `next.config.mjs` CSP configuration
 - Ensure all Clerk domains are whitelisted
 - Verify no inline scripts are blocked
 
-**Authentication Not Working**
+#### Authentication Not Working
 
 - Verify Clerk keys are correct
 - Check CSP allows Clerk domains
 - Ensure cookies are set with proper SameSite
 
-**Petals Not Persisting**
+#### Petals Not Persisting
 
 - Check database connection
 - Verify API routes are accessible
 - Check rate limiting isn't blocking requests
 
-**Build Failures**
+#### Build Failures
 
 - Run `npm run typecheck` to identify TypeScript errors
 - Run `npm run lint` to identify ESLint errors

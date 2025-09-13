@@ -1,0 +1,6 @@
+---- OUTPUT ----
+[
+  {
+    "version": "PostgreSQL 17.2 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.3.0) 14.3.0, 64-bit"
+  }
+]

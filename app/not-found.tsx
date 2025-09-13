@@ -31,22 +31,22 @@ export default function NotFound() {
                 priority
               />
             </div>
-            <p className="mt-3 text-center text-sm text-zinc-200/90">{<>''
-              <span role='img' aria-label='emoji'>Y</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span>' '<span role='img' aria-label='emoji'>w</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>d</span>' '<span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>f</span><span role='img' aria-label='emoji'>f</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span>.
-              ''</>}</p>
+            <p className="mt-3 text-center text-sm text-zinc-200/90">
+              You wandered off the path.
+            </p>
             <div className="mt-3 flex justify-center gap-3">
               <button
                 onClick={() => setShowPopup(false)}
                 className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm hover:bg-white/10"
-              >{<>''
-                <span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>e</span>
-                ''</>}</button>
+              >
+                Continue
+              </button>
               <Link
                 href="/games/404"
                 className="rounded-xl bg-fuchsia-500/90 px-3 py-1.5 text-sm text-white hover:bg-fuchsia-500"
-              >{<>''
-                <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>4</span><span role='img' aria-label='emoji'>0</span><span role='img' aria-label='emoji'>4</span>' '<span role='img' aria-label='emoji'>G</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span>
-                ''</>}</Link>
+              >
+                Start 404 Game
+              </Link>
             </div>
           </div>
         </div>
@@ -54,17 +54,17 @@ export default function NotFound() {
       {/* 404 body (when popup hides) */}
       {!showPopup && (
         <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
-          <h1 className="text-3xl font-bold md:text-5xl">{<><span role='img' aria-label='emoji'>L</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>A</span><span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span></>}</h1>
-          <p className="mt-3 text-zinc-300/90">{<>''
-            <span role='img' aria-label='emoji'>T</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span>'<span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span>' '<span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>n</span>'<span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>.
-            ''</>}</p>
+          <h1 className="text-3xl font-bold md:text-5xl">Lost in the Abyss</h1>
+          <p className="mt-3 text-zinc-300/90">
+            The page you're seeking isn't here.
+          </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/" className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">{<>''
-              <span role='img' aria-label='emoji'>R</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>H</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span>
-              ''</>}</Link>
-            <Link href="/games/404" className="rounded-xl bg-fuchsia-500/90 px-4 py-2 text-sm text-white hover:bg-fuchsia-500">{<>''
-              <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>4</span><span role='img' aria-label='emoji'>0</span><span role='img' aria-label='emoji'>4</span>' '<span role='img' aria-label='emoji'>G</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>e</span>
-              ''</>}</Link>
+            <Link href="/" className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">
+              Return Home
+            </Link>
+            <Link href="/games/404" className="rounded-xl bg-fuchsia-500/90 px-4 py-2 text-sm text-white hover:bg-fuchsia-500">
+              Start 404 Game
+            </Link>
           </div>
         </section>
       )}

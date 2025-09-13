@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
 
 export const runtime = 'nodejs';
@@ -17,12 +17,12 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   if (!title || !url)
     return NextResponse.json({ ok: false, error: 'Missing fields' }, { status: 400 });
 
-  const maxSort = await prisma.musicTrack.aggregate({
+  const maxSort = await db.musicTrack.aggregate({
     _max: { sort: true },
     where: { playlistId: params.id },
   });
 
-  const track = await prisma.musicTrack.create({
+  const track = await db.musicTrack.create({
     data: {
       playlistId: params.id,
       title,
@@ -47,9 +47,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!Array.isArray(order))
     return NextResponse.json({ ok: false, error: 'Invalid order format' }, { status: 400 });
 
-  await prisma.$transaction(
+  await db.$transaction(
     order.map((o: { id: string; sort: number }) =>
-      prisma.musicTrack.update({ where: { id: o.id }, data: { sort: o.sort } }),
+      db.musicTrack.update({ where: { id: o.id }, data: { sort: o.sort } }),
     ),
   );
   return NextResponse.json({ ok: true });

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import StarfieldPurple from '../../components/StarfieldPurple';
-import NavBar from '../../components/NavBar';
+// import NavBar from '../../components/NavBar'; // Removed to prevent nav overlay
 import FooterDark from '../../components/FooterDark';
 import ProductDetail from '../../components/shop/ProductDetail';
 import { t } from '@/lib/microcopy';
@@ -51,7 +51,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   return (
     <>
       <StarfieldPurple />
-      <NavBar />
+      {/* NavBar removed to prevent overlay */}
       <main className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <ProductDetail product={product} />

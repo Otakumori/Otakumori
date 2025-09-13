@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   const { displayName } = (await req.json()) as { displayName?: string };
 
-  await prisma.user.update({
+  await db.user.update({
     where: { id: userId },
     data: { display_name: displayName ?? null },
   });

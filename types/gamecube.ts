@@ -1,13 +1,5 @@
-// DEPRECATED: This component is a duplicate. Use app\mini-games\_components\GameCube.tsx instead.
-export type FaceKey =
-  | 'top-petal-store'
-  | 'top-trade'
-  | 'left-games'
-  | 'right-community'
-  | 'down-music'
-  | 'front-about';
-
-export type FaceType = 'store' | 'trade' | 'games' | 'community' | 'music' | 'about';
+export type FaceKey = 'top-trade' | 'left-games' | 'right-community' | 'down-music' | 'front-about';
+export type FaceType = 'trade' | 'games' | 'community' | 'music' | 'about';
 
 export type GameKey =
   | 'samurai_petal_slice'
@@ -24,7 +16,7 @@ export interface CubeFace {
   key: FaceKey;
   type: FaceType;
   label: string;
-  slug: 'petal-store' | 'trade' | 'mini-games' | 'community' | 'music' | 'about';
+  slug: string;              // 'trade' | 'mini-games' | 'community' | 'music' | 'about'
   enabled: boolean;
   faceTooltip?: string;
 }
@@ -40,5 +32,5 @@ export interface MiniGameMeta {
 
 export interface GameCubeConfig {
   faces: CubeFace[];
-  games: MiniGameMeta[];
+  games: MiniGameMeta[];     // rendered inside Left face panel
 }

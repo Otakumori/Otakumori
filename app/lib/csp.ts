@@ -1,4 +1,4 @@
-import { env } from "@/app/env";
+import { env } from "@/env";
 
 const isDev = env.NODE_ENV !== "production";
 
@@ -22,7 +22,7 @@ export const contentSecurityPolicy = isDev
         "connect-src": [
           "'self'",
           "https:",
-          env.NEXT_PUBLIC_CLERK_PROXY_URL,
+          // env.NEXT_PUBLIC_CLERK_PROXY_URL, // Optional
           "https://api.printify.com",
           "https://*.sentry.io",
           "https://vitals.vercel-insights.com",

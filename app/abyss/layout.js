@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { usePetalContext } from '@/providers';
+import { usePetalContext } from '../../providers';
 
 const navItems = [
   { path: '/abyss', label: 'Home' },

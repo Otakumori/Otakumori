@@ -1,19 +1,17 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/app/components/Footer';
-import { Providers } from '@/providers';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Providers from './Providers';
 import * as Sentry from '@sentry/nextjs';
-import { ClerkProvider } from '@clerk/nextjs';
+import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import { headers } from 'next/headers';
-import Starfield from './components/background/Starfield';
 import CherryBlossomEffect from './components/CherryBlossomEffect';
 import CursorGlow from './components/effects/CursorGlow';
-import { isCursorGlowEnabled } from '@/app/flags';
+import { isCursorGlowEnabled } from './flags';
 import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
-import { env } from '@/app/env';
 
 export function generateMetadata(): Metadata {
   return {
@@ -28,28 +26,10 @@ export function generateMetadata(): Metadata {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const nonce = headers().get('x-nonce') ?? undefined;
 
-  const clerkProps: any = {
-    dynamic: true,
-    nonce,
-    publishableKey: env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  };
-
-  if (env.NEXT_PUBLIC_CLERK_SIGN_IN_URL) clerkProps.signInUrl = env.NEXT_PUBLIC_CLERK_SIGN_IN_URL;
-  if (env.NEXT_PUBLIC_CLERK_SIGN_UP_URL) clerkProps.signUpUrl = env.NEXT_PUBLIC_CLERK_SIGN_UP_URL;
-  if (env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL)
-    clerkProps.afterSignInUrl = env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL;
-  if (env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL)
-    clerkProps.afterSignUpUrl = env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL;
-  if (env.NEXT_PUBLIC_CLERK_DOMAIN) clerkProps.domain = env.NEXT_PUBLIC_CLERK_DOMAIN;
-  if (typeof env.NEXT_PUBLIC_CLERK_IS_SATELLITE !== 'undefined') {
-    clerkProps.isSatellite = env.NEXT_PUBLIC_CLERK_IS_SATELLITE === 'true';
-  }
-
   return (
-    <ClerkProvider {...clerkProps}>
+    <ClerkProviderWrapper nonce={nonce}>
       <html lang="en" suppressHydrationWarning>
         <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
-          <Starfield />
           <CherryBlossomEffect density="site" />
           {isCursorGlowEnabled() && <CursorGlow />}
           <PetalHUD />
@@ -64,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           >
             <Providers>
-              <Navigation />
+              <Header />
               <main id="content" className="relative z-20 flex-1">
                 {children}
               </main>
@@ -73,6 +53,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Sentry.ErrorBoundary>
         </body>
       </html>
-    </ClerkProvider>
+    </ClerkProviderWrapper>
   );
 }

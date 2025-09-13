@@ -1,4 +1,4 @@
-import { db } from '@/app/lib/db';
+import { db } from '@/lib/db';
 import { logger } from '@/app/lib/logger';
 import { type PetalTransaction, PetalTransactionSchema } from '@/app/lib/contracts';
 

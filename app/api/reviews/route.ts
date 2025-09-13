@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
-import { db } from '@/app/lib/db';
+import { db } from '@/lib/db';
 
 const CreateReviewSchema = z.object({
   productId: z.string().min(1),

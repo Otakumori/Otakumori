@@ -4,9 +4,9 @@
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 // import Link from 'next/link';
-import { COPY } from '@/app/lib/copy';
-import GlassButton from '@/app/components/ui/GlassButton';
-import GlassCard from '@/app/components/ui/GlassCard';
+import { COPY } from '../../lib/copy';
+import GlassButton from '../../components/ui/GlassButton';
+import GlassCard from '../../components/ui/GlassCard';
 
 const Game = dynamic(() => import('./Game'), {
   ssr: false,

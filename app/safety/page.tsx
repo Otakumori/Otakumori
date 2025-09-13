@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import SafetySettings from '@/app/components/SafetySettings';
+import SafetySettings from '../components/SafetySettings';
 
 export default function SafetyPage() {
   return (

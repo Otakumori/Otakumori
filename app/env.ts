@@ -2,6 +2,9 @@ import { z } from "zod";
 
 const EnvSchema = z.object({
   NODE_ENV: z.enum(["development","test","production"]),
+  // Site URLs
+  NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   // Clerk (proxy mode)
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(10),
   CLERK_SECRET_KEY: z.string().min(10),
@@ -25,18 +28,25 @@ const EnvSchema = z.object({
 
 export const env = EnvSchema.parse({
   NODE_ENV: process.env.NODE_ENV,
+  // Site URLs
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+  // Clerk (proxy mode)
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
   NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,
   CLERK_PROXY_URL: process.env.CLERK_PROXY_URL,
+  // Optional Clerk URLs
   NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
   NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
   NEXT_PUBLIC_CLERK_DOMAIN: process.env.NEXT_PUBLIC_CLERK_DOMAIN,
   NEXT_PUBLIC_CLERK_IS_SATELLITE: process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE,
+  // Stripe
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+  // Printify
   PRINTIFY_API_URL: process.env.PRINTIFY_API_URL,
   PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
   PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
