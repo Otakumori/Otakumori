@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import { useRouter } from 'next/navigation';
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import { audio } from '@/app/lib/audio';
 import { type CubeFace } from '@/types/gamecube';
 import {
@@ -15,14 +15,13 @@ import {
   getFaceAngle,
   getFacePosition,
   isTap,
-  type GestureState
+  type GestureState,
 } from '@/app/lib/gesture-utils';
 
 interface GameCube3DProps {
   faces: CubeFace[];
   onActivate?: (face: CubeFace) => void;
 }
-
 
 function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: CubeFace) => void }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -39,52 +38,54 @@ function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: Cu
 
   // Face mapping: 0=front, 1=right, 2=back, 3=left, 4=top, 5=down
 
-
   // Handle face rotation
-  const rotateToFace = useCallback((faceIndex: number) => {
-    if (isRotating || faceIndex === currentFace) return;
-    
-    setIsRotating(true);
-    const targetAngle = getFaceAngle(faceIndex);
-    
-    if (meshRef.current) {
-      const startAngle = meshRef.current.rotation.y;
-      const finalDiff = getShortestRotation(startAngle, targetAngle);
-      
-      const startTime = Date.now();
-      const duration = 300; // ms
-      
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeProgress = easeOutCubic(progress);
-        
-        if (meshRef.current) {
-          meshRef.current.rotation.y = startAngle + finalDiff * easeProgress;
-        }
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
+  const rotateToFace = useCallback(
+    (faceIndex: number) => {
+      if (isRotating || faceIndex === currentFace) return;
+
+      setIsRotating(true);
+      const targetAngle = getFaceAngle(faceIndex);
+
+      if (meshRef.current) {
+        const startAngle = meshRef.current.rotation.y;
+        const finalDiff = getShortestRotation(startAngle, targetAngle);
+
+        const startTime = Date.now();
+        const duration = 300; // ms
+
+        const animate = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easeProgress = easeOutCubic(progress);
+
           if (meshRef.current) {
-            meshRef.current.rotation.y = snapToAngle(meshRef.current.rotation.y);
+            meshRef.current.rotation.y = startAngle + finalDiff * easeProgress;
           }
-          setIsRotating(false);
-          audio.play('snap_clack', { gain: 0.6 });
-        }
-      };
-      
-      animate();
-    }
-    
-    setCurrentFace(faceIndex);
-  }, [currentFace, isRotating]);
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            if (meshRef.current) {
+              meshRef.current.rotation.y = snapToAngle(meshRef.current.rotation.y);
+            }
+            setIsRotating(false);
+            audio.play('snap_clack', { gain: 0.6 });
+          }
+        };
+
+        animate();
+      }
+
+      setCurrentFace(faceIndex);
+    },
+    [currentFace, isRotating],
+  );
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isRotating) return;
-      
+
       switch (e.key) {
         case 'ArrowLeft':
           e.preventDefault();
@@ -132,64 +133,78 @@ function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: Cu
     });
   }, []);
 
-  const handlePointerMove = useCallback((e: any) => {
-    if (!gestureState.isDragging) {
-      const deltaX = Math.abs(e.clientX - gestureState.startX);
-      const deltaY = Math.abs(e.clientY - gestureState.startY);
-      
-      if (deltaX > gestureState.threshold || deltaY > gestureState.threshold) {
-        setGestureState(prev => ({ ...prev, isDragging: true }));
-      }
-    }
-  }, [gestureState]);
+  const handlePointerMove = useCallback(
+    (e: any) => {
+      if (!gestureState.isDragging) {
+        const deltaX = Math.abs(e.clientX - gestureState.startX);
+        const deltaY = Math.abs(e.clientY - gestureState.startY);
 
-  const handlePointerUp = useCallback((e: any) => {
-    if (!gestureState.isDragging) {
-      // Check if it's a tap
-      if (isTap(gestureState.startX, gestureState.startY, e.clientX, e.clientY, gestureState.threshold)) {
-        const activeFace = faces[currentFace];
-        if (activeFace?.enabled) {
-          audio.play('samus_jingle', { gain: 0.5 });
-          onActivate?.(activeFace);
+        if (deltaX > gestureState.threshold || deltaY > gestureState.threshold) {
+          setGestureState((prev) => ({ ...prev, isDragging: true }));
         }
       }
-    } else {
-      // Swipe gesture
-      const swipe = detectSwipeDirection(
-        gestureState.startX,
-        gestureState.startY,
-        e.clientX,
-        e.clientY,
-        gestureState.threshold
-      );
-      
-      switch (swipe.direction) {
-        case 'left':
-          audio.play('gamecube_menu', { gain: 0.4 });
-          rotateToFace((currentFace + 1) % 4);
-          break;
-        case 'right':
-          audio.play('gamecube_menu', { gain: 0.4 });
-          rotateToFace((currentFace - 1 + 4) % 4);
-          break;
-        case 'up':
-          audio.play('gamecube_menu', { gain: 0.4 });
-          rotateToFace(4); // Top
-          break;
-        case 'down':
-          audio.play('gamecube_menu', { gain: 0.4 });
-          rotateToFace(5); // Down
-          break;
+    },
+    [gestureState],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: any) => {
+      if (!gestureState.isDragging) {
+        // Check if it's a tap
+        if (
+          isTap(
+            gestureState.startX,
+            gestureState.startY,
+            e.clientX,
+            e.clientY,
+            gestureState.threshold,
+          )
+        ) {
+          const activeFace = faces[currentFace];
+          if (activeFace?.enabled) {
+            audio.play('samus_jingle', { gain: 0.5 });
+            onActivate?.(activeFace);
+          }
+        }
+      } else {
+        // Swipe gesture
+        const swipe = detectSwipeDirection(
+          gestureState.startX,
+          gestureState.startY,
+          e.clientX,
+          e.clientY,
+          gestureState.threshold,
+        );
+
+        switch (swipe.direction) {
+          case 'left':
+            audio.play('gamecube_menu', { gain: 0.4 });
+            rotateToFace((currentFace + 1) % 4);
+            break;
+          case 'right':
+            audio.play('gamecube_menu', { gain: 0.4 });
+            rotateToFace((currentFace - 1 + 4) % 4);
+            break;
+          case 'up':
+            audio.play('gamecube_menu', { gain: 0.4 });
+            rotateToFace(4); // Top
+            break;
+          case 'down':
+            audio.play('gamecube_menu', { gain: 0.4 });
+            rotateToFace(5); // Down
+            break;
+        }
       }
-    }
-    
-    setGestureState({
-      startX: 0,
-      startY: 0,
-      isDragging: false,
-      threshold: 30,
-    });
-  }, [gestureState, currentFace, faces, onActivate, rotateToFace]);
+
+      setGestureState({
+        startX: 0,
+        startY: 0,
+        isDragging: false,
+        threshold: 30,
+      });
+    },
+    [gestureState, currentFace, faces, onActivate, rotateToFace],
+  );
 
   // Gentle idle rotation
   useFrame((state) => {
@@ -223,7 +238,7 @@ function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: Cu
           opacity={0.8}
         />
       </mesh>
-      
+
       {/* Face labels */}
       {faces.map((face, index) => {
         const position = getFacePosition(face.slot);
@@ -253,9 +268,9 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
   // Start background menu music when component mounts
   useEffect(() => {
     const startBackgroundMusic = () => {
-      const stopMusic = audio.play('gamecube_menu', { 
-        gain: 0.3, 
-        loop: true 
+      const stopMusic = audio.play('gamecube_menu', {
+        gain: 0.3,
+        loop: true,
       });
       setBackgroundMusic(() => stopMusic);
     };
@@ -279,16 +294,19 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
     };
   }, [backgroundMusic]);
 
-  const handleActivate = useCallback((face: CubeFace) => {
-    if (face.enabled) {
-      // Stop background music when navigating
-      if (backgroundMusic) {
-        backgroundMusic();
-        setBackgroundMusic(null);
+  const handleActivate = useCallback(
+    (face: CubeFace) => {
+      if (face.enabled) {
+        // Stop background music when navigating
+        if (backgroundMusic) {
+          backgroundMusic();
+          setBackgroundMusic(null);
+        }
+        router.push(`/panel/${face.slug}`);
       }
-      router.push(`/panel/${face.slug}`);
-    }
-  }, [router, backgroundMusic]);
+    },
+    [router, backgroundMusic],
+  );
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-purple-900">
@@ -296,9 +314,9 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={0.8} />
         <pointLight position={[-5, -5, -5]} intensity={0.3} />
-        
+
         <Cube faces={faces} onActivate={handleActivate} />
-        
+
         <OrbitControls
           enableZoom={false}
           enablePan={false}
@@ -306,7 +324,7 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
           autoRotate={false}
         />
       </Canvas>
-      
+
       {/* Instructions */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white text-center">
         <div className="text-sm mb-2">Use arrow keys or swipe to navigate</div>
