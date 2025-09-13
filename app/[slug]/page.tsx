@@ -2,7 +2,7 @@
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { db } from '@/app/lib/db';
+import { db } from '@/lib/db';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const page = await db.contentPage.findUnique({

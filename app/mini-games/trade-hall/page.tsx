@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { COPY } from '@/app/lib/copy';
-import GlassButton from '@/app/components/ui/GlassButton';
-import GlassCard from '@/app/components/ui/GlassCard';
+import { COPY } from '../../lib/copy';
+import GlassButton from '../../components/ui/GlassButton';
+import GlassCard from '../../components/ui/GlassCard';
 
 interface TradeItem {
   id: string;

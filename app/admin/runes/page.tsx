@@ -11,7 +11,7 @@ import {
   type RuneDef,
   type RuneComboDef,
   DEFAULT_RUNE_DISPLAYS,
-} from '@/types/runes';
+} from '../../../types/runes';
 import { AdminLayout } from '@/components/admin/AdminNav';
 
 interface EditableRuneDef extends Omit<RuneDef, 'createdAt' | 'updatedAt'> {

@@ -5,9 +5,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
-import GlassCard from '@/app/components/ui/GlassCard';
-import GlassButton from '@/app/components/ui/GlassButton';
-import CommentsSection from '@/app/components/CommentsSection';
+import GlassCard from '../../components/ui/GlassCard';
+import GlassButton from '../../components/ui/GlassButton';
+import CommentsSection from '../../components/CommentsSection';
 import { type ProfileView, type ProfileSection } from '@/app/lib/contracts';
 
 export default function ProfilePage() {

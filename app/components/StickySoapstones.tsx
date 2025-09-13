@@ -64,7 +64,7 @@ export default function StickySoapstones() {
     <section className="relative">
       <div
         ref={containerRef}
-        className="relative min-h-[520px] w-full rounded-3xl border border-zinc-800/50 bg-zinc-950/40 p-4"
+        className="relative min-h-[150px] w-full rounded-2xl border border-zinc-800/50 bg-zinc-950/40 p-3"
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-zinc-200">Soapstone Messages</h3>
@@ -98,7 +98,7 @@ export default function StickySoapstones() {
                 value={text}
                 onChange={(e) => setText(e.target.value.slice(0, 280))}
                 placeholder="Write freely… (max 280 chars)"
-                className="h-24 w-full resize-none rounded-xl bg-black/40 p-3 text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-pink-500/60"
+                className="h-16 w-full resize-none rounded-xl bg-black/40 p-2 text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-pink-500/60"
                 maxLength={280}
               />
               <div className="mt-2 flex items-center justify-between text-xs text-zinc-400">

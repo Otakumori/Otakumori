@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
 
 export const runtime = 'nodejs';
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   const cursor = searchParams.get('cursor') || undefined;
   const take = Math.min(Number(searchParams.get('take') || 20), 100);
 
-  const reviews = await prisma.productReview.findMany({
+  const reviews = await db.productReview.findMany({
     where: { isApproved: false },
     orderBy: { createdAt: 'asc' },
     take: take + 1,

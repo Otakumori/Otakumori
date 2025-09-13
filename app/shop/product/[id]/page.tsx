@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/app/components/ui/card';
 import Link from 'next/link';
 import NSFWAffirmNote from '@/components/NSFWAffirmNote';

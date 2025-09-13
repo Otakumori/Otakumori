@@ -1,5 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { env } from "@/app/env";
+import { env } from "@/server/env";
 
 const isPublic = createRouteMatcher([
   "/",
@@ -45,7 +45,7 @@ export default clerkMiddleware(
             "connect-src": [
               "'self'",
               "https://api.clerk.com",
-              env.NEXT_PUBLIC_CLERK_PROXY_URL,
+              // env.NEXT_PUBLIC_CLERK_PROXY_URL, // Optional
               "https://api.printify.com",
               "https://*.printify.com",
               "https://*.ingest.sentry.io",
@@ -67,7 +67,7 @@ export default clerkMiddleware(
             ],
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
-            "frame-src": ["'self'", env.NEXT_PUBLIC_CLERK_PROXY_URL, "https://*.clerk.com"],
+            "frame-src": ["'self'", "https://*.clerk.com"],
           },
         },
   }

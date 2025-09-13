@@ -24,11 +24,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform products for frontend consumption
-    const transformedProducts = data.data.map((product: any) => ({
+    const transformedProducts = data.data.items.map((product: any) => ({
       id: product.id,
       title: product.title,
       description: product.description,
-      price: product.price || 0,
+      price: product.variants?.[0]?.price || 0,
       images: product.image ? [product.image] : ['/assets/images/placeholder-product.jpg'],
       variants: product.variants || [],
       category: product.tags?.[0] || 'Other',
