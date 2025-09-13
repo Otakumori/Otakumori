@@ -53,7 +53,7 @@ The scripts perform the following **non-destructive** operations:
    # Linux/Mac/WSL
    source upgrade_config.env
    ./upgrade_precheck_and_backup.sh
-   
+
    # Windows PowerShell
    . .\upgrade_config.env
    .\upgrade_precheck_and_backup.ps1

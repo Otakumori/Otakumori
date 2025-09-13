@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { syncAllExternalData } from '../../../../lib/external-sync';
 
 export const runtime = 'nodejs';
@@ -6,20 +6,23 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   try {
     const results = await syncAllExternalData();
-    
+
     return NextResponse.json({
       ok: true,
       data: {
         message: 'External data sync completed',
-        results
-      }
+        results,
+      },
     });
   } catch (error) {
     console.error('External sync error:', error);
-    
-    return NextResponse.json({
-      ok: false,
-      error: 'Failed to sync external data'
-    }, { status: 500 });
+
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'Failed to sync external data',
+      },
+      { status: 500 },
+    );
   }
 }
