@@ -1,5 +1,5 @@
 import { inngest } from './client';
-import { printifyService } from '@/app/lib/printify/service';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 // Sync Printify products every hour
 export const syncPrintifyProducts = inngest.createFunction(
@@ -10,7 +10,7 @@ export const syncPrintifyProducts = inngest.createFunction(
       try {
         console.log('Starting scheduled Printify sync...');
 
-        const products = await printifyService.getAllProducts();
+        const products = await getPrintifyService().getAllProducts();
 
         console.log(`Sync completed: ${products.length} products fetched`);
 
@@ -39,7 +39,7 @@ export const manualPrintifySync = inngest.createFunction(
       try {
         console.log('Starting manual Printify sync...');
 
-        const products = await printifyService.getAllProducts();
+        const products = await getPrintifyService().getAllProducts();
 
         console.log(`Manual sync completed: ${products.length} products fetched`);
 
@@ -70,7 +70,7 @@ export const syncOnProductChange = inngest.createFunction(
 
         console.log(`Syncing changed product: ${productId}`);
 
-        const product = await printifyService.getProduct(productId);
+        const product = await getPrintifyService().getProduct(productId);
 
         // Here you would update the specific product in your database
         // await updateProductInDatabase(product);
