@@ -83,6 +83,10 @@ export default clerkMiddleware(
             "connect-src": [
               "'self'",
               "https://api.clerk.com",
+              "https://clerk.otaku-mori.com",
+              "https://accounts.otaku-mori.com",
+              "https://clerk-telemetry.com",
+              "https://*.clerk-telemetry.com",
               // env.NEXT_PUBLIC_CLERK_PROXY_URL, // Optional
               "https://api.printify.com",
               "https://*.printify.com",
@@ -92,6 +96,7 @@ export default clerkMiddleware(
               "https://sentry.io",
               "https://vitals.vercel-insights.com",
               "https://www.otaku-mori.com",
+              "https://otaku-mori.com",
               "https://*.vercel-blob.com",
             ],
             "img-src": [
@@ -105,7 +110,12 @@ export default clerkMiddleware(
             ],
             "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
-            "frame-src": ["'self'", "https://*.clerk.com"],
+            "frame-src": [
+              "'self'",
+              "https://*.clerk.com",
+              "https://clerk.otaku-mori.com",
+              "https://accounts.otaku-mori.com",
+            ],
           },
         },
   }
