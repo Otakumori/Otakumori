@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { env } from '@/env';
 import { prisma } from '@/app/lib/prisma';
-import { getShops } from '@/app/lib/printify/printifyClient';
+import { getPrintifyService } from '@/app/lib/printify/service';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -56,7 +56,9 @@ export async function GET() {
   // Printify
   const printifyStart = performance.now();
   try {
-    await getShops();
+    const svc = getPrintifyService();
+    const ok = await svc.testConnection();
+    if (!ok.success) throw new Error(ok.error || 'printify test failed');
     checks.printify = { ok: true, ms: ms(printifyStart) };
   } catch (e: any) {
     checks.printify = { ok: false, ms: ms(printifyStart), error: e?.message };
