@@ -380,29 +380,72 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
     </div>
   );
 
-  const MusicFace = () => (
-    <div className="p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <FaceTitle>Music + Extras</FaceTitle>
-        <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-toggle">
-          <input type="checkbox" className="accent-pink-500" checked={audioOn} onChange={(e) => setAudioOn(e.target.checked)} />
-          Audio
-        </label>
+  const MusicFace = () => {
+    const [loading, setLoading] = useState(true);
+    const [err, setErr] = useState<string | null>(null);
+    const [crt, setCrt] = useState(false);
+    const [vhs, setVhs] = useState(false);
+    const [audio, setAudio] = useState(false);
+    const [vol, setVol] = useState<number>(75);
+
+    useEffect(() => {
+      const reqId = `req_${Date.now()}`;
+      fetch('/api/user/avatar', { headers: { 'x-request-id': reqId } })
+        .then((r) => r.json())
+        .then((j) => {
+          if (!j.ok) throw new Error(j.message || j.code || 'Failed');
+          const p = j.data?.prefs || {};
+          setCrt(!!p.CRT);
+          setVhs(!!p.VHS);
+          setAudio(p.AUDIO !== false);
+          setVol(typeof p.AUDIO_LEVEL === 'number' ? p.AUDIO_LEVEL : 75);
+        })
+        .catch((e) => setErr(e.message))
+        .finally(() => setLoading(false));
+    }, []);
+
+    const save = async () => {
+      await fetch('/api/user/avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` },
+        body: JSON.stringify({ prefs: { CRT: crt, VHS: vhs, AUDIO: audio, AUDIO_LEVEL: vol } }),
+      });
+    };
+
+    return (
+      <div className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <FaceTitle>Music + Extras</FaceTitle>
+          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-toggle">
+            <input type="checkbox" className="accent-pink-500" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
+            Audio
+          </label>
+        </div>
+        {err && <div className="rounded bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-200">{err}</div>}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-crt-toggle"><input type="checkbox" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT</label>
+          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-vhs-toggle"><input type="checkbox" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS</label>
+          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-level">Volume
+            <input type="range" min={0} max={100} value={vol} onChange={(e) => setVol(parseInt(e.target.value))} className="ml-2 w-32" />
+          </label>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {['ost_loop_1.mp3', 'ost_loop_2.mp3'].map((src) => (
+            <div key={src} className="rounded-lg border border-white/15 bg-white/10 p-3">
+              <div className="text-xs text-zinc-300">{src}</div>
+              {audio && (
+                // eslint-disable-next-line jsx-a11y/media-has-caption
+                <audio src={`/${src}`} loop autoPlay controls className="mt-2 w-full" preload="none" />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <button onClick={save} className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700">Save</button>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {['ost_loop_1.mp3', 'ost_loop_2.mp3'].map((src) => (
-          <div key={src} className="rounded-lg border border-white/15 bg-white/10 p-3">
-            <div className="text-xs text-zinc-300">{src}</div>
-            {audioOn && (
-              // eslint-disable-next-line jsx-a11y/media-has-caption
-              <audio src={`/${src}`} loop autoPlay controls className="mt-2 w-full" preload="none" />
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="text-xs text-zinc-400">CRT/Scanline/VHS toggles to be applied card-local.</div>
-    </div>
-  );
+    );
+  };
 
   const TradeFace = () => (
     <div className="p-4 space-y-3">
@@ -729,12 +772,15 @@ function CommunityFace() {
   const wsTimerRef = React.useRef<number | null>(null);
   const lruIds = React.useRef<string[]>([]);
   const lastCursorRef = React.useRef<{ [k: string]: string | null }>({
-    interact: null,
+    interaction: null,
     accidental: null,
     training: null,
     quest: null,
   });
   const [toasts, setToasts] = React.useState<Array<{ id: string; kind: string; text: string; testId?: string }>>([]);
+  const [pendingInteraction, setPendingInteraction] = React.useState<{ requestId: string } | null>(null);
+  const [trainingActive, setTrainingActive] = React.useState(false);
+  const [unlockedEmotes, setUnlockedEmotes] = React.useState<Set<string>>(new Set());
 
   React.useEffect(() => {
     // Sentry breadcrumb on face enter
@@ -790,6 +836,7 @@ function CommunityFace() {
       switch (env.channel) {
         case 'training':
           bc('training.learn', { eventId: env.eventId });
+          setTrainingActive(true);
           break;
         case 'quest':
           bc('quest.complete', { eventId: env.eventId });
@@ -797,6 +844,7 @@ function CommunityFace() {
           break;
         case 'interact':
           bc('interaction.request', { eventId: env.eventId });
+          setPendingInteraction({ requestId: env?.payload?.requestId || 'req_unknown' });
           break;
         case 'accidental':
           bc('accidental.emit', { eventId: env.eventId });
@@ -966,18 +1014,27 @@ function CommunityFace() {
           if (j.ok) {
             setUnlockedEmotes((prev) => new Set([...prev, 'blush_burst']));
             try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'emote.unlock', level: 'info', data: { face: 2, emoteId: 'blush_burst' } }); } catch {}
-            setToasts((prev) => [...prev, { id: ulid(), kind: 'success', text: 'Emote unlocked: Blush Burst', testId: 'toast-unlock-emote' }]);
+            setToasts((prev) => [
+              ...prev,
+              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'success', text: 'Emote unlocked: Blush Burst', testId: 'toast-unlock-emote' },
+            ]);
           }
         }}
         onPerformEmote={async (dirty: boolean) => {
           if (dirty && !prefs.DIRTY_PREF) {
-            setToasts((prev) => [...prev, { id: ulid(), kind: 'warn', text: 'Content blocked by preferences', testId: 'toast-prefs-blocked' }]);
+            setToasts((prev) => [
+              ...prev,
+              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Content blocked by preferences', testId: 'toast-prefs-blocked' },
+            ]);
             try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'prefs.blocked', level: 'info', data: { face: 2, dirty: true } }); } catch {}
             return;
           }
           const res = await fetch('/api/community/emote/perform', { method: 'POST' });
           if (res.status === 429) {
-            setToasts((prev) => [...prev, { id: ulid(), kind: 'warn', text: 'Rate limited. Please wait.', testId: 'toast-rate-limited' }]);
+            setToasts((prev) => [
+              ...prev,
+              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Rate limited. Please wait.', testId: 'toast-rate-limited' },
+            ]);
             try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'rate_limited', level: 'info', data: { face: 2 } }); } catch {}
           } else {
             try {
@@ -986,6 +1043,32 @@ function CommunityFace() {
                 S.addBreadcrumb({ category: 'minigames', message: 'jiggle.play', level: 'info', data: { face: 2, dirty: true } });
               }
             } catch {}
+          }
+        }}
+        onRequestInteraction={async () => {
+          try {
+            const res = await fetch('/api/community/interaction/request', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` },
+              body: JSON.stringify({ targetId: 'demo_target' }),
+            });
+            const j = await res.json().catch(() => ({}));
+            if (res.status === 403 || j?.code === 'BLOCKED') {
+              setToasts((prev) => [
+                ...prev,
+                { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Target has blocked you', testId: 'toast-blocked' },
+              ]);
+              setTimeout(() => setToasts((prev) => prev.filter((x) => x.testId !== 'toast-blocked')), 2500);
+              return;
+            }
+            setPendingInteraction({ requestId: j?.data?.requestId || `req_local_${Date.now()}` });
+            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'interaction.request.sent', level: 'info', data: { face: 2 } }); } catch {}
+          } catch (e) {
+            setToasts((prev) => [
+              ...prev,
+              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Failed to send request', testId: 'toast-request-failed' },
+            ]);
+            setTimeout(() => setToasts((prev) => prev.filter((x) => x.testId !== 'toast-request-failed')), 2500);
           }
         }}
       />
@@ -1050,7 +1133,7 @@ function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSa
   );
 }
 
-function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingInteraction, onAccept, onDecline, trainingActive, onTrainingConfirm, unlockedEmotes, onQuestComplete, onPerformEmote }: {
+function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingInteraction, onAccept, onDecline, trainingActive, onTrainingConfirm, unlockedEmotes, onQuestComplete, onPerformEmote, onRequestInteraction }: {
   avatarUrl: string;
   prefs: any;
   onPrefs: (p: any) => void;
@@ -1064,6 +1147,7 @@ function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingI
   unlockedEmotes: Set<string>;
   onQuestComplete: () => void;
   onPerformEmote: (dirty: boolean) => void;
+  onRequestInteraction: () => void;
 }) {
   const [crt, setCrt] = React.useState(!!prefs.CRT);
   const [vhs, setVhs] = React.useState(!!prefs.VHS);
@@ -1111,6 +1195,7 @@ function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingI
         <button onClick={() => onPerformEmote(true)} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Perform DIRTY Emote</button>
         <button onClick={async () => { await fetch('/api/community/emote/perform', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emoteId: 'bow' }) }); }} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Bow</button>
         <button onClick={async () => { await fetch('/api/community/emote/perform', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emoteId: 'thrust' }) }); }} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Thrust</button>
+        <button onClick={onRequestInteraction} data-testid="btn-request-interaction" className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Request Interaction</button>
       </div>
       {pendingInteraction && (
         <div className="mt-3 rounded border border-white/15 bg-white/5 p-3 text-sm text-zinc-200">Incoming interaction request
