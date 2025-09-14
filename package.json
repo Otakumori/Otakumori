@@ -88,6 +88,8 @@
     "api:test": "npm run api:health",
     "db:test": "tsx scripts/test-database.ts",
     "pre-deploy": "npm run build && npm run api:health",
+    "verify:console": "node scripts/verify-console-card.mjs",
+    "pre-deploy:strict": "npm run verify:console && npm run build && npm run api:health",
     "lint-staged": "lint-staged"
   },
   "dependencies": {
