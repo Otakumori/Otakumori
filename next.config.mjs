@@ -92,6 +92,8 @@ export default withSentryConfig(
     widenClientFileUpload: true,
     // Reduce noise if token is missing (no uploads)
     silent: !process.env.SENTRY_AUTH_TOKEN,
+    // Disable Sentry plugin telemetry logs
+    telemetry: false,
     // Disable tunneling for now to avoid 404 errors
     // tunnelRoute: true, // Generates a random route for each build (recommended)
   }

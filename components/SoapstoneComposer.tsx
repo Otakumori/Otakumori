@@ -41,6 +41,8 @@ export default function SoapstoneComposer() {
         maxLength={160}
         placeholder="Leave a soapstone message…"
         className="flex-1 bg-transparent text-blue-100 placeholder-blue-300/40 outline-none"
+        name="soapstone"
+        aria-label="Soapstone message"
       />
       <button
         onClick={submit}

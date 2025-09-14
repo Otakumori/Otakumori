@@ -417,16 +417,16 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
         <div className="flex items-center justify-between">
           <FaceTitle>Music + Extras</FaceTitle>
           <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-toggle">
-            <input type="checkbox" className="accent-pink-500" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
+            <input type="checkbox" name="audio" className="accent-pink-500" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
             Audio
           </label>
         </div>
         {err && <div className="rounded bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-200">{err}</div>}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-crt-toggle"><input type="checkbox" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT</label>
-          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-vhs-toggle"><input type="checkbox" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS</label>
+          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-crt-toggle"><input type="checkbox" name="crt" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT</label>
+          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-vhs-toggle"><input type="checkbox" name="vhs" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS</label>
           <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-level">Volume
-            <input type="range" min={0} max={100} value={vol} onChange={(e) => setVol(parseInt(e.target.value))} className="ml-2 w-32" />
+            <input type="range" name="volume" min={0} max={100} value={vol} onChange={(e) => setVol(parseInt(e.target.value))} className="ml-2 w-32" />
           </label>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -479,7 +479,7 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       <div className="rounded-lg border border-white/15 bg-white/10 p-3">
         <div className="mb-2 text-xs text-zinc-300">Runes Fusion (MVP)</div>
         <div className="flex items-center gap-2">
-          <select className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15" value={selected} onChange={(e) => setSelected(e.target.value)}>
+          <select className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15" name="runeA" value={selected} onChange={(e) => setSelected(e.target.value)}>
             {['rune_a', 'rune_b', 'rune_c', 'rune_d', 'rune_e'].map((r) => (
               <option key={r} value={r}>
                 {r}
@@ -487,7 +487,7 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
             ))}
           </select>
           <span className="text-zinc-400">+</span>
-          <select className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15" value={second} onChange={(e) => setSecond(e.target.value)}>
+          <select className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15" name="runeB" value={second} onChange={(e) => setSecond(e.target.value)}>
             {['rune_a', 'rune_b', 'rune_c', 'rune_d', 'rune_e'].map((r) => (
               <option key={r} value={r}>
                 {r}
@@ -1109,18 +1109,18 @@ function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSa
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="text-xs text-zinc-300">
           Image URL
-          <input value={url} onChange={(e) => setUrl(e.target.value)} className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15" placeholder="https://…/avatar.png" />
+          <input name="avatarUrl" value={url} onChange={(e) => setUrl(e.target.value)} className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15" placeholder="https://…/avatar.png" />
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
-          <input type="checkbox" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
+          <input type="checkbox" name="audio" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
           Enable Audio
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
-          <input type="checkbox" checked={jiggle} onChange={(e) => setJiggle(e.target.checked)} />
+          <input type="checkbox" name="jiggle" checked={jiggle} onChange={(e) => setJiggle(e.target.checked)} />
           Jiggle Visible (a11y toggle exists)
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
-          <input type="checkbox" checked={dirty} onChange={(e) => setDirty(e.target.checked)} />
+          <input type="checkbox" name="dirty" checked={dirty} onChange={(e) => setDirty(e.target.checked)} />
           DIRTY Pref (consent-gated)
         </label>
       </div>

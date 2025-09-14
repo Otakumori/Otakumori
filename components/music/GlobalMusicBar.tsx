@@ -55,6 +55,7 @@ export default function GlobalMusicBar() {
               onChange={(e) => setVolume(Number(e.target.value))}
               className="h-1 w-28"
               aria-label="Volume"
+              name="volume"
             />
             <button onClick={() => setOptIn(false)} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Mute">
               <span role="img" aria-label="Muted speaker">🔇</span>

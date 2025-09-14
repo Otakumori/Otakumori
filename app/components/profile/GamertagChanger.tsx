@@ -21,6 +21,7 @@ export function GamertagChanger() {
       <div className="flex gap-2">
         <input 
           id="gamertag-input"
+          name="gamertag"
           value={name} 
           onChange={(e)=>setName(e.target.value)} 
           className="flex-1 rounded-xl border border-white/10 bg-black/60 px-3 py-2 text-white outline-none" 
