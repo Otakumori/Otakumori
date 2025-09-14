@@ -1,57 +1,7 @@
 {
-  "version": 2,
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/home",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "otaku-mori.com/:path*",
-      "destination": "https://www.otaku-mori.com/:path*",
-      "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
-    },
-    {
-      "source": "/robots.txt",
-      "destination": "/api/robots"
-    }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "github": {
-    "silent": true
-  }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm run vercel-build"
 }
+
