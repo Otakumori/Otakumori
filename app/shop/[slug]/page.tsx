@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await loadProduct(params.slug);
+  const product = await getProduct(params.slug);
   if (!product) {
     return (
       <main className="min-h-screen bg-[#080611] pt-24">
@@ -65,4 +65,3 @@ export default async function ProductPage({ params }: { params: { slug: string }
     </>
   );
 }
-
