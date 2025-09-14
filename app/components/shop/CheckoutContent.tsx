@@ -1,35 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
+import { useCart } from '@/app/components/cart/CartProvider';
 
-type CartItem = {
-  id: string;
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  variant?: string;
-};
-
-type CartData = {
-  items: CartItem[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-};
-
-type CheckoutContentProps = {
-  cartData: CartData;
-};
-
-export default function CheckoutContent({ cartData }: CheckoutContentProps) {
+export default function CheckoutContent() {
   const router = useRouter();
+  const { items } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -52,13 +32,24 @@ export default function CheckoutContent({ cartData }: CheckoutContentProps) {
   const handleCheckout = async () => {
     setIsProcessing(true);
     try {
+      // Build CheckoutRequest items
+      const checkoutItems = items.map((i) => ({
+        productId: i.id,
+        variantId: i.selectedVariant?.id || 'default',
+        name: i.name,
+        description: undefined,
+        images: i.image ? [i.image] : [],
+        quantity: i.quantity,
+        priceCents: Math.round(i.price * 100),
+        sku: undefined,
+        printifyProductId: undefined,
+        printifyVariantId: undefined,
+      }));
+
       const response = await fetch('/api/v1/checkout/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cartData.items,
-          shippingAddress: formData,
-        }),
+        body: JSON.stringify({ items: checkoutItems, shippingInfo: formData }),
       });
 
       const { url } = await response.json();
@@ -223,7 +214,7 @@ export default function CheckoutContent({ cartData }: CheckoutContentProps) {
           <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
           
           <div className="space-y-4">
-            {cartData.items.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
                 <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl">
                   <Image
@@ -236,8 +227,8 @@ export default function CheckoutContent({ cartData }: CheckoutContentProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-white truncate">{item.name}</h3>
-                  {item.variant && (
-                    <p className="text-sm text-zinc-400">{item.variant}</p>
+                  {item.selectedVariant?.title && (
+                    <p className="text-sm text-zinc-400">{item.selectedVariant.title}</p>
                   )}
                   <p className="text-sm text-zinc-400">Qty: {item.quantity}</p>
                 </div>
@@ -251,20 +242,25 @@ export default function CheckoutContent({ cartData }: CheckoutContentProps) {
           <div className="border-t border-white/10 pt-4 space-y-2">
             <div className="flex justify-between text-zinc-300">
               <span>Subtotal</span>
-              <span>${cartData.subtotal.toFixed(2)}</span>
+              <span>${useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0), [items]).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Tax</span>
-              <span>${cartData.tax.toFixed(2)}</span>
+              <span>${useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0) * 0.08, [items]).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Shipping</span>
-              <span>{cartData.shipping === 0 ? 'Free' : `$${cartData.shipping.toFixed(2)}`}</span>
+              <span>{useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]) === 0 ? 'Free' : `$${useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]).toFixed(2)}`}</span>
             </div>
             <div className="border-t border-white/10 pt-2">
               <div className="flex justify-between text-lg font-semibold text-white">
                 <span>Total</span>
-                <span>${cartData.total.toFixed(2)}</span>
+                <span>${useMemo(() => {
+                  const sub = items.reduce((s, i) => s + i.price * i.quantity, 0);
+                  const tax = sub * 0.08;
+                  const ship = sub > 50 ? 0 : 9.99;
+                  return sub + tax + ship;
+                }, [items]).toFixed(2)}</span>
               </div>
             </div>
           </div>

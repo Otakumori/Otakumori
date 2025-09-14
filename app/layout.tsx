@@ -14,6 +14,7 @@ import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import { env } from '@/app/env';
+import { otakumoriClerkAppearance, otakumoriClerkLocalization } from '@/app/lib/clerkTheme';
 
 export function generateMetadata(): Metadata {
   return {
@@ -32,6 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     dynamic: true,
     nonce,
     publishableKey: env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    appearance: otakumoriClerkAppearance,
+    localization: otakumoriClerkLocalization,
   };
 
   if (env.NEXT_PUBLIC_CLERK_SIGN_IN_URL) clerkProps.signInUrl = env.NEXT_PUBLIC_CLERK_SIGN_IN_URL;

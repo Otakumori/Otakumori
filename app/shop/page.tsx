@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import StarfieldPurple from '../components/StarfieldPurple';
-import NavBar from '../components/NavBar';
 import FooterDark from '../components/FooterDark';
 import ShopCatalog from '../components/shop/ShopCatalog';
 import { t } from '@/lib/microcopy';
@@ -13,18 +12,59 @@ export const metadata: Metadata = {
 
 async function loadProducts(searchParams: { sort?: string; q?: string; page?: string; category?: string }) {
   const params = new URLSearchParams();
-  if (searchParams.sort) params.set('sort', searchParams.sort);
   if (searchParams.q) params.set('q', searchParams.q);
   if (searchParams.page) params.set('page', searchParams.page);
   if (searchParams.category) params.set('category', searchParams.category);
 
-  const url = `/api/v1/products?${params.toString()}`;
-  const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}${url}`, {
-    next: { revalidate: 60 },
-  });
+  // Prefer live Printify-backed endpoint with graceful fallback
+  const url = `/api/v1/shop/products?${params.toString()}`;
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}${url}`, {
+      next: { revalidate: 60 },
+      cache: 'force-cache',
+    });
 
-  if (!response.ok) return { products: [], total: 0, page: 1, totalPages: 1 };
-  return response.json();
+    if (!response.ok) throw new Error('products_fetch_failed');
+    const data = await response.json();
+    const src = data?.data?.products || [];
+    const products = src.map((p: any) => ({
+      id: p.id,
+      name: p.title,
+      price: typeof p.price === 'number' ? p.price : 0,
+      image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : '/placeholder-product.jpg',
+      slug: p.id, // use Printify id for PDP route
+      category: p.category || undefined,
+      inStock: p.available ?? true,
+    }));
+    return {
+      products,
+      total: data?.data?.total ?? products.length,
+      page: parseInt(searchParams.page || '1', 10),
+      totalPages: 1,
+    };
+  } catch {
+    // Fallback: try DB-backed products API (seeded in dev)
+    try {
+      const fallback = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/products?${params.toString()}`, {
+        next: { revalidate: 60 },
+      });
+      if (!fallback.ok) throw new Error('fallback_failed');
+      const json = await fallback.json();
+      const items = json?.data?.items || [];
+      const products = items.map((p: any) => ({
+        id: p.id,
+        name: p.title,
+        price: typeof p.price === 'number' ? p.price : 0,
+        image: Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : '/placeholder-product.jpg',
+        slug: p.id,
+        category: p.category || undefined,
+        inStock: true,
+      }));
+      return { products, total: json?.data?.count ?? products.length, page: 1, totalPages: 1 };
+    } catch {
+      return { products: [], total: 0, page: 1, totalPages: 1 };
+    }
+  }
 }
 
 export default async function ShopPage({ 
@@ -37,8 +77,7 @@ export default async function ShopPage({
   return (
     <>
       <StarfieldPurple />
-      <NavBar />
-      <main className="relative z-10 min-h-screen">
+      <main className="relative z-10 min-h-screen" style={{ ['--om-star-duration-base' as any]: '680s' }}>
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white md:text-4xl">
@@ -50,7 +89,7 @@ export default async function ShopPage({
           </div>
           
           <Suspense fallback={<ShopCatalogSkeleton />}>
-            <ShopCatalog 
+            <ShopCatalog
               products={data.products || []}
               total={data.total || 0}
               currentPage={parseInt(searchParams.page || '1')}

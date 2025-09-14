@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import { t } from '../../lib/microcopy';
+import { useCart } from '@/app/components/cart/CartProvider';
 
 type Product = {
   id: string;
@@ -29,30 +30,38 @@ type ProductDetailProps = {
 };
 
 export default function ProductDetail({ product }: ProductDetailProps) {
+  const { addItem } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(product.variants?.[0] || null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const images = product.images || [product.image];
   const currentPrice = selectedVariant?.price || product.price;
   const isInStock = selectedVariant?.inStock ?? product.inStock ?? true;
 
   const handleAddToCart = async () => {
+    if (!isInStock) return;
     setIsAddingToCart(true);
     try {
-      // TODO: Implement add to cart API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      // Show success toast
-    } catch (error) {
-      // Show error toast
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: currentPrice,
+        quantity,
+        image: images[0],
+        selectedVariant: selectedVariant ? { id: selectedVariant.id, title: selectedVariant.name } : undefined,
+      });
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2000);
     } finally {
       setIsAddingToCart(false);
     }
   };
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2" data-testid="product-details">
       {/* Image Gallery */}
       <div className="space-y-4">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
@@ -92,12 +101,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       {/* Product Info */}
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white md:text-4xl">
-            {product.name}
-          </h1>
-          <p className="mt-2 text-2xl font-semibold text-fuchsia-300">
-            ${currentPrice}
-          </p>
+          <h1 className="text-3xl font-bold text-white md:text-4xl" data-testid="product-name">{product.name}</h1>
+          <p className="mt-2 text-2xl font-semibold text-fuchsia-300" data-testid="product-price">${currentPrice}</p>
           {product.category && (
             <p className="mt-1 text-sm text-zinc-400">
               Category: {product.category}
@@ -160,9 +165,14 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               ? 'bg-fuchsia-500/90 text-white hover:bg-fuchsia-500'
               : 'bg-zinc-600 text-zinc-400 cursor-not-allowed'
           }`}
+          data-testid="add-to-cart"
         >
           {isAddingToCart ? 'Adding...' : isInStock ? 'Add to Cart' : 'Out of Stock'}
         </button>
+
+        {added && (
+          <div className="text-sm text-green-300" data-testid="cart-success">Added to cart!</div>
+        )}
 
         {/* Description */}
         {product.description && (

@@ -199,6 +199,14 @@ This script will:
 
 ### Manual Deployment
 
+**Operations**
+- Health check: `curl http://localhost:3000/api/health` (expects JSON with db, clerk, stripe, printify, env)
+- Seed (db + app data): `npm run seed` • Unseed: `npm run unseed`
+- Smoke test (routes/APIs): `npm run smoke`
+- Migrations (deploy): `npm run prisma:deploy` • Studio: `npm run prisma:studio`
+- Deploy helper: `npm run deploy` (build verification + deploy)
+- Rollback hint: revert to previous Vercel deployment or `git revert <commit>` then redeploy
+
 1. **Build the application**: `npm run build`
 2. **Push to repository**: `git push origin main`
 3. **Deploy via platform**: Use your deployment platform's interface
