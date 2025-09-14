@@ -84,12 +84,14 @@ const nextConfig = {
 export default withSentryConfig(
   withBundleAnalyzer(nextConfig),
   {
-    org: 'otaku-mori',
-    project: 'javascript-react',
+    org: process.env.SENTRY_ORG || 'otaku-mori',
+    project: process.env.SENTRY_PROJECT || 'javascript-react',
     // Pass the auth token
     authToken: process.env.SENTRY_AUTH_TOKEN,
     // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
+    // Reduce noise if token is missing (no uploads)
+    silent: !process.env.SENTRY_AUTH_TOKEN,
     // Disable tunneling for now to avoid 404 errors
     // tunnelRoute: true, // Generates a random route for each build (recommended)
   }

@@ -31,15 +31,14 @@ export default function AchievementsPage() {
   >('all');
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [totalProgress, setTotalProgress] = useState({ completed: 0, total: 0 });
+  const params = useSearchParams();
+  const router = useRouter();
 
   // Mock data - in real app, this would come from API
   useEffect(() => {
-    const params = useSearchParams();
-    const router = useRouter();
     const next = new URLSearchParams(params.toString());
     next.set('face', '1');
     router.replace(`/mini-games?${next.toString()}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params, router]);
   return null;
 }
