@@ -16,6 +16,7 @@ const PrefsSchema = z.object({
   CRT: z.boolean().default(false),
   VHS: z.boolean().default(false),
   AUDIO: z.boolean().default(true),
+  AUDIO_LEVEL: z.number().min(0).max(100).optional(),
 });
 
 const AvatarUpsertSchema = z.object({
@@ -44,6 +45,7 @@ function extractPrefsFromSettings(settings: any): z.infer<typeof PrefsSchema> {
     CRT: !!card.CRT,
     VHS: !!card.VHS,
     AUDIO: card.AUDIO === undefined ? true : !!card.AUDIO,
+    AUDIO_LEVEL: typeof card.AUDIO_LEVEL === 'number' ? Math.min(100, Math.max(0, card.AUDIO_LEVEL)) : undefined,
   };
 }
 
@@ -122,4 +124,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Internal error' }, { status: 500 });
   }
 }
-
