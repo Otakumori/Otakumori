@@ -26,6 +26,13 @@ const EnvSchema = z.object({
   PRINTIFY_SHOP_ID: z.string().min(1),
   // UI rune glyph style preference (client-side); optional
   NEXT_PUBLIC_RUNE_GLYPH_STYLE: z.enum(['emoji','material','auto']).optional(),
+  // Feature flags
+  NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_JIGGLE: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_EVENTS: z.string().optional(),
 });
 
 export const env = EnvSchema.parse({
@@ -53,4 +60,10 @@ export const env = EnvSchema.parse({
   PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
   PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
   NEXT_PUBLIC_RUNE_GLYPH_STYLE: process.env.NEXT_PUBLIC_RUNE_GLYPH_STYLE as any,
+  NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: process.env.NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2,
+  NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: process.env.NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY,
+  NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: process.env.NEXT_PUBLIC_FEATURE_TRADE_PROPOSE,
+  NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: process.env.NEXT_PUBLIC_FEATURE_DIRTY_EMOTES,
+  NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE,
+  NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
 });

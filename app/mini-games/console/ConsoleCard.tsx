@@ -376,9 +376,7 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
   const CharacterFace = () => (
     <div className="p-4 space-y-2">
       <FaceTitle>Character / Community</FaceTitle>
-      <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm text-zinc-300">
-        Character creation and community feed will appear here after avatar setup.
-      </div>
+      <CommunityFace />
     </div>
   );
 
@@ -717,5 +715,418 @@ function GameIcon({ slug, icon }: { slug: string; icon: string }) {
       </span>
       {statusDot}
     </span>
+  );
+}
+
+function CommunityFace() {
+  const [loading, setLoading] = React.useState(true);
+  const [data, setData] = React.useState<{ avatar?: { url: string }; prefs: any } | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [saving, setSaving] = React.useState(false);
+  const [wsDegraded, setWsDegraded] = React.useState(false);
+  const [wsFailures, setWsFailures] = React.useState(0);
+  const wsRef = React.useRef<WebSocket | null>(null);
+  const wsTimerRef = React.useRef<number | null>(null);
+  const lruIds = React.useRef<string[]>([]);
+  const lastCursorRef = React.useRef<{ [k: string]: string | null }>({
+    interact: null,
+    accidental: null,
+    training: null,
+    quest: null,
+  });
+  const [toasts, setToasts] = React.useState<Array<{ id: string; kind: string; text: string; testId?: string }>>([]);
+
+  React.useEffect(() => {
+    // Sentry breadcrumb on face enter
+    try {
+      // @ts-ignore
+      const S = require('@sentry/nextjs');
+      S.addBreadcrumb({ category: 'minigames', message: 'face.enter:2', level: 'info' });
+    } catch {}
+    const reqId = `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    fetch('/api/user/avatar', { headers: { 'x-request-id': reqId } })
+      .then(async (r) => {
+        if (r.status === 401) {
+          throw new Error('AUTH_REQUIRED');
+        }
+        const j = await r.json();
+        if (!j.ok) {
+          throw new Error(j.message || j.code || 'Failed');
+        }
+        return j;
+      })
+      .then((j) => {
+        setData(j.data);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // --- WS mock layer + degraded polling (Face 2 scope) ---
+  React.useEffect(() => {
+    // Helper: add breadcrumb
+    const bc = (message: string, extra?: Record<string, any>) => {
+      try {
+        // @ts-ignore
+        const S = require('@sentry/nextjs');
+        S.addBreadcrumb({ category: 'minigames', message, data: { face: 2, ...(extra || {}) }, level: 'info' });
+      } catch {}
+    };
+    const addToast = (t: { id?: string; kind: string; text: string; testId?: string }) => {
+      const id = t.id || `t_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      setToasts((prev) => [...prev, { ...t, id }]);
+      setTimeout(() => setToasts((prev) => prev.filter((x) => x.id !== id)), 2500);
+    };
+    const rememberId = (id: string) => {
+      if (!id) return false;
+      const arr = lruIds.current;
+      if (arr.includes(id)) return false;
+      arr.push(id);
+      if (arr.length > 10000) arr.splice(0, arr.length - 10000);
+      return true;
+    };
+    const handleEvent = (env: any) => {
+      if (!rememberId(env.eventId)) return;
+      switch (env.channel) {
+        case 'training':
+          bc('training.learn', { eventId: env.eventId });
+          break;
+        case 'quest':
+          bc('quest.complete', { eventId: env.eventId });
+          addToast({ kind: 'success', text: 'Quest complete: reward granted', testId: 'toast-unlock-emote' });
+          break;
+        case 'interact':
+          bc('interaction.request', { eventId: env.eventId });
+          break;
+        case 'accidental':
+          bc('accidental.emit', { eventId: env.eventId });
+          break;
+      }
+    };
+    const startPolling = () => {
+      if (!wsDegraded) return;
+      const domains = ['interaction', 'accidental', 'training', 'quest'] as const;
+      const tick = async () => {
+        for (const d of domains) {
+          const after = lastCursorRef.current[d] || '';
+          try {
+            const r = await fetch(`/api/community/${d}/pending?after=${encodeURIComponent(after)}&limit=100`, {
+              headers: { 'x-request-id': `req_${Date.now()}` },
+            });
+            const j = await r.json();
+            if (j?.ok && j.data) {
+              const evts: any[] = j.data.events || [];
+              for (const ev of evts) handleEvent(ev);
+              if (j.data.cursor) lastCursorRef.current[d] = j.data.cursor;
+            }
+          } catch {
+            // ignore
+          }
+        }
+        const jitter = Math.floor(Math.random() * 1000) - 500; // ±500ms
+        wsTimerRef.current = window.setTimeout(tick, 4000 + jitter) as any;
+      };
+      if (!wsTimerRef.current) wsTimerRef.current = window.setTimeout(tick, 1200) as any;
+    };
+    const stopPolling = () => {
+      if (wsTimerRef.current) {
+        clearTimeout(wsTimerRef.current as any);
+        wsTimerRef.current = null;
+      }
+    };
+    const connect = () => {
+      let ws: WebSocket | null = null;
+      try {
+        const url = process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
+        ws = new WebSocket(url);
+      } catch (e) {
+        setWsFailures((n) => n + 1);
+        setWsDegraded(true);
+        bc('ws.disconnect');
+        startPolling();
+        return;
+      }
+      wsRef.current = ws;
+      bc('ws.connect');
+      ws.onopen = () => {
+        const hello = {
+          type: 'hello',
+          userId: 'clerk_session',
+          sessionId: `sess_${Date.now()}`,
+          faces: ['2'],
+        };
+        ws!.send(JSON.stringify(hello));
+      };
+      ws.onmessage = (ev) => {
+        try {
+          const msg = JSON.parse(ev.data);
+          if (msg.type === 'hello_ack') {
+            setWsFailures(0);
+            setWsDegraded(false);
+            bc('ws.resume', { eventId: msg.resumeCursor });
+            stopPolling();
+          } else if (msg.type === 'event') {
+            handleEvent(msg);
+          }
+        } catch {}
+      };
+      ws.onclose = () => {
+        setWsFailures((n) => n + 1);
+        if (!wsDegraded) {
+          // wait 2s before marking degraded
+          setTimeout(() => setWsDegraded(true), 2000);
+        }
+        bc('ws.disconnect');
+        startPolling();
+        setTimeout(connect, Math.min(5000, 800 + wsFailures * 600));
+      };
+      ws.onerror = () => {
+        try { ws?.close(); } catch {}
+      };
+    };
+    connect();
+    return () => {
+      stopPolling();
+      try { wsRef.current?.close(); } catch {}
+      wsRef.current = null;
+    };
+  }, [wsDegraded, wsFailures]);
+
+  if (loading) {
+    return (
+      <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm text-zinc-300" data-testid="face2-card-root">
+        Loading…
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert">
+        {error === 'AUTH_REQUIRED' ? (
+          <div data-testid="routing-guard">
+            Login required for Community. <a className="underline" href="/sign-in?redirect_url=/mini-games?face=2">Sign in</a> or <a className="underline" href="/mini-games?face=0">return to Face 0</a>.
+          </div>
+        ) : (
+          error
+        )}
+      </div>
+    );
+  }
+  if (!data) return null;
+
+  const prefs = data.prefs || {};
+
+  if (!data.avatar?.url) {
+    return (
+      <div data-testid="face2-card-root">
+        {wsDegraded && (
+          <div className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300" data-testid="ws-banner-degraded">
+            Degraded Realtime: reconnecting… polling active
+          </div>
+        )}
+        <AvatarCreator prefs={prefs} onSaved={(d) => setData(d)} saving={saving} setSaving={setSaving} />
+      </div>
+    );
+  }
+  return (
+    <div data-testid="face2-card-root">
+      {wsDegraded && (
+        <div className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300" data-testid="ws-banner-degraded">
+          Degraded Realtime: reconnecting… polling active
+        </div>
+      )}
+      <CommunityLobby
+        avatarUrl={data.avatar.url}
+        prefs={prefs}
+        onPrefs={(p) => setData({ avatar: data.avatar, prefs: p })}
+        saving={saving}
+        setSaving={setSaving}
+        pendingInteraction={pendingInteraction}
+        onAccept={() => {
+          setPendingInteraction(null);
+          try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'interaction.accepted', level: 'info', data: { face: 2 } }); } catch {}
+        }}
+        onDecline={() => {
+          setPendingInteraction(null);
+          try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'interaction.declined', level: 'info', data: { face: 2 } }); } catch {}
+        }}
+        trainingActive={trainingActive}
+        onTrainingConfirm={async () => {
+          const r = await fetch('/api/community/training/confirm', { method: 'POST' });
+          const j = await r.json();
+          if (j.ok) {
+            setTrainingActive(false);
+            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'training.learn', level: 'info', data: { face: 2 } }); } catch {}
+          }
+        }}
+        unlockedEmotes={unlockedEmotes}
+        onQuestComplete={async () => {
+          const res = await fetch('/api/community/quests/complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ questId: 'q_dungeon_of_desire', score: 97 }) });
+          const j = await res.json();
+          if (j.ok) {
+            setUnlockedEmotes((prev) => new Set([...prev, 'blush_burst']));
+            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'emote.unlock', level: 'info', data: { face: 2, emoteId: 'blush_burst' } }); } catch {}
+            setToasts((prev) => [...prev, { id: ulid(), kind: 'success', text: 'Emote unlocked: Blush Burst', testId: 'toast-unlock-emote' }]);
+          }
+        }}
+        onPerformEmote={async (dirty: boolean) => {
+          if (dirty && !prefs.DIRTY_PREF) {
+            setToasts((prev) => [...prev, { id: ulid(), kind: 'warn', text: 'Content blocked by preferences', testId: 'toast-prefs-blocked' }]);
+            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'prefs.blocked', level: 'info', data: { face: 2, dirty: true } }); } catch {}
+            return;
+          }
+          const res = await fetch('/api/community/emote/perform', { method: 'POST' });
+          if (res.status === 429) {
+            setToasts((prev) => [...prev, { id: ulid(), kind: 'warn', text: 'Rate limited. Please wait.', testId: 'toast-rate-limited' }]);
+            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'rate_limited', level: 'info', data: { face: 2 } }); } catch {}
+          } else {
+            try {
+              if (dirty && prefs.JIGGLE_VISIBLE) {
+                const S = require('@sentry/nextjs');
+                S.addBreadcrumb({ category: 'minigames', message: 'jiggle.play', level: 'info', data: { face: 2, dirty: true } });
+              }
+            } catch {}
+          }
+        }}
+      />
+      {/* toasts */}
+      <div className="mt-2 space-y-1">
+        {toasts.map((t) => (
+          <div key={t.id} className="rounded bg-white/10 px-3 py-2 text-[11px] text-zinc-200" data-testid={t.testId}>
+            {t.text}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSaved: (d: any) => void; saving: boolean; setSaving: (b: boolean) => void }) {
+  const [url, setUrl] = React.useState('');
+  const [dirty, setDirty] = React.useState(!!prefs.DIRTY_PREF);
+  const [jiggle, setJiggle] = React.useState(!!prefs.JIGGLE_VISIBLE);
+  const [audio, setAudio] = React.useState(prefs.AUDIO !== false);
+
+  const save = async () => {
+    setSaving(true);
+    const body = { avatar: url ? { url } : undefined, prefs: { DIRTY_PREF: dirty, JIGGLE_VISIBLE: jiggle, AUDIO: audio } };
+    const res = await fetch('/api/user/avatar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` },
+      body: JSON.stringify(body),
+    });
+    const j = await res.json();
+    setSaving(false);
+    if (j.ok) onSaved(j.data);
+  };
+
+  return (
+    <div className="rounded-lg border border-white/15 bg-white/10 p-4">
+      <div className="mb-2 text-sm text-zinc-200">Create your avatar</div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <label className="text-xs text-zinc-300">
+          Image URL
+          <input value={url} onChange={(e) => setUrl(e.target.value)} className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15" placeholder="https://…/avatar.png" />
+        </label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
+          <input type="checkbox" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
+          Enable Audio
+        </label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
+          <input type="checkbox" checked={jiggle} onChange={(e) => setJiggle(e.target.checked)} />
+          Jiggle Visible (a11y toggle exists)
+        </label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
+          <input type="checkbox" checked={dirty} onChange={(e) => setDirty(e.target.checked)} />
+          DIRTY Pref (consent-gated)
+        </label>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <button onClick={save} disabled={saving} className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50">
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingInteraction, onAccept, onDecline, trainingActive, onTrainingConfirm, unlockedEmotes, onQuestComplete, onPerformEmote }: {
+  avatarUrl: string;
+  prefs: any;
+  onPrefs: (p: any) => void;
+  saving: boolean;
+  setSaving: (b: boolean) => void;
+  pendingInteraction: { requestId: string } | null;
+  onAccept: () => void;
+  onDecline: () => void;
+  trainingActive: boolean;
+  onTrainingConfirm: () => void;
+  unlockedEmotes: Set<string>;
+  onQuestComplete: () => void;
+  onPerformEmote: (dirty: boolean) => void;
+}) {
+  const [crt, setCrt] = React.useState(!!prefs.CRT);
+  const [vhs, setVhs] = React.useState(!!prefs.VHS);
+  const [audio, setAudio] = React.useState(prefs.AUDIO !== false);
+
+  const save = async () => {
+    setSaving(true);
+    const body = { prefs: { ...prefs, CRT: crt, VHS: vhs, AUDIO: audio } };
+    const res = await fetch('/api/user/avatar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` }, body: JSON.stringify(body) });
+    const j = await res.json();
+    setSaving(false);
+    if (j.ok) onPrefs(j.data.prefs);
+  };
+
+  return (
+    <div className="rounded-lg border border-white/15 bg-white/10 p-4">
+      <div className="mb-3 flex items-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={avatarUrl} alt="" className="h-10 w-10 rounded" />
+        <div className="text-sm text-zinc-200" data-testid="avatar-persisted">Welcome to the Community Lobby</div>
+      </div>
+      {/* Hotbar */}
+      <div className="mb-3 flex items-center gap-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} data-testid={`hotbar-slot-${i}`} className="rounded bg-white/10 px-2 py-1 text-[11px] text-zinc-200">
+            {i === 1 && unlockedEmotes.has('blush_burst') ? (
+              <span>
+                Blush Burst <span className="ml-1 rounded bg-pink-500/20 px-1" data-testid="combo-badge">combo</span>
+              </span>
+            ) : (
+              '—'
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2"><input type="checkbox" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT</label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2"><input type="checkbox" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS</label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="chip-consent"><input type="checkbox" checked={audio} onChange={(e) => setAudio(e.target.checked)} /> Audio</label>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button onClick={save} disabled={saving} className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50">{saving ? 'Saving…' : 'Save Preferences'}</button>
+        <button onClick={onQuestComplete} data-testid="btn-start-quest" className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Start Quest</button>
+        <button onClick={() => onPerformEmote(false)} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Perform Emote</button>
+        <button onClick={() => onPerformEmote(true)} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Perform DIRTY Emote</button>
+        <button onClick={async () => { await fetch('/api/community/emote/perform', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emoteId: 'bow' }) }); }} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Bow</button>
+        <button onClick={async () => { await fetch('/api/community/emote/perform', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emoteId: 'thrust' }) }); }} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Thrust</button>
+      </div>
+      {pendingInteraction && (
+        <div className="mt-3 rounded border border-white/15 bg-white/5 p-3 text-sm text-zinc-200">Incoming interaction request
+          <div className="mt-2 flex gap-2">
+            <button onClick={onAccept} data-testid="btn-accept" className="rounded bg-green-600 px-3 py-1 text-white text-xs">Accept</button>
+            <button onClick={onDecline} data-testid="btn-decline" className="rounded bg-red-600 px-3 py-1 text-white text-xs">Decline</button>
+          </div>
+        </div>
+      )}
+      {trainingActive && (
+        <div className="mt-3 flex items-center gap-2" data-testid="training-ring">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-400 border-r-transparent" />
+          <button onClick={onTrainingConfirm} data-testid="btn-training-confirm" className="rounded border border-white/20 px-2 py-0.5 text-xs text-white/90">Confirm Training</button>
+        </div>
+      )}
+      <div className="mt-4 text-[11px] text-zinc-400">Card-contained; consent gates enforced for DIRTY/jiggle. Realtime events pending.</div>
+    </div>
   );
 }
