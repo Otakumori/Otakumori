@@ -55,6 +55,8 @@
     "assets:check": "node ./scripts/check-assets.cjs",
     "assets:report": "node ./scripts/report-missing-assets.cjs",
     "assets:scan": "node ./scripts/scan-image-refs.cjs",
+    "icons:validate": "node ./scripts/validate-game-icons.js",
+    "icons:placeholders": "node ./scripts/validate-game-icons.js --generate",
     "assets:gen:achievements": "tsx ./scripts/gen-achievements.ts --png",
     "assets:gen:achievements:frames": "tsx ./scripts/gen-achievements.ts --png --frame",
     "logs:view": "node scripts/view-logs.js",

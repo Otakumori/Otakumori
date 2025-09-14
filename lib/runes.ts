@@ -5,10 +5,10 @@ import {
   type RuneComboDef,
   type RewardsConfig,
   type PetalGrantResult,
-  DEFAULT_RUNE_DISPLAYS,
   DEFAULT_RUNE_LORE,
   BURST_THRESHOLDS,
 } from '@/types/runes';
+import { DEFAULT_RUNE_DISPLAYS } from '@/app/lib/runes-emoji';
 
 /**
  * Map UPCs to runes based on configuration

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Flower, Crown } from 'lucide-react';
+import RuneGlyph from '@/app/components/runes/RuneGlyph';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 
@@ -238,7 +239,10 @@ export default function ThankYouPage() {
                     className="rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-500/20 to-orange-500/20 p-6 transition-colors hover:border-amber-300/50"
                   >
                     <div className="text-center">
-                      <div className="mb-3 text-4xl">{rune.glyph || '✶'}</div>
+                      <div className="mb-3 text-4xl leading-none">
+                        <RuneGlyph runeId={rune.canonicalId as any} glyphOverride={rune.glyph} style="auto" />
+                      </div>
+                      <div className="mb-3 text-4xl hidden">{rune.glyph || '✶'}</div>
                       <h3 className="mb-2 text-lg font-bold text-white">
                         {rune.displayName ||
                           `Rune ${rune.canonicalId.split('_')[1]?.toUpperCase()}`}

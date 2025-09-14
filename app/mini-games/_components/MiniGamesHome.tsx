@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import GameCubeBoot from '@/app/components/GameCubeBoot';
 import EnhancedLeaderboard from '@/app/components/EnhancedLeaderboard';
+import OwnedRunesGrid from '@/app/mini-games/_components/OwnedRunesGrid';
 
 const games = [
   { slug: 'petal-collection', name: 'Petal Collection' },
@@ -42,6 +43,14 @@ export default function MiniGamesHome() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-semibold text-white">Mini-Games</h1>
+      {/* Owned Runes quick view */}
+      <section aria-labelledby="owned-runes" className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 id="owned-runes" className="text-sm font-semibold text-white">Owned Runes</h2>
+          <div className="text-xs text-zinc-300">Trade Center → Fuse</div>
+        </div>
+        <OwnedRunesGrid />
+      </section>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {games.map((g) => (
           <div key={g.slug} className="rounded-xl border border-white/10 bg-white/5 p-4 text-white">
@@ -82,4 +91,3 @@ export default function MiniGamesHome() {
     </div>
   );
 }
-

@@ -307,3 +307,18 @@ npm run deploy
 ## 📄 License
 
 Private - All rights reserved.
+
+## Mini-Games Console Card (In-Progress)
+
+- Scope: Console card lives exclusively under /mini-games and child routes; Nav/Footer remain visible.
+- Boot: Plays a short boot the first time per session and persists gc_boot in localStorage.
+- Deep links: Planned ?face= query sync and alias routes (/mini-games/achievements, /mini-games/trade) to map to faces.
+- Runes: Owned runes grid is available on /mini-games home, showing user-owned runes with tooltips.
+- APIs (typed, thin):
+  - GET /api/petals/balance ? { ok, balance }
+  - GET /api/trade/inventory ? { ok, items: { canonicalId, displayName, glyph, quantity }[] }
+  - POST /api/trade/fuse ? validates input and ownership, returns { ok:false, code:'DISABLED' } in MVP
+  - GET /api/trade/offers ? { ok, items: [] } (stub)
+  - POST /api/trade/propose ? { ok:false, code:'DISABLED' } (stub)
+- Test IDs: data-testid="runes-grid" on the Owned Runes grid for smoke tests.
+- Telemetry: Server routes log errors to server console; Sentry breadcrumbs to be added alongside face transitions in the card.

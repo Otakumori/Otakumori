@@ -21,6 +21,8 @@ const EnvSchema = z.object({
   PRINTIFY_API_URL: z.string().url(),
   PRINTIFY_API_KEY: z.string().min(10),
   PRINTIFY_SHOP_ID: z.string().min(1),
+  // UI rune glyph style preference (client-side); optional
+  NEXT_PUBLIC_RUNE_GLYPH_STYLE: z.enum(['emoji','material','auto']).optional(),
 });
 
 export const env = EnvSchema.parse({
@@ -40,4 +42,5 @@ export const env = EnvSchema.parse({
   PRINTIFY_API_URL: process.env.PRINTIFY_API_URL,
   PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
   PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
+  NEXT_PUBLIC_RUNE_GLYPH_STYLE: process.env.NEXT_PUBLIC_RUNE_GLYPH_STYLE as any,
 });
