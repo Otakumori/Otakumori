@@ -87,6 +87,7 @@ export default clerkMiddleware(
               "https://accounts.otaku-mori.com",
               "https://clerk-telemetry.com",
               "https://*.clerk-telemetry.com",
+              "https://api.stripe.com",
               // env.NEXT_PUBLIC_CLERK_PROXY_URL, // Optional
               "https://api.printify.com",
               "https://*.printify.com",
@@ -115,6 +116,8 @@ export default clerkMiddleware(
               "https://*.clerk.com",
               "https://clerk.otaku-mori.com",
               "https://accounts.otaku-mori.com",
+              "https://js.stripe.com",
+              "https://checkout.stripe.com",
             ],
           },
         },
