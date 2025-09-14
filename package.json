@@ -1,4 +1,4 @@
-﻿{
+{
     "name":  "otakumori",
     "version":  "0.1.0",
     "private":  true,
@@ -297,5 +297,6 @@
     "prisma":  {
                    "seed":  "tsx prisma/seed.ts"
                },
-    "packageManager":  "pnpm@9"
+    "packageManager":  "pnpm@9",
+    "engines": { "node": "20.x" }
 }
