@@ -1,21 +1,15 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/server/env';
 
 export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
-    // Fetch featured products from Printify
-    const response = await fetch(
-      `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`,
-      {
-        headers: {
-          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+    // Use our v1 Printify API instead of calling Printify directly
+    const response = await fetch(`${request.nextUrl.origin}/api/v1/printify/products`, {
+      cache: 'no-store',
+    });
 
     if (!response.ok) {
       throw new Error(`Printify API error: ${response.status}`);
@@ -23,16 +17,20 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
 
-    // Transform Printify data to our format
-    const featuredProducts = data.data
+    if (!data.ok) {
+      throw new Error(data.error || 'Failed to fetch products');
+    }
+
+    // Transform v1 API data to our format
+    const featuredProducts = data.data.products
       .filter((product: any) => product.visible !== false) // Include all visible products
       .slice(0, 8)
       .map((product: any) => ({
         id: product.id.toString(),
         name: product.title,
-        price: parseFloat(product.variants[0]?.price || '0') / 100, // Convert cents to dollars
-        image: product.images[0]?.src || '/assets/images/placeholder-product.jpg',
-        slug: product.handle || product.id.toString(),
+        price: product.price || 0, // Already in dollars from v1 API
+        image: product.image || '/assets/images/placeholder-product.jpg',
+        slug: product.id.toString(),
       }));
 
     return NextResponse.json(featuredProducts);

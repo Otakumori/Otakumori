@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/app/lib/db';
+import { db } from '@/lib/db';
 import { UserSafetySettingsUpdateSchema } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 

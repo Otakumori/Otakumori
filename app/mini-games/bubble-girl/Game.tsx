@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-// import { COPY } from '@/app/lib/copy';
+// import { COPY } from '../../lib/copy';
 
 type Props = {
   skin: string;

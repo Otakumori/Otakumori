@@ -1,48 +1,51 @@
 {
-  "deno.enablePaths": [],
-  "deno.lint": true,
-  "deno.unstable": [
-    "bare-node-builtins",
-    "byonm",
-    "sloppy-imports",
-    "unsafe-proto",
-    "webgpu",
-    "broadcast-channel",
-    "worker-options",
-    "cron",
-    "kv",
-    "ffi",
-    "fs",
-    "http",
-    "net"
-  ],
-  "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "css.lint.unknownAtRules": "ignore",
+  "tailwindCSS.includeLanguages": {
+    "typescript": "typescript",
+    "typescriptreact": "typescriptreact"
   },
-  "powershell.sideBar.CommandExplorerVisibility": true,
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "css.customData": [".vscode/css_custom_data.json"],
   "cSpell.words": [
     "circlelogo",
+    "contenteditable",
+    "crossfade",
+    "drei",
+    "followee",
     "gacha",
     "gamecube",
-    "gamertag",
+    "Glassmorphic",
+    "haspopup",
+    "homedecor",
+    "hotspot",
     "INNGEST",
-    "Kawaii",
-    "Lofi",
-    "metalness",
+    "jpotter",
+    "midna",
+    "MINIGAMES",
     "mori",
-    "Otaku",
+    "NEXTAUTH",
+    "optimus",
+    "otaku",
     "Otakumori",
-    "Pikmin",
+    "princeps",
+    "Printify",
     "PRINTIFY",
-    "Riftwalker",
-    "sakura",
-    "Signup",
-    "slatey",
-    "soulslike",
-    "Soulslike",
+    "proptypes",
+    "scanline",
+    "soapstonefilter",
     "SUPABASE",
-    "testpassword",
-    "upserted",
-    "Waifu"
+    "Tetsusaiga's",
+    "theabyss",
+    "uuidv",
+    "waifu"
   ]
 }

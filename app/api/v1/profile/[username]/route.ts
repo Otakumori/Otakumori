@@ -1,12 +1,15 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/app/lib/db';
-import { ProfileViewSchema } from '@/app/lib/contracts';
+import { db } from '@/lib/db';
+import { ProfileViewSchema } from '../../../../lib/contracts';
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
 
-export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { username: string } }
+) {
   try {
     const { userId } = await auth();
     const { username } = params;

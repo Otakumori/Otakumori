@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Transform products to match expected format
-    const transformedProducts = products.map((product) => ({
+    const transformedProducts = products.map((product: any) => ({
       id: product.id,
       slug: product.id, // Using ID as slug for now
       title: product.name,
@@ -29,9 +29,9 @@ export async function GET(req: NextRequest) {
       price: product.ProductVariant[0]?.priceCents ? product.ProductVariant[0].priceCents / 100 : 0,
       images: product.primaryImageUrl ? [product.primaryImageUrl] : [],
       tags: [product.category || 'apparel'],
-      stock: product.ProductVariant.filter((v) => v.inStock).length,
+      stock: product.ProductVariant.filter((v: any) => v.inStock).length,
       category: product.category || 'apparel',
-      variants: product.ProductVariant.map((variant) => ({
+      variants: product.ProductVariant.map((variant: any) => ({
         id: variant.id,
         price: variant.priceCents ? variant.priceCents / 100 : 0,
         inStock: variant.inStock,

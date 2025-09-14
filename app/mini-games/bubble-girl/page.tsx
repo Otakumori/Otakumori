@@ -3,10 +3,10 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { COPY } from '@/app/lib/copy';
+import { COPY } from '../../lib/copy';
 import Link from 'next/link';
 // import GlassButton from '@/app/components/ui/GlassButton';
-import GlassCard from '@/app/components/ui/GlassCard';
+import GlassCard from '../../components/ui/GlassCard';
 
 const Game = dynamic(() => import('./Game'), {
   ssr: false,

@@ -1,11 +1,37 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { COPY } from '../../lib/copy';
+import GlassButton from '../../components/ui/GlassButton';
+import GlassCard from '../../components/ui/GlassCard';
 
-export default function AchievementsAlias() {
-  const router = useRouter();
-  const params = useSearchParams();
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  category: 'daily' | 'weekly' | 'skill' | 'collector' | 'social';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  icon: string;
+  progress: number;
+  maxProgress: number;
+  completed: boolean;
+  reward: {
+    petals: number;
+    items?: string[];
+    title?: string;
+  };
+  unlockedAt?: Date;
+}
+
+export default function AchievementsPage() {
+  const [activeCategory, setActiveCategory] = useState<
+    'all' | 'daily' | 'weekly' | 'skill' | 'collector' | 'social'
+  >('all');
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [totalProgress, setTotalProgress] = useState({ completed: 0, total: 0 });
+
+  // Mock data - in real app, this would come from API
   useEffect(() => {
     const next = new URLSearchParams(params.toString());
     next.set('face', '1');

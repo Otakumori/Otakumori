@@ -1,0 +1,7 @@
+---- OUTPUT ----
+[
+  {
+    "extname": "plpgsql",
+    "extversion": "1.0"
+  }
+]

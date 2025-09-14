@@ -5,9 +5,9 @@ import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
-import GlassCard from '@/app/components/ui/GlassCard';
-import GlassButton from '@/app/components/ui/GlassButton';
-import { COPY } from '@/app/lib/copy';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
+import { COPY } from '../lib/copy';
 
 // Dynamically import the character editor to avoid SSR issues
 const CharacterEditor = dynamic(() => import('./components/CharacterEditor'), { ssr: false });

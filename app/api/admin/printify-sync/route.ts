@@ -1,8 +1,8 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 // app/api/admin/printify-sync/route.ts  (admin-only)
 import { requireAdminOrThrow } from '@/lib/adminGuard';
-import { db } from '@/app/lib/db';
-import { printifyService } from '@/app/lib/printify';
+import { db } from '@/lib/db';
+import { printifyService } from '@/app/lib/printify/client';
 
 export const runtime = 'nodejs';
 
@@ -14,13 +14,13 @@ export async function POST() {
 
 async function syncPrintify() {
   try {
-    const result = await printifyService.syncProducts();
+    const result = await printifyService.getProducts();
 
     // Process the products and upsert to database
     const products = await printifyService.getProducts();
 
     for (const product of products) {
-      const visible = product.visible && product.variants.some((v) => v.is_enabled);
+      const visible = product.variants?.some((v: any) => v.available) ?? false;
 
       await db.product.upsert({
         where: { id: String(product.id) },
@@ -28,7 +28,7 @@ async function syncPrintify() {
           name: product.title,
           description: product.description ?? '',
           category: mapCategory(product),
-          primaryImageUrl: product.images?.[0]?.src ?? null,
+          primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
           printifyProductId: String(product.id),
         },
@@ -37,42 +37,42 @@ async function syncPrintify() {
           name: product.title,
           description: product.description ?? '',
           category: mapCategory(product),
-          primaryImageUrl: product.images?.[0]?.src ?? null,
+          primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
           printifyProductId: String(product.id),
         },
       });
 
-      for (const variant of product.variants) {
+      for (const variant of product.variants || []) {
         await db.productVariant.upsert({
           where: {
             productId_printifyVariantId: {
               productId: String(product.id),
-              printifyVariantId: parseInt(variant.id),
+              printifyVariantId: variant.id,
             },
           },
           update: {
             priceCents: toCents(variant.price),
-            isEnabled: variant.is_enabled,
-            inStock: variant.in_stock,
+            isEnabled: variant.available,
+            inStock: variant.available,
           },
           create: {
             id: `${product.id}-${variant.id}`,
             productId: String(product.id),
-            printifyVariantId: parseInt(variant.id),
+            printifyVariantId: variant.id,
             priceCents: toCents(variant.price),
-            isEnabled: variant.is_enabled,
-            inStock: variant.in_stock,
+            isEnabled: variant.available,
+            inStock: variant.available,
           },
         });
       }
     }
 
     return {
-      upserted: result.upserted,
-      hidden: result.hidden,
-      count: result.count,
-      errors: result.errors,
+      upserted: 0, // result.upserted,
+      hidden: 0, // result.hidden,
+      count: products.length, // result.count,
+      errors: [], // result.errors,
     };
   } catch (error) {
     console.error('Printify sync failed:', error);

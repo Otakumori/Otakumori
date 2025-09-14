@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform products for frontend consumption
-    const transformedProducts = data.data.map((product: any) => ({
+    const transformedProducts = data.data.products.map((product: any) => ({
       id: product.id,
       title: product.title,
       description: product.description,

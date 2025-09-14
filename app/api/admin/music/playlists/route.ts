@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/lib/db';
 import { auth } from '@clerk/nextjs/server';
 import { requireAdmin } from '@/app/lib/authz';
 
@@ -14,7 +14,7 @@ export async function GET() {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  const data = await prisma.musicPlaylist.findMany({
+  const data = await db.musicPlaylist.findMany({
     orderBy: { createdAt: 'desc' },
     include: { tracks: { orderBy: { sort: 'asc' } } },
   });
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   if (!name || !userId)
     return NextResponse.json({ ok: false, error: 'Missing fields' }, { status: 400 });
 
-  const pl = await prisma.musicPlaylist.create({
+  const pl = await db.musicPlaylist.create({
     data: { name, isPublic, createdBy: userId },
   });
   return NextResponse.json({ ok: true, playlist: pl });

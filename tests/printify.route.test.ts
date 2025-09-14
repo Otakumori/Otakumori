@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { callGET } from "./helpers/route";
 
 // Mock the env module
-vi.mock("@/app/env", () => ({
+vi.mock("@/env", () => ({
   env: {
     PRINTIFY_API_URL: "https://api.printify.com/v1",
     PRINTIFY_API_KEY: "pk_test_xxx",

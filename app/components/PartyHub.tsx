@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Users, Gamepad2, MessageSquare, Settings } from 'lucide-react';
-import GlassCard from '@/app/components/ui/GlassCard';
-import GlassButton from '@/app/components/ui/GlassButton';
+import GlassCard from './ui/GlassCard';
+import GlassButton from './ui/GlassButton';
 import { type Party, type PartyCreate } from '@/app/lib/contracts';
 
 interface PartyHubProps {

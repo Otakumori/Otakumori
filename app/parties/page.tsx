@@ -3,8 +3,8 @@
 
 import { Suspense } from 'react';
 import { motion } from 'framer-motion';
-import PartyHub from '@/app/components/PartyHub';
-import GlassCard from '@/app/components/ui/GlassCard';
+import PartyHub from '../components/PartyHub';
+import GlassCard from '../components/ui/GlassCard';
 
 // Metadata is handled by layout.tsx for client components
 

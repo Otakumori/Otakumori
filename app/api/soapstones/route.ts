@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { db } from '@/app/lib/db';
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
