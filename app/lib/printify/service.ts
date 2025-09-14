@@ -1,4 +1,4 @@
-import { log } from '@/app/lib/logger';
+import { logger } from '@/app/lib/logger';
 import { env } from '@/env';
 
 export interface PrintifyProduct {
@@ -126,11 +126,7 @@ export class PrintifyService {
         last_page: result.last_page || 1,
       };
     } catch (error) {
-      log('printify_products_fetch_failed', {
-        error: String(error),
-        page,
-        perPage,
-      });
+      logger.error('printify_products_fetch_failed', undefined, { page, perPage, error: String(error) });
       throw error;
     }
   }
@@ -153,7 +149,7 @@ export class PrintifyService {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
       } catch (error) {
-        log('printify_pagination_error', {
+        logger.error('printify_pagination_error', undefined, {
           error: String(error),
           page,
           totalFetched: allProducts.length,
@@ -171,7 +167,7 @@ export class PrintifyService {
 
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
     try {
-      log('printify_order_creation_started', {
+      logger.info('printify_order_creation_started', undefined, {
         externalId: orderData.external_id,
         itemCount: orderData.line_items.length,
       });
@@ -184,7 +180,7 @@ export class PrintifyService {
         },
       );
 
-      log('printify_order_created_success', {
+      logger.info('printify_order_created_success', undefined, {
         orderId: result.id,
         externalId: orderData.external_id,
         status: result.status,
@@ -192,7 +188,7 @@ export class PrintifyService {
 
       return result;
     } catch (error) {
-      log('printify_order_creation_failed', {
+      logger.error('printify_order_creation_failed', undefined, {
         externalId: orderData.external_id,
         error: String(error),
       });
@@ -209,7 +205,7 @@ export class PrintifyService {
       const result = await this.makeRequest<{ data: any[] }>(`/shops/${this.shopId}/shipping.json`);
       return result.data || [];
     } catch (error) {
-      log('printify_shipping_fetch_failed', { error: String(error) });
+      logger.error('printify_shipping_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
   }
@@ -221,7 +217,7 @@ export class PrintifyService {
       );
       return result.data || [];
     } catch (error) {
-      log('printify_providers_fetch_failed', { error: String(error) });
+      logger.error('printify_providers_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
   }

@@ -1,4 +1,3 @@
-import { env } from '@/env';
 
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 export type LogCtx = {
@@ -26,8 +25,8 @@ export interface LogEntry {
 }
 
 class Logger {
-  private isDevelopment = env.NODE_ENV === 'development';
-  private isTest = env.NODE_ENV === 'test';
+  private isDevelopment = (process.env.NODE_ENV ?? 'development') === 'development';
+  private isTest = (process.env.NODE_ENV ?? '') === 'test';
 
   private formatError(error: Error): LogEntry['error'] {
     return {
