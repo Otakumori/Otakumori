@@ -17,9 +17,10 @@ type InventoryItem = {
 type InventoryResponse = { ok: boolean; items?: InventoryItem[]; code?: string; message?: string };
 
 export default function OwnedRunesGrid() {
-  const { data, error, isLoading } = useSWR<InventoryResponse>('/api/trade/inventory', (u) =>
+  const { data, error } = useSWR<InventoryResponse>('/api/trade/inventory', (u) =>
     fetch(u, { headers: { 'x-request-id': `req_${Date.now()}` } }).then((r) => r.json()),
   );
+  const isLoading = !data && !error;
 
   if (isLoading) {
     return (
@@ -75,4 +76,3 @@ export default function OwnedRunesGrid() {
     </div>
   );
 }
-

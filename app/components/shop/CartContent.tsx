@@ -55,8 +55,8 @@ export default function CartContent() {
               
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-white truncate">{item.name}</h3>
-                {item.variant && (
-                  <p className="text-sm text-zinc-400">{item.variant}</p>
+                {item.selectedVariant?.title && (
+                  <p className="text-sm text-zinc-400">{item.selectedVariant.title}</p>
                 )}
                 <p className="text-fuchsia-300 font-semibold">${item.price}</p>
               </div>
