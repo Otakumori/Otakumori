@@ -164,6 +164,12 @@ export class PrintifyService {
     return this.makeRequest<PrintifyProduct>(`/shops/${this.shopId}/products/${productId}.json`);
   }
 
+  async publishProduct(productId: string): Promise<{ status: string } | any> {
+    return this.makeRequest(`/shops/${this.shopId}/products/${productId}/publish.json`, {
+      method: 'POST',
+    });
+  }
+
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
     try {
       logger.info('printify_order_creation_started', undefined, {
