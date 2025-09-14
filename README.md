@@ -42,6 +42,10 @@ npm run dev
 - `npm run preflight` - Run pre-deployment checks
 - `npm run verify` - Run all validation checks
 
+---
+
+Deployment note: Triggering a fresh Vercel build after fixing package.json encoding and pinning Node 20 via `engines.node`.
+
 ### Database
 
 - `npm run prisma:generate` - Generate Prisma client
