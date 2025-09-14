@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { env } from '@/env';
 
 export interface PrintifyProduct {
   id: string;
@@ -60,8 +59,8 @@ export class PrintifyService {
   private readonly shopId: string;
 
   constructor() {
-    const apiKey = env.PRINTIFY_API_KEY;
-    const shopId = env.PRINTIFY_SHOP_ID;
+    const apiKey = process.env.PRINTIFY_API_KEY as string | undefined;
+    const shopId = process.env.PRINTIFY_SHOP_ID as string | undefined;
 
     if (!apiKey) {
       throw new Error('PRINTIFY_API_KEY environment variable is required');
@@ -239,5 +238,8 @@ export class PrintifyService {
   }
 }
 
-// Export singleton instance
-export const printifyService = new PrintifyService();
+let _singleton: PrintifyService | null = null;
+export function getPrintifyService(): PrintifyService {
+  if (!_singleton) _singleton = new PrintifyService();
+  return _singleton;
+}

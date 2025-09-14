@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { printifyService } from '@/app/lib/printify/service';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 export const runtime = 'nodejs';
 export const revalidate = 60;
@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
   const page = Number(searchParams.get('page') || '1') || 1;
   const perPage = Number(searchParams.get('per_page') || '100') || 100;
   try {
-    const result = await printifyService.getProducts(page, perPage);
+    const svc = getPrintifyService();
+    const result = await svc.getProducts(page, perPage);
     const products = (result.data || []).map((product) => ({
       id: product.id,
       title: product.title,
