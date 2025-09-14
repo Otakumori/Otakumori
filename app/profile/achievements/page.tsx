@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import NavBar from '../../components/NavBar';
 import FooterDark from '../../components/FooterDark';
-import AchievementsGrid from '../../components/profile/AchievementsGrid';
+import AchievementsTabs from '../../components/profile/AchievementsTabs';
 import { t } from '@/lib/microcopy';
 
 export const metadata: Metadata = {
@@ -51,7 +51,7 @@ export default async function AchievementsPage() {
             </p>
           </div>
           
-          <AchievementsGrid achievements={achievements} />
+          <AchievementsTabs achievements={achievements} />
         </div>
       </main>
       <FooterDark />

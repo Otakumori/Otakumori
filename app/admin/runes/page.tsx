@@ -6,12 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, Save, X, Crown, Sparkles } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import {
-  type CanonicalRuneId,
-  type RuneDef,
-  type RuneComboDef,
-  DEFAULT_RUNE_DISPLAYS,
-} from '@/types/runes';
+import { type CanonicalRuneId, type RuneDef, type RuneComboDef } from '@/types/runes';
+import { DEFAULT_RUNE_DISPLAYS } from '@/app/lib/runes-emoji';
+import RuneGlyph from '@/app/components/runes/RuneGlyph';
 import { AdminLayout } from '@/components/admin/AdminNav';
 
 interface EditableRuneDef extends Omit<RuneDef, 'createdAt' | 'updatedAt'> {
@@ -203,8 +200,11 @@ export default function AdminRunesPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="text-2xl">
-                        {rune.glyph ||
-                          getDefaultRuneDisplay(rune.canonicalId as CanonicalRuneId).glyph}
+                        <RuneGlyph
+                          runeId={rune.canonicalId as CanonicalRuneId}
+                          glyphOverride={rune.glyph}
+                          style="emoji"
+                        />
                       </div>
                       <div>
                         <h3 className="font-semibold text-white">
