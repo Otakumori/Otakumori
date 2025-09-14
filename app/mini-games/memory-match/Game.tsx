@@ -170,15 +170,15 @@ export default function Game({ mode }: Props) {
     if (gameState.isGameOver) {
       const submitScore = async () => {
         try {
-          const payload = {
-            score: gameState.score,
-            moves: gameState.moves,
-            matches: gameState.matches,
-            mode: mode,
-            meta: { game: 'memory-match' },
-          };
-          // TODO: Implement score submission API
-          console.log('Score to submit:', payload);
+          await fetch('/api/v1/leaderboard/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gameCode: 'memory-match',
+              score: Math.max(0, Math.round(gameState.score)),
+              meta: { moves: gameState.moves, matches: gameState.matches, mode },
+            }),
+          });
         } catch (error) {
           console.error('Failed to submit score:', error);
         }

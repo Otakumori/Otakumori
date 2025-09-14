@@ -125,14 +125,15 @@ export default function Game({ mode }: Props) {
     if (gameState.isGameOver) {
       const submitScore = async () => {
         try {
-          const payload = {
-            score: gameState.score,
-            revealedPercent: gameState.revealedPercent,
-            mode: mode,
-            meta: { game: 'puzzle-reveal' },
-          };
-          // TODO: Implement score submission API
-          console.log('Score to submit:', payload);
+          await fetch('/api/v1/leaderboard/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gameCode: 'puzzle-reveal',
+              score: Math.max(0, Math.round(gameState.score)),
+              meta: { revealedPercent: gameState.revealedPercent, mode },
+            }),
+          });
         } catch (error) {
           console.error('Failed to submit score:', error);
         }

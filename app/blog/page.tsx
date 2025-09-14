@@ -16,7 +16,7 @@ export default function BlogPage() {
     <>
       <StarfieldPurple />
       <NavBar />
-      <main className="relative z-10 min-h-screen">
+      <main className="relative z-10 min-h-screen" style={{ ['--om-star-duration-base' as any]: '760s' }}>
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white md:text-4xl mb-4">{t('nav', 'blog')}</h1>

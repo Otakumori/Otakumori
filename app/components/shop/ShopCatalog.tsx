@@ -136,10 +136,10 @@ export default function ShopCatalog({
 
       {/* Products Grid */}
       {products.length > 0 ? (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4" data-testid="product-grid">
           {products.map((product) => (
             <GlassPanel key={product.id} className="group overflow-hidden">
-              <Link href={`/shop/${product.slug}`} className="block">
+              <Link href={`/shop/${product.slug}`} className="block" data-testid="product-card">
                 <div className="relative aspect-[4/5] w-full">
                   <Image
                     src={product.image}

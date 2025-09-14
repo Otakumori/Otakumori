@@ -1,78 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
+import { useCart } from '@/app/components/cart/CartProvider';
 
-type CartItem = {
-  id: string;
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  variant?: string;
-};
-
-type CartData = {
-  items: CartItem[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-};
-
-type CartContentProps = {
-  cartData: CartData;
-};
-
-export default function CartContent({ cartData }: CartContentProps) {
-  const [items, setItems] = useState(cartData.items);
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const updateQuantity = async (itemId: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    
-    setIsUpdating(true);
-    try {
-      const response = await fetch(`/api/v1/shop/cart/items/${itemId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: newQuantity }),
-      });
-
-      if (response.ok) {
-        setItems(prev => prev.map(item => 
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        ));
-      }
-    } catch (error) {
-      console.error('Failed to update quantity:', error);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const removeItem = async (itemId: string) => {
-    setIsUpdating(true);
-    try {
-      const response = await fetch(`/api/v1/shop/cart/items/${itemId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setItems(prev => prev.filter(item => item.id !== itemId));
-      }
-    } catch (error) {
-      console.error('Failed to remove item:', error);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+export default function CartContent() {
+  const { items, updateQuantity, removeItem } = useCart();
+  const isUpdating = false;
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
   const tax = subtotal * 0.08; // 8% tax
   const shipping = subtotal > 50 ? 0 : 9.99; // Free shipping over $50
   const total = subtotal + tax + shipping;

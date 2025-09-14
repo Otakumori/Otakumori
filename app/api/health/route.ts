@@ -1,39 +1,99 @@
-import { NextResponse } from "next/server";
-import { env } from "@/app/env";
+import { NextResponse, type NextRequest } from "next/server";
+import { prisma } from "@/app/lib/prisma";
+import Stripe from "stripe";
+import { limitApi } from "@/lib/ratelimit";
 
-export async function GET() {
-  const checks = await Promise.allSettled([
-    // Clerk health check
-    fetch(`${env.NEXT_PUBLIC_CLERK_PROXY_URL}/health`, { 
-      method: "GET",
-      signal: AbortSignal.timeout(1500)
-    }).then(res => ({ service: "clerk", status: res.ok ? "ok" : "degraded" })).catch(() => ({ service: "clerk", status: "down" })),
-    
-    // Printify health check
-    fetch(`${env.PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/products.json`, {
-      method: "HEAD",
-      headers: { Authorization: `Bearer ${env.PRINTIFY_API_KEY}` },
-      signal: AbortSignal.timeout(1500)
-    }).then(res => ({ service: "printify", status: res.ok ? "ok" : "degraded" })).catch(() => ({ service: "printify", status: "down" })),
-    
-    // Stripe health check (if we have a test endpoint)
-    fetch("https://api.stripe.com/v1/charges?limit=1", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${env.STRIPE_SECRET_KEY}` },
-      signal: AbortSignal.timeout(1500)
-    }).then(res => ({ service: "stripe", status: res.ok ? "ok" : "degraded" })).catch(() => ({ service: "stripe", status: "down" })),
-  ]);
+export const dynamic = "force-dynamic";
 
-  const results = checks.map(result => 
-    result.status === "fulfilled" ? result.value : { service: "unknown", status: "down" }
-  );
+export async function GET(req: NextRequest) {
+  // Lightweight rate limit
+  try {
+    const requestIp = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || req.ip || 'anon';
+    const key = `api:health:${requestIp}`;
+    const res = await limitApi(key);
+    if (res && !res.success) {
+      return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
+    }
+  } catch {}
+  const out: Record<string, any> = {
+    db: "down",
+    clerk: "unknown",
+    stripe: "down",
+    printify: "unknown",
+    env: "ok",
+  };
 
-  const overall = results.every(r => r.status === "ok") ? "ok" : 
-                 results.some(r => r.status === "ok") ? "degraded" : "down";
+  // DB check (never throw)
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    out.db = "up";
+  } catch (e) {
+    out.db = "down";
+  }
 
-  return NextResponse.json({
-    status: overall,
-    timestamp: new Date().toISOString(),
-    services: results.reduce((acc, r) => ({ ...acc, [r.service]: r.status }), {}),
-  });
+  // Clerk check via proxy health if available
+  try {
+    const url = process.env.NEXT_PUBLIC_CLERK_PROXY_URL
+      ? `${process.env.NEXT_PUBLIC_CLERK_PROXY_URL}/health`
+      : undefined;
+    if (url) {
+      const res = await fetch(url, { method: "GET", signal: AbortSignal.timeout(1500) });
+      out.clerk = res.ok ? "up" : "down";
+    } else {
+      out.clerk = "unknown";
+    }
+  } catch {
+    out.clerk = "down";
+  }
+
+  // Stripe check – list 1 product (test mode ok)
+  try {
+    if (process.env.STRIPE_SECRET_KEY) {
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-20" as any });
+      await stripe.products.list({ limit: 1 });
+      out.stripe = "up";
+    } else {
+      out.stripe = "unknown";
+    }
+  } catch {
+    out.stripe = "down";
+  }
+
+  // Printify check – list shops (mock ok in dev)
+  try {
+    const apiKey = process.env.PRINTIFY_API_KEY;
+    if (apiKey) {
+      const res = await fetch(`https://api.printify.com/v1/shops.json`, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+        cache: "no-store",
+        signal: AbortSignal.timeout(2000),
+      });
+      out.printify = res.ok ? "up" : "down";
+    } else {
+      // Dev-friendly: mark as mock if no creds
+      out.printify = process.env.NODE_ENV === "development" ? "mock" : "unknown";
+    }
+  } catch {
+    out.printify = "down";
+  }
+
+  // Basic env presence check (non-fatal)
+  try {
+    const required = [
+      process.env.DATABASE_URL,
+      process.env.CLERK_SECRET_KEY,
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+      process.env.STRIPE_SECRET_KEY,
+    ];
+    out.env = required.every(Boolean) ? "ok" : "missing";
+  } catch {
+    out.env = "unknown";
+  }
+
+  out.buildHash = process.env.VERCEL_GIT_COMMIT_SHA || "dev";
+  out.commit = out.buildHash?.slice(0, 7);
+  out.nodeEnv = process.env.NODE_ENV || "development";
+  out.region = process.env.VERCEL_REGION || "local";
+
+  return NextResponse.json(out, { status: 200 });
 }

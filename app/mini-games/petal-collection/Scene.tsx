@@ -292,6 +292,15 @@ export default function PetalCollection() {
             stats: { streakMax: mult > 1 ? (mult - 1) * 10 : 0, misses: missCount, caught },
           }),
         });
+        await fetch('/api/v1/leaderboard/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameCode: 'petal-collection',
+            score: Math.max(0, Math.round(score)),
+            meta: { durationMs: duration, streakMax: mult > 1 ? (mult - 1) * 10 : 0, misses: missCount, caught },
+          }),
+        });
       } catch {}
       (window as any).__gameEnd?.({
         score,
