@@ -44,7 +44,7 @@ npm run dev
 
 ---
 
-Deployment note: Triggering a fresh Vercel build after fixing package.json encoding and pinning Node 20 via `engines.node`.
+Deployment note: Triggering a fresh Vercel build after fixing package.json encoding and pinning Node 20 via `engines.node`. Redeploy trigger.
 
 ### Database
 
