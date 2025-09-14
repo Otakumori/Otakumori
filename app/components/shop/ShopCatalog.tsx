@@ -72,8 +72,10 @@ export default function ShopCatalog({
         <div className="flex flex-wrap items-center gap-4">
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <label className="text-sm text-zinc-300">Sort by:</label>
+            <label htmlFor="shop-sort" className="text-sm text-zinc-300">Sort by:</label>
             <select
+              id="shop-sort"
+              name="sort"
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-fuchsia-400 focus:outline-none"
@@ -87,8 +89,10 @@ export default function ShopCatalog({
 
           {/* Category */}
           <div className="flex items-center gap-2">
-            <label className="text-sm text-zinc-300">Category:</label>
+            <label htmlFor="shop-category" className="text-sm text-zinc-300">Category:</label>
             <select
+              id="shop-category"
+              name="category"
               value={selectedCategory}
               onChange={(e) => handleCategoryChange(e.target.value)}
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-fuchsia-400 focus:outline-none"
@@ -103,13 +107,15 @@ export default function ShopCatalog({
 
           {/* Price Range */}
           <div className="flex items-center gap-2">
-            <label className="text-sm text-zinc-300">Price:</label>
+            <label htmlFor="price-min" className="text-sm text-zinc-300">Price:</label>
             <input
               type="number"
               placeholder="Min"
               value={priceRange.min}
               onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
               className="w-20 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+              id="price-min"
+              name="minPrice"
             />
             <span className="text-zinc-400">-</span>
             <input
@@ -118,6 +124,8 @@ export default function ShopCatalog({
               value={priceRange.max}
               onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
               className="w-20 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
+              id="price-max"
+              name="maxPrice"
             />
             <button
               onClick={handlePriceFilter}

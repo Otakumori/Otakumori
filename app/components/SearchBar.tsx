@@ -189,6 +189,8 @@ export default function SearchBar({
         <input
           ref={inputRef}
           type="text"
+          name="q"
+          aria-label="Search"
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={handleKeyDown}

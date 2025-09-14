@@ -56,72 +56,12 @@ export default clerkMiddleware(
       `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     res.headers.set("X-Request-ID", reqId);
 
-    // Security headers
+    // Security headers (keep HSTS here; other headers set via next.config.js)
     res.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
-    res.headers.set("X-Content-Type-Options", "nosniff");
-    res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-    res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
 
     return res;
   },
-  {
-    contentSecurityPolicy: isDev
-      ? {
-          strict: false,
-          directives: {
-            "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:", "data:"],
-            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            "img-src": ["*", "data:"],
-            "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
-            "connect-src": ["*"],
-          },
-        }
-      : {
-          strict: true,
-          directives: {
-            // Clerk handles script-src with nonce + strict-dynamic automatically
-            "connect-src": [
-              "'self'",
-              "https://api.clerk.com",
-              "https://clerk.otaku-mori.com",
-              "https://accounts.otaku-mori.com",
-              "https://clerk-telemetry.com",
-              "https://*.clerk-telemetry.com",
-              "https://api.stripe.com",
-              // env.NEXT_PUBLIC_CLERK_PROXY_URL, // Optional
-              "https://api.printify.com",
-              "https://*.printify.com",
-              "https://*.ingest.sentry.io",
-              "https://o4509520271114240.ingest.us.sentry.io",
-              "https://*.sentry.io",
-              "https://sentry.io",
-              "https://vitals.vercel-insights.com",
-              "https://www.otaku-mori.com",
-              "https://otaku-mori.com",
-              "https://*.vercel-blob.com",
-            ],
-            "img-src": [
-              "'self'",
-              "data:",
-              "https://*.printify.com",
-              "https://images.printify.com",
-              "https://*.cloudinary.com",
-              "https://*.vercel-blob.com",
-              "https:",
-            ],
-            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-            "font-src": ["'self'", "data:", "https://fonts.gstatic.com"],
-            "frame-src": [
-              "'self'",
-              "https://*.clerk.com",
-              "https://clerk.otaku-mori.com",
-              "https://accounts.otaku-mori.com",
-              "https://js.stripe.com",
-              "https://checkout.stripe.com",
-            ],
-          },
-        },
-  }
+  {}
 );
 
 export const config = {

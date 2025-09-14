@@ -109,11 +109,16 @@ function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
               <input
                 placeholder="Email"
                 className="rounded-xl bg-neutral-800/80 p-3 outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
+                name="email"
+                type="email"
+                aria-label="Email"
               />
               <input
                 placeholder="Password"
                 type="password"
                 className="rounded-xl bg-neutral-800/80 p-3 outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
+                name="password"
+                aria-label="Password"
               />
               <button className="rounded-2xl p-3 font-medium bg-pink-500/90 hover:bg-pink-500 text-white transition">
                 Log In
@@ -320,6 +325,9 @@ export default function SiteLayout({
               <input
                 placeholder="Email"
                 className="w-full rounded-xl bg-neutral-900/80 p-3 text-sm outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
+                name="newsletterEmail"
+                type="email"
+                aria-label="Email"
               />
               <button className="rounded-xl bg-pink-500/90 hover:bg-pink-500 px-4 text-sm">
                 Join

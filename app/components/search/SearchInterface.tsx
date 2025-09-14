@@ -121,6 +121,8 @@ export default function SearchInterface({}: SearchInterfaceProps) {
             <input
               ref={inputRef}
               type="text"
+              name="q"
+              aria-label="Search"
               value={query}
               onChange={handleQueryChange}
               placeholder={t("search", "placeholder")}

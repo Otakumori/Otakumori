@@ -101,6 +101,8 @@ export function InsidersSignup() {
                 placeholder="Enter your email"
                 required
                 className="w-full rounded-full border-0 bg-white/90 px-12 py-4 text-gray-800 placeholder-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-offset-2 focus:ring-offset-purple-600"
+                name="email"
+                aria-label="Email"
               />
             </div>
 
