@@ -6,9 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, Save, X, Crown, Sparkles } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import { type CanonicalRuneId, type RuneDef, type RuneComboDef } from '@/types/runes';
-import { DEFAULT_RUNE_DISPLAYS } from '@/app/lib/runes-emoji';
-import RuneGlyph from '@/app/components/runes/RuneGlyph';
+import {
+  type CanonicalRuneId,
+  type RuneDef,
+  type RuneComboDef,
+  DEFAULT_RUNE_DISPLAYS,
+} from '../../../types/runes';
 import { AdminLayout } from '@/components/admin/AdminNav';
 
 interface EditableRuneDef extends Omit<RuneDef, 'createdAt' | 'updatedAt'> {

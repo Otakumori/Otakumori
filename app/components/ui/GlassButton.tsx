@@ -1,73 +1,63 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { type ReactNode } from 'react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
-interface GlassButtonProps {
-  children: ReactNode;
-  onClick?: () => void;
-  href?: string;
+interface GlassButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-  className?: string;
+  href?: string;
 }
 
-export default function GlassButton({
-  children,
-  onClick,
-  href,
-  variant = 'primary',
-  size = 'md',
-  disabled = false,
-  className = '',
-}: GlassButtonProps) {
-  const baseClasses =
-    'relative overflow-hidden rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-transparent';
+const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
+  ({ className, variant = 'primary', size = 'md', href, ...props }, ref) => {
+    const baseClasses = cn(
+      // Base styles
+      'relative inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200',
+      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background',
+      'disabled:pointer-events-none disabled:opacity-50',
+      // Glass effect
+      'backdrop-blur-sm bg-white/10 border border-white/20',
+      'hover:bg-white/20 hover:border-white/30',
+      'active:scale-95',
+      // Variants
+      {
+        'text-white shadow-lg': variant === 'primary',
+        'text-white/80 shadow-md': variant === 'secondary',
+        'text-white/60 shadow-sm hover:text-white/80': variant === 'ghost',
+      },
+      // Sizes
+      {
+        'h-8 px-3 text-sm': size === 'sm',
+        'h-10 px-4 text-base': size === 'md',
+        'h-12 px-6 text-lg': size === 'lg',
+      },
+      className
+    );
 
-  const variantClasses = {
-    primary:
-      'bg-white/20 backdrop-blur-sm border border-white/30 text-gray-900 hover:bg-white/30 hover:border-white/40',
-    secondary:
-      'bg-pink-500/20 backdrop-blur-sm border border-pink-500/30 text-pink-700 hover:bg-pink-500/30 hover:border-pink-500/40',
-    ghost:
-      'bg-transparent border border-white/20 text-gray-700 hover:bg-white/10 hover:border-white/30',
-  };
+    if (href) {
+      return (
+        <Link href={href}>
+          <button
+            className={baseClasses}
+            ref={ref}
+            {...props}
+          />
+        </Link>
+      );
+    }
 
-  const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg',
-  };
-
-  const buttonClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`;
-
-  const buttonContent = (
-    <motion.button
-      className={buttonClasses}
-      onClick={onClick}
-      disabled={disabled}
-      whileHover={disabled ? {} : { scale: 1.02 }}
-      whileTap={disabled ? {} : { scale: 0.98 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-    >
-      {children}
-    </motion.button>
-  );
-
-  if (href) {
     return (
-      <motion.a
-        href={href}
-        className={buttonClasses}
-        whileHover={disabled ? {} : { scale: 1.02 }}
-        whileTap={disabled ? {} : { scale: 0.98 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-      >
-        {children}
-      </motion.a>
+      <button
+        className={baseClasses}
+        ref={ref}
+        {...props}
+      />
     );
   }
+);
 
-  return buttonContent;
-}
+GlassButton.displayName = 'GlassButton';
+
+export default GlassButton;

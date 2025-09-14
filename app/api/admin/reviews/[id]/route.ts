@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
 
 export const runtime = 'nodejs';
@@ -13,6 +13,6 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  await prisma.productReview.delete({ where: { id: params.id } });
+  await db.productReview.delete({ where: { id: params.id } });
   return NextResponse.json({ ok: true });
 }

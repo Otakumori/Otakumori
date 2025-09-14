@@ -1,4 +1,4 @@
-import { env } from "@/app/env";
+import { env } from "@/env";
 
 export function requiredEnv(name: string): string {
   const v = env[name as keyof typeof env];

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import Input from '@/components/ui/input';
+import { Input } from '@/app/components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Lock, Loader2 } from 'lucide-react';

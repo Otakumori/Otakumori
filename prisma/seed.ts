@@ -1,281 +1,382 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log("🌱 Starting database seed...");
 
-  // Clear existing data
-  await prisma.petalShopItem.deleteMany();
-  await prisma.achievement.deleteMany();
-  await prisma.userAchievement.deleteMany();
+  // Clear existing data (optional - remove in production)
+  await prisma.product.deleteMany({});
+  await prisma.gameRun.deleteMany({});
+  await prisma.achievement.deleteMany({});
+  await prisma.reward.deleteMany({});
 
-  // Seed Petal Shop Items
-  const shopItems = [
-    // Frames
+  // Seed Products
+  console.log("📦 Seeding products...");
+  const products = [
     {
-      sku: 'frame.sakura',
-      name: 'Sakura Frame',
-      kind: 'COSMETIC',
-      pricePetals: 50,
-      priceRunes: null,
-      eventTag: 'SPRING_HANAMI',
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Beautiful cherry blossom frame for your profile',
-        type: 'FRAME',
-        rarity: 'RARE',
-        imageUrl: '/assets/ui/frames/sakura.png',
-      },
+      id: "prod_cherry_hoodie",
+      name: "Cherry Blossom Hoodie",
+      description: "Soft, cozy hoodie featuring delicate cherry blossom patterns. Perfect for those who appreciate the beauty of fleeting moments.",
+      primaryImageUrl: "/images/seed/cherry-hoodie.png",
+      active: true,
+      category: "apparel",
+      isNSFW: false,
+      categorySlug: "hoodies",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'frame.neon',
-      name: 'Neon Frame',
-      kind: 'COSMETIC',
-      pricePetals: 75,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Cyberpunk-style neon border',
-        type: 'FRAME',
-        rarity: 'LEGENDARY',
-        imageUrl: '/assets/ui/frames/neon.png',
-      },
+      id: "prod_abyss_tee",
+      name: "Abyss T-Shirt",
+      description: "Dark, mysterious design inspired by the depths. For those who dare to explore the unknown.",
+      primaryImageUrl: "/images/seed/abyss-tee.png",
+      active: true,
+      category: "apparel",
+      isNSFW: false,
+      categorySlug: "t-shirts",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'frame.classic',
-      name: 'Classic Frame',
-      kind: 'COSMETIC',
-      pricePetals: 25,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Timeless elegant border',
-        type: 'FRAME',
-        rarity: 'COMMON',
-        imageUrl: '/assets/ui/frames/classic.png',
-      },
-    },
-
-    // Overlays
-    {
-      sku: 'overlay.ember',
-      name: 'Ember Glow',
-      kind: 'OVERLAY',
-      pricePetals: 100,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Warm fire-like overlay effect',
-        type: 'OVERLAY',
-        rarity: 'LEGENDARY',
-        imageUrl: '/assets/ui/overlays/ember.png',
-      },
+      id: "prod_rune_pin",
+      name: "Guardian Rune Pin",
+      description: "Ancient rune pin that channels protective energy. A small token with great power.",
+      primaryImageUrl: "/images/seed/rune-pin.png",
+      active: true,
+      category: "accessories",
+      isNSFW: false,
+      categorySlug: "pins",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'overlay.sparkle',
-      name: 'Sparkle Magic',
-      kind: 'OVERLAY',
-      pricePetals: 60,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Magical sparkle effects',
-        type: 'OVERLAY',
-        rarity: 'RARE',
-        imageUrl: '/assets/ui/overlays/sparkle.png',
-      },
+      id: "prod_soapstone_mug",
+      name: "Soapstone Mug",
+      description: "Handcrafted mug with soapstone texture. Perfect for leaving messages or enjoying your morning coffee.",
+      primaryImageUrl: "/images/seed/soapstone-mug.png",
+      active: true,
+      category: "drinkware",
+      isNSFW: false,
+      categorySlug: "mugs",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'overlay.rainbow',
-      name: 'Rainbow Aura',
-      kind: 'OVERLAY',
-      pricePetals: 80,
-      priceRunes: null,
-      eventTag: 'PRIDE_MONTH',
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Colorful rainbow aura effect',
-        type: 'OVERLAY',
-        rarity: 'RARE',
-        imageUrl: '/assets/ui/overlays/rainbow.png',
-      },
-    },
-
-    // Text Styles
-    {
-      sku: 'textstyle.colorful',
-      name: 'Colorful Text',
-      kind: 'TEXT',
-      pricePetals: 120,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Vibrant rainbow text effects',
-        type: 'TEXT_STYLE',
-        rarity: 'LEGENDARY',
-      },
+      id: "prod_petal_hoodie",
+      name: "Petal Samurai Hoodie",
+      description: "Inspired by the art of petal collection. Features flowing designs that capture the essence of the game.",
+      primaryImageUrl: "/images/seed/petal-hoodie.png",
+      active: true,
+      category: "apparel",
+      isNSFW: false,
+      categorySlug: "hoodies",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'textstyle.neon',
-      name: 'Neon Text',
-      kind: 'TEXT',
-      pricePetals: 90,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Glowing neon text style',
-        type: 'TEXT_STYLE',
-        rarity: 'RARE',
-      },
+      id: "prod_memory_tee",
+      name: "Memory Match T-Shirt",
+      description: "Clean, minimalist design for those who excel at pattern recognition and memory games.",
+      primaryImageUrl: "/images/seed/memory-tee.png",
+      active: true,
+      category: "apparel",
+      isNSFW: false,
+      categorySlug: "t-shirts",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'textstyle.glow',
-      name: 'Glow Text',
-      kind: 'TEXT',
-      pricePetals: 60,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Soft glowing text effect',
-        type: 'TEXT_STYLE',
-        rarity: 'RARE',
-      },
-    },
-
-    // Cursors
-    {
-      sku: 'cursor.anime-eyes',
-      name: 'Anime Eyes Cursor',
-      kind: 'CURSOR',
-      pricePetals: 40,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Cute anime eyes cursor',
-        type: 'CURSOR',
-        rarity: 'COMMON',
-        imageUrl: '/assets/ui/cursors/anime-eyes.png',
-      },
+      id: "prod_rhythm_sticker",
+      name: "Rhythm Beat Sticker Pack",
+      description: "Set of vinyl stickers featuring musical notes and rhythm patterns. Perfect for laptops, water bottles, and more.",
+      primaryImageUrl: "/images/seed/rhythm-stickers.png",
+      active: true,
+      category: "accessories",
+      isNSFW: false,
+      categorySlug: "stickers",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
     {
-      sku: 'cursor.sword',
-      name: 'Sword Cursor',
-      kind: 'CURSOR',
-      pricePetals: 75,
-      priceRunes: null,
-      eventTag: null,
-      visibleFrom: null,
-      visibleTo: null,
-      metadata: {
-        description: 'Epic sword cursor',
-        type: 'CURSOR',
-        rarity: 'RARE',
-        imageUrl: '/assets/ui/cursors/sword.png',
-      },
+      id: "prod_otakumori_poster",
+      name: "Otakumori Poster",
+      description: "Beautiful poster featuring the iconic cherry blossom tree and game elements. Perfect for any gamer's room.",
+      primaryImageUrl: "/images/seed/otakumori-poster.png",
+      active: true,
+      category: "home",
+      isNSFW: false,
+      categorySlug: "posters",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   ];
 
-  for (const item of shopItems) {
-    await prisma.petalShopItem.create({
-      data: item,
+  for (const product of products) {
+    await prisma.product.upsert({
+      where: { id: product.id },
+      create: product,
+      update: product,
     });
   }
 
-  console.log(`✅ Created ${shopItems.length} petal shop items`);
+  // Create product variants for each product
+  console.log("🔧 Creating product variants...");
+  const productVariants = [
+    // Cherry Blossom Hoodie variants
+    {
+      id: "var_cherry_hoodie_s_black",
+      productId: "prod_cherry_hoodie",
+      previewImageUrl: "/images/seed/cherry-hoodie-s-black.png",
+      printifyVariantId: 1001,
+      printProviderName: "Gildan",
+      leadMinDays: 2,
+      leadMaxDays: 5,
+      isEnabled: true,
+      inStock: true,
+      priceCents: 4599,
+      currency: "USD",
+    },
+    {
+      id: "var_cherry_hoodie_m_black",
+      productId: "prod_cherry_hoodie",
+      previewImageUrl: "/images/seed/cherry-hoodie-m-black.png",
+      printifyVariantId: 1002,
+      printProviderName: "Gildan",
+      leadMinDays: 2,
+      leadMaxDays: 5,
+      isEnabled: true,
+      inStock: true,
+      priceCents: 4599,
+      currency: "USD",
+    },
+    // Abyss T-Shirt variants
+    {
+      id: "var_abyss_tee_s_black",
+      productId: "prod_abyss_tee",
+      previewImageUrl: "/images/seed/abyss-tee-s-black.png",
+      printifyVariantId: 2001,
+      printProviderName: "Bella+Canvas",
+      leadMinDays: 1,
+      leadMaxDays: 3,
+      isEnabled: true,
+      inStock: true,
+      priceCents: 2499,
+      currency: "USD",
+    },
+    {
+      id: "var_abyss_tee_m_black",
+      productId: "prod_abyss_tee",
+      previewImageUrl: "/images/seed/abyss-tee-m-black.png",
+      printifyVariantId: 2002,
+      printProviderName: "Bella+Canvas",
+      leadMinDays: 1,
+      leadMaxDays: 3,
+      isEnabled: true,
+      inStock: true,
+      priceCents: 2499,
+      currency: "USD",
+    },
+    // Rune Pin variant
+    {
+      id: "var_rune_pin_standard",
+      productId: "prod_rune_pin",
+      previewImageUrl: "/images/seed/rune-pin-standard.png",
+      printifyVariantId: 3001,
+      printProviderName: "Custom",
+      leadMinDays: 3,
+      leadMaxDays: 7,
+      isEnabled: true,
+      inStock: true,
+      priceCents: 999,
+      currency: "USD",
+    },
+    // Soapstone Mug variant
+    {
+      id: "var_soapstone_mug_white",
+      productId: "prod_soapstone_mug",
+      previewImageUrl: "/images/seed/soapstone-mug-white.png",
+      printifyVariantId: 4001,
+      printProviderName: "Custom",
+      leadMinDays: 2,
+      leadMaxDays: 4,
+      isEnabled: true,
+      inStock: true,
+      priceCents: 1499,
+      currency: "USD",
+    },
+  ];
+
+  for (const variant of productVariants) {
+    await prisma.productVariant.upsert({
+      where: { id: variant.id },
+      create: variant,
+      update: variant,
+    });
+  }
 
   // Seed Achievements
+  console.log("🏆 Seeding achievements...");
   const achievements = [
     {
-      code: 'FIRST_VICTORY',
-      name: 'First Steps',
-      description: 'Win your first mini-game',
+      id: "ach_first_petal",
+      code: "first_petal",
+      name: "First Petal",
+      description: "Collected your first petal",
       points: 10,
     },
     {
-      code: 'PETAL_COLLECTOR',
-      name: 'Petal Collector',
-      description: 'Collect 100 petals',
-      points: 25,
-    },
-    {
-      code: 'GAME_MASTER',
-      name: 'Game Master',
-      description: 'Win 10 mini-games',
-      points: 50,
-    },
-    {
-      code: 'ACHIEVEMENT_HUNTER',
-      name: 'Achievement Hunter',
-      description: 'Unlock 5 achievements',
-      points: 30,
-    },
-    {
-      code: 'SHOP_SPENDER',
-      name: 'Shop Spender',
-      description: 'Purchase your first cosmetic',
-      points: 15,
-    },
-    {
-      code: 'SPECIAL_SAMURAI',
-      name: 'Special Samurai',
-      description: 'Achieve perfect score in Samurai Slice',
+      id: "ach_petal_master",
+      code: "petal_master",
+      name: "Petal Master",
+      description: "Collected 1000 petals",
       points: 100,
     },
     {
-      code: 'MEMORY_MASTER',
-      name: 'Memory Master',
-      description: 'Complete Memory Match in under 30 seconds',
+      id: "ach_memory_champion",
+      code: "memory_champion",
+      name: "Memory Champion",
+      description: "Completed Memory Match with perfect score",
+      points: 50,
+    },
+    {
+      id: "ach_rhythm_legend",
+      code: "rhythm_legend",
+      name: "Rhythm Legend",
+      description: "Achieved perfect rhythm in Rhythm Beat",
       points: 75,
     },
     {
-      code: 'BUBBLE_POPPER',
-      name: 'Bubble Popper',
-      description: 'Pop 100 bubbles in one session',
-      points: 40,
+      id: "ach_soapstone_poet",
+      code: "soapstone_poet",
+      name: "Soapstone Poet",
+      description: "Left 10 meaningful soapstone messages",
+      points: 25,
     },
     {
-      code: 'RHYTHM_KING',
-      name: 'Rhythm King',
-      description: 'Achieve 95% accuracy in Rhythm Beat-Em-Up',
-      points: 80,
+      id: "ach_shop_explorer",
+      code: "shop_explorer",
+      name: "Shop Explorer",
+      description: "Viewed all product categories",
+      points: 15,
     },
   ];
 
   for (const achievement of achievements) {
-    await prisma.achievement.create({
-      data: achievement,
+    await prisma.achievement.upsert({
+      where: { id: achievement.id },
+      create: achievement,
+      update: achievement,
     });
   }
 
-  console.log(`✅ Created ${achievements.length} achievements`);
+  // Seed Rewards
+  console.log("🎁 Seeding rewards...");
+  const rewards = [
+    {
+      id: "reward_petal_bonus_100",
+      kind: "PETALS_BONUS" as const,
+      sku: "petal_bonus_100",
+      value: 100,
+      metadata: { description: "100 bonus petals" },
+    },
+    {
+      id: "reward_cosmetic_glow",
+      kind: "COSMETIC" as const,
+      sku: "cursor_glow",
+      value: null,
+      metadata: { description: "Cursor glow effect", type: "cosmetic" },
+    },
+    {
+      id: "reward_overlay_petals",
+      kind: "OVERLAY" as const,
+      sku: "petal_overlay",
+      value: null,
+      metadata: { description: "Petal overlay effect", type: "overlay" },
+    },
+  ];
 
-  console.log('🎉 Database seeding completed!');
+  for (const reward of rewards) {
+    await prisma.reward.upsert({
+      where: { id: reward.id },
+      create: reward,
+      update: reward,
+    });
+  }
+
+  // Seed Site Config
+  console.log("⚙️ Seeding site configuration...");
+  await prisma.siteConfig.upsert({
+    where: { id: "singleton" },
+    create: {
+      id: "singleton",
+      guestCap: 50,
+      burst: {
+        enabled: true,
+        minCooldownSec: 15,
+        maxPerMinute: 3,
+        particleCount: { small: 20, medium: 40, large: 80 },
+        rarityWeights: { small: 0.6, medium: 0.3, large: 0.1 },
+      },
+      tree: {
+        sway: 0.5,
+        spawnRate: 2000,
+        snapPx: 4,
+        dither: 0.3,
+      },
+      theme: {
+        pinkIntensity: 0.7,
+        grayIntensity: 0.8,
+        motionIntensity: 2,
+      },
+      seasonal: {
+        sakuraBoost: false,
+        springMode: false,
+        autumnMode: false,
+      },
+      rewards: {
+        baseRateCents: 300,
+        minPerOrder: 5,
+        maxPerOrder: 120,
+        streak: {
+          enabled: true,
+          dailyBonusPct: 0.05,
+          maxPct: 0.25,
+        },
+        seasonal: { multiplier: 1.0 },
+        daily: {
+          softCap: 200,
+          postSoftRatePct: 0.5,
+          hardCap: 400,
+        },
+        firstPurchaseBonus: 20,
+      },
+      runes: {
+        defs: [],
+        combos: [],
+        gacha: { enabled: false },
+      },
+      updatedAt: new Date(),
+    },
+    update: {
+      updatedAt: new Date(),
+    },
+  });
+
+  console.log("✅ Database seed completed successfully!");
+  console.log(`📊 Seeded:`);
+  console.log(`  - ${products.length} products`);
+  console.log(`  - ${productVariants.length} product variants`);
+  console.log(`  - ${achievements.length} achievements`);
+  console.log(`  - ${rewards.length} rewards`);
+  console.log(`  - 1 site configuration`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error during seeding:', e);
+    console.error("❌ Seed failed:", e);
     process.exit(1);
   })
-  .finally(() => {
-    prisma.$disconnect();
+  .finally(async () => {
+    await prisma.$disconnect();
   });

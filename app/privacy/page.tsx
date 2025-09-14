@@ -2,8 +2,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import GlassCard from '@/app/components/ui/GlassCard';
-import GlassButton from '@/app/components/ui/GlassButton';
+import GlassCard from '../components/ui/GlassCard';
+import GlassButton from '../components/ui/GlassButton';
 
 export default function PrivacyPolicy() {
   return (

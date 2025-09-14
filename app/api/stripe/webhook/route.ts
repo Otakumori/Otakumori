@@ -6,7 +6,7 @@ import {
   StripeCheckoutSessionSchema,
   StripePaymentIntentSchema,
 } from '@/lib/api/stripe';
-import { db } from '@/app/lib/db';
+import { db } from '@/lib/db';
 import { logger } from '@/app/lib/logger';
 import {
   printifyService,

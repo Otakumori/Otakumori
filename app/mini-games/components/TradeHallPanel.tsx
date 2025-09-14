@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-// import { COPY } from '@/app/lib/copy';
+// import { COPY } from '../../../lib/copy';
 
 export default function TradeHallPanel() {
   return (

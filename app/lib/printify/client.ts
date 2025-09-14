@@ -1,4 +1,4 @@
-import { env } from "@/app/env";
+import { env } from "@/env";
 import { PrintifyProducts, PrintifyError } from "./schema";
 
 const RETRY_ATTEMPTS = 3;
@@ -39,7 +39,7 @@ async function fetchWithRetry(url: string, options: RequestInit, attempts = RETR
 }
 
 export async function getProducts() {
-  const url = `${env.PRINTIFY_API_URL.replace(/\/$/, "")}/shops/${env.PRINTIFY_SHOP_ID}/products.json`;
+  const url = `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`;
   
   try {
     const response = await fetchWithRetry(url, {
@@ -62,7 +62,7 @@ export async function getProducts() {
 }
 
 export async function getProductVariants(productId: string) {
-  const url = `${env.PRINTIFY_API_URL.replace(/\/$/, "")}/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}/variants.json`;
+  const url = `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}/variants.json`;
   
   try {
     const response = await fetchWithRetry(url, {
@@ -82,3 +82,9 @@ export async function getProductVariants(productId: string) {
     throw error;
   }
 }
+
+// Export a service object for easier imports
+export const printifyService = {
+  getProducts,
+  getProductVariants,
+};
