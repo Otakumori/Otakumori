@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
           is_enabled: v.is_enabled,
           in_stock: v.in_stock,
         })) || [],
-      available: product.variants?.some((v) => v.is_enabled && v.in_stock) || false,
+      available: product.variants?.some((v: any) => v.is_enabled && v.in_stock) || false,
       visible: product.visible,
       createdAt: product.created_at,
       updatedAt: product.updated_at,
