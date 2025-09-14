@@ -63,13 +63,17 @@ export default function PetalStorePage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/v1/petals/shop?category=${selectedCategory}`);
-      const data: PetalStoreResponse = await response.json();
+      const response = await fetch(`/api/petal-shop/catalog`);
+      const data = await response.json();
 
-      if (data.ok && data.data) {
-        setItems(data.data.items);
+      if (data?.ok && data?.data?.items) {
+        let list: ShopItem[] = data.data.items;
+        if (selectedCategory !== 'all') {
+          list = list.filter((i) => i.kind === selectedCategory);
+        }
+        setItems(list);
       } else {
-        setError(data.error || 'Failed to fetch shop items');
+        setError(data?.error || 'Failed to fetch shop items');
       }
     } catch (err) {
       setError('Failed to fetch shop items');
@@ -81,12 +85,10 @@ export default function PetalStorePage() {
 
   const fetchPetalBalance = async () => {
     try {
-      const response = await fetch('/api/v1/petals/balance');
+      const response = await fetch('/api/petals/wallet');
       if (response.ok) {
         const data = await response.json();
-        if (data.ok && data.data) {
-          setPetalBalance(data.data.petalBalance);
-        }
+        if (typeof data.balance === 'number') setPetalBalance(data.balance);
       }
     } catch (err) {
       console.error('Error fetching petal balance:', err);
@@ -102,20 +104,17 @@ export default function PetalStorePage() {
     try {
       setPurchasing(item.id);
 
-      const response = await fetch('/api/v1/petals/purchase', {
+      const response = await fetch('/api/petal-shop/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: item.id,
-          idempotencyKey: `purchase_${item.id}_${Date.now()}`,
-        }),
+        body: JSON.stringify({ sku: item.sku }),
       });
 
       const data = await response.json();
 
       if (data.ok && data.data) {
         // Update local state
-        setPetalBalance(data.data.newBalance);
+        if (typeof data.data.balance === 'number') setPetalBalance(data.data.balance);
         setItems((prev) => prev.filter((i) => i.id !== item.id));
         alert(`Successfully purchased ${item.name}!`);
       } else {
