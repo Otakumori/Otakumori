@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { COPY } from '../../lib/copy';
 import GlassButton from '../../components/ui/GlassButton';
@@ -33,9 +34,12 @@ export default function AchievementsPage() {
 
   // Mock data - in real app, this would come from API
   useEffect(() => {
+    const params = useSearchParams();
+    const router = useRouter();
     const next = new URLSearchParams(params.toString());
     next.set('face', '1');
     router.replace(`/mini-games?${next.toString()}`);
-  }, [params, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return null;
 }

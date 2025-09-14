@@ -13,6 +13,7 @@ import {
   DEFAULT_RUNE_DISPLAYS,
 } from '../../../types/runes';
 import { AdminLayout } from '@/components/admin/AdminNav';
+import RuneGlyph from '@/app/components/runes/RuneGlyph';
 
 interface EditableRuneDef extends Omit<RuneDef, 'createdAt' | 'updatedAt'> {
   createdAt?: Date;
