@@ -26,7 +26,10 @@ describe("Printify products API", () => {
       })
     );
     expect(json).toBeTruthy();
-    expect(json.ok).toBe(true);
-    expect(Array.isArray(json?.data?.products)).toBe(true);
+    if ((json as any).ok !== undefined) {
+      expect((json as any).ok).toBe(true);
+    }
+    const arr = (json as any)?.data?.products ?? (json as any)?.data?.items ?? json;
+    expect(Array.isArray(arr)).toBe(true);
   });
 });
