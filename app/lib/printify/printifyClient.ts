@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 import type { PrintifyOrder } from './types';
 
 const client = axios.create({

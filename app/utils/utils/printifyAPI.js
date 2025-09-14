@@ -1,5 +1,5 @@
 import { printify } from '@/lib/printifyClient';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;

@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 import { OrderConfirmationEmail } from '@/app/emails/OrderConfirmation';
 
 const resend = new Resend(env.RESEND_API_KEY);

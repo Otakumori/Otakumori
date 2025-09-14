@@ -1,5 +1,5 @@
-import { log } from '@/lib/logger';
-import { env } from '@/env.mjs';
+import { log } from '@/app/lib/logger';
+import { env } from '@/env';
 
 export interface PrintifyProduct {
   id: string;
