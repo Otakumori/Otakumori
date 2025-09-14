@@ -1,15 +1,11 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
-import dynamic from 'next/dynamic';
+export const metadata = { title: "Mini-Games | Otakumori" };
 
-const ConsoleCard = dynamic(() => import('./console/ConsoleCard'), { ssr: false });
-
-export const metadata = { title: 'Mini-Games | Otakumori' };
+import HubClient from "./HubClient";
 
 export default function Page() {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <ConsoleCard />
+    <main className="mx-auto max-w-6xl px-4 py-6">
+      <HubClient />
     </main>
   );
 }
-

@@ -35,11 +35,12 @@ export async function POST(req: NextRequest) {
   // Allow guests: record leaderboard only; no economy
   if (!userId) {
     try {
-      await prisma.leaderboardScore.upsert({
-        where: { userId_game_diff: { userId: 'guest', game, diff: null } },
-        create: { userId: 'guest', game, diff: null, score, statsJson: {} },
-        update: { score },
-      });
+      const prev = await prisma.leaderboardScore.findFirst({ where: { userId: 'guest', game, diff: null } });
+      if (prev) {
+        await prisma.leaderboardScore.update({ where: { id: prev.id }, data: { score } });
+      } else {
+        await prisma.leaderboardScore.create({ data: { userId: 'guest', game, diff: null, score, statsJson: {} } });
+      }
     } catch {}
     return NextResponse.json({ ok: true, score, petalsGranted: 0 });
   }
@@ -52,16 +53,11 @@ export async function POST(req: NextRequest) {
   let petalsGranted = calcAward(game, score);
   try {
     // Personal best update
-    const prev = await prisma.leaderboardScore.findUnique({
-      where: { userId_game_diff: { userId, game, diff: null } },
-      select: { score: true },
-    });
-    if (!prev || score > (prev?.score ?? 0)) {
-      await prisma.leaderboardScore.upsert({
-        where: { userId_game_diff: { userId, game, diff: null } },
-        create: { userId, game, diff: null, score, statsJson: {} },
-        update: { score },
-      });
+    const prev = await prisma.leaderboardScore.findFirst({ where: { userId, game, diff: null }, select: { id: true, score: true } });
+    if (!prev) {
+      await prisma.leaderboardScore.create({ data: { userId, game, diff: null, score, statsJson: {} } });
+    } else if (score > (prev.score ?? 0)) {
+      await prisma.leaderboardScore.update({ where: { id: prev.id }, data: { score } });
     }
   } catch {}
 
@@ -78,4 +74,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, score, petalsGranted, ...(balance != null ? { balance } : {}) });
 }
-
