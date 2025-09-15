@@ -15,21 +15,21 @@ export async function POST(_: NextRequest, { params }: { params: { id: string } 
       messageId_userId_type: {
         messageId: id,
         userId,
-        type: 'APPRAISE'
-      }
-    }
+        type: 'APPRAISE',
+      },
+    },
   });
 
   if (existing) {
     await db.$transaction([
       db.reaction.delete({ where: { id: existing.id } }),
-      db.soapstoneMessage.update({ where: { id }, data: { appraises: { decrement: 1 } } })
+      db.soapstoneMessage.update({ where: { id }, data: { appraises: { decrement: 1 } } }),
     ]);
     return NextResponse.json({ ok: true, appraised: false });
   } else {
     await db.$transaction([
       db.reaction.create({ data: { messageId: id, userId, type: 'APPRAISE' } }),
-      db.soapstoneMessage.update({ where: { id }, data: { appraises: { increment: 1 } } })
+      db.soapstoneMessage.update({ where: { id }, data: { appraises: { increment: 1 } } }),
     ]);
     return NextResponse.json({ ok: true, appraised: true });
   }

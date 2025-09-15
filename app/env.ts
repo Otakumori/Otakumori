@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const EnvSchema = z.object({
-  NODE_ENV: z.enum(["development","test","production"]),
+  NODE_ENV: z.enum(['development', 'test', 'production']),
   // Site URLs
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
@@ -25,7 +25,7 @@ const EnvSchema = z.object({
   PRINTIFY_API_KEY: z.string().min(10),
   PRINTIFY_SHOP_ID: z.string().min(1),
   // UI rune glyph style preference (client-side); optional
-  NEXT_PUBLIC_RUNE_GLYPH_STYLE: z.enum(['emoji','material','auto']).optional(),
+  NEXT_PUBLIC_RUNE_GLYPH_STYLE: z.enum(['emoji', 'material', 'auto']).optional(),
   // Feature flags
   NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: z.string().optional(),
   NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: z.string().optional(),

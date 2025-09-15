@@ -38,7 +38,7 @@ export default function PauseMenuExample() {
       <div className="bg-gray-900 p-8 rounded-lg">
         <h2 className="text-2xl font-bold text-white mb-4">Game Paused</h2>
         <p className="text-gray-300 mb-6">Midna's lament is playing in the background</p>
-        
+
         <div className="space-x-4">
           <button
             onClick={() => setIsPaused(false)}

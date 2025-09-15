@@ -13,7 +13,9 @@ export default function ProductFilters({ onFilterChange }: Props) {
 
   return (
     <div className="rounded-2xl p-4 bg-white/10 backdrop-blur">
-      <label htmlFor="product-filters-q" className="block text-sm mb-2 opacity-80">Search</label>
+      <label htmlFor="product-filters-q" className="block text-sm mb-2 opacity-80">
+        Search
+      </label>
       <input
         id="product-filters-q"
         name="q"
@@ -25,7 +27,9 @@ export default function ProductFilters({ onFilterChange }: Props) {
         placeholder="Whatt're ya buyin'?"
         className="w-full mb-4 rounded-xl px-3 py-2 bg-white/5 outline-none"
       />
-      <label htmlFor="product-filters-tag" className="block text-sm mb-2 opacity-80">Tag</label>
+      <label htmlFor="product-filters-tag" className="block text-sm mb-2 opacity-80">
+        Tag
+      </label>
       <input
         id="product-filters-tag"
         name="tag"

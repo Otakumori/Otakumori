@@ -18,7 +18,10 @@ export async function POST(req: Request) {
   const arr = (bins[key] ||= []);
   while (arr.length && now - arr[0] > windowMs) arr.shift();
   if (arr.length >= limit) {
-    const res = NextResponse.json({ ok: false, code: 'RATE_LIMIT', message: 'Too many emotes' }, { status: 429 });
+    const res = NextResponse.json(
+      { ok: false, code: 'RATE_LIMIT', message: 'Too many emotes' },
+      { status: 429 },
+    );
     res.headers.set('Retry-After', '10');
     return res;
   }
@@ -31,7 +34,7 @@ export async function POST(req: Request) {
       const body = await req.json().catch(() => ({}));
       const emoteId: string | undefined = body?.emoteId;
       const us = await db.userSettings.findUnique({ where: { userId: user.id } });
-      const prefs = ((us?.notificationPreferences as any) ?? {});
+      const prefs = (us?.notificationPreferences as any) ?? {};
       const card = prefs.card ?? {};
       const nowTs = Date.now();
       const last: Record<string, number> = card.emoteLast || {};
@@ -44,7 +47,11 @@ export async function POST(req: Request) {
       card.emoteLast = last;
       card.combos = combos;
       const next = { ...prefs, card };
-      await db.userSettings.upsert({ where: { userId: user.id }, update: { notificationPreferences: next }, create: { userId: user.id, notificationPreferences: next } });
+      await db.userSettings.upsert({
+        where: { userId: user.id },
+        update: { notificationPreferences: next },
+        create: { userId: user.id, notificationPreferences: next },
+      });
     }
   } catch {}
 

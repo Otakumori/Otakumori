@@ -23,13 +23,13 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
             'shadow-xl bg-white/10 border-white/20': variant === 'elevated',
             'shadow-sm bg-white/2 border-white/5': variant === 'subtle',
           },
-          className
+          className,
         )}
         ref={ref}
         {...props}
       />
     );
-  }
+  },
 );
 
 GlassCard.displayName = 'GlassCard';

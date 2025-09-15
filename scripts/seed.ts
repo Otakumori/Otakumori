@@ -56,7 +56,7 @@ async function seedPrintifyFallback() {
             {
               id: `${p.id}-v1`,
               printifyVariantId: 1000,
-              productId: p.id,
+              // productId: p.id, // This field doesn't exist in ProductVariant model
               inStock: true,
               isEnabled: true,
               priceCents: 2500,
@@ -178,4 +178,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

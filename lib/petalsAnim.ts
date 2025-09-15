@@ -24,7 +24,7 @@ export class WindController {
     direction: 45, // degrees (45 = diagonal down-right)
     speed: 30, // px/sec
     gustStrength: 0,
-    gustDirection: 45
+    gustDirection: 45,
   };
 
   private gustTimer = 0;
@@ -55,7 +55,7 @@ export class WindController {
   applyWind(physics: PetalPhysics, wind: WindState, deltaTime: number): PetalPhysics {
     const gustMultiplier = 1 + wind.gustStrength;
     const windAngle = wind.direction + wind.gustStrength * (wind.gustDirection - wind.direction);
-    
+
     const windX = Math.cos((windAngle * Math.PI) / 180) * wind.speed * gustMultiplier;
     const windY = Math.sin((windAngle * Math.PI) / 180) * wind.speed * gustMultiplier;
 
@@ -64,7 +64,7 @@ export class WindController {
       vx: windX + Math.sin(physics.y * 0.01) * physics.swayAmplitude * 0.1,
       vy: windY + 50 + Math.random() * 20, // base fall speed + variance
       rotationSpeed: physics.rotationSpeed + wind.gustStrength * 0.5,
-      flipSpeed: physics.flipSpeed + wind.gustStrength * 0.3
+      flipSpeed: physics.flipSpeed + wind.gustStrength * 0.3,
     };
   }
 }
@@ -74,7 +74,7 @@ export class PetalSpawner {
     x: 0,
     y: 0,
     width: 400, // Adjust based on your canopy image
-    height: 300
+    height: 300,
   };
 
   setCanopyBounds(bounds: { x: number; y: number; width: number; height: number }) {
@@ -98,18 +98,18 @@ export class PetalSpawner {
         swayAmplitude: 10 + Math.random() * 10,
         swayFrequency: 0.5 + Math.random() * 0.5,
         flipAngle: 0,
-        flipSpeed: (Math.random() - 0.5) * 0.2
-      }
+        flipSpeed: (Math.random() - 0.5) * 0.2,
+      },
     };
   }
 }
 
 // Utility functions
 export function createPetalElement(
-  x: number, 
-  y: number, 
+  x: number,
+  y: number,
   color: string = '#F7BFD3',
-  interactive: boolean = false
+  interactive: boolean = false,
 ): HTMLDivElement {
   const petal = document.createElement('div');
   petal.style.cssText = `
@@ -128,10 +128,7 @@ export function createPetalElement(
   return petal;
 }
 
-export function updatePetalTransform(
-  element: HTMLDivElement, 
-  physics: PetalPhysics
-): void {
+export function updatePetalTransform(element: HTMLDivElement, physics: PetalPhysics): void {
   element.style.transform = `
     translate3d(${physics.x}px, ${physics.y}px, 0)
     rotateZ(${physics.rotation}deg)
@@ -144,15 +141,15 @@ export function isPetalOffScreen(physics: PetalPhysics, screenHeight: number): b
 }
 
 export function resetPetalToCanopy(
-  physics: PetalPhysics, 
-  spawnX: number, 
-  spawnY: number
+  physics: PetalPhysics,
+  spawnX: number,
+  spawnY: number,
 ): PetalPhysics {
   return {
     ...physics,
     x: spawnX,
     y: spawnY,
     rotation: Math.random() * 360,
-    flipAngle: 0
+    flipAngle: 0,
   };
 }

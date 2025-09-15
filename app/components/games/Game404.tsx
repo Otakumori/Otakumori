@@ -62,7 +62,7 @@ export default function Game404() {
 
     const drawParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       particles.forEach((particle) => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
@@ -161,14 +161,12 @@ export default function Game404() {
       {/* Game Canvas */}
       <GlassPanel className="p-4">
         <div className="text-center mb-4">
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Click the floating particles!
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Click the floating particles!</h2>
           <p className="text-zinc-400 text-sm">
             You have 30 seconds to collect as many as possible
           </p>
         </div>
-        
+
         <div className="relative">
           <canvas
             ref={canvasRef}
@@ -176,7 +174,7 @@ export default function Game404() {
             className="w-full h-96 rounded-xl bg-black/20 cursor-crosshair"
             style={{ minHeight: '384px' }}
           />
-          
+
           {!isPlaying && !gameOver && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
               <button
@@ -187,16 +185,12 @@ export default function Game404() {
               </button>
             </div>
           )}
-          
+
           {gameOver && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
               <div className="text-center">
-                <div className="text-2xl font-bold text-white mb-2">
-                  Game Over!
-                </div>
-                <div className="text-lg text-fuchsia-300 mb-4">
-                  Final Score: {score}
-                </div>
+                <div className="text-2xl font-bold text-white mb-2">Game Over!</div>
+                <div className="text-lg text-fuchsia-300 mb-4">Final Score: {score}</div>
                 <button
                   onClick={resetGame}
                   className="rounded-xl bg-fuchsia-500/90 px-6 py-3 text-white hover:bg-fuchsia-500 transition-colors"

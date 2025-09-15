@@ -40,12 +40,12 @@ export default function GrowingTree() {
     const generateTree = () => {
       const newBranches: Branch[] = [];
       const newBlossoms: Blossom[] = [];
-      
+
       // Tree trunk - extends from bottom to top
       const trunkHeight = window.innerHeight * 0.8;
       const trunkWidth = 40;
       const trunkX = window.innerWidth * 0.15; // Positioned on the left
-      
+
       // Main trunk
       newBranches.push({
         id: 'trunk',
@@ -56,7 +56,7 @@ export default function GrowingTree() {
         thickness: trunkWidth,
         angle: -Math.PI / 2,
         depth: 0,
-        isVisible: true
+        isVisible: true,
       });
 
       // Generate branches recursively
@@ -67,7 +67,7 @@ export default function GrowingTree() {
         length: number,
         thickness: number,
         depth: number,
-        maxDepth: number
+        maxDepth: number,
       ) => {
         if (depth >= maxDepth || length < 20) return;
 
@@ -85,7 +85,7 @@ export default function GrowingTree() {
             thickness: Math.max(2, thickness),
             angle,
             depth,
-            isVisible: true
+            isVisible: true,
           });
 
           // Add blossoms along the branch
@@ -95,14 +95,14 @@ export default function GrowingTree() {
               const t = (i + 1) / (blossomCount + 1);
               const blossomX = startX + Math.cos(angle) * length * t;
               const blossomY = startY + Math.sin(angle) * length * t;
-              
+
               newBlossoms.push({
                 id: `blossom-${depth}-${i}-${startX}`,
                 x: blossomX,
                 y: blossomY,
                 size: Math.random() * 6 + 4,
                 opacity: Math.random() * 0.6 + 0.4,
-                isVisible: true
+                isVisible: true,
               });
             }
           }
@@ -121,7 +121,7 @@ export default function GrowingTree() {
       // Generate main branches from trunk
       const trunkTopY = window.innerHeight - trunkHeight;
       const mainBranchCount = 4;
-      
+
       for (let i = 0; i < mainBranchCount; i++) {
         const angle = -Math.PI / 2 + (i - mainBranchCount / 2) * 0.4;
         const length = 150 + Math.random() * 100;
@@ -154,11 +154,7 @@ export default function GrowingTree() {
   if (!mounted) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-0 pointer-events-none"
-      style={{ zIndex: 2 }}
-    >
+    <div ref={containerRef} className="fixed inset-0 z-0 pointer-events-none" style={{ zIndex: 2 }}>
       <svg
         className="w-full h-full"
         viewBox={`0 0 ${window.innerWidth} ${window.innerHeight}`}
@@ -171,7 +167,7 @@ export default function GrowingTree() {
             <stop offset="50%" stopColor="#A0522D" />
             <stop offset="100%" stopColor="#8B4513" />
           </linearGradient>
-          
+
           {/* Branch gradient */}
           <linearGradient id="branchGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#8B4513" />
@@ -194,7 +190,7 @@ export default function GrowingTree() {
             y1={branch.y1}
             x2={branch.x2}
             y2={branch.y2}
-            stroke={branch.depth === 0 ? "url(#trunkGradient)" : "url(#branchGradient)"}
+            stroke={branch.depth === 0 ? 'url(#trunkGradient)' : 'url(#branchGradient)'}
             strokeWidth={branch.thickness}
             strokeLinecap="round"
             initial={{ pathLength: 0, opacity: 0 }}
@@ -202,7 +198,7 @@ export default function GrowingTree() {
             transition={{
               duration: 2 + branch.depth * 0.5,
               delay: index * 0.1,
-              ease: "easeOut"
+              ease: 'easeOut',
             }}
           />
         ))}
@@ -220,7 +216,7 @@ export default function GrowingTree() {
             transition={{
               duration: 1,
               delay: 1.5 + index * 0.05,
-              ease: "easeOut"
+              ease: 'easeOut',
             }}
           />
         ))}

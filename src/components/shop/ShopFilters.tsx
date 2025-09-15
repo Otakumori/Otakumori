@@ -102,7 +102,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
         <h3 className="text-sm font-medium mb-3">Price Range</h3>
         <div className="space-y-3">
           <div>
-            <label htmlFor="minPrice" className="block text-xs text-white/60 mb-1">Min Price</label>
+            <label htmlFor="minPrice" className="block text-xs text-white/60 mb-1">
+              Min Price
+            </label>
             <input
               id="minPrice"
               type="number"
@@ -116,7 +118,9 @@ export default function ShopFilters({ currentCategory }: ShopFiltersProps) {
             />
           </div>
           <div>
-            <label htmlFor="maxPrice" className="block text-xs text-white/60 mb-1">Max Price</label>
+            <label htmlFor="maxPrice" className="block text-xs text-white/60 mb-1">
+              Max Price
+            </label>
             <input
               id="maxPrice"
               type="number"

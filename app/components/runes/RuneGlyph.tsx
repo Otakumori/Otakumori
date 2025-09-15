@@ -1,7 +1,6 @@
-import React from 'react';
+import { DEFAULT_RUNE_DISPLAYS } from '@/lib/runes-emoji';
+import { getMaterialIcon } from '@/lib/runes-material';
 import { type CanonicalRuneId } from '@/types/runes';
-import { DEFAULT_RUNE_DISPLAYS } from '@/app/lib/runes-emoji';
-import { getMaterialIcon } from '@/app/lib/runes-material';
 
 type RuneGlyphStyle = 'emoji' | 'material' | 'auto';
 
@@ -21,7 +20,8 @@ export default function RuneGlyph({
   const emojiGlyph = glyphOverride || DEFAULT_RUNE_DISPLAYS[runeId]?.glyph || '✶';
   const materialName = getMaterialIcon(runeId);
 
-  const globalPref = (process.env.NEXT_PUBLIC_RUNE_GLYPH_STYLE as RuneGlyphStyle | undefined) ?? 'material';
+  const globalPref =
+    (process.env.NEXT_PUBLIC_RUNE_GLYPH_STYLE as RuneGlyphStyle | undefined) ?? 'material';
   const resolvedStyle: RuneGlyphStyle = style === 'auto' ? globalPref : style;
   // Prefer material only when requested and a mapping exists
   const useMaterial = resolvedStyle === 'material' && !!materialName;
@@ -39,7 +39,11 @@ export default function RuneGlyph({
   }
 
   return (
-    <span className={['emoji-noto', className].filter(Boolean).join(' ')} aria-hidden="true" title={title}>
+    <span
+      className={['emoji-noto', className].filter(Boolean).join(' ')}
+      aria-hidden="true"
+      title={title}
+    >
       {emojiGlyph}
     </span>
   );

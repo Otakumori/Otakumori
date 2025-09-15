@@ -1,14 +1,14 @@
 import { db } from '@/lib/db';
+import { DEFAULT_RUNE_DISPLAYS } from '@/lib/runes-emoji';
 import {
-  type CanonicalRuneId,
-  type RuneDef,
-  type RuneComboDef,
-  type RewardsConfig,
-  type PetalGrantResult,
-  DEFAULT_RUNE_LORE,
   BURST_THRESHOLDS,
+  DEFAULT_RUNE_LORE,
+  type CanonicalRuneId,
+  type PetalGrantResult,
+  type RewardsConfig,
+  type RuneComboDef,
+  type RuneDef,
 } from '@/types/runes';
-import { DEFAULT_RUNE_DISPLAYS } from '@/app/lib/runes-emoji';
 
 /**
  * Map UPCs to runes based on configuration
@@ -28,7 +28,7 @@ export async function mapUPCsToRunes(upcs: string[]): Promise<CanonicalRuneId[]>
 
   // Map UPCs to known runes
   for (const upc of upcs) {
-    const runeDef = runeDefs.find((r: RuneDef) => r.isActive && r.printifyUPCs.includes(upc));
+    const runeDef = runeDefs.find((r: RuneDef) => r.isActive && r.printifyUPCs?.includes(upc));
 
     if (runeDef) {
       mappedRunes.push(runeDef.canonicalId);
@@ -123,13 +123,10 @@ export async function grantPetalsForOrder({
     });
 
     return {
+      success: true,
+      petalsGranted: existingOrder.petalsAwarded,
       granted: existingOrder.petalsAwarded,
-      flags: {
-        firstPurchase: false,
-        hitSoftCap: false,
-        hitHardCap: false,
-        streakBonus: false,
-      },
+      flags: [],
       burst: {
         size: 'none',
         amountGrantedNow: 0,
@@ -226,13 +223,15 @@ export async function grantPetalsForOrder({
   const newTotal = user.petalBalance + finalPetals;
 
   return {
+    success: true,
+    petalsGranted: finalPetals,
     granted: finalPetals,
-    flags: {
-      firstPurchase: isFirstPurchase,
-      hitSoftCap: dailyResult.hitSoftCap,
-      hitHardCap: dailyResult.hitHardCap,
-      streakBonus: streakBonus > 0,
-    },
+    flags: [
+      ...(isFirstPurchase ? ['firstPurchase'] : []),
+      ...(dailyResult.hitSoftCap ? ['hitSoftCap'] : []),
+      ...(dailyResult.hitHardCap ? ['hitHardCap'] : []),
+      ...(streakBonus > 0 ? ['streakBonus'] : []),
+    ],
     burst: {
       size: burstSize,
       amountGrantedNow: finalPetals,
@@ -379,6 +378,9 @@ export function getRuneDisplay(runeDef: RuneDef): {
   return {
     name: runeDef.displayName || defaults.name,
     glyph: runeDef.glyph || defaults.glyph,
-    lore: runeDef.lore || DEFAULT_RUNE_LORE,
+    lore:
+      runeDef.lore ||
+      DEFAULT_RUNE_LORE[runeDef.canonicalId] ||
+      'A mysterious rune with unknown properties.',
   };
 }

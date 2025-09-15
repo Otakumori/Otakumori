@@ -9,10 +9,10 @@ interface CanopyProps {
   className?: string;
 }
 
-const Canopy: React.FC<CanopyProps> = ({ 
-  windDirection: _windDirection = 45, 
+const Canopy: React.FC<CanopyProps> = ({
+  windDirection: _windDirection = 45,
   windSpeed = 1,
-  className = '' 
+  className = '',
 }) => {
   const [canopyBounds, setCanopyBounds] = useState({ x: 0, y: 0, width: 400, height: 300 });
   const [rotation, setRotation] = useState(0);
@@ -26,7 +26,7 @@ const Canopy: React.FC<CanopyProps> = ({
           x: rect.left,
           y: rect.top,
           width: rect.width,
-          height: rect.height
+          height: rect.height,
         });
       }
     };
@@ -51,16 +51,18 @@ const Canopy: React.FC<CanopyProps> = ({
   }, [canopyBounds]);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`fixed top-0 left-0 w-full h-screen pointer-events-none z-0 canopy-background ${className}`}
     >
       {/* Tree Canopy Image */}
-      <div 
+      <div
         className="absolute top-0 left-0 w-full h-full canopy-rotation"
-        style={{
-          '--rotation': `${rotation}deg`,
-        } as React.CSSProperties}
+        style={
+          {
+            '--rotation': `${rotation}deg`,
+          } as React.CSSProperties
+        }
       >
         <Image
           src="/media/cherry-tree.png"

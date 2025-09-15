@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState } from 'react';
 
 export default function BootScreen({ onDone }: { onDone: () => void }) {
@@ -19,8 +19,25 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
   return (
     <div className="relative isolate z-0 h-[min(90vh,100svh)] w-full overflow-hidden bg-black grid place-items-center">
       <style jsx>{`
-        @keyframes dropIn { 0%{ transform: translateY(-120px) scale(0.7);} 60%{ transform: translateY(0) scale(1.05);} 100%{ transform: translateY(0) scale(1);} }
-        @keyframes orbit { 0%{ transform: rotate(0deg);} 100%{ transform: rotate(360deg);} }
+        @keyframes dropIn {
+          0% {
+            transform: translateY(-120px) scale(0.7);
+          }
+          60% {
+            transform: translateY(0) scale(1.05);
+          }
+          100% {
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes orbit {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
       `}</style>
       <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
         <div className="text-center">
@@ -32,8 +49,12 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
         <div className="absolute inset-0 rounded-full border-2 border-pink-500/30" />
         <div className="absolute inset-3 rounded-full border border-pink-400/40" />
         <div className="absolute inset-0 animate-[orbit_2200ms_linear_infinite]">
-          {[0,90,180,270].map((deg) => (
-            <div key={deg} className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.6)]" style={{ transform: `rotate(${deg}deg) translateY(-64px)` }} />
+          {[0, 90, 180, 270].map((deg) => (
+            <div
+              key={deg}
+              className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.6)]"
+              style={{ transform: `rotate(${deg}deg) translateY(-64px)` }}
+            />
           ))}
         </div>
       </div>

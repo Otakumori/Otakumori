@@ -49,7 +49,7 @@ export default function Header() {
             <button
               className="text-gray-300 hover:text-pink-500 md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               type="button"
             >
               <svg
@@ -57,7 +57,7 @@ export default function Header() {
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               >
                 {isMenuOpen ? (
                   <path

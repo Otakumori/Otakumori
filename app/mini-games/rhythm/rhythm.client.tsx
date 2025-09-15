@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useCallback, useState } from 'react';
 
 export default function RhythmClient() {
@@ -47,11 +47,29 @@ export default function RhythmClient() {
     <div className="rounded-xl border border-white/10 bg-black/60 p-4 text-white">
       <div className="mb-2 text-pink-200">Rhythm — Ready</div>
       <div className="flex items-center gap-2">
-        <button onClick={start} disabled={busy} className="rounded bg-pink-600 px-3 py-1 disabled:opacity-50">{runId ? 'Restart' : 'Start'}</button>
-        <label className="text-sm text-zinc-300 inline-flex items-center gap-2">Score
-          <input type="number" value={score} onChange={(e) => setScore(parseInt(e.target.value) || 0)} className="ml-2 w-24 rounded bg-black/40 px-2 py-1 outline-none ring-1 ring-white/15" />
+        <button
+          onClick={start}
+          disabled={busy}
+          className="rounded bg-pink-600 px-3 py-1 disabled:opacity-50"
+        >
+          {runId ? 'Restart' : 'Start'}
+        </button>
+        <label className="text-sm text-zinc-300 inline-flex items-center gap-2">
+          Score
+          <input
+            type="number"
+            value={score}
+            onChange={(e) => setScore(parseInt(e.target.value) || 0)}
+            className="ml-2 w-24 rounded bg-black/40 px-2 py-1 outline-none ring-1 ring-white/15"
+          />
         </label>
-        <button onClick={submit} disabled={!runId || busy} className="rounded bg-pink-600 px-3 py-1 disabled:opacity-50">Submit</button>
+        <button
+          onClick={submit}
+          disabled={!runId || busy}
+          className="rounded bg-pink-600 px-3 py-1 disabled:opacity-50"
+        >
+          Submit
+        </button>
       </div>
       {msg && <div className="mt-2 text-xs text-zinc-300">{msg}</div>}
     </div>

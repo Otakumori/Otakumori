@@ -19,13 +19,13 @@ export class PetalShopHandler {
     collected: 0,
     totalSpawned: 0,
     rewards: [],
-    isActive: false
+    isActive: false,
   };
 
   private rewardChances = {
-    coupon: 0.1,    // 10% chance for coupon
-    petals: 0.7,    // 70% chance for petal currency
-    unlock: 0.2     // 20% chance for unlock
+    coupon: 0.1, // 10% chance for coupon
+    petals: 0.7, // 70% chance for petal currency
+    unlock: 0.2, // 20% chance for unlock
   };
 
   start() {
@@ -42,7 +42,7 @@ export class PetalShopHandler {
     if (!this.state.isActive) return null;
 
     this.state.collected++;
-    
+
     // Generate reward based on probabilities
     const rand = Math.random();
     let reward: PetalReward | null = null;
@@ -53,7 +53,7 @@ export class PetalShopHandler {
         id: `coupon_${Date.now()}`,
         type: 'coupon',
         value,
-        message: `You found a ${value}% off coupon!`
+        message: `You found a ${value}% off coupon!`,
       };
     } else if (rand < this.rewardChances.coupon + this.rewardChances.petals) {
       const value = Math.floor(Math.random() * 10) + 1; // 1-10 petals
@@ -61,22 +61,22 @@ export class PetalShopHandler {
         id: `petals_${Date.now()}`,
         type: 'petals',
         value,
-        message: `+${value} petals added to your collection!`
+        message: `+${value} petals added to your collection!`,
       };
     } else {
       reward = {
         id: `unlock_${Date.now()}`,
         type: 'unlock',
         value: 1,
-        message: `New item unlocked in the Petal Shop!`
+        message: `New item unlocked in the Petal Shop!`,
       };
     }
 
     this.state.rewards.push(reward);
-    
+
     // Show reward notification
     this.showRewardNotification(reward);
-    
+
     return reward;
   }
 
@@ -116,7 +116,7 @@ export class PetalShopHandler {
     }
 
     document.body.appendChild(notification);
-    
+
     // Remove after animation
     setTimeout(() => {
       if (notification.parentNode) {
@@ -134,7 +134,7 @@ export class PetalShopHandler {
       collected: 0,
       totalSpawned: 0,
       rewards: [],
-      isActive: false
+      isActive: false,
     };
   }
 }

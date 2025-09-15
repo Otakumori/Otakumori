@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -34,7 +34,11 @@ export default function GameCubeHub() {
   const listboxId = useMemo(() => `faces_${Math.random().toString(36).slice(2, 8)}`, []);
 
   return (
-    <section ref={containerRef} tabIndex={0} className="relative isolate z-0 mx-auto w-full max-w-[900px] h-[min(80vh,90svh)] overflow-hidden outline-none">
+    <section
+      ref={containerRef}
+      tabIndex={0}
+      className="relative isolate z-0 mx-auto w-full max-w-[900px] h-[min(80vh,90svh)] overflow-hidden outline-none"
+    >
       {/* 3D canvas / hub */}
       <div className="absolute inset-0 z-0">
         <ConsoleCard />
@@ -47,7 +51,13 @@ export default function GameCubeHub() {
           aria-activedescendant={`${listboxId}_${active.id}`}
         >
           {faces.map((f, i) => (
-            <FaceLabel key={f.id} id={`${listboxId}_${f.id}`} label={f.label} href={f.href} active={i === idx} />
+            <FaceLabel
+              key={f.id}
+              id={`${listboxId}_${f.id}`}
+              label={f.label}
+              href={f.href}
+              active={i === idx}
+            />
           ))}
         </div>
       </div>

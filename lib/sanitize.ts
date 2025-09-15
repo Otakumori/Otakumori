@@ -15,4 +15,3 @@ export function sanitizeSoapstone(input: string): string {
   t = t.replace(/[\p{Extended_Pictographic}]/gu, '');
   return t;
 }
-

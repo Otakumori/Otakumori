@@ -37,12 +37,8 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
     return (
       <div className="text-center py-12">
         <GlassPanel className="p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Loading your shrine...
-          </h2>
-          <p className="text-zinc-400">
-            Please wait while we gather your profile data.
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-4">Loading your shrine...</h2>
+          <p className="text-zinc-400">Please wait while we gather your profile data.</p>
         </GlassPanel>
       </div>
     );
@@ -55,9 +51,7 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
         <GlassPanel className="p-6">
           <div className="text-center mb-6">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-              <span className="text-2xl text-fuchsia-300">
-                {profileData.avatar ? '👤' : '🌸'}
-              </span>
+              <span className="text-2xl text-fuchsia-300">{profileData.avatar ? '👤' : '🌸'}</span>
             </div>
             <h2 className="text-xl font-semibold text-white">{profileData.username}</h2>
             <p className="text-sm text-zinc-400">{profileData.email}</p>
@@ -82,7 +76,7 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
                 {new Date(profileData.joinDate).toLocaleDateString()}
               </span>
             </div>
-            
+
             {/* Loadout Button */}
             <div className="pt-4 border-t border-white/10">
               <ProfileLoadout />
@@ -141,11 +135,15 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
               <h3 className="text-lg font-semibold text-white mb-4">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-fuchsia-300">{profileData.totalPetals}</div>
+                  <div className="text-2xl font-bold text-fuchsia-300">
+                    {profileData.totalPetals}
+                  </div>
                   <div className="text-sm text-zinc-400">Petals Collected</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-fuchsia-300">{profileData.achievements}</div>
+                  <div className="text-2xl font-bold text-fuchsia-300">
+                    {profileData.achievements}
+                  </div>
                   <div className="text-sm text-zinc-400">Achievements</div>
                 </div>
                 <div className="text-center">

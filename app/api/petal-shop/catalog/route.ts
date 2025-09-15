@@ -24,7 +24,11 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, data: { items }, requestId: rid });
   } catch (e: any) {
-    logger.error('petal_shop_catalog_error', { requestId: rid }, { error: String(e?.message || e) });
+    logger.error(
+      'petal_shop_catalog_error',
+      { requestId: rid },
+      { error: String(e?.message || e) },
+    );
     return NextResponse.json(problem(500, 'catalog_failed', e?.message), { status: 500 });
   }
 }

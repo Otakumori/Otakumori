@@ -142,7 +142,7 @@ export default function AdminMediaPage() {
                   <div className="mb-2 aspect-video overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900">
                     {isImage ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      (<img src={b.url} alt={name} className="h-full w-full object-cover" />)
+                      <img src={b.url} alt={name} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500">
                         {b.contentType || 'binary'}

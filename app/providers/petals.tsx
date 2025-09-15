@@ -2,7 +2,7 @@
 'use client';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 
-type PetalCtx = { petals: number; earn: (n: number) => void; spend: (n: number) => void; };
+type PetalCtx = { petals: number; earn: (n: number) => void; spend: (n: number) => void };
 const P = createContext<PetalCtx | null>(null);
 
 export function PetalProvider({ children }: { children: ReactNode }) {

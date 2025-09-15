@@ -23,27 +23,41 @@ type AchievementsGridProps = {
 
 export default function AchievementsGrid({ achievements }: AchievementsGridProps) {
   const [hoveredAchievement, setHoveredAchievement] = useState<string | null>(null);
-  const [sparkleElements, setSparkleElements] = useState<Array<{ id: string; x: number; y: number; delay: number }>>([]);
+  const [sparkleElements, setSparkleElements] = useState<
+    Array<{ id: string; x: number; y: number; delay: number }>
+  >([]);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'common': return 'border-zinc-400 text-zinc-400';
-      case 'uncommon': return 'border-green-400 text-green-400';
-      case 'rare': return 'border-blue-400 text-blue-400';
-      case 'epic': return 'border-purple-400 text-purple-400';
-      case 'legendary': return 'border-yellow-400 text-yellow-400';
-      default: return 'border-zinc-400 text-zinc-400';
+      case 'common':
+        return 'border-zinc-400 text-zinc-400';
+      case 'uncommon':
+        return 'border-green-400 text-green-400';
+      case 'rare':
+        return 'border-blue-400 text-blue-400';
+      case 'epic':
+        return 'border-purple-400 text-purple-400';
+      case 'legendary':
+        return 'border-yellow-400 text-yellow-400';
+      default:
+        return 'border-zinc-400 text-zinc-400';
     }
   };
 
   const getRarityGlow = (rarity: string) => {
     switch (rarity) {
-      case 'common': return 'shadow-none';
-      case 'uncommon': return 'shadow-[0_0_20px_rgba(34,197,94,0.3)]';
-      case 'rare': return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
-      case 'epic': return 'shadow-[0_0_20px_rgba(168,85,247,0.3)]';
-      case 'legendary': return 'shadow-[0_0_20px_rgba(234,179,8,0.3)]';
-      default: return 'shadow-none';
+      case 'common':
+        return 'shadow-none';
+      case 'uncommon':
+        return 'shadow-[0_0_20px_rgba(34,197,94,0.3)]';
+      case 'rare':
+        return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
+      case 'epic':
+        return 'shadow-[0_0_20px_rgba(168,85,247,0.3)]';
+      case 'legendary':
+        return 'shadow-[0_0_20px_rgba(234,179,8,0.3)]';
+      default:
+        return 'shadow-none';
     }
   };
 
@@ -51,12 +65,12 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
     const hints = {
       'first-steps': 'A blossom unseen under moonlight',
       'petal-master': 'When the tree weeps, catch its tears',
-      'explorer': 'Venture where shadows dance',
-      'collector': 'Gather what others discard',
+      explorer: 'Venture where shadows dance',
+      collector: 'Gather what others discard',
       'social-butterfly': 'Speak to the silent stones',
       'night-owl': 'When the world sleeps, you awaken',
-      'perfectionist': 'Seek the flawless path',
-      'mystic': 'Read the signs in the digital wind',
+      perfectionist: 'Seek the flawless path',
+      mystic: 'Read the signs in the digital wind',
     };
     return hints[achievement.id as keyof typeof hints] || 'The path reveals itself to the patient';
   };
@@ -75,7 +89,7 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
   };
 
   const handleMouseEnter = (achievementId: string, event: React.MouseEvent<HTMLDivElement>) => {
-    if (achievements.find(a => a.id === achievementId)?.unlocked) {
+    if (achievements.find((a) => a.id === achievementId)?.unlocked) {
       setHoveredAchievement(achievementId);
       const rect = event.currentTarget.getBoundingClientRect();
       createSparkles(achievementId, rect);
@@ -96,7 +110,7 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
     }
   }, [sparkleElements]);
 
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const totalCount = achievements.length;
 
   return (
@@ -118,7 +132,7 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
           </div>
         </div>
         <div className="mt-4 w-full bg-white/10 rounded-full h-2">
-          <div 
+          <div
             className="bg-fuchsia-400 h-2 rounded-full transition-all duration-300"
             style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
           />
@@ -128,22 +142,26 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
       {/* Achievements Grid */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 relative">
         {achievements.map((achievement) => (
-          <div 
-            key={achievement.id} 
+          <div
+            key={achievement.id}
             className={`p-4 transition-all duration-300 cursor-pointer rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_60px_-15px_rgba(200,120,255,0.25)] ${
-              achievement.unlocked 
-                ? 'opacity-100 hover:scale-105' 
+              achievement.unlocked
+                ? 'opacity-100 hover:scale-105'
                 : 'opacity-60 grayscale hover:opacity-80'
             } ${
               hoveredAchievement === achievement.id && achievement.unlocked
                 ? 'animate-pulse bg-fuchsia-500/10 border-fuchsia-400/50'
                 : ''
             }`}
-            onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => handleMouseEnter(achievement.id, e)}
+            onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) =>
+              handleMouseEnter(achievement.id, e)
+            }
             onMouseLeave={handleMouseLeave}
           >
             <div className="text-center">
-              <div className={`w-16 h-16 mx-auto mb-3 rounded-xl border-2 ${getRarityColor(achievement.rarity)} ${getRarityGlow(achievement.rarity)} flex items-center justify-center relative overflow-hidden`}>
+              <div
+                className={`w-16 h-16 mx-auto mb-3 rounded-xl border-2 ${getRarityColor(achievement.rarity)} ${getRarityGlow(achievement.rarity)} flex items-center justify-center relative overflow-hidden`}
+              >
                 {achievement.unlocked ? (
                   <Image
                     src={`/assets/achievements/${achievement.icon}`}
@@ -155,7 +173,7 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
                 ) : (
                   <div className="w-8 h-8 bg-zinc-600 rounded"></div>
                 )}
-                
+
                 {/* Sparkle overlay for unlocked achievements */}
                 {hoveredAchievement === achievement.id && achievement.unlocked && (
                   <div className="absolute inset-0 pointer-events-none">
@@ -163,22 +181,26 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
                   </div>
                 )}
               </div>
-              
-              <h3 className={`font-semibold text-sm mb-1 ${
-                achievement.unlocked ? 'text-white' : 'text-zinc-500'
-              }`}>
+
+              <h3
+                className={`font-semibold text-sm mb-1 ${
+                  achievement.unlocked ? 'text-white' : 'text-zinc-500'
+                }`}
+              >
                 {achievement.name}
               </h3>
-              
-              <p className={`text-xs mb-2 ${
-                achievement.unlocked ? 'text-zinc-300' : 'text-zinc-600'
-              }`}>
+
+              <p
+                className={`text-xs mb-2 ${
+                  achievement.unlocked ? 'text-zinc-300' : 'text-zinc-600'
+                }`}
+              >
                 {achievement.unlocked ? achievement.description : getCrypticHint(achievement)}
               </p>
 
               {achievement.progress !== undefined && achievement.maxProgress && (
                 <div className="w-full bg-white/10 rounded-full h-1 mb-2">
-                  <div 
+                  <div
                     className="bg-fuchsia-400 h-1 rounded-full transition-all duration-300"
                     style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
                   />
@@ -199,7 +221,7 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
             </div>
           </div>
         ))}
-        
+
         {/* Floating Sparkles */}
         {sparkleElements.map((sparkle) => (
           <div
@@ -219,12 +241,8 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
       {achievements.length === 0 && (
         <div className="text-center py-12">
           <GlassPanel className="p-8">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              No achievements yet
-            </h2>
-            <p className="text-zinc-400">
-              Start exploring to unlock your first achievement!
-            </p>
+            <h2 className="text-xl font-semibold text-white mb-4">No achievements yet</h2>
+            <p className="text-zinc-400">Start exploring to unlock your first achievement!</p>
           </GlassPanel>
         </div>
       )}

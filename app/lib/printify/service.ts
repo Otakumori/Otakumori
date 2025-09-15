@@ -125,7 +125,11 @@ export class PrintifyService {
         last_page: result.last_page || 1,
       };
     } catch (error) {
-      logger.error('printify_products_fetch_failed', undefined, { page, perPage, error: String(error) });
+      logger.error('printify_products_fetch_failed', undefined, {
+        page,
+        perPage,
+        error: String(error),
+      });
       throw error;
     }
   }

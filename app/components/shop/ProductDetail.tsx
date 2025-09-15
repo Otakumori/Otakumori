@@ -51,7 +51,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         price: currentPrice,
         quantity,
         image: images[0],
-        selectedVariant: selectedVariant ? { id: selectedVariant.id, title: selectedVariant.name } : undefined,
+        selectedVariant: selectedVariant
+          ? { id: selectedVariant.id, title: selectedVariant.name }
+          : undefined,
       });
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
@@ -74,7 +76,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             priority
           />
         </div>
-        
+
         {images.length > 1 && (
           <div className="grid grid-cols-4 gap-2">
             {images.map((image, index) => (
@@ -82,7 +84,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 key={index}
                 onClick={() => setSelectedImage(index)}
                 className={`relative aspect-square overflow-hidden rounded-xl transition-opacity ${
-                  selectedImage === index ? 'ring-2 ring-fuchsia-400' : 'opacity-70 hover:opacity-100'
+                  selectedImage === index
+                    ? 'ring-2 ring-fuchsia-400'
+                    : 'opacity-70 hover:opacity-100'
                 }`}
               >
                 <Image
@@ -101,12 +105,14 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       {/* Product Info */}
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white md:text-4xl" data-testid="product-name">{product.name}</h1>
-          <p className="mt-2 text-2xl font-semibold text-fuchsia-300" data-testid="product-price">${currentPrice}</p>
+          <h1 className="text-3xl font-bold text-white md:text-4xl" data-testid="product-name">
+            {product.name}
+          </h1>
+          <p className="mt-2 text-2xl font-semibold text-fuchsia-300" data-testid="product-price">
+            ${currentPrice}
+          </p>
           {product.category && (
-            <p className="mt-1 text-sm text-zinc-400">
-              Category: {product.category}
-            </p>
+            <p className="mt-1 text-sm text-zinc-400">Category: {product.category}</p>
           )}
         </div>
 
@@ -127,9 +133,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 >
                   <div className="font-medium">{variant.name}</div>
                   <div className="text-sm text-zinc-400">${variant.price}</div>
-                  {!variant.inStock && (
-                    <div className="text-xs text-red-400">Out of Stock</div>
-                  )}
+                  {!variant.inStock && <div className="text-xs text-red-400">Out of Stock</div>}
                 </button>
               ))}
             </div>
@@ -171,7 +175,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </button>
 
         {added && (
-          <div className="text-sm text-green-300" data-testid="cart-success">Added to cart!</div>
+          <div className="text-sm text-green-300" data-testid="cart-success">
+            Added to cart!
+          </div>
         )}
 
         {/* Description */}

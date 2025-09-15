@@ -52,7 +52,11 @@ export async function POST(req: NextRequest) {
       : await prisma.petalShopItem.create({ data });
     return NextResponse.json({ ok: true, data: { item }, requestId: rid });
   } catch (e: any) {
-    logger.error('admin_petalshop_upsert_error', { requestId: rid }, { error: String(e?.message || e) });
+    logger.error(
+      'admin_petalshop_upsert_error',
+      { requestId: rid },
+      { error: String(e?.message || e) },
+    );
     return NextResponse.json(problem(500, 'upsert_failed', e?.message), { status: 500 });
   }
 }
@@ -68,8 +72,11 @@ export async function DELETE(req: NextRequest) {
     await prisma.petalShopItem.delete({ where: { id } });
     return NextResponse.json({ ok: true, requestId: rid });
   } catch (e: any) {
-    logger.error('admin_petalshop_delete_error', { requestId: rid }, { error: String(e?.message || e) });
+    logger.error(
+      'admin_petalshop_delete_error',
+      { requestId: rid },
+      { error: String(e?.message || e) },
+    );
     return NextResponse.json(problem(500, 'delete_failed', e?.message), { status: 500 });
   }
 }
-

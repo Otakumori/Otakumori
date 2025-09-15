@@ -37,7 +37,7 @@ export default function PixelatedStarfield() {
     const createStars = () => {
       const stars: Star[] = [];
       const starCount = Math.floor((canvas.width * canvas.height) / 8000); // Density based on screen size
-      
+
       for (let i = 0; i < starCount; i++) {
         stars.push({
           x: Math.random() * canvas.width,
@@ -46,10 +46,10 @@ export default function PixelatedStarfield() {
           speed: Math.random() * 0.1 + 0.02,
           opacity: Math.random() * 0.8 + 0.2,
           color: Math.random() > 0.7 ? '#FFB6C1' : Math.random() > 0.4 ? '#FFC0CB' : '#FFFFFF',
-          twinklePhase: Math.random() * Math.PI * 2
+          twinklePhase: Math.random() * Math.PI * 2,
         });
       }
-      
+
       starsRef.current = stars;
     };
 
@@ -58,9 +58,9 @@ export default function PixelatedStarfield() {
     // Animation loop
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       const time = Date.now() * 0.001;
-      
+
       starsRef.current.forEach((star) => {
         // Update position (slow drift)
         star.y += star.speed;
@@ -76,14 +76,14 @@ export default function PixelatedStarfield() {
         // Draw pixelated star
         ctx.fillStyle = star.color;
         ctx.globalAlpha = currentOpacity;
-        
+
         // Create pixelated effect by drawing small squares
         const pixelSize = Math.max(1, Math.floor(star.size));
         const pixelX = Math.floor(star.x / pixelSize) * pixelSize;
         const pixelY = Math.floor(star.y / pixelSize) * pixelSize;
-        
+
         ctx.fillRect(pixelX, pixelY, pixelSize, pixelSize);
-        
+
         // Add glow effect for larger stars
         if (star.size > 1.5) {
           ctx.globalAlpha = currentOpacity * 0.3;
@@ -109,9 +109,9 @@ export default function PixelatedStarfield() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 z-0 pointer-events-none"
-      style={{ 
+      style={{
         background: 'radial-gradient(ellipse at center, #1a0f2b 0%, #0b0412 100%)',
-        imageRendering: 'pixelated'
+        imageRendering: 'pixelated',
       }}
       aria-label="Animated pixelated starfield background"
     />

@@ -16,7 +16,10 @@ export function createBrowserSupabase(accessToken?: string): SupabaseClient {
   return createClient(url, anon, options);
 }
 
-export function createServerSupabase(opts?: { useServiceRole?: boolean; accessToken?: string }): SupabaseClient {
+export function createServerSupabase(opts?: {
+  useServiceRole?: boolean;
+  accessToken?: string;
+}): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const key = opts?.useServiceRole
     ? process.env.SUPABASE_SERVICE_ROLE_KEY || ''

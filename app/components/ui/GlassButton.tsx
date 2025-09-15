@@ -33,29 +33,19 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
         'h-10 px-4 text-base': size === 'md',
         'h-12 px-6 text-lg': size === 'lg',
       },
-      className
+      className,
     );
 
     if (href) {
       return (
         <Link href={href}>
-          <button
-            className={baseClasses}
-            ref={ref}
-            {...props}
-          />
+          <button className={baseClasses} ref={ref} {...props} />
         </Link>
       );
     }
 
-    return (
-      <button
-        className={baseClasses}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
+    return <button className={baseClasses} ref={ref} {...props} />;
+  },
 );
 
 GlassButton.displayName = 'GlassButton';

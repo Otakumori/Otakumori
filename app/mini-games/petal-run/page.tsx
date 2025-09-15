@@ -1,7 +1,10 @@
 export const metadata = { title: 'Petal Run | Otakumori' };
 
 import dynamic from 'next/dynamic';
-const Client = dynamic(() => import('./petal-run.client'), { ssr: false, loading: () => <p>Loading Petal Run…</p> });
+const Client = dynamic(() => import('./petal-run.client'), {
+  ssr: false,
+  loading: () => <p>Loading Petal Run…</p>,
+});
 
 export default function Page() {
   return (
@@ -10,4 +13,3 @@ export default function Page() {
     </main>
   );
 }
-

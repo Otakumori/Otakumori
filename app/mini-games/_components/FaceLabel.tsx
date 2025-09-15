@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import Link from 'next/link';
 
 export default function FaceLabel({
@@ -25,4 +25,3 @@ export default function FaceLabel({
     </Link>
   );
 }
-

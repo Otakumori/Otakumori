@@ -20,7 +20,9 @@ export default function LoadingBonfire() {
         transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
         className="mb-2 h-4 w-4 animate-pulse rounded-full bg-orange-500 shadow-lg"
       />
-      <p className="mt-2 text-center italic text-pink-200">"Rest here, Chosen One. The embers of fate await your return..."</p>
+      <p className="mt-2 text-center italic text-pink-200">
+        "Rest here, Chosen One. The embers of fate await your return..."
+      </p>
       <p className="mt-1 text-xs text-white/40">Loading...</p>
     </div>
   );

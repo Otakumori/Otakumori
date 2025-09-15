@@ -36,13 +36,11 @@ export default async function LeaderboardPage() {
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white md:text-4xl mb-4">
-              {t("leaderboards", "title")}
+              {t('leaderboards', 'title')}
             </h1>
-            <p className="text-lg text-zinc-300/90">
-              {t("leaderboards", "subtitle")}
-            </p>
+            <p className="text-lg text-zinc-300/90">{t('leaderboards', 'subtitle')}</p>
           </div>
-          
+
           <LeaderboardInterface leaderboardData={leaderboardData} />
         </div>
       </main>

@@ -37,4 +37,3 @@ Integration
 npm run icons:validate         # report missing icons
 npm run icons:placeholders     # generate simple SVG placeholders (replace later)
 ```
-

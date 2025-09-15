@@ -18,7 +18,7 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
         audioRef.current.volume = options.volume ?? 0.5;
         audioRef.current.playbackRate = options.playbackRate ?? 1.0;
       }
-      
+
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch((error) => {
         console.warn('Audio play failed:', error);
@@ -47,5 +47,3 @@ export function useAudio(src: string, options: UseAudioOptions = {}) {
     stop,
   };
 }
-
-

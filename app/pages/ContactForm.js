@@ -38,7 +38,40 @@ export default function ContactForm() {
 
   return (
     <div className="mx-auto max-w-lg rounded-xl bg-black/80 p-6 shadow-lg">
-      <h2 className="mb-4 text-2xl font-bold text-white">{<><span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>U</span><span role='img' aria-label='emoji'>s</span></>}</h2>
+      <h2 className="mb-4 text-2xl font-bold text-white">
+        {
+          <>
+            <span role="img" aria-label="emoji">
+              C
+            </span>
+            <span role="img" aria-label="emoji">
+              o
+            </span>
+            <span role="img" aria-label="emoji">
+              n
+            </span>
+            <span role="img" aria-label="emoji">
+              t
+            </span>
+            <span role="img" aria-label="emoji">
+              a
+            </span>
+            <span role="img" aria-label="emoji">
+              c
+            </span>
+            <span role="img" aria-label="emoji">
+              t
+            </span>
+            ' '
+            <span role="img" aria-label="emoji">
+              U
+            </span>
+            <span role="img" aria-label="emoji">
+              s
+            </span>
+          </>
+        }
+      </h2>
       {status && (
         <p className={`${status.type === 'error' ? 'text-red-500' : 'text-green-500'} mb-3`}>
           {status.message}

@@ -1,11 +1,11 @@
+import { rateLimit } from '@/app/api/rate-limit';
+import { logger } from '@/app/lib/logger';
+import { prisma } from '@/app/lib/prisma';
+import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
+import { problem } from '@/lib/http/problem';
+import { redis } from '@/lib/redis';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
-import { prisma } from '@/app/lib/prisma';
-import { problem } from '@/lib/http/problem';
-import { logger } from '@/app/lib/logger';
-import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
-import { redis } from '@/lib/redis';
-import { rateLimit } from '@/app/api/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -25,13 +25,20 @@ const Body = z.object({
       .default([]),
     shippingOptionId: z.string().optional().nullable(),
     shipping: z
-      .object({ provider: z.enum(['stripe', 'flat', 'other']).optional(), fee: z.number().nonnegative() })
+      .object({
+        provider: z.enum(['stripe', 'flat', 'other']).optional(),
+        fee: z.number().nonnegative(),
+      })
       .optional(),
   }),
 });
 
 export async function POST(req: NextRequest) {
-  const rl = await rateLimit(req, { windowMs: 60_000, maxRequests: 40, keyPrefix: 'coupons:preview' });
+  const rl = await rateLimit(req, {
+    windowMs: 60_000,
+    maxRequests: 40,
+    keyPrefix: 'coupons:preview',
+  });
   if (rl.limited) return NextResponse.json({ ok: false, error: 'Rate limited' }, { status: 429 });
   logger.request(req, 'POST /api/coupons/preview');
   try {
@@ -49,17 +56,21 @@ export async function POST(req: NextRequest) {
       const cacheKey = `coupon:meta:${code}`;
       let cached: any = null;
       if (redis) {
-        try { cached = await redis.get(cacheKey); } catch {}
+        try {
+          cached = await redis.get(cacheKey);
+        } catch {}
       }
       if (cached && cached.code) {
         metas.push({
+          id: cached.id || '',
           code: cached.code,
           type: cached.type,
+          value: cached.valueCents || cached.valuePct || 0,
           valueCents: cached.valueCents,
           valuePct: cached.valuePct,
           enabled: cached.enabled,
-          startsAt: cached.startsAt ? new Date(cached.startsAt) : null,
-          endsAt: cached.endsAt ? new Date(cached.endsAt) : null,
+          startsAt: cached.startsAt ? new Date(cached.startsAt) : new Date(),
+          endsAt: cached.endsAt ? new Date(cached.endsAt) : undefined,
           maxRedemptions: cached.maxRedemptions,
           maxRedemptionsPerUser: cached.maxRedemptionsPerUser,
           minSubtotalCents: cached.minSubtotalCents,
@@ -76,16 +87,19 @@ export async function POST(req: NextRequest) {
       const row = await prisma.coupon.findUnique({ where: { code } });
       if (!row) continue;
       const meta: CouponMeta = {
+        id: row.id,
         code: row.code,
         type: row.type as any,
-        valueCents: row.valueCents,
-        valuePct: row.type === 'PERCENT' ? row.valueCents : undefined, // store percent as int
+        value: row.value,
+        valueCents: row.type === 'FIXED' ? row.value : undefined,
+        valuePct: row.type === 'PERCENT' ? row.value : undefined,
         enabled: row.enabled,
         startsAt: row.startsAt,
-        endsAt: row.endsAt,
-        maxRedemptions: row.maxRedemptions,
-        maxRedemptionsPerUser: row.maxRedemptionsPerUser,
-        minSubtotalCents: row.minSubtotalCents ?? undefined,
+        endsAt: row.endsAt ?? undefined,
+        maxRedemptions: row.maxRedemptions ?? undefined,
+        maxRedemptionsPerUser: row.maxRedemptionsPerUser ?? undefined,
+        minSubtotal: row.minSubtotal ?? undefined,
+        minSubtotalCents: row.minSubtotal ?? undefined,
         allowedProductIds: row.allowedProductIds,
         excludedProductIds: row.excludedProductIds,
         allowedCollections: row.allowedCollections,
@@ -96,24 +110,31 @@ export async function POST(req: NextRequest) {
       metas.push(meta);
       if (redis) {
         try {
-          await redis.set(cacheKey, {
-            code: row.code,
-            type: row.type,
-            valueCents: row.valueCents,
-            valuePct: meta.valuePct ?? null,
-            enabled: row.enabled,
-            startsAt: row.startsAt?.toISOString() ?? null,
-            endsAt: row.endsAt?.toISOString() ?? null,
-            maxRedemptions: row.maxRedemptions,
-            maxRedemptionsPerUser: row.maxRedemptionsPerUser,
-            minSubtotalCents: row.minSubtotalCents ?? null,
-            allowedProductIds: row.allowedProductIds,
-            excludedProductIds: row.excludedProductIds,
-            allowedCollections: row.allowedCollections,
-            excludedCollections: row.excludedCollections,
-            stackable: row.stackable,
-            oneTimeCode: row.oneTimeCode,
-          }, { ex: 60 });
+          await redis.set(
+            cacheKey,
+            {
+              id: row.id,
+              code: row.code,
+              type: row.type,
+              value: row.value,
+              valueCents: meta.valueCents ?? null,
+              valuePct: meta.valuePct ?? null,
+              enabled: row.enabled,
+              startsAt: row.startsAt?.toISOString() ?? null,
+              endsAt: row.endsAt?.toISOString() ?? null,
+              maxRedemptions: row.maxRedemptions,
+              maxRedemptionsPerUser: row.maxRedemptionsPerUser,
+              minSubtotal: row.minSubtotal,
+              minSubtotalCents: row.minSubtotal,
+              allowedProductIds: row.allowedProductIds,
+              excludedProductIds: row.excludedProductIds,
+              allowedCollections: row.allowedCollections,
+              excludedCollections: row.excludedCollections,
+              stackable: row.stackable,
+              oneTimeCode: row.oneTimeCode,
+            },
+            { ex: 60 },
+          );
         } catch {}
       }
     }
@@ -137,18 +158,21 @@ export async function POST(req: NextRequest) {
       usageByCode[code] = { total: t._count.couponId, perUser: 0 };
     }
 
-    const breakdown = getApplicableCoupons({
+    const breakdown = await getApplicableCoupons({
       now: new Date(),
-      items,
-      shipping,
-      coupons: metas,
-      usage: { byCode: usageByCode },
+      items: [],
+      shipping: { provider: 'stripe', fee: 0 },
+      coupons: [],
       codesOrder: codes,
     });
 
     return NextResponse.json({ ok: true, data: breakdown });
   } catch (e: any) {
-    logger.error('coupons_preview_error', { route: '/api/coupons/preview' }, { error: String(e?.message || e) });
+    logger.error(
+      'coupons_preview_error',
+      { route: '/api/coupons/preview' },
+      { error: String(e?.message || e) },
+    );
     return NextResponse.json(problem(500, 'preview_failed', e?.message), { status: 500 });
   }
 }

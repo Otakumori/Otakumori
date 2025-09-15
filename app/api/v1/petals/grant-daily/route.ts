@@ -17,7 +17,7 @@ export async function POST(_req: NextRequest) {
     // Check if already granted today
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const existingGrant = await prisma.petalLedger.findFirst({
       where: {
         userId,
@@ -28,7 +28,10 @@ export async function POST(_req: NextRequest) {
     });
 
     if (existingGrant) {
-      return NextResponse.json({ ok: false, error: 'Daily grant already claimed' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Daily grant already claimed' },
+        { status: 400 },
+      );
     }
 
     // Create daily grant transaction

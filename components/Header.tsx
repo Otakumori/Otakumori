@@ -39,22 +39,105 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-white">{<>''
-              <span role='img' aria-label='emoji'>O</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>M</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span>
-              ''</>}</Link>
+            <Link href="/" className="text-xl font-bold text-white">
+              {
+                <>
+                  ''
+                  <span role="img" aria-label="emoji">
+                    O
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    t
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    a
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    k
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    u
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    M
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    o
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    r
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    i
+                  </span>
+                  ''
+                </>
+              }
+            </Link>
           </div>
           <div className="flex items-center space-x-4">
             {isLoaded && isSignedIn && user ? (
               <div className="flex items-center space-x-4">
                 <span className="text-white">{user.firstName || user.username}</span>
-                <button onClick={() => signOut()} className="text-white hover:text-gray-300">{<>''
-                  <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>O</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>t</span>
-                  ''</>}</button>
+                <button onClick={() => signOut()} className="text-white hover:text-gray-300">
+                  {
+                    <>
+                      ''
+                      <span role="img" aria-label="emoji">
+                        S
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        i
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        g
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        n
+                      </span>
+                      ' '
+                      <span role="img" aria-label="emoji">
+                        O
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        u
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        t
+                      </span>
+                      ''
+                    </>
+                  }
+                </button>
               </div>
             ) : (
-              <Link href="/sign-in" className="text-white hover:text-gray-300">{<>''
-                <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>I</span><span role='img' aria-label='emoji'>n</span>
-                ''</>}</Link>
+              <Link href="/sign-in" className="text-white hover:text-gray-300">
+                {
+                  <>
+                    ''
+                    <span role="img" aria-label="emoji">
+                      S
+                    </span>
+                    <span role="img" aria-label="emoji">
+                      i
+                    </span>
+                    <span role="img" aria-label="emoji">
+                      g
+                    </span>
+                    <span role="img" aria-label="emoji">
+                      n
+                    </span>
+                    ' '
+                    <span role="img" aria-label="emoji">
+                      I
+                    </span>
+                    <span role="img" aria-label="emoji">
+                      n
+                    </span>
+                    ''
+                  </>
+                }
+              </Link>
             )}
           </div>
         </div>

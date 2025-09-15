@@ -12,7 +12,10 @@ export async function GET() {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ ok: false, code: 'UNAUTHENTICATED' }, { status: 401 });
 
-    const user = await db.user.findUnique({ where: { id: userId }, select: { petalBalance: true } });
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { petalBalance: true },
+    });
     const balance = user?.petalBalance ?? 0;
     return NextResponse.json({ ok: true, balance });
   } catch (err) {
@@ -20,4 +23,3 @@ export async function GET() {
     return NextResponse.json({ ok: false, code: 'SERVER_ERROR' }, { status: 500 });
   }
 }
-

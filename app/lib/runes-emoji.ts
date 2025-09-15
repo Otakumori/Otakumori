@@ -1,10 +1,7 @@
 import { type CanonicalRuneId } from '@/types/runes';
 
 // Noto Emoji (monochrome) friendly defaults for rune glyphs
-export const DEFAULT_RUNE_DISPLAYS: Record<
-  CanonicalRuneId,
-  { name: string; glyph: string }
-> = {
+export const DEFAULT_RUNE_DISPLAYS: Record<CanonicalRuneId, { name: string; glyph: string }> = {
   rune_a: { name: 'Rune I', glyph: '🌸' },
   rune_b: { name: 'Rune II', glyph: '🌙' },
   rune_c: { name: 'Rune III', glyph: '⭐' },
@@ -30,4 +27,3 @@ export const DEFAULT_RUNE_DISPLAYS: Record<
 export function getDefaultRuneDisplay(id: CanonicalRuneId) {
   return DEFAULT_RUNE_DISPLAYS[id];
 }
-

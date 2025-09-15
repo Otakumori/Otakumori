@@ -20,7 +20,11 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json(problem(401, 'Unauthorized'), { status: 401 });
 
   // Basic RL to prevent hammering
-  const rl = await rateLimit(req, { windowMs: 60_000, maxRequests: 6, keyPrefix: 'petalshop:purchase' }, userId);
+  const rl = await rateLimit(
+    req,
+    { windowMs: 60_000, maxRequests: 6, keyPrefix: 'petalshop:purchase' },
+    userId,
+  );
   if (rl.limited) return NextResponse.json({ ok: false, error: 'rate_limited' }, { status: 429 });
 
   const body = await req.json().catch(() => null);
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
     const user = await ensureUserByClerkId(userId);
     // Handle coupons vs inventory
     if (shopItem.kind?.toUpperCase() === 'COUPON' || (shopItem.metadata as any)?.coupon) {
-      const res = await debitPetals(userId, price, `purchase:${sku}`);
+      const res = await debitPetals(userId, price);
       const meta = (shopItem.metadata as any) || {};
       const coupon = meta.coupon || {};
       const type = coupon.type === 'OFF_AMOUNT' ? 'OFF_AMOUNT' : 'PERCENT';
@@ -56,18 +60,24 @@ export async function POST(req: NextRequest) {
         },
       });
       // Balance was debited above via 'res'
-      const balRow = await prisma.user.findUnique({ where: { id: user.id }, select: { petalBalance: true } });
-      const newBalance = balRow?.petalBalance ?? 0;
+      const userRec = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { petalBalance: true },
+      });
+      if (!userRec) {
+        return NextResponse.json(problem(404, 'User not found'), { status: 404 });
+      }
+      const newBalance = userRec.petalBalance ?? 0;
       return NextResponse.json({ ok: true, data: { balance: newBalance, code }, requestId: rid });
     } else {
       const existing = await prisma.inventoryItem.findFirst({ where: { userId: user.id, sku } });
       if (existing) {
         return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
       }
-      const res = await debitPetals(userId, price, `purchase:${sku}`);
+      const res = await debitPetals(userId, price);
       const kind = (() => {
         const k = (shopItem.kind || '').toUpperCase();
-        if (k in InventoryKind) return (k as keyof typeof InventoryKind) as any;
+        if (k in InventoryKind) return k as keyof typeof InventoryKind as any;
         return InventoryKind.COSMETIC as any;
       })();
       await prisma.inventoryItem.create({
@@ -78,13 +88,26 @@ export async function POST(req: NextRequest) {
           metadata: { shopKind: shopItem.kind },
         },
       });
+      // Get updated balance after debit
+      const userRec = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { petalBalance: true },
+      });
+      if (!userRec) {
+        return NextResponse.json(problem(404, 'User not found'), { status: 404 });
+      }
+      const newBalance = userRec.petalBalance ?? 0;
+      return NextResponse.json({ ok: true, data: { balance: newBalance }, requestId: rid });
     }
-
-    return NextResponse.json({ ok: true, data: { balance: res.balance }, requestId: rid });
   } catch (e: any) {
-    const msg = e?.code === 'INSUFFICIENT_FUNDS' ? 'Insufficient funds' : e?.message || 'purchase_failed';
+    const msg =
+      e?.code === 'INSUFFICIENT_FUNDS' ? 'Insufficient funds' : e?.message || 'purchase_failed';
     const status = e?.code === 'INSUFFICIENT_FUNDS' ? 400 : 500;
-    logger.error('petal_shop_purchase_error', { requestId: rid }, { error: String(e?.message || e), sku });
+    logger.error(
+      'petal_shop_purchase_error',
+      { requestId: rid },
+      { error: String(e?.message || e), sku },
+    );
     return NextResponse.json(problem(status, msg), { status });
   }
 }

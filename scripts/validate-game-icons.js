@@ -32,17 +32,22 @@ function hasIcon(slug) {
 function abbr(slug) {
   // Take first letters of meaningful parts
   const parts = slug.split('-').filter(Boolean);
-  const letters = parts.map((p) => p[0]).join('').toUpperCase();
+  const letters = parts
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
   return letters.slice(0, 2) || slug[0].toUpperCase();
 }
 
 function placeholderSVG(letter) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n` +
+  return (
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">\n` +
     `  <rect x="8" y="8" width="80" height="80" rx="16" fill="#111317" stroke="#e3e3e3" stroke-width="2"/>\n` +
     `  <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"` +
     `    font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" fill="#e3e3e3">${letter}</text>\n` +
-    `</svg>\n`;
+    `</svg>\n`
+  );
 }
 
 const missing = [];

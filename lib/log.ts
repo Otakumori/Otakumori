@@ -9,4 +9,3 @@ export function log(level: LogLevel, message: string, meta?: Record<string, unkn
 export function reqId(headers: Headers): string | undefined {
   return headers.get('x-request-id') || headers.get('x-correlation-id') || undefined;
 }
-

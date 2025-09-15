@@ -57,12 +57,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ ok: true, data: { id: review.id, message: 'Review submitted for approval' } });
+    return NextResponse.json({
+      ok: true,
+      data: { id: review.id, message: 'Review submitted for approval' },
+    });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(problem(400, 'Invalid input data'), { status: 400 });
     }
-    logger.error('reviews_post_error', { route: '/api/reviews' }, { error: String(error?.message || error) });
+    logger.error(
+      'reviews_post_error',
+      { route: '/api/reviews' },
+      { error: String(error?.message || error) },
+    );
     return NextResponse.json(problem(500, 'Failed to create review'), { status: 500 });
   }
 }
@@ -79,11 +86,23 @@ export async function GET(req: NextRequest) {
     const reviews = await db.review.findMany({
       where: { productId, isApproved: approved },
       orderBy: { createdAt: 'desc' },
-      select: { id: true, userId: true, rating: true, title: true, body: true, images: true, createdAt: true },
+      select: {
+        id: true,
+        userId: true,
+        rating: true,
+        title: true,
+        body: true,
+        images: true,
+        createdAt: true,
+      },
     });
     return NextResponse.json({ ok: true, data: reviews });
   } catch (error: any) {
-    logger.error('reviews_get_error', { route: '/api/reviews' }, { error: String(error?.message || error) });
+    logger.error(
+      'reviews_get_error',
+      { route: '/api/reviews' },
+      { error: String(error?.message || error) },
+    );
     return NextResponse.json(problem(500, 'Failed to fetch reviews'), { status: 500 });
   }
 }

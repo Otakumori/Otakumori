@@ -10,9 +10,12 @@ export const runtime = 'nodejs';
 
 async function getProduct(slug: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/products/${slug}`, {
-      next: { revalidate: 300 },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/products/${slug}`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
 
     if (!response.ok) return null;
     return response.json();
@@ -21,9 +24,13 @@ async function getProduct(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   const product = await getProduct(params.slug);
-  
+
   if (!product) {
     return {
       title: 'Product Not Found — Otaku-mori',

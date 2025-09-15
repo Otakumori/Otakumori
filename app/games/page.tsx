@@ -33,14 +33,12 @@ export default async function GamesPage() {
       <main className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white md:text-4xl">
-              {t("nav", "miniGames")}
-            </h1>
+            <h1 className="text-3xl font-bold text-white md:text-4xl">{t('nav', 'miniGames')}</h1>
             <p className="mt-2 text-zinc-300/90">
               Play mini-games and earn petals and achievements
             </p>
           </div>
-          
+
           <GamesGrid games={games} />
         </div>
       </main>

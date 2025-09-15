@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function UserMenu() {
   const { isSignedIn } = useUser();
-  const [redirectParam, setRedirectParam] = useState<string>("");
+  const [redirectParam, setRedirectParam] = useState<string>('');
 
   useEffect(() => {
     try {
@@ -16,13 +16,13 @@ export default function UserMenu() {
   }, []);
 
   const signInUrl = useMemo(() => {
-    const base = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || "/sign-in";
-    return redirectParam ? `${base}${base.includes("?") ? "&" : "?"}${redirectParam}` : base;
+    const base = process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in';
+    return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
   }, [redirectParam]);
 
   const signUpUrl = useMemo(() => {
-    const base = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || "/sign-up";
-    return redirectParam ? `${base}${base.includes("?") ? "&" : "?"}${redirectParam}` : base;
+    const base = process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up';
+    return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
   }, [redirectParam]);
 
   return (
@@ -49,10 +49,7 @@ export default function UserMenu() {
         >
           Profile
         </Link>
-        <UserButton
-          appearance={{ variables: { colorPrimary: "#db2777" } }}
-          afterSignOutUrl="/"
-        />
+        <UserButton appearance={{ variables: { colorPrimary: '#db2777' } }} afterSignOutUrl="/" />
       </SignedIn>
     </div>
   );

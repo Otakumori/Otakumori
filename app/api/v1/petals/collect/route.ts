@@ -28,18 +28,22 @@ export async function POST(request: NextRequest) {
   const { source, amount } = parsed.data;
 
   // Rate limit
-  const rl = await rateLimit(request, { windowMs: 10_000, maxRequests: 10, keyPrefix: 'petals:collect' }, userId);
+  const rl = await rateLimit(
+    request,
+    { windowMs: 10_000, maxRequests: 10, keyPrefix: 'petals:collect' },
+    userId,
+  );
   if (rl.limited) return NextResponse.json(problem(429, 'Rate limit exceeded'));
 
   // Daily caps
   const dailyCap = parseInt(process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500', 10);
   const perSourceCap: Record<string, number> = {
-    'clicker': 120,
+    clicker: 120,
     'mini-game:petal-run': 500,
     'mini-game:memory': 500,
     'mini-game:rhythm': 500,
-    'admin': 2000,
-    'purchase': 10000,
+    admin: 2000,
+    purchase: 10000,
   };
   const srcCap = perSourceCap[source] ?? dailyCap;
 
@@ -51,7 +55,12 @@ export async function POST(request: NextRequest) {
       _sum: { amount: true },
     }),
     prisma.petalLedger.aggregate({
-      where: { userId: user.id, type: 'earn', createdAt: { gte: since }, reason: { startsWith: `source:${source}` } },
+      where: {
+        userId: user.id,
+        type: 'earn',
+        createdAt: { gte: since },
+        reason: { startsWith: `source:${source}` },
+      },
       _sum: { amount: true },
     }),
   ]);
@@ -63,6 +72,12 @@ export async function POST(request: NextRequest) {
 
   if (grant <= 0) return NextResponse.json(problem(429, 'Daily cap reached'));
 
-  const res = await creditPetals(userId, grant, `source:${source}`);
-  return NextResponse.json({ ok: true, granted: grant, balance: res.balance, remainingToday: leftAll - grant, requestId: rid });
+  const res = await creditPetals(userId, grant);
+  return NextResponse.json({
+    ok: true,
+    granted: grant,
+    balance: res.newTotal,
+    remainingToday: leftAll - grant,
+    requestId: rid,
+  });
 }

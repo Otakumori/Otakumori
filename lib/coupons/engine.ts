@@ -82,7 +82,9 @@ function eligibleItemSubtotalCents(item: CartItemInput, c: CouponMeta): number {
   const excludedC = (c.excludedCollections ?? []).length > 0 ? c.excludedCollections : null;
 
   const productAllowed = allowedP ? !!(item.productId && allowedP.includes(item.productId)) : true;
-  const productExcluded = excludedP ? !!(item.productId && excludedP.includes(item.productId)) : false;
+  const productExcluded = excludedP
+    ? !!(item.productId && excludedP.includes(item.productId))
+    : false;
 
   const colSet = new Set(item.collectionIds ?? []);
   const inAllowedCol = allowedC ? allowedC.some((id) => colSet.has(id)) : true;
@@ -96,12 +98,19 @@ function eligibleItemSubtotalCents(item: CartItemInput, c: CouponMeta): number {
 export function getApplicableCoupons(input: EngineInput): CouponBreakdown {
   const messages: string[] = [];
   const normalizedCodes = (input.codesOrder ?? input.coupons.map((c) => c.code)).map(normalizeCode);
-  const itemsCents = input.items.map((i) => ({ id: i.id, cents: toCents(i.unitPrice) * i.quantity }));
+  const itemsCents = input.items.map((i) => ({
+    id: i.id,
+    cents: toCents(i.unitPrice) * i.quantity,
+  }));
   const subtotalCents = itemsCents.reduce((s, it) => s + it.cents, 0);
 
   let runningSubtotalCents = subtotalCents;
   let shippingDiscountCents = 0;
-  const codesApplied: { code: string; type: 'PERCENT' | 'FIXED' | 'FREESHIP'; amountCents: number }[] = [];
+  const codesApplied: {
+    code: string;
+    type: 'PERCENT' | 'FIXED' | 'FREESHIP';
+    amountCents: number;
+  }[] = [];
   const lineItemAdjustments: { lineId: string; discount: number }[] = []; // reserved (future)
 
   // Basic validations and selection
@@ -211,7 +220,11 @@ export function getApplicableCoupons(input: EngineInput): CouponBreakdown {
   );
 
   return {
-    codesApplied: codesApplied.map((c) => ({ code: c.code, type: c.type, amount: dollars(c.amountCents) })),
+    codesApplied: codesApplied.map((c) => ({
+      code: c.code,
+      type: c.type,
+      amount: dollars(c.amountCents),
+    })),
     lineItemAdjustments,
     shippingDiscount,
     subtotalBefore,
@@ -221,4 +234,3 @@ export function getApplicableCoupons(input: EngineInput): CouponBreakdown {
     normalizedCodes: selectedCodes,
   };
 }
-

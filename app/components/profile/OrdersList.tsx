@@ -25,23 +25,35 @@ type OrdersListProps = {
 export default function OrdersList({ orders }: OrdersListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'text-yellow-400';
-      case 'paid': return 'text-blue-400';
-      case 'shipped': return 'text-purple-400';
-      case 'delivered': return 'text-green-400';
-      case 'cancelled': return 'text-red-400';
-      default: return 'text-zinc-400';
+      case 'pending':
+        return 'text-yellow-400';
+      case 'paid':
+        return 'text-blue-400';
+      case 'shipped':
+        return 'text-purple-400';
+      case 'delivered':
+        return 'text-green-400';
+      case 'cancelled':
+        return 'text-red-400';
+      default:
+        return 'text-zinc-400';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending': return 'Pending Payment';
-      case 'paid': return 'Payment Received';
-      case 'shipped': return 'Shipped';
-      case 'delivered': return 'Delivered';
-      case 'cancelled': return 'Cancelled';
-      default: return status;
+      case 'pending':
+        return 'Pending Payment';
+      case 'paid':
+        return 'Payment Received';
+      case 'shipped':
+        return 'Shipped';
+      case 'delivered':
+        return 'Delivered';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return status;
     }
   };
 
@@ -49,12 +61,8 @@ export default function OrdersList({ orders }: OrdersListProps) {
     return (
       <div className="text-center py-12">
         <GlassPanel className="p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            No orders yet
-          </h2>
-          <p className="text-zinc-400 mb-6">
-            {t("status", "emptyInventory")}
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-4">No orders yet</h2>
+          <p className="text-zinc-400 mb-6">{t('status', 'emptyInventory')}</p>
           <Link
             href="/shop"
             className="inline-block rounded-xl bg-fuchsia-500/90 px-6 py-3 text-white hover:bg-fuchsia-500 transition-colors"
@@ -72,9 +80,7 @@ export default function OrdersList({ orders }: OrdersListProps) {
         <GlassPanel key={order.id} className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-white">
-                Order #{order.orderNumber}
-              </h3>
+              <h3 className="text-lg font-semibold text-white">Order #{order.orderNumber}</h3>
               <p className="text-sm text-zinc-400">
                 Placed on {new Date(order.createdAt).toLocaleDateString()}
               </p>
@@ -83,9 +89,7 @@ export default function OrdersList({ orders }: OrdersListProps) {
               <div className={`text-sm font-medium ${getStatusColor(order.status)}`}>
                 {getStatusText(order.status)}
               </div>
-              <div className="text-lg font-semibold text-white">
-                ${order.total.toFixed(2)}
-              </div>
+              <div className="text-lg font-semibold text-white">${order.total.toFixed(2)}</div>
             </div>
           </div>
 
