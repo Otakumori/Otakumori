@@ -5,6 +5,8 @@ import { problem } from '@/lib/http/problem';
 import { prisma } from '@/app/lib/prisma';
 import { creditPetals } from '@/lib/petals';
 import { rateLimit } from '@/app/api/rate-limit';
+import { logger } from '@/app/lib/logger';
+import { reqId } from '@/lib/log';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
@@ -25,6 +27,8 @@ function calcAward(game: string, score: number): number {
 }
 
 export async function POST(req: NextRequest) {
+  const rid = reqId(req.headers);
+  logger.request(req, 'POST /api/mini-games/submit');
   const { userId } = await auth();
   const body = await req.json().catch(() => null);
   const parsed = submitScoreReq.safeParse(body);
@@ -41,7 +45,9 @@ export async function POST(req: NextRequest) {
       } else {
         await prisma.leaderboardScore.create({ data: { userId: 'guest', game, diff: null, score, statsJson: {} } });
       }
-    } catch {}
+    } catch (e: any) {
+      logger.error('leaderboard_guest_upsert_error', { requestId: rid }, { error: String(e?.message || e) });
+    }
     return NextResponse.json({ ok: true, score, petalsGranted: 0 });
   }
 
@@ -59,7 +65,9 @@ export async function POST(req: NextRequest) {
     } else if (score > (prev.score ?? 0)) {
       await prisma.leaderboardScore.update({ where: { id: prev.id }, data: { score } });
     }
-  } catch {}
+  } catch (e: any) {
+    logger.error('leaderboard_upsert_error', { requestId: rid }, { error: String(e?.message || e) });
+  }
 
   // Award petals with server-side clamp
   let balance: number | undefined = undefined;
@@ -67,10 +75,11 @@ export async function POST(req: NextRequest) {
     try {
       const res = await creditPetals(userId, petalsGranted, `mini-game:${game}`);
       balance = res.balance;
-    } catch {
+    } catch (e: any) {
+      logger.error('petals_award_error', { requestId: rid }, { error: String(e?.message || e) });
       petalsGranted = 0; // if economy fails, don't report grant
     }
   }
 
-  return NextResponse.json({ ok: true, score, petalsGranted, ...(balance != null ? { balance } : {}) });
+  return NextResponse.json({ ok: true, score, petalsGranted, ...(balance != null ? { balance } : {}), requestId: rid });
 }
