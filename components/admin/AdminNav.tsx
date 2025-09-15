@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, Flower, Zap, ChevronRight, Home } from 'lucide-react';
+import { Sparkles, Flower, Zap, ChevronRight, Home, Ticket } from 'lucide-react';
 
 const adminRoutes = [
   {
@@ -29,6 +29,18 @@ const adminRoutes = [
     name: 'Rewards',
     icon: Flower,
     description: 'Configure petal rewards',
+  },
+  {
+    path: '/admin/petal-shop',
+    name: 'Petal Shop',
+    icon: Flower,
+    description: 'Manage petal shop items',
+  },
+  {
+    path: '/admin/coupons',
+    name: 'Coupons',
+    icon: Ticket,
+    description: 'Coupon SKUs and templates',
   },
   {
     path: '/admin/burst',

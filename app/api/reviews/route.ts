@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
+import { logger } from '@/app/lib/logger';
+import { problem } from '@/lib/http/problem';
 
 const CreateReviewSchema = z.object({
   productId: z.string().min(1),
@@ -21,109 +23,67 @@ const CreateReviewSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  logger.request(req, 'POST /api/reviews');
   try {
     const { userId } = await auth();
-
     if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Authentication required' }, { status: 401 });
+      return NextResponse.json(problem(401, 'Authentication required'), { status: 401 });
     }
 
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
     const validated = CreateReviewSchema.parse(body);
 
-    // Check if product exists
-    const product = await db.product.findUnique({
-      where: { id: validated.productId },
-    });
-
+    const product = await db.product.findUnique({ where: { id: validated.productId } });
     if (!product) {
-      return NextResponse.json({ ok: false, error: 'Product not found' }, { status: 404 });
+      return NextResponse.json(problem(404, 'Product not found'), { status: 404 });
     }
 
-    // Check if user already reviewed this product
     const existingReview = await db.review.findFirst({
-      where: {
-        productId: validated.productId,
-        userId: userId,
-      },
+      where: { productId: validated.productId, userId },
     });
-
     if (existingReview) {
-      return NextResponse.json(
-        { ok: false, error: 'You have already reviewed this product' },
-        { status: 400 },
-      );
+      return NextResponse.json(problem(400, 'Already reviewed'), { status: 400 });
     }
 
-    // Create review
     const review = await db.review.create({
       data: {
         productId: validated.productId,
-        userId: userId,
+        userId,
         rating: validated.rating,
         title: validated.title,
         body: validated.body,
         images: validated.images,
-        isApproved: false, // Require approval by default
+        isApproved: false,
       },
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        id: review.id,
-        message: 'Review submitted for approval',
-      },
-    });
-  } catch (error) {
-    console.error('Review creation error:', error);
-
+    return NextResponse.json({ ok: true, data: { id: review.id, message: 'Review submitted for approval' } });
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { ok: false, error: 'Invalid input data', details: error.errors },
-        { status: 400 },
-      );
+      return NextResponse.json(problem(400, 'Invalid input data'), { status: 400 });
     }
-
-    return NextResponse.json({ ok: false, error: 'Failed to create review' }, { status: 500 });
+    logger.error('reviews_post_error', { route: '/api/reviews' }, { error: String(error?.message || error) });
+    return NextResponse.json(problem(500, 'Failed to create review'), { status: 500 });
   }
 }
 
 export async function GET(req: NextRequest) {
+  logger.request(req, 'GET /api/reviews');
   try {
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get('productId');
     const approved = searchParams.get('approved') === 'true';
-
     if (!productId) {
-      return NextResponse.json({ ok: false, error: 'Product ID required' }, { status: 400 });
+      return NextResponse.json(problem(400, 'Product ID required'), { status: 400 });
     }
-
     const reviews = await db.review.findMany({
-      where: {
-        productId: productId,
-        isApproved: approved,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      select: {
-        id: true,
-        userId: true,
-        rating: true,
-        title: true,
-        body: true,
-        images: true,
-        createdAt: true,
-      },
+      where: { productId, isApproved: approved },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, userId: true, rating: true, title: true, body: true, images: true, createdAt: true },
     });
-
-    return NextResponse.json({
-      ok: true,
-      data: reviews,
-    });
-  } catch (error) {
-    console.error('Review fetch error:', error);
-    return NextResponse.json({ ok: false, error: 'Failed to fetch reviews' }, { status: 500 });
+    return NextResponse.json({ ok: true, data: reviews });
+  } catch (error: any) {
+    logger.error('reviews_get_error', { route: '/api/reviews' }, { error: String(error?.message || error) });
+    return NextResponse.json(problem(500, 'Failed to fetch reviews'), { status: 500 });
   }
 }

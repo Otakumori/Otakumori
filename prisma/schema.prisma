@@ -55,6 +55,9 @@ model Order {
   primaryItemName String?        @default("")
   label           String?        @default("")
   subtotalCents   Int            @default(0)
+  // Coupons integration
+  appliedCouponCodes String[]    @default([])
+  discountTotalCents Int         @default(0)
   EmailLogs       EmailLog[]
   User            User           @relation(fields: [userId], references: [id])
   OrderItem       OrderItem[]
@@ -428,6 +431,52 @@ model CouponGrant {
   createdAt    DateTime     @default(now())
   redeemedAt   DateTime?
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Checkout coupons: global campaign codes applied at Stripe checkout
+model Coupon {
+  id                       String      @id @default(cuid())
+  code                     String      @unique
+  type                     CouponType
+  // value semantics: for PERCENT store 0-100; for FIXED store USD cents; FREESHIP ignores value
+  valueCents               Int         @default(0)
+  enabled                  Boolean     @default(true)
+  startsAt                 DateTime?
+  endsAt                   DateTime?
+  maxRedemptions           Int?
+  maxRedemptionsPerUser    Int?
+  minSubtotalCents         Int?        // pre-tax/shipping
+  allowedProductIds        String[]    @default([])
+  excludedProductIds       String[]    @default([])
+  allowedCollections       String[]    @default([])
+  excludedCollections      String[]    @default([])
+  stackable                Boolean     @default(false)
+  oneTimeCode              Boolean     @default(false)
+  autoApply                Boolean     @default(false)
+  notes                    String?
+  createdAt                DateTime    @default(now())
+  updatedAt                DateTime    @updatedAt
+  redemptions              CouponRedemption[]
+
+  @@index([enabled])
+  @@index([startsAt, endsAt])
+}
+
+model CouponRedemption {
+  id                 String                     @id @default(cuid())
+  couponId           String
+  userId             String?
+  orderId            String?
+  clientReferenceId  String
+  status             CouponRedemptionStatus     @default(PENDING)
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  coupon             Coupon                     @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user               User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order              Order?                     @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@unique([couponId, clientReferenceId])
+  @@index([userId, status])
 }
 
 model SoapstoneMessage {
@@ -1647,6 +1696,18 @@ enum InventoryKind {
 enum DiscountType {
   PERCENT
   OFF_AMOUNT
+}
+
+enum CouponType {
+  PERCENT
+  FIXED
+  FREESHIP
+}
+
+enum CouponRedemptionStatus {
+  PENDING
+  SUCCEEDED
+  CANCELED
 }
 
 enum CommentKind {

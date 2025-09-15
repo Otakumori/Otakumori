@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
@@ -11,6 +11,9 @@ export default function CheckoutContent() {
   const router = useRouter();
   const { items } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [codes, setCodes] = useState<string[]>([]);
+  const [preview, setPreview] = useState<any>(null);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -21,6 +24,38 @@ export default function CheckoutContent() {
     zipCode: '',
     country: 'US',
   });
+
+  // init codes from query (when navigating from cart)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      const param = url.searchParams.get('coupons');
+      if (param) setCodes(param.split(',').map((c) => c.trim().toUpperCase()).filter(Boolean));
+    }
+  }, []);
+
+  // preview engine output
+  useEffect(() => {
+    let cancelled = false;
+    const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const baseShipping = subtotal > 50 ? 0 : 9.99;
+    const run = async () => {
+      if (codes.length === 0) { setPreview(null); return; }
+      try {
+        const res = await fetch('/api/coupons/preview', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            codes,
+            cart: { items: items.map((i) => ({ id: i.id, productId: i.id, collectionIds: [], quantity: i.quantity, unitPrice: i.price })), shipping: { provider: 'stripe', fee: baseShipping } },
+          }),
+        });
+        const j = await res.json();
+        if (!cancelled && j?.ok) setPreview(j.data);
+      } catch { if (!cancelled) setPreview(null); }
+    };
+    const t = setTimeout(run, 250);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [codes, items]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
@@ -46,10 +81,20 @@ export default function CheckoutContent() {
         printifyVariantId: undefined,
       }));
 
+      // Attach redemptions (best effort)
+      try {
+        const clientReferenceId = (typeof window !== 'undefined' && (localStorage.getItem('cart_id') || (() => { const id = `cart_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; localStorage.setItem('cart_id', id); return id; })())) as string;
+        if (codes.length) {
+          await fetch('/api/coupons/attach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codes, clientReferenceId }) });
+        }
+      } catch {}
+
+      const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+      const baseShipping = subtotal > 50 ? 0 : 9.99;
       const response = await fetch('/api/v1/checkout/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: checkoutItems, shippingInfo: formData }),
+        body: JSON.stringify({ items: checkoutItems, shippingInfo: formData, couponCodes: codes, shipping: { provider: 'stripe', fee: baseShipping } }),
       });
 
       const { url } = await response.json();

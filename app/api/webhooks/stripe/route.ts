@@ -137,6 +137,11 @@ export async function POST(req: Request) {
           totalAmount: total,
           currency: currency.toUpperCase(),
           paidAt: new Date(),
+          appliedCouponCodes:
+            (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as string[] | undefined) ?? [],
+          discountTotalCents: fullSession.metadata?.discount_total_cents
+            ? parseInt(fullSession.metadata.discount_total_cents, 10)
+            : 0,
         },
         create: {
           id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -148,8 +153,29 @@ export async function POST(req: Request) {
           status: 'shipped', // using existing enum value
           paidAt: new Date(),
           updatedAt: new Date(),
+          appliedCouponCodes:
+            (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as string[] | undefined) ?? [],
+          discountTotalCents: fullSession.metadata?.discount_total_cents
+            ? parseInt(fullSession.metadata.discount_total_cents, 10)
+            : 0,
         },
       });
+
+      // Mark coupon redemptions as succeeded
+      try {
+        const codes = (fullSession.metadata?.coupon_codes || '').split(',').filter(Boolean);
+        if (codes.length > 0) {
+          const coupons = await prisma.coupon.findMany({ where: { code: { in: codes } }, select: { id: true, code: true } });
+          for (const c of coupons) {
+            await prisma.couponRedemption.updateMany({
+              where: { couponId: c.id, status: 'PENDING' },
+              data: { status: 'SUCCEEDED', orderId: order.id, userId: user.id },
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('Coupon redemption update failed', e);
+      }
 
       // Simulate Printify order creation
       try {
