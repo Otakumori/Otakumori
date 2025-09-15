@@ -6,18 +6,26 @@ import * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
 
 function canUseWebGL() {
-  try { const c = document.createElement('canvas'); return !!(c.getContext('webgl') || c.getContext('experimental-webgl')); }
-  catch { return false; }
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl') || c.getContext('experimental-webgl'));
+  } catch {
+    return false;
+  }
 }
 
 function WindTree({
   src = '/media/cherry-tree.png',
-  trunkCenterU = 0.50,   // tweak to pixel-snap the trunk center to the right edge
+  trunkCenterU = 0.5, // tweak to pixel-snap the trunk center to the right edge
   windStrength = 0.017,
   gust = 0.55,
   freq = 0.95,
 }: {
-  src?: string; trunkCenterU?: number; windStrength?: number; gust?: number; freq?: number;
+  src?: string;
+  trunkCenterU?: number;
+  windStrength?: number;
+  gust?: number;
+  freq?: number;
 }) {
   const tex = useTexture(src);
   tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
@@ -26,7 +34,9 @@ function WindTree({
   tex.anisotropy = 8;
 
   const mat = useRef<THREE.ShaderMaterial>(null!);
-  useFrame((_, dt) => { if (mat.current) mat.current.uniforms.uTime.value += dt; });
+  useFrame((_, dt) => {
+    if (mat.current) mat.current.uniforms.uTime.value += dt;
+  });
 
   return (
     <mesh scale={[2, 2, 1]}>
@@ -43,8 +53,11 @@ function WindTree({
           uFreq: { value: freq },
           uOffsetU: { value: trunkCenterU - 1.0 }, // trunk center -> right screen edge
         }}
-        vertexShader={/* glsl */`varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.0); }`}
-        fragmentShader={/* glsl */`
+        vertexShader={
+          /* glsl */ `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.0); }`
+        }
+        fragmentShader={
+          /* glsl */ `
           precision highp float;
           uniform sampler2D uTex; uniform float uTime,uStrength,uGust,uFreq,uOffsetU;
           varying vec2 vUv;
@@ -70,7 +83,8 @@ function WindTree({
             vec4 C=texture2D(uTex, uv);
             C.rgb *= clamp(1.0 - (a*6.0), 0.86, 1.0);
             gl_FragColor=C;
-          }`}
+          }`
+        }
       />
     </mesh>
   );
@@ -87,7 +101,11 @@ export default function HomeTreeWindAligned() {
   if (!ok || reduce) {
     return (
       <div aria-hidden className="fixed inset-0 -z-10 pointer-events-none">
-        <img src="/media/cherry-tree.png" alt="" className="h-full w-auto object-contain object-right" />
+        <img
+          src="/media/cherry-tree.png"
+          alt=""
+          className="h-full w-auto object-contain object-right"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/50" />
       </div>
     );
@@ -95,10 +113,15 @@ export default function HomeTreeWindAligned() {
 
   return (
     <div aria-hidden className="fixed inset-0 -z-10 pointer-events-none">
-      <Canvas orthographic camera={{ position: [0,0,1], zoom: 1 }}
-        onCreated={({ gl }) => { gl.setClearColor('#0b0412'); gl.toneMapping = THREE.ACESFilmicToneMapping; }}
+      <Canvas
+        orthographic
+        camera={{ position: [0, 0, 1], zoom: 1 }}
+        onCreated={({ gl }) => {
+          gl.setClearColor('#0b0412');
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+        }}
       >
-        <WindTree trunkCenterU={0.50} />
+        <WindTree trunkCenterU={0.5} />
       </Canvas>
       <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/55" />
     </div>

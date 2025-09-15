@@ -127,7 +127,7 @@ export default function AboutMe() {
                   we love about anime culture.
                 </p>
                 <p>
-                  We believe that being an otaku isn't just about watching anime—it's about the
+                  We believe that being an otaku isn�t just about watching anime � it�s about the
                   connections we make, the creativity we express, and the community we build
                   together. Every feature, every design choice, and every line of code is crafted
                   with this philosophy in mind.

@@ -1,16 +1,20 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const PrintifyProduct = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string().optional(),
   images: z.array(z.string()).optional(),
-  variants: z.array(z.object({
-    id: z.number(),
-    title: z.string(),
-    price: z.number(),
-    available: z.boolean(),
-  })).optional(),
+  variants: z
+    .array(
+      z.object({
+        id: z.number(),
+        title: z.string(),
+        price: z.number(),
+        available: z.boolean(),
+      }),
+    )
+    .optional(),
   tags: z.array(z.string()).optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),

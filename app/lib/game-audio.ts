@@ -41,9 +41,9 @@ export const gameAudio = {
    * Play gamecube menu - used for navigation and background
    */
   playGamecubeMenu: (options: { gain?: number; loop?: boolean } = {}) => {
-    return audio.play('gamecube_menu', { 
-      gain: options.gain || 0.3, 
-      loop: options.loop || false 
+    return audio.play('gamecube_menu', {
+      gain: options.gain || 0.3,
+      loop: options.loop || false,
     });
   },
 
@@ -52,5 +52,5 @@ export const gameAudio = {
    */
   playConfirm: () => {
     audio.play('samus_jingle', { gain: 0.5 });
-  }
+  },
 };

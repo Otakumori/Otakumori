@@ -1,11 +1,11 @@
-import { PrismaClient, PhraseCategory } from "@prisma/client";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { PrismaClient, PhraseCategory } from '@prisma/client';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 const prisma = new PrismaClient();
 
 async function seedPhrases(jsonPath: string) {
-  const raw = await fs.readFile(jsonPath, "utf8");
+  const raw = await fs.readFile(jsonPath, 'utf8');
   const parsed = JSON.parse(raw) as { categories: Record<string, string[]> };
 
   for (const [cat, items] of Object.entries(parsed.categories)) {
@@ -20,11 +20,11 @@ async function seedPhrases(jsonPath: string) {
           category_text_locale: {
             category: category as any,
             text,
-            locale: "en",
+            locale: 'en',
           },
         },
         update: { isActive: true },
-        create: { category: category as any, text, locale: "en" },
+        create: { category: category as any, text, locale: 'en' },
       });
     }
   }
@@ -35,7 +35,7 @@ async function seedTemplates() {
   async function makeTemplate(
     name: string,
     pattern: string,
-    slots: Array<{ position: number; optional?: boolean; accepts: PhraseCategory[] }>
+    slots: Array<{ position: number; optional?: boolean; accepts: PhraseCategory[] }>,
   ) {
     const tmpl = await prisma.messageTemplate.upsert({
       where: { name },
@@ -63,66 +63,66 @@ async function seedTemplates() {
   }
 
   // Classic DS-style shapes
-  await makeTemplate("be_wary_of_subject", "be wary of {SUBJECT}", [
+  await makeTemplate('be_wary_of_subject', 'be wary of {SUBJECT}', [
     { position: 0, accepts: [PhraseCategory.SUBJECT] },
   ]);
 
-  await makeTemplate("try_action", "try {ACTION}", [
+  await makeTemplate('try_action', 'try {ACTION}', [
     { position: 0, accepts: [PhraseCategory.ACTION] },
   ]);
 
-  await makeTemplate("object_ahead", "{OBJECT} ahead", [
+  await makeTemplate('object_ahead', '{OBJECT} ahead', [
     { position: 0, accepts: [PhraseCategory.OBJECT] },
   ]);
 
-  await makeTemplate("subject_ahead", "{SUBJECT} ahead", [
+  await makeTemplate('subject_ahead', '{SUBJECT} ahead', [
     { position: 0, accepts: [PhraseCategory.SUBJECT] },
   ]);
 
-  await makeTemplate("praise_the_subject", "praise the {SUBJECT}", [
+  await makeTemplate('praise_the_subject', 'praise the {SUBJECT}', [
     { position: 0, accepts: [PhraseCategory.SUBJECT] },
   ]);
 
-  await makeTemplate("visions_of_subject", "visions of {SUBJECT}", [
+  await makeTemplate('visions_of_subject', 'visions of {SUBJECT}', [
     { position: 0, accepts: [PhraseCategory.SUBJECT] },
   ]);
 
-  await makeTemplate("no_hidden_path_ahead", "no hidden path ahead", []);
+  await makeTemplate('no_hidden_path_ahead', 'no hidden path ahead', []);
 
-  await makeTemplate("could_this_be", "could this be a {SUBJECT}?", [
+  await makeTemplate('could_this_be', 'could this be a {SUBJECT}?', [
     { position: 0, accepts: [PhraseCategory.SUBJECT] },
   ]);
 
-  await makeTemplate("therefore_quality", "{CONJUNCTION}, {QUALITY}", [
+  await makeTemplate('therefore_quality', '{CONJUNCTION}, {QUALITY}', [
     { position: 0, accepts: [PhraseCategory.CONJUNCTION] },
     { position: 1, accepts: [PhraseCategory.QUALITY] },
   ]);
 
-  await makeTemplate("behold_subject", "behold, {SUBJECT}", [
+  await makeTemplate('behold_subject', 'behold, {SUBJECT}', [
     { position: 0, accepts: [PhraseCategory.SUBJECT] },
   ]);
 
   // Fun Otaku-mori riffs
-  await makeTemplate("time_for_crab", "time for {SUBJECT}", [
+  await makeTemplate('time_for_crab', 'time for {SUBJECT}', [
     { position: 0, accepts: [PhraseCategory.SUBJECT, PhraseCategory.MEME] },
   ]);
 
-  await makeTemplate("meme_only", "{MEME}", [
+  await makeTemplate('meme_only', '{MEME}', [
     { position: 0, accepts: [PhraseCategory.MEME, PhraseCategory.HUMOR] },
   ]);
 
-  await makeTemplate("combo_tip_subject_direction", "{TIP} {SUBJECT} {DIRECTION}", [
+  await makeTemplate('combo_tip_subject_direction', '{TIP} {SUBJECT} {DIRECTION}', [
     { position: 0, accepts: [PhraseCategory.TIP] },
     { position: 1, accepts: [PhraseCategory.SUBJECT] },
     { position: 2, accepts: [PhraseCategory.DIRECTION] },
   ]);
 
-  await makeTemplate("object_requires_action", "{OBJECT} requires {ACTION}", [
+  await makeTemplate('object_requires_action', '{OBJECT} requires {ACTION}', [
     { position: 0, accepts: [PhraseCategory.OBJECT] },
     { position: 1, accepts: [PhraseCategory.ACTION] },
   ]);
 
-  await makeTemplate("element_defense", "{ELEMENT} ahead, {CONJUNCTION} {ACTION}", [
+  await makeTemplate('element_defense', '{ELEMENT} ahead, {CONJUNCTION} {ACTION}', [
     { position: 0, accepts: [PhraseCategory.ELEMENT] },
     { position: 1, accepts: [PhraseCategory.CONJUNCTION] },
     { position: 2, accepts: [PhraseCategory.ACTION] },
@@ -130,10 +130,10 @@ async function seedTemplates() {
 }
 
 async function main() {
-  const jsonPath = path.join(process.cwd(), "prisma", "data", "otaku_mori_phrases.json");
+  const jsonPath = path.join(process.cwd(), 'prisma', 'data', 'otaku_mori_phrases.json');
   await seedPhrases(jsonPath);
   await seedTemplates();
-  console.log("✅ Seeded phrases & templates");
+  console.log('✅ Seeded phrases & templates');
 }
 
 main()

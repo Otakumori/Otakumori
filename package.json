@@ -30,7 +30,9 @@
     "db:seed:shop": "npx tsx scripts/seed-shop.ts",
     "db:seed:products": "npx tsx scripts/seed-products.ts",
     "db:seed:runes": "npx tsx scripts/seed-runes.ts",
-    "seed": "prisma db seed",
+    "seed:app": "tsx scripts/seed.ts",
+    "seed": "npm run db:seed && npm run seed:app",
+    "unseed": "tsx scripts/unseed.ts",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
@@ -56,6 +58,8 @@
     "assets:check": "node ./scripts/check-assets.cjs",
     "assets:report": "node ./scripts/report-missing-assets.cjs",
     "assets:scan": "node ./scripts/scan-image-refs.cjs",
+    "icons:validate": "node ./scripts/validate-game-icons.js",
+    "icons:placeholders": "node ./scripts/validate-game-icons.js --generate",
     "assets:gen:achievements": "tsx ./scripts/gen-achievements.ts --png",
     "assets:gen:achievements:frames": "tsx ./scripts/gen-achievements.ts --png --frame",
     "logs:view": "node scripts/view-logs.js",
@@ -84,12 +88,16 @@
     "api:test": "npm run api:health",
     "db:test": "tsx scripts/test-database.ts",
     "pre-deploy": "npm run build && npm run api:health",
-    "lint-staged": "lint-staged"
+    "verify:console": "node scripts/verify-console-card.mjs",
+    "pre-deploy:strict": "npm run verify:console && npm run build && npm run api:health",
+    "lint-staged": "lint-staged",
+    "dev:community-ws": "node scripts/mock-community-ws.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.7",
     "@headlessui/react": "^2.2.3",
     "@heroicons/react": "^2.2.0",
+    "@jest/globals": "^30.1.2",
     "@opentelemetry/api": "^1.9.0",
     "@panva/hkdf": "github:panva/hkdf",
     "@plasmicapp/loader-nextjs": "^1.0.424",
@@ -288,5 +296,9 @@
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "packageManager": "pnpm@9",
+  "engines": {
+    "node": "20.x"
   }
 }

@@ -27,7 +27,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
 
   const openDialog = useCallback(() => setIsOpen(true), []);
   const closeDialog = useCallback(() => setIsOpen(false), []);
-  const toggleDialog = useCallback(() => setIsOpen(prev => !prev), []);
+  const toggleDialog = useCallback(() => setIsOpen((prev) => !prev), []);
 
   return (
     <DialogContext.Provider value={{ isOpen, openDialog, closeDialog, toggleDialog }}>
@@ -59,11 +59,11 @@ export function Dialog({ children, trigger, title, description, onClose }: Dialo
     if (isOpen) {
       // Store the previously focused element
       previousActiveElement.current = document.activeElement as HTMLElement;
-      
+
       // Focus the dialog
       if (dialogRef.current) {
         const focusableElements = dialogRef.current.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
         const firstElement = focusableElements[0] as HTMLElement;
         if (firstElement) {
@@ -109,7 +109,7 @@ export function Dialog({ children, trigger, title, description, onClose }: Dialo
           {trigger}
         </button>
       )}
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -160,11 +160,7 @@ interface DialogContentProps {
 }
 
 export function DialogContent({ children, className = '' }: DialogContentProps) {
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 }
 
 interface DialogActionsProps {
@@ -173,9 +169,5 @@ interface DialogActionsProps {
 }
 
 export function DialogActions({ children, className = '' }: DialogActionsProps) {
-  return (
-    <div className={`flex gap-3 justify-end mt-6 ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`flex gap-3 justify-end mt-6 ${className}`}>{children}</div>;
 }

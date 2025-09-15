@@ -101,13 +101,15 @@ export default function Game({ skin, mode }: Props) {
     if (gameState.isGameOver && mode === 'challenge') {
       const submitScore = async () => {
         try {
-          const payload = {
-            score: gameState.score,
-            duration: 60,
-            meta: { game: 'bubble-girl' },
-          };
-          // TODO: Implement score submission API
-          console.log('Score to submit:', payload);
+          await fetch('/api/v1/leaderboard/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gameCode: 'bubble-girl',
+              score: Math.max(0, Math.round(gameState.score)),
+              meta: { duration: 60 },
+            }),
+          });
         } catch (error) {
           console.error('Failed to submit score:', error);
         }

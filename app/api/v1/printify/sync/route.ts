@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '@/inngest/client';
-import { printifyService } from '@/app/lib/printify/service';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 export const runtime = 'nodejs';
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
       case 'test':
         // Test connection only
-        const connectionTest = await printifyService.testConnection();
+        const connectionTest = await getPrintifyService().testConnection();
         return NextResponse.json({
           ok: connectionTest.success,
           data: {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
       case 'products':
         // Sync products immediately
-        const products = await printifyService.getAllProducts();
+        const products = await getPrintifyService().getAllProducts();
         return NextResponse.json({
           ok: true,
           data: {

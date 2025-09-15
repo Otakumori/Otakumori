@@ -14,20 +14,12 @@ const PetalSystem: React.FC = () => {
     <>
       {/* Canopy background for all pages */}
       <Canopy />
-      
+
       {/* Conditional petal system */}
       {isHome ? (
-        <InteractivePetals 
-          maxPetals={8}
-          spawnRate={0.1}
-          petalColor="#F7BFD3"
-        />
+        <InteractivePetals maxPetals={8} spawnRate={0.1} petalColor="#F7BFD3" />
       ) : (
-        <AestheticPetals 
-          maxPetals={5}
-          spawnRate={0.05}
-          petalColor="#F7BFD3"
-        />
+        <AestheticPetals maxPetals={5} spawnRate={0.05} petalColor="#F7BFD3" />
       )}
     </>
   );

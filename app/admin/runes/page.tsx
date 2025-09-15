@@ -1,18 +1,19 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, Save, X, Crown, Sparkles } from 'lucide-react';
-import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import {
-  type CanonicalRuneId,
-  type RuneDef,
-  type RuneComboDef,
-  DEFAULT_RUNE_DISPLAYS,
-} from '../../../types/runes';
 import { AdminLayout } from '@/components/admin/AdminNav';
+import RuneGlyph from '@/components/runes/RuneGlyph';
+import { useUser } from '@clerk/nextjs';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Crown, Edit, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import {
+  DEFAULT_RUNE_DISPLAYS,
+  type CanonicalRuneId,
+  type RuneComboDef,
+  type RuneDef,
+} from '../../../types/runes';
 
 interface EditableRuneDef extends Omit<RuneDef, 'createdAt' | 'updatedAt'> {
   createdAt?: Date;
@@ -203,8 +204,11 @@ export default function AdminRunesPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="text-2xl">
-                        {rune.glyph ||
-                          getDefaultRuneDisplay(rune.canonicalId as CanonicalRuneId).glyph}
+                        <RuneGlyph
+                          runeId={rune.canonicalId as CanonicalRuneId}
+                          glyphOverride={rune.glyph}
+                          style="emoji"
+                        />
                       </div>
                       <div>
                         <h3 className="font-semibold text-white">

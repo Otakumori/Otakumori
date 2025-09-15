@@ -25,21 +25,37 @@ export default function GlobalMusicBar() {
             <button
               onClick={() => setOptIn(true)}
               className="rounded-md bg-pink-600 px-3 py-1 text-sm font-medium hover:bg-pink-500"
-            >Yes</button>
+            >
+              Yes
+            </button>
             <button
               onClick={() => setShown(false)}
               className="rounded-md border border-zinc-700 px-3 py-1 text-sm hover:bg-zinc-900"
-            >Not now</button>
+            >
+              Not now
+            </button>
           </>
         ) : (
           <>
-            <button onClick={prev} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Previous track">
+            <button
+              onClick={prev}
+              className="rounded px-2 py-1 hover:bg-zinc-900"
+              aria-label="Previous track"
+            >
               ⏮
             </button>
-            <button onClick={toggle} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label={playing ? "Pause" : "Play"}>
+            <button
+              onClick={toggle}
+              className="rounded px-2 py-1 hover:bg-zinc-900"
+              aria-label={playing ? 'Pause' : 'Play'}
+            >
               {playing ? '⏸' : '▶️'}
             </button>
-            <button onClick={next} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Next track">
+            <button
+              onClick={next}
+              className="rounded px-2 py-1 hover:bg-zinc-900"
+              aria-label="Next track"
+            >
               ⏭
             </button>
             <div className="min-w-[200px] text-sm">
@@ -55,9 +71,16 @@ export default function GlobalMusicBar() {
               onChange={(e) => setVolume(Number(e.target.value))}
               className="h-1 w-28"
               aria-label="Volume"
+              name="volume"
             />
-            <button onClick={() => setOptIn(false)} className="rounded px-2 py-1 hover:bg-zinc-900" aria-label="Mute">
-              <span role="img" aria-label="Muted speaker">🔇</span>
+            <button
+              onClick={() => setOptIn(false)}
+              className="rounded px-2 py-1 hover:bg-zinc-900"
+              aria-label="Mute"
+            >
+              <span role="img" aria-label="Muted speaker">
+                🔇
+              </span>
             </button>
           </>
         )}

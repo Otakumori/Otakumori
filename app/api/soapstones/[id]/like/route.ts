@@ -14,12 +14,12 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   // toggle: if reaction exists -> remove; else -> create
   // Use the Reaction model for soapstone likes
   const existing = await prisma.reaction.findUnique({
-    where: { 
-      messageId_userId_type: { 
-        messageId: msgId, 
-        userId, 
-        type: 'HEART' 
-      } 
+    where: {
+      messageId_userId_type: {
+        messageId: msgId,
+        userId,
+        type: 'HEART',
+      },
     },
   });
 
@@ -28,8 +28,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       prisma.reaction.delete({ where: { id: existing.id } }),
       prisma.soapstoneMessage.update({
         where: { id: msgId },
-        data: { 
-          appraises: { decrement: 1 }
+        data: {
+          appraises: { decrement: 1 },
         },
       }),
     ]);
@@ -37,17 +37,17 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   } else {
     // Create new heart reaction
     await prisma.$transaction([
-      prisma.reaction.create({ 
-        data: { 
-          messageId: msgId, 
+      prisma.reaction.create({
+        data: {
+          messageId: msgId,
           userId,
-          type: 'HEART'
-        } 
+          type: 'HEART',
+        },
       }),
       prisma.soapstoneMessage.update({
         where: { id: msgId },
-        data: { 
-          appraises: { increment: 1 }
+        data: {
+          appraises: { increment: 1 },
         },
       }),
     ]);

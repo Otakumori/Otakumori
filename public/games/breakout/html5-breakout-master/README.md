@@ -1,13 +1,10 @@
-html5-breakout
-==============
+# html5-breakout
 
 A Breakout style HTML5 Canvas game made for my Interactive Web Programming module
 
 Demo: http://dev.bbrks.me/breakout
 
-
-Screenshots
------------
+## Screenshots
 
 ![Main Menu](https://raw.github.com/bbrks/html5-breakout/master/screenshots/main_menu.png)
 

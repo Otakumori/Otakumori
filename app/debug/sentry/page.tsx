@@ -17,13 +17,15 @@ export default function SentryDebugPage() {
           <h2 className="text-xl font-semibold mb-4">What to expect:</h2>
           <ul className="space-y-2 text-sm text-gray-300">
             <li>
-              • <strong>Sync Error:</strong> Will throw an error immediately and trigger the error boundary
+              • <strong>Sync Error:</strong> Will throw an error immediately and trigger the error
+              boundary
             </li>
             <li>
               • <strong>Async Error:</strong> Will throw an error in an async function
             </li>
             <li>
-              • <strong>Custom Error:</strong> Will capture an error directly using Sentry.captureException
+              • <strong>Custom Error:</strong> Will capture an error directly using
+              Sentry.captureException
             </li>
             <li>
               • <strong>Test Message:</strong> Will send a custom message to Sentry

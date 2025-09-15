@@ -62,7 +62,9 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               transition={{ duration: 0.1 }}
               className="text-6xl"
             >
-              <span role="img" aria-label="Person silhouette">👤</span>
+              <span role="img" aria-label="Person silhouette">
+                👤
+              </span>
             </motion.div>
             <motion.div
               animate={{
@@ -72,7 +74,9 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               transition={{ duration: 0.1 }}
               className="text-6xl"
             >
-              <span role="img" aria-label="Person silhouette">👤</span>
+              <span role="img" aria-label="Person silhouette">
+                👤
+              </span>
             </motion.div>
           </div>
         )}
@@ -87,7 +91,9 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-6xl">
-              <span role="img" aria-label="Kiss">💋</span>
+              <span role="img" aria-label="Kiss">
+                💋
+              </span>
             </div>
           </motion.div>
         )}
@@ -121,11 +127,11 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handleMash}
-          aria-label="Mash buttons to progress the kiss"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handleMash}
+        aria-label="Mash buttons to progress the kiss"
+      />
     </div>
   );
 }

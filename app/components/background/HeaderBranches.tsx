@@ -29,20 +29,20 @@ export default function HeaderBranches() {
     const generateHeaderBranches = () => {
       const newBranches: HeaderBranch[] = [];
       const trunkX = window.innerWidth * 0.15; // Same as main tree trunk position
-      
+
       // Create branches that extend from the tree into header sections
       const headerHeight = 80; // Approximate header height
       const branchCount = 8;
-      
+
       for (let i = 0; i < branchCount; i++) {
         const y = headerHeight + i * 15;
         const angle = Math.PI / 6 + (Math.random() - 0.5) * 0.4; // Slight upward angle
         const length = 60 + Math.random() * 40;
         const thickness = 3 + Math.random() * 2;
-        
+
         const endX = trunkX + Math.cos(angle) * length;
         const endY = y + Math.sin(angle) * length;
-        
+
         // Only add branch if it extends into the header area
         if (endX > 0 && endX < window.innerWidth && endY < headerHeight + 100) {
           newBranches.push({
@@ -53,7 +53,7 @@ export default function HeaderBranches() {
             y2: endY,
             thickness,
             angle,
-            isVisible: true
+            isVisible: true,
           });
         }
       }
@@ -64,7 +64,7 @@ export default function HeaderBranches() {
         const navX = (window.innerWidth / navItems.length) * (index + 0.5);
         const twigLength = 20 + Math.random() * 15;
         const twigAngle = Math.PI / 4 + (Math.random() - 0.5) * 0.3;
-        
+
         newBranches.push({
           id: `nav-twig-${index}`,
           x1: trunkX + 20,
@@ -73,7 +73,7 @@ export default function HeaderBranches() {
           y2: headerHeight + 10 + Math.sin(twigAngle) * twigLength,
           thickness: 1 + Math.random(),
           angle: twigAngle,
-          isVisible: true
+          isVisible: true,
         });
       });
 
@@ -127,7 +127,7 @@ export default function HeaderBranches() {
             transition={{
               duration: 1.5 + index * 0.1,
               delay: 2.5 + index * 0.05,
-              ease: "easeOut"
+              ease: 'easeOut',
             }}
           />
         ))}

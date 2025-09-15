@@ -11,13 +11,13 @@ interface ParallaxBackgroundProps {
 const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({
   speed = 0.3,
   backgroundImage = '/assets/images/space-bg.jpg',
-  className = ''
+  className = '',
 }) => {
   const backgroundRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let animationId: number;
-    
+
     const updateParallax = () => {
       if (backgroundRef.current) {
         const scrollY = window.scrollY;
@@ -45,7 +45,7 @@ const ParallaxBackground: React.FC<ParallaxBackgroundProps> = ({
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        backgroundRepeat: 'no-repeat',
       }}
       aria-hidden="true"
     />

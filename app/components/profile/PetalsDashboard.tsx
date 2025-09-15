@@ -25,7 +25,8 @@ type PetalsDashboardProps = {
 
 export default function PetalsDashboard({ petalsData }: PetalsDashboardProps) {
   const totalPetals = petalsData.history.reduce((sum, transaction) => sum + transaction.amount, 0);
-  const dailyProgress = ((petalsData.daily.total - petalsData.daily.remaining) / petalsData.daily.total) * 100;
+  const dailyProgress =
+    ((petalsData.daily.total - petalsData.daily.remaining) / petalsData.daily.total) * 100;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -35,9 +36,7 @@ export default function PetalsDashboard({ petalsData }: PetalsDashboardProps) {
         <div className="text-3xl font-bold text-fuchsia-300 mb-2">
           {totalPetals.toLocaleString()}
         </div>
-        <p className="text-sm text-zinc-400">
-          Collected from various sources
-        </p>
+        <p className="text-sm text-zinc-400">Collected from various sources</p>
       </GlassPanel>
 
       {/* Daily Progress */}
@@ -46,20 +45,21 @@ export default function PetalsDashboard({ petalsData }: PetalsDashboardProps) {
         <div className="mb-2">
           <div className="flex justify-between text-sm text-zinc-300 mb-1">
             <span>Progress</span>
-            <span>{petalsData.daily.total - petalsData.daily.remaining} / {petalsData.daily.total}</span>
+            <span>
+              {petalsData.daily.total - petalsData.daily.remaining} / {petalsData.daily.total}
+            </span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2">
-            <div 
+            <div
               className="bg-fuchsia-400 h-2 rounded-full transition-all duration-300"
               style={{ width: `${dailyProgress}%` }}
             />
           </div>
         </div>
         <p className="text-sm text-zinc-400">
-          {petalsData.daily.remaining > 0 
+          {petalsData.daily.remaining > 0
             ? `${petalsData.daily.remaining} more petals available today`
-            : 'Daily limit reached'
-          }
+            : 'Daily limit reached'}
         </p>
       </GlassPanel>
 
@@ -70,13 +70,18 @@ export default function PetalsDashboard({ petalsData }: PetalsDashboardProps) {
           {petalsData.history.slice(0, 3).map((transaction) => (
             <div key={transaction.id} className="flex items-center justify-between text-sm">
               <div>
-                <span className="text-zinc-300">{transaction.description || transaction.source}</span>
+                <span className="text-zinc-300">
+                  {transaction.description || transaction.source}
+                </span>
                 <div className="text-xs text-zinc-500">
                   {new Date(transaction.timestamp).toLocaleDateString()}
                 </div>
               </div>
-              <span className={`font-semibold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {transaction.amount > 0 ? '+' : ''}{transaction.amount}
+              <span
+                className={`font-semibold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}
+              >
+                {transaction.amount > 0 ? '+' : ''}
+                {transaction.amount}
               </span>
             </div>
           ))}
@@ -90,18 +95,28 @@ export default function PetalsDashboard({ petalsData }: PetalsDashboardProps) {
           {petalsData.history.length > 0 ? (
             <div className="space-y-3">
               {petalsData.history.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-white/10 last:border-b-0">
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between py-3 border-b border-white/10 last:border-b-0"
+                >
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full ${transaction.amount > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
+                    <div
+                      className={`w-2 h-2 rounded-full ${transaction.amount > 0 ? 'bg-green-400' : 'bg-red-400'}`}
+                    />
                     <div>
-                      <div className="text-white">{transaction.description || transaction.source}</div>
+                      <div className="text-white">
+                        {transaction.description || transaction.source}
+                      </div>
                       <div className="text-sm text-zinc-400">
                         {new Date(transaction.timestamp).toLocaleString()}
                       </div>
                     </div>
                   </div>
-                  <div className={`font-semibold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {transaction.amount > 0 ? '+' : ''}{transaction.amount}
+                  <div
+                    className={`font-semibold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}
+                  >
+                    {transaction.amount > 0 ? '+' : ''}
+                    {transaction.amount}
                   </div>
                 </div>
               ))}

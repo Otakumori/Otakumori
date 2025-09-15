@@ -20,7 +20,7 @@ export function detectSwipeDirection(
   startY: number,
   endX: number,
   endY: number,
-  threshold: number = 30
+  threshold: number = 30,
 ): SwipeDirection {
   const deltaX = endX - startX;
   const deltaY = endY - startY;
@@ -33,12 +33,12 @@ export function detectSwipeDirection(
   if (Math.abs(deltaX) > Math.abs(deltaY)) {
     return {
       direction: deltaX > 0 ? 'right' : 'left',
-      distance: Math.abs(deltaX)
+      distance: Math.abs(deltaX),
     };
   } else {
     return {
       direction: deltaY > 0 ? 'down' : 'up',
-      distance: Math.abs(deltaY)
+      distance: Math.abs(deltaY),
     };
   }
 }
@@ -80,12 +80,12 @@ export function getFaceAngle(slot: number): number {
  */
 export function getFacePosition(slot: number): [number, number, number] {
   const facePositions: [number, number, number][] = [
-    [0, 0, 1.5],    // front
-    [1.5, 0, 0],    // right
-    [0, 0, -1.5],   // back
-    [-1.5, 0, 0],   // left
-    [0, 1.5, 0],    // top
-    [0, -1.5, 0],   // down
+    [0, 0, 1.5], // front
+    [1.5, 0, 0], // right
+    [0, 0, -1.5], // back
+    [-1.5, 0, 0], // left
+    [0, 1.5, 0], // top
+    [0, -1.5, 0], // down
   ];
   return facePositions[slot] || [0, 0, 1.5];
 }
@@ -98,7 +98,7 @@ export function isTap(
   startY: number,
   endX: number,
   endY: number,
-  threshold: number = 30
+  threshold: number = 30,
 ): boolean {
   const deltaX = Math.abs(endX - startX);
   const deltaY = Math.abs(endY - startY);

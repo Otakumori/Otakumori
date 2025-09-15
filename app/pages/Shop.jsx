@@ -64,7 +64,52 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-gray-900 p-8">
-      <h1 className="text-center text-4xl font-bold text-white">{<><span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>p</span>' '<span role='img' aria-label='emoji'>O</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span></>}</h1>
+      <h1 className="text-center text-4xl font-bold text-white">
+        {
+          <>
+            <span role="img" aria-label="emoji">
+              S
+            </span>
+            <span role="img" aria-label="emoji">
+              h
+            </span>
+            <span role="img" aria-label="emoji">
+              o
+            </span>
+            <span role="img" aria-label="emoji">
+              p
+            </span>
+            ' '
+            <span role="img" aria-label="emoji">
+              O
+            </span>
+            <span role="img" aria-label="emoji">
+              t
+            </span>
+            <span role="img" aria-label="emoji">
+              a
+            </span>
+            <span role="img" aria-label="emoji">
+              k
+            </span>
+            <span role="img" aria-label="emoji">
+              u
+            </span>
+            <span role="img" aria-label="emoji">
+              m
+            </span>
+            <span role="img" aria-label="emoji">
+              o
+            </span>
+            <span role="img" aria-label="emoji">
+              r
+            </span>
+            <span role="img" aria-label="emoji">
+              i
+            </span>
+          </>
+        }
+      </h1>
       {/* Category Navigation */}
       <div className="mt-8 flex flex-wrap justify-center gap-4">
         {categories.map((category) => (
@@ -82,7 +127,59 @@ export default function Shop() {
         ))}
       </div>
       {loading ? (
-        <div className="mt-8 text-center text-white">{<><span role='img' aria-label='emoji'>L</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span>...</>}</div>
+        <div className="mt-8 text-center text-white">
+          {
+            <>
+              <span role="img" aria-label="emoji">
+                L
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                a
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                g
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                p
+              </span>
+              <span role="img" aria-label="emoji">
+                r
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              <span role="img" aria-label="emoji">
+                u
+              </span>
+              <span role="img" aria-label="emoji">
+                c
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              ...
+            </>
+          }
+        </div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredProducts.map((product) => (
@@ -103,9 +200,48 @@ export default function Shop() {
                 <div className="p-4">
                   <h2 className="mt-2 text-xl font-bold text-white">{product.title}</h2>
                   <p className="mt-2 text-lg font-semibold text-pink-400">${product.price}</p>
-                  <button className="mt-3 w-full rounded-lg bg-pink-600 px-4 py-2 font-semibold text-white transition hover:bg-pink-700">{<>''
-                    <span role='img' aria-label='emoji'>V</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>w</span>' '<span role='img' aria-label='emoji'>D</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>s</span>
-                    ''</>}</button>
+                  <button className="mt-3 w-full rounded-lg bg-pink-600 px-4 py-2 font-semibold text-white transition hover:bg-pink-700">
+                    {
+                      <>
+                        ''
+                        <span role="img" aria-label="emoji">
+                          V
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          i
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          e
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          w
+                        </span>
+                        ' '
+                        <span role="img" aria-label="emoji">
+                          D
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          e
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          t
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          a
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          i
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          l
+                        </span>
+                        <span role="img" aria-label="emoji">
+                          s
+                        </span>
+                        ''
+                      </>
+                    }
+                  </button>
                 </div>
               </Link>
             </div>

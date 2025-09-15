@@ -76,7 +76,9 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-4xl">
-              <span role="img" aria-label="Heart">💕</span>
+              <span role="img" aria-label="Heart">
+                💕
+              </span>
             </div>
           </motion.div>
         )}
@@ -106,11 +108,11 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handlePet}
-          aria-label="Pet the neko to increase happiness"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handlePet}
+        aria-label="Pet the neko to increase happiness"
+      />
     </div>
   );
 }

@@ -82,6 +82,14 @@ export const CheckoutRequest = z.object({
   items: z.array(CheckoutItem).min(1),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
+  couponCodes: z.array(z.string()).optional(),
+  // optional shipping summary to support FREESHIP preview in session creation
+  shipping: z
+    .object({
+      provider: z.enum(['stripe', 'flat', 'other']).optional(),
+      fee: z.number().nonnegative().optional(),
+    })
+    .optional(),
   shippingInfo: z
     .object({
       email: z.string().email().optional(),

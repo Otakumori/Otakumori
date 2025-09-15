@@ -38,7 +38,7 @@ export const Header: React.FC = () => {
 
           {/* Right Side Icons */}
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               className="text-gray-300 transition-colors hover:text-white"
               aria-label="Search"
             >

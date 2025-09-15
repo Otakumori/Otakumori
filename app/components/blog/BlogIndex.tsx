@@ -16,9 +16,12 @@ type BlogPost = {
 
 async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`, {
-      next: { revalidate: 300 },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
 
     if (!response.ok) return [];
     return response.json();
@@ -34,12 +37,8 @@ export default async function BlogIndex() {
     return (
       <div className="text-center py-12">
         <GlassPanel className="p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            No blog posts yet
-          </h2>
-          <p className="text-zinc-400">
-            Check back later for new content!
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-4">No blog posts yet</h2>
+          <p className="text-zinc-400">Check back later for new content!</p>
         </GlassPanel>
       </div>
     );
@@ -73,22 +72,14 @@ export default async function BlogIndex() {
                   {posts[0].title}
                 </h2>
                 {posts[0].excerpt && (
-                  <p className="text-zinc-300 mb-4 line-clamp-3">
-                    {posts[0].excerpt}
-                  </p>
+                  <p className="text-zinc-300 mb-4 line-clamp-3">{posts[0].excerpt}</p>
                 )}
                 <div className="flex items-center gap-4 text-sm text-zinc-400">
                   {posts[0].publishedAt && (
-                    <span>
-                      {new Date(posts[0].publishedAt).toLocaleDateString()}
-                    </span>
+                    <span>{new Date(posts[0].publishedAt).toLocaleDateString()}</span>
                   )}
-                  {posts[0].readTime && (
-                    <span>{posts[0].readTime} min read</span>
-                  )}
-                  {posts[0].author && (
-                    <span>by {posts[0].author}</span>
-                  )}
+                  {posts[0].readTime && <span>{posts[0].readTime} min read</span>}
+                  {posts[0].author && <span>by {posts[0].author}</span>}
                 </div>
               </div>
             </div>
@@ -116,33 +107,25 @@ export default async function BlogIndex() {
                   </div>
                 )}
               </div>
-              
+
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-fuchsia-300 transition-colors line-clamp-2">
                   {post.title}
                 </h3>
-                
+
                 {post.excerpt && (
-                  <p className="text-sm text-zinc-300 mb-3 line-clamp-2">
-                    {post.excerpt}
-                  </p>
+                  <p className="text-sm text-zinc-300 mb-3 line-clamp-2">{post.excerpt}</p>
                 )}
-                
+
                 <div className="flex items-center justify-between text-xs text-zinc-400">
                   <div className="flex items-center gap-2">
                     {post.publishedAt && (
-                      <span>
-                        {new Date(post.publishedAt).toLocaleDateString()}
-                      </span>
+                      <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
                     )}
-                    {post.readTime && (
-                      <span>• {post.readTime} min</span>
-                    )}
+                    {post.readTime && <span>• {post.readTime} min</span>}
                   </div>
-                  
-                  {post.author && (
-                    <span>{post.author}</span>
-                  )}
+
+                  {post.author && <span>{post.author}</span>}
                 </div>
               </div>
             </Link>

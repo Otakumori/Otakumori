@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\lib\rateLimit.ts instead.
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 
 class RateLimitError extends Error {
   constructor(message = 'Rate limit exceeded') {

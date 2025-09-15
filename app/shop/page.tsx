@@ -14,47 +14,56 @@ export const metadata: Metadata = {
   description: 'Discover anime gaming treasures and collectibles.',
 };
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-type ApiResponse = 
-  | { ok: true; data: { items: Array<{ id?: string; title: string; images?: { src: string }[]; variants?: any[] }> } }
+type ApiResponse =
+  | {
+      ok: true;
+      data: {
+        items: Array<{ id?: string; title: string; images?: { src: string }[]; variants?: any[] }>;
+      };
+    }
   | { ok: false; error: string; detail?: any };
 
 async function loadPrintifyProducts(): Promise<ApiResponse> {
   try {
     // Use the request URL to construct the base URL dynamically
-    const baseUrl = env.NODE_ENV === 'production' 
-      ? 'https://www.otaku-mori.com' 
-      : 'http://localhost:3000';
+    const baseUrl =
+      env.NODE_ENV === 'production' ? 'https://www.otaku-mori.com' : 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/printify/products`, {
-      headers: { 
-        "x-req-id": headers().get("x-req-id") ?? "",
+      headers: {
+        'x-req-id': headers().get('x-req-id') ?? '',
       },
-      cache: "no-store",
+      cache: 'no-store',
     });
-    
+
     if (!response.ok) {
-      logger.warn("Printify API failed", { 
+      logger.warn('Printify API failed', {
         extra: {
           status: response.status,
           statusText: response.statusText,
-        }
+        },
       });
-      return { ok: false, error: "Printify API unavailable" };
+      return { ok: false, error: 'Printify API unavailable' };
     }
-    
+
     return await response.json();
   } catch (error) {
-    logger.error("Failed to fetch from Printify API", undefined, undefined, error instanceof Error ? error : new Error(String(error)));
-    return { ok: false, error: "Network error" };
+    logger.error(
+      'Failed to fetch from Printify API',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    return { ok: false, error: 'Network error' };
   }
 }
 
 async function loadDbFallback() {
   try {
-    const { PrismaClient } = await import("@prisma/client");
+    const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
-    
+
     const products = await prisma.product.findMany({
       where: { active: true },
       include: {
@@ -63,70 +72,80 @@ async function loadDbFallback() {
           take: 1,
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: 24,
     });
-    
+
     await prisma.$disconnect();
-    
-    return products.map(product => ({
+
+    return products.map((product) => ({
       id: product.id,
       title: product.name,
       description: product.description || undefined,
       images: product.primaryImageUrl ? [{ src: product.primaryImageUrl }] : [],
-      variants: product.ProductVariant.map(variant => ({
+      variants: product.ProductVariant.map((variant) => ({
         id: variant.id,
         price: variant.priceCents ? variant.priceCents / 100 : 0,
         is_enabled: variant.isEnabled,
       })),
     }));
   } catch (error) {
-    logger.error("Failed to load database fallback", undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Failed to load database fallback',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return [];
   }
 }
 
-async function loadProducts(searchParams: { sort?: string; q?: string; page?: string; category?: string }) {
-  logger.info("Loading products for shop page", { 
-    extra: { searchParams }
+async function loadProducts(searchParams: {
+  sort?: string;
+  q?: string;
+  page?: string;
+  category?: string;
+}) {
+  logger.info('Loading products for shop page', {
+    extra: { searchParams },
   });
-  
+
   // Try Printify first
   const printifyResult = await loadPrintifyProducts();
-  
-  let products: Array<{ 
-    id: string; 
-    title: string; 
+
+  let products: Array<{
+    id: string;
+    title: string;
     description?: string;
-    images?: { src: string }[]; 
+    images?: { src: string }[];
     variants?: any[];
   }> = [];
-  
+
   if (printifyResult.ok && printifyResult.data.items.length > 0) {
-    products = printifyResult.data.items.map(item => ({
+    products = printifyResult.data.items.map((item) => ({
       id: item.id || `printify_${Math.random()}`,
       title: item.title,
       images: item.images || [],
       variants: item.variants || [],
     }));
-    
-    logger.info("Loaded products from Printify", { 
-      extra: { count: products.length }
+
+    logger.info('Loaded products from Printify', {
+      extra: { count: products.length },
     });
   } else {
     // Fallback to database
-    logger.info("Falling back to database products");
+    logger.info('Falling back to database products');
     products = await loadDbFallback();
   }
-  
+
   // Apply search/filter logic here if needed
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product) => {
     if (searchParams.q) {
       return product.title.toLowerCase().includes(searchParams.q.toLowerCase());
     }
     return true;
   });
-  
+
   const page = parseInt(searchParams.page || '1');
   const perPage = 12;
   const total = filteredProducts.length;
@@ -134,7 +153,7 @@ async function loadProducts(searchParams: { sort?: string; q?: string; page?: st
   const startIndex = (page - 1) * perPage;
   const endIndex = startIndex + perPage;
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-  
+
   return {
     products: paginatedProducts,
     total,
@@ -143,10 +162,10 @@ async function loadProducts(searchParams: { sort?: string; q?: string; page?: st
   };
 }
 
-export default async function ShopPage({ 
-  searchParams 
-}: { 
-  searchParams: { sort?: string; q?: string; page?: string; category?: string } 
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: { sort?: string; q?: string; page?: string; category?: string };
 }) {
   const data = await loadProducts(searchParams);
 
@@ -157,17 +176,13 @@ export default async function ShopPage({
       <main className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white md:text-4xl">
-              {t('nav', 'shop')}
-            </h1>
-            <p className="mt-2 text-zinc-300/90">
-              Discover treasures from the digital abyss
-            </p>
+            <h1 className="text-3xl font-bold text-white md:text-4xl">{t('nav', 'shop')}</h1>
+            <p className="mt-2 text-zinc-300/90">Discover treasures from the digital abyss</p>
           </div>
-          
+
           <Suspense fallback={<ShopCatalogSkeleton />}>
-            <ShopCatalog 
-              products={data.products.map(p => ({
+            <ShopCatalog
+              products={data.products.map((p) => ({
                 id: p.id,
                 name: p.title,
                 price: p.variants?.[0]?.price || 0,

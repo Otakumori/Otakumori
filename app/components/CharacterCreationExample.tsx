@@ -13,10 +13,10 @@ export default function CharacterCreationExample() {
 
   const handleCreateCharacter = async () => {
     setIsCreating(true);
-    
+
     // Simulate character creation process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     // Character created! Play Samus jingle
     gameAudio.playCharacterCreated();
     setCharacterCreated(true);
@@ -42,7 +42,7 @@ export default function CharacterCreationExample() {
     <div className="bg-gray-900 p-8 rounded-lg">
       <h2 className="text-2xl font-bold text-white mb-4">Character Creation</h2>
       <p className="text-gray-300 mb-6">Create a new character to hear the Samus jingle</p>
-      
+
       <button
         onClick={handleCreateCharacter}
         disabled={isCreating}

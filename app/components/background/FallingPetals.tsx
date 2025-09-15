@@ -31,7 +31,7 @@ export default function FallingPetals() {
         'rgba(255, 182, 193, 0.8)', // Light pink
         'rgba(255, 192, 203, 0.7)', // Pink
         'rgba(255, 105, 180, 0.6)', // Hot pink
-        'rgba(255, 20, 147, 0.5)',  // Deep pink
+        'rgba(255, 20, 147, 0.5)', // Deep pink
         'rgba(255, 160, 200, 0.7)', // Medium pink
       ];
 
@@ -47,7 +47,7 @@ export default function FallingPetals() {
         opacity: Math.random() * 0.6 + 0.4,
         color: colors[Math.floor(Math.random() * colors.length)],
         life: 0,
-        maxLife: Math.random() * 300 + 200
+        maxLife: Math.random() * 300 + 200,
       };
     };
 
@@ -58,7 +58,7 @@ export default function FallingPetals() {
         x: petal.x + petal.driftSpeed + Math.sin(petal.life * 0.01) * 0.3,
         rotation: petal.rotation + petal.rotationSpeed,
         life: petal.life + 1,
-        opacity: petal.opacity * (1 - petal.life / petal.maxLife)
+        opacity: petal.opacity * (1 - petal.life / petal.maxLife),
       };
     };
 
@@ -89,17 +89,15 @@ export default function FallingPetals() {
 
     const animate = () => {
       // Update existing petals
-      petalsRef.current = petalsRef.current
-        .map(updatePetal)
-        .filter(petal => {
-          if (petal.life >= petal.maxLife || petal.y > window.innerHeight + 100) {
-            const element = document.getElementById(`petal-${petal.id}`);
-            if (element) element.remove();
-            return false;
-          }
-          renderPetal(petal);
-          return true;
-        });
+      petalsRef.current = petalsRef.current.map(updatePetal).filter((petal) => {
+        if (petal.life >= petal.maxLife || petal.y > window.innerHeight + 100) {
+          const element = document.getElementById(`petal-${petal.id}`);
+          if (element) element.remove();
+          return false;
+        }
+        renderPetal(petal);
+        return true;
+      });
 
       // Spawn new petals occasionally
       if (Math.random() < 0.02) {
@@ -122,7 +120,7 @@ export default function FallingPetals() {
 
     return () => {
       // Clean up all petal elements
-      petalsRef.current.forEach(petal => {
+      petalsRef.current.forEach((petal) => {
         const element = document.getElementById(`petal-${petal.id}`);
         if (element) element.remove();
       });

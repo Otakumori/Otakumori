@@ -2,7 +2,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getGameDef } from '@/app/lib/games';
 import { type GameDefinition } from '@/app/lib/games';
@@ -14,6 +14,7 @@ import MemoryMatch from '@/components/games/MemoryMatch';
 import QuickMath from '@/components/games/QuickMath';
 import PetalCollection from '@/components/games/PetalCollection';
 import GameCubeBoot from '@/app/components/GameCubeBoot';
+import EnhancedLeaderboard from '@/app/components/EnhancedLeaderboard';
 
 const gameComponents: Record<string, React.ComponentType<any>> = {
   'samurai-petal-slice': SamuraiPetalSlice,
@@ -32,6 +33,9 @@ export default function GamePage() {
   const [gameDef, setGameDef] = useState<GameDefinition | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showBoot, setShowBoot] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [showLb, setShowLb] = useState(false);
 
   const gameSlug = params.slug as string;
 
@@ -50,8 +54,47 @@ export default function GamePage() {
 
       setGameDef(game);
       setIsLoading(false);
+
+      // Boot animation once per session
+      try {
+        const seen = typeof window !== 'undefined' && window.localStorage.getItem('gc_boot');
+        if (seen === '1') {
+          setShowBoot(false);
+        }
+      } catch {}
     }
   }, [isLoaded, user, gameSlug, router]);
+
+  // Allow skip boot after 2s via click/Enter
+  useEffect(() => {
+    if (!showBoot) return;
+    let ready = false;
+    const t = setTimeout(() => (ready = true), 2000);
+    const onSkip = (e: KeyboardEvent | MouseEvent) => {
+      if (!ready) return;
+      if (e instanceof KeyboardEvent && e.key !== 'Enter') return;
+      setShowBoot(false);
+      try {
+        window.localStorage.setItem('gc_boot', '1');
+      } catch {}
+    };
+    window.addEventListener('keydown', onSkip);
+    window.addEventListener('click', onSkip);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('keydown', onSkip);
+      window.removeEventListener('click', onSkip);
+    };
+  }, [showBoot]);
+
+  // Pause on tab hidden
+  useEffect(() => {
+    const onVis = () => setPaused(document.hidden);
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
+
+  const toggleMute = useCallback(() => setMuted((m) => !m), []);
 
   if (isLoading) {
     return (
@@ -106,7 +149,16 @@ export default function GamePage() {
 
   // Show GameCube boot first
   if (showBoot) {
-    return <GameCubeBoot onBootComplete={() => setShowBoot(false)} />;
+    return (
+      <GameCubeBoot
+        onBootComplete={() => {
+          setShowBoot(false);
+          try {
+            window.localStorage.setItem('gc_boot', '1');
+          } catch {}
+        }}
+      />
+    );
   }
 
   return (
@@ -128,7 +180,7 @@ export default function GamePage() {
             <h1 className="text-xl font-bold text-gray-800">{gameDef.name}</h1>
 
             {/* Game Info */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <div
                 className={`
                 px-2 py-1 rounded-full text-xs font-medium
@@ -140,15 +192,68 @@ export default function GamePage() {
                 {gameDef.difficulty}
               </div>
               <div className="text-sm text-gray-600">Max: {gameDef.maxRewardPerRun} 🌸</div>
+              <button
+                onClick={() => setShowLb((s) => !s)}
+                className="lg:hidden rounded-md border px-2 py-1 text-xs hover:bg-gray-100"
+                aria-expanded={showLb}
+              >
+                Leaderboard
+              </button>
+              <button
+                onClick={() => setPaused((p) => !p)}
+                className="rounded-md border px-2 py-1 text-xs hover:bg-gray-100"
+                aria-pressed={paused}
+              >
+                {paused ? 'Resume' : 'Pause'}
+              </button>
+              <button
+                onClick={toggleMute}
+                className="rounded-md border px-2 py-1 text-xs hover:bg-gray-100"
+                aria-pressed={muted}
+              >
+                {muted ? 'Unmute' : 'Mute'}
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Game Component */}
+      {/* Game + Leaderboard */}
       <main className="flex-1">
-        <GameComponent gameDef={gameDef} />
+        <div className="mx-auto max-w-7xl px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 relative">
+            {paused && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 text-white">
+                <div className="rounded-xl bg-black/60 px-4 py-2 text-sm">Paused</div>
+              </div>
+            )}
+            <GameComponent gameDef={gameDef} muted={muted} paused={paused} />
+          </div>
+          <aside className="lg:col-span-1 hidden lg:block">
+            <EnhancedLeaderboard gameCode={gameSlug} />
+          </aside>
+        </div>
       </main>
+      {showLb && (
+        <div className="fixed inset-0 z-40 flex lg:hidden">
+          <button
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setShowLb(false)}
+            aria-label="Close leaderboard"
+          />
+          <div className="ml-auto h-full w-5/6 max-w-sm bg-white shadow-xl">
+            <div className="p-3 border-b flex items-center justify-between">
+              <div className="text-sm font-semibold">Leaderboard</div>
+              <button className="text-sm" onClick={() => setShowLb(false)}>
+                Close
+              </button>
+            </div>
+            <div className="p-3 overflow-y-auto" style={{ height: 'calc(100% - 48px)' }}>
+              <EnhancedLeaderboard gameCode={gameSlug} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

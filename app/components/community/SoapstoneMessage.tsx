@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
 interface SoapstoneMessageProps {
   preview: string;
@@ -24,9 +24,9 @@ export default function SoapstoneMessage({ preview, full }: SoapstoneMessageProp
 
       {isOpen && (
         <div className="fixed inset-0 z-[60] grid place-items-center p-4">
-          <div 
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm" 
-            onClick={() => setIsOpen(false)} 
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
           />
           <div className="relative z-[61] w-[min(90vw,480px)] rounded-2xl border border-fuchsia-500/20 bg-zinc-950/90 p-6 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">

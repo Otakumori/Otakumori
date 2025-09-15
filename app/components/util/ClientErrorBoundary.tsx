@@ -1,9 +1,9 @@
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 
 export default function ClientErrorBoundary({ children }: { children: React.ReactNode }) {
   const [err, setErr] = useState<Error | null>(null);
-  
+
   if (err) {
     return (
       <div className="p-6 text-rose-300 bg-rose-900/20 rounded-lg border border-rose-500/30">
@@ -11,7 +11,7 @@ export default function ClientErrorBoundary({ children }: { children: React.Reac
         <p className="text-sm text-rose-200 mb-4">
           This component failed to load. Please refresh the page or try again later.
         </p>
-        <button 
+        <button
           onClick={() => setErr(null)}
           className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded text-sm transition"
         >
@@ -20,12 +20,8 @@ export default function ClientErrorBoundary({ children }: { children: React.Reac
       </div>
     );
   }
-  
-  return (
-    <ErrorBoundaryImpl onError={setErr}>
-      {children}
-    </ErrorBoundaryImpl>
-  );
+
+  return <ErrorBoundaryImpl onError={setErr}>{children}</ErrorBoundaryImpl>;
 }
 
 // Minimal boundary using a class component under the hood

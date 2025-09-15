@@ -27,7 +27,9 @@ export const SoundSettings = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="rounded-full bg-gray-800/50 p-3 shadow-lg backdrop-blur-lg"
       >
-        <span role="img" aria-label={isMuted ? "Muted speaker" : "Speaker"}>{isMuted ? '🔇' : '🔊'}</span>
+        <span role="img" aria-label={isMuted ? 'Muted speaker' : 'Speaker'}>
+          {isMuted ? '🔇' : '🔊'}
+        </span>
       </motion.button>
       <AnimatePresence>
         {isOpen && (
@@ -39,26 +41,73 @@ export const SoundSettings = () => {
           >
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
-                <span className="text-white">{<><span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span></>}</span>
+                <span className="text-white">
+                  {
+                    <>
+                      <span role="img" aria-label="emoji">
+                        S
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        o
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        u
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        n
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        d
+                      </span>
+                    </>
+                  }
+                </span>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={toggleMute}
                   className={`rounded-lg p-2 ${isMuted ? 'bg-red-500/20' : 'bg-green-500/20'}`}
                 >
-                  <span role="img" aria-label={isMuted ? "Muted speaker" : "Speaker"}>{isMuted ? '🔇' : '🔊'}</span>
+                  <span role="img" aria-label={isMuted ? 'Muted speaker' : 'Speaker'}>
+                    {isMuted ? '🔇' : '🔊'}
+                  </span>
                 </motion.button>
               </div>
 
               <div className="flex items-center space-x-3">
-                <span className="text-white">{<><span role='img' aria-label='emoji'>H</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>c</span></>}</span>
+                <span className="text-white">
+                  {
+                    <>
+                      <span role="img" aria-label="emoji">
+                        H
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        a
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        p
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        t
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        i
+                      </span>
+                      <span role="img" aria-label="emoji">
+                        c
+                      </span>
+                    </>
+                  }
+                </span>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => vibrate('light')}
                   className="rounded-lg bg-blue-500/20 p-2"
                 >
-                  <span role="img" aria-label="Vibration">📳</span>
+                  <span role="img" aria-label="Vibration">
+                    📳
+                  </span>
                 </motion.button>
               </div>
             </div>

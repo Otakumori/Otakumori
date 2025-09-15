@@ -76,15 +76,15 @@ const EnhancedNavbar: React.FC = () => {
       initial={{ y: 0 }}
       animate={{ y: 0 }}
     >
-      <GlassPanel 
+      <GlassPanel
         className={`mx-3 mt-3 px-4 py-3 md:mx-6 md:mt-4 md:px-6 transition-all duration-200 ease-out ${
           isScrolled ? 'py-2' : ''
         }`}
       >
         <nav className="flex items-center justify-between gap-6">
           {/* Logo */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="font-semibold tracking-wide text-fuchsia-200 hover:text-fuchsia-100 transition-colors duration-200"
           >
             Otaku-mori
@@ -147,9 +147,7 @@ const EnhancedNavbar: React.FC = () => {
               <UserButton afterSignOutUrl="/" />
             ) : (
               <SignInButton mode="modal">
-                <button className="btn-primary">
-                  Sign In
-                </button>
+                <button className="btn-primary">Sign In</button>
               </SignInButton>
             )}
           </div>
@@ -216,7 +214,7 @@ const EnhancedNavbar: React.FC = () => {
                     </Link>
                   </motion.div>
                 ))}
-                
+
                 <div className="pt-4 border-t border-white/10">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-zinc-400">Cart ({itemCount})</span>
@@ -224,9 +222,7 @@ const EnhancedNavbar: React.FC = () => {
                       <UserButton afterSignOutUrl="/" />
                     ) : (
                       <SignInButton mode="modal">
-                        <button className="btn-primary text-sm">
-                          Sign In
-                        </button>
+                        <button className="btn-primary text-sm">Sign In</button>
                       </SignInButton>
                     )}
                   </div>

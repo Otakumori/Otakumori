@@ -1,11 +1,11 @@
-import { env } from "@/env";
-import type { Result } from "./types";
-import { safeAsync } from "./types";
-import Stripe from "stripe";
+import { env } from '@/env';
+import type { Result } from './types';
+import { safeAsync } from './types';
+import Stripe from 'stripe';
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: '2023-10-16',
 });
 
 export interface StripeProduct {
@@ -25,7 +25,7 @@ export interface StripePrice {
   unit_amount: number | null;
   currency: string;
   active: boolean;
-  type: "one_time" | "recurring";
+  type: 'one_time' | 'recurring';
   created: number;
 }
 
@@ -36,8 +36,8 @@ export async function getStripeProducts(): Promise<Result<StripeProduct[]>> {
         active: true,
         limit: 100,
       });
-      
-      return products.data.map(product => ({
+
+      return products.data.map((product) => ({
         id: product.id,
         name: product.name,
         description: product.description || undefined,
@@ -48,8 +48,8 @@ export async function getStripeProducts(): Promise<Result<StripeProduct[]>> {
         updated: product.updated,
       }));
     },
-    "STRIPE_FETCH_ERROR",
-    "Failed to fetch products from Stripe"
+    'STRIPE_FETCH_ERROR',
+    'Failed to fetch products from Stripe',
   );
 }
 
@@ -57,7 +57,7 @@ export async function getStripeProduct(productId: string): Promise<Result<Stripe
   return safeAsync(
     async () => {
       const product = await stripe.products.retrieve(productId);
-      
+
       return {
         id: product.id,
         name: product.name,
@@ -69,8 +69,8 @@ export async function getStripeProduct(productId: string): Promise<Result<Stripe
         updated: product.updated,
       };
     },
-    "STRIPE_FETCH_ERROR",
-    `Failed to fetch product ${productId} from Stripe`
+    'STRIPE_FETCH_ERROR',
+    `Failed to fetch product ${productId} from Stripe`,
   );
 }
 
@@ -78,7 +78,7 @@ export async function getStripePrice(priceId: string): Promise<Result<StripePric
   return safeAsync(
     async () => {
       const price = await stripe.prices.retrieve(priceId);
-      
+
       return {
         id: price.id,
         product: price.product as string,
@@ -89,8 +89,8 @@ export async function getStripePrice(priceId: string): Promise<Result<StripePric
         created: price.created,
       };
     },
-    "STRIPE_FETCH_ERROR",
-    `Failed to fetch price ${priceId} from Stripe`
+    'STRIPE_FETCH_ERROR',
+    `Failed to fetch price ${priceId} from Stripe`,
   );
 }
 
@@ -98,17 +98,14 @@ export async function checkStripeHealth(): Promise<Result<boolean>> {
   return safeAsync(
     async () => {
       // Check Stripe status page instead of making API calls
-      const response = await fetch(
-        "https://status.stripe.com/current",
-        {
-          cache: "no-store",
-        }
-      );
-      
+      const response = await fetch('https://status.stripe.com/current', {
+        cache: 'no-store',
+      });
+
       return response.ok;
     },
-    "STRIPE_HEALTH_CHECK_ERROR",
-    "Failed to check Stripe service health"
+    'STRIPE_HEALTH_CHECK_ERROR',
+    'Failed to check Stripe service health',
   );
 }
 
@@ -119,26 +116,26 @@ export async function createStripeCheckoutSession(
   }>,
   successUrl: string,
   cancelUrl: string,
-  metadata?: Record<string, string>
+  metadata?: Record<string, string>,
 ): Promise<Result<{ url: string }>> {
   return safeAsync(
     async () => {
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
+        payment_method_types: ['card'],
         line_items: lineItems,
-        mode: "payment",
+        mode: 'payment',
         success_url: successUrl,
         cancel_url: cancelUrl,
         metadata: metadata || {},
       });
 
       if (!session.url) {
-        throw new Error("Failed to create checkout session URL");
+        throw new Error('Failed to create checkout session URL');
       }
 
       return { url: session.url };
     },
-    "STRIPE_CHECKOUT_ERROR",
-    "Failed to create Stripe checkout session"
+    'STRIPE_CHECKOUT_ERROR',
+    'Failed to create Stripe checkout session',
   );
 }

@@ -28,7 +28,7 @@ export const t = {
 
   // Shop
   shop: {
-    title: 'The Merchant\'s Wares',
+    title: "The Merchant's Wares",
     subtitle: 'Rare treasures await the bold',
     addToCart: 'Claim for Collection',
     outOfStock: 'Lost to Time',
@@ -79,7 +79,7 @@ export const t = {
   // Profile
   profile: {
     title: 'Your Journey',
-    subtitle: 'The path you\'ve walked',
+    subtitle: "The path you've walked",
     achievements: 'Triumphs',
     orders: 'Acquisitions',
     petals: 'Petals Collected',
@@ -251,7 +251,6 @@ export const t = {
     newReward: 'New reward available',
   },
 
-
   // Orders
   orders: {
     title: 'Chronicles of Purchase',
@@ -264,7 +263,6 @@ export const t = {
     noOrders: 'No orders found',
     emptyMessage: 'Your journey awaits its first purchase',
   },
-
 
   // Leaderboards
   leaderboards: {

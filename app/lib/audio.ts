@@ -28,7 +28,7 @@ class AudioMgr {
   play(name: string, { rate = 1, gain = 0.9, loop = false } = {}) {
     const buf = this.buffers.get(name);
     if (!buf || !this.ctx) return;
-    
+
     try {
       const src = this.ctx.createBufferSource();
       src.buffer = buf;
@@ -38,9 +38,9 @@ class AudioMgr {
       src.loop = loop;
       src.connect(g).connect(this.ctx.destination);
       src.start();
-      return () => { 
-        try { 
-          src.stop(); 
+      return () => {
+        try {
+          src.stop();
         } catch (e) {
           // Ignore errors when stopping already stopped sources
         }

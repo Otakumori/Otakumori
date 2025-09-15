@@ -91,7 +91,9 @@ export default function Header() {
 
           {/* Search Bar */}
           <div className="relative">
-            <label htmlFor="search-input" className="sr-only">Search products</label>
+            <label htmlFor="search-input" className="sr-only">
+              Search products
+            </label>
             <input
               id="search-input"
               type="text"

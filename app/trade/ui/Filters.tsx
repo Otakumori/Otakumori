@@ -14,14 +14,26 @@ export default function Filters() {
   const tag = sp.get('tag') || '';
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <select className="btn" value={kind} onChange={(e) => set('kind', e.target.value)}>
+      <select
+        className="btn"
+        name="kind"
+        aria-label="Filter by kind"
+        value={kind}
+        onChange={(e) => set('kind', e.target.value)}
+      >
         <option value="all">All</option>
         <option value="cosmetic">Avatar</option>
         <option value="overlay">Overlays</option>
         <option value="text">Text Styles</option>
         <option value="cursor">Cursors</option>
       </select>
-      <select className="btn" value={tag} onChange={(e) => set('tag', e.target.value)}>
+      <select
+        className="btn"
+        name="tag"
+        aria-label="Filter by tag"
+        value={tag}
+        onChange={(e) => set('tag', e.target.value)}
+      >
         <option value="">Any tag</option>
         <option value="seasonal">Seasonal</option>
         <option value="event">Event</option>

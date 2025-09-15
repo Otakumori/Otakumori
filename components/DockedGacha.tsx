@@ -82,7 +82,10 @@ export default function DockedGacha() {
           className="rounded-2xl border border-slate-700 bg-cube-900/90 px-3 py-2 text-slatey-200 shadow-glow hover:bg-cube-900 transition-all duration-200"
           aria-expanded="false"
         >
-          <span role="img" aria-label="Slot machine">🎰</span> Lucky&nbsp;Draw
+          <span role="img" aria-label="Slot machine">
+            🎰
+          </span>{' '}
+          Lucky&nbsp;Draw
         </button>
       ) : (
         <div className="w-72 rounded-2xl border border-slate-700 bg-cube-900/95 p-3 shadow-glow backdrop-blur-sm">

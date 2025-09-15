@@ -6,4 +6,4 @@ export const CATEGORIES = [
   { id: 'collectibles', name: 'Collectibles', slug: 'collectibles' },
 ] as const;
 
-export type Category = typeof CATEGORIES[number];
+export type Category = (typeof CATEGORIES)[number];

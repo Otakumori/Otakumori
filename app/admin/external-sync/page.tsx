@@ -33,7 +33,7 @@ export default function ExternalSyncPage() {
       });
 
       const data = await response.json();
-      
+
       if (data.ok) {
         setResults(data.data.results);
       } else {
@@ -49,10 +49,10 @@ export default function ExternalSyncPage() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">External Data Sync</h1>
-      
+
       <div className="mb-6">
-        <Button 
-          onClick={handleSync} 
+        <Button
+          onClick={handleSync}
           disabled={isLoading}
           className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
         >
@@ -63,45 +63,41 @@ export default function ExternalSyncPage() {
       {results && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Sync Results</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 border rounded">
               <h3 className="font-medium">Clerk Users</h3>
               <p className={results.clerk.success ? 'text-green-600' : 'text-red-600'}>
-                {results.clerk.success 
-                  ? `✅ Synced ${results.clerk.count} users` 
-                  : `❌ Error: ${results.clerk.error}`
-                }
+                {results.clerk.success
+                  ? `✅ Synced ${results.clerk.count} users`
+                  : `❌ Error: ${results.clerk.error}`}
               </p>
             </div>
 
             <div className="p-4 border rounded">
               <h3 className="font-medium">Stripe Customers</h3>
               <p className={results.stripeCustomers.success ? 'text-green-600' : 'text-red-600'}>
-                {results.stripeCustomers.success 
-                  ? `✅ Synced ${results.stripeCustomers.count} customers` 
-                  : `❌ Error: ${results.stripeCustomers.error}`
-                }
+                {results.stripeCustomers.success
+                  ? `✅ Synced ${results.stripeCustomers.count} customers`
+                  : `❌ Error: ${results.stripeCustomers.error}`}
               </p>
             </div>
 
             <div className="p-4 border rounded">
               <h3 className="font-medium">Stripe Products</h3>
               <p className={results.stripeProducts.success ? 'text-green-600' : 'text-red-600'}>
-                {results.stripeProducts.success 
-                  ? `✅ Synced ${results.stripeProducts.count} products` 
-                  : `❌ Error: ${results.stripeProducts.error}`
-                }
+                {results.stripeProducts.success
+                  ? `✅ Synced ${results.stripeProducts.count} products`
+                  : `❌ Error: ${results.stripeProducts.error}`}
               </p>
             </div>
 
             <div className="p-4 border rounded">
               <h3 className="font-medium">Printify Products</h3>
               <p className={results.printifyProducts.success ? 'text-green-600' : 'text-red-600'}>
-                {results.printifyProducts.success 
-                  ? `✅ Synced ${results.printifyProducts.count} products` 
-                  : `❌ Error: ${results.printifyProducts.error}`
-                }
+                {results.printifyProducts.success
+                  ? `✅ Synced ${results.printifyProducts.count} products`
+                  : `❌ Error: ${results.printifyProducts.error}`}
               </p>
             </div>
           </div>

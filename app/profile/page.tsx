@@ -1,9 +1,9 @@
-import { getProfileData } from "./_data/profile";
-import AchievementsPanel from "../components/profile/AchievementsPanel";
-import OneTapGamertag from "../components/profile/OneTapGamertag";
-import DailyQuests from "../components/quests/DailyQuests";
+import { getProfileData } from './_data/profile';
+import AchievementsPanel from '../components/profile/AchievementsPanel';
+import OneTapGamertag from '../components/profile/OneTapGamertag';
+import DailyQuests from '../components/quests/DailyQuests';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
   const { user, achievements, ownedCodes, gamertag, canRenameAt } = await getProfileData();

@@ -1,22 +1,26 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useTransition } from "react";
-import { renameGamertag } from "@/app/actions/renameGamertag";
+import { useEffect, useState, useTransition } from 'react';
+import { renameGamertag } from '@/app/actions/renameGamertag';
 
 export default function GamertagStep({ onDone }: { onDone: () => void }) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [confirming, setConfirming] = useState(false);
   const [pending, start] = useTransition();
   const [err, setErr] = useState<string | null>(null);
 
   async function suggest() {
     setErr(null);
-    const res = await fetch(`/api/gamertag/suggest?maxLen=16&sep=-&numbers=suffix`, { cache: "no-store" });
+    const res = await fetch(`/api/gamertag/suggest?maxLen=16&sep=-&numbers=suffix`, {
+      cache: 'no-store',
+    });
     const j = await res.json();
-    setName(j.name || "");
+    setName(j.name || '');
   }
 
-  useEffect(() => { suggest(); }, []);
+  useEffect(() => {
+    suggest();
+  }, []);
 
   function useIt() {
     setConfirming(true);
@@ -28,7 +32,7 @@ export default function GamertagStep({ onDone }: { onDone: () => void }) {
         await renameGamertag(name);
         onDone();
       } catch (e: any) {
-        setErr(e?.message ?? "Could not set gamertag");
+        setErr(e?.message ?? 'Could not set gamertag');
       } finally {
         setConfirming(false);
       }
@@ -50,7 +54,7 @@ export default function GamertagStep({ onDone }: { onDone: () => void }) {
 
         <input
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           autoComplete="nickname"
           name="gamertag"
           inputMode="text"
@@ -72,7 +76,9 @@ export default function GamertagStep({ onDone }: { onDone: () => void }) {
 
       {confirming && (
         <div className="mt-4 rounded-xl border border-white/10 bg-black/70 p-4">
-          <div className="mb-2 text-zinc-200">Set <span className="font-semibold">{name}</span> as your gamertag?</div>
+          <div className="mb-2 text-zinc-200">
+            Set <span className="font-semibold">{name}</span> as your gamertag?
+          </div>
           <div className="flex gap-3">
             <button
               onClick={() => setConfirming(false)}

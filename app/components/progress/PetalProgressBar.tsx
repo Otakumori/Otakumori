@@ -1,5 +1,5 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
+'use client';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * A thin top bar with subtle shimmering and occasional blossom flecks.
@@ -16,8 +16,8 @@ export default function PetalProgressBar() {
       const v = Math.max(0, Math.min(1, e.detail ?? 0));
       setP(v);
     };
-    document.addEventListener("om:progress", onProg);
-    return () => document.removeEventListener("om:progress", onProg);
+    document.addEventListener('om:progress', onProg);
+    return () => document.removeEventListener('om:progress', onProg);
   }, []);
 
   useEffect(() => {
@@ -41,8 +41,8 @@ export default function PetalProgressBar() {
         style={{
           width: `${Math.round(p * 100)}%`,
           backgroundImage:
-            "linear-gradient(90deg, rgba(219,39,119,0.9) 0%, rgba(219,39,119,0.6) 50%, rgba(219,39,119,0.9) 100%)",
-          maskImage: "linear-gradient(90deg, black 60%, transparent 90%)",
+            'linear-gradient(90deg, rgba(219,39,119,0.9) 0%, rgba(219,39,119,0.6) 50%, rgba(219,39,119,0.9) 100%)',
+          maskImage: 'linear-gradient(90deg, black 60%, transparent 90%)',
         }}
       />
     </div>

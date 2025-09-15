@@ -4,15 +4,529 @@ export default function Blog() {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-900 p-8 text-white">
-        <h1 className="mb-4 text-4xl font-bold text-pink-400">{<>''
-          <span role='img' aria-label='emoji'>O</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span>' '<span role='img' aria-label='emoji'>I</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>s</span>' '''</>}<span role="img" aria-label="cherry blossom">🌸</span><span role="img" aria-label="sparkles">{<><span role='img' aria-label='emoji'>✨</span></>}</span>
+        <h1 className="mb-4 text-4xl font-bold text-pink-400">
+          {
+            <>
+              ''
+              <span role="img" aria-label="emoji">
+                O
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                a
+              </span>
+              <span role="img" aria-label="emoji">
+                k
+              </span>
+              <span role="img" aria-label="emoji">
+                u
+              </span>
+              <span role="img" aria-label="emoji">
+                m
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                r
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                I
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                r
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              ' '''
+            </>
+          }
+          <span role="img" aria-label="cherry blossom">
+            🌸
+          </span>
+          <span role="img" aria-label="sparkles">
+            {
+              <>
+                <span role="img" aria-label="emoji">
+                  ✨
+                </span>
+              </>
+            }
+          </span>
         </h1>
-        <p className="mb-6 text-lg">{<>''
-          <span role='img' aria-label='emoji'>S</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>y</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>d</span>,' '<span role='img' aria-label='emoji'>C</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>r</span>!' '<span role='img' aria-label='emoji'>E</span><span role='img' aria-label='emoji'>x</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>v</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>t</span>,' '<span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span>-<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>e</span>-<span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>s</span>,' '<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>d</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>y</span>' '<span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span>
-          <span role='img' aria-label='emoji'>w</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span>' '<span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span>' '<span role='img' aria-label='emoji'>f</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>l</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>e</span>.
-          ''</>}</p>
+        <p className="mb-6 text-lg">
+          {
+            <>
+              ''
+              <span role="img" aria-label="emoji">
+                S
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                a
+              </span>
+              <span role="img" aria-label="emoji">
+                y
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                u
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              ,' '
+              <span role="img" aria-label="emoji">
+                C
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                m
+              </span>
+              <span role="img" aria-label="emoji">
+                m
+              </span>
+              <span role="img" aria-label="emoji">
+                a
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                r
+              </span>
+              !' '
+              <span role="img" aria-label="emoji">
+                E
+              </span>
+              <span role="img" aria-label="emoji">
+                x
+              </span>
+              <span role="img" aria-label="emoji">
+                c
+              </span>
+              <span role="img" aria-label="emoji">
+                l
+              </span>
+              <span role="img" aria-label="emoji">
+                u
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                v
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                c
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              ,' '
+              <span role="img" aria-label="emoji">
+                b
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                h
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              -
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                h
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              -
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                c
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                p
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              <span role="img" aria-label="emoji">
+                k
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              ,' '
+              <span role="img" aria-label="emoji">
+                a
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                d
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                c
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                m
+              </span>
+              <span role="img" aria-label="emoji">
+                m
+              </span>
+              <span role="img" aria-label="emoji">
+                u
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                y
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                g
+              </span>
+              <span role="img" aria-label="emoji">
+                h
+              </span>
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                w
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                l
+              </span>
+              <span role="img" aria-label="emoji">
+                l
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                o
+              </span>
+              <span role="img" aria-label="emoji">
+                n
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                f
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                l
+              </span>
+              <span role="img" aria-label="emoji">
+                l
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                t
+              </span>
+              <span role="img" aria-label="emoji">
+                h
+              </span>
+              <span role="img" aria-label="emoji">
+                i
+              </span>
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              ' '
+              <span role="img" aria-label="emoji">
+                s
+              </span>
+              <span role="img" aria-label="emoji">
+                p
+              </span>
+              <span role="img" aria-label="emoji">
+                a
+              </span>
+              <span role="img" aria-label="emoji">
+                c
+              </span>
+              <span role="img" aria-label="emoji">
+                e
+              </span>
+              . ''
+            </>
+          }
+        </p>
         <div className="mt-8 rounded-xl bg-gray-800 p-4">
-          <p className="italic">{<><span role='img' aria-label='emoji'>N</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>l</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>g</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span>...<span role='img' aria-label='emoji'>b</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>h</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span><span role='img' aria-label='emoji'>s</span>' '<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span>' '<span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span>.' '''</>}<span role="img" aria-label="cherry blossom">🌸</span></p>
+          <p className="italic">
+            {
+              <>
+                <span role="img" aria-label="emoji">
+                  N
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  b
+                </span>
+                <span role="img" aria-label="emoji">
+                  l
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  g
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  p
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  y
+                </span>
+                <span role="img" aria-label="emoji">
+                  e
+                </span>
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                ...
+                <span role="img" aria-label="emoji">
+                  b
+                </span>
+                <span role="img" aria-label="emoji">
+                  u
+                </span>
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  g
+                </span>
+                <span role="img" aria-label="emoji">
+                  r
+                </span>
+                <span role="img" aria-label="emoji">
+                  e
+                </span>
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                <span role="img" aria-label="emoji">
+                  h
+                </span>
+                <span role="img" aria-label="emoji">
+                  i
+                </span>
+                <span role="img" aria-label="emoji">
+                  n
+                </span>
+                <span role="img" aria-label="emoji">
+                  g
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  r
+                </span>
+                <span role="img" aria-label="emoji">
+                  e
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  c
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  m
+                </span>
+                <span role="img" aria-label="emoji">
+                  i
+                </span>
+                <span role="img" aria-label="emoji">
+                  n
+                </span>
+                <span role="img" aria-label="emoji">
+                  g
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  n
+                </span>
+                .' '''
+              </>
+            }
+            <span role="img" aria-label="cherry blossom">
+              🌸
+            </span>
+          </p>
         </div>
       </div>
     </Layout>
