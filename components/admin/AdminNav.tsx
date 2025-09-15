@@ -13,6 +13,12 @@ const adminRoutes = [
     description: 'Admin overview',
   },
   {
+    path: '/admin/settings',
+    name: 'Appearance',
+    icon: Sparkles,
+    description: 'Theme and seasonal settings',
+  },
+  {
     path: '/admin/runes',
     name: 'Rune System',
     icon: Sparkles,

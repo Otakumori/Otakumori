@@ -7,14 +7,17 @@ export default function HubClient() {
   const [bootDone, setBootDone] = useState(false);
   useEffect(() => {
     try {
-      const played = sessionStorage.getItem('om_boot_played') === '1';
-      if (played) setBootDone(true);
+      const today = new Date().toISOString().slice(0, 10);
+      const last = localStorage.getItem('om_boot_day');
+      if (last === today) setBootDone(true);
     } catch {
       setBootDone(true);
     }
   }, []);
 
-  if (!bootDone) return <BootScreen onDone={() => setBootDone(true)} />;
+  if (!bootDone) return <BootScreen onDone={() => {
+    try { localStorage.setItem('om_boot_day', new Date().toISOString().slice(0,10)); } catch {}
+    setBootDone(true);
+  }} />;
   return <GameCubeHub />;
 }
-
