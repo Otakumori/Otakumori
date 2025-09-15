@@ -35,20 +35,47 @@ export async function POST(req: NextRequest) {
     if (price <= 0) return NextResponse.json(problem(400, 'Not for sale'));
 
     const user = await ensureUserByClerkId(userId);
-    const existing = await prisma.inventoryItem.findFirst({ where: { userId: user.id, sku } });
-    if (existing) {
-      return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
+    // Handle coupons vs inventory
+    if (shopItem.kind?.toUpperCase() === 'COUPON' || (shopItem.metadata as any)?.coupon) {
+      const res = await debitPetals(userId, price, `purchase:${sku}`);
+      const meta = (shopItem.metadata as any) || {};
+      const coupon = meta.coupon || {};
+      const type = coupon.type === 'OFF_AMOUNT' ? 'OFF_AMOUNT' : 'PERCENT';
+      const amount = Number(coupon.amount) || 10;
+      const ttlDays = Number(coupon.ttlDays) || 30;
+      const code = `OM-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      const expiresAt = new Date(Date.now() + ttlDays * 86400000);
+      await prisma.couponGrant.create({
+        data: {
+          userId: user.id,
+          code,
+          discountType: type as any,
+          amountOff: type === 'OFF_AMOUNT' ? amount : null,
+          percentOff: type === 'PERCENT' ? amount : null,
+          expiresAt,
+        },
+      });
+      return NextResponse.json({ ok: true, data: { balance: res.balance, code }, requestId: rid });
+    } else {
+      const existing = await prisma.inventoryItem.findFirst({ where: { userId: user.id, sku } });
+      if (existing) {
+        return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
+      }
+      const res = await debitPetals(userId, price, `purchase:${sku}`);
+      const kind = (() => {
+        const k = (shopItem.kind || '').toUpperCase();
+        if (k in InventoryKind) return (k as keyof typeof InventoryKind) as any;
+        return InventoryKind.COSMETIC as any;
+      })();
+      await prisma.inventoryItem.create({
+        data: {
+          userId: user.id,
+          sku,
+          kind,
+          metadata: { shopKind: shopItem.kind },
+        },
+      });
     }
-
-    const res = await debitPetals(userId, price, `purchase:${sku}`);
-    await prisma.inventoryItem.create({
-      data: {
-        userId: user.id,
-        sku,
-        kind: InventoryKind.COSMETIC,
-        metadata: { shopKind: shopItem.kind },
-      },
-    });
 
     return NextResponse.json({ ok: true, data: { balance: res.balance }, requestId: rid });
   } catch (e: any) {
