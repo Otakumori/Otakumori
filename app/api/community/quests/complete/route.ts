@@ -11,19 +11,27 @@ export async function POST(req: Request) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ ok: false, code: 'UNAUTHENTICATED' }, { status: 401 });
     const body = await req.json().catch(() => ({}));
-    if (!body?.questId) return NextResponse.json({ ok: false, code: 'INVALID_INPUT', message: 'questId required' }, { status: 400 });
+    if (!body?.questId)
+      return NextResponse.json(
+        { ok: false, code: 'INVALID_INPUT', message: 'questId required' },
+        { status: 400 },
+      );
     // Persist unlock in UserSettings.notificationPreferences.card.emotes
     try {
       const user = await db.user.findUnique({ where: { clerkId: userId }, select: { id: true } });
       if (user) {
         const us = await db.userSettings.findUnique({ where: { userId: user.id } });
-        const prefs = ((us?.notificationPreferences as any) ?? {});
+        const prefs = (us?.notificationPreferences as any) ?? {};
         const card = prefs.card ?? {};
         const emotes: string[] = Array.isArray(card.emotes) ? card.emotes : [];
         if (!emotes.includes('blush_burst')) emotes.push('blush_burst');
         card.emotes = emotes;
         const next = { ...prefs, card };
-        await db.userSettings.upsert({ where: { userId: user.id }, update: { notificationPreferences: next }, create: { userId: user.id, notificationPreferences: next } });
+        await db.userSettings.upsert({
+          where: { userId: user.id },
+          update: { notificationPreferences: next },
+          create: { userId: user.id, notificationPreferences: next },
+        });
       }
     } catch {}
     // Return payload
@@ -36,6 +44,9 @@ export async function POST(req: Request) {
       },
     });
   } catch (e) {
-    return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
+      { status: 500 },
+    );
   }
 }

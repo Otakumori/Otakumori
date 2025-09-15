@@ -18,7 +18,9 @@ type Achievement = {
 };
 
 export default function AchievementsTabs({ achievements }: { achievements: Achievement[] }) {
-  const [tab, setTab] = useState<'all' | 'site' | 'petal' | 'memory' | 'rhythm' | 'bubble' | 'puzzle'>('all');
+  const [tab, setTab] = useState<
+    'all' | 'site' | 'petal' | 'memory' | 'rhythm' | 'bubble' | 'puzzle'
+  >('all');
 
   // Prefer typed source if present, otherwise use heuristics
   const groups = useMemo(() => {

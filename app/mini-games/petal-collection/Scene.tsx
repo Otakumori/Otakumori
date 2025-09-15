@@ -298,7 +298,12 @@ export default function PetalCollection() {
           body: JSON.stringify({
             gameCode: 'petal-collection',
             score: Math.max(0, Math.round(score)),
-            meta: { durationMs: duration, streakMax: mult > 1 ? (mult - 1) * 10 : 0, misses: missCount, caught },
+            meta: {
+              durationMs: duration,
+              streakMax: mult > 1 ? (mult - 1) * 10 : 0,
+              misses: missCount,
+              caught,
+            },
           }),
         });
       } catch {}

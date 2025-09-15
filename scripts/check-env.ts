@@ -10,4 +10,3 @@ console.log('ENV OK:', {
   hasStripe: !!env.STRIPE_SECRET_KEY,
   hasClerk: !!env.CLERK_SECRET_KEY,
 });
-

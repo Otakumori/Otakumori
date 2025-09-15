@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   const rid = reqId(req.headers);
   logger.request(req, 'POST /api/admin/site-config');
   const admin = await requireAdmin();
-  const body = await req.json().catch(() => null) as any;
+  const body = (await req.json().catch(() => null)) as any;
   if (!body || typeof body !== 'object') return NextResponse.json(problem(400, 'Bad input'));
   try {
     const data: any = {};
@@ -32,8 +32,11 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, data: cfg, requestId: rid });
   } catch (e: any) {
-    logger.error('site_config_update_error', { requestId: rid }, { error: String(e?.message || e) });
+    logger.error(
+      'site_config_update_error',
+      { requestId: rid },
+      { error: String(e?.message || e) },
+    );
     return NextResponse.json(problem(500, 'update_failed', e?.message), { status: 500 });
   }
 }
-

@@ -76,12 +76,12 @@ export default function AdminReviewsClient() {
                   <div className="mt-3 flex gap-3">
                     {r.imageUrls.map((u) => (
                       // eslint-disable-next-line @next/next/no-img-element
-                      (<img
+                      <img
                         key={u}
                         src={u}
                         alt="review"
                         className="h-20 w-20 rounded-lg border border-zinc-700 object-cover"
-                      />)
+                      />
                     ))}
                   </div>
                 )}

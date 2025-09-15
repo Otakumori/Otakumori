@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
 import { z } from 'zod';
 
-const schema = z.object({ status: z.enum(['PUBLIC','HIDDEN','REMOVED']) });
+const schema = z.object({ status: z.enum(['PUBLIC', 'HIDDEN', 'REMOVED']) });
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   await requireAdmin();
@@ -14,7 +14,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const message = await db.soapstoneMessage.update({
     where: { id: params.id },
-    data: { status: parsed.data.status }
+    data: { status: parsed.data.status },
   });
 
   return NextResponse.json({ ok: true, message });

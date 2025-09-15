@@ -1,12 +1,14 @@
 'use client';
 import useSWR from 'swr';
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function SoapstoneList({ postId }: { postId?: string }) {
-  const { data } = useSWR(`/api/soapstone${postId ? `?postId=${postId}` : ''}`, fetcher, { revalidateOnFocus: true });
+  const { data } = useSWR(`/api/soapstone${postId ? `?postId=${postId}` : ''}`, fetcher, {
+    revalidateOnFocus: true,
+  });
   const items = data?.messages ?? [];
-  
+
   return (
     <ul className="space-y-3">
       {items.map((m: any) => (

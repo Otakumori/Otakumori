@@ -1,17 +1,86 @@
 [
-  { "slug": "petal-collection", "name": "Petal Collection", "icon": "spa", "desc": "Collect falling petals and rack up combos." },
-  { "slug": "memory-match", "name": "Memory Match", "icon": "grid_view", "desc": "Flip cards and match pairs. Perfect recall earns bonuses." },
-  { "slug": "rhythm-beat-em-up", "name": "Rhythm Beat", "icon": "music_note", "desc": "Tap in time and keep the beat streak alive." },
-  { "slug": "bubble-girl", "name": "Bubble Girl", "icon": "bubble_chart", "desc": "Spawn bubbles, float and score. Sandbox or challenge mode." },
-  { "slug": "petal-storm-rhythm", "name": "Petal Storm Rhythm", "icon": "thunderstorm", "desc": "Stormy rhythm playlist—precision timing for petals." },
-  { "slug": "bubble-ragdoll", "name": "Bubble Ragdoll", "icon": "toys", "desc": "Toss the ragdoll into bubbles. Survive the chaos." },
-  { "slug": "samurai-petal-slice", "name": "Samurai Petal Slice", "icon": "swords", "desc": "Slice petals midair. Avoid cursed petals." },
-  { "slug": "blossomware", "name": "Blossomware Playlist", "icon": "playlist_play", "desc": "Chaotic micro-sessions—keep your petal streak alive." },
-  { "slug": "dungeon-of-desire", "name": "Dungeon of Desire", "icon": "skull", "desc": "Descend into the dungeon. Survive rooms and claim rewards." },
-  { "slug": "maid-cafe-manager", "name": "Maid Cafe Manager", "icon": "local_cafe", "desc": "Manage shifts and keep guests smiling." },
-  { "slug": "thigh-coliseum", "name": "Thigh Coliseum", "icon": "stadium", "desc": "Enter the arena. Win rounds and advance the bracket." },
-  { "slug": "quick-math", "name": "Quick Math", "icon": "calculate", "desc": "Answer fast. Pressure builds with each correct streak." },
-  { "slug": "puzzle-reveal", "name": "Puzzle Reveal", "icon": "extension", "desc": "Clear the fog to reveal the art. Watch your energy." },
-  { "slug": "petal-samurai", "name": "Petal Samurai", "icon": "swords", "desc": "Slash petals with style. Master storm and endless modes." }
+  {
+    "slug": "petal-collection",
+    "name": "Petal Collection",
+    "icon": "spa",
+    "desc": "Collect falling petals and rack up combos."
+  },
+  {
+    "slug": "memory-match",
+    "name": "Memory Match",
+    "icon": "grid_view",
+    "desc": "Flip cards and match pairs. Perfect recall earns bonuses."
+  },
+  {
+    "slug": "rhythm-beat-em-up",
+    "name": "Rhythm Beat",
+    "icon": "music_note",
+    "desc": "Tap in time and keep the beat streak alive."
+  },
+  {
+    "slug": "bubble-girl",
+    "name": "Bubble Girl",
+    "icon": "bubble_chart",
+    "desc": "Spawn bubbles, float and score. Sandbox or challenge mode."
+  },
+  {
+    "slug": "petal-storm-rhythm",
+    "name": "Petal Storm Rhythm",
+    "icon": "thunderstorm",
+    "desc": "Stormy rhythm playlist—precision timing for petals."
+  },
+  {
+    "slug": "bubble-ragdoll",
+    "name": "Bubble Ragdoll",
+    "icon": "toys",
+    "desc": "Toss the ragdoll into bubbles. Survive the chaos."
+  },
+  {
+    "slug": "samurai-petal-slice",
+    "name": "Samurai Petal Slice",
+    "icon": "swords",
+    "desc": "Slice petals midair. Avoid cursed petals."
+  },
+  {
+    "slug": "blossomware",
+    "name": "Blossomware Playlist",
+    "icon": "playlist_play",
+    "desc": "Chaotic micro-sessions—keep your petal streak alive."
+  },
+  {
+    "slug": "dungeon-of-desire",
+    "name": "Dungeon of Desire",
+    "icon": "skull",
+    "desc": "Descend into the dungeon. Survive rooms and claim rewards."
+  },
+  {
+    "slug": "maid-cafe-manager",
+    "name": "Maid Cafe Manager",
+    "icon": "local_cafe",
+    "desc": "Manage shifts and keep guests smiling."
+  },
+  {
+    "slug": "thigh-coliseum",
+    "name": "Thigh Coliseum",
+    "icon": "stadium",
+    "desc": "Enter the arena. Win rounds and advance the bracket."
+  },
+  {
+    "slug": "quick-math",
+    "name": "Quick Math",
+    "icon": "calculate",
+    "desc": "Answer fast. Pressure builds with each correct streak."
+  },
+  {
+    "slug": "puzzle-reveal",
+    "name": "Puzzle Reveal",
+    "icon": "extension",
+    "desc": "Clear the fog to reveal the art. Watch your energy."
+  },
+  {
+    "slug": "petal-samurai",
+    "name": "Petal Samurai",
+    "icon": "swords",
+    "desc": "Slash petals with style. Master storm and endless modes."
+  }
 ]
-

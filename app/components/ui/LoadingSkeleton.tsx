@@ -10,24 +10,24 @@ interface SkeletonProps {
   lines?: number;
 }
 
-export function Skeleton({ 
-  className = '', 
-  variant = 'rectangular', 
-  width, 
-  height, 
-  lines = 1 
+export function Skeleton({
+  className = '',
+  variant = 'rectangular',
+  width,
+  height,
+  lines = 1,
 }: SkeletonProps) {
   const baseClasses = 'skeleton';
-  
+
   const variantClasses = {
     text: 'h-4',
     rectangular: 'h-20',
-    circular: 'rounded-full'
+    circular: 'rounded-full',
   };
 
   const style = {
     width: width || '100%',
-    height: height || undefined
+    height: height || undefined,
   };
 
   if (lines > 1) {
@@ -39,12 +39,12 @@ export function Skeleton({
             className={`${baseClasses} ${variantClasses[variant]} ${className}`}
             style={style}
             animate={{
-              backgroundPosition: ['200% 0', '-200% 0']
+              backgroundPosition: ['200% 0', '-200% 0'],
             }}
             transition={{
               duration: 1.2,
               repeat: Infinity,
-              ease: 'linear'
+              ease: 'linear',
             }}
           />
         ))}
@@ -57,12 +57,12 @@ export function Skeleton({
       className={`${baseClasses} ${variantClasses[variant]} ${className}`}
       style={style}
       animate={{
-        backgroundPosition: ['200% 0', '-200% 0']
+        backgroundPosition: ['200% 0', '-200% 0'],
       }}
       transition={{
         duration: 1.2,
         repeat: Infinity,
-        ease: 'linear'
+        ease: 'linear',
       }}
     />
   );

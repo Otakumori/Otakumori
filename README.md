@@ -204,6 +204,7 @@ This script will:
 ### Manual Deployment
 
 **Operations**
+
 - Health check: `curl http://localhost:3000/api/health` (expects JSON with db, clerk, stripe, printify, env)
 - Seed (db + app data): `npm run seed` • Unseed: `npm run unseed`
 - Smoke test (routes/APIs): `npm run smoke`

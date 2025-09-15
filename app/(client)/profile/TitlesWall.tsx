@@ -1,4 +1,4 @@
-'use client';;
+'use client';
 import Image from 'next/image';
 import useSWR from 'swr';
 import manifest from '../../../public/assets/manifest.json';
@@ -17,7 +17,8 @@ export default function TitlesWall() {
               src={imageFromSku(title.id || title) || '/assets/ui/profile/title_chip.png'}
               alt=""
               width={14}
-              height={14} />
+              height={14}
+            />
             {pretty(title.id || title)}
           </span>
         ))}

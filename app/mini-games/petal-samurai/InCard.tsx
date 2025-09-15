@@ -7,4 +7,3 @@ const Game = dynamic(() => import('./Game'), { ssr: false });
 export default function PetalSamuraiInCard() {
   return <Game mode="classic" />;
 }
-

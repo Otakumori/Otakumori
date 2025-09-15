@@ -55,7 +55,7 @@ export default function HomePage() {
           </div>
         </section>
       </div>
-      
+
       {/* Soapstone drift animation */}
       <SoapstoneHomeDrift />
     </div>

@@ -33,19 +33,27 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
-      case 1: return '👑';
-      case 2: return '🥈';
-      case 3: return '🥉';
-      default: return `#${rank}`;
+      case 1:
+        return '👑';
+      case 2:
+        return '🥈';
+      case 3:
+        return '🥉';
+      default:
+        return `#${rank}`;
     }
   };
 
   const getRankColor = (rank: number) => {
     switch (rank) {
-      case 1: return 'text-yellow-400';
-      case 2: return 'text-gray-300';
-      case 3: return 'text-amber-600';
-      default: return 'text-zinc-400';
+      case 1:
+        return 'text-yellow-400';
+      case 2:
+        return 'text-gray-300';
+      case 3:
+        return 'text-amber-600';
+      default:
+        return 'text-zinc-400';
     }
   };
 
@@ -107,7 +115,7 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
         <h2 className="text-lg font-semibold text-white mb-4">
           {timeRange === 'weekly' ? 'Weekly' : 'Seasonal'} Leaderboard
         </h2>
-        
+
         {currentData.length > 0 ? (
           <div className="space-y-2">
             {currentData.map((entry) => (
@@ -123,13 +131,11 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
                   <div className={`text-lg font-bold ${getRankColor(entry.rank)}`}>
                     {getRankIcon(entry.rank)}
                   </div>
-                  
+
                   <div className="w-8 h-8 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-                    <span className="text-sm text-fuchsia-300">
-                      {entry.avatar || '🌸'}
-                    </span>
+                    <span className="text-sm text-fuchsia-300">{entry.avatar || '🌸'}</span>
                   </div>
-                  
+
                   <div>
                     <div className="font-medium text-white">
                       {entry.username}
@@ -139,7 +145,7 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="text-right">
                   <div className="text-lg font-semibold text-fuchsia-300">
                     {entry.score.toLocaleString()}

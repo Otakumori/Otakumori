@@ -40,13 +40,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Invalid request' }, { status: 400 });
     }
 
-    const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } = parsed.data as any;
+    const { items, successUrl, cancelUrl, shippingInfo, couponCodes, shipping } =
+      parsed.data as any;
 
     // Get profile
     const user = await prisma.user.findFirst({ where: { clerkId: userId } });
     if (!user) return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
 
-    const subtotalCents = items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0);
+    const subtotalCents = items.reduce((sum: number, i: any) => sum + i.priceCents * i.quantity, 0);
 
     // Coupons: fetch metadata and compute breakdown
     let appliedCodes: string[] = [];
@@ -56,17 +57,19 @@ export async function POST(req: NextRequest) {
     if (Array.isArray(couponCodes) && couponCodes.length > 0) {
       const codes = (couponCodes as string[]).map(normalizeCode);
       const rows = await prisma.coupon.findMany({ where: { code: { in: codes } } });
-      const metas: CouponMeta[] = rows.map((r) => ({
+      const metas: CouponMeta[] = rows.map((r: any) => ({
+        id: r.id,
         code: r.code,
         type: r.type as any,
-        valueCents: r.valueCents,
-        valuePct: r.type === 'PERCENT' ? r.valueCents : undefined,
+        value: r.value,
+        valueCents: r.value,
+        valuePct: r.type === 'PERCENT' ? r.value : undefined,
         enabled: r.enabled,
         startsAt: r.startsAt,
-        endsAt: r.endsAt,
-        maxRedemptions: r.maxRedemptions,
-        maxRedemptionsPerUser: r.maxRedemptionsPerUser,
-        minSubtotalCents: r.minSubtotalCents ?? undefined,
+        endsAt: r.endsAt ?? undefined,
+        maxRedemptions: r.maxRedemptions ?? undefined,
+        maxRedemptionsPerUser: r.maxRedemptionsPerUser ?? undefined,
+        minSubtotalCents: r.minSubtotal ?? undefined,
         allowedProductIds: r.allowedProductIds,
         excludedProductIds: r.excludedProductIds,
         allowedCollections: r.allowedCollections,
@@ -75,10 +78,18 @@ export async function POST(req: NextRequest) {
         oneTimeCode: r.oneTimeCode,
       }));
 
-      const breakdown = getApplicableCoupons({
+      const breakdown = await getApplicableCoupons({
         now: new Date(),
-        items: items.map((i: any) => ({ id: i.productId ?? i.sku ?? i.variantId ?? i.name, productId: i.productId, collectionIds: [], quantity: i.quantity, unitPrice: i.priceCents / 100 })),
-        shipping: shipping ? { provider: shipping.provider ?? 'stripe', fee: shipping.fee ?? 0 } : { provider: 'stripe', fee: 0 },
+        items: items.map((i: any) => ({
+          id: i.productId ?? i.sku ?? i.variantId ?? i.name,
+          productId: i.productId,
+          collectionIds: [],
+          quantity: i.quantity,
+          unitPrice: i.priceCents / 100,
+        })),
+        shipping: shipping
+          ? { provider: shipping.provider ?? 'stripe', fee: shipping.fee ?? 0 }
+          : { provider: 'stripe', fee: 0 },
         coupons: metas,
         codesOrder: codes,
       });
@@ -87,14 +98,20 @@ export async function POST(req: NextRequest) {
       shippingDiscountCents = Math.round(breakdown.shippingDiscount * 100);
 
       // Allocate non-shipping discount proportionally to eligible items for each coupon
-      const itemTotals = items.map((i) => ({ key: i.productId ?? i.sku ?? i.variantId ?? i.name, quantity: i.quantity, unit: i.priceCents, total: i.priceCents * i.quantity, productId: i.productId }));
+      const itemTotals = items.map((i: any) => ({
+        key: i.productId ?? i.sku ?? i.variantId ?? i.name,
+        quantity: i.quantity,
+        unit: i.priceCents,
+        total: i.priceCents * i.quantity,
+        productId: i.productId,
+      }));
       const discountsPerItem: Record<string, number> = {};
       const nonShipDiscountCents = discountTotalCents - shippingDiscountCents;
       if (nonShipDiscountCents > 0) {
         // Proportional to item total
-        const total = itemTotals.reduce((s, it) => s + it.total, 0);
+        const total = itemTotals.reduce((s: number, it: any) => s + it.total, 0);
         let acc = 0;
-        itemTotals.forEach((it, idx) => {
+        itemTotals.forEach((it: any, idx: number) => {
           let d = Math.floor((nonShipDiscountCents * it.total) / total);
           // last item gets remainder
           if (idx === itemTotals.length - 1) d = nonShipDiscountCents - acc;
@@ -102,7 +119,10 @@ export async function POST(req: NextRequest) {
           acc += d;
         });
       }
-      discountedLineItems = itemTotals.map((it) => ({ id: it.key, totalDiscountCents: discountsPerItem[it.key] ?? 0 }));
+      discountedLineItems = itemTotals.map((it: any) => ({
+        id: it.key,
+        totalDiscountCents: discountsPerItem[it.key] ?? 0,
+      }));
     }
 
     // Create order skeleton
@@ -119,7 +139,7 @@ export async function POST(req: NextRequest) {
         label: `Order for ${shippingInfo?.firstName ?? user.display_name ?? user.username}`,
         updatedAt: new Date(),
         appliedCouponCodes: appliedCodes,
-        discountTotalCents,
+        discountTotal: discountTotalCents,
       },
     });
 
@@ -141,7 +161,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build line items with discounted unit_amount
-    const lineItems = items.map((i) => {
+    const lineItems = items.map((i: any) => {
       const key = i.productId ?? i.sku ?? i.variantId ?? i.name;
       const totalDiscount = discountedLineItems.find((d) => d.id === key)?.totalDiscountCents ?? 0;
       const qty = i.quantity;
@@ -160,7 +180,11 @@ export async function POST(req: NextRequest) {
 
     // Adjust for penny drift: ensure totals align
     const original = subtotalCents;
-    const discountedSum = lineItems.reduce((s, li: any, idx) => s + (li.price_data.unit_amount as number) * (li.quantity as number), 0);
+    const discountedSum = lineItems.reduce(
+      (s: number, li: any, idx: number) =>
+        s + (li.price_data.unit_amount as number) * (li.quantity as number),
+      0,
+    );
     const nonShipDiscountCents = discountTotalCents - shippingDiscountCents;
     const target = original - Math.max(0, nonShipDiscountCents);
     let delta = discountedSum - target; // positive means we need to subtract more from first item
@@ -188,9 +212,18 @@ export async function POST(req: NextRequest) {
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'],
       },
-      shipping_options: shippingDiscountCents > 0 ? [
-        { shipping_rate_data: { type: 'fixed_amount', fixed_amount: { amount: 0, currency: 'usd' }, display_name: 'Free shipping' } },
-      ] : undefined,
+      shipping_options:
+        shippingDiscountCents > 0
+          ? [
+              {
+                shipping_rate_data: {
+                  type: 'fixed_amount',
+                  fixed_amount: { amount: 0, currency: 'usd' },
+                  display_name: 'Free shipping',
+                },
+              },
+            ]
+          : undefined,
       metadata: {
         coupon_codes: appliedCodes.join(','),
         discount_total_cents: String(discountTotalCents),

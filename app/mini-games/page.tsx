@@ -1,6 +1,6 @@
-export const metadata = { title: "Mini-Games | Otakumori" };
+export const metadata = { title: 'Mini-Games | Otakumori' };
 
-import HubClient from "./HubClient";
+import HubClient from './HubClient';
 
 export default function Page() {
   return (

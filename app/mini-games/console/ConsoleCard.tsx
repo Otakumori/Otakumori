@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import gamesMeta from '../games.meta.json';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import OwnedRunesGrid from '@/app/mini-games/_components/OwnedRunesGrid';
-import RuneGlyph from '@/app/components/runes/RuneGlyph';
+import { audio } from '@/app/lib/audio';
 import { http } from '@/app/lib/http';
 import * as Sentry from '@sentry/nextjs';
-import { audio } from '@/app/lib/audio';
+import dynamic from 'next/dynamic';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import OwnedRunesGrid from '../_components/OwnedRunesGrid';
+import gamesMeta from '../games.meta.json';
 
 type Mode = 'boot' | 'cube' | 'loadingGame' | 'playingGame';
 
@@ -37,7 +36,13 @@ function useQueryFace(): [number, (n: number) => void] {
   return [face, setFace];
 }
 
-export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string; defaultFace?: number }) {
+export default function ConsoleCard({
+  gameKey,
+  defaultFace,
+}: {
+  gameKey?: string;
+  defaultFace?: number;
+}) {
   const [mode, setMode] = useState<Mode>('boot');
   const [face, setFace] = useQueryFace();
   const [audioOn, setAudioOn] = useState(false);
@@ -66,10 +71,13 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
     const seen = typeof window !== 'undefined' ? sessionStorage.getItem(key) === '1' : true;
     if (!seen) {
       setMode('boot');
-      const t = setTimeout(() => {
-        sessionStorage.setItem(key, '1');
-        setMode('cube');
-      }, isReducedMotion ? 500 : 2000);
+      const t = setTimeout(
+        () => {
+          sessionStorage.setItem(key, '1');
+          setMode('cube');
+        },
+        isReducedMotion ? 500 : 2000,
+      );
       return () => clearTimeout(t);
     }
     setMode('cube');
@@ -285,9 +293,10 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
     const dist = (a: { rx: number; ry: number }, b: { rx: number; ry: number }) =>
       Math.hypot(a.rx - b.rx, a.ry - b.ry);
     const current = rotation;
-    const nearest = withAngles.reduce((best, cur) =>
-      dist(current, cur.rot) < dist(current, best.rot) ? cur : best,
-    withAngles[0]);
+    const nearest = withAngles.reduce(
+      (best, cur) => (dist(current, cur.rot) < dist(current, best.rot) ? cur : best),
+      withAngles[0],
+    );
     if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) {
       setFace(face);
     } else {
@@ -309,19 +318,51 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
     <div className="p-4 space-y-3">
       <FaceTitle>Root Selector</FaceTitle>
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
-        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(1); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Mini-Games">
+        <button
+          className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400"
+          onClick={() => {
+            setFace(1);
+            audio.unlock();
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }}
+          aria-label="Go to Mini-Games"
+        >
           <div className="text-white font-medium">Mini-Games</div>
           <div className="text-xs text-zinc-300">Choose a game</div>
         </button>
-        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(2); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Character and Community">
+        <button
+          className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400"
+          onClick={() => {
+            setFace(2);
+            audio.unlock();
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }}
+          aria-label="Go to Character and Community"
+        >
           <div className="text-white font-medium">Character / Community</div>
           <div className="text-xs text-zinc-300">Create avatar, see feed</div>
         </button>
-        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(3); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Music and Extras">
+        <button
+          className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400"
+          onClick={() => {
+            setFace(3);
+            audio.unlock();
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }}
+          aria-label="Go to Music and Extras"
+        >
           <div className="text-white font-medium">Music + Extras</div>
           <div className="text-xs text-zinc-300">OST, CRT, VHS</div>
         </button>
-        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(4); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Trade Center">
+        <button
+          className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400"
+          onClick={() => {
+            setFace(4);
+            audio.unlock();
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }}
+          aria-label="Go to Trade Center"
+        >
           <div className="text-white font-medium">Trade Center</div>
           <div className="text-xs text-zinc-300">Fuse and trade runes</div>
         </button>
@@ -334,57 +375,68 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       <div className="flex items-center justify-between">
         <FaceTitle>Mini-Games</FaceTitle>
         <div className="flex items-center gap-3">
-          <a href="/profile/achievements" className="text-xs text-pink-300 underline hover:text-pink-200">View Achievements</a>
+          <a
+            href="/profile/achievements"
+            className="text-xs text-pink-300 underline hover:text-pink-200"
+          >
+            View Achievements
+          </a>
           <PetalSlot />
         </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-        {(gamesMeta as Array<{ slug: string; name: string; icon: string; desc: string }>).map((g) => (
-          <button
-            key={g.slug}
-            className="group relative rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/60"
-            onClick={() => { audio.unlock(); audio.play('samus_jingle', { gain: 0.35 }); router.push(`/mini-games/games/${g.slug}`); }}
-            aria-label={`Start ${g.name}`}
-            data-testid="start-game"
-          >
-            <div className="flex items-center justify-between">
-              <div className="inline-flex items-center gap-2">
-                <GameIcon slug={g.slug} icon={g.icon} />
-                <div className="text-white font-medium">{g.name}</div>
-              </div>
-              <span className="text-xs text-pink-300">Ready</span>
-            </div>
-            <div className="mt-1 text-xs text-zinc-300">Load inside console</div>
-
-            {/* Info toggle */}
+        {(gamesMeta as Array<{ slug: string; name: string; icon: string; desc: string }>).map(
+          (g) => (
             <button
-              type="button"
-              className="absolute top-2 right-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-zinc-200 hover:bg-white/20"
-              onClick={(e) => {
-                e.stopPropagation();
-                setInfoOpen(infoOpen === g.slug ? null : g.slug);
+              key={g.slug}
+              className="group relative rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/60"
+              onClick={() => {
+                audio.unlock();
+                audio.play('samus_jingle', { gain: 0.35 });
+                router.push(`/mini-games/games/${g.slug}`);
               }}
-              aria-label={`About ${g.name}`}
-              aria-expanded={infoOpen === g.slug}
+              aria-label={`Start ${g.name}`}
+              data-testid="start-game"
             >
-              ?
-            </button>
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-2">
+                  <GameIcon slug={g.slug} icon={g.icon} />
+                  <div className="text-white font-medium">{g.name}</div>
+                </div>
+                <span className="text-xs text-pink-300">Ready</span>
+              </div>
+              <div className="mt-1 text-xs text-zinc-300">Load inside console</div>
 
-            {/* Hover or toggled description overlay */}
-            <div
-              className={[
-                'pointer-events-none absolute inset-0 rounded-lg bg-black/70 p-3 opacity-0 transition-opacity',
-                'group-hover:opacity-100',
-                infoOpen === g.slug ? 'opacity-100 pointer-events-auto' : '',
-              ].join(' ')}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-1 text-sm font-semibold text-zinc-100">{g.name}</div>
-              <p className="text-xs text-zinc-300">{g.desc}</p>
-              <div className="mt-2 text-[10px] text-zinc-400">Press Enter/A to start</div>
-            </div>
-          </button>
-        ))}
+              {/* Info toggle */}
+              <button
+                type="button"
+                className="absolute top-2 right-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-zinc-200 hover:bg-white/20"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setInfoOpen(infoOpen === g.slug ? null : g.slug);
+                }}
+                aria-label={`About ${g.name}`}
+                aria-expanded={infoOpen === g.slug}
+              >
+                ?
+              </button>
+
+              {/* Hover or toggled description overlay */}
+              <div
+                className={[
+                  'pointer-events-none absolute inset-0 rounded-lg bg-black/70 p-3 opacity-0 transition-opacity',
+                  'group-hover:opacity-100',
+                  infoOpen === g.slug ? 'opacity-100 pointer-events-auto' : '',
+                ].join(' ')}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="mb-1 text-sm font-semibold text-zinc-100">{g.name}</div>
+                <p className="text-xs text-zinc-300">{g.desc}</p>
+                <div className="mt-2 text-[10px] text-zinc-400">Press Enter/A to start</div>
+              </div>
+            </button>
+          ),
+        )}
       </div>
       <AchievementsPreview />
     </div>
@@ -433,17 +485,64 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       <div className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <FaceTitle>Music + Extras</FaceTitle>
-          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-toggle">
-            <input type="checkbox" name="audio" className="accent-pink-500" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
+          <label
+            className="text-xs text-zinc-300 inline-flex items-center gap-2"
+            data-testid="card-audio-toggle"
+          >
+            <input
+              type="checkbox"
+              name="audio"
+              className="accent-pink-500"
+              checked={audio}
+              onChange={(e) => setAudio(e.target.checked)}
+            />
             Audio
           </label>
         </div>
-        {err && <div className="rounded bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-200">{err}</div>}
+        {err && (
+          <div className="rounded bg-red-500/10 border border-red-500/30 px-3 py-2 text-xs text-red-200">
+            {err}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-crt-toggle"><input type="checkbox" name="crt" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT</label>
-          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-vhs-toggle"><input type="checkbox" name="vhs" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS</label>
-          <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="card-audio-level">Volume
-            <input type="range" name="volume" min={0} max={100} value={vol} onChange={(e) => setVol(parseInt(e.target.value))} className="ml-2 w-32" />
+          <label
+            className="text-xs text-zinc-300 inline-flex items-center gap-2"
+            data-testid="card-crt-toggle"
+          >
+            <input
+              type="checkbox"
+              name="crt"
+              checked={crt}
+              onChange={(e) => setCrt(e.target.checked)}
+            />{' '}
+            CRT
+          </label>
+          <label
+            className="text-xs text-zinc-300 inline-flex items-center gap-2"
+            data-testid="card-vhs-toggle"
+          >
+            <input
+              type="checkbox"
+              name="vhs"
+              checked={vhs}
+              onChange={(e) => setVhs(e.target.checked)}
+            />{' '}
+            VHS
+          </label>
+          <label
+            className="text-xs text-zinc-300 inline-flex items-center gap-2"
+            data-testid="card-audio-level"
+          >
+            Volume
+            <input
+              type="range"
+              name="volume"
+              min={0}
+              max={100}
+              value={vol}
+              onChange={(e) => setVol(parseInt(e.target.value))}
+              className="ml-2 w-32"
+            />
           </label>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -452,13 +551,25 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
               <div className="text-xs text-zinc-300">{src}</div>
               {audio && (
                 // eslint-disable-next-line jsx-a11y/media-has-caption
-                <audio src={`/${src}`} loop autoPlay controls className="mt-2 w-full" preload="none" />
+                <audio
+                  src={`/${src}`}
+                  loop
+                  autoPlay
+                  controls
+                  className="mt-2 w-full"
+                  preload="none"
+                />
               )}
             </div>
           ))}
         </div>
         <div className="flex gap-2">
-          <button onClick={save} className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700">Save</button>
+          <button
+            onClick={save}
+            className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700"
+          >
+            Save
+          </button>
         </div>
       </div>
     );
@@ -496,7 +607,12 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       <div className="rounded-lg border border-white/15 bg-white/10 p-3">
         <div className="mb-2 text-xs text-zinc-300">Runes Fusion (MVP)</div>
         <div className="flex items-center gap-2">
-          <select className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15" name="runeA" value={selected} onChange={(e) => setSelected(e.target.value)}>
+          <select
+            className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15"
+            name="runeA"
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+          >
             {['rune_a', 'rune_b', 'rune_c', 'rune_d', 'rune_e'].map((r) => (
               <option key={r} value={r}>
                 {r}
@@ -504,14 +620,24 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
             ))}
           </select>
           <span className="text-zinc-400">+</span>
-          <select className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15" name="runeB" value={second} onChange={(e) => setSecond(e.target.value)}>
+          <select
+            className="bg-black/40 text-white text-sm rounded px-2 py-1 border border-white/15"
+            name="runeB"
+            value={second}
+            onChange={(e) => setSecond(e.target.value)}
+          >
             {['rune_a', 'rune_b', 'rune_c', 'rune_d', 'rune_e'].map((r) => (
               <option key={r} value={r}>
                 {r}
               </option>
             ))}
           </select>
-          <button onClick={fuse} className="ml-auto rounded border border-pink-400/40 px-3 py-1 text-sm text-pink-200 hover:bg-pink-500/10 disabled:opacity-50" disabled={busy} data-testid="fuse-submit">
+          <button
+            onClick={fuse}
+            className="ml-auto rounded border border-pink-400/40 px-3 py-1 text-sm text-pink-200 hover:bg-pink-500/10 disabled:opacity-50"
+            disabled={busy}
+            data-testid="fuse-submit"
+          >
             {busy ? 'Fusing…' : 'Fuse'}
           </button>
         </div>
@@ -583,7 +709,12 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
             <button
               type="button"
               className="rounded border border-white/20 px-3 py-1 text-xs text-white/90 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400"
-              onClick={() => { try { sessionStorage.setItem('om_gc_boot_seen', '1'); } catch {} setMode('cube'); }}
+              onClick={() => {
+                try {
+                  sessionStorage.setItem('om_gc_boot_seen', '1');
+                } catch {}
+                setMode('cube');
+              }}
               aria-label="Skip intro"
             >
               Skip intro
@@ -596,7 +727,13 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       {mode === 'cube' && (
         <div
           className="mx-auto my-1"
-          style={{ perspective: '1000px', width: '100%', maxWidth: 720, userSelect: 'none' as any, touchAction: 'none' as any }}
+          style={{
+            perspective: '1000px',
+            width: '100%',
+            maxWidth: 720,
+            userSelect: 'none' as any,
+            touchAction: 'none' as any,
+          }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -614,35 +751,50 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
             {/* Front (Face 0) */}
             <div
               className="absolute inset-0 rounded-xl border border-white/15 bg-white/5 text-white"
-              style={{ transform: `translateZ(${cubeSize / 2}px)`, backfaceVisibility: 'hidden' as any }}
+              style={{
+                transform: `translateZ(${cubeSize / 2}px)`,
+                backfaceVisibility: 'hidden' as any,
+              }}
             >
               <FaceRoot />
             </div>
             {/* Left (Face 1) */}
             <div
               className="absolute inset-0 rounded-xl border border-white/15 bg-white/5 text-white"
-              style={{ transform: `rotateY(-90deg) translateZ(${cubeSize / 2}px)`, backfaceVisibility: 'hidden' as any }}
+              style={{
+                transform: `rotateY(-90deg) translateZ(${cubeSize / 2}px)`,
+                backfaceVisibility: 'hidden' as any,
+              }}
             >
               <MiniGamesFace />
             </div>
             {/* Right (Face 2) */}
             <div
               className="absolute inset-0 rounded-xl border border-white/15 bg-white/5 text-white"
-              style={{ transform: `rotateY(90deg) translateZ(${cubeSize / 2}px)`, backfaceVisibility: 'hidden' as any }}
+              style={{
+                transform: `rotateY(90deg) translateZ(${cubeSize / 2}px)`,
+                backfaceVisibility: 'hidden' as any,
+              }}
             >
               <CharacterFace />
             </div>
             {/* Bottom (Face 3) */}
             <div
               className="absolute inset-0 rounded-xl border border-white/15 bg-white/5 text-white"
-              style={{ transform: `rotateX(90deg) translateZ(${cubeSize / 2}px)`, backfaceVisibility: 'hidden' as any }}
+              style={{
+                transform: `rotateX(90deg) translateZ(${cubeSize / 2}px)`,
+                backfaceVisibility: 'hidden' as any,
+              }}
             >
               <MusicFace />
             </div>
             {/* Top (Face 4) */}
             <div
               className="absolute inset-0 rounded-xl border border-white/15 bg-white/5 text-white"
-              style={{ transform: `rotateX(-90deg) translateZ(${cubeSize / 2}px)`, backfaceVisibility: 'hidden' as any }}
+              style={{
+                transform: `rotateX(-90deg) translateZ(${cubeSize / 2}px)`,
+                backfaceVisibility: 'hidden' as any,
+              }}
             >
               <TradeFace />
             </div>
@@ -688,10 +840,16 @@ function AchievementsPreview() {
       ) : (
         <div className="grid grid-cols-2 gap-2">
           {items.map((a) => (
-            <div key={a.id} className="rounded bg-white/10 p-2 text-[11px] text-zinc-200" title={a.description}>
+            <div
+              key={a.id}
+              className="rounded bg-white/10 p-2 text-[11px] text-zinc-200"
+              title={a.description}
+            >
               <div className="truncate">{a.name}</div>
               {a.unlockedAt && (
-                <div className="text-[10px] text-zinc-400">{new Date(a.unlockedAt).toLocaleDateString()}</div>
+                <div className="text-[10px] text-zinc-400">
+                  {new Date(a.unlockedAt).toLocaleDateString()}
+                </div>
               )}
             </div>
           ))}
@@ -710,13 +868,16 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
     'memory-match': dynamic(() => import('../memory-match/InCard'), { ssr: false }),
     'rhythm-beat-em-up': dynamic(() => import('../rhythm-beat-em-up/Scene'), { ssr: false }),
     'bubble-girl': dynamic(() => import('../bubble-girl/InCard'), { ssr: false }),
-    'quick-math': dynamic(() => import('../quick-math/QuickMathWrapper').then((m) => m.QuickMathWrapper), { ssr: false }),
+    'quick-math': dynamic(
+      () => import('../quick-math/QuickMathWrapper').then((m) => m.QuickMathWrapper),
+      { ssr: false },
+    ),
     'puzzle-reveal': dynamic(() => import('../puzzle-reveal/InCard'), { ssr: false }),
     'petal-samurai': dynamic(() => import('../petal-samurai/InCard'), { ssr: false }),
     'petal-storm-rhythm': dynamic(() => import('../petal-storm-rhythm/InCard'), { ssr: false }),
     'bubble-ragdoll': dynamic(() => import('../bubble-ragdoll/Scene'), { ssr: false }),
     'samurai-petal-slice': dynamic(() => import('../samurai-petal-slice/Scene'), { ssr: false }),
-    'blossomware': dynamic(() => import('../blossomware/InCard'), { ssr: false }),
+    blossomware: dynamic(() => import('../blossomware/InCard'), { ssr: false }),
     'dungeon-of-desire': dynamic(() => import('../dungeon-of-desire/InCard'), { ssr: false }),
     'maid-cafe-manager': dynamic(() => import('../maid-cafe-manager/InCard'), { ssr: false }),
     'thigh-coliseum': dynamic(() => import('../thigh-coliseum/InCard'), { ssr: false }),
@@ -761,22 +922,20 @@ function GameIcon({ slug, icon }: { slug: string; icon: string }) {
     };
   }, [slug]);
 
-  const statusDot = (
-    process.env.NODE_ENV !== 'production' && (
-      <span
-        className={[
-          'ml-1 inline-block h-1.5 w-1.5 rounded-full align-middle',
-          imgSrc ? 'bg-green-400' : 'bg-zinc-500',
-        ].join(' ')}
-        title={imgSrc ? 'Custom icon found' : 'Using fallback icon'}
-      />
-    )
+  const statusDot = process.env.NODE_ENV !== 'production' && (
+    <span
+      className={[
+        'ml-1 inline-block h-1.5 w-1.5 rounded-full align-middle',
+        imgSrc ? 'bg-green-400' : 'bg-zinc-500',
+      ].join(' ')}
+      title={imgSrc ? 'Custom icon found' : 'Using fallback icon'}
+    />
   );
 
   if (imgSrc) {
     return (
       <span className="inline-flex items-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {}
         <img src={imgSrc} alt="" className="h-5 w-5 object-contain" aria-hidden />
         {statusDot}
       </span>
@@ -808,8 +967,12 @@ function CommunityFace() {
     training: null,
     quest: null,
   });
-  const [toasts, setToasts] = React.useState<Array<{ id: string; kind: string; text: string; testId?: string }>>([]);
-  const [pendingInteraction, setPendingInteraction] = React.useState<{ requestId: string } | null>(null);
+  const [toasts, setToasts] = React.useState<
+    Array<{ id: string; kind: string; text: string; testId?: string }>
+  >([]);
+  const [pendingInteraction, setPendingInteraction] = React.useState<{ requestId: string } | null>(
+    null,
+  );
   const [trainingActive, setTrainingActive] = React.useState(false);
   const [unlockedEmotes, setUnlockedEmotes] = React.useState<Set<string>>(new Set());
 
@@ -846,7 +1009,12 @@ function CommunityFace() {
       try {
         // @ts-ignore
         const S = require('@sentry/nextjs');
-        S.addBreadcrumb({ category: 'minigames', message, data: { face: 2, ...(extra || {}) }, level: 'info' });
+        S.addBreadcrumb({
+          category: 'minigames',
+          message,
+          data: { face: 2, ...(extra || {}) },
+          level: 'info',
+        });
       } catch {}
     };
     const addToast = (t: { id?: string; kind: string; text: string; testId?: string }) => {
@@ -871,7 +1039,11 @@ function CommunityFace() {
           break;
         case 'quest':
           bc('quest.complete', { eventId: env.eventId });
-          addToast({ kind: 'success', text: 'Quest complete: reward granted', testId: 'toast-unlock-emote' });
+          addToast({
+            kind: 'success',
+            text: 'Quest complete: reward granted',
+            testId: 'toast-unlock-emote',
+          });
           break;
         case 'interact':
           bc('interaction.request', { eventId: env.eventId });
@@ -889,9 +1061,12 @@ function CommunityFace() {
         for (const d of domains) {
           const after = lastCursorRef.current[d] || '';
           try {
-            const r = await fetch(`/api/community/${d}/pending?after=${encodeURIComponent(after)}&limit=100`, {
-              headers: { 'x-request-id': `req_${Date.now()}` },
-            });
+            const r = await fetch(
+              `/api/community/${d}/pending?after=${encodeURIComponent(after)}&limit=100`,
+              {
+                headers: { 'x-request-id': `req_${Date.now()}` },
+              },
+            );
             const j = await r.json();
             if (j?.ok && j.data) {
               const evts: any[] = j.data.events || [];
@@ -916,7 +1091,8 @@ function CommunityFace() {
     const connect = () => {
       let ws: WebSocket | null = null;
       try {
-        const url = process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
+        const url =
+          process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
         ws = new WebSocket(url);
       } catch (e) {
         setWsFailures((n) => n + 1);
@@ -960,30 +1136,48 @@ function CommunityFace() {
         setTimeout(connect, Math.min(5000, 800 + wsFailures * 600));
       };
       ws.onerror = () => {
-        try { ws?.close(); } catch {}
+        try {
+          ws?.close();
+        } catch {}
       };
     };
     connect();
     return () => {
       stopPolling();
-      try { wsRef.current?.close(); } catch {}
+      try {
+        wsRef.current?.close();
+      } catch {}
       wsRef.current = null;
     };
   }, [wsDegraded, wsFailures]);
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm text-zinc-300" data-testid="face2-card-root">
+      <div
+        className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm text-zinc-300"
+        data-testid="face2-card-root"
+      >
         Loading…
       </div>
     );
   }
   if (error) {
     return (
-      <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200" role="alert">
+      <div
+        className="rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200"
+        role="alert"
+      >
         {error === 'AUTH_REQUIRED' ? (
           <div data-testid="routing-guard">
-            Login required for Community. <a className="underline" href="/sign-in?redirect_url=/mini-games?face=2">Sign in</a> or <a className="underline" href="/mini-games?face=0">return to Face 0</a>.
+            Login required for Community.{' '}
+            <a className="underline" href="/sign-in?redirect_url=/mini-games?face=2">
+              Sign in
+            </a>{' '}
+            or{' '}
+            <a className="underline" href="/mini-games?face=0">
+              return to Face 0
+            </a>
+            .
           </div>
         ) : (
           error
@@ -999,18 +1193,29 @@ function CommunityFace() {
     return (
       <div data-testid="face2-card-root">
         {wsDegraded && (
-          <div className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300" data-testid="ws-banner-degraded">
+          <div
+            className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300"
+            data-testid="ws-banner-degraded"
+          >
             Degraded Realtime: reconnecting… polling active
           </div>
         )}
-        <AvatarCreator prefs={prefs} onSaved={(d) => setData(d)} saving={saving} setSaving={setSaving} />
+        <AvatarCreator
+          prefs={prefs}
+          onSaved={(d) => setData(d)}
+          saving={saving}
+          setSaving={setSaving}
+        />
       </div>
     );
   }
   return (
     <div data-testid="face2-card-root">
       {wsDegraded && (
-        <div className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300" data-testid="ws-banner-degraded">
+        <div
+          className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300"
+          data-testid="ws-banner-degraded"
+        >
           Degraded Realtime: reconnecting… polling active
         </div>
       )}
@@ -1023,11 +1228,27 @@ function CommunityFace() {
         pendingInteraction={pendingInteraction}
         onAccept={() => {
           setPendingInteraction(null);
-          try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'interaction.accepted', level: 'info', data: { face: 2 } }); } catch {}
+          try {
+            const S = require('@sentry/nextjs');
+            S.addBreadcrumb({
+              category: 'minigames',
+              message: 'interaction.accepted',
+              level: 'info',
+              data: { face: 2 },
+            });
+          } catch {}
         }}
         onDecline={() => {
           setPendingInteraction(null);
-          try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'interaction.declined', level: 'info', data: { face: 2 } }); } catch {}
+          try {
+            const S = require('@sentry/nextjs');
+            S.addBreadcrumb({
+              category: 'minigames',
+              message: 'interaction.declined',
+              level: 'info',
+              data: { face: 2 },
+            });
+          } catch {}
         }}
         trainingActive={trainingActive}
         onTrainingConfirm={async () => {
@@ -1035,19 +1256,44 @@ function CommunityFace() {
           const j = await r.json();
           if (j.ok) {
             setTrainingActive(false);
-            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'training.learn', level: 'info', data: { face: 2 } }); } catch {}
+            try {
+              const S = require('@sentry/nextjs');
+              S.addBreadcrumb({
+                category: 'minigames',
+                message: 'training.learn',
+                level: 'info',
+                data: { face: 2 },
+              });
+            } catch {}
           }
         }}
         unlockedEmotes={unlockedEmotes}
         onQuestComplete={async () => {
-          const res = await fetch('/api/community/quests/complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ questId: 'q_dungeon_of_desire', score: 97 }) });
+          const res = await fetch('/api/community/quests/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ questId: 'q_dungeon_of_desire', score: 97 }),
+          });
           const j = await res.json();
           if (j.ok) {
             setUnlockedEmotes((prev) => new Set([...prev, 'blush_burst']));
-            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'emote.unlock', level: 'info', data: { face: 2, emoteId: 'blush_burst' } }); } catch {}
+            try {
+              const S = require('@sentry/nextjs');
+              S.addBreadcrumb({
+                category: 'minigames',
+                message: 'emote.unlock',
+                level: 'info',
+                data: { face: 2, emoteId: 'blush_burst' },
+              });
+            } catch {}
             setToasts((prev) => [
               ...prev,
-              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'success', text: 'Emote unlocked: Blush Burst', testId: 'toast-unlock-emote' },
+              {
+                id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                kind: 'success',
+                text: 'Emote unlocked: Blush Burst',
+                testId: 'toast-unlock-emote',
+              },
             ]);
           }
         }}
@@ -1055,23 +1301,54 @@ function CommunityFace() {
           if (dirty && !prefs.DIRTY_PREF) {
             setToasts((prev) => [
               ...prev,
-              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Content blocked by preferences', testId: 'toast-prefs-blocked' },
+              {
+                id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                kind: 'warn',
+                text: 'Content blocked by preferences',
+                testId: 'toast-prefs-blocked',
+              },
             ]);
-            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'prefs.blocked', level: 'info', data: { face: 2, dirty: true } }); } catch {}
+            try {
+              const S = require('@sentry/nextjs');
+              S.addBreadcrumb({
+                category: 'minigames',
+                message: 'prefs.blocked',
+                level: 'info',
+                data: { face: 2, dirty: true },
+              });
+            } catch {}
             return;
           }
           const res = await fetch('/api/community/emote/perform', { method: 'POST' });
           if (res.status === 429) {
             setToasts((prev) => [
               ...prev,
-              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Rate limited. Please wait.', testId: 'toast-rate-limited' },
+              {
+                id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                kind: 'warn',
+                text: 'Rate limited. Please wait.',
+                testId: 'toast-rate-limited',
+              },
             ]);
-            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'rate_limited', level: 'info', data: { face: 2 } }); } catch {}
+            try {
+              const S = require('@sentry/nextjs');
+              S.addBreadcrumb({
+                category: 'minigames',
+                message: 'rate_limited',
+                level: 'info',
+                data: { face: 2 },
+              });
+            } catch {}
           } else {
             try {
               if (dirty && prefs.JIGGLE_VISIBLE) {
                 const S = require('@sentry/nextjs');
-                S.addBreadcrumb({ category: 'minigames', message: 'jiggle.play', level: 'info', data: { face: 2, dirty: true } });
+                S.addBreadcrumb({
+                  category: 'minigames',
+                  message: 'jiggle.play',
+                  level: 'info',
+                  data: { face: 2, dirty: true },
+                });
               }
             } catch {}
           }
@@ -1087,26 +1364,54 @@ function CommunityFace() {
             if (res.status === 403 || j?.code === 'BLOCKED') {
               setToasts((prev) => [
                 ...prev,
-                { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Target has blocked you', testId: 'toast-blocked' },
+                {
+                  id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                  kind: 'warn',
+                  text: 'Target has blocked you',
+                  testId: 'toast-blocked',
+                },
               ]);
-              setTimeout(() => setToasts((prev) => prev.filter((x) => x.testId !== 'toast-blocked')), 2500);
+              setTimeout(
+                () => setToasts((prev) => prev.filter((x) => x.testId !== 'toast-blocked')),
+                2500,
+              );
               return;
             }
             setPendingInteraction({ requestId: j?.data?.requestId || `req_local_${Date.now()}` });
-            try { const S = require('@sentry/nextjs'); S.addBreadcrumb({ category: 'minigames', message: 'interaction.request.sent', level: 'info', data: { face: 2 } }); } catch {}
+            try {
+              const S = require('@sentry/nextjs');
+              S.addBreadcrumb({
+                category: 'minigames',
+                message: 'interaction.request.sent',
+                level: 'info',
+                data: { face: 2 },
+              });
+            } catch {}
           } catch (e) {
             setToasts((prev) => [
               ...prev,
-              { id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`, kind: 'warn', text: 'Failed to send request', testId: 'toast-request-failed' },
+              {
+                id: `t_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+                kind: 'warn',
+                text: 'Failed to send request',
+                testId: 'toast-request-failed',
+              },
             ]);
-            setTimeout(() => setToasts((prev) => prev.filter((x) => x.testId !== 'toast-request-failed')), 2500);
+            setTimeout(
+              () => setToasts((prev) => prev.filter((x) => x.testId !== 'toast-request-failed')),
+              2500,
+            );
           }
         }}
       />
       {/* toasts */}
       <div className="mt-2 space-y-1">
         {toasts.map((t) => (
-          <div key={t.id} className="rounded bg-white/10 px-3 py-2 text-[11px] text-zinc-200" data-testid={t.testId}>
+          <div
+            key={t.id}
+            className="rounded bg-white/10 px-3 py-2 text-[11px] text-zinc-200"
+            data-testid={t.testId}
+          >
             {t.text}
           </div>
         ))}
@@ -1115,7 +1420,17 @@ function CommunityFace() {
   );
 }
 
-function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSaved: (d: any) => void; saving: boolean; setSaving: (b: boolean) => void }) {
+function AvatarCreator({
+  prefs,
+  onSaved,
+  saving,
+  setSaving,
+}: {
+  prefs: any;
+  onSaved: (d: any) => void;
+  saving: boolean;
+  setSaving: (b: boolean) => void;
+}) {
   const [url, setUrl] = React.useState('');
   const [dirty, setDirty] = React.useState(!!prefs.DIRTY_PREF);
   const [jiggle, setJiggle] = React.useState(!!prefs.JIGGLE_VISIBLE);
@@ -1123,7 +1438,10 @@ function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSa
 
   const save = async () => {
     setSaving(true);
-    const body = { avatar: url ? { url } : undefined, prefs: { DIRTY_PREF: dirty, JIGGLE_VISIBLE: jiggle, AUDIO: audio } };
+    const body = {
+      avatar: url ? { url } : undefined,
+      prefs: { DIRTY_PREF: dirty, JIGGLE_VISIBLE: jiggle, AUDIO: audio },
+    };
     const res = await fetch('/api/user/avatar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` },
@@ -1140,23 +1458,48 @@ function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSa
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="text-xs text-zinc-300">
           Image URL
-          <input name="avatarUrl" value={url} onChange={(e) => setUrl(e.target.value)} className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15" placeholder="https://…/avatar.png" />
+          <input
+            name="avatarUrl"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15"
+            placeholder="https://…/avatar.png"
+          />
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
-          <input type="checkbox" name="audio" checked={audio} onChange={(e) => setAudio(e.target.checked)} />
+          <input
+            type="checkbox"
+            name="audio"
+            checked={audio}
+            onChange={(e) => setAudio(e.target.checked)}
+          />
           Enable Audio
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
-          <input type="checkbox" name="jiggle" checked={jiggle} onChange={(e) => setJiggle(e.target.checked)} />
+          <input
+            type="checkbox"
+            name="jiggle"
+            checked={jiggle}
+            onChange={(e) => setJiggle(e.target.checked)}
+          />
           Jiggle Visible (a11y toggle exists)
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
-          <input type="checkbox" name="dirty" checked={dirty} onChange={(e) => setDirty(e.target.checked)} />
+          <input
+            type="checkbox"
+            name="dirty"
+            checked={dirty}
+            onChange={(e) => setDirty(e.target.checked)}
+          />
           DIRTY Pref (consent-gated)
         </label>
       </div>
       <div className="mt-3 flex gap-2">
-        <button onClick={save} disabled={saving} className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50"
+        >
           {saving ? 'Saving…' : 'Save'}
         </button>
       </div>
@@ -1164,7 +1507,22 @@ function AvatarCreator({ prefs, onSaved, saving, setSaving }: { prefs: any; onSa
   );
 }
 
-function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingInteraction, onAccept, onDecline, trainingActive, onTrainingConfirm, unlockedEmotes, onQuestComplete, onPerformEmote, onRequestInteraction }: {
+function CommunityLobby({
+  avatarUrl,
+  prefs,
+  onPrefs,
+  saving,
+  setSaving,
+  pendingInteraction,
+  onAccept,
+  onDecline,
+  trainingActive,
+  onTrainingConfirm,
+  unlockedEmotes,
+  onQuestComplete,
+  onPerformEmote,
+  onRequestInteraction,
+}: {
   avatarUrl: string;
   prefs: any;
   onPrefs: (p: any) => void;
@@ -1187,7 +1545,11 @@ function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingI
   const save = async () => {
     setSaving(true);
     const body = { prefs: { ...prefs, CRT: crt, VHS: vhs, AUDIO: audio } };
-    const res = await fetch('/api/user/avatar', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` }, body: JSON.stringify(body) });
+    const res = await fetch('/api/user/avatar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-request-id': `req_${Date.now()}` },
+      body: JSON.stringify(body),
+    });
     const j = await res.json();
     setSaving(false);
     if (j.ok) onPrefs(j.data.prefs);
@@ -1196,17 +1558,26 @@ function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingI
   return (
     <div className="rounded-lg border border-white/15 bg-white/10 p-4">
       <div className="mb-3 flex items-center gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {}
         <img src={avatarUrl} alt="" className="h-10 w-10 rounded" />
-        <div className="text-sm text-zinc-200" data-testid="avatar-persisted">Welcome to the Community Lobby</div>
+        <div className="text-sm text-zinc-200" data-testid="avatar-persisted">
+          Welcome to the Community Lobby
+        </div>
       </div>
       {/* Hotbar */}
       <div className="mb-3 flex items-center gap-2">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} data-testid={`hotbar-slot-${i}`} className="rounded bg-white/10 px-2 py-1 text-[11px] text-zinc-200">
+          <div
+            key={i}
+            data-testid={`hotbar-slot-${i}`}
+            className="rounded bg-white/10 px-2 py-1 text-[11px] text-zinc-200"
+          >
             {i === 1 && unlockedEmotes.has('blush_burst') ? (
               <span>
-                Blush Burst <span className="ml-1 rounded bg-pink-500/20 px-1" data-testid="combo-badge">combo</span>
+                Blush Burst{' '}
+                <span className="ml-1 rounded bg-pink-500/20 px-1" data-testid="combo-badge">
+                  combo
+                </span>
               </span>
             ) : (
               '—'
@@ -1215,34 +1586,115 @@ function CommunityLobby({ avatarUrl, prefs, onPrefs, saving, setSaving, pendingI
         ))}
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className="text-xs text-zinc-300 inline-flex items-center gap-2"><input type="checkbox" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT</label>
-        <label className="text-xs text-zinc-300 inline-flex items-center gap-2"><input type="checkbox" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS</label>
-        <label className="text-xs text-zinc-300 inline-flex items-center gap-2" data-testid="chip-consent"><input type="checkbox" checked={audio} onChange={(e) => setAudio(e.target.checked)} /> Audio</label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
+          <input type="checkbox" checked={crt} onChange={(e) => setCrt(e.target.checked)} /> CRT
+        </label>
+        <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
+          <input type="checkbox" checked={vhs} onChange={(e) => setVhs(e.target.checked)} /> VHS
+        </label>
+        <label
+          className="text-xs text-zinc-300 inline-flex items-center gap-2"
+          data-testid="chip-consent"
+        >
+          <input type="checkbox" checked={audio} onChange={(e) => setAudio(e.target.checked)} />{' '}
+          Audio
+        </label>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
-        <button onClick={save} disabled={saving} className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50">{saving ? 'Saving…' : 'Save Preferences'}</button>
-        <button onClick={onQuestComplete} data-testid="btn-start-quest" className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Start Quest</button>
-        <button onClick={() => onPerformEmote(false)} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Perform Emote</button>
-        <button onClick={() => onPerformEmote(true)} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Perform DIRTY Emote</button>
-        <button onClick={async () => { await fetch('/api/community/emote/perform', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emoteId: 'bow' }) }); }} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Bow</button>
-        <button onClick={async () => { await fetch('/api/community/emote/perform', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emoteId: 'thrust' }) }); }} className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Thrust</button>
-        <button onClick={onRequestInteraction} data-testid="btn-request-interaction" className="rounded border border-white/20 px-3 py-1 text-sm text-white/90">Request Interaction</button>
+        <button
+          onClick={save}
+          disabled={saving}
+          className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50"
+        >
+          {saving ? 'Saving…' : 'Save Preferences'}
+        </button>
+        <button
+          onClick={onQuestComplete}
+          data-testid="btn-start-quest"
+          className="rounded border border-white/20 px-3 py-1 text-sm text-white/90"
+        >
+          Start Quest
+        </button>
+        <button
+          onClick={() => onPerformEmote(false)}
+          className="rounded border border-white/20 px-3 py-1 text-sm text-white/90"
+        >
+          Perform Emote
+        </button>
+        <button
+          onClick={() => onPerformEmote(true)}
+          className="rounded border border-white/20 px-3 py-1 text-sm text-white/90"
+        >
+          Perform DIRTY Emote
+        </button>
+        <button
+          onClick={async () => {
+            await fetch('/api/community/emote/perform', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ emoteId: 'bow' }),
+            });
+          }}
+          className="rounded border border-white/20 px-3 py-1 text-sm text-white/90"
+        >
+          Bow
+        </button>
+        <button
+          onClick={async () => {
+            await fetch('/api/community/emote/perform', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ emoteId: 'thrust' }),
+            });
+          }}
+          className="rounded border border-white/20 px-3 py-1 text-sm text-white/90"
+        >
+          Thrust
+        </button>
+        <button
+          onClick={onRequestInteraction}
+          data-testid="btn-request-interaction"
+          className="rounded border border-white/20 px-3 py-1 text-sm text-white/90"
+        >
+          Request Interaction
+        </button>
       </div>
       {pendingInteraction && (
-        <div className="mt-3 rounded border border-white/15 bg-white/5 p-3 text-sm text-zinc-200">Incoming interaction request
+        <div className="mt-3 rounded border border-white/15 bg-white/5 p-3 text-sm text-zinc-200">
+          Incoming interaction request
           <div className="mt-2 flex gap-2">
-            <button onClick={onAccept} data-testid="btn-accept" className="rounded bg-green-600 px-3 py-1 text-white text-xs">Accept</button>
-            <button onClick={onDecline} data-testid="btn-decline" className="rounded bg-red-600 px-3 py-1 text-white text-xs">Decline</button>
+            <button
+              onClick={onAccept}
+              data-testid="btn-accept"
+              className="rounded bg-green-600 px-3 py-1 text-white text-xs"
+            >
+              Accept
+            </button>
+            <button
+              onClick={onDecline}
+              data-testid="btn-decline"
+              className="rounded bg-red-600 px-3 py-1 text-white text-xs"
+            >
+              Decline
+            </button>
           </div>
         </div>
       )}
       {trainingActive && (
         <div className="mt-3 flex items-center gap-2" data-testid="training-ring">
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-pink-400 border-r-transparent" />
-          <button onClick={onTrainingConfirm} data-testid="btn-training-confirm" className="rounded border border-white/20 px-2 py-0.5 text-xs text-white/90">Confirm Training</button>
+          <button
+            onClick={onTrainingConfirm}
+            data-testid="btn-training-confirm"
+            className="rounded border border-white/20 px-2 py-0.5 text-xs text-white/90"
+          >
+            Confirm Training
+          </button>
         </div>
       )}
-      <div className="mt-4 text-[11px] text-zinc-400">Card-contained; consent gates enforced for DIRTY/jiggle. Realtime events pending.</div>
+      <div className="mt-4 text-[11px] text-zinc-400">
+        Card-contained; consent gates enforced for DIRTY/jiggle. Realtime events pending.
+      </div>
     </div>
   );
 }

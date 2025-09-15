@@ -1,15 +1,15 @@
 // Common types for service layer
 
-export type Ok<T> = { 
-  ok: true; 
+export type Ok<T> = {
+  ok: true;
   data: T;
 };
 
-export type Err = { 
-  ok: false; 
-  error: { 
-    code: string; 
-    message: string; 
+export type Err = {
+  ok: false;
+  error: {
+    code: string;
+    message: string;
     cause?: unknown;
   };
 };
@@ -22,9 +22,9 @@ export function ok<T>(data: T): Ok<T> {
 }
 
 export function err(code: string, message: string, cause?: unknown): Err {
-  return { 
-    ok: false, 
-    error: { code, message, cause }
+  return {
+    ok: false,
+    error: { code, message, cause },
   };
 }
 
@@ -32,7 +32,7 @@ export function err(code: string, message: string, cause?: unknown): Err {
 export async function safeAsync<T>(
   operation: () => Promise<T>,
   errorCode: string,
-  errorMessage: string
+  errorMessage: string,
 ): Promise<Result<T>> {
   try {
     const data = await operation();

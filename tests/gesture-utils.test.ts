@@ -6,7 +6,7 @@ import {
   easeOutCubic,
   getFaceAngle,
   getFacePosition,
-  isTap
+  isTap,
 } from '@/app/lib/gesture-utils';
 
 describe('gesture-utils', () => {
@@ -64,8 +64,8 @@ describe('gesture-utils', () => {
     });
 
     it('should snap to 3π/2 for angles near 3π/2', () => {
-      expect(snapToAngle(3 * Math.PI / 2 + 0.1)).toBe(3 * Math.PI / 2);
-      expect(snapToAngle(3 * Math.PI / 2 - 0.1)).toBe(3 * Math.PI / 2);
+      expect(snapToAngle((3 * Math.PI) / 2 + 0.1)).toBe((3 * Math.PI) / 2);
+      expect(snapToAngle((3 * Math.PI) / 2 - 0.1)).toBe((3 * Math.PI) / 2);
     });
   });
 
@@ -75,7 +75,7 @@ describe('gesture-utils', () => {
     });
 
     it('should return negative rotation for large positive angles', () => {
-      expect(getShortestRotation(0, 3 * Math.PI / 2)).toBeCloseTo(-Math.PI / 2);
+      expect(getShortestRotation(0, (3 * Math.PI) / 2)).toBeCloseTo(-Math.PI / 2);
     });
 
     it('should return 0 for same angles', () => {
@@ -83,7 +83,7 @@ describe('gesture-utils', () => {
     });
 
     it('should handle wraparound correctly', () => {
-      expect(getShortestRotation(7 * Math.PI / 4, Math.PI / 4)).toBeCloseTo(Math.PI / 2);
+      expect(getShortestRotation((7 * Math.PI) / 4, Math.PI / 4)).toBeCloseTo(Math.PI / 2);
     });
   });
 
@@ -109,7 +109,7 @@ describe('gesture-utils', () => {
       expect(getFaceAngle(0)).toBe(0); // front
       expect(getFaceAngle(1)).toBeCloseTo(Math.PI / 2); // right
       expect(getFaceAngle(2)).toBeCloseTo(Math.PI); // back
-      expect(getFaceAngle(3)).toBeCloseTo(3 * Math.PI / 2); // left
+      expect(getFaceAngle(3)).toBeCloseTo((3 * Math.PI) / 2); // left
       expect(getFaceAngle(4)).toBeCloseTo(Math.PI / 2); // top
       expect(getFaceAngle(5)).toBeCloseTo(-Math.PI / 2); // down
     });

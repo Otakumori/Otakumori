@@ -16,9 +16,41 @@ export default function NewPagesNav() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
-            <a href="/" className="text-slatey-200 font-bold text-lg">{<>''
-              <span role='img' aria-label='emoji'>O</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>k</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>i</span>
-              ''</>}</a>
+            <a href="/" className="text-slatey-200 font-bold text-lg">
+              {
+                <>
+                  ''
+                  <span role="img" aria-label="emoji">
+                    O
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    t
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    a
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    k
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    u
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    m
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    o
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    r
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    i
+                  </span>
+                  ''
+                </>
+              }
+            </a>
 
             <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item) => (
@@ -38,9 +70,49 @@ export default function NewPagesNav() {
             <a
               href="/starter-pack"
               className="bg-sakura-500/20 border border-sakura-400 text-slatey-200 px-4 py-2 rounded-lg hover:bg-sakura-500/30 transition-colors text-sm font-medium"
-            >{<>''
-              <span role='img' aria-label='emoji'>G</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>F</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>e</span>' '<span role='img' aria-label='emoji'>P</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>k</span>
-              ''</>}</a>
+            >
+              {
+                <>
+                  ''
+                  <span role="img" aria-label="emoji">
+                    G
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    e
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    t
+                  </span>
+                  ' '
+                  <span role="img" aria-label="emoji">
+                    F
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    r
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    e
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    e
+                  </span>
+                  ' '
+                  <span role="img" aria-label="emoji">
+                    P
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    a
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    c
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    k
+                  </span>
+                  ''
+                </>
+              }
+            </a>
           </div>
         </div>
       </div>

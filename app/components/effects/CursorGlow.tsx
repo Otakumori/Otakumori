@@ -1,5 +1,5 @@
-"use client";
-import { useEffect, useRef } from "react";
+'use client';
+import { useEffect, useRef } from 'react';
 
 export default function CursorGlow() {
   const dotRef = useRef<HTMLDivElement | null>(null);
@@ -9,7 +9,7 @@ export default function CursorGlow() {
 
   useEffect(() => {
     const el = dotRef.current!;
-    const prm = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const prm = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const onMove = (e: MouseEvent) => {
       target.current.x = e.clientX;
@@ -28,9 +28,9 @@ export default function CursorGlow() {
       rafId.current = requestAnimationFrame(tick);
     };
 
-    addEventListener("mousemove", onMove, { passive: true });
+    addEventListener('mousemove', onMove, { passive: true });
     return () => {
-      removeEventListener("mousemove", onMove);
+      removeEventListener('mousemove', onMove);
       if (rafId.current) cancelAnimationFrame(rafId.current);
     };
   }, []);
@@ -42,11 +42,11 @@ export default function CursorGlow() {
       className="pointer-events-none fixed left-0 top-0 z-[15] h-6 w-6 rounded-full"
       style={{
         background:
-          "radial-gradient(12px 12px at 50% 50%, rgba(244,114,182,0.28), rgba(244,114,182,0.0))",
-        filter: "blur(2px)",
-        transition: "transform 40ms linear",
-        willChange: "transform",
-        mixBlendMode: "screen",
+          'radial-gradient(12px 12px at 50% 50%, rgba(244,114,182,0.28), rgba(244,114,182,0.0))',
+        filter: 'blur(2px)',
+        transition: 'transform 40ms linear',
+        willChange: 'transform',
+        mixBlendMode: 'screen',
       }}
     />
   );

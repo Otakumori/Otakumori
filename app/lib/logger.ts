@@ -1,4 +1,3 @@
-
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 export type LogCtx = {
   requestId?: string;

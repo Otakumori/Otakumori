@@ -13,10 +13,16 @@ export default function InsidersPage() {
           We’re polishing this feature. Check back soon or explore the shop and mini‑games.
         </p>
         <div className="mt-6 flex justify-center gap-3">
-          <Link href="/" className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">
+          <Link
+            href="/"
+            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+          >
             Return Home
           </Link>
-          <Link href="/mini-games" className="rounded-xl bg-fuchsia-500/90 px-4 py-2 text-sm text-white hover:bg-fuchsia-500">
+          <Link
+            href="/mini-games"
+            className="rounded-xl bg-fuchsia-500/90 px-4 py-2 text-sm text-white hover:bg-fuchsia-500"
+          >
             Play a Game
           </Link>
         </div>
@@ -24,4 +30,3 @@ export default function InsidersPage() {
     </main>
   );
 }
-

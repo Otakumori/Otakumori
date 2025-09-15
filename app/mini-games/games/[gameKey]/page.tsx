@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
@@ -14,4 +14,3 @@ export default function GameRoute() {
     </main>
   );
 }
-

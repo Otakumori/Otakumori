@@ -47,15 +47,15 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
 
       if (response.ok) {
         const newSoapstone = await response.json();
-        
+
         // Add glow effect to the new message
         const glowingSoapstone = { ...newSoapstone, isGlowing: true };
-        setSoapstones(prev => [glowingSoapstone, ...prev]);
-        
+        setSoapstones((prev) => [glowingSoapstone, ...prev]);
+
         // Remove glow after 3 seconds
         setTimeout(() => {
-          setSoapstones(prev => 
-            prev.map(s => s.id === newSoapstone.id ? { ...s, isGlowing: false } : s)
+          setSoapstones((prev) =>
+            prev.map((s) => (s.id === newSoapstone.id ? { ...s, isGlowing: false } : s)),
           );
         }, 3000);
 
@@ -84,22 +84,16 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
 
       if (response.ok) {
         // Trigger pulse effect on the original message
-        setSoapstones(prev => 
-          prev.map(s => 
-            s.id === soapstoneId 
-              ? { ...s, isReplying: true, replies: s.replies + 1 }
-              : s
-          )
+        setSoapstones((prev) =>
+          prev.map((s) =>
+            s.id === soapstoneId ? { ...s, isReplying: true, replies: s.replies + 1 } : s,
+          ),
         );
 
         // Remove pulse effect after 2 seconds
         setTimeout(() => {
-          setSoapstones(prev => 
-            prev.map(s => 
-              s.id === soapstoneId 
-                ? { ...s, isReplying: false }
-                : s
-            )
+          setSoapstones((prev) =>
+            prev.map((s) => (s.id === soapstoneId ? { ...s, isReplying: false } : s)),
           );
         }, 2000);
       }
@@ -142,18 +136,20 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
               disabled={!isSignedIn || isSubmitting}
             />
             <div className="flex justify-between items-center mt-2">
-              <div className={`text-sm ${characterCount > maxCharacters * 0.9 ? 'text-yellow-400' : 'text-zinc-400'}`}>
+              <div
+                className={`text-sm ${characterCount > maxCharacters * 0.9 ? 'text-yellow-400' : 'text-zinc-400'}`}
+              >
                 {characterCount} / {maxCharacters}
               </div>
-              {!isSignedIn && (
-                <p className="text-sm text-zinc-400">Sign in to leave messages</p>
-              )}
+              {!isSignedIn && <p className="text-sm text-zinc-400">Sign in to leave messages</p>}
             </div>
           </div>
-          
+
           <button
             type="submit"
-            disabled={!newMessage.trim() || !isSignedIn || isSubmitting || characterCount > maxCharacters}
+            disabled={
+              !newMessage.trim() || !isSignedIn || isSubmitting || characterCount > maxCharacters
+            }
             className="rounded-xl bg-fuchsia-500/90 px-6 py-3 text-white hover:bg-fuchsia-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? 'Posting...' : 'Place Soapstone'}
@@ -164,14 +160,14 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
       {/* Soapstone Messages */}
       <div className="space-y-4">
         {soapstones.map((soapstone) => (
-          <GlassPanel 
-            key={soapstone.id} 
+          <GlassPanel
+            key={soapstone.id}
             className={`p-4 transition-all duration-500 ${
-              soapstone.isGlowing 
-                ? 'animate-pulse bg-fuchsia-500/10 border-fuchsia-400/50' 
+              soapstone.isGlowing
+                ? 'animate-pulse bg-fuchsia-500/10 border-fuchsia-400/50'
                 : soapstone.isReplying
-                ? 'animate-pulse bg-purple-500/10 border-purple-400/50'
-                : ''
+                  ? 'animate-pulse bg-purple-500/10 border-purple-400/50'
+                  : ''
             } ${getGlowIntensity(soapstone.glowLevel)}`}
           >
             <div className="flex items-start justify-between mb-3">
@@ -186,23 +182,19 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
-                <span className="text-xs text-zinc-400">
-                  Glow: {soapstone.glowLevel}
-                </span>
+                <span className="text-xs text-zinc-400">Glow: {soapstone.glowLevel}</span>
                 {soapstone.replies > 0 && (
-                  <span className="text-xs text-purple-400">
-                    {soapstone.replies} replies
-                  </span>
+                  <span className="text-xs text-purple-400">{soapstone.replies} replies</span>
                 )}
               </div>
             </div>
-            
+
             <p className={`mb-4 leading-relaxed ${getMessageColor(soapstone.glowLevel)}`}>
               {soapstone.message}
             </p>
-            
+
             <div className="flex items-center gap-4">
               <button
                 onClick={() => handleReply(soapstone.id)}
@@ -212,7 +204,7 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
                 <span>💬</span>
                 Reply
               </button>
-              
+
               <button className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-300 transition-colors">
                 <span>⭐</span>
                 Rate
@@ -225,12 +217,8 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
       {soapstones.length === 0 && (
         <div className="text-center py-12">
           <GlassPanel className="p-8">
-            <h3 className="text-xl font-semibold text-white mb-4">
-              No messages yet
-            </h3>
-            <p className="text-zinc-400">
-              Be the first to leave a message for other travelers!
-            </p>
+            <h3 className="text-xl font-semibold text-white mb-4">No messages yet</h3>
+            <p className="text-zinc-400">Be the first to leave a message for other travelers!</p>
           </GlassPanel>
         </div>
       )}

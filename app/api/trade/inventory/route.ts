@@ -20,7 +20,10 @@ export async function GET(_req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, code: 'UNAUTHENTICATED', message: 'Sign in required' }, { status: 401 });
+      return NextResponse.json(
+        { ok: false, code: 'UNAUTHENTICATED', message: 'Sign in required' },
+        { status: 401 },
+      );
     }
 
     // Fetch user's runes and aggregate by canonicalId
@@ -51,7 +54,9 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ ok: true, items });
   } catch (err) {
     console.error('trade/inventory error', err);
-    return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
+      { status: 500 },
+    );
   }
 }
-

@@ -13,20 +13,20 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
     // Check for reduced motion preference
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);
     };
-    
+
     mediaQuery.addEventListener('change', handleChange);
-    
+
     // Handle visibility change for performance
     const handleVisibilityChange = () => {
       setIsVisible(!document.hidden);
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -41,7 +41,8 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    let w = 0, h = 0;
+    let w = 0,
+      h = 0;
     const fit = () => {
       w = Math.floor(window.innerWidth * DPR);
       h = Math.floor(window.innerHeight * DPR);
@@ -55,8 +56,12 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
     let backdrop: CanvasGradient;
     const buildGrad = () => {
       backdrop = ctx.createRadialGradient(
-        w * 0.5, h * 0.32, Math.min(w, h) * 0.04,
-        w * 0.5, h * 0.65, Math.max(w, h) * 0.95
+        w * 0.5,
+        h * 0.32,
+        Math.min(w, h) * 0.04,
+        w * 0.5,
+        h * 0.65,
+        Math.max(w, h) * 0.95,
       );
       backdrop.addColorStop(0.0, '#1a0f2a');
       backdrop.addColorStop(0.35, '#120b1f');
@@ -64,7 +69,12 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
     };
     buildGrad();
 
-    interface Star { x: number; y: number; z: number; pz: number; }
+    interface Star {
+      x: number;
+      y: number;
+      z: number;
+      pz: number;
+    }
     const spawn = (): Star => {
       const z = Math.random() * 0.95 + 0.05;
       return { x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z, pz: z };
@@ -87,8 +97,12 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
 
       // faint vignette + soft aurora glow
       const glow = ctx.createRadialGradient(
-        w * 0.5, h * 0.62, Math.max(w, h) * 0.18,
-        w * 0.5, h * 0.62, Math.max(w, h) * 1.0
+        w * 0.5,
+        h * 0.62,
+        Math.max(w, h) * 0.18,
+        w * 0.5,
+        h * 0.62,
+        Math.max(w, h) * 1.0,
       );
       glow.addColorStop(0, 'rgba(210, 170, 255, 0.05)');
       glow.addColorStop(1, 'rgba(0, 0, 0, 0.7)');
@@ -105,7 +119,10 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
         const s = stars[i];
         s.pz = s.z;
         s.z -= dt * zStep * (0.15 + s.z * 1.1);
-        if (s.z <= 0.02) { stars[i] = spawn(); continue; }
+        if (s.z <= 0.02) {
+          stars[i] = spawn();
+          continue;
+        }
 
         const sx = (s.x / s.z) * fov + w * 0.5;
         const sy = (s.y / s.z) * fov + h * 0.5;
@@ -135,7 +152,7 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
 
     const frame = (now: number) => {
       if (!isVisible || prefersReducedMotion) return;
-      
+
       const dt = Math.min(0.033, (now - last) / 1000);
       last = now;
       drawBG();

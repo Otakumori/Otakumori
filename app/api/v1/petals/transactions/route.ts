@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       skip: offset,
     });
 
-    const response = transactions.map(tx => PetalTransactionSchema.parse(tx));
+    const response = transactions.map((tx) => PetalTransactionSchema.parse(tx));
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
     console.error('Error fetching petal transactions:', error);

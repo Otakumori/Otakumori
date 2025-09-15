@@ -97,7 +97,11 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
   if (error) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4"><span role="img" aria-label="Disappointed face">😔</span></div>
+        <div className="text-6xl mb-4">
+          <span role="img" aria-label="Disappointed face">
+            😔
+          </span>
+        </div>
         <h3 className="text-xl font-semibold mb-2">Something went wrong</h3>
         <p className="text-white/60 mb-4">{error}</p>
         <button
@@ -113,7 +117,11 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
   if (products.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4"><span role="img" aria-label="Cherry blossom">🌸</span></div>
+        <div className="text-6xl mb-4">
+          <span role="img" aria-label="Cherry blossom">
+            🌸
+          </span>
+        </div>
         <h3 className="text-xl font-semibold mb-2">No products found</h3>
         <p className="text-white/60">
           {query ? `No products match "${query}"` : 'No products available at the moment'}

@@ -148,7 +148,7 @@ export default function ProductDetailPage() {
         <ol className="flex items-center space-x-2 text-sm text-white/60">
           <li>
             <Link href="/shop" className="hover:text-white">
-              {t("nav", "shop")}
+              {t('nav', 'shop')}
             </Link>
           </li>
           <li>/</li>
@@ -196,7 +196,7 @@ export default function ProductDetailPage() {
           {/* Description */}
           {product.description && (
             <Card className="p-6 bg-white/5 border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-2">{t("shop", "description")}</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">{t('shop', 'description')}</h3>
               <p className="text-white/80 leading-relaxed">{product.description}</p>
             </Card>
           )}
@@ -204,7 +204,7 @@ export default function ProductDetailPage() {
           {/* Variants */}
           {product.variants && product.variants.length > 1 && (
             <Card className="p-6 bg-white/5 border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-3">{t("shop", "options")}</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">{t('shop', 'options')}</h3>
               <div className="grid grid-cols-2 gap-3">
                 {product.variants.map((variant) => (
                   <button
@@ -221,7 +221,9 @@ export default function ProductDetailPage() {
                     <div className="text-xs opacity-60">
                       {product.currency || 'USD'} {variant.price.toFixed(2)}
                     </div>
-                    {!variant.is_enabled && <div className="text-xs text-red-400">{t("shop", "unavailable")}</div>}
+                    {!variant.is_enabled && (
+                      <div className="text-xs text-red-400">{t('shop', 'unavailable')}</div>
+                    )}
                   </button>
                 ))}
               </div>
@@ -268,4 +270,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-

@@ -25,12 +25,12 @@ type ShopCatalogProps = {
   searchParams: { sort?: string; q?: string; page?: string; category?: string };
 };
 
-export default function ShopCatalog({ 
-  products, 
-  total, 
-  currentPage, 
-  totalPages, 
-  searchParams 
+export default function ShopCatalog({
+  products,
+  total,
+  currentPage,
+  totalPages,
+  searchParams,
 }: ShopCatalogProps) {
   const router = useRouter();
   const searchParamsHook = useSearchParams();
@@ -72,7 +72,9 @@ export default function ShopCatalog({
         <div className="flex flex-wrap items-center gap-4">
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <label htmlFor="shop-sort" className="text-sm text-zinc-300">Sort by:</label>
+            <label htmlFor="shop-sort" className="text-sm text-zinc-300">
+              Sort by:
+            </label>
             <select
               id="shop-sort"
               name="sort"
@@ -89,7 +91,9 @@ export default function ShopCatalog({
 
           {/* Category */}
           <div className="flex items-center gap-2">
-            <label htmlFor="shop-category" className="text-sm text-zinc-300">Category:</label>
+            <label htmlFor="shop-category" className="text-sm text-zinc-300">
+              Category:
+            </label>
             <select
               id="shop-category"
               name="category"
@@ -107,12 +111,14 @@ export default function ShopCatalog({
 
           {/* Price Range */}
           <div className="flex items-center gap-2">
-            <label htmlFor="price-min" className="text-sm text-zinc-300">Price:</label>
+            <label htmlFor="price-min" className="text-sm text-zinc-300">
+              Price:
+            </label>
             <input
               type="number"
               placeholder="Min"
               value={priceRange.min}
-              onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+              onChange={(e) => setPriceRange((prev) => ({ ...prev, min: e.target.value }))}
               className="w-20 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
               id="price-min"
               name="minPrice"
@@ -122,7 +128,7 @@ export default function ShopCatalog({
               type="number"
               placeholder="Max"
               value={priceRange.max}
-              onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+              onChange={(e) => setPriceRange((prev) => ({ ...prev, max: e.target.value }))}
               className="w-20 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
               id="price-max"
               name="maxPrice"
@@ -136,15 +142,16 @@ export default function ShopCatalog({
           </div>
 
           {/* Results count */}
-          <div className="ml-auto text-sm text-zinc-300">
-            {total} products found
-          </div>
+          <div className="ml-auto text-sm text-zinc-300">{total} products found</div>
         </div>
       </GlassPanel>
 
       {/* Products Grid */}
       {products.length > 0 ? (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4" data-testid="product-grid">
+        <div
+          className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
+          data-testid="product-grid"
+        >
           {products.map((product) => (
             <GlassPanel key={product.id} className="group overflow-hidden">
               <Link href={`/shop/${product.slug}`} className="block" data-testid="product-card">
@@ -159,15 +166,13 @@ export default function ShopCatalog({
                   {!product.inStock && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                       <span className="rounded-xl bg-red-500/90 px-3 py-1 text-sm text-white">
-                        {t("shop", "soldOut")}
+                        {t('shop', 'soldOut')}
                       </span>
                     </div>
                   )}
                 </div>
                 <div className="p-3">
-                  <h3 className="text-sm font-medium text-white line-clamp-2">
-                    {product.name}
-                  </h3>
+                  <h3 className="text-sm font-medium text-white line-clamp-2">{product.name}</h3>
                   <p className="text-xs text-zinc-300/90">${product.price}</p>
                 </div>
               </Link>
@@ -186,7 +191,7 @@ export default function ShopCatalog({
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
             const params = new URLSearchParams(searchParamsHook);
             params.set('page', page.toString());
-            
+
             return (
               <Link
                 key={page}

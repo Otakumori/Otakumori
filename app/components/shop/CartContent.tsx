@@ -10,7 +10,10 @@ import { useCart } from '@/app/components/cart/CartProvider';
 export default function CartContent() {
   const { items, updateQuantity, removeItem } = useCart();
   const isUpdating = false;
-  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
+  const subtotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items],
+  );
   const baseShipping = subtotal > 50 ? 0 : 9.99; // legacy heuristic
   const [couponInput, setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
@@ -37,7 +40,10 @@ export default function CartContent() {
   useEffect(() => {
     let cancelled = false;
     const fn = async () => {
-      if (codes.length === 0) { setPreview(null); return; }
+      if (codes.length === 0) {
+        setPreview(null);
+        return;
+      }
       setBusyPreview(true);
       try {
         const res = await fetch('/api/coupons/preview', {
@@ -46,7 +52,13 @@ export default function CartContent() {
           body: JSON.stringify({
             codes,
             cart: {
-              items: items.map((i) => ({ id: i.id, productId: i.id, collectionIds: [], quantity: i.quantity, unitPrice: i.price })),
+              items: items.map((i) => ({
+                id: i.id,
+                productId: i.id,
+                collectionIds: [],
+                quantity: i.quantity,
+                unitPrice: i.price,
+              })),
               shipping: { provider: 'stripe', fee: baseShipping },
             },
           }),
@@ -60,7 +72,10 @@ export default function CartContent() {
       }
     };
     const t = setTimeout(fn, 250);
-    return () => { cancelled = true; clearTimeout(t); };
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [codes, items, baseShipping]);
 
   const addCode = () => {
@@ -77,12 +92,8 @@ export default function CartContent() {
     return (
       <div className="text-center py-12">
         <GlassPanel className="p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            {t("cart", "empty")}
-          </h2>
-          <p className="text-zinc-400 mb-6">
-            Time for some side quests to fill your inventory!
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-4">{t('cart', 'empty')}</h2>
+          <p className="text-zinc-400 mb-6">Time for some side quests to fill your inventory!</p>
           <Link
             href="/shop"
             className="inline-block rounded-xl bg-fuchsia-500/90 px-6 py-3 text-white hover:bg-fuchsia-500 transition-colors"
@@ -110,7 +121,7 @@ export default function CartContent() {
                   className="object-cover"
                 />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-white truncate">{item.name}</h3>
                 {item.selectedVariant?.title && (
@@ -153,7 +164,7 @@ export default function CartContent() {
       <div className="lg:col-span-1">
         <GlassPanel className="p-6 sticky top-8">
           <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
-          
+
           <div className="space-y-3">
             <div className="flex justify-between text-zinc-300">
               <span>Subtotal</span>
@@ -181,9 +192,18 @@ export default function CartContent() {
               {codes.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {codes.map((c) => (
-                    <span key={c} className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white">
+                    <span
+                      key={c}
+                      className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white"
+                    >
                       {c}
-                      <button aria-label={`Remove ${c}`} onClick={() => removeCode(c)} className="ml-1 text-zinc-300 hover:text-white">×</button>
+                      <button
+                        aria-label={`Remove ${c}`}
+                        onClick={() => removeCode(c)}
+                        className="ml-1 text-zinc-300 hover:text-white"
+                      >
+                        ×
+                      </button>
                     </span>
                   ))}
                 </div>
@@ -192,7 +212,9 @@ export default function CartContent() {
                 <div className="mt-2 space-y-1 text-xs text-zinc-300">
                   {preview.codesApplied.map((ap) => (
                     <div key={ap.code} className="flex justify-between">
-                      <span>{ap.code} — {ap.type}</span>
+                      <span>
+                        {ap.code} — {ap.type}
+                      </span>
                       <span>- ${ap.amount.toFixed(2)}</span>
                     </div>
                   ))}
@@ -226,15 +248,18 @@ export default function CartContent() {
           </div>
 
           <Link
-            href={{ pathname: '/checkout', query: codes.length ? { coupons: codes.join(',') } : undefined } as any}
+            href={
+              {
+                pathname: '/checkout',
+                query: codes.length ? { coupons: codes.join(',') } : undefined,
+              } as any
+            }
             className="mt-6 block w-full rounded-xl bg-fuchsia-500/90 px-6 py-4 text-center font-semibold text-white hover:bg-fuchsia-500 transition-colors"
           >
-            {t("cart", "checkoutClarity")}
+            {t('cart', 'checkoutClarity')}
           </Link>
-          
-          <p className="mt-2 text-center text-xs text-zinc-400">
-            {t("cart", "checkoutFlavor")}
-          </p>
+
+          <p className="mt-2 text-center text-xs text-zinc-400">{t('cart', 'checkoutFlavor')}</p>
         </GlassPanel>
       </div>
     </div>

@@ -10,11 +10,7 @@ import AnimatedTree from './AnimatedTree';
  */
 export default function HomeTree() {
   return (
-    <div 
-      data-tree-root 
-      aria-hidden 
-      className="pointer-events-none fixed inset-0 z-0"
-    >
+    <div data-tree-root aria-hidden className="pointer-events-none fixed inset-0 z-0">
       <AnimatedTree />
     </div>
   );

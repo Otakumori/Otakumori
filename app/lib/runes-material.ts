@@ -27,4 +27,3 @@ export const MATERIAL_RUNE_ICONS: Record<CanonicalRuneId, string> = {
 export function getMaterialIcon(id: CanonicalRuneId): string | undefined {
   return MATERIAL_RUNE_ICONS[id];
 }
-

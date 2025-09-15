@@ -76,7 +76,9 @@ export default function ThighTrap({ onComplete, _onFail, _duration }: GameProps)
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-4xl">
-              <span role="img" aria-label="Wind effect">💨</span>
+              <span role="img" aria-label="Wind effect">
+                💨
+              </span>
             </div>
           </motion.div>
         )}
@@ -110,11 +112,11 @@ export default function ThighTrap({ onComplete, _onFail, _duration }: GameProps)
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handleWiggle}
-          aria-label="Wiggle to escape using arrow keys or click"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handleWiggle}
+        aria-label="Wiggle to escape using arrow keys or click"
+      />
     </div>
   );
 }

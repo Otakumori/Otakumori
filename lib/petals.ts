@@ -34,7 +34,10 @@ export async function debitPetals(clerkId: string, amount: number, reason: strin
   if (amount <= 0) return { balance: 0 };
   const user = await ensureUserByClerkId(clerkId);
   const updated = await prisma.$transaction(async (tx) => {
-    const current = await tx.user.findUnique({ where: { id: user.id }, select: { petalBalance: true } });
+    const current = await tx.user.findUnique({
+      where: { id: user.id },
+      select: { petalBalance: true },
+    });
     const balance = current?.petalBalance ?? 0;
     if (balance < amount) {
       throw Object.assign(new Error('INSUFFICIENT_FUNDS'), { code: 'INSUFFICIENT_FUNDS' });
@@ -49,4 +52,3 @@ export async function debitPetals(clerkId: string, amount: number, reason: strin
   });
   return { balance: updated.petalBalance };
 }
-

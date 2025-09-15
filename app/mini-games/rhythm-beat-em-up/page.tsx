@@ -24,9 +24,176 @@ export default function Page() {
 
         {/* Dev-only UI for signed-in users */}
         {isSignedIn && (
-          <div className="mt-3 text-xs text-white/70">{<>''
-            <span role='img' aria-label='emoji'>D</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>v</span><span role='img' aria-label='emoji'>:</span>' '<span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span>' '''</>}<code>{<><span role='img' aria-label='emoji'>?</span><span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>=</span>/<span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>s</span>/<span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>p</span><span role='img' aria-label='emoji'>s</span>/<span role='img' aria-label='emoji'>y</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>r</span>.<span role='img' aria-label='emoji'>j</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>n</span></>}</code>{<>''' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span>' '<span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>e</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span>' '<span role='img' aria-label='emoji'>a</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>s</span><span role='img' aria-label='emoji'>t</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>m</span>' '<span role='img' aria-label='emoji'>m</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>p</span>.
-            ''</>}</div>
+          <div className="mt-3 text-xs text-white/70">
+            {
+              <>
+                ''
+                <span role="img" aria-label="emoji">
+                  D
+                </span>
+                <span role="img" aria-label="emoji">
+                  e
+                </span>
+                <span role="img" aria-label="emoji">
+                  v
+                </span>
+                <span role="img" aria-label="emoji">
+                  :
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  p
+                </span>
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                ' '''
+              </>
+            }
+            <code>
+              {
+                <>
+                  <span role="img" aria-label="emoji">
+                    ?
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    m
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    a
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    p
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    =
+                  </span>
+                  /
+                  <span role="img" aria-label="emoji">
+                    a
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    s
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    s
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    e
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    t
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    s
+                  </span>
+                  /
+                  <span role="img" aria-label="emoji">
+                    m
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    a
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    p
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    s
+                  </span>
+                  /
+                  <span role="img" aria-label="emoji">
+                    y
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    o
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    u
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    r
+                  </span>
+                  .
+                  <span role="img" aria-label="emoji">
+                    j
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    s
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    o
+                  </span>
+                  <span role="img" aria-label="emoji">
+                    n
+                  </span>
+                </>
+              }
+            </code>
+            {
+              <>
+                ''' '
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                <span role="img" aria-label="emoji">
+                  e
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  c
+                </span>
+                <span role="img" aria-label="emoji">
+                  u
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                <span role="img" aria-label="emoji">
+                  t
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  m
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  m
+                </span>
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  p
+                </span>
+                . ''
+              </>
+            }
+          </div>
         )}
       </div>
     </BootScreen>

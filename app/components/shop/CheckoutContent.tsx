@@ -30,7 +30,13 @@ export default function CheckoutContent() {
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       const param = url.searchParams.get('coupons');
-      if (param) setCodes(param.split(',').map((c) => c.trim().toUpperCase()).filter(Boolean));
+      if (param)
+        setCodes(
+          param
+            .split(',')
+            .map((c) => c.trim().toUpperCase())
+            .filter(Boolean),
+        );
     }
   }, []);
 
@@ -40,25 +46,43 @@ export default function CheckoutContent() {
     const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
     const baseShipping = subtotal > 50 ? 0 : 9.99;
     const run = async () => {
-      if (codes.length === 0) { setPreview(null); return; }
+      if (codes.length === 0) {
+        setPreview(null);
+        return;
+      }
       try {
         const res = await fetch('/api/coupons/preview', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             codes,
-            cart: { items: items.map((i) => ({ id: i.id, productId: i.id, collectionIds: [], quantity: i.quantity, unitPrice: i.price })), shipping: { provider: 'stripe', fee: baseShipping } },
+            cart: {
+              items: items.map((i) => ({
+                id: i.id,
+                productId: i.id,
+                collectionIds: [],
+                quantity: i.quantity,
+                unitPrice: i.price,
+              })),
+              shipping: { provider: 'stripe', fee: baseShipping },
+            },
           }),
         });
         const j = await res.json();
         if (!cancelled && j?.ok) setPreview(j.data);
-      } catch { if (!cancelled) setPreview(null); }
+      } catch {
+        if (!cancelled) setPreview(null);
+      }
     };
     const t = setTimeout(run, 250);
-    return () => { cancelled = true; clearTimeout(t); };
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [codes, items]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
@@ -83,9 +107,19 @@ export default function CheckoutContent() {
 
       // Attach redemptions (best effort)
       try {
-        const clientReferenceId = (typeof window !== 'undefined' && (localStorage.getItem('cart_id') || (() => { const id = `cart_${Date.now()}_${Math.random().toString(36).slice(2,9)}`; localStorage.setItem('cart_id', id); return id; })())) as string;
+        const clientReferenceId = (typeof window !== 'undefined' &&
+          (localStorage.getItem('cart_id') ||
+            (() => {
+              const id = `cart_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+              localStorage.setItem('cart_id', id);
+              return id;
+            })())) as string;
         if (codes.length) {
-          await fetch('/api/coupons/attach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codes, clientReferenceId }) });
+          await fetch('/api/coupons/attach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codes, clientReferenceId }),
+          });
         }
       } catch {}
 
@@ -94,7 +128,12 @@ export default function CheckoutContent() {
       const response = await fetch('/api/v1/checkout/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: checkoutItems, shippingInfo: formData, couponCodes: codes, shipping: { provider: 'stripe', fee: baseShipping } }),
+        body: JSON.stringify({
+          items: checkoutItems,
+          shippingInfo: formData,
+          couponCodes: codes,
+          shipping: { provider: 'stripe', fee: baseShipping },
+        }),
       });
 
       const { url } = await response.json();
@@ -257,7 +296,7 @@ export default function CheckoutContent() {
       <div className="space-y-6">
         <GlassPanel className="p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
-          
+
           <div className="space-y-4">
             {items.map((item) => (
               <div key={item.id} className="flex items-center gap-3">
@@ -287,25 +326,47 @@ export default function CheckoutContent() {
           <div className="border-t border-white/10 pt-4 space-y-2">
             <div className="flex justify-between text-zinc-300">
               <span>Subtotal</span>
-              <span>${useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0), [items]).toFixed(2)}</span>
+              <span>
+                $
+                {useMemo(
+                  () => items.reduce((s, i) => s + i.price * i.quantity, 0),
+                  [items],
+                ).toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Tax</span>
-              <span>${useMemo(() => items.reduce((s, i) => s + i.price * i.quantity, 0) * 0.08, [items]).toFixed(2)}</span>
+              <span>
+                $
+                {useMemo(
+                  () => items.reduce((s, i) => s + i.price * i.quantity, 0) * 0.08,
+                  [items],
+                ).toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between text-zinc-300">
               <span>Shipping</span>
-              <span>{useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]) === 0 ? 'Free' : `$${useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]).toFixed(2)}`}</span>
+              <span>
+                {useMemo(
+                  () => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99),
+                  [items],
+                ) === 0
+                  ? 'Free'
+                  : `$${useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]).toFixed(2)}`}
+              </span>
             </div>
             <div className="border-t border-white/10 pt-2">
               <div className="flex justify-between text-lg font-semibold text-white">
                 <span>Total</span>
-                <span>${useMemo(() => {
-                  const sub = items.reduce((s, i) => s + i.price * i.quantity, 0);
-                  const tax = sub * 0.08;
-                  const ship = sub > 50 ? 0 : 9.99;
-                  return sub + tax + ship;
-                }, [items]).toFixed(2)}</span>
+                <span>
+                  $
+                  {useMemo(() => {
+                    const sub = items.reduce((s, i) => s + i.price * i.quantity, 0);
+                    const tax = sub * 0.08;
+                    const ship = sub > 50 ? 0 : 9.99;
+                    return sub + tax + ship;
+                  }, [items]).toFixed(2)}
+                </span>
               </div>
             </div>
           </div>
@@ -317,10 +378,8 @@ export default function CheckoutContent() {
           >
             {isProcessing ? 'Processing...' : 'Proceed to Payment'}
           </button>
-          
-          <p className="mt-4 text-center text-xs text-zinc-400">
-            {t("cart", "purchaseJoke")}
-          </p>
+
+          <p className="mt-4 text-center text-xs text-zinc-400">{t('cart', 'purchaseJoke')}</p>
         </GlassPanel>
       </div>
     </div>

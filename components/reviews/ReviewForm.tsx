@@ -81,7 +81,9 @@ export default function ReviewForm({ productId }: Props) {
       <h3 className="text-lg font-semibold">Write a Review</h3>
 
       <div className="grid gap-2">
-        <label htmlFor="rating" className="text-sm text-zinc-400">Rating</label>
+        <label htmlFor="rating" className="text-sm text-zinc-400">
+          Rating
+        </label>
         <select
           id="rating"
           value={rating}
@@ -97,7 +99,9 @@ export default function ReviewForm({ productId }: Props) {
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="title" className="text-sm text-zinc-400">Title (optional)</label>
+        <label htmlFor="title" className="text-sm text-zinc-400">
+          Title (optional)
+        </label>
         <input
           id="title"
           value={title}
@@ -108,7 +112,9 @@ export default function ReviewForm({ productId }: Props) {
       </div>
 
       <div className="grid gap-2">
-        <label htmlFor="review" className="text-sm text-zinc-400">Review</label>
+        <label htmlFor="review" className="text-sm text-zinc-400">
+          Review
+        </label>
         <textarea
           id="review"
           value={body}
@@ -147,7 +153,9 @@ export default function ReviewForm({ productId }: Props) {
                   className="absolute right-1 top-1 rounded bg-black/70 px-1 text-xs"
                   aria-label="Remove image"
                 >
-                  <span role="img" aria-label="Close">✕</span>
+                  <span role="img" aria-label="Close">
+                    ✕
+                  </span>
                 </button>
               </div>
             ))}

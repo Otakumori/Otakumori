@@ -52,7 +52,9 @@ export default function SearchInterface({}: SearchInterfaceProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/v1/search?q=${encodeURIComponent(searchQuery)}&type=${activeTab === 'all' ? '' : activeTab}`);
+      const response = await fetch(
+        `/api/v1/search?q=${encodeURIComponent(searchQuery)}&type=${activeTab === 'all' ? '' : activeTab}`,
+      );
       const data = await response.json();
       setResults(data.results || []);
     } catch (error) {
@@ -68,7 +70,7 @@ export default function SearchInterface({}: SearchInterfaceProps) {
     if (!query.trim()) return;
 
     // Add to search history
-    const newHistory = [query, ...searchHistory.filter(h => h !== query)].slice(0, 10);
+    const newHistory = [query, ...searchHistory.filter((h) => h !== query)].slice(0, 10);
     setSearchHistory(newHistory);
     localStorage.setItem('search-history', JSON.stringify(newHistory));
 
@@ -96,19 +98,27 @@ export default function SearchInterface({}: SearchInterfaceProps) {
 
   const getResultIcon = (type: string) => {
     switch (type) {
-      case 'product': return '🛍️';
-      case 'post': return '📝';
-      case 'game': return '🎮';
-      default: return '🔍';
+      case 'product':
+        return '🛍️';
+      case 'post':
+        return '📝';
+      case 'game':
+        return '🎮';
+      default:
+        return '🔍';
     }
   };
 
   const getResultTypeColor = (type: string) => {
     switch (type) {
-      case 'product': return 'text-blue-400';
-      case 'post': return 'text-green-400';
-      case 'game': return 'text-purple-400';
-      default: return 'text-zinc-400';
+      case 'product':
+        return 'text-blue-400';
+      case 'post':
+        return 'text-green-400';
+      case 'game':
+        return 'text-purple-400';
+      default:
+        return 'text-zinc-400';
     }
   };
 
@@ -125,7 +135,7 @@ export default function SearchInterface({}: SearchInterfaceProps) {
               aria-label="Search"
               value={query}
               onChange={handleQueryChange}
-              placeholder={t("search", "placeholder")}
+              placeholder={t('search', 'placeholder')}
               className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 pr-12 text-white placeholder-zinc-400 focus:border-fuchsia-400 focus:outline-none"
             />
             <button
@@ -202,7 +212,7 @@ export default function SearchInterface({}: SearchInterfaceProps) {
                   {results.length} result{results.length !== 1 ? 's' : ''} for "{query}"
                 </h3>
               </div>
-              
+
               {results.map((result) => (
                 <GlassPanel key={`${result.type}-${result.id}`} className="p-4">
                   <Link href={result.url} className="block">
@@ -224,37 +234,33 @@ export default function SearchInterface({}: SearchInterfaceProps) {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h4 className="text-lg font-semibold text-white truncate">
                             {result.title}
                           </h4>
-                          <span className={`text-xs font-medium ${getResultTypeColor(result.type)}`}>
+                          <span
+                            className={`text-xs font-medium ${getResultTypeColor(result.type)}`}
+                          >
                             {result.type.toUpperCase()}
                           </span>
                         </div>
-                        
+
                         {result.description && (
                           <p className="text-sm text-zinc-300 mb-2 line-clamp-2">
                             {result.description}
                           </p>
                         )}
-                        
+
                         <div className="flex items-center gap-4 text-xs text-zinc-400">
                           {result.price && (
-                            <span className="text-fuchsia-300 font-semibold">
-                              ${result.price}
-                            </span>
+                            <span className="text-fuchsia-300 font-semibold">${result.price}</span>
                           )}
                           {result.publishedAt && (
-                            <span>
-                              {new Date(result.publishedAt).toLocaleDateString()}
-                            </span>
+                            <span>{new Date(result.publishedAt).toLocaleDateString()}</span>
                           )}
-                          {result.category && (
-                            <span>{result.category}</span>
-                          )}
+                          {result.category && <span>{result.category}</span>}
                         </div>
                       </div>
                     </div>
@@ -265,9 +271,7 @@ export default function SearchInterface({}: SearchInterfaceProps) {
           ) : (
             <div className="text-center py-12">
               <GlassPanel className="p-8">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  No results found
-                </h3>
+                <h3 className="text-xl font-semibold text-white mb-4">No results found</h3>
                 <p className="text-zinc-400 mb-4">
                   Try searching for something else or check your spelling
                 </p>
@@ -289,9 +293,7 @@ export default function SearchInterface({}: SearchInterfaceProps) {
       {!query && (
         <div className="text-center py-12">
           <GlassPanel className="p-8">
-            <h3 className="text-xl font-semibold text-white mb-4">
-              {t("search", "suggesting")}
-            </h3>
+            <h3 className="text-xl font-semibold text-white mb-4">{t('search', 'suggesting')}</h3>
             <p className="text-zinc-400">
               Search for products, blog posts, or games to get started
             </p>

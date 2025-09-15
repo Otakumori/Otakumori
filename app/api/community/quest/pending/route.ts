@@ -9,4 +9,3 @@ export async function GET(req: Request) {
   const after = url.searchParams.get('after') || '';
   return NextResponse.json({ ok: true, data: { cursor: after || 'evt_0', events: [] } });
 }
-

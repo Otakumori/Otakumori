@@ -45,7 +45,10 @@ function extractPrefsFromSettings(settings: any): z.infer<typeof PrefsSchema> {
     CRT: !!card.CRT,
     VHS: !!card.VHS,
     AUDIO: card.AUDIO === undefined ? true : !!card.AUDIO,
-    AUDIO_LEVEL: typeof card.AUDIO_LEVEL === 'number' ? Math.min(100, Math.max(0, card.AUDIO_LEVEL)) : undefined,
+    AUDIO_LEVEL:
+      typeof card.AUDIO_LEVEL === 'number'
+        ? Math.min(100, Math.max(0, card.AUDIO_LEVEL))
+        : undefined,
   };
 }
 
@@ -58,7 +61,11 @@ export async function GET() {
       where: { clerkId: userId },
       select: { id: true, avatarUrl: true, userSettings: true },
     });
-    if (!user) return NextResponse.json({ ok: false, code: 'NOT_FOUND', message: 'User not found' }, { status: 404 });
+    if (!user)
+      return NextResponse.json(
+        { ok: false, code: 'NOT_FOUND', message: 'User not found' },
+        { status: 404 },
+      );
 
     const settings = user.userSettings?.notificationPreferences as any;
     const prefs = extractPrefsFromSettings(settings);
@@ -70,7 +77,10 @@ export async function GET() {
     return NextResponse.json({ ok: true, data });
   } catch (err) {
     console.error('user/avatar GET error', err);
-    return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
+      { status: 500 },
+    );
   }
 }
 
@@ -104,7 +114,11 @@ export async function POST(req: Request) {
       const merged = mergeCardPrefs(existing, input.prefs);
       await db.userSettings.upsert({
         where: { userId: user.id },
-        update: { notificationPreferences: merged, soundEnabled: input.prefs.AUDIO, musicEnabled: input.prefs.AUDIO },
+        update: {
+          notificationPreferences: merged,
+          soundEnabled: input.prefs.AUDIO,
+          musicEnabled: input.prefs.AUDIO,
+        },
         create: {
           userId: user.id,
           notificationPreferences: merged,
@@ -117,10 +131,19 @@ export async function POST(req: Request) {
     // Return GET payload shape
     const settings = await db.userSettings.findUnique({ where: { userId: user.id } });
     const prefs = extractPrefsFromSettings(settings?.notificationPreferences as any);
-    const avatarUser = await db.user.findUnique({ where: { id: user.id }, select: { avatarUrl: true } });
-    return NextResponse.json({ ok: true, data: { avatar: avatarUser?.avatarUrl ? { url: avatarUser.avatarUrl } : undefined, prefs } });
+    const avatarUser = await db.user.findUnique({
+      where: { id: user.id },
+      select: { avatarUrl: true },
+    });
+    return NextResponse.json({
+      ok: true,
+      data: { avatar: avatarUser?.avatarUrl ? { url: avatarUser.avatarUrl } : undefined, prefs },
+    });
   } catch (err) {
     console.error('user/avatar POST error', err);
-    return NextResponse.json({ ok: false, code: 'SERVER_ERROR', message: 'Internal error' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
+      { status: 500 },
+    );
   }
 }

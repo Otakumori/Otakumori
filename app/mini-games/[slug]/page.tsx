@@ -74,7 +74,9 @@ export default function GamePage() {
       if (!ready) return;
       if (e instanceof KeyboardEvent && e.key !== 'Enter') return;
       setShowBoot(false);
-      try { window.localStorage.setItem('gc_boot', '1'); } catch {}
+      try {
+        window.localStorage.setItem('gc_boot', '1');
+      } catch {}
     };
     window.addEventListener('keydown', onSkip);
     window.addEventListener('click', onSkip);
@@ -151,7 +153,9 @@ export default function GamePage() {
       <GameCubeBoot
         onBootComplete={() => {
           setShowBoot(false);
-          try { window.localStorage.setItem('gc_boot', '1'); } catch {}
+          try {
+            window.localStorage.setItem('gc_boot', '1');
+          } catch {}
         }}
       />
     );
@@ -240,7 +244,9 @@ export default function GamePage() {
           <div className="ml-auto h-full w-5/6 max-w-sm bg-white shadow-xl">
             <div className="p-3 border-b flex items-center justify-between">
               <div className="text-sm font-semibold">Leaderboard</div>
-              <button className="text-sm" onClick={() => setShowLb(false)}>Close</button>
+              <button className="text-sm" onClick={() => setShowLb(false)}>
+                Close
+              </button>
             </div>
             <div className="p-3 overflow-y-auto" style={{ height: 'calc(100% - 48px)' }}>
               <EnhancedLeaderboard gameCode={gameSlug} />

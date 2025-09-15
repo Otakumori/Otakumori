@@ -12,16 +12,28 @@ export default function Navigation() {
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <a href="/" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
+              <a
+                href="/"
+                className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 Home
               </a>
-              <a href="/shop" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
+              <a
+                href="/shop"
+                className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 Shop
               </a>
-              <a href="/games" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
+              <a
+                href="/games"
+                className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 Games
               </a>
-              <a href="/community" className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">
+              <a
+                href="/community"
+                className="text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium"
+              >
                 Community
               </a>
             </div>

@@ -12,11 +12,11 @@ interface MotionCardProps extends HTMLMotionProps<'div'> {
 const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
   ({ variant = 'default', children, className = '', ...props }, ref) => {
     const baseClasses = 'glass-panel rounded-2xl';
-    
+
     const variantClasses = {
       default: '',
       hover: 'card-hover cursor-pointer',
-      interactive: 'card-hover cursor-pointer hover-scale'
+      interactive: 'card-hover cursor-pointer hover-scale',
     };
 
     return (
@@ -30,7 +30,7 @@ const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
         {children}
       </motion.div>
     );
-  }
+  },
 );
 
 MotionCard.displayName = 'MotionCard';

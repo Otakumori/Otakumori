@@ -27,4 +27,3 @@ export const submitScoreRes = z.object({
   balance: z.number().int().nonnegative().optional(),
 });
 export type SubmitScoreRes = z.infer<typeof submitScoreRes>;
-

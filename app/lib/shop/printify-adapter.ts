@@ -1,8 +1,15 @@
 import type { Product } from './types';
 
-type PrintifyItem = { id: string; title: string; images: string[]; price: number; tags?: string[]; available?: boolean; };
+type PrintifyItem = {
+  id: string;
+  title: string;
+  images: string[];
+  price: number;
+  tags?: string[];
+  available?: boolean;
+};
 export function mapPrintify(items: PrintifyItem[]): Product[] {
-  return items.map(i => ({
+  return items.map((i) => ({
     id: i.id,
     title: i.title,
     image: i.images?.[0] ?? '/media/products/fallback.jpg',

@@ -16,4 +16,3 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ ok: false, code: 'SERVER_ERROR' }, { status: 500 });
   }
 }
-

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 type Handlers = {
   onRotateLeft: () => void;
@@ -49,4 +49,3 @@ export function initInput(node: HTMLElement, h: Handlers) {
     node.removeEventListener('touchend', onTouchEnd);
   };
 }
-

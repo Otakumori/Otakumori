@@ -49,7 +49,10 @@ function fixImports(filePath) {
   let changed = false;
 
   for (const [oldImport, newImport] of Object.entries(importMappings)) {
-    const regex = new RegExp(`import\\s+\\w+\\s+from\\s+['"]${oldImport.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"];?`, 'g');
+    const regex = new RegExp(
+      `import\\s+\\w+\\s+from\\s+['"]${oldImport.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"];?`,
+      'g',
+    );
     if (content.includes(oldImport)) {
       content = content.replace(regex, (match) => {
         return match.replace(oldImport, newImport);

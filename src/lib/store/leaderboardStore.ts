@@ -22,7 +22,7 @@ export const useLeaderboardStore = create<LeaderboardStore>((set, get) => ({
   entries: [],
   isLoading: false,
   error: null,
-  
+
   fetchEntries: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -37,7 +37,7 @@ export const useLeaderboardStore = create<LeaderboardStore>((set, get) => ({
       set({ error: 'Failed to fetch leaderboard entries', isLoading: false });
     }
   },
-  
+
   addEntry: (entry) => {
     const newEntry: LeaderboardEntry = {
       ...entry,
@@ -45,24 +45,26 @@ export const useLeaderboardStore = create<LeaderboardStore>((set, get) => ({
       rank: get().entries.length + 1,
     };
     set((state) => ({
-      entries: [...state.entries, newEntry].sort((a, b) => b.score - a.score)
-        .map((entry, index) => ({ ...entry, rank: index + 1 }))
+      entries: [...state.entries, newEntry]
+        .sort((a, b) => b.score - a.score)
+        .map((entry, index) => ({ ...entry, rank: index + 1 })),
     }));
   },
-  
+
   updateEntry: (id, updates) => {
     set((state) => ({
-      entries: state.entries.map((entry) =>
-        entry.id === id ? { ...entry, ...updates } : entry
-      ).sort((a, b) => b.score - a.score)
-        .map((entry, index) => ({ ...entry, rank: index + 1 }))
+      entries: state.entries
+        .map((entry) => (entry.id === id ? { ...entry, ...updates } : entry))
+        .sort((a, b) => b.score - a.score)
+        .map((entry, index) => ({ ...entry, rank: index + 1 })),
     }));
   },
-  
+
   removeEntry: (id) => {
     set((state) => ({
-      entries: state.entries.filter((entry) => entry.id !== id)
-        .map((entry, index) => ({ ...entry, rank: index + 1 }))
+      entries: state.entries
+        .filter((entry) => entry.id !== id)
+        .map((entry, index) => ({ ...entry, rank: index + 1 })),
     }));
   },
 }));

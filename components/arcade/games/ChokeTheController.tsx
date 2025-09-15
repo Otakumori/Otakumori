@@ -85,7 +85,9 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-4xl">
-              <span role="img" aria-label="Cherry blossom">🌸</span>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>
             </div>
           </motion.div>
         )}
@@ -104,11 +106,11 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handleMash}
-          aria-label="Mash the controller to increase vibration"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handleMash}
+        aria-label="Mash the controller to increase vibration"
+      />
     </div>
   );
 }

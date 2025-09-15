@@ -56,7 +56,9 @@ export class ErrorBoundary extends Component<Props, State> {
           >
             <div className="mb-4">
               <div className="w-16 h-16 mx-auto bg-red-500/20 rounded-full flex items-center justify-center mb-4">
-                <span className="text-2xl" role="img" aria-label="Warning">⚠️</span>
+                <span className="text-2xl" role="img" aria-label="Warning">
+                  ⚠️
+                </span>
               </div>
               <h2 className="text-xl font-bold text-white mb-2">Something went wrong</h2>
               <p className="text-gray-400 text-sm">

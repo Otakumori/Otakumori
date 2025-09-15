@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const EnvSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 
   // URLs
   NEXT_PUBLIC_SITE_URL: z.string().url(),
@@ -63,26 +63,26 @@ const parsed = EnvSchema.safeParse({
 });
 
 if (!parsed.success) {
-  console.error("❌ Invalid environment variables:");
+  console.error('❌ Invalid environment variables:');
   console.error(parsed.error.format());
-  
+
   const missingVars = parsed.error.issues
-    .filter(issue => issue.code === "invalid_type" && issue.received === "undefined")
-    .map(issue => issue.path.join("."));
-  
+    .filter((issue) => issue.code === 'invalid_type' && issue.received === 'undefined')
+    .map((issue) => issue.path.join('.'));
+
   if (missingVars.length > 0) {
-    console.error("\n🔧 Missing required environment variables:");
-    missingVars.forEach(varName => console.error(`  - ${varName}`));
-    console.error("\n💡 Next steps:");
-    console.error("  1. Copy env.example to .env.local");
-    console.error("  2. Fill in the missing variables");
-    console.error("  3. Restart your development server");
+    console.error('\n🔧 Missing required environment variables:');
+    missingVars.forEach((varName) => console.error(`  - ${varName}`));
+    console.error('\n💡 Next steps:');
+    console.error('  1. Copy env.example to .env.local');
+    console.error('  2. Fill in the missing variables');
+    console.error('  3. Restart your development server');
   }
-  
-  throw new Error("Invalid environment variables. See logs above.");
+
+  throw new Error('Invalid environment variables. See logs above.');
 }
 
 export const env = parsed.data;
-export const isProd = env.NODE_ENV === "production";
-export const isDev = env.NODE_ENV === "development";
-export const isTest = env.NODE_ENV === "test";
+export const isProd = env.NODE_ENV === 'production';
+export const isDev = env.NODE_ENV === 'development';
+export const isTest = env.NODE_ENV === 'test';

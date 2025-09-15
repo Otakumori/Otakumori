@@ -21,7 +21,57 @@ export default function DiagCube() {
 
   return (
     <div className="relative h-[70vh] w-full rounded-2xl overflow-hidden border border-white/10 bg-black/20">
-      <Suspense fallback={<div className="p-4 text-sm text-gray-300">{<><span role='img' aria-label='emoji'>L</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>d</span><span role='img' aria-label='emoji'>i</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>g</span>' '<span role='img' aria-label='emoji'>c</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>v</span><span role='img' aria-label='emoji'>a</span><span role='img' aria-label='emoji'>s</span>…</>}</div>}>
+      <Suspense
+        fallback={
+          <div className="p-4 text-sm text-gray-300">
+            {
+              <>
+                <span role="img" aria-label="emoji">
+                  L
+                </span>
+                <span role="img" aria-label="emoji">
+                  o
+                </span>
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  d
+                </span>
+                <span role="img" aria-label="emoji">
+                  i
+                </span>
+                <span role="img" aria-label="emoji">
+                  n
+                </span>
+                <span role="img" aria-label="emoji">
+                  g
+                </span>
+                ' '
+                <span role="img" aria-label="emoji">
+                  c
+                </span>
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  n
+                </span>
+                <span role="img" aria-label="emoji">
+                  v
+                </span>
+                <span role="img" aria-label="emoji">
+                  a
+                </span>
+                <span role="img" aria-label="emoji">
+                  s
+                </span>
+                …
+              </>
+            }
+          </div>
+        }
+      >
         <Canvas dpr={[1, 2]} camera={{ fov: 60, position: [2.5, 2, 2.5] }}>
           <ambientLight intensity={1.2} />
           <Box />

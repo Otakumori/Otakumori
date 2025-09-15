@@ -10,16 +10,93 @@ import * as tsParser from 'recast/parsers/typescript';
 
 const NAMES = new Set([
   // from your logs
-  'anchors','dt','deltaTime','ORDER','T','userId','result','ttl','maxAge','cookies',
-  'getCategoryIcon','index','now','running','alpha','seed','bgImg','petalImg','end','miss',
-  'push','startIfNeeded','submit','handleSkip','handleFaceClick','rotateToFace','frameId','hueBase',
-  'gameId','monitor','newCardIds','InputEvent','Image','useRef','useSound','t','inv','petalEconomy',
-  'isSaving','next','bgImg','bubbleImg','ended','useMemo','setFace','error','clearCart','open','setOpen',
-  'useEffect','useState','Sparkles','BackdropAbyssMystique','Eye','Volume2','Palette','Globe','_err',
-  'CherryTree','PetalHUD','petals','motion','AnimatePresence','navLinks','isSearchOpen','setIsSearchOpen',
-  'mobileOpen','setMobileOpen','scrolled','pathname','useReducer','useAchievements','setCommunityProgress',
-  'setLeaderboard','mode','isSignedIn','duration','pointerDown','p','router','monitor','Database','Shield',
-  'Gamepad','Film','prisma','variantId'
+  'anchors',
+  'dt',
+  'deltaTime',
+  'ORDER',
+  'T',
+  'userId',
+  'result',
+  'ttl',
+  'maxAge',
+  'cookies',
+  'getCategoryIcon',
+  'index',
+  'now',
+  'running',
+  'alpha',
+  'seed',
+  'bgImg',
+  'petalImg',
+  'end',
+  'miss',
+  'push',
+  'startIfNeeded',
+  'submit',
+  'handleSkip',
+  'handleFaceClick',
+  'rotateToFace',
+  'frameId',
+  'hueBase',
+  'gameId',
+  'monitor',
+  'newCardIds',
+  'InputEvent',
+  'Image',
+  'useRef',
+  'useSound',
+  't',
+  'inv',
+  'petalEconomy',
+  'isSaving',
+  'next',
+  'bgImg',
+  'bubbleImg',
+  'ended',
+  'useMemo',
+  'setFace',
+  'error',
+  'clearCart',
+  'open',
+  'setOpen',
+  'useEffect',
+  'useState',
+  'Sparkles',
+  'BackdropAbyssMystique',
+  'Eye',
+  'Volume2',
+  'Palette',
+  'Globe',
+  '_err',
+  'CherryTree',
+  'PetalHUD',
+  'petals',
+  'motion',
+  'AnimatePresence',
+  'navLinks',
+  'isSearchOpen',
+  'setIsSearchOpen',
+  'mobileOpen',
+  'setMobileOpen',
+  'scrolled',
+  'pathname',
+  'useReducer',
+  'useAchievements',
+  'setCommunityProgress',
+  'setLeaderboard',
+  'mode',
+  'isSignedIn',
+  'duration',
+  'pointerDown',
+  'p',
+  'router',
+  'monitor',
+  'Database',
+  'Shield',
+  'Gamepad',
+  'Film',
+  'prisma',
+  'variantId',
 ]);
 
 function shouldPrefix(name: string) {
@@ -63,7 +140,7 @@ async function processFile(path: string) {
         changed = true;
       }
       this.traverse(pth);
-    }
+    },
   });
 
   if (changed) {
@@ -74,11 +151,10 @@ async function processFile(path: string) {
 }
 
 (async () => {
-  const files = await globby([
-    'app/**/*.{ts,tsx,js,jsx}',
-    'components/**/*.{ts,tsx,js,jsx}',
-    'src/**/*.{ts,tsx,js,jsx}'
-  ], { gitignore: true });
+  const files = await globby(
+    ['app/**/*.{ts,tsx,js,jsx}', 'components/**/*.{ts,tsx,js,jsx}', 'src/**/*.{ts,tsx,js,jsx}'],
+    { gitignore: true },
+  );
 
   let edited = 0;
   for (const f of files) {
