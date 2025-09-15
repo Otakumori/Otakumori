@@ -5,6 +5,8 @@ import { problem } from '@/lib/http/problem';
 import { prisma } from '@/app/lib/prisma';
 import { creditPetals, ensureUserByClerkId } from '@/lib/petals';
 import { rateLimit } from '@/app/api/rate-limit';
+import { logger } from '@/app/lib/logger';
+import { reqId } from '@/lib/log';
 
 export const runtime = 'nodejs';
 
@@ -15,6 +17,8 @@ function startOfUTCDay(d = new Date()) {
 }
 
 export async function POST(request: NextRequest) {
+  const rid = reqId(request.headers);
+  logger.request(request, 'POST /api/v1/petals/collect');
   const { userId } = await auth();
   if (!userId) return NextResponse.json(problem(401, 'Unauthorized'));
 
@@ -60,5 +64,5 @@ export async function POST(request: NextRequest) {
   if (grant <= 0) return NextResponse.json(problem(429, 'Daily cap reached'));
 
   const res = await creditPetals(userId, grant, `source:${source}`);
-  return NextResponse.json({ ok: true, granted: grant, balance: res.balance, remainingToday: leftAll - grant });
+  return NextResponse.json({ ok: true, granted: grant, balance: res.balance, remainingToday: leftAll - grant, requestId: rid });
 }
