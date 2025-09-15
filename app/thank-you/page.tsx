@@ -246,9 +246,11 @@ export default function ThankYouPage() {
                     <div className="text-center">
                       <div className="mb-3 text-4xl leading-none">
                         <RuneGlyph
-                          runeId={rune.canonicalId as any}
-                          glyphOverride={rune.glyph}
-                          style="auto"
+                          canonicalId={rune.canonicalId as any}
+                          glyph={rune.glyph}
+                          displayName={rune.displayName}
+                          size="lg"
+                          animated={true}
                         />
                       </div>
                       <div className="mb-3 text-4xl hidden">{rune.glyph || '✶'}</div>
