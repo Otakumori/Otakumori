@@ -33,12 +33,15 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
     }, 500);
   }, [isBlowing]);
 
-  const handleKeyPress = useCallback((e: KeyboardEvent) => {
-    if (e.code === 'Space') {
-      e.preventDefault();
-      handleBlow();
-    }
-  }, [handleBlow]);
+  const handleKeyPress = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        handleBlow();
+      }
+    },
+    [handleBlow],
+  );
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
@@ -88,7 +91,9 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-4xl">
-              <span role="img" aria-label="Wind effect">💨</span>
+              <span role="img" aria-label="Wind effect">
+                💨
+              </span>
             </div>
           </motion.div>
         )}
@@ -122,11 +127,11 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handleBlow}
-          aria-label="Blow on cartridge to clean it"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handleBlow}
+        aria-label="Blow on cartridge to clean it"
+      />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export default function GameCubeBootSequence({ onBootComplete }: GameCubeBootSeq
         ['midna_lament', '/sfx/midna-lament.mp3'],
         ['jpotter_sound', '/sfx/jpotter-sound.mp3'],
       ];
-      
+
       await audio.preload(files);
       audioLoaded.current = true;
     };
@@ -35,7 +35,7 @@ export default function GameCubeBootSequence({ onBootComplete }: GameCubeBootSeq
   useEffect(() => {
     const hasBooted = sessionStorage.getItem('otakumori-boot-seen');
     const forceReboot = new URLSearchParams(window.location.search).get('reboot') === '1';
-    
+
     if (hasBooted && !forceReboot) {
       setBootSeen(true);
       onBootComplete();
@@ -55,27 +55,27 @@ export default function GameCubeBootSequence({ onBootComplete }: GameCubeBootSeq
     const bootSequence = async () => {
       // Start boot whoosh - plays for entire boot animation duration (4.5 seconds total)
       const bootWhoosh = audio.play('boot_whoosh', { gain: 0.7 });
-      
+
       // Stage 1: Initial logo
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       setStage('logo');
 
       // Stage 2: Logo phase
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setStage('loading');
 
       // Stage 3: Loading phase
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setStage('complete');
 
       // Stage 4: Complete - boot whoosh should end here
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Stop boot whoosh
       if (bootWhoosh) {
         bootWhoosh();
       }
-      
+
       sessionStorage.setItem('otakumori-boot-seen', 'true');
       onBootComplete();
     };

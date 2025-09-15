@@ -16,7 +16,7 @@ export interface CubeFace {
   key: FaceKey;
   type: FaceType;
   label: string;
-  slug: string;              // 'trade' | 'mini-games' | 'community' | 'music' | 'about'
+  slug: string; // 'trade' | 'mini-games' | 'community' | 'music' | 'about'
   enabled: boolean;
   faceTooltip?: string;
 }
@@ -32,5 +32,5 @@ export interface MiniGameMeta {
 
 export interface GameCubeConfig {
   faces: CubeFace[];
-  games: MiniGameMeta[];     // rendered inside Left face panel
+  games: MiniGameMeta[]; // rendered inside Left face panel
 }

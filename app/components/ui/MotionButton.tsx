@@ -12,24 +12,25 @@ interface MotionButtonProps extends HTMLMotionProps<'button'> {
 }
 
 const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
-  ({ variant = 'primary', size = 'md', disabled = false, children, className = '', ...props }, ref) => {
+  (
+    { variant = 'primary', size = 'md', disabled = false, children, className = '', ...props },
+    ref,
+  ) => {
     const baseClasses = 'font-medium rounded-xl focus-ring transition-all duration-200 ease-out';
-    
+
     const variantClasses = {
       primary: 'glass-button text-white hover-scale',
       secondary: 'glass-panel text-white hover-scale',
-      ghost: 'text-white/80 hover:text-white hover:bg-white/5'
+      ghost: 'text-white/80 hover:text-white hover:bg-white/5',
     };
-    
+
     const sizeClasses = {
       sm: 'px-4 py-2 text-sm',
       md: 'px-6 py-3 text-base',
-      lg: 'px-8 py-4 text-lg'
+      lg: 'px-8 py-4 text-lg',
     };
-    
-    const disabledClasses = disabled 
-      ? 'opacity-50 cursor-not-allowed transform-none' 
-      : '';
+
+    const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed transform-none' : '';
 
     return (
       <motion.button
@@ -43,7 +44,7 @@ const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
         {children}
       </motion.button>
     );
-  }
+  },
 );
 
 MotionButton.displayName = 'MotionButton';

@@ -250,6 +250,16 @@ export default function QuickMath() {
           stats: { correct, wrong, maxStreak, diff },
         }),
       });
+      // Also submit to leaderboard
+      await fetch('/api/v1/leaderboard/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameCode: 'quick-math',
+          score,
+          meta: { durationMs: duration, correct, wrong, maxStreak, diff },
+        }),
+      });
     } catch {}
     (window as any).__gameEnd?.({
       score,

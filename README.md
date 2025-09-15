@@ -42,6 +42,10 @@ npm run dev
 - `npm run preflight` - Run pre-deployment checks
 - `npm run verify` - Run all validation checks
 
+---
+
+Deployment note: Triggering a fresh Vercel build after fixing package.json encoding and pinning Node 20 via `engines.node`. Redeploy trigger.
+
 ### Database
 
 - `npm run prisma:generate` - Generate Prisma client
@@ -199,6 +203,15 @@ This script will:
 
 ### Manual Deployment
 
+**Operations**
+
+- Health check: `curl http://localhost:3000/api/health` (expects JSON with db, clerk, stripe, printify, env)
+- Seed (db + app data): `npm run seed` • Unseed: `npm run unseed`
+- Smoke test (routes/APIs): `npm run smoke`
+- Migrations (deploy): `npm run prisma:deploy` • Studio: `npm run prisma:studio`
+- Deploy helper: `npm run deploy` (build verification + deploy)
+- Rollback hint: revert to previous Vercel deployment or `git revert <commit>` then redeploy
+
 1. **Build the application**: `npm run build`
 2. **Push to repository**: `git push origin main`
 3. **Deploy via platform**: Use your deployment platform's interface
@@ -299,3 +312,18 @@ npm run deploy
 ## 📄 License
 
 Private - All rights reserved.
+
+## Mini-Games Console Card (In-Progress)
+
+- Scope: Console card lives exclusively under /mini-games and child routes; Nav/Footer remain visible.
+- Boot: Plays a short boot the first time per session and persists gc_boot in localStorage.
+- Deep links: Planned ?face= query sync and alias routes (/mini-games/achievements, /mini-games/trade) to map to faces.
+- Runes: Owned runes grid is available on /mini-games home, showing user-owned runes with tooltips.
+- APIs (typed, thin):
+  - GET /api/petals/balance ? { ok, balance }
+  - GET /api/trade/inventory ? { ok, items: { canonicalId, displayName, glyph, quantity }[] }
+  - POST /api/trade/fuse ? validates input and ownership, returns { ok:false, code:'DISABLED' } in MVP
+  - GET /api/trade/offers ? { ok, items: [] } (stub)
+  - POST /api/trade/propose ? { ok:false, code:'DISABLED' } (stub)
+- Test IDs: data-testid="runes-grid" on the Owned Runes grid for smoke tests.
+- Telemetry: Server routes log errors to server console; Sentry breadcrumbs to be added alongside face transitions in the card.

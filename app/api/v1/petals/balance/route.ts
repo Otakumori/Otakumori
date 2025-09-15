@@ -25,7 +25,7 @@ export async function GET(_req: NextRequest) {
     // Check if user needs daily grant
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const lastGrant = await prisma.petalLedger.findFirst({
       where: {
         userId,

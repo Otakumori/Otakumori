@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { printifyService } from '@/app/lib/printify/service';
+import { getPrintifyService } from '@/app/lib/printify/service';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const result = await printifyService.getProducts(query.page, query.per_page);
+    const result = await getPrintifyService().getProducts(query.page, query.per_page);
 
     // Transform products to match expected format
-    const products = result.data.map((product) => ({
+    const products = result.data.map((product: any) => ({
       id: product.id,
       title: product.title,
       description: product.description,
@@ -44,13 +44,13 @@ export async function GET(request: NextRequest) {
       image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
       tags: product.tags || [],
       variants:
-        product.variants?.map((v) => ({
+        product.variants?.map((v: any) => ({
           id: v.id,
           price: v.price / 100, // Convert cents to dollars
           is_enabled: v.is_enabled,
           in_stock: v.in_stock,
         })) || [],
-      available: product.variants?.some((v) => v.is_enabled && v.in_stock) || false,
+      available: product.variants?.some((v: any) => v.is_enabled && v.in_stock) || false,
       visible: product.visible,
       createdAt: product.created_at,
       updatedAt: product.updated_at,
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
 async function syncProductsInBackground() {
   try {
     console.log('Starting background Printify sync...');
-    const products = await printifyService.getAllProducts();
+    const products = await getPrintifyService().getAllProducts();
     console.log(`Background sync completed: ${products.length} products fetched`);
 
     // Here you would save to your database

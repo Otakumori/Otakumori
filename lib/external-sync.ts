@@ -5,7 +5,7 @@ export async function syncClerkUsers() {
   try {
     const response = await fetch('https://api.clerk.com/v1/users', {
       headers: {
-        'Authorization': `Bearer ${env.CLERK_SECRET_KEY}`,
+        Authorization: `Bearer ${env.CLERK_SECRET_KEY}`,
         'Content-Type': 'application/json',
       },
     });
@@ -15,7 +15,7 @@ export async function syncClerkUsers() {
     }
 
     const users = await response.json();
-    
+
     // Insert/update users in external.clerk_users
     for (const user of users.data || []) {
       await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
@@ -45,9 +45,9 @@ export async function syncClerkUsers() {
             new Date(user.created_at),
             new Date(user.updated_at),
             JSON.stringify(user),
-            user.invitation_id || null
-          ]
-        })
+            user.invitation_id || null,
+          ],
+        }),
       });
     }
 
@@ -63,7 +63,7 @@ export async function syncStripeCustomers() {
   try {
     const response = await fetch('https://api.stripe.com/v1/customers?limit=100', {
       headers: {
-        'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
@@ -73,7 +73,7 @@ export async function syncStripeCustomers() {
     }
 
     const customers = await response.json();
-    
+
     for (const customer of customers.data || []) {
       await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
         method: 'POST',
@@ -98,9 +98,9 @@ export async function syncStripeCustomers() {
             customer.name,
             new Date(customer.created * 1000),
             customer.currency,
-            JSON.stringify(customer.metadata)
-          ]
-        })
+            JSON.stringify(customer.metadata),
+          ],
+        }),
       });
     }
 
@@ -115,7 +115,7 @@ export async function syncStripeProducts() {
   try {
     const response = await fetch('https://api.stripe.com/v1/products?limit=100', {
       headers: {
-        'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+        Authorization: `Bearer ${env.STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
@@ -125,7 +125,7 @@ export async function syncStripeProducts() {
     }
 
     const products = await response.json();
-    
+
     for (const product of products.data || []) {
       await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
         method: 'POST',
@@ -150,9 +150,9 @@ export async function syncStripeProducts() {
             product.active,
             new Date(product.created * 1000),
             product.description,
-            JSON.stringify(product.metadata)
-          ]
-        })
+            JSON.stringify(product.metadata),
+          ],
+        }),
       });
     }
 
@@ -166,19 +166,22 @@ export async function syncStripeProducts() {
 // Printify API sync
 export async function syncPrintifyProducts() {
   try {
-    const response = await fetch(`https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`, {
-      headers: {
-        'Authorization': `Bearer ${env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`,
+      {
+        headers: {
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Printify API error: ${response.status}`);
     }
 
     const products = await response.json();
-    
+
     for (const product of products.data || []) {
       await fetch(`${env.DATABASE_URL.replace('prisma+', '')}`, {
         method: 'POST',
@@ -201,9 +204,9 @@ export async function syncPrintifyProducts() {
             product.title,
             product.description,
             new Date(product.created_at),
-            product.visible
-          ]
-        })
+            product.visible,
+          ],
+        }),
       });
     }
 

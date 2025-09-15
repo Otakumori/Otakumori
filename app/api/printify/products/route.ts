@@ -1,72 +1,51 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getPrintifyProducts } from '@/src/services/printify';
-import { logger } from '@/app/lib/logger';
-import { v4 as uuidv4 } from 'uuid';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 export const runtime = 'nodejs';
 export const revalidate = 60;
 
 export async function GET(request: NextRequest) {
-  const requestId = uuidv4();
-  const startTime = Date.now();
-
-  logger.request(request, `GET /api/printify/products`, { requestId });
-
+  const { searchParams } = new URL(request.url);
+  const page = Number(searchParams.get('page') || '1') || 1;
+  const perPage = Number(searchParams.get('per_page') || '100') || 100;
   try {
-    const result = await getPrintifyProducts();
-
-    if (!result.ok) {
-      logger.error('Failed to fetch Printify products', {
-        requestId,
-        // error: result.error,
-      });
-
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Failed to fetch products from Printify',
-          detail: result.error,
-          requestId,
-        },
-        { status: 502 },
-      );
-    }
-
-    const duration = Date.now() - startTime;
-    logger.info(`GET /api/printify/products response 200`, {
-      requestId,
-      // duration,
-      // itemCount: result.data.length,
-    });
-
-    return NextResponse.json(
-      {
-        ok: true,
-        data: { items: result.data },
-        requestId,
-      },
-      {
-        status: 200,
-        headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+    const svc = getPrintifyService();
+    const result = await svc.getProducts(page, perPage);
+    const products = (result.data || []).map((product) => ({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0,
+      image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
+      tags: product.tags || [],
+      variants:
+        product.variants?.map((v) => ({
+          id: v.id,
+          price: v.price / 100,
+          is_enabled: v.is_enabled,
+          in_stock: v.in_stock,
+        })) || [],
+      available: product.variants?.some((v) => v.is_enabled && v.in_stock) || false,
+      visible: product.visible,
+      createdAt: product.created_at,
+      updatedAt: product.updated_at,
+    }));
+    return NextResponse.json({
+      ok: true,
+      data: {
+        products,
+        pagination: {
+          currentPage: page,
+          totalPages: result.last_page,
+          total: result.total,
+          perPage,
         },
       },
-    );
-  } catch (error) {
-    const duration = Date.now() - startTime;
-    logger.error('Unexpected error in Printify products API', {
-      requestId,
-      // error: error instanceof Error ? error.message : "Unknown error",
-      // duration,
     });
-
+  } catch (err: any) {
     return NextResponse.json(
-      {
-        ok: false,
-        error: 'Internal server error',
-        requestId,
-      },
-      { status: 500 },
+      { ok: false, error: err?.message || 'Printify fetch failed' },
+      { status: 502 },
     );
   }
 }

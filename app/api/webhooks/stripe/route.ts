@@ -46,14 +46,15 @@ async function readRawBody(req: Request) {
 async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.Session) {
   // In a real implementation, this would call the Printify API
   // For now, we'll simulate the order creation and log it
-  
+
   const printifyOrderData = {
     external_id: order.id,
-    line_items: session.line_items?.data.map(item => ({
-      product_id: item.price?.product,
-      variant_id: item.price?.id,
-      quantity: item.quantity,
-    })) ?? [],
+    line_items:
+      session.line_items?.data.map((item) => ({
+        product_id: item.price?.product,
+        variant_id: item.price?.id,
+        quantity: item.quantity,
+      })) ?? [],
     shipping_method: 1, // Standard shipping
     send_shipping_notification: true,
     address_to: {
@@ -86,7 +87,7 @@ async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.
   //   },
   //   body: JSON.stringify(printifyOrderData),
   // });
-  
+
   return { success: true, simulated: true };
 }
 
@@ -102,7 +103,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
-      } catch (_err) {
+  } catch (_err) {
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
@@ -137,6 +138,13 @@ export async function POST(req: Request) {
           totalAmount: total,
           currency: currency.toUpperCase(),
           paidAt: new Date(),
+          appliedCouponCodes:
+            (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
+              | string[]
+              | undefined) ?? [],
+          discountTotal: fullSession.metadata?.discount_total_cents
+            ? parseInt(fullSession.metadata.discount_total_cents, 10)
+            : 0,
         },
         create: {
           id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -148,8 +156,34 @@ export async function POST(req: Request) {
           status: 'shipped', // using existing enum value
           paidAt: new Date(),
           updatedAt: new Date(),
+          appliedCouponCodes:
+            (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
+              | string[]
+              | undefined) ?? [],
+          discountTotal: fullSession.metadata?.discount_total_cents
+            ? parseInt(fullSession.metadata.discount_total_cents, 10)
+            : 0,
         },
       });
+
+      // Mark coupon redemptions as succeeded
+      try {
+        const codes = (fullSession.metadata?.coupon_codes || '').split(',').filter(Boolean);
+        if (codes.length > 0) {
+          const coupons = await prisma.coupon.findMany({
+            where: { code: { in: codes } },
+            select: { id: true, code: true },
+          });
+          for (const c of coupons) {
+            await prisma.couponRedemption.updateMany({
+              where: { couponId: c.id, status: 'PENDING' },
+              data: { status: 'SUCCEEDED', orderId: order.id },
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('Coupon redemption update failed', e);
+      }
 
       // Simulate Printify order creation
       try {

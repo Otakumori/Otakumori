@@ -29,9 +29,10 @@ export default function CherryBlossomTree() {
 
     const createPetals = () => {
       const newPetals: Petal[] = [];
-      
+
       // Create petals at the top of the tree (where the pink leaves would be)
-      for (let i = 0; i < 3; i++) { // Fewer petals for better performance
+      for (let i = 0; i < 3; i++) {
+        // Fewer petals for better performance
         newPetals.push({
           id: `petal-${Date.now()}-${i}`,
           x: Math.random() * 350 + 20, // Tree width area (w-96 = 384px)
@@ -43,28 +44,29 @@ export default function CherryBlossomTree() {
           drift: (Math.random() - 0.5) * 0.8, // More natural drift
         });
       }
-      
-      setPetals(prev => [...prev, ...newPetals]);
+
+      setPetals((prev) => [...prev, ...newPetals]);
     };
 
     // Create initial petals
     createPetals();
-    
+
     // Create new petals periodically (less frequent for better performance)
     const petalInterval = setInterval(createPetals, 4000);
 
     const animatePetals = () => {
-      setPetals(prev => 
-        prev
-          .map(petal => ({
-            ...petal,
-            y: petal.y + petal.speed,
-            x: petal.x + petal.drift,
-            rotation: petal.rotation + 1,
-          }))
-          .filter(petal => petal.y < window.innerHeight + 50) // Remove petals that are off screen
+      setPetals(
+        (prev) =>
+          prev
+            .map((petal) => ({
+              ...petal,
+              y: petal.y + petal.speed,
+              x: petal.x + petal.drift,
+              rotation: petal.rotation + 1,
+            }))
+            .filter((petal) => petal.y < window.innerHeight + 50), // Remove petals that are off screen
       );
-      
+
       animationRef.current = requestAnimationFrame(animatePetals);
     };
 
@@ -81,11 +83,7 @@ export default function CherryBlossomTree() {
   if (!mounted) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-1 pointer-events-none"
-      style={{ zIndex: 1 }}
-    >
+    <div ref={containerRef} className="fixed inset-0 z-1 pointer-events-none" style={{ zIndex: 1 }}>
       {/* Cherry Blossom Tree - Fixed to Left Side */}
       <div className="fixed left-0 top-0 h-screen w-96 flex items-end pointer-events-none z-0">
         <div className="relative h-screen w-full">

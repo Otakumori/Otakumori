@@ -599,6 +599,51 @@
   }
 }
 
+/* Noto Emoji (monochrome) utility */
+.emoji-noto,
+.noto-emoji-otaku {
+  font-family: "Noto Emoji", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.emoji-noto-300 { font-weight: 300; }
+.emoji-noto-400 { font-weight: 400; }
+.emoji-noto-500 { font-weight: 500; }
+.emoji-noto-600 { font-weight: 600; }
+.emoji-noto-700 { font-weight: 700; }
+
+/* Material Symbols (variable font) utility */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1em; /* inherit size from parent */
+  line-height: 1;
+  display: inline-block;
+  vertical-align: text-bottom;
+  /* Axis defaults */
+  --ms-fill: 0;
+  --ms-wght: 400;
+  --ms-grad: 0;
+  --ms-opsz: 24;
+  font-variation-settings: 'FILL' var(--ms-fill), 'wght' var(--ms-wght), 'GRAD' var(--ms-grad), 'opsz' var(--ms-opsz);
+}
+
+/* Simple axis helpers */
+.ms-fill-1 { --ms-fill: 1; }
+.ms-wght-300 { --ms-wght: 300; }
+.ms-wght-400 { --ms-wght: 400; }
+.ms-wght-500 { --ms-wght: 500; }
+.ms-wght-700 { --ms-wght: 700; }
+.ms-grad-200 { --ms-grad: 200; }
+.ms-grad-0 { --ms-grad: 0; }
+.ms-opsz-20 { --ms-opsz: 20; }
+.ms-opsz-24 { --ms-opsz: 24; }
+.ms-opsz-40 { --ms-opsz: 40; }
+.ms-opsz-48 { --ms-opsz: 48; }
+
 @keyframes flash-pink {
   0% {
     opacity: 0;
@@ -1119,6 +1164,10 @@ textarea,
 }
 
 /* ===== Starfield (server-safe; no styled-jsx) ===== */
+:root {
+  /* Slower global starfield speed (can be overridden per page) */
+  --om-star-duration-base: 600s;
+}
 .om-star,
 .om-star::before,
 .om-star::after {

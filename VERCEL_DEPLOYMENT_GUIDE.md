@@ -78,6 +78,16 @@ vercel login
 vercel --prod
 ```
 
+### Clerk + Preview Deployments
+
+- For Vercel preview URLs (`*.vercel.app`), use Clerk test keys (pk_test/sk_test) and set:
+  - `NEXT_PUBLIC_CLERK_PROXY_URL=https://clerk.otaku-mori.com`
+  - Optional hosted pages:
+    - `NEXT_PUBLIC_CLERK_SIGN_IN_URL=https://accounts.otaku-mori.com/sign-in`
+    - `NEXT_PUBLIC_CLERK_SIGN_UP_URL=https://accounts.otaku-mori.com/sign-up`
+
+Production (`otaku-mori.com`) should use live keys.
+
 ### **Step 4: Set Environment Variables**
 
 Go to your Vercel dashboard → Project Settings → Environment Variables and add ALL the variables listed above.

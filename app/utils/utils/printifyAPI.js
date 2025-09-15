@@ -1,5 +1,4 @@
-import { printify } from '@/lib/printifyClient';
-import { env } from '@/env.mjs';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
@@ -29,14 +28,14 @@ const handleApiError = (error) => {
   }
 };
 
-const fetchWithRetry = async (endpoint, options = {}, retries = MAX_RETRIES) => {
+const fetchWithRetry = async (fn, retries = MAX_RETRIES) => {
   try {
-    const response = await printify.get(endpoint, options);
-    return response.data;
+    return await fn();
   } catch (error) {
-    if (retries > 0 && (error.response?.status === 429 || error.response?.status >= 500)) {
+    const status = error?.response?.status;
+    if (retries > 0 && (status === 429 || status >= 500)) {
       await sleep(RETRY_DELAY);
-      return fetchWithRetry(endpoint, options, retries - 1);
+      return fetchWithRetry(fn, retries - 1);
     }
     handleApiError(error);
   }
@@ -44,9 +43,9 @@ const fetchWithRetry = async (endpoint, options = {}, retries = MAX_RETRIES) => 
 
 export const fetchProducts = async () => {
   try {
-    return await fetchWithRetry(`/shops/${env.PRINTIFY_SHOP_ID}/products.json`, {
-      method: 'GET',
-    });
+    const svc = getPrintifyService();
+    const res = await fetchWithRetry(() => svc.getProducts(1, 100));
+    return res?.data || [];
   } catch (error) {
     console.error('Failed to fetch products:', error);
     throw error;
@@ -55,9 +54,8 @@ export const fetchProducts = async () => {
 
 export const fetchProductDetails = async (productId) => {
   try {
-    return await fetchWithRetry(`/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}.json`, {
-      method: 'GET',
-    });
+    const svc = getPrintifyService();
+    return await fetchWithRetry(() => svc.getProduct(productId));
   } catch (error) {
     console.error(`Failed to fetch product details for ${productId}:`, error);
     throw error;
@@ -66,12 +64,8 @@ export const fetchProductDetails = async (productId) => {
 
 export const publishProduct = async (productId) => {
   try {
-    return await fetchWithRetry(
-      `/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}/publish.json`,
-      {
-        method: 'POST',
-      },
-    );
+    const svc = getPrintifyService();
+    return await fetchWithRetry(() => svc.publishProduct(productId));
   } catch (error) {
     console.error(`Failed to publish product ${productId}:`, error);
     throw error;

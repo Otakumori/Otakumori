@@ -1,6 +1,6 @@
-"use client";
-import { useEffect } from "react";
-type Density = "home" | "site";
+'use client';
+import { useEffect } from 'react';
+type Density = 'home' | 'site';
 type Vec = { x: number; y: number };
 
 const AMBIENT_MS_HOME = 700;
@@ -9,24 +9,24 @@ const CLICK_BURST_COUNT = 16;
 const FALL_MIN = 9000;
 const FALL_MAX = 14000;
 
-const rnd = (a:number,b:number)=>Math.random()*(b-a)+a;
+const rnd = (a: number, b: number) => Math.random() * (b - a) + a;
 
 function spawnPetal(root: HTMLElement, start: Vec, z = 6) {
-  const p = document.createElement("div");
+  const p = document.createElement('div');
   const size = rnd(5, 8);
   Object.assign(p.style, {
-    position: "fixed",
+    position: 'fixed',
     left: `${start.x}px`,
     top: `${start.y}px`,
     width: `${size}px`,
     height: `${size * 0.7}px`,
     borderRadius: `${size}px ${size}px ${size * 0.2}px ${size * 0.8}px`,
-    background: "radial-gradient(40% 50% at 40% 50%, rgba(255,175,215,.95), rgba(250,130,190,.8))",
-    boxShadow: "0 0 6px rgba(255,150,210,.25)",
-    pointerEvents: "none",
+    background: 'radial-gradient(40% 50% at 40% 50%, rgba(255,175,215,.95), rgba(250,130,190,.8))',
+    boxShadow: '0 0 6px rgba(255,150,210,.25)',
+    pointerEvents: 'none',
     zIndex: String(z),
-    transform: "translateZ(0)",
-    willChange: "transform, opacity",
+    transform: 'translateZ(0)',
+    willChange: 'transform, opacity',
   } as CSSStyleDeclaration);
   root.appendChild(p);
 
@@ -48,13 +48,13 @@ function spawnPetal(root: HTMLElement, start: Vec, z = 6) {
   requestAnimationFrame(tick);
 }
 
-export default function CherryBlossomEffect({ density = "home" }: { density?: Density }) {
+export default function CherryBlossomEffect({ density = 'home' }: { density?: Density }) {
   // Find tree position for canopy anchor
   useEffect(() => {
-    const el = document.querySelector("[data-tree-root]") as HTMLDivElement | null;
+    const el = document.querySelector('[data-tree-root]') as HTMLDivElement | null;
     if (!el) return;
     const root = document.body;
-    const ms = density === "home" ? AMBIENT_MS_HOME : AMBIENT_MS_SITE;
+    const ms = density === 'home' ? AMBIENT_MS_HOME : AMBIENT_MS_SITE;
 
     let canopy: Vec = { x: 160, y: 140 };
     const setFromRect = () => {
@@ -65,32 +65,37 @@ export default function CherryBlossomEffect({ density = "home" }: { density?: De
     const ro = new ResizeObserver(setFromRect);
     ro.observe(el);
     const onResize = () => setFromRect();
-    addEventListener("resize", onResize);
+    addEventListener('resize', onResize);
 
     const id = setInterval(() => {
-      const n = Math.round(rnd(1, density === "home" ? 2 : 1));
+      const n = Math.round(rnd(1, density === 'home' ? 2 : 1));
       for (let i = 0; i < n; i++) {
-        const jx = rnd(-18, 18), jy = rnd(-18, 18);
+        const jx = rnd(-18, 18),
+          jy = rnd(-18, 18);
         spawnPetal(root, { x: canopy.x + jx, y: canopy.y + jy }, 6);
       }
     }, ms);
 
     const onClick = (e: MouseEvent) => {
-      const count = density === "home" ? CLICK_BURST_COUNT : Math.round(CLICK_BURST_COUNT * 0.6);
+      const count = density === 'home' ? CLICK_BURST_COUNT : Math.round(CLICK_BURST_COUNT * 0.6);
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2;
         const r = rnd(4, 22);
-        spawnPetal(root, { x: e.clientX + Math.cos(angle) * r, y: e.clientY + Math.sin(angle) * r }, 9);
+        spawnPetal(
+          root,
+          { x: e.clientX + Math.cos(angle) * r, y: e.clientY + Math.sin(angle) * r },
+          9,
+        );
       }
       // Dispatch petal collect event for HUD
-      window.dispatchEvent(new Event("petal:collect"));
+      window.dispatchEvent(new Event('petal:collect'));
     };
-    addEventListener("click", onClick, { passive: true });
+    addEventListener('click', onClick, { passive: true });
 
     return () => {
       clearInterval(id);
-      removeEventListener("click", onClick);
-      removeEventListener("resize", onResize);
+      removeEventListener('click', onClick);
+      removeEventListener('resize', onResize);
       ro.disconnect();
     };
   }, [density]);

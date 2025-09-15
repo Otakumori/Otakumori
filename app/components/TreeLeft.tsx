@@ -21,9 +21,9 @@ type TreeLeftAlignedProps = {
   trunkCenterPx?: number;
 };
 
-export default function TreeLeftAligned({ 
+export default function TreeLeftAligned({
   src = '/assets/images/cherry-tree@2x.webp',
-  trunkCenterPx = 380 
+  trunkCenterPx = 380,
 }: TreeLeftAlignedProps) {
   return (
     <>

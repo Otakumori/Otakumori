@@ -40,7 +40,7 @@ async function getPetalsData() {
 
 export default async function PetalsPage() {
   const { userId } = await auth();
-  
+
   if (!userId) {
     redirect('/sign-in?redirect_url=/profile/petals');
   }
@@ -53,14 +53,10 @@ export default async function PetalsPage() {
       <main className="relative z-10 min-h-screen bg-[#080611]">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white md:text-4xl">
-              {t("petals", "title")}
-            </h1>
-            <p className="mt-2 text-zinc-300/90">
-              {t("profile", "petals_subtitle")}
-            </p>
+            <h1 className="text-3xl font-bold text-white md:text-4xl">{t('petals', 'title')}</h1>
+            <p className="mt-2 text-zinc-300/90">{t('profile', 'petals_subtitle')}</p>
           </div>
-          
+
           <PetalsDashboard petalsData={petalsData} />
         </div>
       </main>

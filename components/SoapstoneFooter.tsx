@@ -156,6 +156,8 @@ export function SoapstoneFooter() {
                 maxLength={140}
                 className="flex-1 px-4 py-3 bg-neutral-800 border border-pink-500/30 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 disabled={isSubmitting}
+                name="soapstone"
+                aria-label="Soapstone message"
               />
               <button
                 type="submit"
@@ -299,7 +301,11 @@ export function SoapstoneFooter() {
 
           <div className="mt-8 text-center">
             <p className="text-neutral-500 text-sm">
-              © 2024 Otakumori. Made with <span role="img" aria-label="Red heart">❤️</span> for the otaku community.
+              © 2024 Otakumori. Made with{' '}
+              <span role="img" aria-label="Red heart">
+                ❤️
+              </span>{' '}
+              for the otaku community.
             </p>
           </div>
         </div>

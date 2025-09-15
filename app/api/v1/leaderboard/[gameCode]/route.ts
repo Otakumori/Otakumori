@@ -4,12 +4,9 @@ import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { LeaderboardRequestSchema, LeaderboardResponseSchema } from '@/app/lib/contracts';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { gameCode: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { gameCode: string } }) {
   try {
     const { userId } = await auth();
     const { gameCode } = params;

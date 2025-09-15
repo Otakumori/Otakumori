@@ -283,7 +283,7 @@ const Navbar: React.FC = () => {
                 onClick={() => setIsMobileShopOpen(!isMobileShopOpen)}
                 className="flex items-center justify-between w-full text-2xl text-white"
                 aria-label="Shop categories"
-                aria-expanded={isMobileShopOpen ? "true" : "false"}
+                aria-expanded={isMobileShopOpen ? 'true' : 'false'}
               >
                 <span>Shop</span>
                 <ChevronDown

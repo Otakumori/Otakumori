@@ -48,6 +48,8 @@ export default function ProductFilters({
       <form onSubmit={handleSearch} className="relative">
         <input
           type="text"
+          name="q"
+          aria-label="Search products"
           placeholder={placeholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -91,6 +93,7 @@ export default function ProductFilters({
             placeholder="Min"
             min="0"
             step="0.01"
+            name="minPrice"
             defaultValue={searchParams.get('minPrice') || ''}
             onChange={(e) =>
               handlePriceRangeChange(e.target.value, searchParams.get('maxPrice') || '')
@@ -102,6 +105,7 @@ export default function ProductFilters({
             placeholder="Max"
             min="0"
             step="0.01"
+            name="maxPrice"
             defaultValue={searchParams.get('maxPrice') || ''}
             onChange={(e) =>
               handlePriceRangeChange(searchParams.get('minPrice') || '', e.target.value)

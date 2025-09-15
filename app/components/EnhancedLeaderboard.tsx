@@ -52,11 +52,11 @@ export default function EnhancedLeaderboard({
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return '🥇';
+        return '?';
       case 2:
-        return '🥈';
+        return '?';
       case 3:
-        return '🥉';
+        return '?';
       default:
         return `#${rank}`;
     }
@@ -65,11 +65,11 @@ export default function EnhancedLeaderboard({
   const getRankColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return 'text-yellow-400';
+        return '?';
       case 2:
-        return 'text-gray-300';
+        return '?';
       case 3:
-        return 'text-orange-400';
+        return '?';
       default:
         return 'text-pink-300';
     }

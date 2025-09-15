@@ -5,9 +5,9 @@ import { z } from 'zod';
 
 export const env = createEnv({
   server: {
-    NODE_ENV: z.enum(["development", "test", "production"]),
+    NODE_ENV: z.enum(['development', 'test', 'production']),
     DATABASE_URL: z.string().url(),
-    DIRECT_URL: z.string().url(),
+    DIRECT_URL: z.string().url().optional(),
     // server-only keys we actually reference (mark optional if not always used)
     CLERK_SECRET_KEY: z.string().optional(),
     CLERK_WEBHOOK_SECRET: z.string().optional(),

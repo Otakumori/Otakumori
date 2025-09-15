@@ -19,10 +19,10 @@ interface PetalLayerProps {
   className?: string;
 }
 
-export default function PetalLayer({ 
-  count = 20, 
+export default function PetalLayer({
+  count = 20,
   intensity = 'medium',
-  className = '' 
+  className = '',
 }: PetalLayerProps) {
   const [petals, setPetals] = useState<Petal[]>([]);
 
@@ -68,7 +68,7 @@ export default function PetalLayer({
           }}
         />
       ))}
-      
+
       <style jsx>{`
         @keyframes petal-fall {
           0% {
@@ -86,7 +86,7 @@ export default function PetalLayer({
             opacity: 0;
           }
         }
-        
+
         @media (prefers-reduced-motion: reduce) {
           .absolute {
             animation: none !important;

@@ -1,5 +1,4 @@
-import { log } from '@/lib/logger';
-import { env } from '@/env.mjs';
+import { logger } from '@/app/lib/logger';
 
 export interface PrintifyProduct {
   id: string;
@@ -60,8 +59,8 @@ export class PrintifyService {
   private readonly shopId: string;
 
   constructor() {
-    const apiKey = env.PRINTIFY_API_KEY;
-    const shopId = env.PRINTIFY_SHOP_ID;
+    const apiKey = process.env.PRINTIFY_API_KEY as string | undefined;
+    const shopId = process.env.PRINTIFY_SHOP_ID as string | undefined;
 
     if (!apiKey) {
       throw new Error('PRINTIFY_API_KEY environment variable is required');
@@ -126,10 +125,10 @@ export class PrintifyService {
         last_page: result.last_page || 1,
       };
     } catch (error) {
-      log('printify_products_fetch_failed', {
-        error: String(error),
+      logger.error('printify_products_fetch_failed', undefined, {
         page,
         perPage,
+        error: String(error),
       });
       throw error;
     }
@@ -153,7 +152,7 @@ export class PrintifyService {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
       } catch (error) {
-        log('printify_pagination_error', {
+        logger.error('printify_pagination_error', undefined, {
           error: String(error),
           page,
           totalFetched: allProducts.length,
@@ -169,9 +168,15 @@ export class PrintifyService {
     return this.makeRequest<PrintifyProduct>(`/shops/${this.shopId}/products/${productId}.json`);
   }
 
+  async publishProduct(productId: string): Promise<{ status: string } | any> {
+    return this.makeRequest(`/shops/${this.shopId}/products/${productId}/publish.json`, {
+      method: 'POST',
+    });
+  }
+
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
     try {
-      log('printify_order_creation_started', {
+      logger.info('printify_order_creation_started', undefined, {
         externalId: orderData.external_id,
         itemCount: orderData.line_items.length,
       });
@@ -184,7 +189,7 @@ export class PrintifyService {
         },
       );
 
-      log('printify_order_created_success', {
+      logger.info('printify_order_created_success', undefined, {
         orderId: result.id,
         externalId: orderData.external_id,
         status: result.status,
@@ -192,7 +197,7 @@ export class PrintifyService {
 
       return result;
     } catch (error) {
-      log('printify_order_creation_failed', {
+      logger.error('printify_order_creation_failed', undefined, {
         externalId: orderData.external_id,
         error: String(error),
       });
@@ -209,7 +214,7 @@ export class PrintifyService {
       const result = await this.makeRequest<{ data: any[] }>(`/shops/${this.shopId}/shipping.json`);
       return result.data || [];
     } catch (error) {
-      log('printify_shipping_fetch_failed', { error: String(error) });
+      logger.error('printify_shipping_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
   }
@@ -221,7 +226,7 @@ export class PrintifyService {
       );
       return result.data || [];
     } catch (error) {
-      log('printify_providers_fetch_failed', { error: String(error) });
+      logger.error('printify_providers_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
   }
@@ -243,5 +248,8 @@ export class PrintifyService {
   }
 }
 
-// Export singleton instance
-export const printifyService = new PrintifyService();
+let _singleton: PrintifyService | null = null;
+export function getPrintifyService(): PrintifyService {
+  if (!_singleton) _singleton = new PrintifyService();
+  return _singleton;
+}

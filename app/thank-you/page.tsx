@@ -1,12 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Flower, Crown } from 'lucide-react';
+import RuneGlyph from '@/components/runes/RuneGlyph';
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle, Crown, Flower } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface OrderResult {
   id: string;
@@ -95,7 +95,11 @@ export default function ThankYouPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
         <div className="text-center">
-          <div className="mb-4 text-6xl text-red-400"><span role="img" aria-label="Warning">⚠️</span></div>
+          <div className="mb-4 text-6xl text-red-400">
+            <span role="img" aria-label="Warning">
+              ⚠️
+            </span>
+          </div>
           <h1 className="mb-4 text-2xl font-bold text-white">Order Not Found</h1>
           <p className="mb-6 text-neutral-300">{error}</p>
           <button
@@ -131,7 +135,9 @@ export default function ThankYouPage() {
                 transition={{ duration: 1.5, ease: 'easeOut' }}
                 className="mb-4 text-8xl"
               >
-                <span role="img" aria-label="Cherry blossom">🌸</span>
+                <span role="img" aria-label="Cherry blossom">
+                  🌸
+                </span>
               </motion.div>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -238,7 +244,16 @@ export default function ThankYouPage() {
                     className="rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-500/20 to-orange-500/20 p-6 transition-colors hover:border-amber-300/50"
                   >
                     <div className="text-center">
-                      <div className="mb-3 text-4xl">{rune.glyph || '✶'}</div>
+                      <div className="mb-3 text-4xl leading-none">
+                        <RuneGlyph
+                          canonicalId={rune.canonicalId as any}
+                          glyph={rune.glyph}
+                          displayName={rune.displayName}
+                          size="lg"
+                          animated={true}
+                        />
+                      </div>
+                      <div className="mb-3 text-4xl hidden">{rune.glyph || '✶'}</div>
                       <h3 className="mb-2 text-lg font-bold text-white">
                         {rune.displayName ||
                           `Rune ${rune.canonicalId.split('_')[1]?.toUpperCase()}`}

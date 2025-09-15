@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       'svix-timestamp': svixTimestamp,
       'svix-signature': svixSignature,
     });
-      } catch (_err) {
+  } catch (_err) {
     return new NextResponse('Invalid signature', { status: 400 });
   }
 

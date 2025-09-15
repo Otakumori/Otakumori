@@ -177,7 +177,12 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
           </div>
 
           <p className="text-lg font-bold text-gray-400">Otaku-mori</p>
-          <p className="mb-4 text-sm text-gray-500">Stay a while. Let's blossom together. <span role="img" aria-label="Cherry blossom">🌸</span></p>
+          <p className="mb-4 text-sm text-gray-500">
+            Stay a while. Let's blossom together.{' '}
+            <span role="img" aria-label="Cherry blossom">
+              🌸
+            </span>
+          </p>
 
           <div className="mb-2 flex justify-center space-x-4 text-sm text-gray-500">
             <Link href="/contact" className="hover:text-pink-500">
@@ -186,7 +191,10 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
           </div>
 
           <p className="text-xs text-gray-600">
-            &copy; {new Date().getFullYear()} Otaku-mori. Made with <span role="img" aria-label="Red heart">❤️</span>
+            &copy; {new Date().getFullYear()} Otaku-mori. Made with{' '}
+            <span role="img" aria-label="Red heart">
+              ❤️
+            </span>
           </p>
         </div>
       </footer>

@@ -63,13 +63,17 @@ export default function PetalStorePage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/v1/petals/shop?category=${selectedCategory}`);
-      const data: PetalStoreResponse = await response.json();
+      const response = await fetch(`/api/petal-shop/catalog`);
+      const data = await response.json();
 
-      if (data.ok && data.data) {
-        setItems(data.data.items);
+      if (data?.ok && data?.data?.items) {
+        let list: ShopItem[] = data.data.items;
+        if (selectedCategory !== 'all') {
+          list = list.filter((i) => i.kind === selectedCategory);
+        }
+        setItems(list);
       } else {
-        setError(data.error || 'Failed to fetch shop items');
+        setError(data?.error || 'Failed to fetch shop items');
       }
     } catch (err) {
       setError('Failed to fetch shop items');
@@ -81,12 +85,10 @@ export default function PetalStorePage() {
 
   const fetchPetalBalance = async () => {
     try {
-      const response = await fetch('/api/v1/petals/balance');
+      const response = await fetch('/api/petals/wallet');
       if (response.ok) {
         const data = await response.json();
-        if (data.ok && data.data) {
-          setPetalBalance(data.data.petalBalance);
-        }
+        if (typeof data.balance === 'number') setPetalBalance(data.balance);
       }
     } catch (err) {
       console.error('Error fetching petal balance:', err);
@@ -102,20 +104,17 @@ export default function PetalStorePage() {
     try {
       setPurchasing(item.id);
 
-      const response = await fetch('/api/v1/petals/purchase', {
+      const response = await fetch('/api/petal-shop/purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          itemId: item.id,
-          idempotencyKey: `purchase_${item.id}_${Date.now()}`,
-        }),
+        body: JSON.stringify({ sku: item.sku }),
       });
 
       const data = await response.json();
 
       if (data.ok && data.data) {
         // Update local state
-        setPetalBalance(data.data.newBalance);
+        if (typeof data.data.balance === 'number') setPetalBalance(data.data.balance);
         setItems((prev) => prev.filter((i) => i.id !== item.id));
         alert(`Successfully purchased ${item.name}!`);
       } else {
@@ -211,7 +210,8 @@ export default function PetalStorePage() {
               placeholder="Search items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-pink-500 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:border-pink-500 focus-visible:ring-2 focus-visible:ring-pink-400 transition-colors"
+              aria-label="Search items"
             />
           </div>
 
@@ -221,11 +221,13 @@ export default function PetalStorePage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 ${
                   selectedCategory === category.id
                     ? 'bg-pink-600 text-white shadow-lg shadow-pink-600/25'
                     : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white'
                 }`}
+                aria-pressed={selectedCategory === category.id}
+                aria-label={`Filter ${category.name}`}
               >
                 <span>{category.icon}</span>
                 {category.name}
@@ -302,13 +304,14 @@ export default function PetalStorePage() {
                     <button
                       onClick={() => handlePurchase(item)}
                       disabled={purchasing === item.id || petalBalance < item.pricePetals}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 ${
                         petalBalance < item.pricePetals
                           ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
                           : purchasing === item.id
                             ? 'bg-blue-600 text-white cursor-wait'
                             : 'bg-pink-600 hover:bg-pink-700 text-white hover:scale-105'
                       }`}
+                      aria-label={`Purchase ${item.name}`}
                     >
                       {purchasing === item.id ? (
                         <>

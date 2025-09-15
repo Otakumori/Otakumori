@@ -42,7 +42,7 @@ export default function ErrorTestButton() {
       // Create a custom error with additional context
       const customError = new Error('Test custom error for Sentry');
       customError.name = 'CustomTestError';
-      
+
       // Add custom context to Sentry
       Sentry.withScope((scope) => {
         scope.setTag('errorType', 'custom');
@@ -54,7 +54,7 @@ export default function ErrorTestButton() {
         scope.setLevel('error');
         Sentry.captureException(customError);
       });
-      
+
       throw customError;
     } catch (error) {
       throw error; // Re-throw to trigger error boundary
@@ -68,7 +68,7 @@ export default function ErrorTestButton() {
     try {
       // Send a custom message to Sentry
       Sentry.captureMessage('Test message from Sentry debug page', 'info');
-      
+
       // Also send with additional context
       Sentry.withScope((scope) => {
         scope.setTag('messageType', 'test');
@@ -80,7 +80,7 @@ export default function ErrorTestButton() {
         scope.setLevel('info');
         Sentry.captureMessage('Test message with context from Sentry debug page', 'info');
       });
-      
+
       alert('Test message sent to Sentry! Check your Sentry dashboard.');
     } catch (error) {
       console.error('Error sending test message:', error);
@@ -128,8 +128,8 @@ export default function ErrorTestButton() {
       <div className="mt-6 p-4 bg-yellow-900/20 border border-yellow-500 rounded-lg">
         <h3 className="text-lg font-semibold mb-2 text-yellow-300">⚠️ Warning</h3>
         <p className="text-sm text-yellow-200">
-          These buttons will trigger actual errors and send data to Sentry. Only use this page for testing purposes.
-          Make sure you have Sentry properly configured before testing.
+          These buttons will trigger actual errors and send data to Sentry. Only use this page for
+          testing purposes. Make sure you have Sentry properly configured before testing.
         </p>
       </div>
     </div>

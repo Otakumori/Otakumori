@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
 const PRINTIFY_SHOP_ID = env.PRINTIFY_SHOP_ID || '';

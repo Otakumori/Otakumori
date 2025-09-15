@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import { NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
+import { env } from '@/env';
 
 export async function GET() {
   try {

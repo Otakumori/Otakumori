@@ -109,11 +109,16 @@ function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
               <input
                 placeholder="Email"
                 className="rounded-xl bg-neutral-800/80 p-3 outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
+                name="email"
+                type="email"
+                aria-label="Email"
               />
               <input
                 placeholder="Password"
                 type="password"
                 className="rounded-xl bg-neutral-800/80 p-3 outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
+                name="password"
+                aria-label="Password"
               />
               <button className="rounded-2xl p-3 font-medium bg-pink-500/90 hover:bg-pink-500 text-white transition">
                 Log In
@@ -173,7 +178,9 @@ export default function SiteLayout({
         <div className="mx-auto max-w-6xl px-3 sm:px-6 py-4 flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-xl bg-pink-500/90 grid place-items-center shadow-lg select-none">
-              <span role="img" aria-label="Crossed swords">⚔️</span>
+              <span role="img" aria-label="Crossed swords">
+                ⚔️
+              </span>
             </div>
             <a href="/" className="text-lg font-semibold tracking-wide hover:text-pink-200">
               Otakumori
@@ -282,7 +289,11 @@ export default function SiteLayout({
         <div className="mx-auto max-w-6xl px-3 sm:px-6 py-10 grid md:grid-cols-3 gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-lg bg-pink-500/90 grid place-items-center"><span role="img" aria-label="Crossed swords">⚔️</span></div>
+              <div className="h-7 w-7 rounded-lg bg-pink-500/90 grid place-items-center">
+                <span role="img" aria-label="Crossed swords">
+                  ⚔️
+                </span>
+              </div>
               <span className="font-semibold">Otakumori</span>
             </div>
             <p className="mt-3 text-neutral-400 text-sm max-w-xs">
@@ -320,6 +331,9 @@ export default function SiteLayout({
               <input
                 placeholder="Email"
                 className="w-full rounded-xl bg-neutral-900/80 p-3 text-sm outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
+                name="newsletterEmail"
+                type="email"
+                aria-label="Email"
               />
               <button className="rounded-xl bg-pink-500/90 hover:bg-pink-500 px-4 text-sm">
                 Join

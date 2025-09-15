@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { printifyService } from '@/app/lib/printify/service';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const result = await printifyService.testConnection();
+    const result = await getPrintifyService().testConnection();
 
     if (result.success) {
       return NextResponse.json({

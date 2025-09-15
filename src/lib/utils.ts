@@ -40,5 +40,3 @@ export function slugify(str: string) {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
-
-

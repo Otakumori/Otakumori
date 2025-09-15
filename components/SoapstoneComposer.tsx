@@ -41,14 +41,46 @@ export default function SoapstoneComposer() {
         maxLength={160}
         placeholder="Leave a soapstone message…"
         className="flex-1 bg-transparent text-blue-100 placeholder-blue-300/40 outline-none"
+        name="soapstone"
+        aria-label="Soapstone message"
       />
       <button
         onClick={submit}
         disabled={busy}
         className="rounded-xl border border-blue-300/40 bg-blue-300/10 px-3 py-2 text-blue-100 hover:bg-blue-300/20 disabled:opacity-50"
-      >{<>''
-        <span role='img' aria-label='emoji'>D</span><span role='img' aria-label='emoji'>r</span><span role='img' aria-label='emoji'>o</span><span role='img' aria-label='emoji'>p</span>' '<span role='img' aria-label='emoji'>R</span><span role='img' aria-label='emoji'>u</span><span role='img' aria-label='emoji'>n</span><span role='img' aria-label='emoji'>e</span>
-        ''</>}</button>
+      >
+        {
+          <>
+            ''
+            <span role="img" aria-label="emoji">
+              D
+            </span>
+            <span role="img" aria-label="emoji">
+              r
+            </span>
+            <span role="img" aria-label="emoji">
+              o
+            </span>
+            <span role="img" aria-label="emoji">
+              p
+            </span>
+            ' '
+            <span role="img" aria-label="emoji">
+              R
+            </span>
+            <span role="img" aria-label="emoji">
+              u
+            </span>
+            <span role="img" aria-label="emoji">
+              n
+            </span>
+            <span role="img" aria-label="emoji">
+              e
+            </span>
+            ''
+          </>
+        }
+      </button>
     </div>
   );
 }

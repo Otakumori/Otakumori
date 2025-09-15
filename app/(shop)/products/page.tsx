@@ -47,7 +47,7 @@ function ProductCard({ product }: { product: Product }) {
     <div className="group relative overflow-hidden rounded-2xl bg-black/20 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:bg-black/30 hover:border-white/20 hover:shadow-2xl hover:shadow-purple-500/20">
       {/* Glassmorphic overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl" />
-      
+
       {/* Image container with dark overlay */}
       <div className="aspect-square overflow-hidden relative">
         <Image
@@ -60,7 +60,7 @@ function ProductCard({ product }: { product: Product }) {
         {/* Dark overlay on image */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
-      
+
       <div className="p-6 relative z-10">
         <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-200 transition-colors duration-300">
           {product.title}
@@ -86,7 +86,7 @@ function ProductCard({ product }: { product: Product }) {
           </Link>
         </div>
       </div>
-      
+
       {/* Subtle glow effect */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/0 via-pink-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-pink-500/5 group-hover:to-purple-500/5 transition-all duration-500 pointer-events-none" />
     </div>
@@ -121,7 +121,10 @@ function ProductsSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="animate-pulse rounded-2xl bg-black/20 backdrop-blur-xl border border-white/10 p-6">
+        <div
+          key={i}
+          className="animate-pulse rounded-2xl bg-black/20 backdrop-blur-xl border border-white/10 p-6"
+        >
           <div className="aspect-square bg-gray-800/50 rounded-xl mb-4"></div>
           <div className="h-5 bg-gray-800/50 rounded-lg mb-2"></div>
           <div className="h-3 bg-gray-800/50 rounded w-3/4 mb-4"></div>

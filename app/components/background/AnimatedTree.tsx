@@ -18,34 +18,34 @@ function Branch({ x, y, angle, length, thickness, depth, maxDepth }: BranchProps
   const endY = y + Math.sin(angle) * length;
 
   const branchVariants = {
-    hidden: { 
+    hidden: {
       pathLength: 0,
-      opacity: 0 
+      opacity: 0,
     },
-    visible: { 
+    visible: {
       pathLength: 1,
       opacity: 1,
       transition: {
         duration: 0.8 + depth * 0.2,
-        ease: "easeOut"
-      }
-    }
+        ease: 'easeOut',
+      },
+    },
   };
 
   const blossomVariants = {
-    hidden: { 
+    hidden: {
       scale: 0,
-      opacity: 0 
+      opacity: 0,
     },
-    visible: { 
+    visible: {
       scale: 1,
       opacity: 0.8,
       transition: {
         delay: 0.5 + depth * 0.1,
         duration: 0.6,
-        ease: "easeOut"
-      }
-    }
+        ease: 'easeOut',
+      },
+    },
   };
 
   return (
@@ -63,7 +63,7 @@ function Branch({ x, y, angle, length, thickness, depth, maxDepth }: BranchProps
         initial="hidden"
         animate="visible"
       />
-      
+
       {/* Cherry blossoms along the branch */}
       {depth < 3 && (
         <>
@@ -124,11 +124,7 @@ export default function AnimatedTree() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <svg
-        className="h-full w-full"
-        viewBox="0 0 1200 800"
-        preserveAspectRatio="xMidYMax meet"
-      >
+      <svg className="h-full w-full" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax meet">
         <defs>
           {/* Cherry blossom gradient */}
           <radialGradient id="cherryBlossomGradient" cx="50%" cy="50%" r="50%">
@@ -136,7 +132,7 @@ export default function AnimatedTree() {
             <stop offset="50%" stopColor="#FF69B4" stopOpacity="0.8" />
             <stop offset="100%" stopColor="#FF1493" stopOpacity="0.7" />
           </radialGradient>
-          
+
           {/* Tree trunk gradient */}
           <linearGradient id="trunkGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#8B4513" />
@@ -155,7 +151,7 @@ export default function AnimatedTree() {
           rx={30}
           initial={{ scaleY: 0 }}
           animate={{ scaleY: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 1, ease: 'easeOut' }}
         />
 
         {/* Main branches */}
@@ -195,22 +191,22 @@ export default function AnimatedTree() {
             cy={200 + Math.random() * 400}
             r={3 + Math.random() * 2}
             fill="url(#cherryBlossomGradient)"
-            initial={{ 
+            initial={{
               opacity: 0,
               scale: 0,
-              y: 0
+              y: 0,
             }}
-            animate={{ 
+            animate={{
               opacity: [0, 0.8, 0],
               scale: [0, 1, 0],
               y: [0, -100 - Math.random() * 200],
-              x: [0, (Math.random() - 0.5) * 100]
+              x: [0, (Math.random() - 0.5) * 100],
             }}
             transition={{
               duration: 3 + Math.random() * 2,
               repeat: Infinity,
               delay: Math.random() * 2,
-              ease: "easeOut"
+              ease: 'easeOut',
             }}
           />
         ))}

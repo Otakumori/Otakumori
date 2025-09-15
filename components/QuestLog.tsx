@@ -54,7 +54,9 @@ export default function QuestLog() {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-slatey-200 text-lg font-semibold">Daily Quests</h3>
         <div className="flex items-center gap-2 text-sakura-500">
-          <span className="text-sm" role="img" aria-label="Cherry blossom">🌸</span>
+          <span className="text-sm" role="img" aria-label="Cherry blossom">
+            🌸
+          </span>
           <span className="font-medium">{petalBalance}</span>
         </div>
       </div>
@@ -161,7 +163,10 @@ function QuestRow({
         </div>
         <div className="text-right">
           <div className="text-sakura-500 font-semibold flex items-center gap-1">
-            +{totalReward} <span role="img" aria-label="Cherry blossom">🌸</span>
+            +{totalReward}{' '}
+            <span role="img" aria-label="Cherry blossom">
+              🌸
+            </span>
           </div>
           {bonusReward > 0 && <div className="text-xs text-sakura-400">+{bonusReward} bonus</div>}
         </div>

@@ -348,14 +348,18 @@ export default function Navigation() {
                         fallbackRedirectUrl={appUrl('/')}
                         forceRedirectUrl={appUrl('/onboarding')}
                       >
-                        <button className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-pink-500/30 hover:bg-pink-500/10 rounded-lg transition-colors">Sign In</button>
+                        <button className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-pink-500/30 hover:bg-pink-500/10 rounded-lg transition-colors">
+                          Sign In
+                        </button>
                       </SignInButton>
                       <SignUpButton
                         mode="modal"
                         fallbackRedirectUrl={appUrl('/')}
                         forceRedirectUrl={appUrl('/onboarding')}
                       >
-                        <button className="w-full px-4 py-3 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">Join the quest</button>
+                        <button className="w-full px-4 py-3 text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 rounded-lg transition-colors">
+                          Join the quest
+                        </button>
                       </SignUpButton>
                     </div>
                   )}

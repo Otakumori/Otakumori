@@ -775,10 +775,7 @@
   },
   "printify": {
     "winner": "app\\abyss\\shop\\api\\printify.js",
-    "losers": [
-      "app\\lib\\printify.ts",
-      "lib\\api\\printify.ts"
-    ],
+    "losers": ["app\\lib\\printify.ts", "lib\\api\\printify.ts"],
     "scores": [
       {
         "file": "app\\abyss\\shop\\api\\printify.js",
@@ -2075,9 +2072,7 @@
   },
   "achievementcard": {
     "winner": "app\\components\\achievements\\AchievementCard.tsx",
-    "losers": [
-      "components\\achievements\\AchievementCard.tsx"
-    ],
+    "losers": ["components\\achievements\\AchievementCard.tsx"],
     "scores": [
       {
         "file": "app\\components\\achievements\\AchievementCard.tsx",
@@ -2095,9 +2090,7 @@
   },
   "achievementprovider": {
     "winner": "app\\components\\achievements\\AchievementProvider.tsx",
-    "losers": [
-      "components\\achievements\\AchievementProvider.tsx"
-    ],
+    "losers": ["components\\achievements\\AchievementProvider.tsx"],
     "scores": [
       {
         "file": "app\\components\\achievements\\AchievementProvider.tsx",
@@ -2115,10 +2108,7 @@
   },
   "achievements": {
     "winner": "app\\components\\Achievements.tsx",
-    "losers": [
-      "data\\achievements.ts",
-      "app\\types\\achievements.ts"
-    ],
+    "losers": ["data\\achievements.ts", "app\\types\\achievements.ts"],
     "scores": [
       {
         "file": "app\\components\\Achievements.tsx",
@@ -2169,10 +2159,7 @@
   },
   "quickactions": {
     "winner": "app\\components\\components\\admin\\QuickActions.tsx",
-    "losers": [
-      "app\\components\\admin\\QuickActions.tsx",
-      "components\\admin\\QuickActions.tsx"
-    ],
+    "losers": ["app\\components\\admin\\QuickActions.tsx", "components\\admin\\QuickActions.tsx"],
     "scores": [
       {
         "file": "app\\components\\components\\admin\\QuickActions.tsx",
@@ -2196,9 +2183,7 @@
   },
   "interactivecherryblossom": {
     "winner": "components\\animations\\InteractiveCherryBlossom.tsx",
-    "losers": [
-      "app\\components\\animations\\InteractiveCherryBlossom.tsx"
-    ],
+    "losers": ["app\\components\\animations\\InteractiveCherryBlossom.tsx"],
     "scores": [
       {
         "file": "components\\animations\\InteractiveCherryBlossom.tsx",
@@ -2216,9 +2201,7 @@
   },
   "avatarcreator": {
     "winner": "app\\components\\profile\\AvatarCreator.tsx",
-    "losers": [
-      "app\\components\\AvatarCreator.tsx"
-    ],
+    "losers": ["app\\components\\AvatarCreator.tsx"],
     "scores": [
       {
         "file": "app\\components\\profile\\AvatarCreator.tsx",
@@ -2236,9 +2219,7 @@
   },
   "blogteaser": {
     "winner": "components\\hero\\BlogTeaser.tsx",
-    "losers": [
-      "app\\components\\BlogTeaser.tsx"
-    ],
+    "losers": ["app\\components\\BlogTeaser.tsx"],
     "scores": [
       {
         "file": "components\\hero\\BlogTeaser.tsx",
@@ -2256,9 +2237,7 @@
   },
   "cherryblossomeffect": {
     "winner": "app\\components\\CherryBlossomEffect.js",
-    "losers": [
-      "app\\components\\CherryBlossomEffect.tsx"
-    ],
+    "losers": ["app\\components\\CherryBlossomEffect.tsx"],
     "scores": [
       {
         "file": "app\\components\\CherryBlossomEffect.js",
@@ -2276,9 +2255,7 @@
   },
   "cherryblossomtree": {
     "winner": "app\\components\\components\\CherryBlossomTree.tsx",
-    "losers": [
-      "components\\games\\CherryBlossomTree.tsx"
-    ],
+    "losers": ["components\\games\\CherryBlossomTree.tsx"],
     "scores": [
       {
         "file": "app\\components\\components\\CherryBlossomTree.tsx",
@@ -2296,10 +2273,7 @@
   },
   "soapstonemessage": {
     "winner": "app\\components\\components\\SoapstoneMessage.tsx",
-    "losers": [
-      "components\\animations\\SoapstoneMessage.tsx",
-      "components\\SoapstoneMessage.tsx"
-    ],
+    "losers": ["components\\animations\\SoapstoneMessage.tsx", "components\\SoapstoneMessage.tsx"],
     "scores": [
       {
         "file": "app\\components\\components\\SoapstoneMessage.tsx",
@@ -2350,10 +2324,7 @@
   },
   "loadingbonfire": {
     "winner": "app\\components\\components\\ui\\LoadingBonfire.tsx",
-    "losers": [
-      "components\\ui\\LoadingBonfire.tsx",
-      "app\\components\\ui\\LoadingBonfire.tsx"
-    ],
+    "losers": ["components\\ui\\LoadingBonfire.tsx", "app\\components\\ui\\LoadingBonfire.tsx"],
     "scores": [
       {
         "file": "app\\components\\components\\ui\\LoadingBonfire.tsx",
@@ -2377,10 +2348,7 @@
   },
   "contactform": {
     "winner": "app\\components\\ContactForm.jsx",
-    "losers": [
-      "app\\components\\ContactForm.js",
-      "app\\pages\\ContactForm.js"
-    ],
+    "losers": ["app\\components\\ContactForm.js", "app\\pages\\ContactForm.js"],
     "scores": [
       {
         "file": "app\\components\\ContactForm.jsx",
@@ -2404,9 +2372,7 @@
   },
   "footer": {
     "winner": "components\\layout\\Footer.tsx",
-    "losers": [
-      "app\\components\\Footer.tsx"
-    ],
+    "losers": ["app\\components\\Footer.tsx"],
     "scores": [
       {
         "file": "components\\layout\\Footer.tsx",
@@ -2424,9 +2390,7 @@
   },
   "friendactivity": {
     "winner": "app\\components\\FriendActivity.tsx",
-    "losers": [
-      "components\\FriendActivity.tsx"
-    ],
+    "losers": ["components\\FriendActivity.tsx"],
     "scores": [
       {
         "file": "app\\components\\FriendActivity.tsx",
@@ -2444,9 +2408,7 @@
   },
   "friendchat": {
     "winner": "app\\components\\FriendChat.tsx",
-    "losers": [
-      "components\\FriendChat.tsx"
-    ],
+    "losers": ["components\\FriendChat.tsx"],
     "scores": [
       {
         "file": "app\\components\\FriendChat.tsx",
@@ -2464,9 +2426,7 @@
   },
   "friendlist": {
     "winner": "app\\components\\FriendList.tsx",
-    "losers": [
-      "components\\FriendList.tsx"
-    ],
+    "losers": ["components\\FriendList.tsx"],
     "scores": [
       {
         "file": "app\\components\\FriendList.tsx",
@@ -2484,10 +2444,7 @@
   },
   "gamecubeboot": {
     "winner": "app\\components\\GameCubeBoot.js",
-    "losers": [
-      "app\\components\\GameCubeBoot.tsx",
-      "app\\mini-games\\_shared\\GameCubeBoot.tsx"
-    ],
+    "losers": ["app\\components\\GameCubeBoot.tsx", "app\\mini-games\\_shared\\GameCubeBoot.tsx"],
     "scores": [
       {
         "file": "app\\components\\GameCubeBoot.js",
@@ -2545,9 +2502,7 @@
   },
   "navbar": {
     "winner": "app\\components\\layout\\Navbar.tsx",
-    "losers": [
-      "app\\components\\NavBar.tsx"
-    ],
+    "losers": ["app\\components\\NavBar.tsx"],
     "scores": [
       {
         "file": "app\\components\\layout\\Navbar.tsx",
@@ -2565,10 +2520,7 @@
   },
   "toast": {
     "winner": "app\\components\\Toast.tsx",
-    "losers": [
-      "app\\components\\notifications\\Toast.tsx",
-      "components\\Toast.tsx"
-    ],
+    "losers": ["app\\components\\notifications\\Toast.tsx", "components\\Toast.tsx"],
     "scores": [
       {
         "file": "app\\components\\Toast.tsx",
@@ -2592,9 +2544,7 @@
   },
   "searchbar": {
     "winner": "app\\components\\SearchBar.tsx",
-    "losers": [
-      "src\\components\\hero\\SearchBar.tsx"
-    ],
+    "losers": ["src\\components\\hero\\SearchBar.tsx"],
     "scores": [
       {
         "file": "app\\components\\SearchBar.tsx",
@@ -2612,9 +2562,7 @@
   },
   "productfilters": {
     "winner": "components\\shop\\ProductFilters.tsx",
-    "losers": [
-      "app\\components\\shop\\ProductFilters.tsx"
-    ],
+    "losers": ["app\\components\\shop\\ProductFilters.tsx"],
     "scores": [
       {
         "file": "components\\shop\\ProductFilters.tsx",
@@ -2632,9 +2580,7 @@
   },
   "productgrid": {
     "winner": "components\\shop\\ProductGrid.tsx",
-    "losers": [
-      "app\\components\\shop\\ProductGrid.tsx"
-    ],
+    "losers": ["app\\components\\shop\\ProductGrid.tsx"],
     "scores": [
       {
         "file": "components\\shop\\ProductGrid.tsx",
@@ -2652,9 +2598,7 @@
   },
   "badge": {
     "winner": "components\\ui\\badge.tsx",
-    "losers": [
-      "app\\components\\ui\\badge.tsx"
-    ],
+    "losers": ["app\\components\\ui\\badge.tsx"],
     "scores": [
       {
         "file": "components\\ui\\badge.tsx",
@@ -2672,9 +2616,7 @@
   },
   "button": {
     "winner": "app\\components\\ui\\button.tsx",
-    "losers": [
-      "components\\ui\\button.tsx"
-    ],
+    "losers": ["components\\ui\\button.tsx"],
     "scores": [
       {
         "file": "app\\components\\ui\\button.tsx",
@@ -2692,9 +2634,7 @@
   },
   "card": {
     "winner": "app\\components\\ui\\card.tsx",
-    "losers": [
-      "components\\ui\\card.tsx"
-    ],
+    "losers": ["components\\ui\\card.tsx"],
     "scores": [
       {
         "file": "app\\components\\ui\\card.tsx",
@@ -2712,9 +2652,7 @@
   },
   "input": {
     "winner": "components\\ui\\input.tsx",
-    "losers": [
-      "app\\components\\ui\\input.tsx"
-    ],
+    "losers": ["app\\components\\ui\\input.tsx"],
     "scores": [
       {
         "file": "components\\ui\\input.tsx",
@@ -2732,10 +2670,7 @@
   },
   "loading": {
     "winner": "app\\components\\ui\\loading.tsx",
-    "losers": [
-      "app\\loading.tsx",
-      "app\\mini-games\\loading.tsx"
-    ],
+    "losers": ["app\\loading.tsx", "app\\mini-games\\loading.tsx"],
     "scores": [
       {
         "file": "app\\components\\ui\\loading.tsx",
@@ -2759,9 +2694,7 @@
   },
   "select": {
     "winner": "app\\components\\ui\\select.tsx",
-    "losers": [
-      "components\\ui\\select.tsx"
-    ],
+    "losers": ["components\\ui\\select.tsx"],
     "scores": [
       {
         "file": "app\\components\\ui\\select.tsx",
@@ -2779,9 +2712,7 @@
   },
   "tabs": {
     "winner": "app\\components\\ui\\tabs.tsx",
-    "losers": [
-      "components\\ui\\tabs.tsx"
-    ],
+    "losers": ["components\\ui\\tabs.tsx"],
     "scores": [
       {
         "file": "app\\components\\ui\\tabs.tsx",
@@ -2799,9 +2730,7 @@
   },
   "authcontext": {
     "winner": "contexts\\AuthContext.tsx",
-    "losers": [
-      "app\\context\\context\\AuthContext.js"
-    ],
+    "losers": ["app\\context\\context\\AuthContext.js"],
     "scores": [
       {
         "file": "contexts\\AuthContext.tsx",
@@ -2819,9 +2748,7 @@
   },
   "fonts": {
     "winner": "app\\fonts.ts",
-    "losers": [
-      "lib\\fonts.ts"
-    ],
+    "losers": ["lib\\fonts.ts"],
     "scores": [
       {
         "file": "app\\fonts.ts",
@@ -2839,9 +2766,7 @@
   },
   "api": {
     "winner": "app\\hooks\\api.ts",
-    "losers": [
-      "types\\api.ts"
-    ],
+    "losers": ["types\\api.ts"],
     "scores": [
       {
         "file": "app\\hooks\\api.ts",
@@ -2859,9 +2784,7 @@
   },
   "useachievements": {
     "winner": "app\\hooks\\hooks\\useAchievements.ts",
-    "losers": [
-      "lib\\hooks\\useAchievements.ts"
-    ],
+    "losers": ["lib\\hooks\\useAchievements.ts"],
     "scores": [
       {
         "file": "app\\hooks\\hooks\\useAchievements.ts",
@@ -2879,9 +2802,7 @@
   },
   "useaudio": {
     "winner": "app\\hooks\\hooks\\useAudio.ts",
-    "losers": [
-      "lib\\hooks\\useAudio.ts"
-    ],
+    "losers": ["lib\\hooks\\useAudio.ts"],
     "scores": [
       {
         "file": "app\\hooks\\hooks\\useAudio.ts",
@@ -2899,9 +2820,7 @@
   },
   "cubehub": {
     "winner": "app\\hub\\_scene\\CubeHub.tsx",
-    "losers": [
-      "app\\mini-games\\components\\CubeHub.tsx"
-    ],
+    "losers": ["app\\mini-games\\components\\CubeHub.tsx"],
     "scores": [
       {
         "file": "app\\hub\\_scene\\CubeHub.tsx",
@@ -2919,10 +2838,7 @@
   },
   "index": {
     "winner": "app\\types\\index.ts",
-    "losers": [
-      "components\\games\\index.ts",
-      "app\\lib\\assets\\index.ts"
-    ],
+    "losers": ["components\\games\\index.ts", "app\\lib\\assets\\index.ts"],
     "scores": [
       {
         "file": "app\\types\\index.ts",
@@ -2946,9 +2862,7 @@
   },
   "manifest": {
     "winner": "app\\lib\\assets\\manifest.ts",
-    "losers": [
-      "app\\lib\\manifest.ts"
-    ],
+    "losers": ["app\\lib\\manifest.ts"],
     "scores": [
       {
         "file": "app\\lib\\assets\\manifest.ts",
@@ -2966,9 +2880,7 @@
   },
   "style-map": {
     "winner": "app\\lib\\style-map.ts",
-    "losers": [
-      "app\\lib\\assets\\style-map.ts"
-    ],
+    "losers": ["app\\lib\\assets\\style-map.ts"],
     "scores": [
       {
         "file": "app\\lib\\style-map.ts",
@@ -3027,9 +2939,7 @@
   },
   "assets": {
     "winner": "app\\lib\\assets.ts",
-    "losers": [
-      "scripts\\assets.ts"
-    ],
+    "losers": ["scripts\\assets.ts"],
     "scores": [
       {
         "file": "app\\lib\\assets.ts",
@@ -3047,9 +2957,7 @@
   },
   "auth": {
     "winner": "app\\lib\\auth.ts",
-    "losers": [
-      "app\\types\\auth.ts"
-    ],
+    "losers": ["app\\types\\auth.ts"],
     "scores": [
       {
         "file": "app\\lib\\auth.ts",
@@ -3067,9 +2975,7 @@
   },
   "db": {
     "winner": "app\\lib\\db.ts",
-    "losers": [
-      "lib\\db.ts"
-    ],
+    "losers": ["lib\\db.ts"],
     "scores": [
       {
         "file": "app\\lib\\db.ts",
@@ -3087,10 +2993,7 @@
   },
   "env": {
     "winner": "app\\lib\\env.ts",
-    "losers": [
-      "env.ts",
-      "lib\\env.ts"
-    ],
+    "losers": ["env.ts", "lib\\env.ts"],
     "scores": [
       {
         "file": "app\\lib\\env.ts",
@@ -3114,10 +3017,7 @@
   },
   "games": {
     "winner": "app\\lib\\games.ts",
-    "losers": [
-      "config\\games.ts",
-      "app\\lib\\state\\games.ts"
-    ],
+    "losers": ["config\\games.ts", "app\\lib\\state\\games.ts"],
     "scores": [
       {
         "file": "app\\lib\\games.ts",
@@ -3141,9 +3041,7 @@
   },
   "http": {
     "winner": "app\\lib\\http.ts",
-    "losers": [
-      "lib\\api\\http.ts"
-    ],
+    "losers": ["lib\\api\\http.ts"],
     "scores": [
       {
         "file": "app\\lib\\http.ts",
@@ -3161,9 +3059,7 @@
   },
   "utils": {
     "winner": "app\\lib\\lib\\utils.ts",
-    "losers": [
-      "lib\\utils.ts"
-    ],
+    "losers": ["lib\\utils.ts"],
     "scores": [
       {
         "file": "app\\lib\\lib\\utils.ts",
@@ -3181,9 +3077,7 @@
   },
   "logger": {
     "winner": "app\\lib\\logger.ts",
-    "losers": [
-      "lib\\logger.ts"
-    ],
+    "losers": ["lib\\logger.ts"],
     "scores": [
       {
         "file": "app\\lib\\logger.ts",
@@ -3201,9 +3095,7 @@
   },
   "petals": {
     "winner": "app\\lib\\petals.ts",
-    "losers": [
-      "app\\providers\\petals.tsx"
-    ],
+    "losers": ["app\\providers\\petals.tsx"],
     "scores": [
       {
         "file": "app\\lib\\petals.ts",
@@ -3221,9 +3113,7 @@
   },
   "printifyclient": {
     "winner": "app\\lib\\printify\\printifyClient.ts",
-    "losers": [
-      "lib\\printifyClient.ts"
-    ],
+    "losers": ["lib\\printifyClient.ts"],
     "scores": [
       {
         "file": "app\\lib\\printify\\printifyClient.ts",
@@ -3241,9 +3131,7 @@
   },
   "ratelimit": {
     "winner": "app\\lib\\rateLimit.ts",
-    "losers": [
-      "middleware\\rateLimit.ts"
-    ],
+    "losers": ["middleware\\rateLimit.ts"],
     "scores": [
       {
         "file": "app\\lib\\rateLimit.ts",
@@ -3261,10 +3149,7 @@
   },
   "redis": {
     "winner": "lib\\redis.ts",
-    "losers": [
-      "app\\lib\\redis.ts",
-      "scripts\\lib\\redis.ts"
-    ],
+    "losers": ["app\\lib\\redis.ts", "scripts\\lib\\redis.ts"],
     "scores": [
       {
         "file": "lib\\redis.ts",
@@ -3377,9 +3262,7 @@
   },
   "gamecube": {
     "winner": "app\\mini-games\\_components\\GameCube.tsx",
-    "losers": [
-      "types\\gamecube.ts"
-    ],
+    "losers": ["types\\gamecube.ts"],
     "scores": [
       {
         "file": "app\\mini-games\\_components\\GameCube.tsx",
@@ -3397,11 +3280,7 @@
   },
   "shop": {
     "winner": "app\\pages\\Shop.jsx",
-    "losers": [
-      "app\\trade\\ui\\Shop.tsx",
-      "src\\lib\\shop.ts",
-      "lib\\shop.ts"
-    ],
+    "losers": ["app\\trade\\ui\\Shop.tsx", "src\\lib\\shop.ts", "lib\\shop.ts"],
     "scores": [
       {
         "file": "app\\pages\\Shop.jsx",
@@ -3431,9 +3310,7 @@
   },
   "cart": {
     "winner": "src\\lib\\cart.ts",
-    "losers": [
-      "app\\providers\\cart.tsx"
-    ],
+    "losers": ["app\\providers\\cart.tsx"],
     "scores": [
       {
         "file": "src\\lib\\cart.ts",
@@ -3451,9 +3328,7 @@
   },
   "providers": {
     "winner": "app\\Providers.tsx",
-    "losers": [
-      "providers.tsx"
-    ],
+    "losers": ["providers.tsx"],
     "scores": [
       {
         "file": "app\\Providers.tsx",
@@ -3471,9 +3346,7 @@
   },
   "printifyapi": {
     "winner": "app\\utils\\utils\\printifyAPI.js",
-    "losers": [
-      "utils\\printifyAPI.js"
-    ],
+    "losers": ["utils\\printifyAPI.js"],
     "scores": [
       {
         "file": "app\\utils\\utils\\printifyAPI.js",
@@ -3491,9 +3364,7 @@
   },
   "errorboundary": {
     "winner": "components\\dev\\ErrorBoundary.tsx",
-    "losers": [
-      "components\\ErrorBoundary.tsx"
-    ],
+    "losers": ["components\\ErrorBoundary.tsx"],
     "scores": [
       {
         "file": "components\\dev\\ErrorBoundary.tsx",
@@ -3511,9 +3382,7 @@
   },
   "featuredproducts": {
     "winner": "components\\hero\\FeaturedProducts.tsx",
-    "losers": [
-      "components\\shop\\FeaturedProducts.tsx"
-    ],
+    "losers": ["components\\shop\\FeaturedProducts.tsx"],
     "scores": [
       {
         "file": "components\\hero\\FeaturedProducts.tsx",
@@ -3531,9 +3400,7 @@
   },
   "schema": {
     "winner": "drizzle\\schema.ts",
-    "losers": [
-      "lib\\assets\\schema.ts"
-    ],
+    "losers": ["lib\\assets\\schema.ts"],
     "scores": [
       {
         "file": "drizzle\\schema.ts",
@@ -3551,9 +3418,7 @@
   },
   "runes": {
     "winner": "lib\\runes.ts",
-    "losers": [
-      "types\\runes.ts"
-    ],
+    "losers": ["types\\runes.ts"],
     "scores": [
       {
         "file": "lib\\runes.ts",
@@ -3571,9 +3436,7 @@
   },
   "tailwind-config": {
     "winner": "tailwind.config.js",
-    "losers": [
-      "tailwind.config.ts"
-    ],
+    "losers": ["tailwind.config.ts"],
     "scores": [
       {
         "file": "tailwind.config.js",

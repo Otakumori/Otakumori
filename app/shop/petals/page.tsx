@@ -1,4 +1,4 @@
-import { GachaPull } from "../../components/shop/GachaPull";
+import { GachaPull } from '../../components/shop/GachaPull';
 
 export default function PetalShopPage() {
   return (

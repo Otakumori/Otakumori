@@ -16,7 +16,7 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
     { emoji: '🔥', label: 'Fire' },
     { emoji: '⚡', label: 'Lightning' },
     { emoji: '🌟', label: 'Star' },
-    { emoji: '💥', label: 'Explosion' }
+    { emoji: '💥', label: 'Explosion' },
   ];
 
   useEffect(() => {
@@ -96,7 +96,9 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-6xl">
-              <span role="img" aria-label="Explosion effect">💥</span>
+              <span role="img" aria-label="Explosion effect">
+                💥
+              </span>
             </div>
           </motion.div>
         )}
@@ -119,11 +121,11 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
       </div>
 
       {/* Click area */}
-        <button
-          className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
-          onClick={handleThrust}
-          aria-label="Thrust with arrow keys or click"
-        />
+      <button
+        className="absolute inset-0 cursor-pointer bg-transparent border-none p-0 w-full h-full"
+        onClick={handleThrust}
+        aria-label="Thrust with arrow keys or click"
+      />
     </div>
   );
 }

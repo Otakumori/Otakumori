@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const response = cart.items.map(item => ({
+    const response = cart.items.map((item) => ({
       id: item.id,
       productId: item.productId,
       variantId: item.productVariantId,
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Product not found' }, { status: 404 });
     }
 
-    if (variantId && !product.ProductVariant.find(v => v.id === variantId)) {
+    if (variantId && !product.ProductVariant.find((v) => v.id === variantId)) {
       return NextResponse.json({ ok: false, error: 'Variant not found' }, { status: 404 });
     }
 

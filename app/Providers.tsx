@@ -14,15 +14,18 @@ import Navbar from './components/layout/Navbar';
 import BackdropAbyssMystique from '../components/BackdropAbyssMystique';
 import QuakeHUD from './components/hud/QuakeHUD';
 import GlobalBackground from './components/GlobalBackground';
+import { usePathname } from 'next/navigation';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  const pathname = (typeof window !== 'undefined' ? window.location.pathname : '/') as string;
+  const showTree = pathname === '/about';
   return (
     <WorldProvider>
       <PetalProvider>
         <CartProvider>
           <GlobalMusicProvider>
             {/* Site-wide background (fixed, behind everything) */}
-            <GlobalBackground />
+            {showTree && <GlobalBackground />}
             {/* Navigation */}
             <Navbar />
             {children}

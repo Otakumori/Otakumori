@@ -10,9 +10,12 @@ export const runtime = 'nodejs';
 
 async function getProduct(slug: string) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/products/${slug}`, {
-      next: { revalidate: 300 },
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/products/${slug}`,
+      {
+        next: { revalidate: 300 },
+      },
+    );
 
     if (!response.ok) return null;
     return response.json();
@@ -21,9 +24,13 @@ async function getProduct(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   const product = await getProduct(params.slug);
-  
+
   if (!product) {
     return {
       title: 'Product Not Found — Otaku-mori',
@@ -43,11 +50,15 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await getProduct(params.slug);
-
   if (!product) {
-    notFound();
+    return (
+      <main className="min-h-screen bg-[#080611] pt-24">
+        <div className="mx-auto max-w-5xl px-4">
+          <h1 className="text-2xl font-semibold text-white">Product not found</h1>
+        </div>
+      </main>
+    );
   }
-
   return (
     <>
       <StarfieldPurple />
