@@ -34,15 +34,15 @@ export default function GameCubeHub() {
   const listboxId = useMemo(() => `faces_${Math.random().toString(36).slice(2, 8)}`, []);
 
   return (
-    <section ref={containerRef} tabIndex={0} className="relative isolate z-0 w-full h-[min(90vh,100svh)] overflow-hidden outline-none">
+    <section ref={containerRef} tabIndex={0} className="relative isolate z-0 mx-auto w-full max-w-[900px] h-[min(80vh,90svh)] overflow-hidden outline-none">
       {/* 3D canvas / hub */}
       <div className="absolute inset-0 z-0">
         <ConsoleCard />
       </div>
       {/* Overlay labels */}
-      <div className="pointer-events-none absolute inset-0 z-10 grid place-items-end p-4">
+      <div className="pointer-events-none absolute inset-x-0 bottom-2 z-10 grid place-items-center p-2">
         <div
-          className="flex gap-2"
+          className="flex max-w-[720px] flex-wrap items-center justify-center gap-2"
           role="listbox"
           aria-activedescendant={`${listboxId}_${active.id}`}
         >
@@ -54,4 +54,3 @@ export default function GameCubeHub() {
     </section>
   );
 }
-
