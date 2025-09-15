@@ -23,6 +23,8 @@ export const envSchema = z.object({
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
+  COUPON_SIGNING_SECRET: z.string().optional(),
+  FEATURE_COUPONS: z.string().optional(),
 
   // Build-time
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

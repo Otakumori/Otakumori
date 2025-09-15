@@ -8,6 +8,7 @@ import OwnedRunesGrid from '@/app/mini-games/_components/OwnedRunesGrid';
 import RuneGlyph from '@/app/components/runes/RuneGlyph';
 import { http } from '@/app/lib/http';
 import * as Sentry from '@sentry/nextjs';
+import { audio } from '@/app/lib/audio';
 
 type Mode = 'boot' | 'cube' | 'loadingGame' | 'playingGame';
 
@@ -51,6 +52,13 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
   useEffect(() => {
     setIsReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }, []);
+  useEffect(() => {
+    audio.preload([
+      ['gamecube_menu', '/sfx/gamecube-menu.mp3'],
+      ['samus_jingle', '/sfx/samus-jingle.mp3'],
+      ['boot_whoosh', '/sfx/boot_whoosh.mp3'],
+    ]);
+  }, []);
 
   // Boot gate once per session
   useEffect(() => {
@@ -61,11 +69,11 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       const t = setTimeout(() => {
         sessionStorage.setItem(key, '1');
         setMode('cube');
-      }, 2000);
+      }, isReducedMotion ? 500 : 2000);
       return () => clearTimeout(t);
     }
     setMode('cube');
-  }, []);
+  }, [isReducedMotion]);
 
   // Respect defaultFace on first mount if no query present
   useEffect(() => {
@@ -108,12 +116,16 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
         if (face === 0) setFace(1);
         else if (face === 2) setFace(0);
         else if (face === 1) setFace(0);
+        audio.unlock();
+        audio.play('gamecube_menu', { gain: 0.25 });
       }
       if (e.key === 'ArrowRight') {
         setAnimMs(isReducedMotion ? 100 : 180);
         if (face === 0) setFace(2);
         else if (face === 1) setFace(0);
         else if (face === 2) setFace(0);
+        audio.unlock();
+        audio.play('gamecube_menu', { gain: 0.25 });
       }
       // Vertical rotation between front/top/bottom
       if (e.key === 'ArrowUp') {
@@ -121,12 +133,16 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
         if (face === 0) setFace(4);
         else if (face === 3) setFace(0);
         else if (face === 4) setFace(0);
+        audio.unlock();
+        audio.play('gamecube_menu', { gain: 0.25 });
       }
       if (e.key === 'ArrowDown') {
         setAnimMs(isReducedMotion ? 100 : 180);
         if (face === 0) setFace(3);
         else if (face === 4) setFace(0);
         else if (face === 3) setFace(0);
+        audio.unlock();
+        audio.play('gamecube_menu', { gain: 0.25 });
       }
       if (e.key === 'Enter') {
         if (face === 1) router.push('/mini-games/games/petal-collection');
@@ -292,20 +308,20 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
   const FaceRoot = () => (
     <div className="p-4 space-y-3">
       <FaceTitle>Root Selector</FaceTitle>
-      <div className="grid grid-cols-2 gap-3">
-        <button className="rounded-lg border border-white/15 bg-white/10 p-4 text-left hover:bg-white/15" onClick={() => setFace(1)}>
+      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(1); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Mini-Games">
           <div className="text-white font-medium">Mini-Games</div>
           <div className="text-xs text-zinc-300">Choose a game</div>
         </button>
-        <button className="rounded-lg border border-white/15 bg-white/10 p-4 text-left hover:bg-white/15" onClick={() => setFace(2)}>
+        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(2); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Character and Community">
           <div className="text-white font-medium">Character / Community</div>
           <div className="text-xs text-zinc-300">Create avatar, see feed</div>
         </button>
-        <button className="rounded-lg border border-white/15 bg-white/10 p-4 text-left hover:bg-white/15" onClick={() => setFace(3)}>
+        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(3); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Music and Extras">
           <div className="text-white font-medium">Music + Extras</div>
           <div className="text-xs text-zinc-300">OST, CRT, VHS</div>
         </button>
-        <button className="rounded-lg border border-white/15 bg-white/10 p-4 text-left hover:bg-white/15" onClick={() => setFace(4)}>
+        <button className="rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400" onClick={() => { setFace(4); audio.unlock(); audio.play('gamecube_menu', { gain: 0.25 }); }} aria-label="Go to Trade Center">
           <div className="text-white font-medium">Trade Center</div>
           <div className="text-xs text-zinc-300">Fuse and trade runes</div>
         </button>
@@ -322,12 +338,13 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
           <PetalSlot />
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
         {(gamesMeta as Array<{ slug: string; name: string; icon: string; desc: string }>).map((g) => (
           <button
             key={g.slug}
-            className="group relative rounded-lg border border-white/15 bg-white/10 p-4 text-left hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-pink-500/60"
-            onClick={() => router.push(`/mini-games/games/${g.slug}`)}
+            className="group relative rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/60"
+            onClick={() => { audio.unlock(); audio.play('samus_jingle', { gain: 0.35 }); router.push(`/mini-games/games/${g.slug}`); }}
+            aria-label={`Start ${g.name}`}
             data-testid="start-game"
           >
             <div className="flex items-center justify-between">
@@ -335,7 +352,7 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
                 <GameIcon slug={g.slug} icon={g.icon} />
                 <div className="text-white font-medium">{g.name}</div>
               </div>
-              <span className="text-xs text-pink-300">Start</span>
+              <span className="text-xs text-pink-300">Ready</span>
             </div>
             <div className="mt-1 text-xs text-zinc-300">Load inside console</div>
 
@@ -559,7 +576,21 @@ export default function ConsoleCard({ gameKey, defaultFace }: { gameKey?: string
       className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none"
       aria-label="Mini-Games Console"
     >
-      {mode === 'boot' && <Boot />}
+      {mode === 'boot' && (
+        <>
+          <Boot />
+          <div className="mt-2 flex justify-center">
+            <button
+              type="button"
+              className="rounded border border-white/20 px-3 py-1 text-xs text-white/90 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400"
+              onClick={() => { try { sessionStorage.setItem('om_gc_boot_seen', '1'); } catch {} setMode('cube'); }}
+              aria-label="Skip intro"
+            >
+              Skip intro
+            </button>
+          </div>
+        </>
+      )}
       {mode === 'loadingGame' && <LoadingGame />}
       {mode === 'playingGame' && <PlayingGame />}
       {mode === 'cube' && (
