@@ -66,7 +66,13 @@ export default function OwnedRunesGrid() {
           >
             <div className="flex items-center justify-between">
               <div className="text-2xl">
-                <RuneGlyph runeId={it.canonicalId} glyphOverride={it.glyph ?? undefined} />
+                <RuneGlyph 
+                  canonicalId={it.canonicalId} 
+                  glyph={it.glyph ?? undefined}
+                  displayName={it.displayName ?? undefined}
+                  size="sm"
+                  animated={true}
+                />
               </div>
               <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-200">
                 ×{it.quantity}
