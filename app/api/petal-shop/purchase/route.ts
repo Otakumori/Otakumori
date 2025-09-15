@@ -55,7 +55,8 @@ export async function POST(req: NextRequest) {
           expiresAt,
         },
       });
-      return NextResponse.json({ ok: true, data: { balance: res.balance, code }, requestId: rid });
+      // Balance was debited above via 'res'
+      return NextResponse.json({ ok: true, data: { balance: (await prisma.user.findUnique({ where: { id: user.id }, select: { petalBalance: true } })).petalBalance, code }, requestId: rid });
     } else {
       const existing = await prisma.inventoryItem.findFirst({ where: { userId: user.id, sku } });
       if (existing) {
