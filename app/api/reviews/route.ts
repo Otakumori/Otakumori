@@ -2,9 +2,17 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
-import { db } from '@/lib/db';
-import { logger } from '@/app/lib/logger';
 import { problem } from '@/lib/http/problem';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 const CreateReviewSchema = z.object({
   productId: z.string().min(1),
@@ -23,12 +31,15 @@ const CreateReviewSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const logger = await getLogger();
   logger.request(req, 'POST /api/reviews');
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(problem(401, 'Authentication required'), { status: 401 });
     }
+    
+    const db = await getDb();
 
     const body = await req.json().catch(() => null);
     const validated = CreateReviewSchema.parse(body);
@@ -75,6 +86,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const logger = await getLogger();
   logger.request(req, 'GET /api/reviews');
   try {
     const { searchParams } = new URL(req.url);
@@ -83,6 +95,7 @@ export async function GET(req: NextRequest) {
     if (!productId) {
       return NextResponse.json(problem(400, 'Product ID required'), { status: 400 });
     }
+    const db = await getDb();
     const reviews = await db.review.findMany({
       where: { productId, isApproved: approved },
       orderBy: { createdAt: 'desc' },
@@ -98,6 +111,7 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, data: reviews });
   } catch (error: any) {
+    const logger = await getLogger();
     logger.error(
       'reviews_get_error',
       { route: '/api/reviews' },

@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   const parsed = submitScoreReq.safeParse(body);
   if (!parsed.success) return NextResponse.json(problem(400, 'Invalid request'));
 
-  const { sessionId, score, timeSpent, game } = parsed.data;
+  const { runId, score, game } = parsed.data;
 
   // Allow guests: record leaderboard only; no economy
   if (!userId) {
@@ -94,8 +94,8 @@ export async function POST(req: NextRequest) {
   let balance: number | undefined = undefined;
   if (petalsGranted > 0) {
     try {
-      const res = await creditPetals(userId, petalsGranted);
-      balance = res.newTotal;
+      const res = await creditPetals(userId, petalsGranted, 'mini-game-reward');
+      balance = res.balance;
     } catch (e: any) {
       logger.error('petals_award_error', { requestId: rid }, { error: String(e?.message || e) });
       petalsGranted = 0; // if economy fails, don't report grant

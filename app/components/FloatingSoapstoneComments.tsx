@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { env } from '@/env.mjs';
 // import { createClient } from '@supabase/supabase-js';
 
 interface SoapstoneMessage {
@@ -20,8 +21,8 @@ export default function FloatingSoapstoneComments() {
 
   // Create Supabase client for client-side use
   // const supabase = createClient(
-  //   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  //   env.NEXT_PUBLIC_SUPABASE_URL || '',
+  //   env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
   // );
 
   // useEffect(() => {

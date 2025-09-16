@@ -123,10 +123,13 @@ export async function grantPetalsForOrder({
     });
 
     return {
-      success: true,
-      petalsGranted: existingOrder.petalsAwarded,
       granted: existingOrder.petalsAwarded,
-      flags: [],
+      flags: {
+        firstPurchase: false,
+        hitSoftCap: false,
+        hitHardCap: false,
+        streakBonus: false,
+      },
       burst: {
         size: 'none',
         amountGrantedNow: 0,
@@ -223,15 +226,13 @@ export async function grantPetalsForOrder({
   const newTotal = user.petalBalance + finalPetals;
 
   return {
-    success: true,
-    petalsGranted: finalPetals,
     granted: finalPetals,
-    flags: [
-      ...(isFirstPurchase ? ['firstPurchase'] : []),
-      ...(dailyResult.hitSoftCap ? ['hitSoftCap'] : []),
-      ...(dailyResult.hitHardCap ? ['hitHardCap'] : []),
-      ...(streakBonus > 0 ? ['streakBonus'] : []),
-    ],
+    flags: {
+      firstPurchase: isFirstPurchase,
+      hitSoftCap: dailyResult.hitSoftCap,
+      hitHardCap: dailyResult.hitHardCap,
+      streakBonus: streakBonus > 0,
+    },
     burst: {
       size: burstSize,
       amountGrantedNow: finalPetals,
@@ -370,7 +371,7 @@ export function getRuneDisplay(runeDef: RuneDef): {
   glyph: string;
   lore: string;
 } {
-  const defaults = DEFAULT_RUNE_DISPLAYS[runeDef.canonicalId as CanonicalRuneId] || {
+  const defaults = {
     name: `Rune ${runeDef.canonicalId.split('_')[1]?.toUpperCase() || '?'}`,
     glyph: '✶',
   };
@@ -380,7 +381,7 @@ export function getRuneDisplay(runeDef: RuneDef): {
     glyph: runeDef.glyph || defaults.glyph,
     lore:
       runeDef.lore ||
-      DEFAULT_RUNE_LORE[runeDef.canonicalId] ||
+      DEFAULT_RUNE_LORE ||
       'A mysterious rune with unknown properties.',
   };
 }

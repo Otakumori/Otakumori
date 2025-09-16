@@ -10,7 +10,11 @@ import {
   type SearchSuggestionResponse,
   type SearchResult,
 } from '@/app/lib/contracts';
-import { logger } from '@/app/lib/logger';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface SearchBarProps {
   placeholder?: string;
@@ -61,6 +65,7 @@ export default function SearchBar({
         }
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.warn('Failed to load recent searches', {
         extra: { error: error instanceof Error ? error.message : 'Unknown error' },
       });
@@ -102,6 +107,7 @@ export default function SearchBar({
         }
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.warn('Failed to fetch search suggestions', {
         extra: { error: error instanceof Error ? error.message : 'Unknown error' },
       });
@@ -135,6 +141,7 @@ export default function SearchBar({
         if (data.ok && onResultClick) {
           // For now, just log the results - in a real implementation,
           // you'd want to show them in a results page or modal
+          const logger = await getLogger();
           logger.info('Search completed', {
             extra: {
               query: searchQuery,
@@ -144,6 +151,7 @@ export default function SearchBar({
         }
       }
     } catch (error) {
+      const logger = await getLogger();
       logger.error('Search failed', {
         extra: { error: error instanceof Error ? error.message : 'Unknown error' },
       });

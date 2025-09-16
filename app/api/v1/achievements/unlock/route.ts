@@ -2,8 +2,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
-import { db } from '@/lib/db';
 import { AchievementUnlockRequestSchema } from '@/app/lib/contracts';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 export const runtime = 'nodejs';
 
@@ -23,6 +27,9 @@ export async function POST(request: NextRequest) {
     // Parse and validate request
     const body = await request.json();
     const validatedData = UnlockRequestSchema.parse(body);
+
+    // Get database connection
+    const db = await getDb();
 
     // Check idempotency
     const existingKey = await db.idempotencyKey.findUnique({

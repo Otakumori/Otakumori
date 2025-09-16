@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
 import { z } from 'zod';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 const contactSchema = z.object({
   name: z.string().min(1).max(100),
@@ -18,6 +22,7 @@ export async function POST(request: NextRequest) {
     const { name, email, message, imageUrl } = contactSchema.parse(body);
 
     // Store contact message in database
+    const db = await getDb();
     const contactMessage = await db.contactMessage.create({
       data: {
         name,
@@ -51,6 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user is admin (you can implement your own admin check)
+    const db = await getDb();
     const user = await db.user.findUnique({
       where: { clerkId: userId },
       select: { id: true },

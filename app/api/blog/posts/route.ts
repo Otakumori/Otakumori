@@ -1,6 +1,10 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +22,7 @@ export async function GET(request: NextRequest) {
       where.published = true;
     }
 
+    const db = await getDb();
     const posts = await db.contentPage.findMany({
       where,
       orderBy: { updatedAt: 'desc' },

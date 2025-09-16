@@ -142,9 +142,6 @@ export async function POST(req: Request) {
             (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
               | string[]
               | undefined) ?? [],
-          discountTotal: fullSession.metadata?.discount_total_cents
-            ? parseInt(fullSession.metadata.discount_total_cents, 10)
-            : 0,
         },
         create: {
           id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -160,9 +157,6 @@ export async function POST(req: Request) {
             (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
               | string[]
               | undefined) ?? [],
-          discountTotal: fullSession.metadata?.discount_total_cents
-            ? parseInt(fullSession.metadata.discount_total_cents, 10)
-            : 0,
         },
       });
 

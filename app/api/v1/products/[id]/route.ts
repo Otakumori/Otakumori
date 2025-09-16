@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
 import { ProductDetailQuery, ProductDetailResponse } from '@/app/lib/contracts';
+
+async function getPrisma() {
+  const { prisma } = await import('@/app/lib/prisma');
+  return prisma;
+}
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const parsed = ProductDetailQuery.safeParse({ id: params.id });
@@ -10,6 +14,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ ok: false, error: 'Invalid id' }, { status: 400 });
   }
 
+  const prisma = await getPrisma();
   const p = await prisma.product.findUnique({
     where: { id: parsed.data.id },
     include: { ProductVariant: { where: { isEnabled: true } } },

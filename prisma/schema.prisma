@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  directUrl = env("DATABASE_URL")
 }
 
 model ContentPage {
@@ -63,6 +63,7 @@ model Order {
   OrderItem       OrderItem[]
   RewardLedger    RewardLedger[]
   UserRunes       UserRune[]
+  couponRedemptions CouponRedemption[]
 }
 
 model OrderItem {
@@ -238,6 +239,7 @@ model User {
   userSettings              UserSettings?
   userTitles                UserTitle[]
   wallet                    Wallet?
+  couponRedemptions         CouponRedemption[]
 
   @@index([clerkId])
 }

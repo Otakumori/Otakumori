@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
 import { z } from 'zod';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 const earnPetalsSchema = z.object({
   amount: z.number().int().positive(),
@@ -18,6 +22,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { amount, reason } = earnPetalsSchema.parse(body);
+    
+    const db = await getDb();
 
     // Check daily click limit
     const today = new Date().toISOString().split('T')[0];
@@ -84,6 +90,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const db = await getDb();
     const user = await db.user.findUnique({
       where: { clerkId: userId },
       select: {
