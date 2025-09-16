@@ -7,6 +7,7 @@ import { creditPetals, ensureUserByClerkId } from '@/lib/petals';
 import { rateLimit } from '@/app/api/rate-limit';
 import { logger } from '@/app/lib/logger';
 import { reqId } from '@/lib/log';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
   if (rl.limited) return NextResponse.json(problem(429, 'Rate limit exceeded'));
 
   // Daily caps
-  const dailyCap = parseInt(process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500', 10);
+  const dailyCap = parseInt(env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500', 10);
   const perSourceCap: Record<string, number> = {
     clicker: 120,
     'mini-game:petal-run': 500,
