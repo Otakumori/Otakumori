@@ -68,6 +68,12 @@ const nextConfig = {
   async headers() {
     const isProd = env.NODE_ENV === 'production';
 
+    const securityHeaders = [
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    ];
+
     const cspCommon = [
       "default-src 'self'",
       "base-uri 'self'",
@@ -75,10 +81,10 @@ const nextConfig = {
       "img-src 'self' data: blob: https:",
       "media-src 'self' data: blob:",
       "font-src 'self' data: https:",
-      // keep 'unsafe-inline' for styled components/TW JIT; remove once you move to nonces
-      "style-src 'self' 'unsafe-inline' https:",
-      // Allow inline scripts with nonces for better security
-      isProd ? "script-src 'self' 'unsafe-inline' https:" : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "connect-src 'self' https: wss://* ws://localhost:*",
+      "frame-ancestors 'self'",
     ];
 
     const connectProd = [
@@ -131,9 +137,8 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
+          ...securityHeaders,
           { key: 'Content-Security-Policy', value: csp },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'geolocation=(), microphone=()' },
           ...(isProd ? [{ key: 'Cross-Origin-Opener-Policy', value: 'same-origin' }] : []),
         ],

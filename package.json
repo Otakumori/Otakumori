@@ -18,6 +18,11 @@
     "health": "node scripts/health.mjs",
     "validate": "tsx scripts/pre-build-validation.ts",
     "verify": "npm run typecheck && npm run lint && npm run build:test && npm run health",
+    "prepare": "husky",
+    "check": "tsc --noEmit && eslint .",
+    "test": "vitest run",
+    "release": "standard-version",
+    "commitmsg": "commitlint --edit $GIT_PARAMS",
     "verify:a11y": "npm run lint:a11y && npm run preflight:a11y",
     "build:prod-check": "npm run typecheck && npm run lint && next build",
     "ci": "pnpm typecheck && pnpm lint && pnpm build && powershell -ExecutionPolicy Bypass -File scripts/sanity.ps1",
@@ -25,17 +30,18 @@
     "deploy": "node scripts/deploy.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "is-ci || husky install",
     "postinstall": "prisma generate",
     "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force && npm run db:seed",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:seed:shop": "npx tsx scripts/seed-shop.ts",
     "db:seed:products": "npx tsx scripts/seed-products.ts",
     "db:seed:runes": "npx tsx scripts/seed-runes.ts",
     "seed:app": "tsx scripts/seed.ts",
     "seed": "npm run db:seed && npm run seed:app",
     "unseed": "tsx scripts/unseed.ts",
-    "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
@@ -52,7 +58,6 @@
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:reset": "prisma migrate reset -f",
-    "db:studio": "prisma studio",
     "setup": "pnpm install && pnpm prisma generate && pnpm prisma migrate deploy",
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "doctor": "npm run type-check && npm run build",
@@ -185,6 +190,8 @@
     "@axe-core/puppeteer": "^4.10.2",
     "@babel/core": "^7.28.4",
     "@babel/preset-typescript": "^7.27.1",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.0.0",
     "@next/bundle-analyzer": "^15.5.2",
     "@next/eslint-plugin-next": "^15.5.2",
@@ -257,7 +264,7 @@
     "autoprefixer": "^10.0.1",
     "axe-core": "^4.10.3",
     "clsx": "^2.1.1",
-    "eslint": "^8.57.0",
+    "eslint": "^9.35.0",
     "eslint-config-next": "14.0.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-drizzle": "^0.2.3",
@@ -271,6 +278,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jscodeshift": "^17.3.0",
+    "jsdom": "^27.0.0",
     "lint-staged": "^16.0.0",
     "msw": "^2.11.1",
     "postcss": "^8",
@@ -279,6 +287,7 @@
     "prisma": "^6.15.0",
     "recast": "^0.23.11",
     "rimraf": "^5.0.0",
+    "standard-version": "^9.5.0",
     "tailwindcss": "^3.3.0",
     "ts-jest": "^29.1.2",
     "ts-morph": "^26.0.0",
@@ -296,11 +305,8 @@
       "prettier --write"
     ]
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
-  "packageManager": "pnpm@9",
+  "packageManager": "pnpm@10.15.1",
   "engines": {
-    "node": "20.x"
+    "node": ">=20.12 <21"
   }
 }
