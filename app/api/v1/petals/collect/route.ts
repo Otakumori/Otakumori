@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
 
   if (grant <= 0) return NextResponse.json(problem(429, 'Daily cap reached'));
 
-  const res = await creditPetals(userId, grant);
+  const res = await creditPetals(userId, grant, 'petal-collection');
   return NextResponse.json({
     ok: true,
     granted: grant,
-    balance: res.newTotal,
+    balance: res.balance,
     remainingToday: leftAll - grant,
     requestId: rid,
   });

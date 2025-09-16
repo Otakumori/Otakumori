@@ -4,7 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search, User, Package, MessageSquare, Users, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { type SearchRequest, type SearchResponse, type SearchResult } from '@/app/lib/contracts';
-import { logger } from '@/app/lib/logger';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 interface SearchResultsProps {
   query: string;
@@ -58,6 +62,7 @@ export default function SearchResults({
           }
         }
       } catch (error) {
+        const logger = await getLogger();
         logger.error('Search failed', {
           extra: { error: error instanceof Error ? error.message : 'Unknown error' },
         });
@@ -107,6 +112,7 @@ export default function SearchResults({
         }),
       });
     } catch (error) {
+      const logger = await getLogger();
       logger.warn('Failed to track search click', {
         extra: { error: error instanceof Error ? error.message : 'Unknown error' },
       });

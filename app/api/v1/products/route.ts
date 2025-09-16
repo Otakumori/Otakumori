@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
 import { ProductListQuery, ProductListResponse } from '@/app/lib/contracts';
+
+async function getPrisma() {
+  const { prisma } = await import('@/app/lib/prisma');
+  return prisma;
+}
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -28,6 +32,7 @@ export async function GET(req: Request) {
     ];
   }
 
+  const prisma = await getPrisma();
   const [products, count] = await Promise.all([
     prisma.product.findMany({
       where,

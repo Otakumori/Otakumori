@@ -7,7 +7,11 @@ import FooterDark from '../components/FooterDark';
 import ShopCatalog from '../components/shop/ShopCatalog';
 import { t } from '@/lib/microcopy';
 import { env } from '@/server/env';
-import { logger } from '@/app/lib/logger';
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
 
 export const metadata: Metadata = {
   title: 'Shop — Otaku-mori',
@@ -38,6 +42,7 @@ async function loadPrintifyProducts(): Promise<ApiResponse> {
     });
 
     if (!response.ok) {
+      const logger = await getLogger();
       logger.warn('Printify API failed', {
         extra: {
           status: response.status,
@@ -49,6 +54,7 @@ async function loadPrintifyProducts(): Promise<ApiResponse> {
 
     return await response.json();
   } catch (error) {
+    const logger = await getLogger();
     logger.error(
       'Failed to fetch from Printify API',
       undefined,
@@ -90,6 +96,7 @@ async function loadDbFallback() {
       })),
     }));
   } catch (error) {
+    const logger = await getLogger();
     logger.error(
       'Failed to load database fallback',
       undefined,
@@ -106,6 +113,7 @@ async function loadProducts(searchParams: {
   page?: string;
   category?: string;
 }) {
+  const logger = await getLogger();
   logger.info('Loading products for shop page', {
     extra: { searchParams },
   });

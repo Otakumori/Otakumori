@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const user = await ensureUserByClerkId(userId);
     // Handle coupons vs inventory
     if (shopItem.kind?.toUpperCase() === 'COUPON' || (shopItem.metadata as any)?.coupon) {
-      const res = await debitPetals(userId, price);
+      const res = await debitPetals(userId, price, 'petal-shop-purchase');
       const meta = (shopItem.metadata as any) || {};
       const coupon = meta.coupon || {};
       const type = coupon.type === 'OFF_AMOUNT' ? 'OFF_AMOUNT' : 'PERCENT';
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       if (existing) {
         return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
       }
-      const res = await debitPetals(userId, price);
+      const res = await debitPetals(userId, price, 'petal-shop-purchase');
       const kind = (() => {
         const k = (shopItem.kind || '').toUpperCase();
         if (k in InventoryKind) return k as keyof typeof InventoryKind as any;

@@ -1,4 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+import { env } from '@/env.mjs';
+
 export default function TestPage() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
@@ -270,7 +272,7 @@ export default function TestPage() {
               ' '''
             </>
           }
-          {process.env.NEXT_PUBLIC_SITE_URL || 'NOT SET'}
+          {env.NEXT_PUBLIC_SITE_URL || 'NOT SET'}
         </p>
         <p>
           {
@@ -305,7 +307,7 @@ export default function TestPage() {
               ' '''
             </>
           }
-          {process.env.NODE_ENV || 'NOT SET'}
+          {env.NODE_ENV || 'NOT SET'}
         </p>
       </div>
       <div style={{ marginTop: '20px' }}>

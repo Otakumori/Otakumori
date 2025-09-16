@@ -41,8 +41,8 @@ export async function GET() {
         error: errorMessage,
         timestamp: new Date().toISOString(),
         environment: env.NODE_ENV || 'unknown',
-        inngestDevUrl: process.env.INNGEST_SERVE_URL || 'http://localhost:8288',
-        isDevelopment: process.env.NODE_ENV === 'development',
+        inngestDevUrl: env.INNGEST_SERVE_URL || 'http://localhost:8288',
+        isDevelopment: env.NODE_ENV === 'development',
         isInngestError,
         suggestion: isInngestError
           ? 'Make sure Inngest dev server is running on port 8288'

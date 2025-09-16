@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
 import { CommentUpdateSchema } from '@/app/lib/contracts';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 export const runtime = 'nodejs';
 
@@ -18,6 +22,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const validatedData = CommentUpdateSchema.parse(body);
 
     // Get current user
+    const db = await getDb();
     const currentUser = await db.user.findUnique({
       where: { clerkId: userId },
     });
@@ -106,6 +111,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Get current user
+    const db = await getDb();
     const currentUser = await db.user.findUnique({
       where: { clerkId: userId },
     });

@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
 import { BurstConfig } from '@/types/runes';
+
+async function getDb() {
+  const { db } = await import('@/app/lib/db');
+  return db;
+}
 
 export const runtime = 'nodejs';
 
@@ -25,6 +29,7 @@ export async function GET() {
     // const user = await db.user.findUnique({ where: { clerkId: userId } });
     // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
 
+    const db = await getDb();
     const siteConfig = await db.siteConfig.findUnique({
       where: { id: 'singleton' },
     });
@@ -183,6 +188,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Update or create site config
+    const db = await getDb();
     const updatedConfig = await db.siteConfig.upsert({
       where: { id: 'singleton' },
       update: {

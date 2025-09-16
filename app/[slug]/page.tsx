@@ -2,9 +2,14 @@
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { db } from '@/lib/db';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const db = await getDb();
   const page = await db.contentPage.findUnique({
     where: { slug: params.slug },
     select: { title: true },
@@ -22,6 +27,7 @@ export default async function StaticPage({ params }: { params: { slug: string } 
     return notFound();
   }
 
+  const db = await getDb();
   const page = await db.contentPage.findUnique({
     where: { slug: params.slug },
   });

@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         await prisma.couponRedemption.upsert({
           where: { couponId_clientReferenceId: { couponId: cid, clientReferenceId } },
           update: { status: 'PENDING' },
-          create: { couponId: cid, clientReferenceId, status: 'PENDING', discountAmount: 0 },
+          create: { couponId: cid, clientReferenceId, status: 'PENDING' },
         });
         results.push({ code, attached: true });
       } catch {

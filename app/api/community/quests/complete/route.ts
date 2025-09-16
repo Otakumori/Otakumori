@@ -4,7 +4,11 @@ export const fetchCache = 'force-no-store';
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 export async function POST(req: Request) {
   try {
@@ -18,6 +22,7 @@ export async function POST(req: Request) {
       );
     // Persist unlock in UserSettings.notificationPreferences.card.emotes
     try {
+      const db = await getDb();
       const user = await db.user.findUnique({ where: { clerkId: userId }, select: { id: true } });
       if (user) {
         const us = await db.userSettings.findUnique({ where: { userId: user.id } });

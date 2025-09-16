@@ -139,7 +139,6 @@ export async function POST(req: NextRequest) {
         label: `Order for ${shippingInfo?.firstName ?? user.display_name ?? user.username}`,
         updatedAt: new Date(),
         appliedCouponCodes: appliedCodes,
-        discountTotal: discountTotalCents,
       },
     });
 

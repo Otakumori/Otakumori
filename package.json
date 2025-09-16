@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build:scripts": "tsc --project tsconfig.json --outDir dist --rootDir . lib/*.ts scripts/*.ts",
+    "prebuild": "tsx scripts/pre-build-validation.ts",
     "build": "prisma generate --no-engine && next build",
     "build:analyze": "ANALYZE=true prisma generate --no-engine && next build",
     "vercel-build": "prisma generate && next build",
@@ -15,6 +16,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "build:test": "NEXT_TELEMETRY_DISABLED=1 next build",
     "health": "node scripts/health.mjs",
+    "validate": "tsx scripts/pre-build-validation.ts",
     "verify": "npm run typecheck && npm run lint && npm run build:test && npm run health",
     "verify:a11y": "npm run lint:a11y && npm run preflight:a11y",
     "build:prod-check": "npm run typecheck && npm run lint && next build",

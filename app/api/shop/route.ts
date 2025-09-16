@@ -1,8 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
+
+async function getPrisma() {
+  const { prisma } = await import('@/app/lib/prisma');
+  return prisma;
+}
 
 export async function GET(req: Request) {
   const { userId } = await auth();
@@ -13,6 +17,7 @@ export async function GET(req: Request) {
 
   const where: any = {};
   if (tag) where.eventTag = tag;
+  const prisma = await getPrisma();
   const rows = await prisma.petalShopItem.findMany({
     where,
     orderBy: [{ visibleFrom: 'asc' }, { name: 'asc' }],

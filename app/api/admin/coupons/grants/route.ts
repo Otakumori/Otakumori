@@ -1,12 +1,31 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { prisma } from '@/app/lib/prisma';
-import { requireAdmin } from '@/app/lib/authz';
-import { logger } from '@/app/lib/logger';
-import { problem } from '@/lib/http/problem';
+
+async function getPrisma() {
+  const { prisma } = await import('@/app/lib/prisma');
+  return prisma;
+}
+
+async function getRequireAdmin() {
+  const { requireAdmin } = await import('@/app/lib/authz');
+  return requireAdmin;
+}
+
+async function getLogger() {
+  const { logger } = await import('@/app/lib/logger');
+  return logger;
+}
+
+async function getProblem() {
+  const { problem } = await import('@/lib/http/problem');
+  return problem;
+}
 
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
+  const requireAdmin = await getRequireAdmin();
+  const logger = await getLogger();
+  
   await requireAdmin();
   logger.request(req, 'GET /api/admin/coupons/grants');
   try {
@@ -16,6 +35,7 @@ export async function GET(req: NextRequest) {
     const userId = searchParams.get('userId') || undefined;
 
     const where = userId ? { userId } : {};
+    const prisma = await getPrisma();
     const [total, rows] = await Promise.all([
       prisma.couponGrant.count({ where }),
       prisma.couponGrant.findMany({
@@ -29,11 +49,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ ok: true, data: { total, rows } });
   } catch (e: any) {
+    const logger = await getLogger();
     logger.error(
       'admin_coupon_grants_error',
       { route: '/api/admin/coupons/grants' },
       { error: String(e?.message || e) },
     );
+    const problem = await getProblem();
     return NextResponse.json(problem(500, 'fetch_failed', e?.message), { status: 500 });
   }
 }

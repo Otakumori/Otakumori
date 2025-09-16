@@ -4,6 +4,7 @@ import NavBar from '../components/NavBar';
 import FooterDark from '../components/FooterDark';
 import GamesGrid from '../components/games/GamesGrid';
 import { t } from '@/lib/microcopy';
+import { env } from '@/env.mjs';
 
 export const metadata: Metadata = {
   title: 'Games — Otaku-mori',
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 async function getGames() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/games`, {
+    const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/games`, {
       next: { revalidate: 300 },
     });
 

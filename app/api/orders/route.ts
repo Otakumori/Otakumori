@@ -1,7 +1,11 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
+
+async function getDb() {
+  const { db } = await import('@/lib/db');
+  return db;
+}
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
@@ -15,6 +19,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get user from database
+    const db = await getDb();
     const user = await db.user.findUnique({
       where: { clerkId: userId },
     });
