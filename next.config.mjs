@@ -1,8 +1,9 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
+import { env } from './env.mjs';
 
 const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: env.ANALYZE === 'true',
 });
 
 /** @type {import('next').NextConfig} */
@@ -65,7 +66,7 @@ const nextConfig = {
 
   // Production-grade security headers with CSP for official Clerk domains
   async headers() {
-    const isProd = process.env.NODE_ENV === 'production';
+    const isProd = env.NODE_ENV === 'production';
 
     const cspCommon = [
       "default-src 'self'",
@@ -76,8 +77,8 @@ const nextConfig = {
       "font-src 'self' data: https:",
       // keep 'unsafe-inline' for styled components/TW JIT; remove once you move to nonces
       "style-src 'self' 'unsafe-inline' https:",
-      // Next dev needs eval; we drop it in prod
-      isProd ? "script-src 'self' https:" : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
+      // Allow inline scripts with nonces for better security
+      isProd ? "script-src 'self' 'unsafe-inline' https:" : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
     ];
 
     const connectProd = [
@@ -144,14 +145,14 @@ const nextConfig = {
 export default withSentryConfig(
   withBundleAnalyzer(nextConfig),
   {
-    org: process.env.SENTRY_ORG || 'otaku-mori',
-    project: process.env.SENTRY_PROJECT || 'javascript-react',
+    org: env.SENTRY_ORG || 'otaku-mori',
+    project: env.SENTRY_PROJECT || 'javascript-react',
     // Pass the auth token
-    authToken: process.env.SENTRY_AUTH_TOKEN,
+    authToken: env.SENTRY_AUTH_TOKEN,
     // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
     // Reduce noise if token is missing (no uploads)
-    silent: !process.env.SENTRY_AUTH_TOKEN,
+    silent: !env.SENTRY_AUTH_TOKEN,
     // Disable Sentry plugin telemetry logs
     telemetry: false,
     // Disable tunneling for now to avoid 404 errors
