@@ -1,7 +1,11 @@
 .env
 .env.local
 .env.local.backup
+.env*.local
 node_modules
 .next
 .vercel
-.env*.local
+*.log
+.DS_Store
+.vscode/settings.json
+.vscode/tasks.json

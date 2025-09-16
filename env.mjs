@@ -43,6 +43,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_PETALS: z.enum(["on","off"]).default("on"),
     NEXT_PUBLIC_FEATURE_CURSOR_GLOW: z.enum(["on","off"]).default("off"),
     NEXT_PUBLIC_FEATURE_STARFIELD: z.enum(["on","off"]).default("on"),
+    NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
