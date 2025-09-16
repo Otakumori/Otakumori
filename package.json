@@ -9,7 +9,7 @@
     "prebuild": "tsx scripts/pre-build-validation.ts",
     "build": "prisma generate --no-engine && next build",
     "build:analyze": "ANALYZE=true prisma generate --no-engine && next build",
-    "vercel-build": "prisma generate && next build",
+    "vercel-build": "prisma generate --no-engine && next build",
     "start": "next start",
     "lint": "next lint --no-inline-config --max-warnings=0",
     "lint:a11y": "next lint --no-inline-config --dir app --dir components --dir lib --ext .ts,.tsx,.js,.jsx",

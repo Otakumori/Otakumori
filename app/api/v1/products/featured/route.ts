@@ -3,11 +3,13 @@ import { NextResponse } from 'next/server';
 import { env } from '@/server/env';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
     // Use our v1 Printify API instead of calling Printify directly
-    const response = await fetch(`${request.nextUrl.origin}/api/v1/printify/products`, {
+    const baseUrl = env.NEXT_PUBLIC_APP_URL || `https://${request.headers.get('host')}`;
+    const response = await fetch(`${baseUrl}/api/v1/printify/products`, {
       cache: 'no-store',
     });
 

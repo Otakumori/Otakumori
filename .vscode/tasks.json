@@ -23,6 +23,15 @@
       "problemMatcher": [],
       "label": "npm: api:test",
       "detail": "npm run api:health"
+    },
+    {
+      "type": "deno",
+      "command": "cache",
+      "problemMatcher": [
+        "$deno"
+      ],
+      "group": "build",
+      "label": "deno: cache"
     }
   ]
 }
