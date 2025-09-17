@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useRef, useEffect, useState } from 'react';
-import Image from 'next/image';
+import Image from "next/image";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 
 interface CanopyProps {
   windDirection?: number;
@@ -9,74 +9,74 @@ interface CanopyProps {
   className?: string;
 }
 
-const Canopy: React.FC<CanopyProps> = ({
-  windDirection: _windDirection = 45,
-  windSpeed = 1,
-  className = '',
-}) => {
+export default function Canopy({ windDirection = 45, windSpeed = 1, className }: CanopyProps) {
   const [canopyBounds, setCanopyBounds] = useState({ x: 0, y: 0, width: 400, height: 300 });
   const [rotation, setRotation] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
     const updateBounds = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setCanopyBounds({
-          x: rect.left,
-          y: rect.top,
-          width: rect.width,
-          height: rect.height,
-        });
-      }
+      const element = containerRef.current;
+      if (!element) return;
+
+      const rect = element.getBoundingClientRect();
+      setCanopyBounds({
+        x: rect.left,
+        y: rect.top,
+        width: rect.width,
+        height: rect.height,
+      });
     };
 
     updateBounds();
-    window.addEventListener('resize', updateBounds);
-    return () => window.removeEventListener('resize', updateBounds);
+    window.addEventListener("resize", updateBounds);
+    return () => window.removeEventListener("resize", updateBounds);
   }, []);
 
-  // Animation effect for rotation
   useEffect(() => {
     const animate = () => {
-      setRotation(Math.sin(Date.now() * 0.001) * windSpeed * 2);
-      requestAnimationFrame(animate);
+      const time = Date.now() * 0.001;
+      const directionalFactor = Math.cos((windDirection * Math.PI) / 180);
+      setRotation(Math.sin(time * 0.3) * windSpeed * 2 * directionalFactor);
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
-    animate();
-  }, [windSpeed]);
 
-  // Expose bounds to parent components
+    animationFrameRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [windDirection, windSpeed]);
+
   useEffect(() => {
-    (window as any).canopyBounds = canopyBounds;
+    if (typeof window === "undefined") return;
+    (window as Window & { canopyBounds?: typeof canopyBounds }).canopyBounds = canopyBounds;
   }, [canopyBounds]);
 
+  const containerClassName = [
+    "fixed top-0 left-0 h-screen w-full pointer-events-none z-0 canopy-background",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div
-      ref={containerRef}
-      className={`fixed top-0 left-0 w-full h-screen pointer-events-none z-0 canopy-background ${className}`}
-    >
-      {/* Tree Canopy Image */}
+    <div ref={containerRef} className={containerClassName}>
       <div
-        className="absolute top-0 left-0 w-full h-full canopy-rotation"
-        style={
-          {
-            '--rotation': `${rotation}deg`,
-          } as React.CSSProperties
-        }
+        className="absolute inset-0 canopy-rotation"
+        style={{ "--rotation": `${rotation}deg` } as CSSProperties}
       >
         <Image
           src="/media/cherry-tree.png"
           alt="Cherry blossom tree canopy"
           fill
-          className="object-fill canopy-image"
+          className="canopy-image object-fill"
           priority
         />
       </div>
-
-      {/* Gradient mask for text contrast */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent canopy-mask" />
+      <div className="absolute inset-0 canopy-mask bg-gradient-to-r from-black/20 via-transparent to-transparent" />
     </div>
   );
-};
-
-export default Canopy;
+}

@@ -1,6 +1,13 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface Achievement {
   id: string;
@@ -11,7 +18,7 @@ export interface Achievement {
   progress: number;
   total: number;
   reward?: {
-    type: 'points' | 'badge' | 'discount';
+    type: "points" | "badge" | "discount";
     value: number | string;
   };
 }
@@ -23,69 +30,71 @@ interface AchievementContextType {
   getUnlockedCount: () => number;
 }
 
+const STORAGE_KEY = "otakumori:achievements";
+
 const defaultAchievements: Achievement[] = [
   {
-    id: 'first_purchase',
-    title: 'First Purchase',
-    description: 'Make your first purchase',
-    icon: '🛍️',
+    id: "first_purchase",
+    title: "First Purchase",
+    description: "Make your first purchase",
+    icon: "??",
     unlocked: false,
     progress: 0,
     total: 1,
     reward: {
-      type: 'points',
+      type: "points",
       value: 100,
     },
   },
   {
-    id: 'collector',
-    title: 'Collector',
-    description: 'Purchase 10 different items',
-    icon: '🎯',
+    id: "collector",
+    title: "Collector",
+    description: "Purchase 10 different items",
+    icon: "??",
     unlocked: false,
     progress: 0,
     total: 10,
     reward: {
-      type: 'badge',
-      value: 'Collector Badge',
+      type: "badge",
+      value: "Collector Badge",
     },
   },
   {
-    id: 'big_spender',
-    title: 'Big Spender',
-    description: 'Spend $100 or more',
-    icon: '💰',
+    id: "big_spender",
+    title: "Big Spender",
+    description: "Spend 100,000 petals across the shop",
+    icon: "??",
     unlocked: false,
     progress: 0,
     total: 100,
     reward: {
-      type: 'discount',
+      type: "discount",
       value: 10,
     },
   },
   {
-    id: 'community_member',
-    title: 'Community Member',
-    description: 'Join the Bonfire community',
-    icon: '🔥',
+    id: "community_member",
+    title: "Community Member",
+    description: "Join the Bonfire community",
+    icon: "??",
     unlocked: false,
     progress: 0,
     total: 1,
     reward: {
-      type: 'points',
+      type: "points",
       value: 50,
     },
   },
   {
-    id: 'reviewer',
-    title: 'Product Reviewer',
-    description: 'Write 5 product reviews',
-    icon: '✍️',
+    id: "reviewer",
+    title: "Product Reviewer",
+    description: "Write five product reviews",
+    icon: "??",
     unlocked: false,
     progress: 0,
     total: 5,
     reward: {
-      type: 'points',
+      type: "points",
       value: 200,
     },
   },
@@ -93,17 +102,34 @@ const defaultAchievements: Achievement[] = [
 
 const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
 
-export function AchievementProvider({ children }: { children: React.ReactNode }) {
-  const [achievements, setAchievements] = useState<Achievement[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('achievements');
-      return saved ? JSON.parse(saved) : defaultAchievements;
+const loadInitialAchievements = (): Achievement[] => {
+  if (typeof window === "undefined") return defaultAchievements;
+
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) return defaultAchievements;
+
+    const parsed = JSON.parse(saved) as Achievement[];
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.map((achievement) => ({
+        ...achievement,
+        progress: Math.min(achievement.progress, achievement.total),
+        unlocked: achievement.unlocked || achievement.progress >= achievement.total,
+      }));
     }
-    return defaultAchievements;
-  });
+  } catch (error) {
+    console.warn("Unable to load achievements from storage", error);
+  }
+
+  return defaultAchievements;
+};
+
+export function AchievementProvider({ children }: { children: ReactNode }) {
+  const [achievements, setAchievements] = useState<Achievement[]>(loadInitialAchievements);
 
   useEffect(() => {
-    localStorage.setItem('achievements', JSON.stringify(achievements));
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(achievements));
   }, [achievements]);
 
   const unlockAchievement = (id: string) => {
@@ -119,38 +145,31 @@ export function AchievementProvider({ children }: { children: React.ReactNode })
   const updateProgress = (id: string, progress: number) => {
     setAchievements((current) =>
       current.map((achievement) => {
-        if (achievement.id === id) {
-          const newProgress = Math.min(progress, achievement.total);
-          const unlocked = newProgress >= achievement.total;
-          return { ...achievement, progress: newProgress, unlocked };
+        if (achievement.id !== id) {
+          return achievement;
         }
-        return achievement;
+
+        const nextProgress = Math.max(0, Math.min(progress, achievement.total));
+        const unlocked = nextProgress >= achievement.total;
+        return { ...achievement, progress: nextProgress, unlocked };
       }),
     );
   };
 
-  const getUnlockedCount = () => {
-    return achievements.filter((a) => a.unlocked).length;
-  };
+  const getUnlockedCount = () => achievements.filter((achievement) => achievement.unlocked).length;
 
-  return (
-    <AchievementContext.Provider
-      value={{
-        achievements,
-        unlockAchievement,
-        updateProgress,
-        getUnlockedCount,
-      }}
-    >
-      {children}
-    </AchievementContext.Provider>
+  const value = useMemo(
+    () => ({ achievements, unlockAchievement, updateProgress, getUnlockedCount }),
+    [achievements],
   );
+
+  return <AchievementContext.Provider value={value}>{children}</AchievementContext.Provider>;
 }
 
 export function useAchievements() {
   const context = useContext(AchievementContext);
-  if (context === undefined) {
-    throw new Error('useAchievements must be used within an AchievementProvider');
+  if (!context) {
+    throw new Error("useAchievements must be used within an AchievementProvider");
   }
   return context;
 }

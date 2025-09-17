@@ -1,26 +1,44 @@
-import React from 'react';
+import type { FC } from "react";
 
 interface AchievementCategoriesProps {
-  selectedCategory: string | null;
-  onSelectCategory: (_category: string | null) => void;
+  selectedCategory?: string | null;
+  onSelectCategory: (category: string | null) => void;
 }
 
-export const AchievementCategories: React.FC<AchievementCategoriesProps> = ({
+export const AchievementCategories: FC<AchievementCategoriesProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => (
   <div className="mb-4">
-    <span
-      className={`mr-2 inline-block cursor-pointer rounded-full px-3 py-1 ${
-        selectedCategory === null ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-600'
-      }`}
+    <button
+      type="button"
+      className={[
+        "mr-2 inline-block cursor-pointer rounded-full px-3 py-1",
+        selectedCategory === null ? "bg-pink-500 text-white" : "bg-pink-100 text-pink-600",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       onClick={() => onSelectCategory(null)}
     >
       All
-    </span>
-    <span className="mr-2 inline-block rounded-full bg-pink-100 px-3 py-1 text-pink-600">
-      Community
-    </span>
-    <span className="inline-block rounded-full bg-pink-100 px-3 py-1 text-pink-600">Special</span>
+    </button>
+    {[
+      { id: "community", label: "Community" },
+      { id: "special", label: "Special" },
+    ].map(({ id, label }) => (
+      <button
+        key={id}
+        type="button"
+        className={[
+          "mr-2 inline-block rounded-full px-3 py-1",
+          selectedCategory === id ? "bg-pink-500 text-white" : "bg-pink-100 text-pink-600",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        onClick={() => onSelectCategory(id)}
+      >
+        {label}
+      </button>
+    ))}
   </div>
 );

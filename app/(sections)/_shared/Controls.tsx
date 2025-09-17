@@ -1,6 +1,6 @@
-'use client';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+"use client";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ControlHint {
   key: string;
@@ -14,18 +14,19 @@ interface ControlsProps {
   className?: string;
 }
 
-export default function Controls({ title = 'Controls', hints, className = '' }: ControlsProps) {
+export default function Controls({ title = "Controls", hints, className }: ControlsProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const containerClassName = ["fixed bottom-4 right-4 z-50", className].filter(Boolean).join(" ");
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 ${className}`}>
+    <div className={containerClassName}>
       {/* Controls Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((current) => !current)}
         className="bg-neutral-900/80 hover:bg-neutral-800/90 text-white px-4 py-2 rounded-lg border border-neutral-700 backdrop-blur-sm transition-colors"
         aria-label="Show controls"
       >
-        🎮 {title}
+        {title}
       </button>
 
       {/* Controls Overlay */}
@@ -45,13 +46,13 @@ export default function Controls({ title = 'Controls', hints, className = '' }: 
                 className="text-neutral-400 hover:text-white transition-colors"
                 aria-label="Close controls"
               >
-                ✕
+                X
               </button>
             </div>
 
             <div className="space-y-2">
               {hints.map((hint, index) => (
-                <div key={index} className="flex items-center gap-3 text-sm">
+                <div key={`${hint.key}-${index}`} className="flex items-center gap-3 text-sm">
                   <kbd className="px-2 py-1 bg-neutral-800 text-neutral-200 rounded border border-neutral-600 font-mono text-xs min-w-[2rem] text-center">
                     {hint.key}
                   </kbd>
@@ -75,23 +76,23 @@ export default function Controls({ title = 'Controls', hints, className = '' }: 
 
 // Predefined control sets for common actions
 export const GAME_CONTROLS: ControlHint[] = [
-  { key: 'WASD', action: 'Move', description: 'Arrow keys also work' },
-  { key: 'SPACE', action: 'Jump/Action' },
-  { key: 'ESC', action: 'Pause/Menu' },
-  { key: 'R', action: 'Restart' },
-  { key: 'M', action: 'Mute/Unmute' },
+  { key: "WASD", action: "Move", description: "Arrow keys also work" },
+  { key: "SPACE", action: "Jump / Action" },
+  { key: "ESC", action: "Pause / Menu" },
+  { key: "R", action: "Restart" },
+  { key: "M", action: "Mute / Unmute" },
 ];
 
 export const HUB_CONTROLS: ControlHint[] = [
-  { key: '←→', action: 'Navigate', description: 'D-pad or arrow keys' },
-  { key: 'A', action: 'Confirm', description: 'Enter or Space' },
-  { key: 'B', action: 'Back', description: 'Escape or B button' },
-  { key: 'LS', action: 'Rotate', description: 'Left stick movement' },
+  { key: "Arrow Keys", action: "Navigate", description: "D-pad also supported" },
+  { key: "A", action: "Confirm", description: "Enter or Space" },
+  { key: "B", action: "Back", description: "Escape or B button" },
+  { key: "Left Stick", action: "Rotate", description: "Analog movement" },
 ];
 
 export const SHOP_CONTROLS: ControlHint[] = [
-  { key: '↑↓', action: 'Navigate items' },
-  { key: 'ENTER', action: 'Select item' },
-  { key: 'ESC', action: 'Close/Back' },
-  { key: 'F', action: 'Filter/Search' },
+  { key: "Arrow Keys", action: "Navigate items" },
+  { key: "ENTER", action: "Select item" },
+  { key: "ESC", action: "Close / Back" },
+  { key: "F", action: "Filter / Search" },
 ];

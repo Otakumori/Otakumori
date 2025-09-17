@@ -1,23 +1,41 @@
-import React from 'react';
+import type { ChangeEventHandler, FC } from "react";
+
+type SortOption = "name" | "date" | "category" | "progress";
 
 interface AchievementSortProps {
-  sortBy: string;
-  onSortChange: (value: 'name' | 'date' | 'category' | 'progress') => void;
+  sortBy: SortOption;
+  onSortChange: (value: SortOption) => void;
 }
 
-export const AchievementSort: React.FC<AchievementSortProps> = ({ sortBy, onSortChange }) => (
-  <div className="mb-4">
-    <label className="mr-2">Sort by:</label>
-    <select
-      value={sortBy}
-      onChange={(e) => onSortChange(e.target.value as 'name' | 'date' | 'category' | 'progress')}
-      className="rounded border px-2 py-1"
-      aria-label="Select"
-    >
-      <option value="name">Name</option>
-      <option value="date">Date</option>
-      <option value="category">Category</option>
-      <option value="progress">Progress</option>
-    </select>
-  </div>
-);
+const OPTIONS: Array<{ value: SortOption; label: string }> = [
+  { value: "name", label: "Name" },
+  { value: "date", label: "Date" },
+  { value: "category", label: "Category" },
+  { value: "progress", label: "Progress" },
+];
+
+export const AchievementSort: FC<AchievementSortProps> = ({ sortBy, onSortChange }) => {
+  const handleChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    onSortChange(event.target.value as SortOption);
+  };
+
+  return (
+    <div className="mb-4">
+      <label htmlFor="achievement-sort" className="mr-2 text-sm font-medium text-gray-600">
+        Sort by:
+      </label>
+      <select
+        id="achievement-sort"
+        value={sortBy}
+        onChange={handleChange}
+        className="rounded border px-2 py-1 text-sm"
+      >
+        {OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
