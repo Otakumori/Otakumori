@@ -1,25 +1,26 @@
-import { rateLimit } from '@/app/api/rate-limit';
-import { logger } from '@/app/lib/logger';
-import { prisma } from '@/app/lib/prisma';
-import { problem } from '@/lib/http/problem';
-import { reqId } from '@/lib/log';
-import { creditPetals } from '@/lib/petals';
-import { submitScoreReq } from '@/lib/schemas/minigames';
-import { auth } from '@clerk/nextjs/server';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-export const runtime = 'nodejs';
+import { rateLimit } from "@/app/api/rate-limit";
+import { logger } from "@/app/lib/logger";
+import { db } from "@/lib/db";
+import { problem } from "@/lib/http/problem";
+import { reqId } from "@/lib/log";
+import { creditPetals } from "@/lib/petals";
+import { submitScoreReq } from "@/lib/schemas/minigames";
+
+export const runtime = "nodejs";
 export const maxDuration = 10;
 
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
 function calcAward(game: string, score: number): number {
-  const clamp = (n: number, a: number, b: number) => Math.max(a, Math.min(b, n));
-  // Simple, conservative mapping per game
   switch (game) {
-    case 'petal-run':
+    case "petal-run":
       return clamp(Math.floor(score / 10), 0, 50);
-    case 'memory':
+    case "memory":
       return clamp(Math.floor(score / 20), 0, 30);
-    case 'rhythm':
+    case "rhythm":
       return clamp(Math.floor(score / 12), 0, 60);
     default:
       return 0;
@@ -27,78 +28,53 @@ function calcAward(game: string, score: number): number {
 }
 
 export async function POST(req: NextRequest) {
-  const rid = reqId(req.headers);
-  logger.request(req, 'POST /api/mini-games/submit');
+  const requestId = reqId(req.headers);
+  logger.request(req, "POST /api/mini-games/submit");
+
   const { userId } = await auth();
-  const body = await req.json().catch(() => null);
-  const parsed = submitScoreReq.safeParse(body);
-  if (!parsed.success) return NextResponse.json(problem(400, 'Invalid request'));
 
-  const { runId, score, game } = parsed.data;
+  let payload: unknown;
+  try {
+    payload = await req.json();
+  } catch (error) {
+    logger.error("mini-game submit JSON parse failed", { requestId }, { error });
+    return NextResponse.json(problem(400, "Invalid request"), { status: 400 });
+  }
 
-  // Allow guests: record leaderboard only; no economy
+  const parsed = submitScoreReq.safeParse(payload);
+  if (!parsed.success) {
+    return NextResponse.json(problem(400, "Invalid request"), { status: 400 });
+  }
+
+  const { score, game } = parsed.data;
+
   if (!userId) {
-    try {
-      const prev = await prisma.leaderboardScore.findFirst({
-        where: { userId: 'guest', game, diff: null },
-      });
-      if (prev) {
-        await prisma.leaderboardScore.update({ where: { id: prev.id }, data: { score } });
-      } else {
-        await prisma.leaderboardScore.create({
-          data: { userId: 'guest', game, diff: null, score, statsJson: {} },
-        });
-      }
-    } catch (e: any) {
-      logger.error(
-        'leaderboard_guest_upsert_error',
-        { requestId: rid },
-        { error: String(e?.message || e) },
-      );
-    }
+    await upsertLeaderboardScore({ userId: "guest", game, score, requestId });
     return NextResponse.json({ ok: true, score, petalsGranted: 0 });
   }
 
-  // Rate limit submissions
-  const rl = await rateLimit(
+  const limit = await rateLimit(
     req,
-    { windowMs: 60_000, maxRequests: 6, keyPrefix: 'mg:submit' },
-    userId,
+    { windowMs: 60_000, maxRequests: 6, keyPrefix: "mg:submit" },
+    `${userId}:${game}`,
   );
-  if (rl.limited) return NextResponse.json(problem(429, 'Rate limit exceeded'));
 
-  // Persist personal best and award petals
-  let petalsGranted = calcAward(game, score);
-  try {
-    // Personal best update
-    const prev = await prisma.leaderboardScore.findFirst({
-      where: { userId, game, diff: null },
-      select: { id: true, score: true },
-    });
-    if (!prev) {
-      await prisma.leaderboardScore.create({
-        data: { userId, game, diff: null, score, statsJson: {} },
-      });
-    } else if (score > (prev.score ?? 0)) {
-      await prisma.leaderboardScore.update({ where: { id: prev.id }, data: { score } });
-    }
-  } catch (e: any) {
-    logger.error(
-      'leaderboard_upsert_error',
-      { requestId: rid },
-      { error: String(e?.message || e) },
-    );
+  if (limit.limited) {
+    return NextResponse.json(problem(429, "Rate limit exceeded"), { status: 429 });
   }
 
-  // Award petals with server-side clamp
-  let balance: number | undefined = undefined;
+  await upsertLeaderboardScore({ userId, game, score, requestId });
+
+  let petalsGranted = calcAward(game, score);
+  let balance: number | undefined;
+
   if (petalsGranted > 0) {
     try {
-      const res = await creditPetals(userId, petalsGranted, 'mini-game-reward');
-      balance = res.balance;
-    } catch (e: any) {
-      logger.error('petals_award_error', { requestId: rid }, { error: String(e?.message || e) });
-      petalsGranted = 0; // if economy fails, don't report grant
+      const result = await creditPetals(userId, petalsGranted, "mini-game-reward");
+      balance = result.balance;
+    } catch (error) {
+      logger.error("petals_award_error", { requestId, userId, game }, { error });
+      petalsGranted = 0;
     }
   }
 
@@ -106,7 +82,42 @@ export async function POST(req: NextRequest) {
     ok: true,
     score,
     petalsGranted,
-    ...(balance != null ? { balance } : {}),
-    requestId: rid,
+    ...(balance !== undefined ? { balance } : {}),
+    requestId,
   });
+}
+
+async function upsertLeaderboardScore({
+  userId,
+  game,
+  score,
+  requestId,
+}: {
+  userId: string;
+  game: string;
+  score: number;
+  requestId?: string;
+}) {
+  try {
+    const previous = await db.leaderboardScore.findFirst({
+      where: { userId, game, diff: null },
+      select: { id: true, score: true },
+    });
+
+    if (!previous) {
+      await db.leaderboardScore.create({
+        data: { userId, game, diff: null, score, statsJson: {} },
+      });
+      return;
+    }
+
+    if (score > previous.score) {
+      await db.leaderboardScore.update({
+        where: { id: previous.id },
+        data: { score },
+      });
+    }
+  } catch (error) {
+    logger.error("leaderboard_upsert_error", { requestId, userId, game }, { error });
+  }
 }

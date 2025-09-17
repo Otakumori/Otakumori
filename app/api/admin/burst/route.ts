@@ -1,205 +1,126 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { BurstConfig } from '@/types/runes';
+import { NextResponse, type NextRequest } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { z } from "zod";
 
-async function getDb() {
-  const { db } = await import('@/app/lib/db');
-  return db;
+import { db } from "@/lib/db";
+import type { BurstConfig } from "@/types/runes";
+
+export const runtime = "nodejs";
+
+const ParticleCountSchema = z.object({
+  small: z.number().int().min(0).max(500),
+  medium: z.number().int().min(0).max(500),
+  large: z.number().int().min(0).max(500),
+});
+
+const RarityWeightsSchema = z
+  .object({
+    small: z.number().min(0).max(1),
+    medium: z.number().min(0).max(1),
+    large: z.number().min(0).max(1),
+  })
+  .superRefine((weights, ctx) => {
+    const total = weights.small + weights.medium + weights.large;
+    if (Math.abs(total - 1) > 0.01) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Rarity weights must total 100% (currently ${(total * 100).toFixed(1)}%)`,
+      });
+    }
+  });
+
+const BurstConfigSchema = z.object({
+  enabled: z.boolean(),
+  minCooldownSec: z.number().int().min(5).max(60),
+  maxPerMinute: z.number().int().min(1).max(10),
+  particleCount: ParticleCountSchema,
+  rarityWeights: RarityWeightsSchema,
+});
+
+type BurstConfigPayload = z.infer<typeof BurstConfigSchema>;
+
+const DEFAULT_BURST_CONFIG: BurstConfig = {
+  enabled: true,
+  minCooldownSec: 15,
+  maxPerMinute: 3,
+  particleCount: {
+    small: 20,
+    medium: 40,
+    large: 80,
+  },
+  rarityWeights: {
+    small: 0.6,
+    medium: 0.3,
+    large: 0.1,
+  },
+};
+
+async function requireAdmin() {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new ResponseError("Unauthorized", 401);
+  }
+
+  const user = await currentUser();
+  if (user?.publicMetadata?.role !== "admin") {
+    throw new ResponseError("Forbidden", 403);
+  }
+
+  return userId;
 }
 
-export const runtime = 'nodejs';
-
-// GET: Fetch burst configuration
-export async function GET() {
-  try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 },
-      );
-    }
-
-    // TODO: Add admin role check
-    // const user = await db.user.findUnique({ where: { clerkId: userId } });
-    // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
-
-    const db = await getDb();
-    const siteConfig = await db.siteConfig.findUnique({
-      where: { id: 'singleton' },
-    });
-
-    const burstConfig = (siteConfig?.burst as any) || {
-      enabled: true,
-      minCooldownSec: 15,
-      maxPerMinute: 3,
-      particleCount: {
-        small: 20,
-        medium: 40,
-        large: 80,
-      },
-      rarityWeights: {
-        small: 0.6,
-        medium: 0.3,
-        large: 0.1,
-      },
-    };
-
-    return NextResponse.json({
-      ok: true,
-      data: { config: burstConfig },
-    });
-  } catch (error) {
-    console.error('Burst config fetch error:', error);
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'Internal server error',
-      },
-      { status: 500 },
-    );
+class ResponseError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
   }
 }
 
-// POST: Update burst configuration
+async function getBurstConfig(): Promise<BurstConfig> {
+  const siteConfig = await db.siteConfig.findUnique({
+    where: { id: "singleton" },
+  });
+
+  const parsed = BurstConfigSchema.safeParse(siteConfig?.burst ?? DEFAULT_BURST_CONFIG);
+  if (parsed.success) {
+    return parsed.data;
+  }
+
+  return DEFAULT_BURST_CONFIG;
+}
+
+export async function GET() {
+  try {
+    await requireAdmin();
+    const config = await getBurstConfig();
+
+    return NextResponse.json({ ok: true, data: { config } });
+  } catch (error) {
+    if (error instanceof ResponseError) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
+    }
+
+    console.error("Burst config fetch error", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const userId = await requireAdmin();
+    const body = (await request.json()) as unknown;
+    const config = BurstConfigSchema.parse(body);
 
-    if (!userId) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 },
-      );
-    }
-
-    // TODO: Add admin role check
-    // const user = await db.user.findUnique({ where: { clerkId: userId } });
-    // if (!user?.isAdmin) { return NextResponse.json({ ok: false, error: 'Admin access required' }, { status: 403 }); }
-
-    const body = await request.json();
-
-    // Validate required fields
-    const requiredFields = [
-      'enabled',
-      'minCooldownSec',
-      'maxPerMinute',
-      'particleCount',
-      'rarityWeights',
-    ];
-    for (const field of requiredFields) {
-      if (!(field in body)) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: `Missing required field: ${field}`,
-          },
-          { status: 400 },
-        );
-      }
-    }
-
-    // Validate basic fields
-    if (typeof body.enabled !== 'boolean') {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Enabled must be a boolean',
-        },
-        { status: 400 },
-      );
-    }
-
-    if (
-      typeof body.minCooldownSec !== 'number' ||
-      body.minCooldownSec < 5 ||
-      body.minCooldownSec > 60
-    ) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Min cooldown must be between 5 and 60 seconds',
-        },
-        { status: 400 },
-      );
-    }
-
-    if (typeof body.maxPerMinute !== 'number' || body.maxPerMinute < 1 || body.maxPerMinute > 10) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Max per minute must be between 1 and 10',
-        },
-        { status: 400 },
-      );
-    }
-
-    // Validate particle counts
-    const particleFields = ['small', 'medium', 'large'];
-    for (const size of particleFields) {
-      if (typeof body.particleCount[size] !== 'number' || body.particleCount[size] < 0) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: `Invalid particle count for ${size} burst`,
-          },
-          { status: 400 },
-        );
-      }
-    }
-
-    // Validate rarity weights
-    const weightFields = ['small', 'medium', 'large'];
-    let totalWeight = 0;
-    for (const size of weightFields) {
-      if (
-        typeof body.rarityWeights[size] !== 'number' ||
-        body.rarityWeights[size] < 0 ||
-        body.rarityWeights[size] > 1
-      ) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: `Invalid rarity weight for ${size} burst`,
-          },
-          { status: 400 },
-        );
-      }
-      totalWeight += body.rarityWeights[size];
-    }
-
-    // Check if weights total approximately 1.0
-    if (Math.abs(totalWeight - 1.0) > 0.01) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: `Rarity weights must total 100% (currently ${(totalWeight * 100).toFixed(1)}%)`,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Update or create site config
-    const db = await getDb();
-    const updatedConfig = await db.siteConfig.upsert({
-      where: { id: 'singleton' },
+    const siteConfig = await db.siteConfig.upsert({
+      where: { id: "singleton" },
       update: {
-        burst: body,
+        burst: config,
         updatedAt: new Date(),
         updatedBy: userId,
       },
       create: {
-        id: 'singleton',
+        id: "singleton",
         guestCap: 50,
-        burst: body,
+        burst: config,
         tree: {
           sway: 0.5,
           spawnRate: 2000,
@@ -207,8 +128,8 @@ export async function POST(request: NextRequest) {
           dither: 0.3,
         },
         theme: {
-          pinkIntensity: 1.0,
-          grayIntensity: 1.0,
+          pinkIntensity: 1,
+          grayIntensity: 1,
           motionIntensity: 2,
         },
         seasonal: {
@@ -221,7 +142,7 @@ export async function POST(request: NextRequest) {
           minPerOrder: 5,
           maxPerOrder: 120,
           streak: { enabled: true, dailyBonusPct: 0.05, maxPct: 0.25 },
-          seasonal: { multiplier: 1.0 },
+          seasonal: { multiplier: 1 },
           daily: { softCap: 200, postSoftRatePct: 0.5, hardCap: 400 },
           firstPurchaseBonus: 20,
         },
@@ -235,21 +156,28 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const updated = BurstConfigSchema.parse(siteConfig.burst ?? config);
+
     return NextResponse.json({
       ok: true,
       data: {
-        config: updatedConfig.burst,
-        message: 'Burst configuration updated successfully',
+        config: updated,
+        message: "Burst configuration updated successfully",
       },
     });
   } catch (error) {
-    console.error('Burst config save error:', error);
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'Internal server error',
-      },
-      { status: 500 },
-    );
+    if (error instanceof ResponseError) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
+    }
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { ok: false, error: error.errors.map((issue) => issue.message).join(", ") },
+        { status: 400 },
+      );
+    }
+
+    console.error("Burst config save error", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }

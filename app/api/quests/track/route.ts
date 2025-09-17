@@ -1,101 +1,118 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { Redis } from '@upstash/redis';
-import { Ratelimit } from '@upstash/ratelimit';
-import { auth } from '@clerk/nextjs/server';
-import { userDayNY, ensureDailyAssignments } from '@/app/lib/quests/server';
+import { type NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { z } from "zod";
 
-const prisma = new PrismaClient();
-import { env } from '@/env';
+import { ensureDailyAssignments, userDayNY } from "@/app/lib/quests/server";
+import { db } from "@/lib/db";
+import { redis } from "@/lib/redis";
 
-const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL!,
-  token: env.UPSTASH_REDIS_REST_TOKEN!,
+const TrackRequestSchema = z.object({
+  type: z.string().min(1),
 });
-const limit = new Ratelimit({
+
+const questTrackLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(20, '1 m'),
+  limiter: Ratelimit.slidingWindow(20, "1 m"),
 });
 
-export async function POST(req: Request) {
+const EVENT_TO_QUESTS: Record<string, string[]> = {
+  "view-product": ["view-3-products"],
+  "submit-review": ["add-1-review"],
+  "gacha-roll": ["roll-gacha"],
+  purchase: ["complete-purchase"],
+  "visit-checkout": ["visit-checkout"],
+  "browse-collection": ["browse-collections"],
+};
+
+export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
-    const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0] || 'anon';
-    const rl = await limit.limit(ip);
-    if (!rl.success) {
-      return NextResponse.json({ error: 'rate' }, { status: 429 });
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anon";
+    const rateResult = await questTrackLimiter.limit(ip);
+
+    if (!rateResult.success) {
+      return NextResponse.json({ error: "rate" }, { status: 429 });
     }
 
-    const { type } = await req.json(); // e.g., "view-product", "submit-review", "gacha-roll", "purchase"
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ error: "auth" }, { status: 401 });
+    }
 
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: 'auth' }, { status: 401 });
+    const body = TrackRequestSchema.parse(await request.json());
+
+    const questKeys = EVENT_TO_QUESTS[body.type] ?? [];
+    if (!questKeys.length) {
+      return NextResponse.json({ ok: true, message: "No quests for this event type" });
+    }
+
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "notfound" }, { status: 404 });
     }
 
     const day = userDayNY();
-    await ensureDailyAssignments(userId, day);
+    await ensureDailyAssignments(user.id, day);
 
-    // Map event types to quest keys
-    const eventToQuestMap: Record<string, string[]> = {
-      'view-product': ['view-3-products'],
-      'submit-review': ['add-1-review'],
-      'gacha-roll': ['roll-gacha'],
-      purchase: ['complete-purchase'],
-      'visit-checkout': ['visit-checkout'],
-      'browse-collection': ['browse-collections'],
-    };
-
-    const questKeys = eventToQuestMap[type] || [];
-    if (!questKeys.length) {
-      return NextResponse.json({ ok: true, message: 'No quests for this event type' });
-    }
-
-    // Update progress for matching quests
-    const assignments = await prisma.questAssignment.findMany({
+    const assignments = await db.questAssignment.findMany({
       where: {
-        userId: userId,
+        userId: user.id,
         day,
         quest: { key: { in: questKeys } },
       },
       include: { quest: true },
     });
 
-    const updates = [];
-    for (const assignment of assignments) {
-      if (assignment.completedAt) continue; // Already completed
+    if (!assignments.length) {
+      return NextResponse.json({ ok: true, updated: 0, quests: [] });
+    }
 
-      const newProgress = Math.min(assignment.target, assignment.progress + 1);
-      const isCompleted = newProgress >= assignment.target;
+    const updates: Array<ReturnType<typeof db.questAssignment.update>> = [];
+    const summaries = assignments.map((assignment) => {
+      const target = assignment.target ?? 1;
+      const currentProgress = assignment.progress ?? 0;
+
+      if (assignment.completedAt) {
+        return {
+          key: assignment.quest?.key ?? "",
+          progress: currentProgress,
+          target,
+          completed: true,
+        };
+      }
+
+      const nextProgress = Math.min(target, currentProgress + 1);
+      const completed = nextProgress >= target;
 
       updates.push(
-        prisma.questAssignment.update({
+        db.questAssignment.update({
           where: { id: assignment.id },
           data: {
-            progress: newProgress,
-            completedAt: isCompleted ? new Date() : null,
+            progress: nextProgress,
+            completedAt: completed ? new Date() : null,
           },
         }),
       );
-    }
 
-    if (updates.length > 0) {
-      await prisma.$transaction(updates);
-    }
-
-    return NextResponse.json({
-      ok: true,
-      updated: updates.length,
-      quests: assignments.map((a) => ({
-        key: a.quest.key,
-        progress: a.progress,
-        target: a.target,
-        completed: !!a.completedAt,
-      })),
+      return {
+        key: assignment.quest?.key ?? "",
+        progress: nextProgress,
+        target,
+        completed,
+      };
     });
+
+    if (updates.length) {
+      await db.$transaction(updates);
+    }
+
+    return NextResponse.json({ ok: true, updated: updates.length, quests: summaries });
   } catch (error) {
-    console.error('Quest track error:', error);
-    return NextResponse.json({ error: 'internal' }, { status: 500 });
+    console.error("Quest track error", error);
+    return NextResponse.json({ error: "internal" }, { status: 500 });
   }
 }

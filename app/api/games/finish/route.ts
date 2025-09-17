@@ -1,106 +1,116 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-export const runtime = 'nodejs';
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { z } from "zod";
+
+import { GAME_FLAGS } from "@/config/games";
+import { logger } from "@/app/lib/logger";
+import { db } from "@/lib/db";
+
+export const runtime = "nodejs";
 export const maxDuration = 10;
-
-import { NextResponse } from 'next/server';
-import { log } from '@/lib/logger';
-import { prisma } from '@/app/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { GAME_FLAGS } from '@/config/games';
-
-type LeaderboardScore = {
-  id: string;
-  userId: string;
-  game: string;
-  diff: string | null;
-  score: number;
-  statsJson: any;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type Body = {
-  game: string;
-  score: number;
-  durationMs?: number;
-  stats?: any; // e.g., { diff?: "easy"|"normal"|"hard"|"insane", ... }
-};
 
 const MAX_TOP = 25;
 
-export async function POST(req: Request) {
+const BodySchema = z.object({
+  game: z.string().min(1),
+  score: z.number(),
+  durationMs: z.number().optional(),
+  stats: z
+    .object({
+      diff: z.string().optional(),
+    })
+    .catch({}),
+});
+
+type Body = z.infer<typeof BodySchema>;
+
+type LeaderboardEntry = {
+  userId: string;
+  score: number;
+  diff: string | null;
+  updatedAt: Date;
+};
+
+export async function POST(request: Request) {
   const { userId } = await auth();
-  const body = (await req.json().catch(() => null)) as Body | null;
-  if (!body?.game || typeof body.score !== 'number') {
-    return NextResponse.json({ ok: false, error: 'bad_input' }, { status: 400 });
+  const parsed = BodySchema.safeParse(await request.json().catch(() => null));
+
+  if (!parsed.success) {
+    return NextResponse.json({ ok: false, error: "bad_input" }, { status: 400 });
   }
 
-  // clamp score defensively
-  const score = Math.max(0, Math.min(body.score | 0, 10_000_000));
-  const game = String(body.game);
-  const diff = typeof body.stats?.diff === 'string' ? body.stats.diff : null;
+  const body = parsed.data;
+  const flags = GAME_FLAGS[body.game as keyof typeof GAME_FLAGS];
 
-  // Check game flags
-  const flags = GAME_FLAGS[game as keyof typeof GAME_FLAGS];
   if (!flags?.enabled) {
-    return NextResponse.json({ ok: false, error: 'game_disabled' }, { status: 400 });
+    return NextResponse.json({ ok: false, error: "game_disabled" }, { status: 400 });
   }
+
   if (flags.practice) {
-    // Practice mode: don't grant petals/achievements/leaderboard
     return NextResponse.json({ ok: true, practice: true });
   }
 
-  // Guest users can play but won't get economy rewards
+  const score = clamp(Math.trunc(body.score), 0, 10_000_000);
+  const diff = typeof body.stats.diff === "string" ? body.stats.diff : null;
+
   if (!userId) {
-    return NextResponse.json({ ok: true, guest: true });
+    return NextResponse.json({ ok: true, guest: true, score });
   }
 
-  // Economy: grant petals and unlock achievements based on game + score
-  // NOTE: Replace placeholders with your existing prisma PetalLedger/Achievement logic
-  let petalsGranted = 0;
-  const grants: Record<string, (s: number) => number> = {
-    samurai_petal_slice: (s) => clamp(mapRange(s, 0, 5000, 5, 35), 0, 50),
-    anime_memory_match: (s) => clamp(mapRange(s, 0, 2000, 5, 25), 0, 30),
-    bubble_pop_gacha: (s) => clamp(mapRange(s, 0, 1500, 5, 20), 0, 25),
-    rhythm_beat_em_up: (s) => clamp(mapRange(s, 0, 8000, 10, 60), 0, 80),
-  };
+  const petalsGranted = calculatePetals(body.game, score);
+
+  if (petalsGranted > 0) {
+    logger.info("petals_granted", { userId, game: body.game, score, petalsGranted });
+    // TODO: integrate with petals ledger + achievements once migrations are stable
+  }
+
+  let personalBest = false;
+
   try {
-    petalsGranted = Math.round((grants[game] ?? (() => 0))(score));
-    if (petalsGranted > 0) {
-      // await prisma.petalLedger.create({ data: { userId, amount: petalsGranted, kind: "earn", reason: `game:${game}` } });
-      log('petals_granted', { userId, game, score, petalsGranted });
-    }
-    // Special Samurai cheevos (examples)
-    // if (game === "samurai_petal_slice" && score >= 4000) await unlock("zen_is_a_lie");
-    // if (game === "samurai_petal_slice" && body.stats?.noHit) await unlock("dont_touch_my_petals");
-  } catch (e) {
-    log('finish_grant_error', { message: String(e) });
-  }
+    const previous = await db.leaderboardScore.findUnique({
+      where: {
+        userId_game_diff: {
+          userId,
+          game: body.game,
+          diff,
+        },
+      },
+    });
 
-  // Save personal best (if authed)
-  let newPersonalBest = false;
-  if (userId) {
-    try {
-      const prev = await prisma.leaderboardScore.findUnique({
-        where: { userId_game_diff: { userId, game, diff } },
+    if (!previous || score > previous.score) {
+      await db.leaderboardScore.upsert({
+        where: {
+          userId_game_diff: {
+            userId,
+            game: body.game,
+            diff,
+          },
+        },
+        create: {
+          userId,
+          game: body.game,
+          diff,
+          score,
+          statsJson: body.stats ?? {},
+        },
+        update: {
+          score,
+          statsJson: body.stats ?? {},
+        },
       });
-      if (!prev || score > prev.score) {
-        await prisma.leaderboardScore.upsert({
-          where: { userId_game_diff: { userId, game, diff } },
-          create: { userId, game, diff, score, statsJson: body.stats ?? {} },
-          update: { score, statsJson: body.stats ?? {} },
-        });
-        newPersonalBest = true;
-      }
-    } catch (e) {
-      console.error('leaderboard upsert error', e);
+
+      personalBest = true;
     }
+  } catch (error) {
+    logger.error("leaderboard upsert error", { extra: { error } });
   }
 
-  // Top board slice (public)
-  const top = await prisma.leaderboardScore.findMany({
-    where: { game, ...(diff ? { diff } : {}) },
-    orderBy: [{ score: 'desc' }, { updatedAt: 'asc' }],
+  const top = await db.leaderboardScore.findMany({
+    where: {
+      game: body.game,
+      ...(diff ? { diff } : {}),
+    },
+    orderBy: [{ score: "desc" }, { updatedAt: "asc" }],
     take: MAX_TOP,
   });
 
@@ -108,21 +118,37 @@ export async function POST(req: Request) {
     ok: true,
     score,
     petalsGranted,
-    personalBest: newPersonalBest,
-    top: top.map((t: LeaderboardScore) => ({
-      userId: t.userId,
-      score: t.score,
-      diff: t.diff,
-      when: t.updatedAt,
-    })),
+    personalBest,
+    top: top.map(formatLeaderboardEntry),
   });
 }
 
-function clamp(n: number, a: number, b: number) {
-  return Math.max(a, Math.min(b, n));
+function formatLeaderboardEntry(entry: LeaderboardEntry) {
+  return {
+    userId: entry.userId,
+    score: entry.score,
+    diff: entry.diff,
+    updatedAt: entry.updatedAt.toISOString(),
+  };
 }
-function mapRange(n: number, inMin: number, inMax: number, outMin: number, outMax: number) {
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number) {
   if (inMax === inMin) return outMin;
-  const t = (n - inMin) / (inMax - inMin);
+  const t = (value - inMin) / (inMax - inMin);
   return outMin + t * (outMax - outMin);
+}
+
+function calculatePetals(game: string, score: number) {
+  const grants: Record<string, (s: number) => number> = {
+    samurai_petal_slice: (s) => clamp(Math.round(mapRange(s, 0, 5000, 5, 35)), 0, 50),
+    anime_memory_match: (s) => clamp(Math.round(mapRange(s, 0, 2000, 5, 25)), 0, 30),
+    bubble_pop_gacha: (s) => clamp(Math.round(mapRange(s, 0, 1500, 5, 20)), 0, 25),
+    rhythm_beat_em_up: (s) => clamp(Math.round(mapRange(s, 0, 8000, 10, 60)), 0, 80),
+  };
+
+  return grants[game]?.(score) ?? 0;
 }

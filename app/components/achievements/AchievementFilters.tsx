@@ -1,4 +1,5 @@
-import React from 'react';
+import type { FC } from "react";
+
 interface AchievementFiltersProps {
   showUnlocked: boolean;
   showLocked: boolean;
@@ -7,7 +8,11 @@ interface AchievementFiltersProps {
   onToggleLocked: () => void;
   onToggleHidden: () => void;
 }
-export const AchievementFilters: React.FC<AchievementFiltersProps> = ({
+
+const buttonClasses = (active: boolean) =>
+  ["rounded px-3 py-1", active ? "bg-pink-500 text-white" : "bg-gray-200 text-gray-700"].join(" ");
+
+export const AchievementFilters: FC<AchievementFiltersProps> = ({
   showUnlocked,
   showLocked,
   showHidden,
@@ -16,22 +21,13 @@ export const AchievementFilters: React.FC<AchievementFiltersProps> = ({
   onToggleHidden,
 }) => (
   <div className="mb-4 flex space-x-2">
-    <button
-      onClick={onToggleUnlocked}
-      className={`rounded px-3 py-1 ${showUnlocked ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-    >
+    <button type="button" onClick={onToggleUnlocked} className={buttonClasses(showUnlocked)}>
       Unlocked
     </button>
-    <button
-      onClick={onToggleLocked}
-      className={`rounded px-3 py-1 ${showLocked ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-    >
+    <button type="button" onClick={onToggleLocked} className={buttonClasses(showLocked)}>
       Locked
     </button>
-    <button
-      onClick={onToggleHidden}
-      className={`rounded px-3 py-1 ${showHidden ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'}`}
-    >
+    <button type="button" onClick={onToggleHidden} className={buttonClasses(showHidden)}>
       Hidden
     </button>
   </div>
