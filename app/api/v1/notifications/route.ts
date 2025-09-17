@@ -1,144 +1,126 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { NotificationRequestSchema, NotificationResponseSchema } from '@/app/lib/contracts';
+﻿export const runtime = "nodejs";
 
-export const runtime = 'nodejs';
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { z } from "zod";
 
-export async function GET(request: NextRequest) {
+import { db } from "@/lib/db";
+
+const QuerySchema = z.object({
+  type: z.string().min(1).optional(),
+  read: z.enum(["true", "false"]).transform((value) => value === "true").optional(),
+  cursor: z.string().datetime().optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+const MarkReadSchema = z.object({
+  notificationIds: z.array(z.string().min(1)).min(1),
+});
+
+export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-
-    const queryParams = {
-      type: searchParams.get('type') || undefined,
-      read: searchParams.get('read') ? searchParams.get('read') === 'true' : undefined,
-      cursor: searchParams.get('cursor') || undefined,
-      limit: parseInt(searchParams.get('limit') || '20'),
-    };
-
-    const validatedParams = NotificationRequestSchema.parse(queryParams);
-
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
+    const params = QuerySchema.parse({
+      type: searchParams.get("type") ?? undefined,
+      read: searchParams.get("read") ?? undefined,
+      cursor: searchParams.get("cursor") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
     });
 
-    if (!currentUser) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
     }
 
-    // Build where clause
-    let whereClause: any = {
-      profileId: currentUser.id,
-    };
-
-    if (validatedParams.type) {
-      whereClause.type = validatedParams.type;
-    }
-
-    if (validatedParams.read !== undefined) {
-      whereClause.read = validatedParams.read;
-    }
-
-    if (validatedParams.cursor) {
-      whereClause.createdAt = {
-        lt: new Date(validatedParams.cursor),
-      };
-    }
-
-    // Get notifications
     const notifications = await db.notification.findMany({
-      where: whereClause,
-      orderBy: { createdAt: 'desc' },
-      take: validatedParams.limit + 1, // Take one extra to check if there are more
+      where: {
+        profileId: user.id,
+        ...(params.type ? { type: params.type } : {}),
+        ...(typeof params.read === "boolean" ? { read: params.read } : {}),
+        ...(params.cursor ? { createdAt: { lt: new Date(params.cursor) } } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      take: params.limit + 1,
     });
 
-    const hasMore = notifications.length > validatedParams.limit;
-    const notificationsToReturn = hasMore ? notifications.slice(0, -1) : notifications;
+    const hasMore = notifications.length > params.limit;
+    const sliced = hasMore ? notifications.slice(0, -1) : notifications;
 
-    // Get unread count
     const unreadCount = await db.notification.count({
       where: {
-        profileId: currentUser.id,
+        profileId: user.id,
         read: false,
       },
     });
 
-    // Build response
-    const responseData = {
-      notifications: notificationsToReturn.map((notification) => ({
-        id: notification.id,
-        profileId: notification.profileId,
-        type: notification.type,
-        payload: notification.payload as any,
-        read: notification.read,
-        createdAt: notification.createdAt.toISOString(),
-      })),
-      unreadCount,
-      nextCursor: hasMore
-        ? notificationsToReturn[notificationsToReturn.length - 1]?.createdAt.toISOString()
-        : undefined,
-      hasMore,
-    };
-
-    const validatedResponse = NotificationResponseSchema.parse(responseData);
-
-    return NextResponse.json({ ok: true, data: validatedResponse });
+    return NextResponse.json({
+      ok: true,
+      data: {
+        notifications: sliced.map((notification) => ({
+          id: notification.id,
+          profileId: notification.profileId,
+          type: notification.type,
+          payload: notification.payload,
+          read: notification.read,
+          createdAt: notification.createdAt.toISOString(),
+        })),
+        unreadCount,
+        nextCursor: hasMore ? sliced[sliced.length - 1]?.createdAt.toISOString() : undefined,
+        hasMore,
+      },
+    });
   } catch (error) {
-    console.error('Notifications fetch error:', error);
-
-    if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, error: "Invalid query parameters" }, { status: 400 });
     }
 
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    console.error("Notifications fetch error", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { notificationIds } = body;
+    const body = MarkReadSchema.parse(await request.json());
 
-    if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
-      return NextResponse.json({ ok: false, error: 'Invalid notification IDs' }, { status: 400 });
-    }
-
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
     });
 
-    if (!currentUser) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
     }
 
-    // Mark notifications as read
     await db.notification.updateMany({
       where: {
-        id: { in: notificationIds },
-        profileId: currentUser.id,
+        id: { in: body.notificationIds },
+        profileId: user.id,
       },
-      data: {
-        read: true,
-      },
+      data: { read: true },
     });
 
     return NextResponse.json({ ok: true, data: { success: true } });
   } catch (error) {
-    console.error('Mark notifications read error:', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, error: "Invalid request" }, { status: 400 });
+    }
+
+    console.error("Mark notifications read error", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }

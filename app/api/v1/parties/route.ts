@@ -1,157 +1,198 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { PartyCreateSchema, PartyListRequestSchema } from '@/app/lib/contracts';
-import { logger } from '@/app/lib/logger';
+﻿import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { z } from "zod";
 
-export async function GET(request: NextRequest) {
+import { db } from "@/lib/db";
+import { logger } from "@/app/lib/logger";
+
+const ListQuerySchema = z.object({
+  gameMode: z.string().min(1).optional(),
+  status: z.string().min(1).optional(),
+  isPublic: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const CreateSchema = z.object({
+  name: z.string().min(1).max(50),
+  description: z.string().max(200).optional(),
+  maxMembers: z.coerce.number().int().min(2).max(8).default(4),
+  isPublic: z.boolean().default(true),
+  gameMode: z.string().min(1).optional(),
+  settings: z.record(z.any()).optional(),
+});
+
+const memberSelect = {
+  id: true,
+  username: true,
+  display_name: true,
+  avatarUrl: true,
+} as const;
+
+export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const query = {
-      gameMode: searchParams.get('gameMode') || undefined,
-      status: searchParams.get('status') || undefined,
-      isPublic: searchParams.get('isPublic') ? searchParams.get('isPublic') === 'true' : undefined,
-      limit: parseInt(searchParams.get('limit') || '20'),
-      offset: parseInt(searchParams.get('offset') || '0'),
-    };
+    const params = ListQuerySchema.parse({
+      gameMode: searchParams.get("gameMode") ?? undefined,
+      status: searchParams.get("status") ?? undefined,
+      isPublic: searchParams.get("isPublic") ?? undefined,
+      limit: searchParams.get("limit") ?? undefined,
+      offset: searchParams.get("offset") ?? undefined,
+    });
 
-    const validatedQuery = PartyListRequestSchema.parse(query);
-
-    // Build where clause
-    const where: any = {};
-    if (validatedQuery.gameMode) where.gameMode = validatedQuery.gameMode;
-    if (validatedQuery.status) where.status = validatedQuery.status;
-    if (validatedQuery.isPublic !== undefined) where.isPublic = validatedQuery.isPublic;
-
-    // Get parties with member count
     const [parties, totalCount] = await Promise.all([
       db.party.findMany({
-        where,
+        where: {
+          ...(params.gameMode ? { gameMode: params.gameMode } : {}),
+          ...(params.status ? { status: params.status } : {}),
+          ...(typeof params.isPublic === "boolean" ? { isPublic: params.isPublic } : {}),
+        },
         include: {
-          leader: {
-            select: {
-              id: true,
-              username: true,
-              display_name: true,
-              avatarUrl: true,
-            },
-          },
+          leader: { select: memberSelect },
           members: {
             include: {
-              user: {
-                select: {
-                  id: true,
-                  username: true,
-                  display_name: true,
-                  avatarUrl: true,
-                },
-              },
+              user: { select: memberSelect },
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
-        take: validatedQuery.limit,
-        skip: validatedQuery.offset,
+        orderBy: { createdAt: "desc" },
+        take: params.limit,
+        skip: params.offset,
       }),
-      db.party.count({ where }),
+      db.party.count({
+        where: {
+          ...(params.gameMode ? { gameMode: params.gameMode } : {}),
+          ...(params.status ? { status: params.status } : {}),
+          ...(typeof params.isPublic === "boolean" ? { isPublic: params.isPublic } : {}),
+        },
+      }),
     ]);
-
-    // Transform parties to include member count
-    const transformedParties = parties.map((party) => ({
-      ...party,
-      memberCount: party.members.length,
-      createdAt: party.createdAt.toISOString(),
-      updatedAt: party.updatedAt.toISOString(),
-    }));
 
     return NextResponse.json({
       ok: true,
       data: {
-        parties: transformedParties,
+        parties: parties.map((party) => ({
+          id: party.id,
+          name: party.name,
+          description: party.description,
+          maxMembers: party.maxMembers,
+          isPublic: party.isPublic,
+          status: party.status,
+          gameMode: party.gameMode,
+          settings: party.settings,
+          createdAt: party.createdAt.toISOString(),
+          updatedAt: party.updatedAt.toISOString(),
+          leader: party.leader,
+          members: party.members.map((member) => ({
+            id: member.id,
+            role: member.role,
+            joinedAt: member.joinedAt.toISOString(),
+            lastActiveAt: member.lastActiveAt.toISOString(),
+            user: member.user,
+          })),
+          memberCount: party.members.length,
+        })),
         totalCount,
-        hasMore: validatedQuery.offset + validatedQuery.limit < totalCount,
+        hasMore: params.offset + params.limit < totalCount,
       },
     });
   } catch (error) {
-    logger.error('Failed to fetch parties', {
-      extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
-    return NextResponse.json({ ok: false, error: 'Failed to fetch parties' }, { status: 500 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, error: "Invalid query parameters" }, { status: 400 });
+    }
+
+    logger.error("Failed to fetch parties", { extra: { error } });
+    return NextResponse.json({ ok: false, error: "Failed to fetch parties" }, { status: 500 });
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const validatedData = PartyCreateSchema.parse(body);
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
+    });
 
-    // Create party with leader as first member
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
+    }
+
+    const payload = CreateSchema.parse(await request.json());
+
     const party = await db.party.create({
       data: {
-        ...validatedData,
-        leaderId: userId,
+        name: payload.name,
+        description: payload.description,
+        maxMembers: payload.maxMembers,
+        isPublic: payload.isPublic,
+        gameMode: payload.gameMode,
+        settings: payload.settings,
+        leaderId: user.id,
         members: {
           create: {
-            userId: userId,
-            role: 'leader',
+            userId: user.id,
+            role: "leader",
           },
         },
       },
       include: {
-        leader: {
-          select: {
-            id: true,
-            username: true,
-            display_name: true,
-            avatarUrl: true,
-          },
-        },
+        leader: { select: memberSelect },
         members: {
           include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                display_name: true,
-                avatarUrl: true,
-              },
-            },
+            user: { select: memberSelect },
           },
         },
       },
     });
 
-    const transformedParty = {
-      ...party,
-      memberCount: party.members.length,
-      createdAt: party.createdAt.toISOString(),
-      updatedAt: party.updatedAt.toISOString(),
-    };
-
-    logger.info('Party created', { extra: { partyId: party.id, leaderId: userId } });
+    logger.info("Party created", { extra: { partyId: party.id, leaderId: user.id } });
 
     return NextResponse.json(
       {
         ok: true,
-        data: transformedParty,
+        data: {
+          id: party.id,
+          name: party.name,
+          description: party.description,
+          maxMembers: party.maxMembers,
+          isPublic: party.isPublic,
+          status: party.status,
+          gameMode: party.gameMode,
+          settings: party.settings,
+          createdAt: party.createdAt.toISOString(),
+          updatedAt: party.updatedAt.toISOString(),
+          leader: party.leader,
+          members: party.members.map((member) => ({
+            id: member.id,
+            role: member.role,
+            joinedAt: member.joinedAt.toISOString(),
+            lastActiveAt: member.lastActiveAt.toISOString(),
+            user: member.user,
+          })),
+          memberCount: party.members.length,
+        },
       },
       { status: 201 },
     );
   } catch (error) {
-    logger.error('Failed to create party', {
-      extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
-    return NextResponse.json({ ok: false, error: 'Failed to create party' }, { status: 500 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, error: "Invalid request" }, { status: 400 });
+    }
+
+    logger.error("Failed to create party", { extra: { error } });
+    return NextResponse.json({ ok: false, error: "Failed to create party" }, { status: 500 });
   }
 }

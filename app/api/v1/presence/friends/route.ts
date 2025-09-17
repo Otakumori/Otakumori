@@ -1,70 +1,72 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-export const dynamic = 'force-dynamic';
+﻿export const dynamic = "force-dynamic";
 export const revalidate = 0;
-export const fetchCache = 'force-no-store';
-export const runtime = 'nodejs';
+export const fetchCache = "force-no-store";
+export const runtime = "nodejs";
 
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { FriendsPresenceResponseSchema } from '@/app/lib/contracts';
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { z } from "zod";
 
-export async function GET(_request: NextRequest) {
+import { db } from "@/lib/db";
+
+const FriendsPresenceSchema = z.object({
+  friends: z.array(
+    z.object({
+      profileId: z.string(),
+      status: z.string(),
+      lastSeen: z.string(),
+      activity: z.unknown(),
+      showActivity: z.boolean(),
+    }),
+  ),
+});
+
+export async function GET() {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
     });
 
-    if (!currentUser) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
     }
 
-    // Get mutual followers (friends)
     const friends = await db.user.findMany({
       where: {
-        AND: [
-          {
-            followers: {
-              some: { followerId: currentUser.id },
-            },
-          },
-          {
-            following: {
-              some: { followeeId: currentUser.id },
-            },
-          },
-        ],
+        followers: { some: { followerId: user.id } },
+        following: { some: { followeeId: user.id } },
       },
-      include: {
+      select: {
         presence: true,
       },
     });
 
-    // Get presence data for friends
-    const friendsPresence = friends
-      .filter((friend) => friend.presence)
-      .map((friend) => ({
-        profileId: friend.presence!.profileId,
-        status: friend.presence!.status,
-        lastSeen: friend.presence!.lastSeen.toISOString(),
-        activity: friend.presence!.activity as any,
-        showActivity: friend.presence!.showActivity,
-      }));
-
-    const response = FriendsPresenceResponseSchema.parse({
-      friends: friendsPresence,
+    const payload = FriendsPresenceSchema.parse({
+      friends: friends
+        .map((friend) => friend.presence)
+        .filter((presence): presence is NonNullable<typeof presence> => Boolean(presence))
+        .map((presence) => ({
+          profileId: presence.profileId,
+          status: presence.status,
+          lastSeen: presence.lastSeen.toISOString(),
+          activity: presence.activity,
+          showActivity: presence.showActivity,
+        })),
     });
 
-    return NextResponse.json({ ok: true, data: response });
+    return NextResponse.json({ ok: true, data: payload });
   } catch (error) {
-    console.error('Friends presence error:', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, error: "Invalid data" }, { status: 400 });
+    }
+
+    console.error("Friends presence error", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }
