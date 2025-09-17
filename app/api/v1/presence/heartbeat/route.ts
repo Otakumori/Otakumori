@@ -1,58 +1,71 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { PresenceUpdateSchema } from '@/app/lib/contracts';
+﻿export const runtime = "nodejs";
 
-export const runtime = 'nodejs';
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { z } from "zod";
 
-export async function POST(request: NextRequest) {
+import { db } from "@/lib/db";
+
+const HeartbeatSchema = z.object({
+  status: z.string().min(1),
+  activity: z.unknown().optional(),
+  showActivity: z.boolean().optional(),
+});
+
+export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json();
-    const validatedData = PresenceUpdateSchema.parse(body);
+    const payload = HeartbeatSchema.parse(await request.json());
 
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
+    const user = await db.user.findUnique({
+      where: { clerkId },
+      select: { id: true },
     });
 
-    if (!currentUser) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
     }
 
-    // Update or create presence
+    const now = new Date();
+
     const presence = await db.presence.upsert({
-      where: { profileId: currentUser.id },
+      where: { profileId: user.id },
       update: {
-        status: validatedData.status,
-        activity: validatedData.activity || {},
-        showActivity: validatedData.showActivity,
-        lastSeen: new Date(),
-        updatedAt: new Date(),
+        status: payload.status,
+        activity: payload.activity ?? {},
+        ...(typeof payload.showActivity === "boolean" ? { showActivity: payload.showActivity } : {}),
+        lastSeen: now,
       },
       create: {
-        profileId: currentUser.id,
-        status: validatedData.status,
-        activity: validatedData.activity || {},
-        showActivity: validatedData.showActivity ?? true,
-        lastSeen: new Date(),
+        profileId: user.id,
+        status: payload.status,
+        activity: payload.activity ?? {},
+        showActivity: payload.showActivity ?? true,
+        lastSeen: now,
       },
     });
 
-    return NextResponse.json({ ok: true, data: presence });
+    return NextResponse.json({
+      ok: true,
+      data: {
+        profileId: presence.profileId,
+        status: presence.status,
+        lastSeen: presence.lastSeen.toISOString(),
+        activity: presence.activity,
+        showActivity: presence.showActivity,
+        updatedAt: presence.updatedAt.toISOString(),
+      },
+    });
   } catch (error) {
-    console.error('Presence heartbeat error:', error);
-
-    if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ ok: false, error: "Invalid input data" }, { status: 400 });
     }
 
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    console.error("Presence heartbeat error", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
 }

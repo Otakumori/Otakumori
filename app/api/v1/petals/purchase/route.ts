@@ -1,117 +1,114 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { z } from 'zod';
-import { db } from '@/lib/db';
+﻿export const runtime = "nodejs";
 
-export const runtime = 'nodejs';
+import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { InventoryKind } from "@prisma/client";
+import { z } from "zod";
 
-const PurchaseRequestSchema = z.object({
+import { db } from "@/lib/db";
+
+const PurchaseSchema = z.object({
   itemId: z.string().min(1),
   idempotencyKey: z.string().min(1),
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    // Verify authentication
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    const { userId: clerkId } = await auth();
+    if (!clerkId) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
     }
 
-    // Parse and validate request
-    const body = await request.json();
-    const validatedData = PurchaseRequestSchema.parse(body);
+    const payload = PurchaseSchema.parse(await request.json());
 
-    // Check idempotency
     const existingKey = await db.idempotencyKey.findUnique({
-      where: { key: validatedData.idempotencyKey },
+      where: { key: payload.idempotencyKey },
     });
 
     if (existingKey) {
-      return NextResponse.json({ ok: false, error: 'Duplicate request' }, { status: 409 });
+      return NextResponse.json({ ok: false, error: "Duplicate request" }, { status: 409 });
     }
 
-    // Create idempotency key
-    await db.idempotencyKey.create({
-      data: { key: validatedData.idempotencyKey, purpose: 'petal_purchase' },
-    });
-
-    // Get user
     const user = await db.user.findUnique({
-      where: { clerkId: userId },
+      where: { clerkId },
+      select: { id: true, petalBalance: true },
     });
 
     if (!user) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
     }
 
-    // Get shop item
-    const shopItem = await db.petalShopItem.findUnique({
-      where: { id: validatedData.itemId },
+    const item = await db.petalShopItem.findUnique({
+      where: { id: payload.itemId },
     });
 
-    if (!shopItem) {
-      return NextResponse.json({ ok: false, error: 'Item not found' }, { status: 404 });
+    if (!item) {
+      return NextResponse.json({ ok: false, error: "Item not found" }, { status: 404 });
     }
 
-    // Check if user has enough petals
-    if (!shopItem.pricePetals) {
-      return NextResponse.json({ ok: false, error: 'Item has no price set' }, { status: 400 });
+    if (item.pricePetals == null) {
+      return NextResponse.json({ ok: false, error: "Item has no price" }, { status: 400 });
     }
 
-    if (user.petalBalance < shopItem.pricePetals) {
-      return NextResponse.json({ ok: false, error: 'Insufficient petals' }, { status: 400 });
+    if (user.petalBalance < item.pricePetals) {
+      return NextResponse.json({ ok: false, error: "Insufficient petals" }, { status: 400 });
     }
 
-    // Check if user already owns this item
-    const existingItem = await db.inventoryItem.findFirst({
+    const alreadyOwned = await db.inventoryItem.findFirst({
       where: {
         userId: user.id,
-        sku: shopItem.sku,
+        sku: item.sku,
+      },
+      select: { id: true },
+    });
+
+    if (alreadyOwned) {
+      return NextResponse.json({ ok: false, error: "Item already owned" }, { status: 400 });
+    }
+
+    await db.idempotencyKey.create({
+      data: {
+        key: payload.idempotencyKey,
+        purpose: "petal_purchase",
       },
     });
 
-    if (existingItem) {
-      return NextResponse.json({ ok: false, error: 'Item already owned' }, { status: 400 });
-    }
-
-    // Begin transaction
     const result = await db.$transaction(async (tx) => {
-      // Deduct petals from user balance
       const updatedUser = await tx.user.update({
         where: { id: user.id },
-        data: { petalBalance: { decrement: shopItem.pricePetals! } },
+        data: {
+          petalBalance: {
+            decrement: item.pricePetals ?? 0,
+          },
+        },
+        select: { petalBalance: true },
       });
 
-      // Add item to user's inventory
       const inventoryItem = await tx.inventoryItem.create({
         data: {
           userId: user.id,
-          sku: shopItem.sku,
-          kind: shopItem.kind as any, // Cast to InventoryKind enum
+          sku: item.sku,
+          kind: normalizeInventoryKind(item.kind),
           metadata: {
-            source: 'purchase',
-            shopItemId: shopItem.id,
+            source: "petal_shop",
+            shopItemId: item.id,
             purchasedAt: new Date().toISOString(),
           },
         },
       });
 
-      // Record the transaction in petal ledger
-      const petalTransaction = await tx.petalLedger.create({
+      await tx.petalLedger.create({
         data: {
           userId: user.id,
-          type: 'spend',
-          amount: shopItem.pricePetals!,
-          reason: `Purchase: ${shopItem.name}`,
+          type: "spend",
+          amount: item.pricePetals ?? 0,
+          reason: `Purchase:${item.sku}`,
         },
       });
 
       return {
-        updatedUser,
+        newBalance: updatedUser.petalBalance,
         inventoryItem,
-        petalTransaction,
       };
     });
 
@@ -119,23 +116,35 @@ export async function POST(request: NextRequest) {
       ok: true,
       data: {
         itemId: result.inventoryItem.id,
-        petalsSpent: shopItem.pricePetals,
-        newBalance: result.updatedUser.petalBalance,
+        petalsSpent: item.pricePetals,
+        newBalance: result.newBalance,
         item: {
-          id: shopItem.id,
-          name: shopItem.name,
-          sku: shopItem.sku,
-          kind: shopItem.kind,
+          id: item.id,
+          name: item.name,
+          sku: item.sku,
+          kind: item.kind,
         },
       },
     });
   } catch (error) {
-    console.error('Error processing purchase:', error);
-
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Invalid request data" }, { status: 400 });
     }
 
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    console.error("Error processing petal purchase", error);
+    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
   }
+}
+
+function normalizeInventoryKind(kind: string | null | undefined): InventoryKind {
+  if (!kind) {
+    return InventoryKind.COSMETIC;
+  }
+
+  const normalized = kind.toUpperCase();
+  if ((InventoryKind as Record<string, InventoryKind>)[normalized]) {
+    return (InventoryKind as Record<string, InventoryKind>)[normalized];
+  }
+
+  return InventoryKind.COSMETIC;
 }
