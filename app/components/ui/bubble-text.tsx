@@ -1,36 +1,34 @@
-'use client';
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface BubbleTextProps {
   text: string;
   className?: string;
 }
 
-const BubbleText = ({ text, className = '' }: BubbleTextProps) => {
+export function BubbleText({ text, className }: BubbleTextProps) {
   return (
-    <div className={`relative ${className}`}>
-      {text.split('').map((char, index) => (
+    <div className={cn("relative", className)}>
+      {text.split("").map((character, index) => (
         <motion.span
-          key={index}
+          key={`${character}-${index}`}
           className="inline-block"
           initial={{ y: 0 }}
-          animate={{
-            y: [0, -10, 0],
-          }}
+          animate={{ y: [0, -10, 0] }}
           transition={{
             duration: 1.5,
             repeat: Infinity,
             delay: index * 0.1,
-            ease: 'easeInOut',
+            ease: "easeInOut",
           }}
         >
-          {char === ' ' ? '\u00A0' : char}
+          {character === " " ? "\u00A0" : character}
         </motion.span>
       ))}
     </div>
   );
-};
+}
 
 export default BubbleText;

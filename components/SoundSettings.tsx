@@ -1,113 +1,74 @@
-'use client';
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { useSound } from '@/lib/hooks/useSound';
-import { useHaptic } from '@/lib/hooks/useHaptic';
-import { useState } from 'react';
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Volume2, VolumeX, Vibrate } from "lucide-react";
+import { useSound } from "@/lib/hooks/useSound";
+import { useHaptic } from "@/lib/hooks/useHaptic";
 
-export const SoundSettings = () => {
+export function SoundSettings() {
   const { playSound } = useSound();
   const { vibrate } = useHaptic();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (!isMuted) {
-      playSound('/assets/sounds/ui-click.mp3');
-    }
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (!next) {
+        void playSound("/assets/sounds/ui-click.mp3");
+      }
+      return next;
+    });
   };
 
   return (
     <div className="fixed bottom-4 left-4 z-50">
       <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="rounded-full bg-gray-800/50 p-3 shadow-lg backdrop-blur-lg"
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="rounded-full bg-gray-800/70 p-3 text-white shadow-lg backdrop-blur"
+        aria-expanded={isOpen}
+        aria-label="Sound settings"
       >
-        <span role="img" aria-label={isMuted ? 'Muted speaker' : 'Speaker'}>
-          {isMuted ? '🔇' : '🔊'}
-        </span>
+        {isMuted ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
       </motion.button>
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-16 left-0 rounded-lg bg-gray-800/50 p-4 shadow-lg backdrop-blur-lg"
+            className="absolute bottom-16 left-0 rounded-lg bg-gray-900/80 p-4 text-white shadow-lg backdrop-blur"
           >
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <span className="text-white">
-                  {
-                    <>
-                      <span role="img" aria-label="emoji">
-                        S
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        o
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        u
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        n
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        d
-                      </span>
-                    </>
-                  }
-                </span>
+            <div className="space-y-4 text-sm">
+              <div className="flex items-center justify-between">
+                <span>Sound</span>
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={toggleMute}
-                  className={`rounded-lg p-2 ${isMuted ? 'bg-red-500/20' : 'bg-green-500/20'}`}
+                  className="rounded-lg bg-white/10 p-2"
+                  aria-pressed={isMuted}
+                  aria-label={isMuted ? "Unmute" : "Mute"}
                 >
-                  <span role="img" aria-label={isMuted ? 'Muted speaker' : 'Speaker'}>
-                    {isMuted ? '🔇' : '🔊'}
-                  </span>
+                  {isMuted ? <VolumeX className="h-4 w-4" aria-hidden="true" /> : <Volume2 className="h-4 w-4" aria-hidden="true" />}
                 </motion.button>
               </div>
 
-              <div className="flex items-center space-x-3">
-                <span className="text-white">
-                  {
-                    <>
-                      <span role="img" aria-label="emoji">
-                        H
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        a
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        p
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        t
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        i
-                      </span>
-                      <span role="img" aria-label="emoji">
-                        c
-                      </span>
-                    </>
-                  }
-                </span>
+              <div className="flex items-center justify-between">
+                <span>Haptic</span>
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => vibrate('light')}
-                  className="rounded-lg bg-blue-500/20 p-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => vibrate("light")}
+                  className="rounded-lg bg-white/10 p-2"
+                  aria-label="Trigger haptic feedback"
                 >
-                  <span role="img" aria-label="Vibration">
-                    📳
-                  </span>
+                  <Vibrate className="h-4 w-4" aria-hidden="true" />
                 </motion.button>
               </div>
             </div>
@@ -116,4 +77,6 @@ export const SoundSettings = () => {
       </AnimatePresence>
     </div>
   );
-};
+}
+
+export default SoundSettings;
