@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ ok: false, code: 'UNAUTHENTICATED' }, { status: 401 });
   const key = userId;
-  const arr = (bins[key] ||= []);
+  const arr = bins[key] ?? (bins[key] = []);
   while (arr.length && now - arr[0] > windowMs) arr.shift();
   if (arr.length >= limit) {
     const res = NextResponse.json(

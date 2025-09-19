@@ -1,28 +1,37 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { NextResponse } from 'next/server';
-import { del } from '@vercel/blob';
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { NextResponse } from "next/server";
+import { del } from "@vercel/blob";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
-export const runtime = 'nodejs';
+export const runtime = "nodejs";
+
+function ensureBlobToken(): string {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) {
+    throw new Error("Missing BLOB_READ_WRITE_TOKEN");
+  }
+  return token;
+}
 
 async function requireAdmin() {
   const { userId } = await auth();
-  if (!userId) throw new Error('Unauthorized');
+  if (!userId) throw new Error("Unauthorized");
   const user = await currentUser();
-  const isAdmin = user?.publicMetadata?.role === 'admin';
-  if (!isAdmin) throw new Error('Forbidden');
+  const isAdmin = user?.publicMetadata?.role === "admin";
+  if (!isAdmin) throw new Error("Forbidden");
 }
 
 export async function POST(req: Request) {
   try {
     await requireAdmin();
     const { url } = await req.json();
-    if (!url) return NextResponse.json({ ok: false, error: 'Missing url' }, { status: 400 });
-    await del(url, { token: process.env.BLOB_READ_WRITE_TOKEN });
+    if (!url) return NextResponse.json({ ok: false, error: "Missing url" }, { status: 400 });
+
+    const token = ensureBlobToken();
+    await del(url, { token });
     return NextResponse.json({ ok: true });
   } catch (err: any) {
-    const message = err?.message || 'Delete error';
-    const code = message === 'Unauthorized' ? 401 : message === 'Forbidden' ? 403 : 500;
+    const message = err?.message || "Delete error";
+    const code = message === "Unauthorized" ? 401 : message === "Forbidden" ? 403 : 500;
     return NextResponse.json({ ok: false, error: message }, { status: code });
   }
 }
