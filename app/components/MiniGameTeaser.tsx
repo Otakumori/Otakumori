@@ -8,11 +8,23 @@ type Game = { id: string; slug: string; title: string; summary?: string };
 async function getGames(): Promise<Game[]> {
   // Always use localhost for now to avoid production URL issues
   const baseUrl = 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/v1/games/teaser?limit=3`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) return [];
-  return (await res.json()) as Game[];
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/games/teaser?limit=3`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) return [];
+    
+    const contentType = res.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      console.error('API returned non-JSON response:', contentType);
+      return [];
+    }
+    
+    return (await res.json()) as Game[];
+  } catch (error) {
+    console.error('Failed to fetch games:', error);
+    return [];
+  }
 }
 
 export default async function MiniGameTeaser() {
