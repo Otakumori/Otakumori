@@ -104,7 +104,7 @@ export default function Game({ mode }: Props) {
       cancelAnimationFrame(animationId);
       game.destroy();
     };
-  }, [mode, gameState.isRunning, gameState.isStunned]);
+  }, [mode]);
 
   // Handle petal clicks
   const handleCanvasClick = useCallback(

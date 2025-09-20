@@ -9,11 +9,23 @@ type Product = { id: string; name: string; price: number; image: string; slug?: 
 async function getFeatured(): Promise<Product[]> {
   // Always use localhost for now to avoid production URL issues
   const baseUrl = 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/v1/products/featured`, {
-    cache: 'no-store', // Force fresh data on each request
-  });
-  if (!res.ok) return [];
-  return (await res.json()) as Product[];
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/products/featured`, {
+      cache: 'no-store', // Force fresh data on each request
+    });
+    if (!res.ok) return [];
+    
+    const contentType = res.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      console.error('API returned non-JSON response:', contentType);
+      return [];
+    }
+    
+    return (await res.json()) as Product[];
+  } catch (error) {
+    console.error('Failed to fetch featured products:', error);
+    return [];
+  }
 }
 
 export default async function ShopTeaser() {

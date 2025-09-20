@@ -9,11 +9,23 @@ type Post = { id: string; slug: string; title: string; excerpt?: string; publish
 async function getPosts(): Promise<Post[]> {
   // Always use localhost for now to avoid production URL issues
   const baseUrl = 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/v1/content/blog?limit=3`, {
-    next: { revalidate: 120 },
-  });
-  if (!res.ok) return [];
-  return (await res.json()) as Post[];
+  try {
+    const res = await fetch(`${baseUrl}/api/v1/content/blog?limit=3`, {
+      next: { revalidate: 120 },
+    });
+    if (!res.ok) return [];
+    
+    const contentType = res.headers.get('content-type');
+    if (!contentType?.includes('application/json')) {
+      console.error('API returned non-JSON response:', contentType);
+      return [];
+    }
+    
+    return (await res.json()) as Post[];
+  } catch (error) {
+    console.error('Failed to fetch blog posts:', error);
+    return [];
+  }
 }
 
 export default async function BlogTeaser() {
