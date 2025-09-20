@@ -119,7 +119,7 @@ export default function AdminMediaPage() {
           className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           disabled={loading}
         >
-          {loading ? "Refreshing…" : "Refresh"}
+          {loading ? "Refreshing..." : "Refresh"}
         </button>
       </header>
 
@@ -151,7 +151,7 @@ export default function AdminMediaPage() {
             className="rounded-xl bg-neutral-900 px-4 py-2 text-sm text-white hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-neutral-900"
             disabled={uploading}
           >
-            {uploading ? "Uploading…" : "Select File"}
+            {uploading ? "Uploading..." : "Select File"}
           </button>
         </div>
         {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -161,7 +161,7 @@ export default function AdminMediaPage() {
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Library</h2>
           <div className="text-sm text-neutral-500 dark:text-neutral-400">
-            {blobs.length} item{blobs.length === 1 ? "" : "s"} • {totalSize} MB total
+            {blobs.length} item{blobs.length === 1 ? "" : "s"} â€¢ {totalSize} MB total
           </div>
         </div>
 

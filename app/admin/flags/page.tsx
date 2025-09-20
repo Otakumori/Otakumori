@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 
-type FlagCategory = "events" | "gameplay" | "economy" | "admin";
+type FlagCategory = 'events' | 'gameplay' | 'economy' | 'admin';
 
 interface FeatureFlag {
   id: string;
@@ -21,32 +21,32 @@ interface FlagsResponse {
 
 const DEFAULT_FLAGS: FeatureFlag[] = [
   {
-    id: "event_hanami",
-    name: "Hanami Event",
-    description: "Enable cherry blossom festival content and rewards",
+    id: 'event_hanami',
+    name: 'Hanami Event',
+    description: 'Enable cherry blossom festival content and rewards',
     enabled: true,
-    category: "events",
+    category: 'events',
   },
   {
-    id: "crit_rate_boost",
-    name: "Critical Rate Boost",
-    description: "Increase critical hit chance in mini-games by 15%",
+    id: 'crit_rate_boost',
+    name: 'Critical Rate Boost',
+    description: 'Increase critical hit chance in mini-games by 15%',
     enabled: false,
-    category: "gameplay",
+    category: 'gameplay',
   },
   {
-    id: "daily_limit_removal",
-    name: "Remove Daily Limits",
-    description: "Allow unlimited petal earning per day",
+    id: 'daily_limit_removal',
+    name: 'Remove Daily Limits',
+    description: 'Allow unlimited petal earning per day',
     enabled: false,
-    category: "economy",
+    category: 'economy',
   },
   {
-    id: "admin_debug_mode",
-    name: "Admin Debug Mode",
-    description: "Show debug info and testing tools",
+    id: 'admin_debug_mode',
+    name: 'Admin Debug Mode',
+    description: 'Show debug info and testing tools',
     enabled: false,
-    category: "admin",
+    category: 'admin',
   },
 ];
 
@@ -60,7 +60,7 @@ export default function AdminFlagsPage() {
 
   const loadFlags = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/flags", { cache: "no-store" });
+      const response = await fetch('/api/admin/flags', { cache: 'no-store' });
       if (!response.ok) return;
 
       const data = (await response.json()) as FlagsResponse;
@@ -68,7 +68,7 @@ export default function AdminFlagsPage() {
         setFlags(data.flags);
       }
     } catch (error) {
-      console.error("Failed to load flags", error);
+      console.error('Failed to load flags', error);
     } finally {
       setLoading(false);
     }
@@ -77,58 +77,53 @@ export default function AdminFlagsPage() {
   useEffect(() => {
     if (!isLoaded) return;
     if (!user) {
-      router.replace("/login");
+      router.replace('/login');
       return;
     }
 
     const role = user.publicMetadata?.role as string | undefined;
-    if (role !== "admin") {
-      router.replace("/");
+    if (role !== 'admin') {
+      router.replace('/');
       return;
     }
 
     void loadFlags();
   }, [isLoaded, loadFlags, router, user]);
 
-  const toggleFlag = useCallback(
-    async (flagId: string) => {
-      setSaving(true);
-      try {
-        const response = await fetch("/api/admin/flags", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ flagId, action: "toggle" }),
-        });
+  const toggleFlag = useCallback(async (flagId: string) => {
+    setSaving(true);
+    try {
+      const response = await fetch('/api/admin/flags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flagId, action: 'toggle' }),
+      });
 
-        if (!response.ok) return;
-        const data = (await response.json()) as FlagsResponse;
-        if (!data.ok) return;
+      if (!response.ok) return;
+      const data = (await response.json()) as FlagsResponse;
+      if (!data.ok) return;
 
-        setFlags((current) =>
-          current.map((flag) =>
-            flag.id === flagId ? { ...flag, enabled: !flag.enabled } : flag,
-          ),
-        );
-      } catch (error) {
-        console.error("Failed to toggle flag", error);
-      } finally {
-        setSaving(false);
-      }
-    },
-    [],
-  );
+      setFlags((current) =>
+        current.map((flag) => (flag.id === flagId ? { ...flag, enabled: !flag.enabled } : flag)),
+      );
+    } catch (error) {
+      console.error('Failed to toggle flag', error);
+    } finally {
+      setSaving(false);
+    }
+  }, []);
 
   const resetFlags = useCallback(async () => {
-    if (!window.confirm("Reset all flags to defaults? This cannot be undone.")) {
+    if (!window.confirm('Reset all flags to defaults? This cannot be undone.')) {
       return;
     }
 
     setSaving(true);
     try {
-      const response = await fetch("/api/admin/flags", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reset" }),
+      const response = await fetch('/api/admin/flags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset' }),
       });
 
       if (!response.ok) return;
@@ -137,7 +132,7 @@ export default function AdminFlagsPage() {
 
       setFlags(DEFAULT_FLAGS);
     } catch (error) {
-      console.error("Failed to reset flags", error);
+      console.error('Failed to reset flags', error);
     } finally {
       setSaving(false);
     }
@@ -164,7 +159,7 @@ export default function AdminFlagsPage() {
       <div className="flex min-h-screen items-center justify-center bg-neutral-950 text-neutral-100">
         <div className="text-center">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-pink-500" />
-          <p className="mt-4 text-neutral-400">Loading admin panel…</p>
+          <p className="mt-4 text-neutral-400">Loading admin panel...</p>
         </div>
       </div>
     );
@@ -175,9 +170,7 @@ export default function AdminFlagsPage() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-pink-400">Feature Flags</h1>
-          <p className="mt-2 text-neutral-400">
-            Control system features and experimental content
-          </p>
+          <p className="mt-2 text-neutral-400">Control system features and experimental content</p>
         </header>
 
         <div className="mb-6 flex gap-4">
@@ -202,11 +195,14 @@ export default function AdminFlagsPage() {
         {Object.entries(groupedFlags).map(([category, categoryFlags]) => (
           <section key={category} className="mb-8">
             <h2 className="mb-4 text-xl font-semibold capitalize text-white">
-              {category.replace("_", " ")}
+              {category.replace('_', ' ')}
             </h2>
             <div className="grid gap-4">
               {categoryFlags.map((flag) => (
-                <article key={flag.id} className="rounded-lg border border-neutral-800 bg-neutral-900 p-4">
+                <article
+                  key={flag.id}
+                  className="rounded-lg border border-neutral-800 bg-neutral-900 p-4"
+                >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1">
                       <h3 className="font-medium text-white">{flag.name}</h3>
