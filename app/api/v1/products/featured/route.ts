@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     // Use our v1 Printify API instead of calling Printify directly
-    const baseUrl = env.NEXT_PUBLIC_APP_URL || `https://${request.headers.get('host')}`;
-    const response = await fetch(`${baseUrl}/api/v1/printify/products`, {
+    const baseUrl = 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/printify/products`, {
       cache: 'no-store',
     });
 

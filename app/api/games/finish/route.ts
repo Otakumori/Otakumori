@@ -60,44 +60,41 @@ export async function POST(request: Request) {
   const petalsGranted = calculatePetals(body.game, score);
 
   if (petalsGranted > 0) {
-    logger.info("petals_granted", { userId, game: body.game, score, petalsGranted });
+    logger.info("petals_granted", { userId, extra: { game: body.game, score, petalsGranted } });
     // TODO: integrate with petals ledger + achievements once migrations are stable
   }
 
   let personalBest = false;
 
   try {
-    const previous = await db.leaderboardScore.findUnique({
+    const previous = await db.leaderboardScore.findFirst({
       where: {
-        userId_game_diff: {
-          userId,
-          game: body.game,
-          diff,
-        },
+        userId,
+        game: body.game,
+        diff: diff ?? null,
       },
     });
 
     if (!previous || score > previous.score) {
-      await db.leaderboardScore.upsert({
-        where: {
-          userId_game_diff: {
+      if (previous) {
+        await db.leaderboardScore.update({
+          where: { id: previous.id },
+          data: {
+            score,
+            statsJson: body.stats ?? {},
+          },
+        });
+      } else {
+        await db.leaderboardScore.create({
+          data: {
             userId,
             game: body.game,
-            diff,
+            diff: diff ?? null,
+            score,
+            statsJson: body.stats ?? {},
           },
-        },
-        create: {
-          userId,
-          game: body.game,
-          diff,
-          score,
-          statsJson: body.stats ?? {},
-        },
-        update: {
-          score,
-          statsJson: body.stats ?? {},
-        },
-      });
+        });
+      }
 
       personalBest = true;
     }

@@ -6,7 +6,8 @@ import { env } from '@/server/env';
 type Game = { id: string; slug: string; title: string; summary?: string };
 
 async function getGames(): Promise<Game[]> {
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  // Always use localhost for now to avoid production URL issues
+  const baseUrl = 'http://localhost:3000';
   const res = await fetch(`${baseUrl}/api/v1/games/teaser?limit=3`, {
     cache: 'no-store',
   });

@@ -58,12 +58,25 @@ export default function ConsoleCard({
     setIsReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }, []);
   useEffect(() => {
-    audio.preload([
-      ['gamecube_menu', '/sfx/gamecube-menu.mp3'],
-      ['samus_jingle', '/sfx/samus-jingle.mp3'],
-      ['boot_whoosh', '/sfx/boot_whoosh.mp3'],
-    ]);
-  }, []);
+    // Only preload audio if not in reduced motion mode and audio is supported
+    const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+    if (
+      !isReducedMotion &&
+      audioEnabled &&
+      typeof window !== 'undefined' &&
+      'AudioContext' in window
+    ) {
+      audio
+        .preload([
+          ['gamecube_menu', '/sfx/gamecube-menu.mp3'],
+          ['samus_jingle', '/sfx/samus-jingle.mp3'],
+          ['boot_whoosh', '/sfx/boot_whoosh.mp3'],
+        ])
+        .catch((error) => {
+          console.warn('Failed to preload audio files:', error);
+        });
+    }
+  }, [isReducedMotion]);
 
   // Boot gate once per session
   useEffect(() => {
@@ -125,7 +138,14 @@ export default function ConsoleCard({
         else if (face === 2) setFace(0);
         else if (face === 1) setFace(0);
         audio.unlock();
-        audio.play('gamecube_menu', { gain: 0.25 });
+        try {
+          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          if (audioEnabled) {
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
+        }
       }
       if (e.key === 'ArrowRight') {
         setAnimMs(isReducedMotion ? 100 : 180);
@@ -133,7 +153,14 @@ export default function ConsoleCard({
         else if (face === 1) setFace(0);
         else if (face === 2) setFace(0);
         audio.unlock();
-        audio.play('gamecube_menu', { gain: 0.25 });
+        try {
+          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          if (audioEnabled) {
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
+        }
       }
       // Vertical rotation between front/top/bottom
       if (e.key === 'ArrowUp') {
@@ -142,7 +169,14 @@ export default function ConsoleCard({
         else if (face === 3) setFace(0);
         else if (face === 4) setFace(0);
         audio.unlock();
-        audio.play('gamecube_menu', { gain: 0.25 });
+        try {
+          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          if (audioEnabled) {
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
+        }
       }
       if (e.key === 'ArrowDown') {
         setAnimMs(isReducedMotion ? 100 : 180);
@@ -150,7 +184,14 @@ export default function ConsoleCard({
         else if (face === 4) setFace(0);
         else if (face === 3) setFace(0);
         audio.unlock();
-        audio.play('gamecube_menu', { gain: 0.25 });
+        try {
+          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          if (audioEnabled) {
+            audio.play('gamecube_menu', { gain: 0.25 });
+          }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
+        }
       }
       if (e.key === 'Enter') {
         if (face === 1) router.push('/mini-games/games/petal-collection');
@@ -323,7 +364,18 @@ export default function ConsoleCard({
           onClick={() => {
             setFace(1);
             audio.unlock();
-            audio.play('gamecube_menu', { gain: 0.25 });
+            try {
+              try {
+                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                if (audioEnabled) {
+                  audio.play('gamecube_menu', { gain: 0.25 });
+                }
+              } catch (error) {
+                console.warn('Failed to play audio:', error);
+              }
+            } catch (error) {
+              console.warn('Failed to play audio:', error);
+            }
           }}
           aria-label="Go to Mini-Games"
         >
@@ -335,7 +387,18 @@ export default function ConsoleCard({
           onClick={() => {
             setFace(2);
             audio.unlock();
-            audio.play('gamecube_menu', { gain: 0.25 });
+            try {
+              try {
+                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                if (audioEnabled) {
+                  audio.play('gamecube_menu', { gain: 0.25 });
+                }
+              } catch (error) {
+                console.warn('Failed to play audio:', error);
+              }
+            } catch (error) {
+              console.warn('Failed to play audio:', error);
+            }
           }}
           aria-label="Go to Character and Community"
         >
@@ -347,7 +410,18 @@ export default function ConsoleCard({
           onClick={() => {
             setFace(3);
             audio.unlock();
-            audio.play('gamecube_menu', { gain: 0.25 });
+            try {
+              try {
+                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                if (audioEnabled) {
+                  audio.play('gamecube_menu', { gain: 0.25 });
+                }
+              } catch (error) {
+                console.warn('Failed to play audio:', error);
+              }
+            } catch (error) {
+              console.warn('Failed to play audio:', error);
+            }
           }}
           aria-label="Go to Music and Extras"
         >
@@ -359,7 +433,18 @@ export default function ConsoleCard({
           onClick={() => {
             setFace(4);
             audio.unlock();
-            audio.play('gamecube_menu', { gain: 0.25 });
+            try {
+              try {
+                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                if (audioEnabled) {
+                  audio.play('gamecube_menu', { gain: 0.25 });
+                }
+              } catch (error) {
+                console.warn('Failed to play audio:', error);
+              }
+            } catch (error) {
+              console.warn('Failed to play audio:', error);
+            }
           }}
           aria-label="Go to Trade Center"
         >
@@ -387,13 +472,43 @@ export default function ConsoleCard({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
         {(gamesMeta as Array<{ slug: string; name: string; icon: string; desc: string }>).map(
           (g) => (
-            <button
+            <div
               key={g.slug}
-              className="group relative rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500/60"
+              className="group relative rounded-lg border border-white/15 bg-white/10 p-3 sm:p-4 text-left hover:bg-white/15 focus-within:outline-none focus-within:ring-2 focus-within:ring-pink-500/60"
+              role="button"
+              tabIndex={0}
               onClick={() => {
-                audio.unlock();
-                audio.play('samus_jingle', { gain: 0.35 });
+                try {
+                  const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                  if (audioEnabled) {
+                    audio.unlock();
+                    // Small delay to ensure audio context is unlocked
+                    setTimeout(() => {
+                      audio.play('samus_jingle', { gain: 0.35 });
+                    }, 10);
+                  }
+                } catch (error) {
+                  console.warn('Failed to play audio:', error);
+                }
                 router.push(`/mini-games/games/${g.slug}`);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  try {
+                    const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                    if (audioEnabled) {
+                      audio.unlock();
+                      // Small delay to ensure audio context is unlocked
+                      setTimeout(() => {
+                        audio.play('samus_jingle', { gain: 0.35 });
+                      }, 10);
+                    }
+                  } catch (error) {
+                    console.warn('Failed to play audio:', error);
+                  }
+                  router.push(`/mini-games/games/${g.slug}`);
+                }
               }}
               aria-label={`Start ${g.name}`}
               data-testid="start-game"
@@ -434,7 +549,7 @@ export default function ConsoleCard({
                 <p className="text-xs text-zinc-300">{g.desc}</p>
                 <div className="mt-2 text-[10px] text-zinc-400">Press Enter/A to start</div>
               </div>
-            </button>
+            </div>
           ),
         )}
       </div>
@@ -1089,10 +1204,35 @@ function CommunityFace() {
       }
     };
     const connect = () => {
+      // Only connect if WebSocket is explicitly enabled
+      const wsEnabled = process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === '1';
+      console.log('WebSocket connection attempt:', {
+        wsEnabled,
+        envVar: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+        envVarType: typeof process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+      });
+
+      // Always disable WebSocket for now to prevent connection errors
+      // WebSocket is disabled by default to prevent "Insufficient resources" errors
+      if (
+        !wsEnabled ||
+        process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === 'false' ||
+        process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === undefined
+      ) {
+        console.log('WebSocket disabled, using polling instead');
+        setWsDegraded(true);
+        bc('ws.disabled');
+        startPolling();
+        return;
+      }
+
+      console.log('WebSocket enabled, proceeding with connection');
+
       let ws: WebSocket | null = null;
       try {
         const url =
           process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
+        console.log('Creating WebSocket connection to:', url);
         ws = new WebSocket(url);
       } catch (e) {
         setWsFailures((n) => n + 1);

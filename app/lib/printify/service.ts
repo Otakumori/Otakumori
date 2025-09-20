@@ -4,17 +4,57 @@ export interface PrintifyProduct {
   id: string;
   title: string;
   description: string;
+  safety_information?: string;
   tags: string[];
-  images: Array<{ src: string; alt?: string }>;
+  options: Array<{
+    name: string;
+    type: string;
+    values: Array<{
+      id: number;
+      title: string;
+      colors?: string[];
+    }>;
+  }>;
   variants: Array<{
-    id: string;
+    id: number;
     price: number;
+    title: string;
+    sku?: string;
+    grams: number;
     is_enabled: boolean;
-    in_stock: boolean;
+    is_default: boolean;
+    is_available: boolean;
+    is_printify_express_eligible: boolean;
+    options: number[];
+  }>;
+  images: Array<{
+    src: string;
+    variant_ids: number[];
+    position: string;
+    is_default: boolean;
   }>;
   visible: boolean;
+  blueprint_id: number;
+  print_provider_id: number;
+  user_id: number;
+  shop_id: number;
   created_at: string;
   updated_at: string;
+  is_locked: boolean;
+  is_printify_express_eligible: boolean;
+  is_economy_shipping_eligible: boolean;
+  is_printify_express_enabled?: boolean;
+  is_economy_shipping_enabled: boolean;
+  sales_channel_properties?: any;
+  views?: Array<{
+    id: number;
+    label: string;
+    position: string;
+    files: Array<{
+      src: string;
+      variant_ids: number[];
+    }>;
+  }>;
 }
 
 export interface PrintifyOrderItem {
@@ -57,6 +97,11 @@ export class PrintifyService {
   private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly shopId: string;
+  private readonly userAgent: string;
+  private requestCount = 0;
+  private lastResetTime = Date.now();
+  private readonly rateLimit = 600; // 600 requests per minute
+  private readonly catalogRateLimit = 100; // 100 requests per minute for catalog
 
   constructor() {
     const apiKey = process.env.PRINTIFY_API_KEY as string | undefined;
@@ -73,13 +118,48 @@ export class PrintifyService {
     this.apiKey = apiKey;
     this.shopId = shopId;
     this.baseUrl = 'https://api.printify.com/v1';
+    this.userAgent = 'Otaku-mori/1.0.0 (Node.js)';
   }
 
-  private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async checkRateLimit(isCatalogEndpoint = false): Promise<void> {
+    const now = Date.now();
+    const timeDiff = now - this.lastResetTime;
+
+    // Reset counter every minute
+    if (timeDiff >= 60000) {
+      this.requestCount = 0;
+      this.lastResetTime = now;
+    }
+
+    const limit = isCatalogEndpoint ? this.catalogRateLimit : this.rateLimit;
+
+    if (this.requestCount >= limit) {
+      const waitTime = 60000 - timeDiff;
+      logger.warn('printify_rate_limit_exceeded', undefined, {
+        requestCount: this.requestCount,
+        limit,
+        waitTime,
+        isCatalogEndpoint,
+      });
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
+      this.requestCount = 0;
+      this.lastResetTime = Date.now();
+    }
+  }
+
+  private async makeRequest<T>(
+    endpoint: string,
+    options: RequestInit = {},
+    isCatalogEndpoint = false,
+  ): Promise<T> {
+    // Check rate limit before making request
+    await this.checkRateLimit(isCatalogEndpoint);
+
     const url = `${this.baseUrl}${endpoint}`;
     const headers = {
       Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json;charset=utf-8',
+      'User-Agent': this.userAgent,
       ...options.headers,
     };
 
@@ -94,9 +174,26 @@ export class PrintifyService {
       });
 
       clearTimeout(timeoutId);
+      this.requestCount++;
 
       if (!response.ok) {
         const errorText = await response.text();
+
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After');
+          const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : 60000;
+
+          logger.warn('printify_rate_limit_429', undefined, {
+            endpoint,
+            retryAfter: waitTime,
+            isCatalogEndpoint,
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+          return this.makeRequest<T>(endpoint, options, isCatalogEndpoint);
+        }
+
         throw new Error(`Printify API error (${response.status}): ${errorText}`);
       }
 
@@ -110,19 +207,49 @@ export class PrintifyService {
   async getProducts(
     page = 1,
     perPage = 100,
-  ): Promise<{ data: PrintifyProduct[]; total: number; last_page: number }> {
+  ): Promise<{
+    data: PrintifyProduct[];
+    total: number;
+    last_page: number;
+    current_page: number;
+    per_page: number;
+    from: number;
+    to: number;
+    first_page_url?: string;
+    prev_page_url?: string;
+    next_page_url?: string;
+    last_page_url?: string;
+  }> {
     try {
+      // Ensure perPage doesn't exceed the maximum allowed by Printify API
+      const limit = Math.min(perPage, 50);
+
       const result = await this.makeRequest<{
         data: PrintifyProduct[];
         total: number;
         last_page: number;
         current_page: number;
-      }>(`/shops/${this.shopId}/products.json?page=${page}&per_page=${perPage}`);
+        per_page: number;
+        from: number;
+        to: number;
+        first_page_url?: string;
+        prev_page_url?: string;
+        next_page_url?: string;
+        last_page_url?: string;
+      }>(`/shops/${this.shopId}/products.json?page=${page}&per_page=${limit}`);
 
       return {
         data: result.data || [],
         total: result.total || 0,
         last_page: result.last_page || 1,
+        current_page: result.current_page || page,
+        per_page: result.per_page || limit,
+        from: result.from || 0,
+        to: result.to || 0,
+        first_page_url: result.first_page_url,
+        prev_page_url: result.prev_page_url,
+        next_page_url: result.next_page_url,
+        last_page_url: result.last_page_url,
       };
     } catch (error) {
       logger.error('printify_products_fetch_failed', undefined, {
@@ -222,11 +349,66 @@ export class PrintifyService {
   async getPrintProviders(): Promise<any[]> {
     try {
       const result = await this.makeRequest<{ data: any[] }>(
-        `/shops/${this.shopId}/print_providers.json`,
+        `/catalog/print_providers.json`,
+        {},
+        true, // This is a catalog endpoint
       );
       return result.data || [];
     } catch (error) {
       logger.error('printify_providers_fetch_failed', undefined, { error: String(error) });
+      throw error;
+    }
+  }
+
+  async getBlueprints(): Promise<any[]> {
+    try {
+      const result = await this.makeRequest<{ data: any[] }>(
+        `/catalog/blueprints.json`,
+        {},
+        true, // This is a catalog endpoint
+      );
+      return result.data || [];
+    } catch (error) {
+      logger.error('printify_blueprints_fetch_failed', undefined, { error: String(error) });
+      throw error;
+    }
+  }
+
+  async getBlueprint(blueprintId: number): Promise<any> {
+    try {
+      return await this.makeRequest<any>(
+        `/catalog/blueprints/${blueprintId}.json`,
+        {},
+        true, // This is a catalog endpoint
+      );
+    } catch (error) {
+      logger.error('printify_blueprint_fetch_failed', undefined, {
+        blueprintId,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  async getBlueprintVariants(
+    blueprintId: number,
+    printProviderId: number,
+    showOutOfStock = false,
+  ): Promise<any[]> {
+    try {
+      const result = await this.makeRequest<{ data: any[] }>(
+        `/catalog/blueprints/${blueprintId}/print_providers/${printProviderId}/variants.json?show-out-of-stock=${showOutOfStock ? 1 : 0}`,
+        {},
+        true, // This is a catalog endpoint
+      );
+      return result.data || [];
+    } catch (error) {
+      logger.error('printify_blueprint_variants_fetch_failed', undefined, {
+        blueprintId,
+        printProviderId,
+        showOutOfStock,
+        error: String(error),
+      });
       throw error;
     }
   }

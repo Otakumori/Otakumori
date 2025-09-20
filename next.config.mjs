@@ -69,9 +69,9 @@ const nextConfig = {
     const isProd = env.NODE_ENV === 'production';
 
     const securityHeaders = [
-      { key: "X-Frame-Options", value: "SAMEORIGIN" },
-      { key: "X-Content-Type-Options", value: "nosniff" },
-      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
     ];
 
     const cspCommon = [
@@ -80,10 +80,11 @@ const nextConfig = {
       "object-src 'none'",
       "img-src 'self' data: blob: https:",
       "media-src 'self' data: blob:",
-      "font-src 'self' data: https:",
-      "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      "connect-src 'self' https: wss://* ws://localhost:*",
+      "font-src 'self' data: https: https://fonts.gstatic.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com",
+      "worker-src 'self' blob:",
+      "connect-src 'self' https: wss://* ws://localhost:* webpack:",
       "frame-ancestors 'self'",
     ];
 
@@ -147,20 +148,17 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(
-  withBundleAnalyzer(nextConfig),
-  {
-    org: env.SENTRY_ORG || 'otaku-mori',
-    project: env.SENTRY_PROJECT || 'javascript-react',
-    // Pass the auth token
-    authToken: env.SENTRY_AUTH_TOKEN,
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
-    widenClientFileUpload: true,
-    // Reduce noise if token is missing (no uploads)
-    silent: !env.SENTRY_AUTH_TOKEN,
-    // Disable Sentry plugin telemetry logs
-    telemetry: false,
-    // Disable tunneling for now to avoid 404 errors
-    // tunnelRoute: true, // Generates a random route for each build (recommended)
-  }
-);
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+  org: env.SENTRY_ORG || 'otaku-mori',
+  project: env.SENTRY_PROJECT || 'javascript-react',
+  // Pass the auth token
+  authToken: env.SENTRY_AUTH_TOKEN,
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+  // Reduce noise if token is missing (no uploads)
+  silent: !env.SENTRY_AUTH_TOKEN,
+  // Disable Sentry plugin telemetry logs
+  telemetry: false,
+  // Disable tunneling for now to avoid 404 errors
+  // tunnelRoute: true, // Generates a random route for each build (recommended)
+});

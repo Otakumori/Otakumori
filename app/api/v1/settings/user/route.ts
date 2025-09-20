@@ -142,7 +142,7 @@ export async function PUT(request: NextRequest) {
 
 function buildCreateData(userId: string, updates: z.infer<typeof UserSettingsUpdateSchema>): Prisma.UserSettingsCreateInput {
   return {
-    userId,
+    user: { connect: { id: userId } },
     profileVisibility: updates.profileVisibility ?? "public",
     allowFriendRequests: updates.allowFriendRequests ?? true,
     allowPartyInvites: updates.allowPartyInvites ?? true,

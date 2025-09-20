@@ -1,13 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import { env } from './env.mjs';
 
-Sentry.init({
-  dsn: 'https://388fd3ecd8a41c61b6cf6c9e7f42e15d@o4509520271114240.ingest.us.sentry.io/4509520275701760',
-  tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0,
-  // Adds request headers and IP for users, for more info visit:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
-  // Note: if you want to override the automatic release value, do not set a
-  // `release` value here - use the environment variable `SENTRY_RELEASE`, so
-  // that it will also get attached to your source maps
-});
+// Sentry is initialized in instrumentation-client.ts to avoid double initialization
+// This file is kept for any additional client-side Sentry configuration if needed
