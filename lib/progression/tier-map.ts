@@ -80,7 +80,9 @@ export function tierPreset(tier: number): TierPreset {
     },
   };
 
-  return presets[tier] || presets[1];
+  const preset = presets[tier];
+  if (preset) return preset;
+  return presets[1];
 }
 
 export function getTierMotionDuration(motion: 'none' | 'low' | 'med' | 'high'): number {

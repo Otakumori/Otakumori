@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 import { UserReportUpdateSchema } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 
@@ -125,15 +126,31 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Update the report
+    const updateData: Prisma.UserReportUncheckedUpdateInput = {};
+
+    if (validatedData.status !== undefined) {
+      updateData.status = validatedData.status;
+      updateData.resolvedAt =
+        validatedData.status === 'resolved' || validatedData.status === 'dismissed'
+          ? new Date()
+          : null;
+    }
+    if (validatedData.priority !== undefined) {
+      updateData.priority = validatedData.priority;
+    }
+    if (validatedData.assignedModeratorId !== undefined) {
+      updateData.assignedModeratorId = validatedData.assignedModeratorId ?? null;
+    }
+    if (validatedData.moderatorNotes !== undefined) {
+      updateData.moderatorNotes = validatedData.moderatorNotes;
+    }
+    if (validatedData.resolution !== undefined) {
+      updateData.resolution = validatedData.resolution;
+    }
+
     const updatedReport = await db.userReport.update({
       where: { id: params.id },
-      data: {
-        ...validatedData,
-        resolvedAt:
-          validatedData.status === 'resolved' || validatedData.status === 'dismissed'
-            ? new Date()
-            : undefined,
-      },
+      data: updateData,
       include: {
         reporter: {
           select: {
@@ -187,3 +204,4 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ ok: false, error: 'Failed to update report' }, { status: 500 });
   }
 }
+

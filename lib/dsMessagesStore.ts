@@ -40,8 +40,10 @@ export async function voteDSMessage(slug: string, id: string, kind: 'up' | 'down
   const arr = await listDSMessages(slug);
   const i = arr.findIndex((x) => x.id === id);
   if (i < 0) return null;
-  if (kind === 'up') arr[i].appraisals += 1;
-  else arr[i].disparages += 1;
+  const message = arr[i];
+  if (!message) return null;
+  if (kind === 'up') message.appraisals += 1;
+  else message.disparages += 1;
   await save(slug, arr);
-  return arr[i];
+  return message;
 }

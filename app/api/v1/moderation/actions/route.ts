@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 import { ModerationActionCreateSchema } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 
@@ -63,12 +64,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the moderation action
+    const actionData: Prisma.ModerationActionUncheckedCreateInput = {
+      userId: validatedData.userId,
+      moderatorId: userId,
+      actionType: validatedData.actionType,
+      reason: validatedData.reason,
+      ...(validatedData.reportId ? { reportId: validatedData.reportId } : {}),
+    };
+    if (validatedData.details !== undefined) {
+      actionData.details = validatedData.details;
+    }
+    if (validatedData.expiresAt) {
+      actionData.expiresAt = new Date(validatedData.expiresAt);
+    }
+
     const action = await db.moderationAction.create({
-      data: {
-        ...validatedData,
-        moderatorId: userId,
-        expiresAt: validatedData.expiresAt ? new Date(validatedData.expiresAt) : undefined,
-      },
+      data: actionData,
       include: {
         user: {
           select: {
@@ -95,7 +106,6 @@ export async function POST(request: NextRequest) {
         },
       },
     });
-
     const transformedAction = {
       ...action,
       createdAt: action.createdAt.toISOString(),

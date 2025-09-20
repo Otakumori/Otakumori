@@ -26,79 +26,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
-    // Get or create leaderboards for all scopes and periods
-    const leaderboards = await Promise.all([
-      // Global leaderboards
-      db.leaderboard.findFirst({
-        where: {
-          gameCode: validatedData.gameCode,
-          scope: 'global',
-          period: 'daily',
-        },
-      }),
-      db.leaderboard.findFirst({
-        where: {
-          gameCode: validatedData.gameCode,
-          scope: 'global',
-          period: 'weekly',
-        },
-      }),
-      db.leaderboard.findFirst({
-        where: {
-          gameCode: validatedData.gameCode,
-          scope: 'global',
-          period: 'all',
-        },
-      }),
-      // Friends leaderboards
-      db.leaderboard.findFirst({
-        where: {
-          gameCode: validatedData.gameCode,
-          scope: 'friends',
-          period: 'daily',
-        },
-      }),
-      db.leaderboard.findFirst({
-        where: {
-          gameCode: validatedData.gameCode,
-          scope: 'friends',
-          period: 'weekly',
-        },
-      }),
-      db.leaderboard.findFirst({
-        where: {
-          gameCode: validatedData.gameCode,
-          scope: 'friends',
-          period: 'all',
-        },
-      }),
-    ]);
+    const leaderboardConfigs = [
+      { scope: 'global', period: 'daily' },
+      { scope: 'global', period: 'weekly' },
+      { scope: 'global', period: 'all' },
+      { scope: 'friends', period: 'daily' },
+      { scope: 'friends', period: 'weekly' },
+      { scope: 'friends', period: 'all' },
+    ] as const;
 
-    // Create missing leaderboards
-    const createdLeaderboards = await Promise.all(
-      leaderboards.map(async (board, index) => {
-        if (!board) {
-          const scopes = ['global', 'global', 'global', 'friends', 'friends', 'friends'];
-          const periods = ['daily', 'weekly', 'all', 'daily', 'weekly', 'all'];
-
-          return await db.leaderboard.create({
-            data: {
-              gameCode: validatedData.gameCode,
-              scope: scopes[index],
-              period: periods[index],
-            },
-          });
-        }
-        return board;
-      }),
+    const existingLeaderboards = await Promise.all(
+      leaderboardConfigs.map((config) =>
+        db.leaderboard.findFirst({
+          where: {
+            gameCode: validatedData.gameCode,
+            scope: config.scope,
+            period: config.period,
+          },
+        }),
+      ),
     );
 
+    const leaderboards = await Promise.all(
+      leaderboardConfigs.map((config, index) => {
+        const board = existingLeaderboards[index];
+        if (board) return board;
+        return db.leaderboard.create({
+          data: {
+            gameCode: validatedData.gameCode,
+            scope: config.scope,
+            period: config.period,
+          },
+        });
+      }),
+    );
     let isPersonalBest = false;
-    let newRank = undefined;
-    let previousRank = undefined;
+    let newRank: number | undefined;
+    let previousRank: number | undefined;
 
     // Submit score to all leaderboards
-    for (const leaderboard of createdLeaderboards) {
+    for (const leaderboard of leaderboards) {
       // Check if this is a personal best for this leaderboard
       const existingScore = await db.leaderboardScore.findFirst({
         where: {
