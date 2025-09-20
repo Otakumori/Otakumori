@@ -1,20 +1,34 @@
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({
-  dsn: 'https://388fd3ecd8a41c61b6cf6c9e7f42e15d@o4509520271114240.ingest.us.sentry.io/4509520275701760',
-  integrations: [Sentry.browserTracingIntegration()],
-  // Capture front-end performance transactions
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    // Optional: Replay (great context for errors)
+    // Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
+  ],
+
+  // Performance tracing
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-  // Propagate traces to our API routes and deployed hostnames
-  tracePropagationTargets: ['localhost', /^https:\/\/.*vercel\.app/, /^\/api\//],
-  // Optional: JS profiling
+
+  // Propagate traces to API + your domains
+  tracePropagationTargets: [
+    'localhost',
+    /^https:\/\/.*vercel\.app$/,
+    /^https:\/\/(www\.)?otaku-mori\.com$/,
+    /^\/api\//,
+  ],
+
+  // JS profiling (browser)
   profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-  // Adds request headers and IP for users, for more info visit:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
+
+  // Optional: Replay sampling (uncomment if using replayIntegration above)
+  // replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.05 : 1.0,
+  // replaysOnErrorSampleRate: 1.0,
+
+  // PII (ensure policy covers this)
   sendDefaultPii: true,
-  // Note: if you want to override the automatic release value, do not set a
-  // `release` value here - use the environment variable `SENTRY_RELEASE`, so
-  // that it will also get attached to your source maps
 });
 
 // Instrument client-side navigations for better routing spans

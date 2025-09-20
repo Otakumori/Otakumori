@@ -159,6 +159,8 @@ export default withSentryConfig(withBundleAnalyzer(nextConfig), {
   silent: !env.SENTRY_AUTH_TOKEN,
   // Disable Sentry plugin telemetry logs
   telemetry: false,
-  // Disable tunneling for now to avoid 404 errors
-  // tunnelRoute: true, // Generates a random route for each build (recommended)
+  // Sentry runtime config
+  tunnelRoute: '/monitoring', // helps bypass ad blockers
+  hideSourceMaps: true, // source maps still uploaded to Sentry
+  disableLogger: true,
 });

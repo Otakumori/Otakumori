@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type BlobItem = {
   url: string;
@@ -28,17 +28,17 @@ export default function AdminMediaPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/admin/media/list", { cache: "no-store" });
-      if (!response.ok) throw new Error("Failed to fetch media list");
+      const response = await fetch('/api/admin/media/list', { cache: 'no-store' });
+      if (!response.ok) throw new Error('Failed to fetch media list');
 
       const payload = (await response.json()) as MediaResponse;
       if (!payload.ok || !Array.isArray(payload.blobs)) {
-        throw new Error(payload.error ?? "Invalid media response");
+        throw new Error(payload.error ?? 'Invalid media response');
       }
 
       setBlobs(payload.blobs);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unexpected error";
+      const message = err instanceof Error ? err.message : 'Unexpected error';
       setError(message);
     } finally {
       setLoading(false);
@@ -55,25 +55,25 @@ export default function AdminMediaPage() {
       setError(null);
       try {
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append('file', file);
 
-        const response = await fetch("/api/admin/media/upload", {
-          method: "POST",
+        const response = await fetch('/api/admin/media/upload', {
+          method: 'POST',
           body: formData,
         });
 
-        if (!response.ok) throw new Error("Upload failed");
+        if (!response.ok) throw new Error('Upload failed');
         const payload = (await response.json()) as MediaResponse;
-        if (!payload.ok) throw new Error(payload.error ?? "Upload failed");
+        if (!payload.ok) throw new Error(payload.error ?? 'Upload failed');
 
         await fetchList();
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Unexpected error";
+        const message = err instanceof Error ? err.message : 'Unexpected error';
         setError(message);
       } finally {
         setUploading(false);
         if (inputRef.current) {
-          inputRef.current.value = "";
+          inputRef.current.value = '';
         }
       }
     },
@@ -81,25 +81,25 @@ export default function AdminMediaPage() {
   );
 
   const handleDelete = useCallback(async (url: string) => {
-    if (!window.confirm("Delete this asset? This cannot be undone.")) {
+    if (!window.confirm('Delete this asset? This cannot be undone.')) {
       return;
     }
 
     setError(null);
     try {
-      const response = await fetch("/api/admin/media/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/admin/media/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       });
 
-      if (!response.ok) throw new Error("Delete failed");
+      if (!response.ok) throw new Error('Delete failed');
       const payload = (await response.json()) as MediaResponse;
-      if (!payload.ok) throw new Error(payload.error ?? "Delete failed");
+      if (!payload.ok) throw new Error(payload.error ?? 'Delete failed');
 
       setBlobs((current) => current.filter((item) => item.url !== url));
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unexpected error";
+      const message = err instanceof Error ? err.message : 'Unexpected error';
       setError(message);
     }
   }, []);
@@ -119,7 +119,7 @@ export default function AdminMediaPage() {
           className="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           disabled={loading}
         >
-          {loading ? "Refreshing..." : "Refresh"}
+          {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </header>
 
@@ -151,7 +151,7 @@ export default function AdminMediaPage() {
             className="rounded-xl bg-neutral-900 px-4 py-2 text-sm text-white hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-neutral-900"
             disabled={uploading}
           >
-            {uploading ? "Uploading..." : "Select File"}
+            {uploading ? 'Uploading...' : 'Select File'}
           </button>
         </div>
         {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -161,7 +161,7 @@ export default function AdminMediaPage() {
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Library</h2>
           <div className="text-sm text-neutral-500 dark:text-neutral-400">
-            {blobs.length} item{blobs.length === 1 ? "" : "s"} • {totalSize} MB total
+            {blobs.length} item{blobs.length === 1 ? '' : 's'} • {totalSize} MB total
           </div>
         </div>
 
@@ -172,25 +172,31 @@ export default function AdminMediaPage() {
         ) : (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {blobs.map((blob) => {
-              const isImage = (blob.contentType ?? "").startsWith("image/");
-              const fileName = blob.pathname.split("/").pop() ?? blob.pathname;
-              const uploadedAt = blob.uploadedAt ? new Date(blob.uploadedAt).toLocaleString() : "";
+              const isImage = (blob.contentType ?? '').startsWith('image/');
+              const fileName = blob.pathname.split('/').pop() ?? blob.pathname;
+              const uploadedAt = blob.uploadedAt ? new Date(blob.uploadedAt).toLocaleString() : '';
 
               return (
-                <li key={blob.url} className="rounded-xl border border-neutral-200 p-3 dark:border-neutral-800">
+                <li
+                  key={blob.url}
+                  className="rounded-xl border border-neutral-200 p-3 dark:border-neutral-800"
+                >
                   <div className="mb-2 aspect-video overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900">
                     {isImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={blob.url} alt={fileName} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500 dark:text-neutral-400">
-                        {blob.contentType ?? "binary"}
+                        {blob.contentType ?? 'binary'}
                       </div>
                     )}
                   </div>
                   <div className="mb-1 truncate text-sm font-medium">{fileName}</div>
-                  <div className="mb-3 truncate text-xs text-neutral-500 dark:text-neutral-400">{blob.url}</div>
-                  <div className="mb-3 text-xs text-neutral-500 dark:text-neutral-400">{uploadedAt}</div>
+                  <div className="mb-3 truncate text-xs text-neutral-500 dark:text-neutral-400">
+                    {blob.url}
+                  </div>
+                  <div className="mb-3 text-xs text-neutral-500 dark:text-neutral-400">
+                    {uploadedAt}
+                  </div>
                   <div className="flex gap-2">
                     <button
                       type="button"
