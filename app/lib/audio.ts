@@ -8,12 +8,29 @@ class AudioMgr {
   async load(name: string, url: string) {
     try {
       const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
       const arr = await res.arrayBuffer();
+      if (arr.byteLength === 0) {
+        throw new Error('Empty audio file');
+      }
+
       this.ctx ??= new (window.AudioContext || (window as any).webkitAudioContext)();
+
+      // Check if the audio context is suspended (common on mobile)
+      if (this.ctx.state === 'suspended') {
+        console.warn(`Audio context suspended, cannot load: ${name}`);
+        return;
+      }
+
       const buf = await this.ctx.decodeAudioData(arr);
       this.buffers.set(name, buf);
+      console.log(`Successfully loaded audio: ${name} (${buf.duration.toFixed(2)}s)`);
     } catch (error) {
       console.warn(`Failed to load audio: ${name}`, error);
+      // Don't throw, just log the error and continue
     }
   }
 
@@ -27,7 +44,16 @@ class AudioMgr {
 
   play(name: string, { rate = 1, gain = 0.9, loop = false } = {}) {
     const buf = this.buffers.get(name);
-    if (!buf || !this.ctx) return;
+    if (!buf || !this.ctx) {
+      console.warn(`Cannot play audio: ${name} (not loaded or no audio context)`);
+      return null;
+    }
+
+    // Check if audio context is suspended
+    if (this.ctx.state === 'suspended') {
+      console.warn(`Cannot play audio: ${name} (audio context suspended)`);
+      return null;
+    }
 
     try {
       const src = this.ctx.createBufferSource();

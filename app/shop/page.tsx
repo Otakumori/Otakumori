@@ -127,14 +127,24 @@ async function loadProducts(searchParams: {
     description?: string;
     images?: { src: string }[];
     variants?: any[];
+    price?: number;
+    available?: boolean;
   }> = [];
 
-  if (printifyResult.ok && printifyResult.data.items.length > 0) {
-    products = printifyResult.data.items.map((item) => ({
+  if (
+    printifyResult.ok &&
+    printifyResult.data &&
+    printifyResult.data.items &&
+    printifyResult.data.items.length > 0
+  ) {
+    products = printifyResult.data.items.map((item: any) => ({
       id: item.id || `printify_${Math.random()}`,
       title: item.title,
-      images: item.images || [],
+      description: item.description,
+      images: [{ src: item.image }],
       variants: item.variants || [],
+      price: item.price,
+      available: item.visible !== false, // Show as available if visible
     }));
 
     logger.info('Loaded products from Printify', {
@@ -193,9 +203,10 @@ export default async function ShopPage({
               products={data.products.map((p) => ({
                 id: p.id,
                 name: p.title,
-                price: p.variants?.[0]?.price || 0,
+                price: p.price || p.variants?.[0]?.price || 0,
                 image: p.images?.[0]?.src || '',
                 slug: p.id,
+                inStock: p.available !== false,
               }))}
               total={data.total || 0}
               currentPage={parseInt(searchParams.page || '1')}

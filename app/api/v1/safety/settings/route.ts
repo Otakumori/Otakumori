@@ -81,7 +81,7 @@ function buildCreateData(
   updates: z.infer<typeof UserSafetySettingsUpdateSchema>,
 ): Prisma.UserSafetySettingsCreateInput {
   return {
-    userId,
+    user: { connect: { id: userId } },
     allowFriendRequests: updates.allowFriendRequests ?? true,
     allowPartyInvites: updates.allowPartyInvites ?? true,
     allowMessages: updates.allowMessages ?? true,

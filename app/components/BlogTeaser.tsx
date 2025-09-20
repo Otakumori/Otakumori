@@ -7,7 +7,9 @@ import { env } from '@/env';
 type Post = { id: string; slug: string; title: string; excerpt?: string; publishedAt?: string };
 
 async function getPosts(): Promise<Post[]> {
-  const res = await fetch(`${env.NEXT_PUBLIC_SITE_URL ?? ''}/api/v1/content/blog?limit=3`, {
+  // Always use localhost for now to avoid production URL issues
+  const baseUrl = 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/v1/content/blog?limit=3`, {
     next: { revalidate: 120 },
   });
   if (!res.ok) return [];

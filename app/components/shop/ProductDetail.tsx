@@ -37,7 +37,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [added, setAdded] = useState(false);
 
-  const images = product.images || [product.image];
+  const images =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.image
+        ? [product.image]
+        : ['/assets/images/placeholder-product.jpg'];
   const currentPrice = selectedVariant?.price || product.price;
   const isInStock = selectedVariant?.inStock ?? product.inStock ?? true;
 
@@ -50,7 +55,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         name: product.name,
         price: currentPrice,
         quantity,
-        image: images[0],
+        image: images?.[0],
         selectedVariant: selectedVariant
           ? { id: selectedVariant.id, title: selectedVariant.name }
           : undefined,
@@ -68,7 +73,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <div className="space-y-4">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
           <Image
-            src={images[selectedImage]}
+            src={images?.[selectedImage]}
             alt={product.name}
             fill
             sizes="(max-width:1024px) 100vw, 50vw"
@@ -77,9 +82,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           />
         </div>
 
-        {images.length > 1 && (
+        {images && images.length > 1 && (
           <div className="grid grid-cols-4 gap-2">
-            {images.map((image, index) => (
+            {images?.map((image, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}

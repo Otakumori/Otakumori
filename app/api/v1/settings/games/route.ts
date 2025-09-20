@@ -106,7 +106,7 @@ function buildCreateData(
   updates: z.infer<typeof GameSettingsUpdateSchema>,
 ): Prisma.GameSettingsCreateInput {
   return {
-    userId,
+    user: { connect: { id: userId } },
     gameCode: updates.gameCode,
     difficulty: updates.difficulty ?? "normal",
     soundEffects: updates.soundEffects ?? true,

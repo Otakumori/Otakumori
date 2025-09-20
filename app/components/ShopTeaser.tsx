@@ -7,7 +7,8 @@ import { env } from '@/server/env';
 type Product = { id: string; name: string; price: number; image: string; slug?: string };
 
 async function getFeatured(): Promise<Product[]> {
-  const baseUrl = env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  // Always use localhost for now to avoid production URL issues
+  const baseUrl = 'http://localhost:3000';
   const res = await fetch(`${baseUrl}/api/v1/products/featured`, {
     cache: 'no-store', // Force fresh data on each request
   });

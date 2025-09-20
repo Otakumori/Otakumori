@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
       const result = await creditPetals(userId, petalsGranted, "mini-game-reward");
       balance = result.balance;
     } catch (error) {
-      logger.error("petals_award_error", { requestId, userId, game }, { error });
+      logger.error("petals_award_error", { requestId, userId, extra: { game } }, { error });
       petalsGranted = 0;
     }
   }
@@ -118,6 +118,6 @@ async function upsertLeaderboardScore({
       });
     }
   } catch (error) {
-    logger.error("leaderboard_upsert_error", { requestId, userId, game }, { error });
+    logger.error("leaderboard_upsert_error", { requestId, userId, extra: { game } }, { error });
   }
 }

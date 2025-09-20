@@ -96,6 +96,13 @@ export default [
     },
   },
   {
+    // Allow process.env for NEXT_PUBLIC_ variables in client components
+    files: ['**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
     // Scripts and CJS: allow require(), looser parsing
     files: ['scripts/**/*.{js,cjs}', '**/*.cjs'],
     languageOptions: {

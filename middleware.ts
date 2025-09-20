@@ -28,6 +28,23 @@ export default clerkMiddleware(async (auth, req) => {
   const proto = req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
   const isApi = url.pathname.startsWith('/api/');
 
+  // Skip authentication for API routes that don't need it
+  if (isApi) {
+    const res = NextResponse.next();
+
+    // Correlation ID header
+    const reqId =
+      req.headers.get('x-request-id') ||
+      req.headers.get('x-correlation-id') ||
+      `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    res.headers.set('X-Request-ID', reqId);
+
+    // Security headers (keep HSTS here; other headers set via next.config.js)
+    res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+
+    return res;
+  }
+
   // Enforce canonical domain (exclude accounts subdomain)
   const isApex = host === 'otaku-mori.com';
   const isAccounts = host.startsWith('accounts.');
