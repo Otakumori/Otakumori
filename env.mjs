@@ -44,6 +44,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_CURSOR_GLOW: z.enum(['on', 'off']).default('off'),
     NEXT_PUBLIC_FEATURE_STARFIELD: z.enum(['on', 'off']).default('on'),
     NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
+    NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   },
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
@@ -81,6 +82,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_CURSOR_GLOW: process.env.NEXT_PUBLIC_FEATURE_CURSOR_GLOW,
     NEXT_PUBLIC_FEATURE_STARFIELD: process.env.NEXT_PUBLIC_FEATURE_STARFIELD,
     NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     VERCEL: process.env.VERCEL,
     AUTHORIZED_PARTIES: process.env.AUTHORIZED_PARTIES,
