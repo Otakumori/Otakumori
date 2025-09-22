@@ -14,13 +14,13 @@ async function getPosts(): Promise<Post[]> {
       next: { revalidate: 120 },
     });
     if (!res.ok) return [];
-    
+
     const contentType = res.headers.get('content-type');
     if (!contentType?.includes('application/json')) {
       console.error('API returned non-JSON response:', contentType);
       return [];
     }
-    
+
     return (await res.json()) as Post[];
   } catch (error) {
     console.error('Failed to fetch blog posts:', error);

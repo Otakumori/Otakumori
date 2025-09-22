@@ -30,31 +30,34 @@ export default function SoapstoneHomeDrift() {
           <div
             key={it.id}
             style={{ left: `${left}%`, bottom: `${bottom}%`, animationDelay: `${delay}s` }}
-            className="absolute select-none rounded-md border border-white/15 bg-black/70 px-3 py-2 text-sm text-zinc-100 backdrop-blur-md shadow-2xl
-                          animate-[rise_10s_ease-out_forwards]"
+            className="absolute select-none rounded-md border border-white/15 bg-black/70 px-3 py-2 text-sm text-zinc-100 backdrop-blur-md shadow-2xl animate-[rise_10s_ease-out_forwards]"
           >
             {it.text}
           </div>
         );
       })}
-      <style jsx>{`
-        @keyframes rise {
-          from {
-            transform: translateY(0px);
-            opacity: 0;
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          @keyframes rise {
+            from {
+              transform: translateY(0px);
+              opacity: 0;
+            }
+            10% {
+              opacity: 1;
+            }
+            90% {
+              opacity: 1;
+            }
+            to {
+              transform: translateY(-120px);
+              opacity: 0;
+            }
           }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          to {
-            transform: translateY(-120px);
-            opacity: 0;
-          }
-        }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

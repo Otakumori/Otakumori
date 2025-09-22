@@ -131,7 +131,7 @@ class RateLimiter {
 
   private generateKey(req: NextRequest): string {
     // Use IP address as default key
-    const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const ip = req.headers.get('x-forwarded-for') || 'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
     // Create a hash-like key from IP and user agent

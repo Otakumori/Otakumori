@@ -1,7 +1,7 @@
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
-import { env } from '@/server/env';
+import { env } from '@/env.mjs';
 
 type Game = { id: string; slug: string; title: string; summary?: string };
 
@@ -13,13 +13,13 @@ async function getGames(): Promise<Game[]> {
       cache: 'no-store',
     });
     if (!res.ok) return [];
-    
+
     const contentType = res.headers.get('content-type');
     if (!contentType?.includes('application/json')) {
       console.error('API returned non-JSON response:', contentType);
       return [];
     }
-    
+
     return (await res.json()) as Game[];
   } catch (error) {
     console.error('Failed to fetch games:', error);

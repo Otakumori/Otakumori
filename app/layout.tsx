@@ -1,6 +1,5 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import Header from './components/Header';
 import Footer from './components/Footer';
 import Providers from './Providers';
 import * as Sentry from '@sentry/nextjs';
@@ -23,8 +22,9 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const nonce = headers().get('x-nonce') ?? undefined;
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') ?? undefined;
 
   return (
     <ClerkProviderWrapper nonce={nonce}>
@@ -56,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }
           >
             <Providers>
-              <Header />
               <main id="content" className="relative z-20 flex-1">
                 {children}
               </main>

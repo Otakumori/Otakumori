@@ -17,7 +17,7 @@ const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 100; // 100 requests per minute
 
 export async function rateLimit(request: NextRequest) {
-  const ip = request.ip || 'unknown';
+  const ip = request.headers.get('x-forwarded-for') || 'unknown';
   const now = Date.now();
 
   const rateLimitInfo = rateLimitMap.get(ip);

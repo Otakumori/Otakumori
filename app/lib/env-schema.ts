@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { env } from '@/env.mjs';
 
 // Environment schema for production validation
 export const envSchema = z.object({
@@ -36,21 +37,21 @@ export type EnvSchema = z.infer<typeof envSchema>;
 // Validate environment at runtime
 export function validateEnv(): EnvSchema {
   try {
-    return envSchema.parse(process.env);
+    return envSchema.parse(env);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.errors.map((e) => e.path.join('.')).join(', ');
       console.error(`❌ Environment validation failed. Missing or invalid: ${missingVars}`);
 
       // In production, throw to prevent app from starting with invalid config
-      if (process.env.NODE_ENV === 'production') {
+      if (env.NODE_ENV === 'production') {
         throw new Error(`Environment validation failed: ${missingVars}`);
       }
     }
 
     // In development, return partial config and log warnings
     console.warn('⚠️ Environment validation failed, continuing with partial config');
-    return process.env as any;
+    return env as any;
   }
 }
 

@@ -9,6 +9,7 @@ import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { env } from './env.mjs';
 
 // Create output directory
 const OUTDIR_BASE = './upgrade_run_outputs';
@@ -84,7 +85,7 @@ async function main() {
 
     try {
       const dumpFile = path.join(OUTDIR, 'backup_dump.sql');
-      const dbUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
+      const dbUrl = env.DATABASE_URL || env.DIRECT_URL;
 
       if (dbUrl) {
         // Try to use pg_dump if available

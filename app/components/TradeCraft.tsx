@@ -280,7 +280,9 @@ export default function TradeCraft() {
           </p>
         </div>
       )}
-      <style jsx>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .drop-shadow-glow {
           filter: drop-shadow(0 0 8px #ff2ab8cc) drop-shadow(0 0 2px #fff3);
         }
@@ -309,7 +311,9 @@ export default function TradeCraft() {
         .animate-glow {
           animation: glow 2s infinite alternate;
         }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

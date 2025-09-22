@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/authz';
 import { put } from '@vercel/blob';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
@@ -23,7 +24,7 @@ export async function POST(req: Request) {
   const res = await put(filename, new Blob([], { type: contentType }), {
     access: 'public',
     addRandomSuffix: true,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+    token: env.BLOB_READ_WRITE_TOKEN,
   });
 
   return NextResponse.json({ ok: true, url: res.url });

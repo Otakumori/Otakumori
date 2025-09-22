@@ -6,6 +6,7 @@ import React from 'react';
 import { CartProvider } from './components/cart/CartProvider';
 import { PetalProvider } from '../providers';
 import { WorldProvider } from './world/WorldProvider';
+import { AuthProvider } from './contexts/AuthContext';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
@@ -20,22 +21,24 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const pathname = (typeof window !== 'undefined' ? window.location.pathname : '/') as string;
   const showTree = pathname === '/about';
   return (
-    <WorldProvider>
-      <PetalProvider>
-        <CartProvider>
-          <GlobalMusicProvider>
-            {/* Site-wide background (fixed, behind everything) */}
-            {showTree && <GlobalBackground />}
-            {/* Navigation */}
-            <Navbar />
-            {children}
-            <GlobalMusicBar />
-            <SoapstoneDock />
-            <DockedGacha />
-            <QuakeHUD />
-          </GlobalMusicProvider>
-        </CartProvider>
-      </PetalProvider>
-    </WorldProvider>
+    <AuthProvider>
+      <WorldProvider>
+        <PetalProvider>
+          <CartProvider>
+            <GlobalMusicProvider>
+              {/* Site-wide background (fixed, behind everything) */}
+              {showTree && <GlobalBackground />}
+              {/* Navigation */}
+              <Navbar />
+              {children}
+              <GlobalMusicBar />
+              <SoapstoneDock />
+              <DockedGacha />
+              <QuakeHUD />
+            </GlobalMusicProvider>
+          </CartProvider>
+        </PetalProvider>
+      </WorldProvider>
+    </AuthProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 import type { Result } from './types';
 import { safeAsync } from './types';
 import { checkClerkHealth } from './clerk';
@@ -39,7 +39,7 @@ export async function checkHealth(): Promise<Result<HealthStatus>> {
       ];
 
       const missingEnvs = requiredEnvs.filter((envVar) => {
-        const value = process.env[envVar];
+        const value = env[envVar as keyof typeof env];
         return !value || value.trim() === '';
       });
 

@@ -15,7 +15,7 @@ export async function rateLimit(
   config: RateLimitConfig,
   identifier?: string,
 ): Promise<{ limited: boolean; remaining: number; resetTime: number }> {
-  const key = identifier || req.ip || 'anonymous';
+  const key = identifier || req.headers.get('x-forwarded-for') || 'anonymous';
   const now = Date.now();
   const windowKey = `${config.keyPrefix}:${key}`;
 

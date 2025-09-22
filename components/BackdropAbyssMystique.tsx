@@ -84,7 +84,9 @@ export default function BackdropAbyssMystique({ tone = 0.42, speed = 68, angle =
       <div className="om-layer bokeh" aria-hidden />
       <div className="om-layer stars" aria-hidden />
 
-      <style jsx global>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         :root {
           --om-base: #1a1320;
           --om-tone: 0.42;
@@ -239,7 +241,9 @@ export default function BackdropAbyssMystique({ tone = 0.42, speed = 68, angle =
             animation: none !important;
           }
         }
-      `}</style>
+        `,
+        }}
+      />
     </>
   );
 }

@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/server/env';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
 
     // Get all products from Printify and find the one with matching ID
     const baseUrl = 'http://localhost:3000';

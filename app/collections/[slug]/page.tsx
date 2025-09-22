@@ -158,9 +158,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CollectionPage({ params }: Props) {
+export default async function CollectionPage({ params }: Props) {
   const collection = COLLECTIONS[params.slug];
-  const nonce = headers().get('x-nonce') ?? undefined;
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') ?? undefined;
 
   if (!collection) {
     notFound();

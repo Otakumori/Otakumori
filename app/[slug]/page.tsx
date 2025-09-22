@@ -8,28 +8,31 @@ async function getDb() {
   return db;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const db = await getDb();
   const page = await db.contentPage.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     select: { title: true },
   });
   return { title: page?.title ?? 'Otaku-Mori' };
 }
 
-export default async function StaticPage({ params }: { params: { slug: string } }) {
+export default async function StaticPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
   // Don't handle API routes or other system routes
   if (
-    params.slug.startsWith('api/') ||
-    params.slug.startsWith('_next/') ||
-    params.slug.startsWith('admin/')
+    slug.startsWith('api/') ||
+    slug.startsWith('_next/') ||
+    slug.startsWith('admin/')
   ) {
     return notFound();
   }
 
   const db = await getDb();
   const page = await db.contentPage.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
   });
   if (!page || !page.published) return notFound();
 

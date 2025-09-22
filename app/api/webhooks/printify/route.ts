@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
-// import { env } from '@/env.mjs';
+import { env } from '@/env.mjs';
 import { logger } from '@/app/lib/logger';
 import { newRequestId } from '@/app/lib/requestId';
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       req.headers.get('x-printify-signature') ||
       req.headers.get('x-hmac-signature');
 
-    const ok = await verifySignature(raw, signature, process.env.PRINTIFY_WEBHOOK_SECRET);
+    const ok = await verifySignature(raw, signature, env.PRINTIFY_WEBHOOK_SECRET);
     if (!ok) {
       logger.warn('signature verification failed', { requestId, route });
       return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 401 });

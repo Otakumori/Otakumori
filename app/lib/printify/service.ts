@@ -1,4 +1,4 @@
-import { logger } from '@/app/lib/logger';
+import { env } from '@/env.mjs';
 
 export interface PrintifyProduct {
   id: string;
@@ -104,8 +104,8 @@ export class PrintifyService {
   private readonly catalogRateLimit = 100; // 100 requests per minute for catalog
 
   constructor() {
-    const apiKey = process.env.PRINTIFY_API_KEY as string | undefined;
-    const shopId = process.env.PRINTIFY_SHOP_ID as string | undefined;
+    const apiKey = env.PRINTIFY_API_KEY;
+    const shopId = env.PRINTIFY_SHOP_ID;
 
     if (!apiKey) {
       throw new Error('PRINTIFY_API_KEY environment variable is required');
@@ -135,6 +135,7 @@ export class PrintifyService {
 
     if (this.requestCount >= limit) {
       const waitTime = 60000 - timeDiff;
+      const { logger } = await import('@/app/lib/logger');
       logger.warn('printify_rate_limit_exceeded', undefined, {
         requestCount: this.requestCount,
         limit,
@@ -184,6 +185,7 @@ export class PrintifyService {
           const retryAfter = response.headers.get('Retry-After');
           const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : 60000;
 
+          const { logger } = await import('@/app/lib/logger');
           logger.warn('printify_rate_limit_429', undefined, {
             endpoint,
             retryAfter: waitTime,
@@ -252,6 +254,7 @@ export class PrintifyService {
         last_page_url: result.last_page_url,
       };
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_products_fetch_failed', undefined, {
         page,
         perPage,
@@ -279,6 +282,7 @@ export class PrintifyService {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
       } catch (error) {
+        const { logger } = await import('@/app/lib/logger');
         logger.error('printify_pagination_error', undefined, {
           error: String(error),
           page,
@@ -303,6 +307,7 @@ export class PrintifyService {
 
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
     try {
+      const { logger } = await import('@/app/lib/logger');
       logger.info('printify_order_creation_started', undefined, {
         externalId: orderData.external_id,
         itemCount: orderData.line_items.length,
@@ -324,6 +329,7 @@ export class PrintifyService {
 
       return result;
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_order_creation_failed', undefined, {
         externalId: orderData.external_id,
         error: String(error),
@@ -341,6 +347,7 @@ export class PrintifyService {
       const result = await this.makeRequest<{ data: any[] }>(`/shops/${this.shopId}/shipping.json`);
       return result.data || [];
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_shipping_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
@@ -355,6 +362,7 @@ export class PrintifyService {
       );
       return result.data || [];
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_providers_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
@@ -369,6 +377,7 @@ export class PrintifyService {
       );
       return result.data || [];
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_blueprints_fetch_failed', undefined, { error: String(error) });
       throw error;
     }
@@ -382,6 +391,7 @@ export class PrintifyService {
         true, // This is a catalog endpoint
       );
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_blueprint_fetch_failed', undefined, {
         blueprintId,
         error: String(error),
@@ -403,6 +413,7 @@ export class PrintifyService {
       );
       return result.data || [];
     } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
       logger.error('printify_blueprint_variants_fetch_failed', undefined, {
         blueprintId,
         printProviderId,
