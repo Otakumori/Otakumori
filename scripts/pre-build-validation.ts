@@ -18,14 +18,14 @@ interface ValidationResult {
 // Simple glob function
 function glob(pattern: string, baseDir: string = '.'): string[] {
   const results: string[] = [];
-  
+
   function walkDir(dir: string, pattern: string) {
     const items = readdirSync(dir);
-    
+
     for (const item of items) {
       const fullPath = path.join(dir, item);
       const stat = statSync(fullPath);
-      
+
       if (stat.isDirectory()) {
         walkDir(fullPath, pattern);
       } else if (stat.isFile()) {
@@ -36,12 +36,12 @@ function glob(pattern: string, baseDir: string = '.'): string[] {
       }
     }
   }
-  
+
   function matchesPattern(filePath: string, pattern: string): boolean {
     const regex = new RegExp(pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*'));
     return regex.test(filePath);
   }
-  
+
   walkDir(baseDir, pattern);
   return results;
 }
@@ -72,15 +72,15 @@ class PreBuildValidator {
     await this.checkEnvironmentVariables();
 
     const success = this.errors.length === 0;
-    
+
     if (this.warnings.length > 0) {
       console.log('\n⚠️  Warnings:');
-      this.warnings.forEach(warning => console.log(`  - ${warning}`));
+      this.warnings.forEach((warning) => console.log(`  - ${warning}`));
     }
 
     if (this.errors.length > 0) {
       console.log('\n❌ Errors:');
-      this.errors.forEach(error => console.log(`  - ${error}`));
+      this.errors.forEach((error) => console.log(`  - ${error}`));
     }
 
     if (success) {
@@ -116,10 +116,14 @@ class PreBuildValidator {
 
   private async checkImportPaths(): Promise<void> {
     console.log('📦 Checking import paths...');
-    
+
     const apiFiles = await glob('app/api/**/*.ts');
     const componentFiles = await glob('app/**/*.tsx');
-    const allFiles = [...apiFiles, ...componentFiles];
+    const libFiles = await glob('app/lib/**/*.ts');
+    const allFiles = [...apiFiles, ...componentFiles, ...libFiles].filter(
+      (file) =>
+        !file.includes('.next/') && !file.includes('node_modules/') && !file.includes('dist/'),
+    );
 
     for (const file of allFiles) {
       const content = readFileSync(file, 'utf-8');
@@ -127,26 +131,39 @@ class PreBuildValidator {
 
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        
+
         // Check for old import patterns
         if (line.includes("from '@/lib/db'") && !line.includes('await import')) {
           this.errors.push(`${file}:${i + 1} - Direct import of @/lib/db (use dynamic import)`);
         }
-        
+
         if (line.includes("from '@/app/lib/prisma'") && !line.includes('await import')) {
-          this.errors.push(`${file}:${i + 1} - Direct import of @/app/lib/prisma (use dynamic import)`);
-        }
-        
-        if (line.includes("from '@/app/lib/authz'") && !line.includes('await import')) {
-          this.errors.push(`${file}:${i + 1} - Direct import of @/app/lib/authz (use dynamic import)`);
-        }
-        
-        if (line.includes("from '@/app/lib/logger'") && !line.includes('await import')) {
-          this.errors.push(`${file}:${i + 1} - Direct import of @/app/lib/logger (use dynamic import)`);
+          this.errors.push(
+            `${file}:${i + 1} - Direct import of @/app/lib/prisma (use dynamic import)`,
+          );
         }
 
-        // Check for process.env usage
-        if (line.includes('process.env') && !file.includes('env.mjs') && !file.includes('env.ts')) {
+        if (line.includes("from '@/app/lib/authz'") && !line.includes('await import')) {
+          this.errors.push(
+            `${file}:${i + 1} - Direct import of @/app/lib/authz (use dynamic import)`,
+          );
+        }
+
+        if (line.includes("from '@/app/lib/logger'") && !line.includes('await import')) {
+          this.errors.push(
+            `${file}:${i + 1} - Direct import of @/app/lib/logger (use dynamic import)`,
+          );
+        }
+
+        // Check for process.env usage (only in source files, not compiled files)
+        if (
+          line.includes('process.env') &&
+          !file.includes('env.mjs') &&
+          !file.includes('env.ts') &&
+          !file.includes('.next/') &&
+          !file.includes('node_modules/') &&
+          !file.includes('dist/')
+        ) {
           this.errors.push(`${file}:${i + 1} - Direct process.env usage (use env from env.mjs)`);
         }
       }
@@ -159,14 +176,14 @@ class PreBuildValidator {
 
   private async checkMissingComponents(): Promise<void> {
     console.log('🧩 Checking for missing components...');
-    
+
     const componentFiles = await glob('app/**/*.tsx');
     const missingComponents = new Set<string>();
 
     for (const file of componentFiles) {
       const content = readFileSync(file, 'utf-8');
       const importMatches = content.matchAll(/import.*from\s+['"]([^'"]+)['"]/g);
-      
+
       for (const match of importMatches) {
         const importPath = match[1];
         if (importPath.startsWith('@/components/')) {
@@ -187,18 +204,18 @@ class PreBuildValidator {
 
   private async checkTypeConsistency(): Promise<void> {
     console.log('🔗 Checking type consistency...');
-    
+
     // Check for common type mismatches
     const apiFiles = await glob('app/api/**/*.ts');
-    
+
     for (const file of apiFiles) {
       const content = readFileSync(file, 'utf-8');
-      
+
       // Check for CouponMeta type issues
       if (content.includes('CouponMeta') && content.includes('id:')) {
         this.warnings.push(`${file} - CouponMeta type doesn't have 'id' field`);
       }
-      
+
       // Check for Prisma field mismatches
       if (content.includes('row.value') && !content.includes('row.valueCents')) {
         this.warnings.push(`${file} - Using 'row.value' instead of 'row.valueCents'`);
@@ -210,11 +227,11 @@ class PreBuildValidator {
 
   private async checkEnvironmentVariables(): Promise<void> {
     console.log('🌍 Checking environment variables...');
-    
+
     if (!existsSync('.env')) {
       this.warnings.push('No .env file found');
     }
-    
+
     if (!existsSync('env.mjs')) {
       this.errors.push('env.mjs file missing');
     }
@@ -227,7 +244,7 @@ class PreBuildValidator {
 async function main() {
   const validator = new PreBuildValidator();
   const result = await validator.validate();
-  
+
   if (!result.success) {
     process.exit(1);
   }

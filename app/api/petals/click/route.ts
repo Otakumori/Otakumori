@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 import { z } from 'zod';
+import { env } from '@/env.mjs';
 
 const schema = z.object({
   // Optional: can be called without body for simple clicks
@@ -80,7 +81,7 @@ export async function POST(req: Request) {
     }
 
     // Check daily limit (configurable via env)
-    const dailyLimit = parseInt(process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500');
+    const dailyLimit = parseInt(env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500');
 
     if (dailyClicks >= dailyLimit) {
       return NextResponse.json(

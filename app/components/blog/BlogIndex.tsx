@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
 import { t } from '../../lib/microcopy';
+import { env } from '@/env.mjs';
 
 type BlogPost = {
   id: string;
@@ -17,7 +18,7 @@ type BlogPost = {
 async function getBlogPosts(): Promise<BlogPost[]> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`,
+      `${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`,
       {
         next: { revalidate: 300 },
       },

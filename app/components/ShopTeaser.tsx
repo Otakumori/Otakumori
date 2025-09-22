@@ -2,7 +2,7 @@ import GlassPanel from './GlassPanel';
 import Image from 'next/image';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
-import { env } from '@/server/env';
+import { env } from '@/env.mjs';
 
 type Product = { id: string; name: string; price: number; image: string; slug?: string };
 
@@ -14,13 +14,13 @@ async function getFeatured(): Promise<Product[]> {
       cache: 'no-store', // Force fresh data on each request
     });
     if (!res.ok) return [];
-    
+
     const contentType = res.headers.get('content-type');
     if (!contentType?.includes('application/json')) {
       console.error('API returned non-JSON response:', contentType);
       return [];
     }
-    
+
     return (await res.json()) as Product[];
   } catch (error) {
     console.error('Failed to fetch featured products:', error);

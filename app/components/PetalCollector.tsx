@@ -261,7 +261,9 @@ export default function PetalCollector() {
         </div>
       )}
 
-      <style jsx>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes float {
           0% {
             transform: translateY(0) rotate(0deg);
@@ -270,7 +272,9 @@ export default function PetalCollector() {
             transform: translateY(-10px) rotate(10deg);
           }
         }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

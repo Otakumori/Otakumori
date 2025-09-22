@@ -6,14 +6,15 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
-import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import { UserButton } from '@clerk/nextjs';
+import { useAuth } from '@/app/hooks/useAuth';
 import { useCart } from '../cart/CartProvider';
 import { CATEGORIES } from '@/lib/categories';
 import { parseQuery } from '@/lib/search/parse';
 import PetalWallet from '../PetalWallet';
 
 const Navbar: React.FC = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isAdmin } = useAuth();
   const router = useRouter();
   const { itemCount } = useCart();
 
@@ -161,7 +162,7 @@ const Navbar: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
-                placeholder="Search products or cat:category..."
+                placeholder="What're ya buyin' ?"
                 className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
             </div>
@@ -220,21 +221,33 @@ const Navbar: React.FC = () => {
 
           {/* Authentication */}
           {isSignedIn ? (
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: 'h-8 w-8',
-                },
-              }}
-              userProfileMode="navigation"
-              userProfileUrl="/profile"
-            />
+            <div className="flex items-center gap-2">
+              {isAdmin && (
+                <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30">
+                  Admin
+                </span>
+              )}
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: 'h-8 w-8',
+                    userButtonPopoverCard: 'bg-black/90 backdrop-blur-md border border-white/20',
+                    userButtonPopoverActionButton: 'text-white hover:bg-white/10',
+                    userButtonPopoverActionButtonText: 'text-white',
+                    userButtonPopoverFooter: 'hidden',
+                  },
+                }}
+                userProfileMode="navigation"
+                userProfileUrl="/account"
+              />
+            </div>
           ) : (
-            <SignInButton mode="modal">
-              <button className="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition-colors">
-                Sign In
-              </button>
-            </SignInButton>
+            <Link
+              href="/sign-in"
+              className="px-4 py-2 bg-[#ff4fa3] hover:bg-[#ff86c2] text-white rounded-lg transition-all duration-200 animate-pulse"
+            >
+              Sign In
+            </Link>
           )}
 
           <PetalWallet />

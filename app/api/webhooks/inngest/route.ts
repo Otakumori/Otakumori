@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const headersList = headers();
+    const headersList = await headers();
 
     // Verify webhook signature (implement proper verification)
     const signature = headersList.get('svix-signature');

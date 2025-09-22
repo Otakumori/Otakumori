@@ -84,55 +84,14 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com",
       "worker-src 'self' blob:",
-      "connect-src 'self' https: wss://* ws://localhost:* webpack:",
       "frame-ancestors 'self'",
     ];
 
-    const connectProd = [
-      "connect-src 'self' https: wss:",
-      'https://clerk-telemetry.com',
-      'https://*.clerk-telemetry.com',
-      'https://api.stripe.com',
-      'https://maps.googleapis.com',
-      'https://api.clerk.com',
-      'https://clerk.otaku-mori.com',
-      'https://accounts.otaku-mori.com',
-      'https://api.printify.com',
-      'https://*.printify.com',
-      'https://*.ingest.sentry.io',
-      'https://o4509520271114240.ingest.us.sentry.io',
-      'https://*.sentry.io',
-      'https://sentry.io',
-      'https://vitals.vercel-insights.com',
-      'https://www.otaku-mori.com',
-      'https://otaku-mori.com',
-      'https://*.vercel-blob.com',
-      'https://ydbhokoxqwqbtqqeibef.supabase.co',
-      'https://*.upstash.io',
-    ];
+    const connectProd = "connect-src 'self' https: wss: https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://clerk.otaku-mori.com https://accounts.otaku-mori.com https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://www.otaku-mori.com https://otaku-mori.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io";
 
-    const connectDev = [
-      "connect-src 'self' https: wss: ws:",
-      'ws://localhost:8787',
-      'https://clerk-telemetry.com',
-      'https://*.clerk-telemetry.com',
-      'https://api.stripe.com',
-      'https://maps.googleapis.com',
-      'https://api.clerk.com',
-      'https://*.clerk.accounts.dev',
-      'https://api.printify.com',
-      'https://*.printify.com',
-      'https://*.ingest.sentry.io',
-      'https://o4509520271114240.ingest.us.sentry.io',
-      'https://*.sentry.io',
-      'https://sentry.io',
-      'https://vitals.vercel-insights.com',
-      'https://*.vercel-blob.com',
-      'https://ydbhokoxqwqbtqqeibef.supabase.co',
-      'https://*.upstash.io',
-    ];
+    const connectDev = "connect-src 'self' https: wss: ws: ws://localhost:8787 https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://*.clerk.accounts.dev https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io";
 
-    const csp = [...cspCommon, ...(isProd ? connectProd : connectDev)].join('; ');
+    const csp = [...cspCommon, isProd ? connectProd : connectDev].join('; ');
 
     return [
       {

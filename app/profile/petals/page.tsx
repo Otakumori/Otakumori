@@ -5,6 +5,7 @@ import NavBar from '../../components/NavBar';
 import FooterDark from '../../components/FooterDark';
 import PetalsDashboard from '../../components/profile/PetalsDashboard';
 import { t } from '@/lib/microcopy';
+import { env } from '@/env.mjs';
 
 export const metadata: Metadata = {
   title: 'Petals — Otaku-mori',
@@ -16,7 +17,7 @@ async function getPetalsData() {
     const { getToken } = await auth();
     const token = await getToken({ template: 'otakumori-jwt' });
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+    const siteUrl = env.NEXT_PUBLIC_SITE_URL || '';
 
     const [historyResponse, dailyResponse] = await Promise.all([
       fetch(`${siteUrl}/api/v1/petals/history`, {

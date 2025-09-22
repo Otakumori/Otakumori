@@ -69,7 +69,9 @@ export default function PetalLayer({
         />
       ))}
 
-      <style jsx>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes petal-fall {
           0% {
             transform: translateY(-100vh) rotate(0deg);
@@ -92,7 +94,9 @@ export default function PetalLayer({
             animation: none !important;
           }
         }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

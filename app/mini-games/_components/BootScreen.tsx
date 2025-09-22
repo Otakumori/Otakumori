@@ -18,7 +18,9 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="relative isolate z-0 h-[min(90vh,100svh)] w-full overflow-hidden bg-black grid place-items-center">
-      <style jsx>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes dropIn {
           0% {
             transform: translateY(-120px) scale(0.7);
@@ -38,7 +40,9 @@ export default function BootScreen({ onDone }: { onDone: () => void }) {
             transform: rotate(360deg);
           }
         }
-      `}</style>
+        `,
+        }}
+      />
       <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
         <div className="text-center">
           <div className="text-2xl font-semibold text-pink-200">Otakumori</div>

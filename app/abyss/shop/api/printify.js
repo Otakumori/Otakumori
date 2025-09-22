@@ -1,4 +1,5 @@
 import { prisma } from '../../../lib/prisma';
+import { env } from '@/env.mjs';
 
 const PRINTIFY_API_URL = 'https://api.printify.com/v1';
 
@@ -22,10 +23,10 @@ export async function getAbyssProducts() {
 
     // Fetch fresh products from Printify
     const response = await fetch(
-      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`,
+      `${PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/products.json`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
           'Content-Type': 'application/json',
         },
       },
@@ -79,10 +80,10 @@ export async function getAbyssProducts() {
 export async function getProductDetails(productId) {
   try {
     const response = await fetch(
-      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products/${productId}.json`,
+      `${PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/products/${productId}.json`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
           'Content-Type': 'application/json',
         },
       },
@@ -100,28 +101,25 @@ export async function getProductDetails(productId) {
 
 export async function createOrder(productId, variantId, quantity, shippingAddress) {
   try {
-    const response = await fetch(
-      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          external_id: `abyss-${Date.now()}`,
-          line_items: [
-            {
-              blueprint_id: productId,
-              variant_id: variantId,
-              quantity: quantity,
-            },
-          ],
-          shipping_method: 1,
-          shipping_address: shippingAddress,
-        }),
+    const response = await fetch(`${PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/orders.json`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({
+        external_id: `abyss-${Date.now()}`,
+        line_items: [
+          {
+            blueprint_id: productId,
+            variant_id: variantId,
+            quantity: quantity,
+          },
+        ],
+        shipping_method: 1,
+        shipping_address: shippingAddress,
+      }),
+    });
 
     if (!response.ok) throw new Error('Failed to create order');
 

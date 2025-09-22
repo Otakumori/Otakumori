@@ -1,14 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
+import { env } from './env.mjs';
 
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
   reporter: [['list']],
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL: env.BASE_URL || 'http://localhost:3000',
     trace: 'retain-on-failure',
   },
-  webServer: process.env.BASE_URL
+  webServer: env.BASE_URL
     ? undefined
     : {
         command: 'npm run dev',

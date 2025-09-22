@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { del } from '@vercel/blob';
 import { auth, currentUser } from '@clerk/nextjs/server';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
     await requireAdmin();
     const { url } = await req.json();
     if (!url) return NextResponse.json({ ok: false, error: 'Missing url' }, { status: 400 });
-    await del(url, { token: process.env.BLOB_READ_WRITE_TOKEN });
+    await del(url, { token: env.BLOB_READ_WRITE_TOKEN });
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     const message = err?.message || 'Delete error';

@@ -3,15 +3,16 @@ export const dynamic = 'force-dynamic';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { checkPrintifyHealth } from '@/lib/api/printify';
+import { env } from '@/env.mjs';
 
 export async function GET(request: NextRequest) {
   try {
     // Check environment variables
     const envCheck = {
-      PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY ? '✅ Set' : '❌ Missing',
-      PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID ? '✅ Set' : '❌ Missing',
-      NODE_ENV: process.env.NODE_ENV || 'Not set',
-      VERCEL_ENV: process.env.VERCEL_ENVIRONMENT || 'Not set',
+      PRINTIFY_API_KEY: env.PRINTIFY_API_KEY ? '✅ Set' : '❌ Missing',
+      PRINTIFY_SHOP_ID: env.PRINTIFY_SHOP_ID ? '✅ Set' : '❌ Missing',
+      NODE_ENV: env.NODE_ENV || 'Not set',
+      VERCEL_ENV: env.VERCEL_ENVIRONMENT || 'Not set',
     };
 
     // Check Printify API health
@@ -21,10 +22,10 @@ export async function GET(request: NextRequest) {
     let directTest = null;
     try {
       const response = await fetch(
-        `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/products.json?page=1&limit=1`,
+        `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json?page=1&limit=1`,
         {
           headers: {
-            Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+            Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
           },
           cache: 'no-store',
         },

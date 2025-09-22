@@ -1,6 +1,6 @@
 /* Extract static inline styles into colocated CSS Modules.
  * Usage:
- *   node scripts/no-inline/extract-inline-styles.cjs "app/**/*.{tsx,jsx}" "components/**/*.{tsx,jsx}"
+ *   node scripts/no-inline/extract-inline-styles.cjs "app/glob/glob.{tsx,jsx}" "components/glob/glob.{tsx,jsx}"
  *
  * Notes:
  * - Only moves STATIC values (string or number literals).

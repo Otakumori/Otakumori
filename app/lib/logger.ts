@@ -23,9 +23,11 @@ export interface LogEntry {
   };
 }
 
+import { env } from '@/env.mjs';
+
 class Logger {
-  private isDevelopment = (process.env.NODE_ENV ?? 'development') === 'development';
-  private isTest = (process.env.NODE_ENV ?? '') === 'test';
+  private isDevelopment = (env.NODE_ENV ?? 'development') === 'development';
+  private isTest = (env.NODE_ENV ?? '') === 'test';
 
   private formatError(error: Error): LogEntry['error'] {
     return {

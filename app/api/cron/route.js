@@ -3,11 +3,12 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { prisma } from '../../lib/prisma';
+import { env } from '@/env.mjs';
 
 // Environment validation
 function validateEnv() {
   const required = ['CRON_SECRET', 'PRINTIFY_API_KEY', 'PRINTIFY_SHOP_ID'];
-  const missing = required.filter((key) => !process.env[key]);
+  const missing = required.filter((key) => !env[key]);
 
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
@@ -42,10 +43,10 @@ async function fetchPrintifyProducts() {
 
   try {
     const response = await fetch(
-      `${PRINTIFY_API_URL}/shops/${process.env.PRINTIFY_SHOP_ID}/products.json`,
+      `${PRINTIFY_API_URL}/shops/${env.PRINTIFY_SHOP_ID}/products.json`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
           'Content-Type': 'application/json',
         },
       },

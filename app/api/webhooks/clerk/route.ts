@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
 import { db as prisma } from '@/lib/db';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs'; // Node runtime for crypto
 export const dynamic = 'force-dynamic';
@@ -29,14 +30,15 @@ function getPrimaryEmail(u: ClerkUser): string | null {
 }
 
 export async function POST(req: Request) {
-  const svixId = headers().get('svix-id');
-  const svixTimestamp = headers().get('svix-timestamp');
-  const svixSignature = headers().get('svix-signature');
+  const headersList = await headers();
+  const svixId = headersList.get('svix-id');
+  const svixTimestamp = headersList.get('svix-timestamp');
+  const svixSignature = headersList.get('svix-signature');
   if (!svixId || !svixTimestamp || !svixSignature) {
     return new NextResponse('Missing Svix headers', { status: 400 });
   }
 
-  const secret = process.env.CLERK_WEBHOOK_SECRET;
+  const secret = env.CLERK_WEBHOOK_SECRET;
   if (!secret) return new NextResponse('Missing CLERK_WEBHOOK_SECRET', { status: 500 });
 
   const payload = await req.text();

@@ -1,3 +1,5 @@
+import { env } from '@/env.mjs';
+
 export interface GameDefinition {
   key: string;
   name: string;
@@ -219,7 +221,7 @@ export function isGameEnabled(key: string): boolean {
   } catch {
     // Fallback to environment variables if config not available
     const flagKey = game.featureFlagKey;
-    const envValue = process.env[`NEXT_PUBLIC_${flagKey.toUpperCase()}`];
+    const envValue = env[`NEXT_PUBLIC_${flagKey.toUpperCase()}` as keyof typeof env];
     return envValue === 'true' || envValue === '1';
   }
 }

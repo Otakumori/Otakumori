@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return new Response('Webhook secret not configured', { status: 500 });
   }
   // Get the headers
-  const headerPayload = headers();
+  const headerPayload = await headers();
   const svix_id = headerPayload.get('svix-id');
   const svix_timestamp = headerPayload.get('svix-timestamp');
   const svix_signature = headerPayload.get('svix-signature');

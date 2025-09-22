@@ -9,7 +9,7 @@ const rateLimitConfig = {
     limiter: rateLimiters.auth,
     identifier: (req: NextRequest) => {
       // Use IP for auth routes
-      return req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
@@ -17,14 +17,14 @@ const rateLimitConfig = {
   '/api/v1/contact': {
     limiter: rateLimiters.contact,
     identifier: (req: NextRequest) => {
-      return req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
   '/api/v1/comments': {
     limiter: rateLimiters.publicWrite,
     identifier: (req: NextRequest) => {
-      return req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
@@ -34,7 +34,7 @@ const rateLimitConfig = {
     identifier: (req: NextRequest) => {
       // Use user ID if available, otherwise IP
       const userId = req.headers.get('x-user-id');
-      return userId || req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return userId || req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
@@ -43,7 +43,7 @@ const rateLimitConfig = {
     limiter: rateLimiters.search,
     identifier: (req: NextRequest) => {
       const userId = req.headers.get('x-user-id');
-      return userId || req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return userId || req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
@@ -52,7 +52,7 @@ const rateLimitConfig = {
     limiter: rateLimiters.upload,
     identifier: (req: NextRequest) => {
       const userId = req.headers.get('x-user-id');
-      return userId || req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return userId || req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
@@ -61,7 +61,7 @@ const rateLimitConfig = {
     limiter: rateLimiters.checkout,
     identifier: (req: NextRequest) => {
       const userId = req.headers.get('x-user-id');
-      return userId || req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return userId || req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 
@@ -70,7 +70,7 @@ const rateLimitConfig = {
     limiter: rateLimiters.api,
     identifier: (req: NextRequest) => {
       const userId = req.headers.get('x-user-id');
-      return userId || req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+      return userId || req.headers.get('x-forwarded-for') || 'unknown';
     },
   },
 } as const;
@@ -227,7 +227,7 @@ export async function burstProtectionMiddleware(req: NextRequest): Promise<NextR
   }
 
   try {
-    const identifier = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const identifier = req.headers.get('x-forwarded-for') || 'unknown';
 
     // Very strict burst protection: 10 requests per 10 seconds
     if (!redis) {
@@ -272,7 +272,7 @@ export async function ddosProtectionMiddleware(req: NextRequest): Promise<NextRe
   }
 
   try {
-    const identifier = req.ip || req.headers.get('x-forwarded-for') || 'unknown';
+    const identifier = req.headers.get('x-forwarded-for') || 'unknown';
     const userAgent = req.headers.get('user-agent') || '';
 
     // Check for suspicious patterns

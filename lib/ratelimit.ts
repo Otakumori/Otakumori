@@ -1,9 +1,10 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { env } from '@/env.mjs';
 
 // Simple Upstash rate-limit helper for API routes
-const url = process.env.UPSTASH_REDIS_REST_URL;
-const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+const url = env.UPSTASH_REDIS_REST_URL;
+const token = env.UPSTASH_REDIS_REST_TOKEN;
 
 export const rl =
   url && token

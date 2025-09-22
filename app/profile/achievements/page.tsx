@@ -5,6 +5,7 @@ import NavBar from '../../components/NavBar';
 import FooterDark from '../../components/FooterDark';
 import AchievementsTabs from '../../components/profile/AchievementsTabs';
 import { t } from '@/lib/microcopy';
+import { env } from '@/env.mjs';
 
 export const metadata: Metadata = {
   title: 'Achievements — Otaku-mori',
@@ -17,7 +18,7 @@ async function getAchievements() {
     const token = await getToken({ template: 'otakumori-jwt' });
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/achievements/me`,
+      `${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/achievements/me`,
       {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         cache: 'no-store',

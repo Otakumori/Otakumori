@@ -2,11 +2,12 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { auth, currentUser } from '@clerk/nextjs/server';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
 function assertEnv() {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!env.BLOB_READ_WRITE_TOKEN) {
     throw new Error('Missing BLOB_READ_WRITE_TOKEN');
   }
 }
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
       access: 'public',
       contentType: file.type || 'application/octet-stream',
       addRandomSuffix: false,
-      token: process.env.BLOB_READ_WRITE_TOKEN,
+      token: env.BLOB_READ_WRITE_TOKEN,
     });
 
     return NextResponse.json({ ok: true, url, path });

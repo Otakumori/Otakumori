@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { GameStartRequestSchema, GameStartResponseSchema } from '@/app/lib/contracts';
 import { getGameDef } from '@/app/lib/games';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
@@ -66,13 +67,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if game is enabled via feature flag
-    const isEnabled = process.env[`NEXT_PUBLIC_${gameDef.featureFlagKey.toUpperCase()}`] === 'true';
+    const isEnabled =
+      env[`NEXT_PUBLIC_${gameDef.featureFlagKey.toUpperCase()}` as keyof typeof env] === 'true';
     if (!isEnabled) {
       return NextResponse.json({ ok: false, error: 'Game is currently disabled' }, { status: 403 });
     }
 
     // Check daily petal limit
-    const dailyLimit = parseInt(process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500');
+    const dailyLimit = parseInt(env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500');
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
@@ -107,7 +109,7 @@ export async function POST(request: NextRequest) {
           seed,
           flags: {
             dailyLimit,
-            eventCode: process.env.NEXT_PUBLIC_EVENT_CODE || 'SPRING_HANAMI',
+            eventCode: env.NEXT_PUBLIC_EVENT_CODE || 'SPRING_HANAMI',
           },
         },
       },
@@ -129,7 +131,7 @@ export async function POST(request: NextRequest) {
         seed,
         flags: {
           dailyLimit,
-          eventCode: process.env.NEXT_PUBLIC_EVENT_CODE || 'SPRING_HANAMI',
+          eventCode: env.NEXT_PUBLIC_EVENT_CODE || 'SPRING_HANAMI',
         },
       },
     };

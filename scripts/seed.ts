@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
 import { PrismaClient } from '@prisma/client';
+import { env } from '../env.mjs';
 
 const prisma = new PrismaClient();
 
@@ -72,8 +73,8 @@ async function seedPrintifyFallback() {
 }
 
 async function trySeedFromPrintify() {
-  const apiKey = process.env.PRINTIFY_API_KEY;
-  const shopId = process.env.PRINTIFY_SHOP_ID;
+  const apiKey = env.PRINTIFY_API_KEY;
+  const shopId = env.PRINTIFY_SHOP_ID;
   if (!apiKey || !shopId) return false;
 
   try {

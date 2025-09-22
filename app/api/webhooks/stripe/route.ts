@@ -92,7 +92,8 @@ async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.
 }
 
 export async function POST(req: Request) {
-  const sig = headers().get('stripe-signature');
+  const headersList = await headers();
+  const sig = headersList.get('stripe-signature');
   if (!sig) return new NextResponse('Missing Stripe-Signature', { status: 400 });
 
   const secret = env.STRIPE_WEBHOOK_SECRET;

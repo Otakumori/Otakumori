@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
 import { auth, currentUser } from '@clerk/nextjs/server';
+import { env } from '@/env.mjs';
 
 export const runtime = 'nodejs';
 
@@ -16,7 +17,7 @@ async function requireAdmin() {
 export async function GET() {
   try {
     await requireAdmin();
-    const result = await list({ prefix: 'media/', token: process.env.BLOB_READ_WRITE_TOKEN });
+    const result = await list({ prefix: 'media/', token: env.BLOB_READ_WRITE_TOKEN });
     // Sort newest first
     result.blobs.sort((a, b) => {
       const aTime = a.uploadedAt ? new Date(a.uploadedAt).getTime() : 0;

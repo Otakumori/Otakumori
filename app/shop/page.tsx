@@ -6,7 +6,7 @@ import StarfieldPurple from '../components/StarfieldPurple';
 import FooterDark from '../components/FooterDark';
 import ShopCatalog from '../components/shop/ShopCatalog';
 import { t } from '@/lib/microcopy';
-import { env } from '@/server/env';
+import { env } from '@/env.mjs';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
@@ -36,7 +36,7 @@ async function loadPrintifyProducts(): Promise<ApiResponse> {
       env.NODE_ENV === 'production' ? 'https://www.otaku-mori.com' : 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/printify/products`, {
       headers: {
-        'x-req-id': headers().get('x-req-id') ?? '',
+        'x-req-id': (await headers()).get('x-req-id') ?? '',
       },
       cache: 'no-store',
     });

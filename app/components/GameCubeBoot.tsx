@@ -123,7 +123,9 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
         )}
       </AnimatePresence>
 
-      <style jsx>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes scanline-flicker {
           0%,
           100% {
@@ -133,7 +135,9 @@ export default function GameCubeBoot({ onBootComplete }: GameCubeBootProps) {
             opacity: 0.12;
           }
         }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }

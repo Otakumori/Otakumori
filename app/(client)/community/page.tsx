@@ -1,12 +1,12 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
-import Header from '../../components/Header';
+// Header is now handled by Navbar in the layout
 
 export default function CommunityPage() {
   return (
     <main className="min-h-screen bg-pink-50">
-      <Header />
+      {/* Header is now handled by Navbar in the layout */}
       <section className="mx-auto max-w-4xl px-4 pb-12 pt-32">
         <h1 className="mb-6 text-center text-3xl font-extrabold text-pink-700 md:text-5xl">
           Community
