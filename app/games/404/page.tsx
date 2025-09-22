@@ -1,12 +1,8 @@
-import type { Metadata } from 'next';
+'use client';
+
 import dynamic from 'next/dynamic';
 import NavBar from '../../components/NavBar';
 import FooterDark from '../../components/FooterDark';
-
-export const metadata: Metadata = {
-  title: '404 Game — Otaku-mori',
-  description: 'A special mini-game for when you get lost in the digital abyss.',
-};
 
 // Dynamic import to avoid SSR issues with game components
 const Game404 = dynamic(() => import('../../components/games/Game404'), {

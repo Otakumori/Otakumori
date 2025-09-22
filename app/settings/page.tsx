@@ -1,11 +1,8 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
-import dynamic from 'next/dynamic';
+import OneTapGamertagWrapper from './OneTapGamertagWrapper';
 
 const db = new PrismaClient();
-const OneTapGamertag = dynamic(() => import('@/app/components/profile/OneTapGamertag'), {
-  ssr: false,
-});
 
 export default async function SettingsPage() {
   const { userId } = await auth();
@@ -17,7 +14,7 @@ export default async function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <h1 className="mb-6 text-2xl font-semibold">Settings</h1>
-      <OneTapGamertag
+      <OneTapGamertagWrapper
         initial={(profile?.gamertag ?? me?.publicMetadata?.gamertag) as string | undefined}
       />
     </div>

@@ -333,3 +333,99 @@ utils/supabase/client.ts
 utils/supabase/middleware.ts
 utils/supabase/server.ts
 utils/supabase/supabase.ts
+[33mcommit d160010cfd4bcb56a02634cc1d31db5dc52c09a2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: ap190 <ap190@adis_pc.com>
+Date:   Mon Sep 22 09:42:45 2025 -0400
+
+    feat: Complete auth flow overhaul and Next.js 15 upgrade
+
+D	.eslintcache
+D	.eslintrc.cjs
+A	.eslintrc.json
+M	app/(client)/community/page.tsx
+M	app/Providers.tsx
+M	app/[slug]/page.tsx
+M	app/abyss/shop/api/printify.js
+M	app/api/admin/backup/route.ts
+M	app/api/admin/cache/clear/route.ts
+M	app/api/admin/maintenance/route.ts
+M	app/api/admin/media/delete/route.ts
+M	app/api/admin/media/list/route.ts
+M	app/api/admin/media/upload/route.ts
+M	app/api/admin/music/blob-upload-token/route.ts
+M	app/api/admin/notifications/route.ts
+M	app/api/clerk/webhook/route.ts
+M	app/api/cron/route.js
+M	app/api/debug/printify/route.ts
+M	app/api/health/clerk/route.ts
+M	app/api/petals/click/route.ts
+M	app/api/printify/health/route.ts
+M	app/api/rate-limit.ts
+M	app/api/test-simple/route.ts
+M	app/api/v1/games/start/route.ts
+M	app/api/v1/products/[slug]/route.ts
+M	app/api/v1/products/featured/route.ts
+M	app/api/webhooks/clerk/route.ts
+M	app/api/webhooks/inngest/route.ts
+M	app/api/webhooks/printify/route.ts
+M	app/api/webhooks/stripe/route.ts
+M	app/collections/[slug]/page.tsx
+M	app/components/BlogTeaser.tsx
+M	app/components/GameCubeBoot.tsx
+D	app/components/Header.js
+M	app/components/MiniGameTeaser.tsx
+D	app/components/NavAuth.tsx
+M	app/components/PetalCollector.tsx
+M	app/components/PetalLayer.tsx
+M	app/components/ShopTeaser.tsx
+M	app/components/TradeCraft.tsx
+A	app/components/auth/RouteGuard.tsx
+M	app/components/auth/UserMenu.tsx
+M	app/components/blog/BlogIndex.tsx
+A	app/components/effects/PetalField.tsx
+M	app/components/layout/Navbar.tsx
+M	app/components/soapstone/SoapstoneHomeDrift.tsx
+A	app/contexts/AuthContext.tsx
+M	app/flags.ts
+A	app/hooks/useAuth.ts
+M	app/layout.tsx
+M	app/lib/env-schema.ts
+M	app/lib/games.ts
+M	app/lib/logger.ts
+M	app/lib/printify/service.ts
+M	app/lib/prisma.ts
+M	app/lib/rateLimit.ts
+M	app/lib/supabaseClient.ts
+M	app/mini-games/_components/BootScreen.tsx
+M	app/profile/achievements/page.tsx
+M	app/profile/petals/page.tsx
+M	app/providers/ClerkProviderWrapper.tsx
+M	app/shop/page.tsx
+M	app/sign-in/[[...index]]/page.tsx
+M	app/sign-up/[[...index]]/page.tsx
+A	app/unauthorized/page.tsx
+M	components/BackdropAbyssMystique.tsx
+M	dist/tsconfig.tsbuildinfo
+M	env.mjs
+M	lib/flags.ts
+M	lib/ratelimit.ts
+M	lib/required-env.ts
+M	middleware.ts
+M	middleware/rate-limit.ts
+M	middleware/rateLimit.ts
+M	next-env.d.ts
+M	next.config.mjs
+M	package.json
+M	playwright.config.ts
+M	pnpm-lock.yaml
+M	scripts/no-inline/extract-inline-styles.cjs
+M	scripts/pre-build-validation.ts
+M	scripts/seed.ts
+M	server/db.ts
+D	server/env.ts
+D	src/config/env.ts
+D	src/config/flags.ts
+M	src/services/health.ts
+A	test-db-connection.js
+A	test-env.js
+M	upgrade_precheck_and_backup.js
