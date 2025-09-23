@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Pop for spy-craft secrets…',
 };
 
-'use client';
+('use client');
 
 import { useState } from 'react';
 
@@ -16,11 +16,11 @@ export default function BubblePopGachaPage() {
   const [bubbles, setBubbles] = useState(0);
 
   const popBubble = () => {
-    setBubbles(prev => prev + 1);
-    
+    setBubbles((prev) => prev + 1);
+
     // 20% chance to get a shard
     if (Math.random() < 0.2) {
-      setShards(prev => prev + 1);
+      setShards((prev) => prev + 1);
     }
   };
 
@@ -31,12 +31,12 @@ export default function BubblePopGachaPage() {
         'Double Pop',
         'Shard Magnet',
         'Lucky Star',
-        'Bubble Shield'
+        'Bubble Shield',
       ];
-      
+
       const newPerk = availablePerks[Math.floor(Math.random() * availablePerks.length)];
-      setPerks(prev => [...prev, newPerk]);
-      setShards(prev => prev - 5);
+      setPerks((prev) => [...prev, newPerk]);
+      setShards((prev) => prev - 5);
     }
   };
 
@@ -53,7 +53,7 @@ export default function BubblePopGachaPage() {
 
           {/* Main Game Area */}
           <div className="bg-black/20 rounded-2xl p-8 text-center mb-6">
-            <div 
+            <div
               className="text-8xl cursor-pointer hover:scale-110 transition-transform duration-200 inline-block"
               onClick={popBubble}
               role="button"
@@ -85,7 +85,10 @@ export default function BubblePopGachaPage() {
               <h3 className="text-white text-xl font-bold mb-4">Your Perks</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {perks.map((perk, index) => (
-                  <div key={index} className="bg-purple-600/30 rounded-lg p-2 text-center text-white text-sm">
+                  <div
+                    key={index}
+                    className="bg-purple-600/30 rounded-lg p-2 text-center text-white text-sm"
+                  >
                     {perk}
                   </div>
                 ))}
