@@ -30,7 +30,7 @@ export default function MiniGamesHome() {
   if (showBoot) {
     return (
       <GameCubeBoot
-        onBootComplete={() => {
+        onComplete={() => {
           setShowBoot(false);
           try {
             window.localStorage.setItem('gc_boot', '1');
