@@ -116,11 +116,11 @@ export default function ThighChaseGame() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       keysRef.current.add(e.key.toLowerCase());
-      
+
       if (e.key === 'Escape') {
-        setGameState(prev => prev === 'playing' ? 'paused' : prev);
+        setGameState((prev) => (prev === 'playing' ? 'paused' : prev));
       }
-      
+
       if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') && gameState === 'playing') {
         jump();
       }
@@ -141,7 +141,7 @@ export default function ThighChaseGame() {
 
   // Jump action
   const jump = useCallback(() => {
-    setPlayer(prev => {
+    setPlayer((prev) => {
       if (prev.onGround) {
         return { ...prev, velocityY: JUMP_FORCE, onGround: false };
       }
@@ -156,10 +156,10 @@ export default function ThighChaseGame() {
       { type: 'high' as const, width: 30, height: 60, y: GROUND_Y - 60 },
       { type: 'wide' as const, width: 80, height: 40, y: GROUND_Y - 40 },
     ];
-    
+
     const template = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
     const speed = BASE_SPEED + stage * 0.5;
-    
+
     const newObstacle: Obstacle = {
       id: nextObstacleId,
       x: CANVAS_WIDTH + 50,
@@ -169,16 +169,16 @@ export default function ThighChaseGame() {
       type: template.type,
       speed,
     };
-    
-    setObstacles(prev => [...prev, newObstacle]);
-    setNextObstacleId(prev => prev + 1);
+
+    setObstacles((prev) => [...prev, newObstacle]);
+    setNextObstacleId((prev) => prev + 1);
   }, [stage, nextObstacleId]);
 
   // Spawn powerup
   const spawnPowerup = useCallback(() => {
     const powerupTypes = ['speed', 'shield', 'points'] as const;
     const type = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
-    
+
     const newPowerup: Powerup = {
       id: nextPowerupId,
       x: CANVAS_WIDTH + 30,
@@ -186,63 +186,63 @@ export default function ThighChaseGame() {
       type,
       collected: false,
     };
-    
-    setPowerups(prev => [...prev, newPowerup]);
-    setNextPowerupId(prev => prev + 1);
+
+    setPowerups((prev) => [...prev, newPowerup]);
+    setNextPowerupId((prev) => prev + 1);
   }, [nextPowerupId]);
 
   // Game loop
   useEffect(() => {
     if (gameState !== 'playing') return;
-    
+
     const gameLoop = () => {
       const deltaTime = 16; // ~60fps
-      setGameTime(prev => prev + deltaTime);
-      
+      setGameTime((prev) => prev + deltaTime);
+
       // Update distance
-      setDistance(prev => {
+      setDistance((prev) => {
         const newDistance = prev + (BASE_SPEED + stage * 0.5);
-        
+
         // Stage progression every 1000 distance units
         if (Math.floor(newDistance / 1000) > stage - 1) {
-          setStage(s => s + 1);
+          setStage((s) => s + 1);
         }
-        
+
         return newDistance;
       });
 
       // Player physics
-      setPlayer(prev => {
+      setPlayer((prev) => {
         let newY = prev.y + prev.velocityY;
         let newVelocityY = prev.velocityY;
         let newOnGround = prev.onGround;
         let newInvulnerable = Math.max(0, prev.invulnerable - deltaTime);
         let newShielded = Math.max(0, prev.shielded - deltaTime);
         let newSpeedBoost = Math.max(0, prev.speedBoost - deltaTime);
-        
+
         // Apply gravity
         if (!prev.onGround) {
           newVelocityY += GRAVITY;
         }
-        
+
         // Ground collision
         if (newY >= GROUND_Y - prev.height) {
           newY = GROUND_Y - prev.height;
           newVelocityY = 0;
           newOnGround = true;
         }
-        
+
         // Horizontal movement
         let newX = prev.x;
         const speed = newSpeedBoost > 0 ? 6 : 4;
-        
+
         if (keysRef.current.has('a') || keysRef.current.has('arrowleft')) {
           newX = Math.max(50, newX - speed);
         }
         if (keysRef.current.has('d') || keysRef.current.has('arrowright')) {
           newX = Math.min(CANVAS_WIDTH - 100, newX + speed);
         }
-        
+
         return {
           ...prev,
           x: newX,
@@ -256,11 +256,11 @@ export default function ThighChaseGame() {
       });
 
       // Update pursuer (always getting closer)
-      setPursuer(prev => {
+      setPursuer((prev) => {
         const targetDistance = 150; // Ideal distance behind player
         const currentDistance = player.x - prev.x;
         let newSpeed = prev.speed + 0.01; // Gradually getting faster
-        
+
         if (currentDistance < 50) {
           // Too close - catching the player
           return { ...prev, catching: true, speed: newSpeed };
@@ -268,7 +268,7 @@ export default function ThighChaseGame() {
           // Too far - speed up
           newSpeed += 0.5;
         }
-        
+
         return {
           ...prev,
           x: prev.x + newSpeed,
@@ -278,7 +278,7 @@ export default function ThighChaseGame() {
       });
 
       // Spawn obstacles
-      setObstacleSpawnTimer(prev => {
+      setObstacleSpawnTimer((prev) => {
         const spawnRate = Math.max(800, 2000 - stage * 100); // Faster spawning each stage
         if (prev <= 0) {
           if (Math.random() < 0.7) spawnObstacle();
@@ -288,7 +288,7 @@ export default function ThighChaseGame() {
       });
 
       // Spawn powerups
-      setPowerupSpawnTimer(prev => {
+      setPowerupSpawnTimer((prev) => {
         if (prev <= 0) {
           if (Math.random() < 0.3) spawnPowerup();
           return 5000; // Every 5 seconds chance
@@ -297,31 +297,34 @@ export default function ThighChaseGame() {
       });
 
       // Update obstacles
-      setObstacles(prev => prev
-        .map(obstacle => ({ ...obstacle, x: obstacle.x - obstacle.speed }))
-        .filter(obstacle => obstacle.x > -100)
+      setObstacles((prev) =>
+        prev
+          .map((obstacle) => ({ ...obstacle, x: obstacle.x - obstacle.speed }))
+          .filter((obstacle) => obstacle.x > -100),
       );
 
       // Update powerups
-      setPowerups(prev => prev
-        .map(powerup => ({ ...powerup, x: powerup.x - (BASE_SPEED + stage * 0.5) }))
-        .filter(powerup => powerup.x > -50 && !powerup.collected)
+      setPowerups((prev) =>
+        prev
+          .map((powerup) => ({ ...powerup, x: powerup.x - (BASE_SPEED + stage * 0.5) }))
+          .filter((powerup) => powerup.x > -50 && !powerup.collected),
       );
 
       // Collision detection
       // Player vs Obstacles
       if (player.invulnerable <= 0 && player.shielded <= 0) {
-        setObstacles(prevObstacles => {
+        setObstacles((prevObstacles) => {
           let playerHit = false;
-          const result = prevObstacles.filter(obstacle => {
-            const collision = obstacle.x < player.x + player.width && 
-                            obstacle.x + obstacle.width > player.x &&
-                            obstacle.y < player.y + player.height && 
-                            obstacle.y + obstacle.height > player.y;
+          const result = prevObstacles.filter((obstacle) => {
+            const collision =
+              obstacle.x < player.x + player.width &&
+              obstacle.x + obstacle.width > player.x &&
+              obstacle.y < player.y + player.height &&
+              obstacle.y + obstacle.height > player.y;
             if (collision && !playerHit) {
               playerHit = true;
-              setLives(l => l - 1);
-              setPlayer(prev => ({ ...prev, invulnerable: 2000 })); // 2 second invulnerability
+              setLives((l) => l - 1);
+              setPlayer((prev) => ({ ...prev, invulnerable: 2000 })); // 2 second invulnerability
               return false; // Remove obstacle
             }
             return true;
@@ -331,28 +334,29 @@ export default function ThighChaseGame() {
       }
 
       // Player vs Powerups
-      setPowerups(prevPowerups => {
-        return prevPowerups.map(powerup => {
+      setPowerups((prevPowerups) => {
+        return prevPowerups.map((powerup) => {
           if (powerup.collected) return powerup;
-          
-          const collision = powerup.x < player.x + player.width && 
-                          powerup.x + 20 > player.x &&
-                          powerup.y < player.y + player.height && 
-                          powerup.y + 20 > player.y;
-          
+
+          const collision =
+            powerup.x < player.x + player.width &&
+            powerup.x + 20 > player.x &&
+            powerup.y < player.y + player.height &&
+            powerup.y + 20 > player.y;
+
           if (collision) {
             switch (powerup.type) {
               case 'speed':
-                setPlayer(prev => ({ ...prev, speedBoost: 5000 })); // 5 seconds
+                setPlayer((prev) => ({ ...prev, speedBoost: 5000 })); // 5 seconds
                 break;
               case 'shield':
-                setPlayer(prev => ({ ...prev, shielded: 8000 })); // 8 seconds
+                setPlayer((prev) => ({ ...prev, shielded: 8000 })); // 8 seconds
                 break;
               case 'points':
-                setScore(prev => prev + 200);
+                setScore((prev) => prev + 200);
                 break;
             }
-            setScore(prev => prev + 50); // Base powerup points
+            setScore((prev) => prev + 50); // Base powerup points
             return { ...powerup, collected: true };
           }
           return powerup;
@@ -361,10 +365,11 @@ export default function ThighChaseGame() {
 
       // Player vs Pursuer (Game Over)
       if (pursuer.catching && player.invulnerable <= 0 && player.shielded <= 0) {
-        const collision = pursuer.x < player.x + player.width && 
-                        pursuer.x + pursuer.width > player.x &&
-                        pursuer.y < player.y + player.height && 
-                        pursuer.y + pursuer.height > player.y;
+        const collision =
+          pursuer.x < player.x + player.width &&
+          pursuer.x + pursuer.width > player.x &&
+          pursuer.y < player.y + player.height &&
+          pursuer.y + pursuer.height > player.y;
         if (collision) {
           setLives(0); // Instant game over when caught
         }
@@ -376,7 +381,7 @@ export default function ThighChaseGame() {
       }
 
       // Score for survival
-      setScore(prev => prev + 1);
+      setScore((prev) => prev + 1);
 
       animationRef.current = requestAnimationFrame(gameLoop);
     };
@@ -452,10 +457,10 @@ export default function ThighChaseGame() {
     }
 
     // Draw obstacles
-    obstacles.forEach(obstacle => {
+    obstacles.forEach((obstacle) => {
       ctx.fillStyle = obstacle.type === 'high' ? '#8b0000' : '#654321';
       ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      
+
       // Obstacle warning/style
       ctx.fillStyle = '#ffffff';
       ctx.font = '12px monospace';
@@ -464,9 +469,9 @@ export default function ThighChaseGame() {
     });
 
     // Draw powerups
-    powerups.forEach(powerup => {
+    powerups.forEach((powerup) => {
       if (powerup.collected) return;
-      
+
       const colors = {
         speed: '#00ff00',
         shield: '#0066ff',
@@ -474,13 +479,13 @@ export default function ThighChaseGame() {
       };
       ctx.fillStyle = colors[powerup.type];
       ctx.fillRect(powerup.x, powerup.y, 20, 20);
-      
+
       // Powerup glow effect
       ctx.shadowColor = colors[powerup.type];
       ctx.shadowBlur = 10;
       ctx.fillRect(powerup.x, powerup.y, 20, 20);
       ctx.shadowBlur = 0;
-      
+
       const symbols = {
         speed: '💨',
         shield: '🛡️',
@@ -493,7 +498,7 @@ export default function ThighChaseGame() {
     // Draw pursuer (menacing thighs)
     ctx.fillStyle = pursuer.catching ? '#ff0000' : '#800080';
     ctx.fillRect(pursuer.x, pursuer.y, pursuer.width, pursuer.height);
-    
+
     // Pursuer effects
     if (pursuer.catching) {
       ctx.shadowColor = '#ff0000';
@@ -501,26 +506,31 @@ export default function ThighChaseGame() {
       ctx.fillRect(pursuer.x, pursuer.y, pursuer.width, pursuer.height);
       ctx.shadowBlur = 0;
     }
-    
+
     // Pursuer symbol
     ctx.fillStyle = '#ffffff';
     ctx.font = '24px monospace';
     ctx.fillText('🦵', pursuer.x + 25, pursuer.y + 50);
 
     // Draw player
-    const playerColor = player.invulnerable > 0 ? '#ff69b480' : 
-                       player.shielded > 0 ? '#00ffff' : 
-                       player.speedBoost > 0 ? '#ffff00' : '#ff69b4';
+    const playerColor =
+      player.invulnerable > 0
+        ? '#ff69b480'
+        : player.shielded > 0
+          ? '#00ffff'
+          : player.speedBoost > 0
+            ? '#ffff00'
+            : '#ff69b4';
     ctx.fillStyle = playerColor;
     ctx.fillRect(player.x, player.y, player.width, player.height);
-    
+
     // Player effects
     if (player.shielded > 0) {
       ctx.strokeStyle = '#00ffff';
       ctx.lineWidth = 3;
       ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
     }
-    
+
     // Player symbol
     ctx.fillStyle = '#ffffff';
     ctx.font = '16px monospace';

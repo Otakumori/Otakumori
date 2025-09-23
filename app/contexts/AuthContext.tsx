@@ -51,6 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     action: null,
   });
 
+  // Session-based deduplication to prevent modal spam
+  const [shownThisSession, setShownThisSession] = useState<Set<string>>(new Set());
+
   // Check if user is admin based on metadata
   const isAdmin = user?.publicMetadata?.role === 'admin' || user?.unsafeMetadata?.role === 'admin';
 
@@ -60,8 +63,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isLoaded]);
 
+  // Reset session deduplication when user auth state changes
+  useEffect(() => {
+    if (isLoaded) {
+      setShownThisSession(new Set()); // Clear session deduplication on auth change
+    }
+  }, [user?.id, isLoaded]); // Reset when user ID changes
+
   const openAuthModal = useCallback(
     (action: 'sign-in' | 'sign-up', redirectUrl?: string, message?: string) => {
+      // Create a unique key for this modal request
+      const modalKey = `${action}-${message || 'default'}`;
+      
+      // Check if we've already shown this modal in this session
+      if (shownThisSession.has(modalKey)) {
+        return; // Don't show duplicate modal
+      }
+      
+      // Mark as shown for this session
+      setShownThisSession(prev => new Set(prev).add(modalKey));
+      
       setAuthModal({
         isOpen: true,
         action,
@@ -69,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message,
       });
     },
-    [],
+    [shownThisSession],
   );
 
   const closeAuthModal = useCallback(() => {

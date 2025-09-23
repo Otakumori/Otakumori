@@ -1,62 +1,56 @@
 'use client';
 
+import { useAuthContext } from '../contexts/AuthContext';
 import { useAuth as useClerkAuth, useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
 
+// This hook now delegates to the main AuthContext to avoid conflicts
 export function useAuth() {
-  const { user, isLoaded } = useUser();
-  const { signOut } = useClerkAuth();
-  const router = useRouter();
-
-  const isSignedIn = !!user;
-  const isAdmin = user?.publicMetadata?.role === 'admin' || user?.unsafeMetadata?.role === 'admin';
-
-  const requireAuth = useCallback(
-    (redirectTo?: string) => {
-      if (!isLoaded) return false;
-      if (!isSignedIn) {
-        const url = new URL('/sign-in', window.location.origin);
-        if (redirectTo) {
-          url.searchParams.set('redirect_url', redirectTo);
-        }
-        router.push(url.toString());
-        return false;
-      }
-      return true;
-    },
-    [isLoaded, isSignedIn, router],
-  );
-
-  const requireAdmin = useCallback(
-    (redirectTo?: string) => {
-      if (!requireAuth(redirectTo)) return false;
-      if (!isAdmin) {
-        router.push('/unauthorized');
-        return false;
-      }
-      return true;
-    },
-    [requireAuth, isAdmin, router],
-  );
-
-  const signOutAndRedirect = useCallback(
-    async (redirectTo = '/') => {
-      await signOut();
-      router.push(redirectTo);
-    },
-    [signOut, router],
-  );
-
+  const authContext = useAuthContext();
+  const { user } = useUser();
+  
+  // Use AuthContext values for consistent modal behavior
   return {
-    user,
-    isLoaded,
-    isSignedIn,
-    isAdmin,
-    isLoading: !isLoaded,
-    signOut: signOutAndRedirect,
-    requireAuth,
-    requireAdmin,
+    user: authContext.user,
+    isLoaded: authContext.isLoaded,
+    isSignedIn: authContext.isSignedIn,
+    isAdmin: authContext.isAdmin,
+    isLoading: authContext.isLoading,
+    signOut: authContext.signOut,
+    // Use modal intercepts instead of hard navigation
+    requireAuth: (action?: (() => void) | string, fallbackMessage?: string) => {
+      if (typeof action === 'string') {
+        // Legacy support for redirectTo string
+        if (!authContext.isSignedIn) {
+          authContext.openAuthModal('sign-in', action, fallbackMessage);
+          return false;
+        }
+        return true;
+      } else if (typeof action === 'function') {
+        // New modal intercept behavior
+        authContext.requireAuth(action, fallbackMessage);
+        return true;
+      } else {
+        // Just check auth status
+        return authContext.isSignedIn;
+      }
+    },
+    requireAdmin: (action?: (() => void) | string, fallbackMessage?: string) => {
+      if (typeof action === 'string') {
+        // Legacy support with admin check
+        if (!authContext.isSignedIn || !authContext.isAdmin) {
+          authContext.openAuthModal('sign-in', action, 'Administrator access required');
+          return false;
+        }
+        return true;
+      } else if (typeof action === 'function') {
+        // New modal intercept behavior
+        authContext.requireRole('admin', action, fallbackMessage);
+        return true;
+      } else {
+        // Just check admin status
+        return authContext.isSignedIn && authContext.isAdmin;
+      }
+    },
   };
 }
 

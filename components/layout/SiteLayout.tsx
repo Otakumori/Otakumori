@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import FriendsButton from '@/app/components/FriendsButton';
 import NotificationBell from '@/app/components/NotificationBell';
 import CharacterReaction from '@/app/components/CharacterReaction';
+import { useAuthContext } from '@/app/contexts/AuthContext';
 
 // ---- Experience flags (could be fed by proxy) ----
 const experience = {
@@ -84,55 +85,7 @@ function Petals({
   );
 }
 
-// ---- Login modal ----
-function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 grid place-items-center bg-black/50"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 10, opacity: 0 }}
-            className="mx-4 w-full max-w-md rounded-3xl bg-neutral-900/95 border border-pink-400/40 p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-semibold text-pink-200">Message Received, Commander!</h3>
-            <p className="mt-2 text-neutral-300">Log in to sync perks, petals, and progress.</p>
-            <div className="mt-4 grid gap-3">
-              <input
-                placeholder="Email"
-                className="rounded-xl bg-neutral-800/80 p-3 outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
-                name="email"
-                type="email"
-                aria-label="Email"
-              />
-              <input
-                placeholder="Password"
-                type="password"
-                className="rounded-xl bg-neutral-800/80 p-3 outline-none ring-1 ring-neutral-700 focus:ring-pink-400"
-                name="password"
-                aria-label="Password"
-              />
-              <button className="rounded-2xl p-3 font-medium bg-pink-500/90 hover:bg-pink-500 text-white transition">
-                Log In
-              </button>
-            </div>
-            <p className="mt-3 text-xs text-neutral-400">
-              By continuing, you accept seasonal shenanigans and randomized perks.
-            </p>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
+// Removed duplicate LoginModal - using AuthContext modal instead
 
 export default function SiteLayout({
   children,
@@ -141,8 +94,8 @@ export default function SiteLayout({
   children: React.ReactNode;
   showPetals?: boolean;
 }) {
-  const [showLogin, setShowLogin] = useState(false);
   const [collected, setCollected] = useState(0);
+  const { openAuthModal } = useAuthContext();
 
   const seasonBg = {
     spring: 'from-neutral-950 via-neutral-950 to-neutral-900',
@@ -259,7 +212,7 @@ export default function SiteLayout({
 
             <div className="relative group">
               <button
-                onClick={() => setShowLogin(true)}
+                onClick={() => openAuthModal('sign-in', undefined, 'Log in to sync perks, petals, and progress.')}
                 className="rounded-2xl border border-white/10 bg-neutral-900/70 px-3 py-2 text-sm hover:border-pink-400/50"
               >
                 Log in
@@ -349,8 +302,7 @@ export default function SiteLayout({
         </div>
       </footer>
 
-      {/* Overlays */}
-      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+      {/* Overlays removed - using AuthContext modal instead */}
 
       {/* Character Reactions */}
       <CharacterReaction />
