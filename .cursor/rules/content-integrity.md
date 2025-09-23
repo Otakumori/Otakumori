@@ -1,0 +1,107 @@
+# Content Integrity Standards
+
+## Approved Microcopy Preservation
+
+### Core Principle
+**NEVER alter approved microcopy** without explicit user approval. Preserve exact wording, punctuation, and tone.
+
+### Protected Content Categories
+
+#### Game Descriptions
+```typescript
+// PROTECTED - Do not modify
+const GAME_DESCRIPTIONS = {
+  'samurai-petal-slice': "Draw the Tetsusaiga's arc…",
+  'anime-memory-match': "Recall the faces bound by fate.",
+  'bubble-pop-gacha': "Pop for spy-craft secrets…",
+  'rhythm-beat-em-up': "Sync to the Moon Prism's pulse.",
+  'petal-storm-rhythm': "Stormy rhythm playlist—precision timing for petals.",
+  'memory-match': "Flip cards and match pairs. Perfect recall earns bonuses.",
+  'bubble-girl': "Spawn bubbles, float and score. Sandbox or challenge mode.",
+  'bubble-ragdoll': "Toss the ragdoll into bubbles. Survive the chaos.",
+  'blossomware': "Chaotic micro-sessions—keep your petal streak alive.",
+  'dungeon-of-desire': "Descend into the dungeon. Survive rooms and claim rewards.",
+  'maid-cafe-manager': "Manage shifts and keep guests smiling.",
+  'thigh-coliseum': "Enter the arena. Win rounds and advance the bracket.",
+  'quick-math': "Answer fast. Pressure builds with each correct streak.",
+  'puzzle-reveal': "Clear the fog to reveal the art. Watch your energy.",
+  'petal-samurai': "Slash petals with style. Master storm and endless modes."
+};
+```
+
+#### Navigation & UI Text
+```typescript
+// PROTECTED - Do not modify
+const UI_MICROCOPY = {
+  site_tagline: "Anime x gaming shop + play — petals, runes, rewards.",
+  hero_title: "Welcome Home, Traveler — Otaku-mori",
+  soapstone_cta: "Leave a sign for fellow travelers",
+  search_placeholder: "What're ya buyin'?",
+  footer_copyright: "© 2024 Otaku-mori. All petals accounted for. Don't go hollow.",
+  footer_trademark: "Otakumori ™ made with ♡",
+  gamecube_select: "Select a face to navigate",
+  auth_soapstone: "Sign in to leave a sign for fellow travelers",
+  auth_praise: "Sign in to send praise to other travelers",
+  auth_wishlist: "Sign in to add items to your wishlist",
+  auth_trade: "Sign in to present offers in the Scarlet Bazaar",
+  auth_community: "Sign in to participate in community discussions"
+};
+```
+
+#### Character Quotes & References
+```typescript
+// PROTECTED - Preserve attribution and exact wording
+const CHARACTER_QUOTES = {
+  edward_elric: "I didn't lose. Just ran out of health. – Edward Elric",
+  // Add other character quotes as they appear
+};
+```
+
+### Content Guidelines
+
+#### Tone & Voice
+- **Nostalgic gaming references** - Maintain otaku culture authenticity
+- **Playful technical terms** - "petals", "runes", "travelers", "signs"
+- **Dark Souls inspiration** - "Don't go hollow", soapstone messaging
+- **Anime references** - Character quotes and series references
+
+#### Formatting Standards
+- **Em dashes** (—) for dramatic pauses, not hyphens (-)
+- **Smart quotes** (" ") when contextually appropriate
+- **Ellipses** (…) for trailing thoughts, not three periods (...)
+- **Apostrophes** (') properly formatted in contractions
+
+#### Brand Terminology
+- **Otaku-mori** - Primary brand name (hyphenated)
+- **Otakumori** - Trademark version (no hyphen)
+- **GameCube** - Proper capitalization for interface references
+- **Mini-Games** - Hyphenated in navigation
+- **Cherry Blossom** - Full term, not abbreviated
+
+### Implementation Rules
+
+#### Variable Naming
+```typescript
+// Use descriptive constants for protected content
+const SOAPSTONE_COMPOSE_PLACEHOLDER = "Compose a sign…";
+const PRAISE_MODAL_TITLE = "Send praise to fellow travelers";
+const WISHLIST_ADD_SUCCESS = "Added to wishlist";
+```
+
+#### Content Sources
+- Import from centralized constants file
+- Never hardcode strings in components
+- Use translation keys even for English-only content
+- Maintain content audit trail
+
+#### Review Process
+- **Content changes require approval** - Tag user for microcopy changes
+- **Preserve context** - Don't change meaning while fixing formatting
+- **Test thoroughly** - Verify content appears correctly across devices
+- **Document changes** - Track any approved modifications
+
+### Sanitization Rules
+- Fix technical issues (encoding, extra quotes) without changing meaning
+- Normalize quote styles consistently
+- Preserve intentional stylistic choices
+- Never auto-correct approved creative writing
