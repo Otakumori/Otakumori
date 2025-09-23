@@ -99,14 +99,21 @@ export default function Game({ mode }: Props) {
       const canvas = canvasRef.current!;
       const rect = canvas.getBoundingClientRect();
 
-      let x: number, y: number;
+      let clientX: number, clientY: number;
       if ('touches' in event) {
-        x = event.touches[0].clientX - rect.left;
-        y = event.touches[0].clientY - rect.top;
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
       } else {
-        x = event.clientX - rect.left;
-        y = event.clientY - rect.top;
+        clientX = event.clientX;
+        clientY = event.clientY;
       }
+
+      // Calculate scaled coordinates to match canvas resolution
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const x = (clientX - rect.left) * scaleX;
+      const y = (clientY - rect.top) * scaleY;
 
       gameRef.current.revealArea(x, y);
     },

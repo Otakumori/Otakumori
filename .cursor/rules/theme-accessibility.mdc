@@ -1,6 +1,6 @@
 ---
-description: "Global dark glass theme, a11y AA+, reduced-motion fallbacks"
-globs: ["**/*.tsx", "**/*.css", "app/globals.css", "tailwind.config.ts"]
+description: 'Global dark glass theme, a11y AA+, reduced-motion fallbacks'
+globs: ['**/*.tsx', '**/*.css', 'app/globals.css', 'tailwind.config.ts']
 alwaysApply: true
 ---
 
@@ -9,24 +9,27 @@ alwaysApply: true
 ## Global Dark Glass Theme
 
 ### Color Palette
+
 ```css
 /* Primary Theme Colors */
---background: #080611;          /* Deep dark background */
---surface: rgba(255,255,255,0.1); /* Glass surfaces */
---border: rgba(255,255,255,0.2);  /* Glass borders */
---text-primary: #ffffff;        /* Primary text */
---text-secondary: #zinc-300;    /* Secondary text */
---accent-pink: #ec4899;         /* Pink accents */
---accent-purple: #8b5cf6;       /* Purple accents */
+--background: #080611; /* Deep dark background */
+--surface: rgba(255, 255, 255, 0.1); /* Glass surfaces */
+--border: rgba(255, 255, 255, 0.2); /* Glass borders */
+--text-primary: #ffffff; /* Primary text */
+--text-secondary: #zinc-300; /* Secondary text */
+--accent-pink: #ec4899; /* Pink accents */
+--accent-purple: #8b5cf6; /* Purple accents */
 ```
 
 ### Glass Effect Standards
+
 - Use `backdrop-blur-lg` for primary glass surfaces
 - Combine with `bg-white/10` or `bg-black/20` for depth
 - Add `border border-white/20` for definition
 - Use `rounded-2xl` for primary containers, `rounded-xl` for cards
 
 ### Component Theming
+
 - **Game containers**: Dark card-based layout, not bright backgrounds
 - **Memory cards**: Custom Otaku-mori backs (🌸), dark theme
 - **Buttons**: Glass effect with hover states
@@ -36,18 +39,21 @@ alwaysApply: true
 ## Accessibility Standards (AA+)
 
 ### Color Contrast
+
 - **Minimum 4.5:1** contrast ratio for normal text
 - **Minimum 3:1** contrast ratio for large text
 - **Minimum 3:1** contrast ratio for UI components
 - Test with tools like WebAIM Contrast Checker
 
 ### Keyboard Navigation
+
 - All interactive elements must be keyboard accessible
 - Proper focus indicators with `focus:ring-2 focus:ring-pink-500`
 - Logical tab order maintained
 - Skip links for main content
 
 ### Screen Reader Support
+
 ```typescript
 // Required ARIA patterns
 <img alt="descriptive text" />         // Never empty alt
@@ -57,30 +63,35 @@ alwaysApply: true
 ```
 
 ### Form Accessibility
+
 - Every input must have explicit `<label for="id">` or wrapper
 - Never rely on placeholder-only labeling
 - Required fields indicated with aria-required
 - Error messages linked with aria-describedby
 
 ### Motion & Animation
+
 - **Respect `prefers-reduced-motion: reduce`**
 - Provide static alternatives for all animations
 - GameCube boot sequence must be skippable
 - Petal effects disabled for reduced motion users
 
 ### Interactive Elements
+
 - Minimum 44px touch targets for mobile
 - Clear focus states for all interactive elements
 - Descriptive link text (avoid "click here")
 - Proper semantic HTML (buttons vs links vs divs)
 
 ### ARIA Implementation
+
 - Use semantic HTML first, ARIA second
 - Proper roles: `role="img"` for decorative SVGs
 - Live regions for dynamic content updates
 - Modal accessibility with focus trapping
 
 ### Testing Standards
+
 - Run axe-core accessibility checks
 - Test with screen readers (NVDA/JAWS)
 - Verify keyboard-only navigation
