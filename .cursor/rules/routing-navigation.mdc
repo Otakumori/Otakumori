@@ -1,3 +1,9 @@
+---
+description: 'Header/footer/nav always present, no dupes, GameCube hub labels correct'
+globs: ['app/**/page.tsx', 'app/**/layout.tsx', 'app/components/**/*.tsx']
+alwaysApply: true
+---
+
 # Routing & Navigation Standards
 
 ## Global Navigation Requirements

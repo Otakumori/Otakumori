@@ -1,3 +1,9 @@
+---
+description: 'Clerk SSR safe auth, modal intercept for gated actions, RBAC enforcement'
+globs: ['app/api/**/*.ts', 'app/contexts/**/*.tsx', 'app/lib/auth*.ts']
+alwaysApply: true
+---
+
 # Authentication & Security Standards
 
 ## Clerk SSR Integration
