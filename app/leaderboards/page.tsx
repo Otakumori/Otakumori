@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import StarfieldPurple from '../components/StarfieldPurple';
-import NavBar from '../components/NavBar';
+import Navbar from '../components/layout/Navbar';
 import FooterDark from '../components/FooterDark';
 import LeaderboardInterface from '../components/community/LeaderboardInterface';
 import { t } from '@/lib/microcopy';
@@ -31,7 +31,7 @@ export default async function LeaderboardPage() {
   return (
     <>
       <StarfieldPurple />
-      <NavBar />
+      <Navbar />
       <main className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
           <div className="mb-8 text-center">

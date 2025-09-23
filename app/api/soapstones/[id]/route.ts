@@ -13,8 +13,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const msg = await prisma.soapstoneMessage.update({
     where: { id: params.id },
     data: {
-      ...(typeof isHidden === 'boolean' ? { status: isHidden ? 'HIDDEN' : 'PUBLIC' } : {}),
-      ...(typeof isFlagged === 'boolean' ? { status: isFlagged ? 'HIDDEN' : 'PUBLIC' } : {}),
+      ...(typeof isHidden === 'boolean' ? { status: isHidden ? 'REPORTED' : 'VISIBLE' } : {}),
+      ...(typeof isFlagged === 'boolean' ? { status: isFlagged ? 'REPORTED' : 'VISIBLE' } : {}),
     },
   });
   return NextResponse.json({ ok: true, msg });

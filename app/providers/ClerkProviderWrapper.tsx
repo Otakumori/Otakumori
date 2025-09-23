@@ -13,6 +13,16 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
   const isActualProduction =
     typeof window !== 'undefined' && window.location.hostname === 'otaku-mori.com';
 
+  // Use development keys for localhost, production keys for production
+  const isLocalhost =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  // For localhost, skip Clerk entirely to avoid production key errors
+  if (isLocalhost) {
+    return <>{children}</>;
+  }
+
   const clerkProps: any = {
     dynamic: true,
     nonce,

@@ -1,5 +1,29 @@
 [
   {
+    "slug": "samurai-petal-slice",
+    "name": "Samurai Petal Slice",
+    "icon": "swords",
+    "desc": "Draw the Tetsusaiga's arc…"
+  },
+  {
+    "slug": "anime-memory-match",
+    "name": "Anime Memory Match",
+    "icon": "psychology",
+    "desc": "Recall the faces bound by fate."
+  },
+  {
+    "slug": "bubble-pop-gacha",
+    "name": "Bubble-Pop Gacha",
+    "icon": "bubble_chart",
+    "desc": "Pop for spy-craft secrets…"
+  },
+  {
+    "slug": "rhythm-beat-em-up",
+    "name": "Rhythm Beat-Em-Up",
+    "icon": "music_note",
+    "desc": "Sync to the Moon Prism's pulse."
+  },
+  {
     "slug": "petal-collection",
     "name": "Petal Collection",
     "icon": "spa",
@@ -10,12 +34,6 @@
     "name": "Memory Match",
     "icon": "grid_view",
     "desc": "Flip cards and match pairs. Perfect recall earns bonuses."
-  },
-  {
-    "slug": "rhythm-beat-em-up",
-    "name": "Rhythm Beat",
-    "icon": "music_note",
-    "desc": "Tap in time and keep the beat streak alive."
   },
   {
     "slug": "bubble-girl",
@@ -34,12 +52,6 @@
     "name": "Bubble Ragdoll",
     "icon": "toys",
     "desc": "Toss the ragdoll into bubbles. Survive the chaos."
-  },
-  {
-    "slug": "samurai-petal-slice",
-    "name": "Samurai Petal Slice",
-    "icon": "swords",
-    "desc": "Slice petals midair. Avoid cursed petals."
   },
   {
     "slug": "blossomware",

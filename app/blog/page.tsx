@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import StarfieldPurple from '../components/StarfieldPurple';
-import NavBar from '../components/NavBar';
+import Navbar from '../components/layout/Navbar';
 import FooterDark from '../components/FooterDark';
 import BlogIndex from '../components/blog/BlogIndex';
 import { t } from '@/lib/microcopy';
@@ -15,7 +15,7 @@ export default function BlogPage() {
   return (
     <>
       <StarfieldPurple />
-      <NavBar />
+      <Navbar />
       <main
         className="relative z-10 min-h-screen"
         style={{ ['--om-star-duration-base' as any]: '760s' }}

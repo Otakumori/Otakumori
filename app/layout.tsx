@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import Footer from './components/Footer';
+import Navbar from './components/layout/Navbar';
 import Providers from './Providers';
 import * as Sentry from '@sentry/nextjs';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
@@ -11,6 +12,8 @@ import { isCursorGlowEnabled } from './flags';
 import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
+import GoogleAnalytics from './components/analytics/GoogleAnalytics';
+import { initPerformanceMonitoring } from './lib/performance';
 
 export function generateMetadata(): Metadata {
   return {
@@ -33,6 +36,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
           <link
+            href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;700&display=swap"
+            rel="stylesheet"
+          />
+          <link
             href="https://fonts.googleapis.com/css2?family=Noto+Emoji:wght@300..700&display=swap"
             rel="stylesheet"
           />
@@ -41,7 +48,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             rel="stylesheet"
           />
         </head>
-        <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
+        <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50 font-body">
+          <GoogleAnalytics />
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if (typeof window !== 'undefined') {
+                  import('/lib/performance.js').then(module => {
+                    module.initPerformanceMonitoring();
+                  });
+                }
+              `,
+            }}
+          />
           <CherryBlossomEffect density="site" />
           {isCursorGlowEnabled() && <CursorGlow />}
           <PetalHUD />
@@ -56,6 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }
           >
             <Providers>
+              <Navbar />
               <main id="content" className="relative z-20 flex-1">
                 {children}
               </main>

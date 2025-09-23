@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getAsset } from '../_shared/assets-resolver';
 import { play } from '../_shared/audio-bus';
+import { useGameSave } from '../_shared/SaveSystem';
 import '../_shared/cohesion.css';
 
 // --- tunables (env/admin later) ---
@@ -32,12 +33,14 @@ type SlashPt = { x: number; y: number; t: number };
 export default function SamuraiSlice() {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { saveOnExit, autoSave, load } = useGameSave('samurai-petal-slice');
   const [over, setOver] = useState<null | {
     score: number;
     hits: number;
     crit: number;
     miss: number;
   }>(null);
+  const [highScore, setHighScore] = useState(0);
 
   useEffect(() => {
     const host = hostRef.current!,
@@ -86,6 +89,17 @@ export default function SamuraiSlice() {
     let crit = 0;
     const endAt = performance.now() + ROUND_TIME;
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+    // Load previous high score
+    load()
+      .then((saveData) => {
+        if (saveData?.stats?.highScore) {
+          setHighScore(saveData.stats.highScore);
+        }
+      })
+      .catch(() => {
+        // Ignore loading errors
+      });
 
     // spawn petals
     function spawn(n: number) {
@@ -174,6 +188,18 @@ export default function SamuraiSlice() {
           }
           hits++;
           if (hitSfx) play(hitSfx, -6);
+
+          // Auto-save progress every 10 hits
+          if (hits % 10 === 0) {
+            autoSave({
+              score,
+              level: 1,
+              progress: (ROUND_TIME - (endAt - performance.now())) / ROUND_TIME,
+              stats: { hits, crit, miss, highScore: Math.max(score, highScore) },
+            }).catch(() => {
+              // Ignore save errors during gameplay
+            });
+          }
         }
       }
 
@@ -294,7 +320,30 @@ export default function SamuraiSlice() {
     raf = requestAnimationFrame(loop);
 
     async function end() {
+      const finalHighScore = Math.max(score, highScore);
       setOver({ score, hits, crit, miss });
+      setHighScore(finalHighScore);
+
+      // Save final game state
+      try {
+        await saveOnExit({
+          score,
+          level: 1,
+          progress: 1.0, // Game completed
+          stats: {
+            hits,
+            crit,
+            miss,
+            highScore: finalHighScore,
+            gamesPlayed: (highScore > 0 ? 1 : 0) + 1,
+            lastPlayed: Date.now(),
+          },
+        });
+      } catch (error) {
+        console.error('Failed to save game on exit:', error);
+      }
+
+      // Also send to legacy endpoint for compatibility
       try {
         await fetch('/api/games/finish', {
           method: 'POST',
@@ -303,7 +352,7 @@ export default function SamuraiSlice() {
             game: 'samurai-petal-slice',
             score,
             durationMs: ROUND_TIME,
-            stats: { hits, crit, miss },
+            stats: { hits, crit, miss, highScore: finalHighScore },
           }),
         });
       } catch {}

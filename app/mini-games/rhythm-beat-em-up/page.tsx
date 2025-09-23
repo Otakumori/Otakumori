@@ -1,201 +1,25 @@
-'use client';
-import { useUser } from '@clerk/nextjs'; // Clerk client
-import { useEffect, useState } from 'react';
+import { type Metadata } from 'next';
 import GameShell from '../_shared/GameShell';
-import BootScreen from '../../components/games/BootScreen';
-import Scene from './Scene';
 
-export default function Page() {
-  const { isSignedIn } = useUser();
-  const [mapOverride, setMapOverride] = useState<string | null>(null);
+export const metadata: Metadata = {
+  title: 'Rhythm Beat-Em-Up | Otakumori',
+  description: "Sync to the Moon Prism's pulse.",
+};
 
-  useEffect(() => {
-    if (!isSignedIn) return;
-    const u = new URLSearchParams(location.search).get('map');
-    if (u && u.startsWith('/assets/maps/')) setMapOverride(u);
-  }, [isSignedIn]);
-
+export default function RhythmBeatEmUpPage() {
   return (
-    <BootScreen gameId="rhythm-beat">
-      <div className="mx-auto w-full max-w-6xl px-4 py-6">
-        <GameShell gameKey="rhythm-beat-em-up" title="Rhythm Beat-Em-Up">
-          <Scene mapUrl={mapOverride ?? undefined} />
-        </GameShell>
-
-        {/* Dev-only UI for signed-in users */}
-        {isSignedIn && (
-          <div className="mt-3 text-xs text-white/70">
-            {
-              <>
-                ''
-                <span role="img" aria-label="emoji">
-                  D
-                </span>
-                <span role="img" aria-label="emoji">
-                  e
-                </span>
-                <span role="img" aria-label="emoji">
-                  v
-                </span>
-                <span role="img" aria-label="emoji">
-                  :
-                </span>
-                ' '
-                <span role="img" aria-label="emoji">
-                  p
-                </span>
-                <span role="img" aria-label="emoji">
-                  a
-                </span>
-                <span role="img" aria-label="emoji">
-                  s
-                </span>
-                <span role="img" aria-label="emoji">
-                  s
-                </span>
-                ' '''
-              </>
-            }
-            <code>
-              {
-                <>
-                  <span role="img" aria-label="emoji">
-                    ?
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    m
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    a
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    p
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    =
-                  </span>
-                  /
-                  <span role="img" aria-label="emoji">
-                    a
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    s
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    s
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    e
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    t
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    s
-                  </span>
-                  /
-                  <span role="img" aria-label="emoji">
-                    m
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    a
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    p
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    s
-                  </span>
-                  /
-                  <span role="img" aria-label="emoji">
-                    y
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    o
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    u
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    r
-                  </span>
-                  .
-                  <span role="img" aria-label="emoji">
-                    j
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    s
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    o
-                  </span>
-                  <span role="img" aria-label="emoji">
-                    n
-                  </span>
-                </>
-              }
-            </code>
-            {
-              <>
-                ''' '
-                <span role="img" aria-label="emoji">
-                  t
-                </span>
-                <span role="img" aria-label="emoji">
-                  o
-                </span>
-                ' '
-                <span role="img" aria-label="emoji">
-                  t
-                </span>
-                <span role="img" aria-label="emoji">
-                  e
-                </span>
-                <span role="img" aria-label="emoji">
-                  s
-                </span>
-                <span role="img" aria-label="emoji">
-                  t
-                </span>
-                ' '
-                <span role="img" aria-label="emoji">
-                  a
-                </span>
-                ' '
-                <span role="img" aria-label="emoji">
-                  c
-                </span>
-                <span role="img" aria-label="emoji">
-                  u
-                </span>
-                <span role="img" aria-label="emoji">
-                  s
-                </span>
-                <span role="img" aria-label="emoji">
-                  t
-                </span>
-                <span role="img" aria-label="emoji">
-                  o
-                </span>
-                <span role="img" aria-label="emoji">
-                  m
-                </span>
-                ' '
-                <span role="img" aria-label="emoji">
-                  m
-                </span>
-                <span role="img" aria-label="emoji">
-                  a
-                </span>
-                <span role="img" aria-label="emoji">
-                  p
-                </span>
-                . ''
-              </>
-            }
-          </div>
-        )}
+    <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-900 via-rose-800 to-red-900">
+        <div className="text-center text-white">
+          <div className="text-6xl mb-4">🎵</div>
+          <h2 className="text-2xl font-bold mb-2">Rhythm Beat-Em-Up</h2>
+          <p className="text-pink-200 mb-6">Sync to the Moon Prism's pulse.</p>
+          <div className="text-lg text-yellow-300">Coming Soon!</div>
+          <p className="text-sm text-pink-300 mt-2">
+            I didn't lose. Just ran out of health. – Edward Elric
+          </p>
+        </div>
       </div>
-    </BootScreen>
+    </GameShell>
   );
 }

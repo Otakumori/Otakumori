@@ -1,15 +1,11 @@
-export const metadata = { title: 'Petal Run | Otakumori' };
+import PetalRunWrapper from './petal-run-wrapper';
 
-import dynamic from 'next/dynamic';
-const Client = dynamic(() => import('./petal-run.client'), {
-  ssr: false,
-  loading: () => <p>Loading Petal Run…</p>,
-});
+export const metadata = { title: 'Petal Run | Otakumori' };
 
 export default function Page() {
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <Client />
+      <PetalRunWrapper />
     </main>
   );
 }

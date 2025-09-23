@@ -1,15 +1,11 @@
-export const metadata = { title: 'Rhythm | Otakumori' };
+import RhythmWrapper from './rhythm-wrapper';
 
-import dynamic from 'next/dynamic';
-const Client = dynamic(() => import('./rhythm.client'), {
-  ssr: false,
-  loading: () => <p>Loading Rhythm…</p>,
-});
+export const metadata = { title: 'Rhythm | Otakumori' };
 
 export default function Page() {
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <Client />
+      <RhythmWrapper />
     </main>
   );
 }

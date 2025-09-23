@@ -19,7 +19,16 @@ export async function POST(req: Request) {
     const result = await prisma.$transaction(async (tx) => {
       const existing = await tx.idempotencyKey.findUnique({ where: { key: idem } });
       if (existing) return 'DUP' as const;
-      await tx.idempotencyKey.create({ data: { key: idem, purpose: 'petals/spend' } });
+      await tx.idempotencyKey.create({
+        data: {
+          key: idem,
+          purpose: 'petals/spend',
+          method: 'POST',
+          path: '/api/v1/petals/spend',
+          response: JSON.stringify({ pending: true }),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        },
+      });
 
       const user = await tx.user.findUnique({
         where: { id: u.id },

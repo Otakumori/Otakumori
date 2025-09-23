@@ -783,14 +783,75 @@ export default function ConsoleCard({
     );
   };
 
-  const Boot = () => (
-    <div className="grid place-items-center h-64" data-testid="boot-seen">
-      <div className="text-center text-pink-200">
-        <div className="mb-2 text-lg">GameCube BIOS</div>
-        <div className="text-xs opacity-80">Booting…</div>
+  const Boot = () => {
+    const [bootPhase, setBootPhase] = useState<'start' | 'logo' | 'complete'>('start');
+    const [logoScale, setLogoScale] = useState(0);
+    const [logoOpacity, setLogoOpacity] = useState(0);
+
+    useEffect(() => {
+      if (isReducedMotion) {
+        setBootPhase('complete');
+        return;
+      }
+
+      // Phase 1: Logo appears and scales up
+      const timer1 = setTimeout(() => {
+        setBootPhase('logo');
+        setLogoOpacity(1);
+        setLogoScale(1);
+      }, 500);
+
+      // Phase 2: Complete boot
+      const timer2 = setTimeout(() => {
+        setBootPhase('complete');
+      }, 2500);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }, [isReducedMotion]);
+
+    return (
+      <div className="grid place-items-center h-64 bg-black" data-testid="boot-seen">
+        <div className="text-center text-white">
+          {bootPhase === 'start' && <div className="text-sm opacity-60">Initializing...</div>}
+
+          {bootPhase === 'logo' && (
+            <div className="relative">
+              {/* Classic GameCube "G" Logo */}
+              <div
+                className="text-8xl font-bold text-pink-400 transition-all duration-1000 ease-out"
+                style={{
+                  transform: `scale(${logoScale})`,
+                  opacity: logoOpacity,
+                  filter: 'drop-shadow(0 0 20px rgba(255, 79, 163, 0.5))',
+                }}
+              >
+                G
+              </div>
+
+              {/* Spinning ring around the G */}
+              <div
+                className="absolute inset-0 border-4 border-pink-400 rounded-full animate-spin"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  borderTopColor: 'transparent',
+                  borderRightColor: 'transparent',
+                }}
+              />
+            </div>
+          )}
+
+          {bootPhase === 'complete' && <div className="text-sm opacity-80">Ready</div>}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const LoadingGame = () => (
     <div className="grid place-items-center h-64">

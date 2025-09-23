@@ -102,6 +102,6 @@ export const trackViewItem = (product: { id: string; name: string; price: number
 declare global {
   interface Window {
     gtag?: (...args: any[]) => void;
-    dataLayer: any[];
+    dataLayer?: any[];
   }
 }

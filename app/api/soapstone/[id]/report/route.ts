@@ -17,10 +17,10 @@ export async function POST(_: NextRequest, { params }: { params: { id: string } 
       data: { reports: { increment: 1 } },
     });
 
-    if (updated.reports + 1 >= AUTO_HIDE_AFTER && updated.status === 'PUBLIC') {
+    if (updated.reports + 1 >= AUTO_HIDE_AFTER && updated.status === 'VISIBLE') {
       return tx.soapstoneMessage.update({
         where: { id },
-        data: { status: 'HIDDEN' },
+        data: { status: 'REPORTED' },
       });
     }
     return updated;

@@ -16,12 +16,12 @@ export default function HeroIntro() {
         <div className="relative">
           {/* Clean pink text without excessive effects */}
           <motion.h1
-            className="text-6xl md:text-8xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-pink-400 to-pink-500 text-center"
+            className="text-6xl md:text-8xl font-display leading-tight text-pink-400 text-center"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: 'easeOut' }}
           >
-            Welcome Home, Traveler
+            Welcome home, wanderer
           </motion.h1>
         </div>
       </motion.div>

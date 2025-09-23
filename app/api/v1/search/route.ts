@@ -209,7 +209,7 @@ async function searchContent(
     where: {
       content: { contains: query, mode: 'insensitive' },
       author: {
-        visibility: { not: 'private' },
+        visibility: { not: 'PRIVATE' },
       },
     },
     select: {
@@ -255,7 +255,7 @@ async function searchContent(
         { payload: { path: ['description'], string_contains: query } },
       ],
       profile: {
-        visibility: { not: 'private' },
+        visibility: { not: 'PRIVATE' },
       },
     },
     select: {

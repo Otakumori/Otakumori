@@ -14,7 +14,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const message = await db.soapstoneMessage.update({
     where: { id: params.id },
-    data: { status: parsed.data.status },
+    data: {
+      status:
+        parsed.data.status === 'PUBLIC'
+          ? 'VISIBLE'
+          : parsed.data.status === 'HIDDEN'
+            ? 'REPORTED'
+            : 'REMOVED',
+    },
   });
 
   return NextResponse.json({ ok: true, message });

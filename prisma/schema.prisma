@@ -32,37 +32,37 @@ model ContactMessage {
 }
 
 model Order {
-  id              String         @id
-  userId          String
-  stripeId        String         @unique
-  paymentIntentId String?
-  chargeId        String?
-  status          OrderStatus    @default(pending)
-  totalAmount     Int
-  currency        String         @default("USD")
-  shippedAt       DateTime?
-  trackingUrl     String?
-  carrier         String?
-  trackingNumber  String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime
-  paidAt          DateTime?
-  petalsAwarded   Int            @default(0)
-  printifyId      String?
-  memoryCardKey   String?
-  displayNumber   Int            @unique @default(autoincrement())
-  primaryItemName String?        @default("")
-  label           String?        @default("")
-  subtotalCents   Int            @default(0)
+  id                 String             @id
+  userId             String
+  stripeId           String             @unique
+  paymentIntentId    String?
+  chargeId           String?
+  status             OrderStatus        @default(pending)
+  totalAmount        Int
+  currency           String             @default("USD")
+  shippedAt          DateTime?
+  trackingUrl        String?
+  carrier            String?
+  trackingNumber     String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime
+  paidAt             DateTime?
+  petalsAwarded      Int                @default(0)
+  printifyId         String?
+  memoryCardKey      String?
+  displayNumber      Int                @unique @default(autoincrement())
+  primaryItemName    String?            @default("")
+  label              String?            @default("")
+  subtotalCents      Int                @default(0)
   // Coupons integration
-  appliedCouponCodes String[]    @default([])
-  discountTotalCents Int         @default(0)
-  EmailLogs       EmailLog[]
-  User            User           @relation(fields: [userId], references: [id])
-  OrderItem       OrderItem[]
-  RewardLedger    RewardLedger[]
-  UserRunes       UserRune[]
-  couponRedemptions CouponRedemption[]
+  appliedCouponCodes String[]           @default([])
+  discountTotalCents Int                @default(0)
+  EmailLogs          EmailLog[]
+  User               User               @relation(fields: [userId], references: [id])
+  OrderItem          OrderItem[]
+  RewardLedger       RewardLedger[]
+  UserRunes          UserRune[]
+  couponRedemptions  CouponRedemption[]
 }
 
 model OrderItem {
@@ -104,6 +104,7 @@ model Product {
   OrderItem         OrderItem[]
   ProductVariant    ProductVariant[]
   Reviews           Review[]
+  Wishlist          Wishlist[]
 
   @@index([categorySlug])
   @@index([integrationRef])
@@ -173,12 +174,15 @@ model User {
   bannerUrl                 String?
   bio                       String?
   location                  String?
-  visibility                String                   @default("public")
+  visibility                Visibility               @default(PUBLIC)
   website                   String?
   activities                Activity[]
   appraisals                Appraisal[]
   blockedBy                 Block[]                  @relation("UserBlockedBy")
   blocking                  Block[]                  @relation("UserBlocking")
+  praiseSent                Praise[]                 @relation("PraiseSender")
+  praiseReceived            Praise[]                 @relation("PraiseReceiver")
+  wishlist                  Wishlist[]
   cart                      Cart?
   characterConfigs          CharacterConfig[]
   comments                  Comment[]
@@ -196,6 +200,7 @@ model User {
   followers                 Follow[]                 @relation("UserFollowers")
   following                 Follow[]                 @relation("UserFollowing")
   gameRuns                  GameRun[]
+  gameSaves                 GameSave[]
   gameSettings              GameSettings[]
   inventory                 InventoryItem[]
   leaderboardScores         LeaderboardScore[]
@@ -239,6 +244,9 @@ model User {
   userTitles                UserTitle[]
   wallet                    Wallet?
   couponRedemptions         CouponRedemption[]
+  tradeOffersInitiated      TradeOffer[]             @relation("TradeOfferInitiator")
+  tradeOffersReceived       TradeOffer[]             @relation("TradeOfferTarget")
+  tradeResponses            TradeResponse[]          @relation("TradeResponder")
 
   @@index([clerkId])
 }
@@ -352,12 +360,6 @@ model MusicTrack {
   @@index([playlistId, sort])
 }
 
-model IdempotencyKey {
-  key       String   @id
-  purpose   String
-  createdAt DateTime @default(now())
-}
-
 model GameRun {
   id           String    @id @default(cuid())
   userId       String
@@ -370,6 +372,21 @@ model GameRun {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, gameKey])
+}
+
+model GameSave {
+  id          String   @id @default(cuid())
+  userId      String
+  gameId      String
+  slot        Int // 0, 1, 2 for rolling snapshots
+  payload     Json // Save data as JSONB
+  saveVersion Int      @default(1)
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId, slot])
+  @@index([userId, gameId])
+  @@index([updatedAt])
 }
 
 model Achievement {
@@ -436,68 +453,71 @@ model CouponGrant {
 
 // Checkout coupons: global campaign codes applied at Stripe checkout
 model Coupon {
-  id                       String      @id @default(cuid())
-  code                     String      @unique
-  type                     CouponType
+  id                    String             @id @default(cuid())
+  code                  String             @unique
+  type                  CouponType
   // value semantics: for PERCENT store 0-100; for FIXED store USD cents; FREESHIP ignores value
-  valueCents               Int         @default(0)
-  enabled                  Boolean     @default(true)
-  startsAt                 DateTime?
-  endsAt                   DateTime?
-  maxRedemptions           Int?
-  maxRedemptionsPerUser    Int?
-  minSubtotalCents         Int?        // pre-tax/shipping
-  allowedProductIds        String[]    @default([])
-  excludedProductIds       String[]    @default([])
-  allowedCollections       String[]    @default([])
-  excludedCollections      String[]    @default([])
-  stackable                Boolean     @default(false)
-  oneTimeCode              Boolean     @default(false)
-  autoApply                Boolean     @default(false)
-  notes                    String?
-  createdAt                DateTime    @default(now())
-  updatedAt                DateTime    @updatedAt
-  redemptions              CouponRedemption[]
+  valueCents            Int                @default(0)
+  enabled               Boolean            @default(true)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  maxRedemptions        Int?
+  maxRedemptionsPerUser Int?
+  minSubtotalCents      Int? // pre-tax/shipping
+  allowedProductIds     String[]           @default([])
+  excludedProductIds    String[]           @default([])
+  allowedCollections    String[]           @default([])
+  excludedCollections   String[]           @default([])
+  stackable             Boolean            @default(false)
+  oneTimeCode           Boolean            @default(false)
+  autoApply             Boolean            @default(false)
+  notes                 String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  redemptions           CouponRedemption[]
 
   @@index([enabled])
   @@index([startsAt, endsAt])
 }
 
 model CouponRedemption {
-  id                 String                     @id @default(cuid())
-  couponId           String
-  userId             String?
-  orderId            String?
-  clientReferenceId  String
-  status             CouponRedemptionStatus     @default(PENDING)
-  createdAt          DateTime                   @default(now())
-  updatedAt          DateTime                   @updatedAt
-  coupon             Coupon                     @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  user               User?                      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  order              Order?                     @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  id                String                 @id @default(cuid())
+  couponId          String
+  userId            String?
+  orderId           String?
+  clientReferenceId String
+  status            CouponRedemptionStatus @default(PENDING)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  coupon            Coupon                 @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user              User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order             Order?                 @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@unique([couponId, clientReferenceId])
   @@index([userId, status])
 }
 
 model SoapstoneMessage {
-  id         String     @id @default(cuid())
-  createdAt  DateTime   @default(now())
-  appraises  Int        @default(0)
-  authorId   String
+  id         String          @id @default(cuid())
+  createdAt  DateTime        @default(now())
+  appraises  Int             @default(0)
+  authorId   String?
   overlayURL String?
   postId     String?
-  reports    Int        @default(0)
-  status     Visibility @default(PUBLIC)
-  text       String
-  updatedAt  DateTime   @updatedAt
+  reports    Int             @default(0)
+  status     SoapstoneStatus @default(VISIBLE)
+  text       String          @db.VarChar(280)
+  updatedAt  DateTime        @updatedAt
   x          Int?
   y          Int?
   reactions  Reaction[]
-  user       User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  user       User?           @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([postId])
-  @@index([authorId])
+  @@index([authorId, createdAt(sort: Desc)]) // For user's message history
+  @@index([createdAt(sort: Desc)]) // For chronological feeds
+  @@index([status, createdAt(sort: Desc)]) // For moderation queries
+  @@index([appraises(sort: Desc), createdAt(sort: Desc)]) // For popular messages
 }
 
 model Reaction {
@@ -509,6 +529,34 @@ model Reaction {
   message   SoapstoneMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
 
   @@unique([messageId, userId, type])
+}
+
+model Praise {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  dayKey     String // YYYY-MM-DD format
+  createdAt  DateTime @default(now())
+  sender     User     @relation("PraiseSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("PraiseReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId, dayKey])
+  @@index([receiverId, dayKey])
+  @@index([senderId, dayKey]) // For sender's daily limits
+  @@index([createdAt(sort: Desc)]) // For recent praise queries
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId, createdAt(sort: Desc)]) // For user's recent wishlist items
+  @@index([productId, createdAt(sort: Desc)]) // For popular product tracking
 }
 
 model LeaderboardScore {
@@ -1643,7 +1691,13 @@ model SlotAccepts {
 
 enum Visibility {
   PUBLIC
-  HIDDEN
+  FRIENDS
+  PRIVATE
+}
+
+enum SoapstoneStatus {
+  VISIBLE
+  REPORTED
   REMOVED
 }
 
@@ -1744,4 +1798,95 @@ enum PhraseCategory {
   TIME
   MEME
   HUMOR
+}
+
+model IdempotencyKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  method    String
+  path      String
+  userId    String?
+  response  String
+  purpose   String? // Purpose or category of the idempotent operation
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([key])
+  @@index([expiresAt])
+  @@index([userId, createdAt(sort: Desc)]) // For user idempotency history
+}
+
+// High-performance trade system
+model TradeOffer {
+  id           String      @id @default(cuid())
+  initiatorId  String
+  targetUserId String? // null for public offers
+  offerType    TradeType   @default(DIRECT)
+  status       TradeStatus @default(PENDING)
+  title        String      @db.VarChar(100)
+  description  String?     @db.VarChar(500)
+
+  // What the initiator is offering
+  offerPetals Int?  @default(0)
+  offerRunes  Int?  @default(0)
+  offerItems  Json? // Array of item IDs
+
+  // What the initiator wants
+  requestPetals Int?  @default(0)
+  requestRunes  Int?  @default(0)
+  requestItems  Json? // Array of item IDs
+
+  expiresAt   DateTime // Auto-expire trades
+  completedAt DateTime?
+  cancelledAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  initiator  User            @relation("TradeOfferInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+  targetUser User?           @relation("TradeOfferTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  responses  TradeResponse[]
+
+  @@index([initiatorId, status, createdAt(sort: Desc)])
+  @@index([targetUserId, status, createdAt(sort: Desc)])
+  @@index([status, expiresAt]) // For cleanup of expired trades
+  @@index([offerType, status, createdAt(sort: Desc)]) // For public/private trade browsing
+}
+
+model TradeResponse {
+  id          String       @id @default(cuid())
+  tradeId     String
+  responderId String
+  response    ResponseType
+  message     String?      @db.VarChar(280)
+  createdAt   DateTime     @default(now())
+
+  trade     TradeOffer @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+  responder User       @relation("TradeResponder", fields: [responderId], references: [id], onDelete: Cascade)
+
+  @@unique([tradeId, responderId]) // One response per user per trade
+  @@index([tradeId, createdAt(sort: Desc)])
+  @@index([responderId, createdAt(sort: Desc)])
+}
+
+enum TradeType {
+  DIRECT // Specific user target
+  PUBLIC // Open to anyone
+  AUCTION // Bidding system (future)
+}
+
+enum TradeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum ResponseType {
+  ACCEPT
+  DECLINE
+  COUNTER
+  INTERESTED
 }

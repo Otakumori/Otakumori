@@ -6,48 +6,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white text-lg font-semibold mb-4">Otaku-mori</h3>
+            <h3 className="text-white text-lg font-semibold mb-4">Otakumori</h3>
             <p className="text-gray-300 text-sm">Discover treasures from the digital abyss</p>
-          </div>
-          <div>
-            <h4 className="text-white text-sm font-semibold mb-4">Shop</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="/shop" className="text-gray-300 hover:text-white text-sm">
-                  All Products
-                </a>
-              </li>
-              <li>
-                <a href="/shop/games" className="text-gray-300 hover:text-white text-sm">
-                  Games
-                </a>
-              </li>
-              <li>
-                <a href="/shop/merch" className="text-gray-300 hover:text-white text-sm">
-                  Merchandise
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-white text-sm font-semibold mb-4">Community</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="/community" className="text-gray-300 hover:text-white text-sm">
-                  Forums
-                </a>
-              </li>
-              <li>
-                <a href="/leaderboard" className="text-gray-300 hover:text-white text-sm">
-                  Leaderboard
-                </a>
-              </li>
-              <li>
-                <a href="/soapstone" className="text-gray-300 hover:text-white text-sm">
-                  Soapstone
-                </a>
-              </li>
-            </ul>
           </div>
           <div>
             <h4 className="text-white text-sm font-semibold mb-4">Support</h4>
@@ -69,11 +29,63 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+          <div>
+            <h4 className="text-white text-sm font-semibold mb-4">Legal</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/terms" className="text-gray-300 hover:text-white text-sm">
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="/returns" className="text-gray-300 hover:text-white text-sm">
+                  Returns
+                </a>
+              </li>
+              <li>
+                <a href="/cookies" className="text-gray-300 hover:text-white text-sm">
+                  Cookie Settings
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white text-sm font-semibold mb-4">Connect</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/community" className="text-gray-300 hover:text-white text-sm">
+                  Community
+                </a>
+              </li>
+              <li>
+                <a href="/glossary" className="text-gray-300 hover:text-white text-sm">
+                  Glossary
+                </a>
+              </li>
+              <li>
+                <a href="/#leave-a-sign" className="text-gray-300 hover:text-white text-sm">
+                  Leave a sign
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className="mt-8 pt-8 border-t border-white/10">
-          <p className="text-gray-300 text-sm text-center">
-            © 2024 Otaku-mori. All rights reserved.
-          </p>
+          <div className="text-gray-300 text-sm text-center space-y-2">
+            <p>
+              © {new Date().getFullYear()} Otaku-mori. All petals accounted for. Don't go hollow.
+            </p>
+            <p>Otakumori ™ made with ♡</p>
+            <p>
+              <a href="/#leave-a-sign" className="hover:text-white transition-colors">
+                Leave a sign
+              </a>
+              {' • '}
+              <a href="/cookies" className="hover:text-white transition-colors">
+                Cookie Settings
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

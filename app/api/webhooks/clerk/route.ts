@@ -1,134 +1,118 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { type NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
-import { db as prisma } from '@/lib/db';
+import { headers } from 'next/headers';
 import { env } from '@/env.mjs';
+import { db } from '@/lib/db';
+import { type WebhookEvent } from '@clerk/nextjs/server';
 
-export const runtime = 'nodejs'; // Node runtime for crypto
-export const dynamic = 'force-dynamic';
+export async function POST(request: NextRequest) {
+  const WEBHOOK_SECRET = env.CLERK_WEBHOOK_SECRET;
 
-type ClerkEmail = { id: string; email_address: string };
-type ClerkUser = {
-  id: string;
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  image_url: string | null;
-  primary_email_address_id: string | null;
-  email_addresses: ClerkEmail[];
-};
-
-function getPrimaryEmail(u: ClerkUser): string | null {
-  const pid = u.primary_email_address_id;
-  if (!u.email_addresses?.length) return null;
-  return (
-    u.email_addresses.find((e) => e.id === pid)?.email_address ??
-    u.email_addresses[0]?.email_address ??
-    null
-  );
-}
-
-export async function POST(req: Request) {
-  const headersList = await headers();
-  const svixId = headersList.get('svix-id');
-  const svixTimestamp = headersList.get('svix-timestamp');
-  const svixSignature = headersList.get('svix-signature');
-  if (!svixId || !svixTimestamp || !svixSignature) {
-    return new NextResponse('Missing Svix headers', { status: 400 });
+  if (!WEBHOOK_SECRET) {
+    throw new Error('Please add CLERK_WEBHOOK_SECRET to .env.local');
   }
 
-  const secret = env.CLERK_WEBHOOK_SECRET;
-  if (!secret) return new NextResponse('Missing CLERK_WEBHOOK_SECRET', { status: 500 });
+  // Get the headers
+  const headerPayload = await headers();
+  const svix_id = headerPayload.get('svix-id');
+  const svix_timestamp = headerPayload.get('svix-timestamp');
+  const svix_signature = headerPayload.get('svix-signature');
 
-  const payload = await req.text();
-  let evt: any;
+  // If there are no headers, error out
+  if (!svix_id || !svix_timestamp || !svix_signature) {
+    return new NextResponse('Error occured -- no svix headers', {
+      status: 400,
+    });
+  }
+
+  // Get the body
+  const payload = await request.text();
+  const body = JSON.parse(payload);
+
+  // Create a new Svix instance with your secret.
+  const wh = new Webhook(WEBHOOK_SECRET);
+
+  let evt: WebhookEvent;
+
+  // Verify the payload with the headers
   try {
-    const wh = new Webhook(secret);
     evt = wh.verify(payload, {
-      'svix-id': svixId,
-      'svix-timestamp': svixTimestamp,
-      'svix-signature': svixSignature,
+      'svix-id': svix_id,
+      'svix-timestamp': svix_timestamp,
+      'svix-signature': svix_signature,
+    }) as WebhookEvent;
+  } catch (err) {
+    console.error('Error verifying webhook:', err);
+    return new NextResponse('Error occured', {
+      status: 400,
     });
-  } catch (_err) {
-    return new NextResponse('Invalid signature', { status: 400 });
   }
 
-  // Idempotency: store the event id; if it exists, exit early.
-  try {
-    await prisma.webhookEvent.create({
-      data: { id: evt.id, type: evt.type, payload: evt.data ?? {} },
-    });
-  } catch {
-    // already processed
-    return NextResponse.json({ ok: true, duplicate: true });
-  }
+  // Handle the webhook
+  const eventType = evt.type;
 
-  const type: string = evt.type;
+  if (eventType === 'user.created') {
+    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
 
-  // Core user sync
-  if (type === 'user.created' || type === 'user.updated') {
-    const u = evt.data as ClerkUser;
-    const email = getPrimaryEmail(u);
-    const userData = {
-      clerkId: u.id,
-      email,
-      username: u.username ?? null,
-      firstName: u.first_name ?? null,
-      lastName: u.last_name ?? null,
-      imageUrl: u.image_url ?? null,
-    };
+    try {
+      // Create user profile in database
+      await db.user.create({
+        data: {
+          id: id,
+          email: email_addresses[0]?.email_address || '',
+          username: `user_${id.slice(0, 8)}`,
+          display_name: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
+          avatarUrl: image_url || null,
+          clerkId: id,
+          visibility: 'PUBLIC',
+          createdAt: new Date(),
+        },
+      });
 
-    await prisma.user.upsert({
-      where: { clerkId: u.id },
-      update: {
-        email: userData.email || undefined,
-        username: userData.username || undefined,
-        display_name:
-          userData.firstName && userData.lastName
-            ? `${userData.firstName} ${userData.lastName}`
-            : undefined,
-        avatarUrl: userData.imageUrl || undefined,
-      },
-      create: {
-        clerkId: u.id,
-        email: userData.email || '',
-        username: userData.username || `user_${u.id.slice(0, 8)}`,
-        display_name:
-          userData.firstName && userData.lastName
-            ? `${userData.firstName} ${userData.lastName}`
-            : undefined,
-        avatarUrl: userData.imageUrl || undefined,
-        wallet: { create: { petals: 0, runes: 0 } },
-        profile: { create: {} },
-      },
-    });
-
-    return NextResponse.json({ ok: true });
-  }
-
-  // Email updates (keep primary email in sync)
-  if (type === 'email.created' || type === 'email.updated') {
-    const u = evt.data as ClerkUser;
-    const email = getPrimaryEmail(u);
-    if (email) {
-      await prisma.user
-        .update({
-          where: { clerkId: u.id },
-          data: { email },
-        })
-        .catch(() => {});
+      console.log(`User profile created for ${id}`);
+    } catch (error) {
+      console.error('Error creating user profile:', error);
+      // Don't throw error to avoid webhook retry
     }
-    return NextResponse.json({ ok: true });
   }
 
-  if (type === 'user.deleted') {
-    const u = evt.data as { id: string };
-    // For now, we'll just log the deletion since we don't have a deletedAt field
-    console.log(`User deleted: ${u.id}`);
-    return NextResponse.json({ ok: true });
+  if (eventType === 'user.updated') {
+    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+
+    try {
+      // Update user profile in database
+      await db.user.update({
+        where: { id },
+        data: {
+          email: email_addresses[0]?.email_address || '',
+          display_name: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
+          avatarUrl: image_url || null,
+        },
+      });
+
+      console.log(`User profile updated for ${id}`);
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+    }
   }
 
-  // No-op for other events for now
-  return NextResponse.json({ ok: true, ignored: type });
+  if (eventType === 'user.deleted') {
+    const { id } = evt.data;
+
+    try {
+      // Soft delete user profile
+      await db.user.update({
+        where: { id },
+        data: {
+          visibility: 'PRIVATE',
+        },
+      });
+
+      console.log(`User profile soft deleted for ${id}`);
+    } catch (error) {
+      console.error('Error soft deleting user profile:', error);
+    }
+  }
+
+  return new NextResponse('', { status: 200 });
 }

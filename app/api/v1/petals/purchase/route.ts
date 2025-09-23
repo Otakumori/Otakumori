@@ -1,11 +1,11 @@
-﻿export const runtime = "nodejs";
+﻿export const runtime = 'nodejs';
 
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { InventoryKind } from "@prisma/client";
-import { z } from "zod";
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { InventoryKind } from '@prisma/client';
+import { z } from 'zod';
 
-import { db } from "@/lib/db";
+import { db } from '@/lib/db';
 
 const PurchaseSchema = z.object({
   itemId: z.string().min(1),
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   try {
     const { userId: clerkId } = await auth();
     if (!clerkId) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const payload = PurchaseSchema.parse(await request.json());
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     });
 
     if (existingKey) {
-      return NextResponse.json({ ok: false, error: "Duplicate request" }, { status: 409 });
+      return NextResponse.json({ ok: false, error: 'Duplicate request' }, { status: 409 });
     }
 
     const user = await db.user.findUnique({
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
     const item = await db.petalShopItem.findUnique({
@@ -43,15 +43,15 @@ export async function POST(request: Request) {
     });
 
     if (!item) {
-      return NextResponse.json({ ok: false, error: "Item not found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: 'Item not found' }, { status: 404 });
     }
 
     if (item.pricePetals == null) {
-      return NextResponse.json({ ok: false, error: "Item has no price" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Item has no price' }, { status: 400 });
     }
 
     if (user.petalBalance < item.pricePetals) {
-      return NextResponse.json({ ok: false, error: "Insufficient petals" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Insufficient petals' }, { status: 400 });
     }
 
     const alreadyOwned = await db.inventoryItem.findFirst({
@@ -63,13 +63,17 @@ export async function POST(request: Request) {
     });
 
     if (alreadyOwned) {
-      return NextResponse.json({ ok: false, error: "Item already owned" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Item already owned' }, { status: 400 });
     }
 
     await db.idempotencyKey.create({
       data: {
         key: payload.idempotencyKey,
-        purpose: "petal_purchase",
+        purpose: 'petal_purchase',
+        method: 'POST',
+        path: '/api/v1/petals/purchase',
+        response: JSON.stringify({ pending: true }),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 
@@ -90,7 +94,7 @@ export async function POST(request: Request) {
           sku: item.sku,
           kind: normalizeInventoryKind(item.kind),
           metadata: {
-            source: "petal_shop",
+            source: 'petal_shop',
             shopItemId: item.id,
             purchasedAt: new Date().toISOString(),
           },
@@ -100,7 +104,7 @@ export async function POST(request: Request) {
       await tx.petalLedger.create({
         data: {
           userId: user.id,
-          type: "spend",
+          type: 'spend',
           amount: item.pricePetals ?? 0,
           reason: `Purchase:${item.sku}`,
         },
@@ -128,11 +132,11 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: "Invalid request data" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
 
-    console.error("Error processing petal purchase", error);
-    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+    console.error('Error processing petal purchase', error);
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
