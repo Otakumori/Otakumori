@@ -42,7 +42,14 @@ export async function POST(request: NextRequest) {
 
     // Create idempotency key
     await db.idempotencyKey.create({
-      data: { key: validatedData.idempotencyKey, purpose: 'achievement_unlock' },
+      data: {
+        key: validatedData.idempotencyKey,
+        purpose: 'achievement_unlock',
+        method: 'POST',
+        path: '/api/v1/achievements/unlock',
+        response: JSON.stringify({ pending: true }),
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      },
     });
 
     // Get user

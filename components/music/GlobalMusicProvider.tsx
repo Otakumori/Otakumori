@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client';
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -114,8 +112,8 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
       value={{ playlist, current, playing, volume, setVolume, toggle, next, prev, optIn, setOptIn }}
     >
       {children}
-      {/* Hidden audio element */}
-      <audio ref={audioRef} src={src} preload="none" />
+      {/* Hidden audio element - only render when we have a valid src */}
+      {src && <audio ref={audioRef} src={src} preload="none" />}
     </MusicCtx.Provider>
   );
 }

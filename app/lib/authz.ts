@@ -1,4 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
+import { db } from './db';
+
+export type UserRole = 'user' | 'moderator' | 'admin';
 
 export async function requireUser() {
   const { userId } = await auth();
@@ -6,16 +9,61 @@ export async function requireUser() {
   return { id: userId };
 }
 
+export async function getUserRole(userId: string): Promise<UserRole> {
+  try {
+    const moderatorRole = await db.moderatorRole.findFirst({
+      where: {
+        userId,
+        isActive: true,
+      },
+    });
+
+    if (moderatorRole) {
+      return moderatorRole.role === 'admin' ? 'admin' : 'moderator';
+    }
+
+    return 'user';
+  } catch (error) {
+    return 'user';
+  }
+}
+
 export async function requireAdmin() {
   const { userId } = await auth();
   if (!userId) throw new Error('UNAUTHORIZED');
-  // For now, just return the user - admin check can be added later
-  return { id: userId };
+
+  const role = await getUserRole(userId);
+  if (role !== 'admin') throw new Error('FORBIDDEN');
+
+  return { id: userId, role };
 }
 
-export async function isAdmin() {
+export async function requireModerator() {
   const { userId } = await auth();
-  if (!userId) return false;
-  // For now, just return true - admin check can be added later
-  return true;
+  if (!userId) throw new Error('UNAUTHORIZED');
+
+  const role = await getUserRole(userId);
+  if (role !== 'admin' && role !== 'moderator') throw new Error('FORBIDDEN');
+
+  return { id: userId, role };
+}
+
+export async function isAdmin(userId?: string): Promise<boolean> {
+  const { userId: authUserId } = await auth();
+  const targetUserId = userId || authUserId;
+
+  if (!targetUserId) return false;
+
+  const role = await getUserRole(targetUserId);
+  return role === 'admin';
+}
+
+export async function isModerator(userId?: string): Promise<boolean> {
+  const { userId: authUserId } = await auth();
+  const targetUserId = userId || authUserId;
+
+  if (!targetUserId) return false;
+
+  const role = await getUserRole(targetUserId);
+  return role === 'admin' || role === 'moderator';
 }

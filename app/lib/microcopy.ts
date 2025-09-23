@@ -18,7 +18,7 @@ export const t = {
 
   // Homepage
   home: {
-    welcome: 'Welcome Home, Traveler',
+    welcome: 'Welcome home, wanderer',
     subtitle: 'A digital sanctuary for the wandering soul',
     explore: 'Explore the Abyss',
     discover: 'Discover what lies beyond',
@@ -30,7 +30,7 @@ export const t = {
   shop: {
     title: "The Merchant's Wares",
     subtitle: 'Rare treasures await the bold',
-    addToCart: 'Claim for Collection',
+    addToCart: 'Claim this treasure.',
     outOfStock: 'Lost to Time',
     inStock: 'Available',
     price: 'Cost',
@@ -40,6 +40,9 @@ export const t = {
     description: 'Description',
     options: 'Options',
     unavailable: 'Unavailable',
+    couponApplied: 'My little gift to you, enjoy your reward.',
+    confirmation: "Exquisite taste, Senpai, I knew you'd choose wisely.",
+    noResults: 'Nothing found in the abyss',
   },
 
   // Games
@@ -52,6 +55,12 @@ export const t = {
     newGame: 'Begin Anew',
     gameOver: 'The cycle continues',
     victory: 'Victory achieved',
+    // Mini-games tooltips
+    samuraiPetalSlice: "Draw the Tetsusaiga's arc…",
+    animeMemoryMatch: 'Recall the faces bound by fate.',
+    bubblePopGacha: 'Pop for spy-craft secrets…',
+    rhythmBeatEmUp: "Sync to the Moon Prism's pulse.",
+    postDeathLine: "I didn't lose. Just ran out of health." + ' – Edward Elric',
   },
 
   // Blog
@@ -74,6 +83,7 @@ export const t = {
     reply: 'Respond',
     like: 'Appraise',
     share: 'Spread the word',
+    upvoteLabel: 'Appraise',
   },
 
   // Profile
@@ -87,6 +97,11 @@ export const t = {
     edit: 'Modify',
     save: 'Preserve',
     cancel: 'Abandon',
+    hallOfEchoes: 'This is your Hall of Echoes…',
+    insidersTale: "Insider's Tale…",
+    giveForm: 'Give form to your inner self, Hanamichi.',
+    neverLooked: "You've never looked more like yourself.",
+    shapeReflection: 'Shape your reflection.',
   },
 
   // Achievements
@@ -108,11 +123,11 @@ export const t = {
 
   // Soapstones
   soapstones: {
-    title: 'Messages in Stone',
+    title: 'Leave a sign for fellow travelers',
     subtitle: 'Leave your mark for others to find',
-    compose: 'Carve your message',
-    placeholder: 'What wisdom do you wish to share?',
-    post: 'Leave the mark',
+    compose: 'Compose a sign…',
+    placeholder: 'Compose a sign…',
+    post: 'Place Sign',
     reply: 'Add your voice',
     glow: 'Your message shines briefly',
     fade: 'The stone returns to silence',
@@ -249,6 +264,36 @@ export const t = {
     spend: 'Spend petals',
     reward: 'Reward unlocked',
     newReward: 'New reward available',
+  },
+
+  // Honorific system
+  honorific: {
+    hanamichi:
+      "Hanamichi (花道): the 'path of flowers'—a dramatic entrance. Think 'star of the show.'",
+    senpai: 'Senpai (先輩): a senior or mentor figure. Someone to look up to and learn from.',
+  },
+
+  // Newsletter
+  newsletter: {
+    success: 'Welcome in. Message Received, Commander!',
+  },
+
+  // Trade Center
+  trade: {
+    title: 'Barter in the Scarlet Bazaar',
+    presentOffer: 'Present your offer',
+    tooltip: 'Mention simoleons',
+  },
+
+  // Praise system
+  praise: {
+    sent: 'Praise sent.',
+    stamps: {
+      cherryBud: 'Cherry Bud',
+      petalFavorite: 'Petal Favorite',
+      siteBlossom: 'Site Blossom',
+      divineBloom: 'Divine Bloom',
+    },
   },
 
   // Orders

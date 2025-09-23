@@ -67,22 +67,24 @@
   box-shadow: 0 0 20px -8px rgba(200, 120, 255, 0.15);
 }
 
-/* Focus & Hover States */
+/* Otaku-mori v0 Focus & Hover States */
 .focus-ring {
-  @apply outline-2 outline-fuchsia-300/60 outline-offset-2;
+  outline: 2px solid var(--glow-pink-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .hover-lift {
-  @apply transition-all duration-200 ease-out;
+  transition: all var(--motion-normal) var(--motion-ease);
 }
 
 .hover-lift:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px -8px rgba(200, 120, 255, 0.3);
+  box-shadow: 0 4px 20px -8px var(--glow-pink);
 }
 
 .hover-scale {
-  @apply transition-transform duration-200 ease-out;
+  transition: transform var(--motion-normal) var(--motion-ease);
 }
 
 .hover-scale:hover {
@@ -93,34 +95,53 @@
   transform: scale(0.98);
 }
 
-/* Button States */
+/* Pink glow system for hover/focus */
+.hover-glow:hover {
+  box-shadow: 0 0 20px var(--glow-pink);
+}
+
+.focus-glow:focus {
+  box-shadow: 0 0 20px var(--glow-pink-focus);
+}
+
+/* Consistent inner/outer 1px strokes on cards/inputs */
+.card-stroke {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Otaku-mori v0 Button States */
 .btn-primary {
-  @apply glass-button rounded-xl px-6 py-3 text-white font-medium;
-  @apply hover-scale focus-ring;
+  @apply glass-button rounded-xl px-6 py-3 text-white font-ui;
+  transition: all var(--motion-normal) var(--motion-ease);
+  @apply hover-scale focus-ring hover-glow;
   @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
 }
 
 .btn-secondary {
-  @apply glass-panel rounded-xl px-6 py-3 text-white font-medium;
-  @apply hover-scale focus-ring;
+  @apply glass-panel rounded-xl px-6 py-3 text-white font-ui;
+  transition: all var(--motion-normal) var(--motion-ease);
+  @apply hover-scale focus-ring hover-glow;
   @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
 }
 
-/* Card Animations */
+/* Otaku-mori v0 Card Animations */
 .card-hover {
-  @apply transition-all duration-[250ms] ease-out;
+  transition: all var(--motion-slow) var(--motion-ease);
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px -12px rgba(200, 120, 255, 0.4);
+  box-shadow: 0 8px 30px -12px var(--glow-pink);
 }
 
-/* Form Focus States */
+/* Otaku-mori v0 Form Focus States */
 .form-input {
-  @apply bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white;
-  @apply focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-300/50;
+  @apply bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-body;
+  transition: all var(--motion-normal) var(--motion-ease);
+  @apply focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-300/50;
   @apply focus:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.12)];
+  @apply card-stroke;
 }
 
 /* Loading Skeletons */
@@ -503,6 +524,25 @@
     font-family: var(--font-optimus-princeps), serif;
     font-weight: 700;
   }
+
+  /* Otaku-mori v0 Typography System */
+  .font-display {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .font-body {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  .font-ui {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+  }
 }
 
 @layer utilities {
@@ -602,17 +642,27 @@
 /* Noto Emoji (monochrome) utility */
 .emoji-noto,
 .noto-emoji-otaku {
-  font-family: "Noto Emoji", sans-serif;
+  font-family: 'Noto Emoji', sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
 }
 
-.emoji-noto-300 { font-weight: 300; }
-.emoji-noto-400 { font-weight: 400; }
-.emoji-noto-500 { font-weight: 500; }
-.emoji-noto-600 { font-weight: 600; }
-.emoji-noto-700 { font-weight: 700; }
+.emoji-noto-300 {
+  font-weight: 300;
+}
+.emoji-noto-400 {
+  font-weight: 400;
+}
+.emoji-noto-500 {
+  font-weight: 500;
+}
+.emoji-noto-600 {
+  font-weight: 600;
+}
+.emoji-noto-700 {
+  font-weight: 700;
+}
 
 /* Material Symbols (variable font) utility */
 .material-symbols-outlined {
@@ -628,21 +678,47 @@
   --ms-wght: 400;
   --ms-grad: 0;
   --ms-opsz: 24;
-  font-variation-settings: 'FILL' var(--ms-fill), 'wght' var(--ms-wght), 'GRAD' var(--ms-grad), 'opsz' var(--ms-opsz);
+  font-variation-settings:
+    'FILL' var(--ms-fill),
+    'wght' var(--ms-wght),
+    'GRAD' var(--ms-grad),
+    'opsz' var(--ms-opsz);
 }
 
 /* Simple axis helpers */
-.ms-fill-1 { --ms-fill: 1; }
-.ms-wght-300 { --ms-wght: 300; }
-.ms-wght-400 { --ms-wght: 400; }
-.ms-wght-500 { --ms-wght: 500; }
-.ms-wght-700 { --ms-wght: 700; }
-.ms-grad-200 { --ms-grad: 200; }
-.ms-grad-0 { --ms-grad: 0; }
-.ms-opsz-20 { --ms-opsz: 20; }
-.ms-opsz-24 { --ms-opsz: 24; }
-.ms-opsz-40 { --ms-opsz: 40; }
-.ms-opsz-48 { --ms-opsz: 48; }
+.ms-fill-1 {
+  --ms-fill: 1;
+}
+.ms-wght-300 {
+  --ms-wght: 300;
+}
+.ms-wght-400 {
+  --ms-wght: 400;
+}
+.ms-wght-500 {
+  --ms-wght: 500;
+}
+.ms-wght-700 {
+  --ms-wght: 700;
+}
+.ms-grad-200 {
+  --ms-grad: 200;
+}
+.ms-grad-0 {
+  --ms-grad: 0;
+}
+.ms-opsz-20 {
+  --ms-opsz: 20;
+}
+.ms-opsz-24 {
+  --ms-opsz: 24;
+}
+.ms-opsz-40 {
+  --ms-opsz: 40;
+}
+.ms-opsz-48 {
+  --ms-opsz: 48;
+}
 
 @keyframes flash-pink {
   0% {
@@ -956,22 +1032,54 @@ footer::after {
   letter-spacing: 0.01em;
 }
 
-/* Universal space-purple + stars background (site-wide) */
+/* Otaku-mori v0 Visual System */
 :root {
-  --space-from: #0b0412; /* deep plum */
-  --space-to: #1a0f2b; /* space purple */
+  /* Deep indigo to near-black gradient */
+  --space-from: #0f0f12; /* near-black */
+  --space-to: #1a0f2b; /* deep indigo */
   --star: rgba(255, 255, 255, 0.9);
   --star-dim: rgba(255, 255, 255, 0.35);
+
+  /* Motion timing - 120-300ms, easeOut/easeInOut only */
+  --motion-fast: 120ms;
+  --motion-normal: 200ms;
+  --motion-slow: 300ms;
+  --motion-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* easeOut */
+  --motion-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1); /* easeInOut */
+
+  /* Pink glow system */
+  --glow-pink: rgba(255, 79, 163, 0.3);
+  --glow-pink-strong: rgba(255, 79, 163, 0.5);
+  --glow-pink-focus: rgba(255, 79, 163, 0.6);
 }
 
-/* layered gradients + animated twinkle */
+/* Otaku-mori v0 Background System */
 .bg-otaku-space {
   background:
-    radial-gradient(1200px 800px at 10% 10%, #30104a55 0%, transparent 60%),
-    radial-gradient(1000px 700px at 80% 20%, #6a2bb455 0%, transparent 60%),
+    radial-gradient(1200px 800px at 10% 10%, rgba(48, 16, 74, 0.3) 0%, transparent 60%),
+    radial-gradient(1000px 700px at 80% 20%, rgba(106, 43, 180, 0.2) 0%, transparent 60%),
     linear-gradient(180deg, var(--space-from), var(--space-to));
   position: relative;
   isolation: isolate;
+}
+
+/* Calm star/speckle pattern with 3-4% grain */
+.bg-otaku-space::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, var(--star) 40%, transparent 41%),
+    radial-gradient(1px 1px at 60% 70%, var(--star-dim) 40%, transparent 41%),
+    radial-gradient(1.5px 1.5px at 80% 25%, var(--star-dim) 40%, transparent 41%),
+    radial-gradient(1.2px 1.2px at 35% 85%, var(--star-dim) 40%, transparent 41%),
+    radial-gradient(1.8px 1.8px at 50% 50%, var(--star) 40%, transparent 41%);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: twinkle 20s linear infinite;
+  opacity: 0.03; /* 3-4% grain */
 }
 
 /* starfield via pseudo elements so content stays clean */

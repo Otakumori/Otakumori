@@ -36,7 +36,10 @@ export async function POST(request: NextRequest) {
         website: validatedData.website,
         bannerUrl: validatedData.bannerUrl,
         avatarUrl: validatedData.avatarUrl,
-        visibility: validatedData.visibility,
+        // Convert lowercase visibility to uppercase for Prisma enum
+        visibility: validatedData.visibility
+          ? (validatedData.visibility.toUpperCase() as 'PUBLIC' | 'FRIENDS' | 'PRIVATE')
+          : undefined,
       },
       select: {
         id: true,

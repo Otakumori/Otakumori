@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { requireUserId } from '@/app/lib/auth';
 import { rateLimit } from '@/app/api/rate-limit';
 import { sanitizeSoapstone } from '@/lib/sanitize';

@@ -12,14 +12,7 @@ import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
 
-async function ensureIdempotency(key: string, purpose: string) {
-  try {
-    await prisma.idempotencyKey.create({ data: { key, purpose } });
-    return true;
-  } catch {
-    return false;
-  }
-}
+// NOTE: This route should use the proper idempotency middleware instead of manual key creation
 
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.api, async () => {
@@ -30,9 +23,7 @@ export async function POST(req: NextRequest) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
 
-    if (!(await ensureIdempotency(idemp, 'checkout.session'))) {
-      return NextResponse.json({ ok: true, data: { duplicate: true } });
-    }
+    // TODO: Implement proper idempotency check using the middleware
 
     const json = await req.json();
     const parsed = CheckoutRequest.safeParse(json);

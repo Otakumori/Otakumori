@@ -76,7 +76,34 @@ export default function CherryBlossomEffect({ density = 'home' }: { density?: De
       }
     }, ms);
 
+    // Only enable click interactions on home page
     const onClick = (e: MouseEvent) => {
+      // Check if we're on the home page
+      if (window.location.pathname !== '/') return;
+
+      // Check if click is within exclusion zones around UI elements
+      const target = e.target as HTMLElement;
+      if (target.closest('button, a, input, textarea, select, [role="button"], [role="link"]')) {
+        return;
+      }
+
+      // Check if click is near interactive elements (exclusion halo)
+      const interactiveElements = document.querySelectorAll(
+        'button, a, input, textarea, select, [role="button"], [role="link"]',
+      );
+      for (const element of interactiveElements) {
+        const rect = element.getBoundingClientRect();
+        const halo = 20; // 20px exclusion halo
+        if (
+          e.clientX >= rect.left - halo &&
+          e.clientX <= rect.right + halo &&
+          e.clientY >= rect.top - halo &&
+          e.clientY <= rect.bottom + halo
+        ) {
+          return;
+        }
+      }
+
       const count = density === 'home' ? CLICK_BURST_COUNT : Math.round(CLICK_BURST_COUNT * 0.6);
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2;
@@ -90,11 +117,17 @@ export default function CherryBlossomEffect({ density = 'home' }: { density?: De
       // Dispatch petal collect event for HUD
       window.dispatchEvent(new Event('petal:collect'));
     };
-    addEventListener('click', onClick, { passive: true });
+
+    // Only add click listener on home page
+    if (window.location.pathname === '/') {
+      addEventListener('click', onClick, { passive: true });
+    }
 
     return () => {
       clearInterval(id);
-      removeEventListener('click', onClick);
+      if (window.location.pathname === '/') {
+        removeEventListener('click', onClick);
+      }
       removeEventListener('resize', onResize);
       ro.disconnect();
     };

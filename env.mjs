@@ -1,6 +1,17 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
+// Load environment variables from .env.local when running outside Next.js context
+if (typeof window === 'undefined' && !process.env.NEXT_RUNTIME) {
+  try {
+    const dotenv = await import('dotenv');
+    dotenv.config({ path: '.env.local' });
+  } catch (error) {
+    // dotenv not available or .env.local not found, continue without it
+    console.warn('Could not load .env.local:', error.message);
+  }
+}
+
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

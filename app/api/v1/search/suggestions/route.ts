@@ -91,7 +91,7 @@ async function generateDynamicSuggestions(query: string, searchType: string, lim
             { username: { contains: query, mode: 'insensitive' } },
             { display_name: { contains: query, mode: 'insensitive' } },
           ],
-          visibility: { not: 'private' },
+          visibility: { not: 'PRIVATE' },
         },
         select: {
           id: true,

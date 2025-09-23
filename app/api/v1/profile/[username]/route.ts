@@ -76,9 +76,9 @@ export async function GET(request: NextRequest, { params }: { params: { username
     let canView = true;
     let isFollowing = false;
 
-    if (profileUser.visibility === 'private') {
+    if (profileUser.visibility === 'PRIVATE') {
       canView = false;
-    } else if (profileUser.visibility === 'friends') {
+    } else if (profileUser.visibility === 'FRIENDS') {
       if (!userId) {
         canView = false;
       } else {

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import NavBar from '../../components/NavBar';
+import Navbar from '../../components/layout/Navbar';
 import FooterDark from '../../components/FooterDark';
 import OrdersList from '../../components/profile/OrdersList';
 import { t } from '@/lib/microcopy';
@@ -42,7 +42,7 @@ export default async function OrdersPage() {
 
   return (
     <>
-      <NavBar />
+      <Navbar />
       <main className="relative z-10 min-h-screen bg-[#080611]">
         <div className="mx-auto max-w-7xl px-4 py-8 md:px-6">
           <div className="mb-8">

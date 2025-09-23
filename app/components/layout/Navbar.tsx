@@ -3,11 +3,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useAuthContext } from '../../contexts/AuthContext';
 import { useCart } from '../cart/CartProvider';
 import { CATEGORIES } from '@/lib/categories';
 import { parseQuery } from '@/lib/search/parse';
@@ -15,7 +16,9 @@ import PetalWallet from '../PetalWallet';
 
 const Navbar: React.FC = () => {
   const { isSignedIn, isAdmin } = useAuth();
+  const { requireAuth } = useAuthContext();
   const router = useRouter();
+  const pathname = usePathname();
   const { itemCount } = useCart();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +78,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-black/50 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 w-full bg-black/50 backdrop-blur-lg font-ui">
       {/* Skip to content for accessibility */}
       <a
         href="#main-content"
@@ -101,21 +104,35 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Menu */}
         <div className="hidden items-center gap-6 text-white md:flex">
-          <Link href="/" className="transition-colors hover:text-pink-500" aria-label="Home">
+          <Link
+            href="/"
+            className={`transition-colors hover:text-pink-500 relative ${
+              pathname === '/' ? 'text-pink-400' : ''
+            }`}
+            aria-label="Home"
+          >
             Home
+            {pathname === '/' && (
+              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
+            )}
           </Link>
 
           {/* Shop Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              className="flex items-center space-x-1 transition-colors hover:text-pink-500"
+              className={`flex items-center space-x-1 transition-colors hover:text-pink-500 relative ${
+                pathname.startsWith('/shop') ? 'text-pink-400' : ''
+              }`}
               aria-expanded={isCategoryDropdownOpen}
               aria-haspopup="true"
               aria-label="Shop categories"
             >
               <span>Shop</span>
               <ChevronDown className="w-4 h-4" />
+              {pathname.startsWith('/shop') && (
+                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
+              )}
             </button>
 
             {isCategoryDropdownOpen && (
@@ -142,11 +159,41 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          <Link href="/blog" className="transition-colors hover:text-pink-500" aria-label="Blog">
+          <Link
+            href="/blog"
+            className={`transition-colors hover:text-pink-500 relative ${
+              pathname.startsWith('/blog') ? 'text-pink-400' : ''
+            }`}
+            aria-label="Blog"
+          >
             Blog
+            {pathname.startsWith('/blog') && (
+              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
+            )}
           </Link>
-          <Link href="/about" className="transition-colors hover:text-pink-500" aria-label="About">
+          <Link
+            href="/mini-games"
+            className={`transition-colors hover:text-pink-500 relative ${
+              pathname.startsWith('/mini-games') ? 'text-pink-400' : ''
+            }`}
+            aria-label="Mini-Games"
+          >
+            Mini-Games
+            {pathname.startsWith('/mini-games') && (
+              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
+            )}
+          </Link>
+          <Link
+            href="/about"
+            className={`transition-colors hover:text-pink-500 relative ${
+              pathname === '/about' ? 'text-pink-400' : ''
+            }`}
+            aria-label="About"
+          >
             About
+            {pathname === '/about' && (
+              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
+            )}
           </Link>
         </div>
 
@@ -196,15 +243,19 @@ const Navbar: React.FC = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/wishlist"
+          <button
+            onClick={() =>
+              requireAuth(() => router.push('/wishlist'), 'Please sign in to view your wishlist')
+            }
             className="text-white transition-colors hover:text-pink-500 text-xl"
             aria-label="Wishlist"
           >
             ♡
-          </Link>
-          <Link
-            href="/cart"
+          </button>
+          <button
+            onClick={() =>
+              requireAuth(() => router.push('/cart'), 'Please sign in to view your cart')
+            }
             className="relative text-white transition-colors hover:text-pink-500"
             aria-label="Cart"
           >
@@ -217,7 +268,7 @@ const Navbar: React.FC = () => {
                 {itemCount}
               </span>
             )}
-          </Link>
+          </button>
 
           {/* Authentication */}
           {isSignedIn ? (
@@ -244,7 +295,7 @@ const Navbar: React.FC = () => {
           ) : (
             <Link
               href="/sign-in"
-              className="px-4 py-2 bg-[#ff4fa3] hover:bg-[#ff86c2] text-white rounded-lg transition-all duration-200 animate-pulse"
+              className="px-4 py-2 bg-[#ff4fa3] hover:bg-[#ff86c2] text-white rounded-lg transition-all duration-200 animate-pulse hover:animate-none"
             >
               Sign In
             </Link>
@@ -328,6 +379,15 @@ const Navbar: React.FC = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Blog
+            </Link>
+            <Link
+              href="/mini-games"
+              className="text-2xl text-white"
+              aria-label="Mini-Games"
+              tabIndex={0}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Mini-Games
             </Link>
             <Link
               href="/about"

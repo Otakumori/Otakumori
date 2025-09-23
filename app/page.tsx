@@ -15,7 +15,9 @@ export default function HomePage() {
       {/* Background layers */}
       <PixelatedStarfield />
       <FallingPetals />
-      <CherryBlossomTree />
+      <div data-tree-root>
+        <CherryBlossomTree />
+      </div>
       <CherryBlossomEffect density="home" />
 
       {/* Main content with improved spacing and layout */}

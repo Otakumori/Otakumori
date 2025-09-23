@@ -1,15 +1,16 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+import { type Metadata } from 'next';
 import GameShell from '../_shared/GameShell';
-import Scene from './Scene';
+import SamuraiSlice from './Scene';
 
-export const metadata = { title: 'Samurai Petal Slice' };
+export const metadata: Metadata = {
+  title: 'Samurai Petal Slice | Otakumori',
+  description: "Draw the Tetsusaiga's arc…",
+};
 
-export default function Page() {
+export default function SamuraiPetalSlicePage() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6">
-      <GameShell gameKey="samurai-petal-slice" title="Samurai Petal Slice">
-        <Scene />
-      </GameShell>
-    </div>
+    <GameShell title="Samurai Petal Slice" gameKey="samurai-petal-slice">
+      <SamuraiSlice />
+    </GameShell>
   );
 }
