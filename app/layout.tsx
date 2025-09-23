@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               `,
             }}
           />
-          <CherryBlossomEffect density="site" />
+          {/* CherryBlossomEffect moved to Home page only for v0 spec compliance */}
           {isCursorGlowEnabled() && <CursorGlow />}
           <PetalHUD />
           <Konami />

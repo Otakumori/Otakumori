@@ -164,8 +164,10 @@ export default function SamuraiSlice() {
       let anyHit = false,
         anyCrit = false;
 
-      for (const p of petals) {
-        if (p.hit) continue;
+      // Only check for hits if there are slashable petals visible
+      const visiblePetals = petals.filter((p) => !p.hit && p.y >= -20 && p.y <= H + 20);
+
+      for (const p of visiblePetals) {
         // distance from petal to segment ab < radius
         const r = 12 * p.s;
         const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / (len * len)));
@@ -183,6 +185,7 @@ export default function SamuraiSlice() {
           if (isCrit) {
             score += 25;
             crit++;
+            anyCrit = true;
           } else {
             score += 10;
           }
@@ -203,9 +206,10 @@ export default function SamuraiSlice() {
         }
       }
 
-      if (!anyHit && missSfx) {
-        // only occasionally play miss
-        if (Math.random() < 0.35) play(missSfx, -12);
+      // Only count as miss if there were visible petals to hit but player missed them all
+      if (!anyHit && visiblePetals.length > 0 && len > 15) {
+        // require minimum slash length
+        if (missSfx && Math.random() < 0.35) play(missSfx, -12);
         miss++;
       }
 
