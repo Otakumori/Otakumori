@@ -37,7 +37,7 @@ export default function GameCubePage() {
   }, []);
 
   if (!hasBooted) {
-    return <GameCubeBootSequence onBootComplete={handleBootComplete} />;
+    return <GameCubeBootSequence onComplete={handleBootComplete} />;
   }
 
   return <GameCube3D textures={['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']} />;

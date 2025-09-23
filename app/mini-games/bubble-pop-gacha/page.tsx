@@ -1,14 +1,7 @@
-import { type Metadata } from 'next';
-import GameShell from '../_shared/GameShell';
-
-export const metadata: Metadata = {
-  title: 'Bubble-Pop Gacha | Otakumori',
-  description: 'Pop for spy-craft secrets…',
-};
-
-('use client');
+'use client';
 
 import { useState } from 'react';
+import GameShell from '../_shared/GameShell';
 
 export default function BubblePopGachaPage() {
   const [shards, setShards] = useState(0);

@@ -151,7 +151,7 @@ export default function GamePage() {
   if (showBoot) {
     return (
       <GameCubeBoot
-        onBootComplete={() => {
+        onComplete={() => {
           setShowBoot(false);
           try {
             window.localStorage.setItem('gc_boot', '1');
