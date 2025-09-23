@@ -1,3 +1,9 @@
+---
+description: 'GameCube-style boot animation (dark bg, pink/purple highlights), once/day logic'
+globs: ['app/mini-games/**/*.tsx', 'app/components/**/*Boot*.tsx']
+alwaysApply: true
+---
+
 # Loader & Boot Animation Standards
 
 ## GameCube Boot Sequence

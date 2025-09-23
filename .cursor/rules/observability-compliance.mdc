@@ -1,3 +1,9 @@
+---
+description: "GA4 + Sentry with feature tags, no PII"
+globs: ["app/components/analytics/**/*.tsx", "app/lib/**/*.ts", "sentry.*.config.ts"]
+alwaysApply: true
+---
+
 # Observability & Compliance Standards
 
 ## Google Analytics 4 (GA4) Integration

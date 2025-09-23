@@ -1,3 +1,9 @@
+---
+description: 'LCP < 2.5s, JS chunk ≤ 230KB gzipped, no jank'
+globs: ['**/*.tsx', '**/*.ts', 'next.config.js', 'package.json']
+alwaysApply: true
+---
+
 # Performance Budget Standards
 
 ## Core Web Vitals Targets

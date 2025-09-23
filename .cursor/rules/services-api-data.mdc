@@ -1,3 +1,9 @@
+---
+description: 'Zod validation, idempotency, requestId logging, no duplicates'
+globs: ['app/api/**/*.ts', 'app/lib/api-*.ts', 'prisma/schema.prisma']
+alwaysApply: true
+---
+
 # Services, API & Data Standards
 
 ## API Design Standards
