@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-ragdoll\Scene.tsx instead.
+// Quick Math Game - Answer fast. Pressure builds with each correct streak.
 /* eslint-disable react-hooks/exhaustive-deps */
 
 'use client';
