@@ -1,6 +1,6 @@
 ---
-description: "Preserve approved microcopy exactly"
-globs: ["**/*.tsx", "**/*.ts", "app/lib/copy.ts", "app/lib/content-*.ts"]
+description: 'Preserve approved microcopy exactly'
+globs: ['**/*.tsx', '**/*.ts', 'app/lib/copy.ts', 'app/lib/content-*.ts']
 alwaysApply: true
 ---
 
