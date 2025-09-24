@@ -88,6 +88,10 @@ export const env = createEnv({
     // WebSocket
     NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: z.string().optional(),
     NEXT_PUBLIC_COMMUNITY_WS_URL: z.string().optional(),
+    // Feature flags
+    NEXT_PUBLIC_FEATURE_GA_ENABLED: z.string().default('true'),
+    NEXT_PUBLIC_FEATURE_OTEL_CLIENT: z.string().default('false'),
+    NEXT_PUBLIC_FEATURE_PERF_MODULE: z.string().default('true'),
     // Sentry
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
     // Feature flags
@@ -194,6 +198,10 @@ export const env = createEnv({
     // WebSocket
     NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
     NEXT_PUBLIC_COMMUNITY_WS_URL: process.env.NEXT_PUBLIC_COMMUNITY_WS_URL,
+    // Feature flags
+    NEXT_PUBLIC_FEATURE_GA_ENABLED: process.env.NEXT_PUBLIC_FEATURE_GA_ENABLED,
+    NEXT_PUBLIC_FEATURE_OTEL_CLIENT: process.env.NEXT_PUBLIC_FEATURE_OTEL_CLIENT,
+    NEXT_PUBLIC_FEATURE_PERF_MODULE: process.env.NEXT_PUBLIC_FEATURE_PERF_MODULE,
     // Sentry
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
     // Feature flags

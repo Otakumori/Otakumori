@@ -1,80 +1,120 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter, usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
-import { UserButton } from '@clerk/nextjs';
-import { useAuth } from '@/app/hooks/useAuth';
-import { useAuthContext } from '../../contexts/AuthContext';
-import { useCart } from '../cart/CartProvider';
-import { CATEGORIES } from '@/lib/categories';
-import { parseQuery } from '@/lib/search/parse';
-import PetalWallet from '../PetalWallet';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth, useUser } from '@clerk/nextjs';
+import { SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
+import { useAuthContext } from '@/app/contexts/AuthContext';
 
-const Navbar: React.FC = () => {
-  const { isSignedIn, isAdmin } = useAuth();
-  const { requireAuth } = useAuthContext();
-  const router = useRouter();
+// Game registry for mega-menu
+const FEATURED_GAMES = [
+  { id: 'samurai-petal-slice', title: 'Samurai Petal Slice', summary: "Draw the Tetsusaiga's arc…", status: 'ready' },
+  { id: 'anime-memory-match', title: 'Anime Memory Match', summary: 'Recall the faces bound by fate.', status: 'ready' },
+  { id: 'bubble-pop-gacha', title: 'Bubble-Pop Gacha', summary: 'Pop for spy-craft secrets…', status: 'ready' },
+  { id: 'petal-storm-rhythm', title: 'Petal Storm Rhythm', summary: "Sync to the Moon Prism's pulse.", status: 'ready' },
+  { id: 'quick-math', title: 'Quick Math', summary: 'Answer fast. Pressure builds with each correct streak.', status: 'ready' },
+  { id: 'dungeon-of-desire', title: 'Dungeon of Desire', summary: 'Descend into the dungeon. Survive rooms and claim rewards.', status: 'beta' }
+];
+
+const SAMPLE_PRODUCTS = [
+  { id: '1', name: 'Sakura Cherry Blossom T-Shirt', price: 2999, image: '/placeholder-product.jpg' },
+  { id: '2', name: 'Anime Gaming Controller', price: 4999, image: '/placeholder-product.jpg' },
+  { id: '3', name: 'Otaku-mori Sticker Pack', price: 1499, image: '/placeholder-product.jpg' },
+  { id: '4', name: 'Mini-Games Poster Collection', price: 1999, image: '/placeholder-product.jpg' }
+];
+
+const SAMPLE_POSTS = [
+  { id: '1', title: 'Welcome to Otaku-mori: Your New Digital Haven', date: '2024-09-20' },
+  { id: '2', title: 'Mini-Games Hub: Complete Guide for Beginners', date: '2024-09-18' },
+  { id: '3', title: 'Building a Positive Community Together', date: '2024-09-15' }
+];
+
+// Search suggestions with easter eggs
+const SEARCH_SUGGESTIONS = [
+  'sakura', 'gaming', 'anime', 'merch', 'petals', 'mini-games',
+  'what are ya buyin', 'stranger', 'gamecube', 'otaku'
+];
+
+const EASTER_EGGS: Record<string, string> = {
+  'what are ya buyin': 'The classic merchant greeting! 🛍️',
+  'stranger': 'Ah, a fellow RE4 fan! Welcome!',
+  'gamecube': 'Ready for some nostalgic gaming? 🎮'
+};
+
+export default function Navbar() {
   const pathname = usePathname();
-  const { itemCount } = useCart();
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
+  const { requireAuthForSoapstone, requireAuthForWishlist } = useAuthContext();
 
+  // State for mega-menu and search
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobileShopOpen, setIsMobileShopOpen] = useState(false);
 
-  const searchRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const megaMenuRef = useRef<HTMLDivElement>(null);
+
+  // Handle search input
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.length >= 2) {
+      // Fuzzy search suggestions
+      const filtered = SEARCH_SUGGESTIONS.filter(suggestion =>
+        suggestion.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 5);
+      setSearchSuggestions(filtered);
+      setShowSearchDropdown(true);
+    } else {
+      setShowSearchDropdown(false);
+    }
+  };
+
+  // Handle search submit
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSearchDropdown(false);
+      setSearchQuery('');
+    }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    setShowSearchDropdown(false);
+    router.push(`/search?q=${encodeURIComponent(suggestion)}`);
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsCategoryDropdownOpen(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchDropdown(false);
       }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
+      if (megaMenuRef.current && !megaMenuRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
       }
-    }
+    };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle search submission
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-
-    const parsed = parseQuery(searchQuery);
-
-    // If category directive, redirect to category page
-    if (parsed.category) {
-      router.push(`/shop/c/${parsed.category}`);
-    } else {
-      // Regular search
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setActiveDropdown(null);
+      setShowSearchDropdown(false);
     }
-
-    setSearchQuery('');
-    setIsSearchFocused(false);
-  };
-
-  // Handle category selection
-  const handleCategorySelect = (categorySlug: string) => {
-    router.push(`/shop/c/${categorySlug}`);
-    setIsCategoryDropdownOpen(false);
-    setIsMenuOpen(false);
-    setIsMobileShopOpen(false);
-  };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
   };
 
   return (
@@ -86,330 +126,272 @@ const Navbar: React.FC = () => {
       >
         Skip to main content
       </a>
-      <nav
-        className="container mx-auto flex items-center justify-between px-4 py-3"
-        aria-label="Main navigation"
-      >
+      <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
-        <Link href="/" aria-label="Home">
-          <Image
-            src="/assets/images/circlelogo.png"
-            alt="Otaku-mori Logo"
-            width={40}
-            height={40}
-            className="rounded-full"
-            priority
-          />
+        <Link href="/" className="flex items-center space-x-2 group">
+          <div className="relative w-8 h-8">
+            <Image
+              src="/circlelogo.png"
+              alt="Otaku-mori"
+              fill
+              className="object-contain group-hover:scale-110 transition-transform"
+            />
+          </div>
+          <span className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">
+            Otaku-mori
+          </span>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden items-center gap-6 text-white md:flex">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center space-x-8" ref={megaMenuRef}>
+          {/* Home */}
           <Link
             href="/"
-            className={`transition-colors hover:text-pink-500 relative ${
-              pathname === '/' ? 'text-pink-400' : ''
+            className={`text-white hover:text-pink-400 transition-colors ${
+              pathname === '/' ? 'text-pink-400 border-b-2 border-pink-400' : ''
             }`}
-            aria-label="Home"
           >
             Home
-            {pathname === '/' && (
-              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
-            )}
           </Link>
 
-          {/* Shop Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          {/* Shop with Mega Menu */}
+          <div className="relative">
             <button
-              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              className={`flex items-center space-x-1 transition-colors hover:text-pink-500 relative ${
-                pathname.startsWith('/shop') ? 'text-pink-400' : ''
+              onMouseEnter={() => setActiveDropdown('shop')}
+              className={`text-white hover:text-pink-400 transition-colors flex items-center ${
+                pathname.startsWith('/shop') ? 'text-pink-400 border-b-2 border-pink-400' : ''
               }`}
-              aria-expanded={isCategoryDropdownOpen}
-              aria-haspopup="true"
-              aria-label="Shop categories"
             >
-              <span>Shop</span>
-              <ChevronDown className="w-4 h-4" />
-              {pathname.startsWith('/shop') && (
-                <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
-              )}
+              Shop
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </button>
 
-            {isCategoryDropdownOpen && (
-              <div className="absolute top-full left-0 mt-2 w-80 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl">
-                <div className="p-4">
-                  <h3 className="text-white font-semibold mb-3">Categories</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {CATEGORIES.map((category) => (
-                      <button
-                        key={category.slug}
-                        onClick={() => handleCategorySelect(category.slug)}
-                        className="text-left p-2 rounded text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                        aria-label={`View ${category.label} category`}
-                      >
-                        <div className="font-medium">{category.label}</div>
-                        {category.description && (
-                          <div className="text-xs text-white/60 mt-1">{category.description}</div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+            {/* Shop Mega Menu */}
+            {activeDropdown === 'shop' && (
+              <div
+                className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <h3 className="text-white font-semibold mb-4">Featured Products</h3>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {SAMPLE_PRODUCTS.slice(0, 4).map((product) => (
+                    <Link
+                      key={product.id}
+                      href={`/shop/${product.id}`}
+                      className="flex items-center space-x-3 p-2 rounded hover:bg-white/10 transition-colors"
+                    >
+                      <div className="w-12 h-12 bg-white/10 rounded flex items-center justify-center">
+                        <span className="text-xs text-white">IMG</span>
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium line-clamp-2">{product.name}</p>
+                        <p className="text-pink-400 text-sm">${(product.price / 100).toFixed(2)}</p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
+                <Link
+                  href="/shop"
+                  className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
+                >
+                  View All Products →
+                </Link>
               </div>
             )}
           </div>
 
-          <Link
-            href="/blog"
-            className={`transition-colors hover:text-pink-500 relative ${
-              pathname.startsWith('/blog') ? 'text-pink-400' : ''
-            }`}
-            aria-label="Blog"
-          >
-            Blog
-            {pathname.startsWith('/blog') && (
-              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
-            )}
-          </Link>
-          <Link
-            href="/mini-games"
-            className={`transition-colors hover:text-pink-500 relative ${
-              pathname.startsWith('/mini-games') ? 'text-pink-400' : ''
-            }`}
-            aria-label="Mini-Games"
-          >
-            Mini-Games
-            {pathname.startsWith('/mini-games') && (
-              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
-            )}
-          </Link>
-          <Link
-            href="/about"
-            className={`transition-colors hover:text-pink-500 relative ${
-              pathname === '/about' ? 'text-pink-400' : ''
-            }`}
-            aria-label="About"
-          >
-            About
-            {pathname === '/about' && (
-              <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-pink-400 rounded-full shadow-[0_0_4px_rgba(255,79,163,0.6)]" />
-            )}
-          </Link>
-        </div>
+          {/* Mini-Games with Mega Menu */}
+          <div className="relative">
+            <button
+              onMouseEnter={() => setActiveDropdown('games')}
+              className={`text-white hover:text-pink-400 transition-colors flex items-center ${
+                pathname.startsWith('/mini-games') ? 'text-pink-400 border-b-2 border-pink-400' : ''
+              }`}
+            >
+              Mini-Games
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-        {/* Center Search */}
-        <div className="flex-1 max-w-md mx-4 hidden md:block">
-          <form onSubmit={handleSearch} className="relative">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
-              <input
-                ref={searchRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-                placeholder="What're ya buyin' ?"
-                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Search suggestions */}
-            {isSearchFocused && searchQuery && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl z-10">
-                <div className="p-2">
-                  <div className="text-xs text-white/60 mb-2">Quick categories:</div>
-                  <div className="space-y-1">
-                    {CATEGORIES.slice(0, 6).map((category) => (
-                      <button
-                        key={category.slug}
-                        onClick={() => {
-                          setSearchQuery(`cat:${category.slug}`);
-                          handleSearch({ preventDefault: () => {} } as React.FormEvent);
-                        }}
-                        className="w-full text-left p-2 rounded text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-                        aria-label={`Search ${category.label} category`}
-                      >
-                        <span className="font-medium">cat:{category.slug}</span>
-                        <span className="text-xs text-white/60 ml-2">{category.label}</span>
-                      </button>
-                    ))}
-                  </div>
+            {/* Games Mega Menu */}
+            {activeDropdown === 'games' && (
+              <div
+                className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <h3 className="text-white font-semibold mb-4">Featured Games</h3>
+                <div className="space-y-3 mb-4">
+                  {FEATURED_GAMES.slice(0, 4).map((game) => (
+                    <Link
+                      key={game.id}
+                      href={`/mini-games/${game.id}`}
+                      className="flex items-center space-x-3 p-2 rounded hover:bg-white/10 transition-colors"
+                    >
+                      <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded flex items-center justify-center">
+                        <span className="text-white text-lg">🎮</span>
+                      </div>
+                      <div>
+                        <p className="text-white text-sm font-medium">{game.title}</p>
+                        <p className="text-gray-400 text-xs italic">{game.summary}</p>
+                        {game.status === 'beta' && (
+                          <span className="inline-block mt-1 px-2 py-0.5 bg-yellow-500/20 text-yellow-300 text-xs rounded">
+                            BETA
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
                 </div>
+                <Link
+                  href="/mini-games"
+                  className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
+                >
+                  Enter GameCube Hub →
+                </Link>
               </div>
             )}
-          </form>
+          </div>
+
+          {/* Blog with Mega Menu */}
+          <div className="relative">
+            <button
+              onMouseEnter={() => setActiveDropdown('blog')}
+              className={`text-white hover:text-pink-400 transition-colors flex items-center ${
+                pathname.startsWith('/blog') ? 'text-pink-400 border-b-2 border-pink-400' : ''
+              }`}
+            >
+              Blog
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Blog Mega Menu */}
+            {activeDropdown === 'blog' && (
+              <div
+                className="absolute top-full left-0 mt-2 w-80 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <h3 className="text-white font-semibold mb-4">Latest Posts</h3>
+                <div className="space-y-3 mb-4">
+                  {SAMPLE_POSTS.map((post) => (
+                    <Link
+                      key={post.id}
+                      href={`/blog/${post.id}`}
+                      className="block p-2 rounded hover:bg-white/10 transition-colors"
+                    >
+                      <p className="text-white text-sm font-medium line-clamp-2">{post.title}</p>
+                      <p className="text-gray-400 text-xs mt-1">{post.date}</p>
+                    </Link>
+                  ))}
+                </div>
+                <Link
+                  href="/blog"
+                  className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
+                >
+                  View All Posts →
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* About */}
+          <Link
+            href="/about"
+            className={`text-white hover:text-pink-400 transition-colors ${
+              pathname === '/about' ? 'text-pink-400 border-b-2 border-pink-400' : ''
+            }`}
+          >
+            About
+          </Link>
         </div>
 
-        {/* Icons */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() =>
-              requireAuth(() => router.push('/wishlist'), 'Please sign in to view your wishlist')
-            }
-            className="text-white transition-colors hover:text-pink-500 text-xl"
-            aria-label="Wishlist"
-          >
-            ♡
-          </button>
-          <button
-            onClick={() =>
-              requireAuth(() => router.push('/cart'), 'Please sign in to view your cart')
-            }
-            className="relative text-white transition-colors hover:text-pink-500"
-            aria-label="Cart"
-          >
-            <ShoppingCart size={20} />
-            {itemCount > 0 && (
-              <span
-                className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white"
-                aria-label={`Cart items: ${itemCount}`}
-              >
-                {itemCount}
-              </span>
-            )}
-          </button>
-
-          {/* Authentication */}
-          {isSignedIn ? (
-            <div className="flex items-center gap-2">
-              {isAdmin && (
-                <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30">
-                  Admin
-                </span>
-              )}
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: 'h-8 w-8',
-                    userButtonPopoverCard: 'bg-black/90 backdrop-blur-md border border-white/20',
-                    userButtonPopoverActionButton: 'text-white hover:bg-white/10',
-                    userButtonPopoverActionButtonText: 'text-white',
-                    userButtonPopoverFooter: 'hidden',
-                  },
-                }}
-                userProfileMode="navigation"
-                userProfileUrl="/account"
+        {/* Search and Auth */}
+        <div className="flex items-center space-x-4">
+          {/* Enhanced Search */}
+          <div className="relative" ref={searchRef}>
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                type="text"
+                placeholder="What're ya buyin' ?"
+                value={searchQuery}
+                onChange={handleSearchInput}
+                onKeyDown={handleKeyDown}
+                className="w-64 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
               />
-            </div>
-          ) : (
-            <Link
-              href="/sign-in"
-              className="px-4 py-2 bg-[#ff4fa3] hover:bg-[#ff86c2] text-white rounded-lg transition-all duration-200 animate-pulse hover:animate-none"
-            >
-              Sign In
-            </Link>
-          )}
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </form>
 
-          <PetalWallet />
+            {/* Search Suggestions Dropdown */}
+            {showSearchDropdown && searchSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg py-2 z-50">
+                {searchSuggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="w-full px-4 py-2 text-left text-white hover:bg-white/10 transition-colors flex items-center justify-between"
+                  >
+                    <span>{suggestion}</span>
+                    {EASTER_EGGS[suggestion] && (
+                      <span className="text-xs text-pink-400">{EASTER_EGGS[suggestion]}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Auth */}
+          {isSignedIn ? (
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "w-8 h-8 border border-white/20 hover:border-pink-400/50 transition-colors"
+                }
+              }}
+            />
+          ) : (
+            <SignInButton mode="modal">
+              <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+                Sign In
+              </button>
+            </SignInButton>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <button
-            onClick={toggleMenu}
-            className="text-white"
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="md:hidden text-white"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </nav>
+
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            id="mobile-menu"
-            ref={mobileMenuRef}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 bg-black/90 backdrop-blur-lg md:hidden"
-            role="menu"
-            aria-label="Mobile navigation"
-          >
-            <Link
-              href="/"
-              className="text-2xl text-white"
-              aria-label="Home"
-              tabIndex={0}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-
-            {/* Mobile Shop Accordion */}
-            <div>
-              <button
-                onClick={() => setIsMobileShopOpen(!isMobileShopOpen)}
-                className="flex items-center justify-between w-full text-2xl text-white"
-                aria-label="Shop categories"
-                aria-expanded={isMobileShopOpen ? 'true' : 'false'}
-              >
-                <span>Shop</span>
-                <ChevronDown
-                  className={`w-6 h-6 transition-transform ${isMobileShopOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {isMobileShopOpen && (
-                <div className="mt-4 pl-4 space-y-2">
-                  {CATEGORIES.map((category) => (
-                    <button
-                      key={category.slug}
-                      onClick={() => handleCategorySelect(category.slug)}
-                      className="block w-full text-left text-lg text-white/70 hover:text-white transition-colors"
-                      aria-label={`View ${category.label} category`}
-                    >
-                      {category.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <Link
-              href="/blog"
-              className="text-2xl text-white"
-              aria-label="Blog"
-              tabIndex={0}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Blog
-            </Link>
-            <Link
-              href="/mini-games"
-              className="text-2xl text-white"
-              aria-label="Mini-Games"
-              tabIndex={0}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Mini-Games
-            </Link>
-            <Link
-              href="/about"
-              className="text-2xl text-white"
-              aria-label="About"
-              tabIndex={0}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <button
-              onClick={toggleMenu}
-              className="absolute right-4 top-4 text-white"
-              aria-label="Close menu"
-            >
-              <X size={32} />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isMenuOpen && (
+        <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/20">
+          <div className="px-4 py-2 space-y-2">
+            <Link href="/" className="block text-white hover:text-pink-400 py-2">Home</Link>
+            <Link href="/shop" className="block text-white hover:text-pink-400 py-2">Shop</Link>
+            <Link href="/mini-games" className="block text-white hover:text-pink-400 py-2">Mini-Games</Link>
+            <Link href="/blog" className="block text-white hover:text-pink-400 py-2">Blog</Link>
+            <Link href="/about" className="block text-white hover:text-pink-400 py-2">About</Link>
+          </div>
+        </div>
+      )}
     </header>
   );
-};
-
-export default Navbar;
+}
