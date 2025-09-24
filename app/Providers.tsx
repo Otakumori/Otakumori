@@ -10,7 +10,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
-import DockedGacha from '../components/DockedGacha';
 import Navbar from './components/layout/Navbar';
 import BackdropAbyssMystique from '../components/BackdropAbyssMystique';
 import QuakeHUD from './components/hud/QuakeHUD';
@@ -33,7 +32,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               {children}
               <GlobalMusicBar />
               <SoapstoneDock />
-              <DockedGacha />
               <QuakeHUD />
             </GlobalMusicProvider>
           </CartProvider>

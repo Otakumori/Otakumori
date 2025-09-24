@@ -2,66 +2,89 @@
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
-import { env } from '@/env';
 
 type Post = { id: string; slug: string; title: string; excerpt?: string; publishedAt?: string };
 
-async function getPosts(): Promise<Post[]> {
-  // Always use localhost for now to avoid production URL issues
-  const baseUrl = 'http://localhost:3000';
-  try {
-    const res = await fetch(`${baseUrl}/api/v1/content/blog?limit=3`, {
-      next: { revalidate: 120 },
-    });
-    if (!res.ok) return [];
-
-    const contentType = res.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-      console.error('API returned non-JSON response:', contentType);
-      return [];
-    }
-
-    return (await res.json()) as Post[];
-  } catch (error) {
-    console.error('Failed to fetch blog posts:', error);
-    return [];
+// Mock blog posts for now until blog API is properly implemented
+const SAMPLE_POSTS: Post[] = [
+  {
+    id: '1',
+    slug: 'welcome-to-otaku-mori',
+    title: 'Welcome to Otaku-mori: Your New Digital Haven',
+    excerpt: 'Discover what makes our community special and how to get started on your journey.',
+    publishedAt: '2024-09-20'
+  },
+  {
+    id: '2', 
+    slug: 'mini-games-guide',
+    title: 'Mini-Games Hub: Complete Guide for Beginners',
+    excerpt: 'Learn the ins and outs of our GameCube-inspired gaming experience.',
+    publishedAt: '2024-09-18'
+  },
+  {
+    id: '3',
+    slug: 'community-guidelines',
+    title: 'Building a Positive Community Together',
+    excerpt: 'Our approach to creating safe, welcoming spaces for all travelers.',
+    publishedAt: '2024-09-15'
   }
-}
+];
 
 export default async function BlogTeaser() {
-  const posts = await getPosts();
-  if (!posts.length) return null;
+  // Use sample posts for now, later replace with real blog service
+  const posts = SAMPLE_POSTS;
 
   return (
-    <section id="blog" className="relative z-10 mx-auto mt-10 max-w-7xl px-4 md:mt-14 md:px-6">
-      <div className="mb-4 flex items-end justify-between">
-        <h2 className="text-xl font-semibold text-fuchsia-100 md:text-2xl">
-          {t('cta', 'newPost1')}
+    <section id="blog" className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
+      {/* Section Header */}
+      <div className="mb-12 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+          Latest Stories
         </h2>
-        <Link href="/blog" className="text-sm text-fuchsia-300 hover:text-fuchsia-200">
-          {t('cta', 'download2')}
-        </Link>
+        <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+          Insights, guides, and stories from the otaku community
+        </p>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-        {posts.map((p) => (
-          <GlassPanel key={p.id} className="p-4">
-            <Link href={`/blog/${p.slug}`} className="block">
-              <h3 className="text-base font-semibold text-white">{p.title}</h3>
-              {p.excerpt ? (
-                <p className="mt-2 line-clamp-3 text-sm text-zinc-300/90">{p.excerpt}</p>
-              ) : null}
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {posts.map((post) => (
+          <GlassPanel key={post.id} className="group hover:scale-105 transition-all duration-300">
+            <Link href={`/blog/${post.slug}`} className="block p-6">
+              <div className="mb-4">
+                <time className="text-sm text-pink-400 font-medium">
+                  {post.publishedAt}
+                </time>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2 group-hover:text-pink-300 transition-colors">
+                {post.title}
+              </h3>
+              {post.excerpt && (
+                <p className="text-gray-300 line-clamp-3 mb-4">
+                  {post.excerpt}
+                </p>
+              )}
+              <div className="flex items-center text-pink-400 text-sm font-medium">
+                Read More
+                <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </Link>
           </GlassPanel>
         ))}
       </div>
 
-      {/* Insiders nudge (subtle, optional) */}
-      <div className="mt-6 text-center">
+      {/* View All CTA */}
+      <div className="text-center">
         <Link
-          href="/insiders"
-          className="text-sm text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-4"
+          href="/blog"
+          className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
         >
-          {t('cta', 'signUp2')} {t('cta', 'signUp3')}.
+          View All Posts
+          <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </Link>
       </div>
     </section>

@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-black/50 backdrop-blur-lg font-ui">
+    <header className="relative z-50 w-full bg-black/50 backdrop-blur-lg font-ui">
       {/* Skip to content for accessibility */}
       <a
         href="#main-content"
