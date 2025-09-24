@@ -61,48 +61,39 @@ export default function AboutMe() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: '🎮',
                 title: 'Mini-Games Hub',
                 description: 'Engaging anime-themed games with petal economy and leaderboards',
               },
               {
-                icon: '👥',
                 title: 'Community Features',
-                description:
-                  'Connect with fellow otaku through friends, chat, and shared experiences',
+                description: 'Connect with fellow otaku through discussions, trades, and shared experiences',
               },
               {
-                icon: '🏆',
-                title: 'Achievement System',
-                description: 'Unlock rewards, climb leaderboards, and showcase your progress',
+                title: 'Shop Collections',
+                description: 'Curated anime merchandise and gaming accessories from trusted creators',
               },
               {
-                icon: '🛍️',
-                title: 'Anime Merchandise',
-                description: 'Curated collection of anime-inspired products and exclusive items',
+                title: 'Digital Collectibles',
+                description: 'Unique items, achievements, and rewards to showcase your otaku journey',
               },
               {
-                icon: '📝',
-                title: 'Blog & Content',
-                description: 'Thoughtful articles, reviews, and insights from the anime community',
+                title: 'Safe Environment',
+                description: 'Moderated community spaces ensuring positive interactions for all members',
               },
               {
-                icon: '🌸',
-                title: 'Beautiful Design',
-                description: 'Immersive sakura-themed experience with attention to every detail',
+                title: 'Cross-Platform',
+                description: 'Seamless experience across desktop and mobile devices',
               },
             ].map((feature, index) => (
               <motion.div
-                key={feature.title}
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 + index * 0.1 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:border-pink-500/30 transition-colors"
               >
-                <GlassCard className="p-6 h-full text-center hover:scale-105 transition-transform duration-300">
-                  <div className="text-4xl mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-bold text-pink-300 mb-3">{feature.title}</h3>
-                  <p className="text-pink-100/90 leading-relaxed">{feature.description}</p>
-                </GlassCard>
+                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
               </motion.div>
             ))}
           </div>

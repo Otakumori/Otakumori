@@ -2,35 +2,44 @@ import GlassPanel from './GlassPanel';
 import Image from 'next/image';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
-import { env } from '@/env.mjs';
 
 type Product = { id: string; name: string; price: number; image: string; slug?: string };
 
-async function getFeatured(): Promise<Product[]> {
-  // Always use localhost for now to avoid production URL issues
-  const baseUrl = 'http://localhost:3000';
-  try {
-    const res = await fetch(`${baseUrl}/api/v1/products/featured`, {
-      cache: 'no-store', // Force fresh data on each request
-    });
-    if (!res.ok) return [];
-
-    const contentType = res.headers.get('content-type');
-    if (!contentType?.includes('application/json')) {
-      console.error('API returned non-JSON response:', contentType);
-      return [];
-    }
-
-    return (await res.json()) as Product[];
-  } catch (error) {
-    console.error('Failed to fetch featured products:', error);
-    return [];
-  }
-}
+// Mock featured products for now until Printify integration is properly set up
+const SAMPLE_PRODUCTS: Product[] = [
+  {
+    id: '1',
+    name: 'Sakura Cherry Blossom T-Shirt',
+    price: 2999, // Price in cents
+    image: '/placeholder-product.jpg',
+    slug: 'sakura-cherry-blossom-tshirt',
+  },
+  {
+    id: '2',
+    name: 'Anime Gaming Controller',
+    price: 4999,
+    image: '/placeholder-product.jpg',
+    slug: 'anime-gaming-controller',
+  },
+  {
+    id: '3',
+    name: 'Otaku-mori Sticker Pack',
+    price: 1499,
+    image: '/placeholder-product.jpg',
+    slug: 'otaku-mori-sticker-pack',
+  },
+  {
+    id: '4',
+    name: 'Mini-Games Poster Collection',
+    price: 1999,
+    image: '/placeholder-product.jpg',
+    slug: 'mini-games-poster-collection',
+  },
+];
 
 export default async function ShopTeaser() {
-  const products = await getFeatured();
-  if (!products.length) return null;
+  // Use sample products for now, later replace with real Printify service
+  const products = SAMPLE_PRODUCTS;
 
   return (
     <section id="shop" className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
@@ -44,50 +53,54 @@ export default async function ShopTeaser() {
         </p>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {products.slice(0, 4).map((p) => (
-          <GlassPanel
-            key={p.id}
-            className="group overflow-hidden hover:scale-105 transition-all duration-300"
-          >
-            <Link href={`/shop/${p.slug ?? p.id}`} className="block">
-              <div className="relative aspect-[4/5] w-full overflow-hidden">
-                <Image
-                  src={p.image}
-                  alt={p.name}
-                  fill
-                  sizes="(max-width:768px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-              <div className="p-4 bg-black/20 backdrop-blur-sm">
-                <div className="text-sm font-medium text-white mb-1 line-clamp-2">{p.name}</div>
-                <div className="text-lg font-bold text-pink-400">${p.price}</div>
-              </div>
-            </Link>
-          </GlassPanel>
-        ))}
-      </div>
+      {/* Products Grid or Empty State */}
+      {products.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          {products.map((p) => (
+            <GlassPanel
+              key={p.id}
+              className="group relative overflow-hidden hover:scale-105 transition-all duration-300"
+            >
+              <Link href={`/shop/${p.slug}`} className="block">
+                <div className="aspect-square relative mb-4">
+                  <Image
+                    src={p.image}
+                    alt={p.name}
+                    fill
+                    className="object-cover rounded-lg group-hover:scale-110 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                </div>
+                <h3 className="text-white font-semibold mb-2 line-clamp-2">{p.name}</h3>
+                <p className="text-pink-400 font-bold">${(p.price / 100).toFixed(2)}</p>
+              </Link>
+            </GlassPanel>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
+            <span className="text-2xl text-white/60">🛍️</span>
+          </div>
+          <h3 className="text-xl text-white mb-2">Shop Coming Soon</h3>
+          <p className="text-gray-400">Featured products will appear here</p>
+        </div>
+      )}
 
-      {/* View All Button */}
-      <div className="text-center">
-        <Link
-          href="/shop"
-          className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-        >
-          View All Products
-          <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 8l4 4m0 0l-4 4m4-4H3"
-            />
-          </svg>
-        </Link>
-      </div>
+      {/* View All CTA */}
+      {products.length > 0 && (
+        <div className="text-center">
+          <Link
+            href="/shop"
+            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
+          >
+            Browse All Products
+            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      )}
     </section>
   );
 }
