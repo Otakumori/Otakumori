@@ -7,61 +7,84 @@ import FooterDark from '../components/FooterDark';
 import ShopCatalog from '../components/shop/ShopCatalog';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
-
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
   return logger;
 }
+import { getPrintifyService } from '../lib/printify/service';
+import type { PrintifyProduct } from '../lib/printify/schema';
 
 export const metadata: Metadata = {
-  title: 'Shop — Otaku-mori',
-  description: 'Discover anime gaming treasures and collectibles.',
+  title: 'Shop | Otaku-mori',
+  description: 'Discover exclusive anime merchandise and gaming accessories',
 };
 
-export const dynamic = 'force-dynamic';
+// Use ISR instead of no-store for better performance
+export const revalidate = 300; // 5 minutes
 
-type ApiResponse =
-  | {
-      ok: true;
-      data: {
-        items: Array<{ id?: string; title: string; images?: { src: string }[]; variants?: any[] }>;
-      };
-    }
-  | { ok: false; error: string; detail?: any };
+type MappedProduct = {
+  id: string;
+  title: string;
+  description?: string;
+  images?: string[];
+  variants?: Array<{
+    id: number;
+    title: string;
+    price: number;
+    available: boolean;
+  }>;
+  tags?: string[];
+  created_at?: string;
+  updated_at?: string;
+  price?: number;
+  available?: boolean;
+};
+
+type ApiResponse = { ok: true; data: MappedProduct[] } | { ok: false; error: string; detail?: any };
 
 async function loadPrintifyProducts(): Promise<ApiResponse> {
   try {
-    // Use the request URL to construct the base URL dynamically
-    const baseUrl =
-      env.NODE_ENV === 'production' ? 'https://www.otaku-mori.com' : 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/printify/products`, {
-      headers: {
-        'x-req-id': (await headers()).get('x-req-id') ?? '',
-      },
-      cache: 'no-store',
-    });
+    // Use direct service call instead of localhost fetch
+    const printifyService = getPrintifyService();
+    const response = await printifyService.getProducts(1, 20);
 
-    if (!response.ok) {
-      const logger = await getLogger();
-      logger.warn('Printify API failed', {
-        extra: {
-          status: response.status,
-          statusText: response.statusText,
-        },
-      });
-      return { ok: false, error: 'Printify API unavailable' };
-    }
+    // Map Printify products to our expected format
+    const mappedProducts: MappedProduct[] = response.data.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      images: item.images?.map((img) => img.src) || [],
+      variants:
+        item.variants?.map((v) => ({
+          id: v.id,
+          title: v.title,
+          price: v.price,
+          available: v.is_available && v.is_enabled,
+        })) || [],
+      tags: item.tags,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      price: item.variants?.[0]?.price || 0,
+      available: item.variants?.some((v) => v.is_available && v.is_enabled) || false,
+    }));
 
-    return await response.json();
+    return {
+      ok: true,
+      data: mappedProducts,
+    };
   } catch (error) {
     const logger = await getLogger();
-    logger.error(
-      'Failed to fetch from Printify API',
-      undefined,
-      undefined,
-      error instanceof Error ? error : new Error(String(error)),
-    );
-    return { ok: false, error: 'Network error' };
+    logger.warn('Printify service failed', {
+      extra: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+    });
+
+    return {
+      ok: false,
+      error: 'Failed to load products',
+      detail: error instanceof Error ? error.message : 'Unknown error',
+    };
   }
 }
 
@@ -131,20 +154,15 @@ async function loadProducts(searchParams: {
     available?: boolean;
   }> = [];
 
-  if (
-    printifyResult.ok &&
-    printifyResult.data &&
-    printifyResult.data.items &&
-    printifyResult.data.items.length > 0
-  ) {
-    products = printifyResult.data.items.map((item: any) => ({
-      id: item.id || `printify_${Math.random()}`,
+  if (printifyResult.ok && printifyResult.data && printifyResult.data.length > 0) {
+    products = printifyResult.data.map((item: MappedProduct) => ({
+      id: item.id,
       title: item.title,
-      description: item.description,
-      images: [{ src: item.image }],
+      description: item.description || '',
+      images: item.images && item.images.length > 0 ? [{ src: item.images[0] }] : [],
       variants: item.variants || [],
-      price: item.price,
-      available: item.visible !== false, // Show as available if visible
+      price: item.price || 0,
+      available: item.available !== false,
     }));
 
     logger.info('Loaded products from Printify', {

@@ -3,6 +3,7 @@
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { env } from '@/env.mjs';
 
 const GA_TRACKING_ID = 'G-GEKT6PWNXL';
 
@@ -10,24 +11,44 @@ export default function GoogleAnalytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Check feature flag
+  const isGAEnabled = env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true';
+
   useEffect(() => {
+    if (!isGAEnabled) return;
+
     if (typeof window !== 'undefined' && window.gtag) {
       const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
-      window.gtag('config', GA_TRACKING_ID, {
-        page_path: url,
-      });
+
+      // Prevent duplicate page views
+      if (window.location.pathname !== pathname) {
+        window.gtag('config', GA_TRACKING_ID, {
+          page_path: url,
+        });
+      }
     }
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, isGAEnabled]);
+
+  // Don't render anything if GA is disabled
+  if (!isGAEnabled) {
+    return null;
+  }
 
   return (
     <>
       <Script
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+        onError={(error) => {
+          console.warn('Failed to load Google Analytics:', error);
+        }}
       />
       <Script
         id="google-analytics"
         strategy="afterInteractive"
+        onError={(error) => {
+          console.warn('Failed to initialize Google Analytics:', error);
+        }}
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -43,9 +64,13 @@ export default function GoogleAnalytics() {
   );
 }
 
-// GA4 Event tracking functions
+// GA4 Event tracking functions with feature flag check
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
-  if (typeof window !== 'undefined' && window.gtag) {
+  if (
+    typeof window !== 'undefined' &&
+    window.gtag &&
+    env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true'
+  ) {
     window.gtag('event', eventName, parameters);
   }
 };
@@ -122,6 +147,13 @@ export const trackGameComplete = (gameName: string, score?: number) => {
     game_name: gameName,
     score,
     event_category: 'games',
+  });
+};
+
+// GameCube boot sequence tracking
+export const trackGameCubeBoot = () => {
+  trackEvent('gamecube_boot', {
+    event_category: 'minigames',
   });
 };
 

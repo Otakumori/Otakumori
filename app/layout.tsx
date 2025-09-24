@@ -13,7 +13,7 @@ import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import GoogleAnalytics from './components/analytics/GoogleAnalytics';
-import { initPerformanceMonitoring } from './lib/performance';
+import PerformanceMonitor from './components/PerformanceMonitor';
 
 export function generateMetadata(): Metadata {
   return {
@@ -50,17 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </head>
         <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50 font-body">
           <GoogleAnalytics />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                if (typeof window !== 'undefined') {
-                  import('/lib/performance.js').then(module => {
-                    module.initPerformanceMonitoring();
-                  });
-                }
-              `,
-            }}
-          />
+          <PerformanceMonitor />
           {/* CherryBlossomEffect moved to Home page only for v0 spec compliance */}
           {isCursorGlowEnabled() && <CursorGlow />}
           <PetalHUD />
@@ -68,18 +58,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <PetalProgressBar />
           <Sentry.ErrorBoundary
             fallback={
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold text-red-500">Something went wrong!</h1>
-                <p className="text-gray-400 mt-2">Please refresh the page or contact support.</p>
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center p-8">
+                  <h1 className="text-2xl font-bold text-pink-400 mb-4">Something went wrong</h1>
+                  <p className="text-zinc-300">
+                    We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
+                  </p>
+                </div>
               </div>
             }
           >
             <Providers>
-              <Navbar />
-              <main id="content" className="relative z-20 flex-1">
-                {children}
-              </main>
-              <Footer />
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <main id="main-content" className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
             </Providers>
           </Sentry.ErrorBoundary>
         </body>

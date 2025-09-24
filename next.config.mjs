@@ -64,7 +64,7 @@ const nextConfig = {
     minimumCacheTTL: 60,
   },
 
-  // Production-grade security headers with CSP for official Clerk domains
+  // Production-grade security headers with CSP for GA, GTM, and Clerk
   async headers() {
     const isProd = env.NODE_ENV === 'production';
 
@@ -82,16 +82,16 @@ const nextConfig = {
       "media-src 'self' data: blob:",
       "font-src 'self' data: https: https://fonts.gstatic.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com https://www.googletagmanager.com https://www.google-analytics.com",
       "worker-src 'self' blob:",
       "frame-ancestors 'self'",
     ];
 
     const connectProd =
-      "connect-src 'self' https: wss: https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://clerk.otaku-mori.com https://accounts.otaku-mori.com https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://www.otaku-mori.com https://otaku-mori.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io";
+      "connect-src 'self' https: wss: https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://clerk.otaku-mori.com https://accounts.otaku-mori.com https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://www.otaku-mori.com https://otaku-mori.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io https://www.google-analytics.com";
 
     const connectDev =
-      "connect-src 'self' https: wss: ws: ws://localhost:8787 https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://*.clerk.accounts.dev https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io";
+      "connect-src 'self' https: wss: ws: ws://localhost:8787 https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://*.clerk.accounts.dev https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io https://www.google-analytics.com";
 
     const csp = [...cspCommon, isProd ? connectProd : connectDev].join('; ');
 
@@ -106,6 +106,20 @@ const nextConfig = {
         ],
       },
     ];
+  },
+
+  // Webpack configuration to handle client/server module splitting
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Alias server-only modules to false for client builds
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'require-in-the-middle': false,
+        '@sentry/node': false,
+        '@prisma/instrumentation': false,
+      };
+    }
+    return config;
   },
 };
 
