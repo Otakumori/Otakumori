@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { ensureUserByClerkId } from '@/lib/petals';
+import { ensureUserByClerkId } from '@/lib/petals-db';
 import { problem } from '@/lib/http/problem';
 import { logger } from '@/app/lib/logger';
 import { reqId } from '@/lib/log';

@@ -77,8 +77,10 @@ export const PetalEffect = ({
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="absolute inset-0 overflow-hidden"
       onMouseMove={handleMouseMove}
+      role="presentation"
+      aria-hidden="true"
     >
       {Array.from({ length: count }).map((_, index) => {
         return (

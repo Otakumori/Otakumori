@@ -88,30 +88,42 @@ export default function ProductFilters({
       <div>
         <h3 className="text-lg font-semibold text-white mb-3">Price Range</h3>
         <div className="grid grid-cols-2 gap-3">
-          <input
-            type="number"
-            placeholder="Min"
-            min="0"
-            step="0.01"
-            name="minPrice"
-            defaultValue={searchParams.get('minPrice') || ''}
-            onChange={(e) =>
-              handlePriceRangeChange(e.target.value, searchParams.get('maxPrice') || '')
-            }
-            className="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-500/50"
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            min="0"
-            step="0.01"
-            name="maxPrice"
-            defaultValue={searchParams.get('maxPrice') || ''}
-            onChange={(e) =>
-              handlePriceRangeChange(searchParams.get('minPrice') || '', e.target.value)
-            }
-            className="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-500/50"
-          />
+          <div>
+            <label htmlFor="minPrice" className="sr-only">
+              Minimum Price
+            </label>
+            <input
+              id="minPrice"
+              type="number"
+              placeholder="Min"
+              min="0"
+              step="0.01"
+              name="minPrice"
+              defaultValue={searchParams.get('minPrice') || ''}
+              onChange={(e) =>
+                handlePriceRangeChange(e.target.value, searchParams.get('maxPrice') || '')
+              }
+              className="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-500/50"
+            />
+          </div>
+          <div>
+            <label htmlFor="maxPrice" className="sr-only">
+              Maximum Price
+            </label>
+            <input
+              id="maxPrice"
+              type="number"
+              placeholder="Max"
+              min="0"
+              step="0.01"
+              name="maxPrice"
+              defaultValue={searchParams.get('maxPrice') || ''}
+              onChange={(e) =>
+                handlePriceRangeChange(searchParams.get('minPrice') || '', e.target.value)
+              }
+              className="px-3 py-2 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-pink-500/50"
+            />
+          </div>
         </div>
       </div>
 

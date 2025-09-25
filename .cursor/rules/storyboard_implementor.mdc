@@ -1,0 +1,80 @@
+description: Storyboards → Code
+
+alwaysApply: true
+
+# Storyboard Implementation
+
+## Document-Driven Development
+
+### Storyboard Process
+
+Convert documents under `docs/storyboards/*.md` into concrete UI/logic:
+
+- Keep copy in `lib/i18n/en.ts`
+- Generate component stubs with proper TypeScript types
+- Create routes with proper SEO metadata
+- Generate test scaffolding
+
+### Implementation Requirements
+
+Each storyboard must emit:
+
+- **Acceptance checklist**: measurable criteria for completion
+- **E2E test seeds**: Playwright test outline
+- **Component hierarchy**: React component structure
+- **API contracts**: Zod schemas for data flow
+
+### Quality Gates
+
+- All interactive elements have `data-test` attributes
+- All copy comes from i18n constants
+- All routes have proper metadata
+- All components have TypeScript interfaces
+
+## Storyboard Standards
+
+### Structure
+
+Each storyboard must include:
+
+```markdown
+# Feature Name
+
+## User Stories
+
+- As a [user type], I want [goal] so that [benefit]
+
+## Acceptance Criteria
+
+- [ ] Criterion 1 (measurable)
+- [ ] Criterion 2 (testable)
+
+## UI Components
+
+- ComponentName: description and props
+- Layout: responsive behavior
+
+## API Requirements
+
+- Endpoints needed
+- Data schemas
+- Error handling
+
+## E2E Test Flow
+
+1. User action
+2. Expected result
+3. Success criteria
+```
+
+### Implementation Tracking
+
+- Each storyboard has implementation status
+- Components track completion percentage
+- E2E tests validate acceptance criteria
+- Performance budgets enforced
+  description:
+  globs:
+  alwaysApply: true
+
+---

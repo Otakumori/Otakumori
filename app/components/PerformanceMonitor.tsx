@@ -14,8 +14,8 @@ export default function PerformanceMonitor() {
     // Initialize performance monitoring when component mounts
     const initModule = async () => {
       try {
-        const { initPerformanceMonitoring } = await import('../lib/performance');
-        initPerformanceMonitoring();
+        const { initializePerformanceMonitoring } = await import('../lib/performance');
+        initializePerformanceMonitoring();
       } catch (error) {
         console.warn('Performance monitoring failed to initialize:', error);
       }

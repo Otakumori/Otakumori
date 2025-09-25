@@ -29,7 +29,11 @@ export default function ProductGrid({ products }: ProductGridProps) {
                 className="w-full h-full object-cover rounded-xl"
               />
             ) : (
-              <div className="text-4xl opacity-50">🎮</div>
+              <div className="text-4xl opacity-50">
+                <span role="img" aria-label="Gaming controller">
+                  🎮
+                </span>
+              </div>
             )}
           </div>
 

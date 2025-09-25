@@ -1,30 +1,75 @@
 'use client';
+
 import { useEffect, useState } from 'react';
-import BootScreen from './_components/BootScreen';
-import GameCubeHub from './_components/GameCubeHub';
+import GameCubeBootOverlay from './_components/GameCubeBootOverlay';
+import GameCubeHubV2 from './_components/GameCubeHubV2';
 
 export default function HubClient() {
-  const [bootDone, setBootDone] = useState(false);
+  const [bootState, setBootState] = useState<'loading' | 'boot' | 'hub'>('loading');
+
   useEffect(() => {
+    // Check if boot should be shown (once per day)
     try {
-      const today = new Date().toISOString().slice(0, 10);
-      const last = localStorage.getItem('om_boot_day');
-      if (last === today) setBootDone(true);
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const bootKey = `otm_gc_boot_${today}`;
+      const sessionKey = 'otm_gc_boot_seen';
+
+      // Check localStorage for today's boot
+      const hasBootedToday = localStorage.getItem(bootKey) === 'true';
+
+      // Check sessionStorage for this session
+      const hasBootedThisSession = sessionStorage.getItem(sessionKey) === 'true';
+
+      if (hasBootedToday || hasBootedThisSession) {
+        setBootState('hub');
+      } else {
+        setBootState('boot');
+      }
     } catch {
-      setBootDone(true);
+      // If localStorage/sessionStorage fails, skip boot
+      setBootState('hub');
     }
   }, []);
 
-  if (!bootDone)
+  const handleBootComplete = () => {
+    try {
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const bootKey = `otm_gc_boot_${today}`;
+      const sessionKey = 'otm_gc_boot_seen';
+
+      // Mark as booted for today and this session
+      localStorage.setItem(bootKey, 'true');
+      sessionStorage.setItem(sessionKey, 'true');
+    } catch {
+      // Ignore storage errors
+    }
+
+    setBootState('hub');
+  };
+
+  const handleBootSkip = () => {
+    try {
+      const sessionKey = 'otm_gc_boot_seen';
+      // Only mark session as seen, not the daily flag
+      sessionStorage.setItem(sessionKey, 'true');
+    } catch {
+      // Ignore storage errors
+    }
+
+    setBootState('hub');
+  };
+
+  if (bootState === 'loading') {
     return (
-      <BootScreen
-        onDone={() => {
-          try {
-            localStorage.setItem('om_boot_day', new Date().toISOString().slice(0, 10));
-          } catch {}
-          setBootDone(true);
-        }}
-      />
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-2 border-pink-400 border-t-transparent rounded-full" />
+      </div>
     );
-  return <GameCubeHub />;
+  }
+
+  if (bootState === 'boot') {
+    return <GameCubeBootOverlay onComplete={handleBootComplete} onSkip={handleBootSkip} />;
+  }
+
+  return <GameCubeHubV2 />;
 }

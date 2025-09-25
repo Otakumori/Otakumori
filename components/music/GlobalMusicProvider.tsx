@@ -113,7 +113,11 @@ export default function GlobalMusicProvider({ children }: { children: React.Reac
     >
       {children}
       {/* Hidden audio element - only render when we have a valid src */}
-      {src && <audio ref={audioRef} src={src} preload="none" />}
+      {src && (
+        <audio ref={audioRef} src={src} preload="none" aria-label="Background music player">
+          <track kind="captions" />
+        </audio>
+      )}
     </MusicCtx.Provider>
   );
 }

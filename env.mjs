@@ -62,6 +62,10 @@ export const env = createEnv({
     PRISMA_ACCELERATE_API_KEY: z.string().optional(),
     // Misc
     DEBUG_MODE: z.string().optional(),
+    // Feature Flags
+    FEATURE_FLAG_PROVIDER: z.enum(['local', 'configcat', 'flagsmith']).optional().default('local'),
+    FEATURE_FLAG_API_KEY: z.string().optional(),
+    FEATURE_FLAG_BASE_URL: z.string().url().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -92,6 +96,20 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_GA_ENABLED: z.string().default('true'),
     NEXT_PUBLIC_FEATURE_OTEL_CLIENT: z.string().default('false'),
     NEXT_PUBLIC_FEATURE_PERF_MODULE: z.string().default('true'),
+    NEXT_PUBLIC_FEATURE_MINIGAMES: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_RUNE: z.string().default('off'),
+    NEXT_PUBLIC_FEATURE_SOAPSTONE: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_PETALS: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_CURSOR_GLOW: z.string().default('off'),
+    NEXT_PUBLIC_FEATURE_STARFIELD: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: z.string().default('off'),
+    NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_JIGGLE: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_EVENTS: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_CUBE_HUB: z.string().default('on'),
+    NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().default('on'),
     // Sentry
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
     // Feature flags

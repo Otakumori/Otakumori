@@ -1,0 +1,80 @@
+description: SEO & A11y guardrails
+
+alwaysApply: true
+
+# SEO & Accessibility Guardrails
+
+## SEO Requirements
+
+### Metadata Standards
+
+Every top route must set:
+
+- **Title**: 40-60 characters, brand-specific
+- **Description**: 120-160 characters, action-oriented
+- **Canonical URL**: prevent duplicate content
+- **Open Graph**: title, description, image, type
+- **Twitter Cards**: summary with image
+
+### JSON-LD Schema
+
+- **Games**: VideoGame schema with ratings, genre, platform
+- **Products**: Product schema with price, availability, reviews
+- **Articles**: Article schema with author, publish date, keywords
+- **Organization**: Otaku-mori company data
+
+### Technical SEO
+
+- **Sitemap**: auto-generated with proper priority
+- **Robots.txt**: configured for crawling preferences
+- **Page Speed**: Core Web Vitals compliance
+- **Mobile-first**: responsive design verified
+
+## Accessibility Standards
+
+### WCAG 2.1 AA+ Compliance
+
+- **Color contrast**: minimum 4.5:1 for normal text, 3:1 for large
+- **Keyboard navigation**: all interactive elements accessible
+- **Screen readers**: proper ARIA labels and descriptions
+- **Focus management**: visible focus indicators
+
+### Testing Requirements
+
+Add Playwright+Axe scans for:
+
+- `/` (homepage)
+- `/mini-games` (GameCube hub)
+- `/shop/[slug]` (product pages)
+- `/terms` (legal pages)
+
+Build fails on critical a11y violations.
+
+### Implementation Standards
+
+- **Semantic HTML**: proper heading hierarchy, landmarks
+- **Form labels**: explicit association with inputs
+- **Image alt text**: descriptive for content, empty for decorative
+- **Error messaging**: clear, actionable feedback
+- **Reduced motion**: respect user preferences
+
+## Validation Tools
+
+### Automated Checks
+
+- **Lighthouse CI**: performance and SEO scores
+- **Axe-core**: accessibility violations
+- **HTML validation**: semantic correctness
+- **Link checking**: no broken internal links
+
+### Manual Testing
+
+- **Screen reader testing**: NVDA/JAWS compatibility
+- **Keyboard-only navigation**: complete user flows
+- **Mobile usability**: touch targets, viewport
+- **Color blindness**: contrast and differentiation
+  description:
+  globs:
+  alwaysApply: true
+
+---

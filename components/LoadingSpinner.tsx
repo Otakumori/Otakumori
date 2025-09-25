@@ -36,9 +36,9 @@ export function LoadingSpinner({
         className={`${sizeClasses[size]} rounded-full border-2 ${colorClasses[color]} animate-spin`}
         animate={{ rotate: 360 }}
         transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-        role="status"
-        aria-label="Loading"
+        aria-hidden="true"
       />
+      <output className="sr-only">{text || 'Loading'}</output>
       {text && (
         <motion.p
           initial={{ opacity: 0, y: 10 }}
