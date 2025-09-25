@@ -1,0 +1,98 @@
+description: Non-negotiable execution protocol
+
+alwaysApply: true
+
+# Execution Protocol
+
+## In-Place Edits & Validation
+
+### Edit Strategy
+
+- **ALWAYS** prefer editing existing files over creating new ones
+- Use `search_replace` or `MultiEdit` for targeted changes
+- Never delete aspects of the project until ensuring they don't already exist
+- Maintain existing file structure and naming conventions
+
+### Validation Sequence
+
+After ANY code changes, run in order:
+
+1. `npm run typecheck` - Ensure 0 TypeScript errors
+2. `npm run lint` - Fix any linting errors (warnings acceptable)
+3. `npx prisma generate` - If schema changes made
+4. `npm run build --no-lint` - Verify successful build
+
+### Error Handling
+
+- TypeScript errors are **blocking** - must be fixed
+- ESLint errors must be resolved for changed lines
+- Prisma schema changes require migration generation
+- Build failures must be investigated and resolved
+
+### Code Quality Standards
+
+- No `any` types unless justified with comment
+- Strict TypeScript mode enforced
+- Prefer small, composable functions
+- Use absolute imports via `@/...` syntax
+
+### Tool Usage
+
+- Use `read_file` before editing to understand context
+- Run `grep` for exact symbol searches
+- Use `codebase_search` for semantic exploration
+- Always check `read_lints` after edits on modified files
+
+### Commit Standards
+
+- Atomic commits with descriptive messages
+- Include file count and change summary
+- Use conventional commit format when appropriate
+- Verify all validations pass before committing
+
+## Production Standards
+
+### No Mock Data
+
+- Never introduce mock data or fake routes
+- Every button must route or be explicitly disabled with a reason
+- Default to inline edits and search before create
+- Reuse utilities, avoid duplicating APIs
+
+### UI Requirements
+
+All new UI must ship with:
+
+- **Accessibility**: labels, focus order, reduced-motion support
+- **i18n microcopy**: centralized copy from `lib/i18n/en.ts`
+- **Test hooks**: `data-test="..."` attributes for E2E testing
+
+### Mini-Games Standards
+
+Mini-games MUST include:
+
+- **Lore seed**: connection to Otaku-mori narrative
+- **Save/resume**: using `game_saves` table
+- **Petal Wallet**: earn/sink mechanics
+- **Daily challenge**: slot for progression
+- **Achievements**: tracking and unlock system
+- **Leaderboards**: scoring and ranking hooks
+
+### Security & Performance
+
+- **CSP Compliance**: no third-party scripts without policy updates; no inline `<script>` tags
+- **SSG/SSR correctness**: no localhost fetches at build; avoid no-store in prerender paths
+- **Rate limiting**: all mutating endpoints protected
+- **Idempotency**: all writes support `Idempotency-Key` header
+
+### Data Integrity
+
+- **DB constraints**: enforce uniqueness as specified
+- **Retry semantics**: retry-once on UniqueViolation
+- **No duplicate APIs**: reuse existing endpoints
+- **Asset validation**: all referenced assets must exist
+  description:
+  globs:
+  alwaysApply: true
+
+---

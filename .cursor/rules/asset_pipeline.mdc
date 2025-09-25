@@ -1,0 +1,74 @@
+description: Centralized asset pipeline & validation
+
+alwaysApply: true
+
+# Asset Pipeline & Validation
+
+## Asset Registry
+
+### Global Manifest
+
+Create a registry at `public/assets/manifest.json` as the canonical list of:
+
+- Textures and sprites for all games
+- Audio files (music, SFX)
+- UI frames and components
+- Site shell assets
+
+### Game-Specific Manifests
+
+For each game: `app/mini-games/<gameKey>/assets.manifest.json` references entries in the global manifest by key.
+
+### Build Validation
+
+Add a build script `scripts/assets-verify.ts` that fails build if:
+
+- Referenced files are missing
+- Files exceed size caps (images: 500KB, audio: 2MB)
+- Files violate allowed formats (png/webp/svg for images, ogg/mp3 for audio)
+
+### Credits & Licensing
+
+Add `CREDITS.md` in `public/assets/` (auto-updated by script) that enumerates:
+
+- Every non-OTM asset with license (prefer CC0)
+- Author attribution
+- Source URL
+
+## Asset Standards
+
+### Image Formats
+
+- **Primary**: WebP with PNG fallback
+- **Icons**: SVG preferred
+- **Sprites**: PNG with transparency
+- **Max size**: 500KB per image
+
+### Audio Formats
+
+- **Primary**: OGG Vorbis
+- **Fallback**: MP3
+- **Max size**: 2MB per audio file
+- **Quality**: 44.1kHz, 16-bit minimum
+
+### Naming Conventions
+
+```
+public/assets/
+├── ui/glass/card-320.png
+├── games/memory-match/cards/
+├── games/rhythm/tracks/
+└── shared/icons/
+```
+
+### Performance
+
+- All assets must be optimized
+- Lazy loading for non-critical assets
+- Progressive enhancement for audio
+- Responsive image sizing
+  description:
+  globs:
+  alwaysApply: true
+
+---

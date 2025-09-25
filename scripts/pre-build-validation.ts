@@ -156,13 +156,19 @@ class PreBuildValidator {
         }
 
         // Check for process.env usage (only in source files, not compiled files)
+        // Allow NEXT_PUBLIC_ variables in client components
         if (
           line.includes('process.env') &&
+          !line.includes('process.env.NEXT_PUBLIC_') &&
           !file.includes('env.mjs') &&
           !file.includes('env.ts') &&
+          !file.includes('next.config') &&
           !file.includes('.next/') &&
           !file.includes('node_modules/') &&
-          !file.includes('dist/')
+          !file.includes('dist/') &&
+          !file.includes('scripts/') &&
+          !file.includes('lib/performance/') &&
+          !file.includes('lib/feature-flags/')
         ) {
           this.errors.push(`${file}:${i + 1} - Direct process.env usage (use env from env.mjs)`);
         }

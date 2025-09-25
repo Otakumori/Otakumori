@@ -1,88 +1,199 @@
 {
-  "ui": {
-    "petal": "/assets/ui/petal.png",
-    "petals": {
-      "petal_pink": "/assets/ui/petals/petal_pink.png"
-    },
-    "kenneyFantasyBorders": "/assets/ui/kenney-fantasy-ui-borders.png",
-    "rhythm": {
-      "lane": "/assets/ui/rhythm/lane.png",
-      "note": "/assets/ui/rhythm/note.png"
-    },
-    "hub": {
-      "cubeFrame": "/assets/ui/hub/cube_frame.png",
-      "iconGames": "/assets/ui/hub/icon_games.png",
-      "iconTrade": "/assets/ui/hub/icon_trade.png",
-      "iconAvatar": "/assets/ui/hub/icon_avatar.png",
-      "iconMusic": "/assets/ui/hub/icon_music.png",
-      "iconDrawerTop": "/assets/ui/hub/icon_drawer_top.png",
-      "iconDrawerBottom": "/assets/ui/hub/icon_drawer_bottom.png",
-      "avatarIdle": "/assets/ui/hub/avatar_idle.png",
-      "avatarShadow": "/assets/ui/hub/avatar_shadow.png"
-    },
-    "trade": {
-      "blurPanel": "/assets/ui/trade/blur_panel.png"
-    },
-    "profile": {
-      "banner": "/assets/ui/profile/banner_placeholder.png",
-      "frame": "/assets/ui/profile/avatar_frame.png",
-      "badge": "/assets/ui/profile/badge_placeholder.png",
-      "title": "/assets/ui/profile/title_chip.png"
+  "$schema": "https://otm/schema/assets-manifest.json",
+  "version": "1.0.0",
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "palettes": {
+    "otm-dark": {
+      "primary": "#0b0b12",
+      "secondary": "#161621",
+      "tertiary": "#2a2338",
+      "accent-pink": "#e7a1d7",
+      "accent-purple": "#f2d8f2",
+      "glass-base": "rgba(255, 255, 255, 0.1)",
+      "glass-border": "rgba(255, 255, 255, 0.2)"
     }
   },
-  "bg": {
-    "oakWoods": "/assets/bg/oak-woods.png",
-    "oak-woods": "/assets/bg/oak_woods.png",
-    "nightGradient": "/assets/bg/night_gradient.jpg",
-    "night-gradient": "/assets/bg/night-gradient.png",
-    "rhythm": "/assets/bg/rhythm-bg.png"
-  },
-  "particles": {
-    "bubble": "/assets/particles/bubble.png",
-    "kenney-bubble": "/assets/particles/kenney-bubble.png"
-  },
-  "sfx": {
-    "pop": "/assets/sfx/pop.ogg",
-    "boing": "/assets/sfx/boing.ogg",
-    "thud": "/assets/sfx/thud.ogg",
-    "samurai-slash": "/assets/sfx/samurai-slash.ogg",
-    "hit-good": "/assets/sfx/hit-good.ogg",
-    "hit-miss": "/assets/sfx/hit-miss.ogg",
-    "collect": "/assets/sfx/petal_collect.ogg",
-    "miss": "/assets/sfx/miss.ogg",
-    "tick": "/assets/sfx/tick.ogg",
-    "success": "/assets/sfx/success.ogg",
-    "fail": "/assets/sfx/fail.ogg",
-    "purchaseOk": "/assets/sfx/purchase_ok.ogg",
-    "purchaseFail": "/assets/sfx/purchase_fail.ogg",
-    "hub_move": "/assets/sfx/hub_move.ogg",
-    "hub_select": "/assets/sfx/hub_select.ogg",
-    "hub_back": "/assets/sfx/hub_back.ogg"
-  },
-  "music": {
-    "final-punch-track01": "/assets/music/final-punch-track01.ogg"
-  },
-  "maps": {
-    "final-punch-track01-easy": "/assets/maps/final-punch-track01-easy.json"
+  "ui": {
+    "glass-card": {
+      "path": "public/assets/ui/glass/card-320.png",
+      "size": "320x240",
+      "format": "png",
+      "description": "Standard glassmorphic card background"
+    },
+    "glass-button": {
+      "path": "public/assets/ui/glass/button-base.png",
+      "size": "160x48",
+      "format": "png",
+      "description": "Glass button base texture"
+    },
+    "petal-icon": {
+      "path": "public/assets/ui/icons/petal.svg",
+      "size": "24x24",
+      "format": "svg",
+      "description": "Cherry blossom petal icon for currency"
+    },
+    "otm-logo": {
+      "path": "public/assets/ui/branding/otm-logo.svg",
+      "size": "120x40",
+      "format": "svg",
+      "description": "Otaku-mori main logo"
+    }
   },
   "games": {
-    "avatarFallback": "/assets/avatars/fallback-sprite.png"
-  },
-  "cosmetics": {
-    "frames": {
-      "sakura_v1": "/assets/cosmetics/frames/frame_sakura_v1.png",
-      "neon_v1": "/assets/cosmetics/frames/frame_neon_v1.png"
+    "memory-match": {
+      "cards": {
+        "back": {
+          "path": "public/assets/memory/cards/otm-back.png",
+          "size": "80x120",
+          "format": "png",
+          "description": "Otaku-mori branded card back with cherry blossom"
+        },
+        "set-killakill": {
+          "path": "public/assets/memory/cards/killakill/*.png",
+          "count": 16,
+          "size": "80x120",
+          "format": "png",
+          "description": "Kill la Kill character set - 8 pairs"
+        }
+      },
+      "frame": {
+        "path": "public/assets/memory/ui/game-frame.png",
+        "size": "800x600",
+        "format": "png",
+        "description": "Dark glass game board frame"
+      },
+      "sfx": {
+        "flip": {
+          "path": "public/assets/memory/sfx/card-flip.ogg",
+          "duration": "0.3s",
+          "format": "ogg",
+          "description": "Card flip sound effect"
+        },
+        "match": {
+          "path": "public/assets/memory/sfx/match-success.ogg",
+          "duration": "0.8s",
+          "format": "ogg",
+          "description": "Successful match chime"
+        },
+        "mismatch": {
+          "path": "public/assets/memory/sfx/mismatch.ogg",
+          "duration": "0.5s",
+          "format": "ogg",
+          "description": "Mismatch buzz sound"
+        }
+      }
     },
-    "cursors": {
-      "katana_v1": "/assets/cosmetics/cursors/cursor_katana_v1.png"
+    "petal-storm-rhythm": {
+      "lanes": {
+        "path": "public/assets/rhythm/lanes/*.png",
+        "count": 4,
+        "size": "120x800",
+        "format": "png",
+        "description": "Rhythm game lanes with petal trails"
+      },
+      "notes": {
+        "normal": {
+          "path": "public/assets/rhythm/notes/normal.png",
+          "size": "48x48",
+          "format": "png",
+          "description": "Standard rhythm note"
+        },
+        "hold": {
+          "path": "public/assets/rhythm/notes/hold.png",
+          "size": "48x96",
+          "format": "png",
+          "description": "Hold note for sustained beats"
+        }
+      },
+      "tracks": {
+        "demo": {
+          "path": "public/assets/rhythm/tracks/demo-track.ogg",
+          "bpm": 128,
+          "duration": "2:30",
+          "format": "ogg",
+          "description": "Demo rhythm track"
+        }
+      }
+    },
+    "samurai-petal-slice": {
+      "sprites": {
+        "katana": {
+          "path": "public/assets/samurai/sprites/katana.png",
+          "size": "200x20",
+          "format": "png",
+          "description": "Tetsusaiga-inspired katana sprite"
+        },
+        "petal": {
+          "path": "public/assets/samurai/sprites/petal-target.png",
+          "size": "32x32",
+          "format": "png",
+          "description": "Sliceable petal target"
+        }
+      },
+      "backgrounds": {
+        "dojo": {
+          "path": "public/assets/samurai/bg/dojo.png",
+          "size": "1920x1080",
+          "format": "png",
+          "description": "Traditional dojo background"
+        }
+      },
+      "sfx": {
+        "slice": {
+          "path": "public/assets/samurai/sfx/katana-slice.ogg",
+          "duration": "0.4s",
+          "format": "ogg",
+          "description": "Katana slicing sound"
+        }
+      }
+    },
+    "bubble-pop-gacha": {
+      "sprites": {
+        "bubble": {
+          "path": "public/assets/bubble/sprites/bubble-base.png",
+          "size": "64x64",
+          "format": "png",
+          "description": "Basic bubble sprite"
+        }
+      },
+      "sfx": {
+        "pop": {
+          "path": "public/assets/bubble/sfx/bubble-pop.ogg",
+          "duration": "0.2s",
+          "format": "ogg",
+          "description": "Bubble pop sound"
+        }
+      }
     }
   },
-  "overlays": {
-    "sakura_tint1": "/assets/overlays/overlay_sakura_tint1.png",
-    "sakura_anim_v1": "/assets/overlays/overlay_animated_sakura.gif",
-    "legendary_set": "/assets/overlays/overlay_legendary_set.png"
-  },
-  "textstyles": {
-    "sample_multicolor": "/assets/textstyles/sample_multicolor.png"
+  "shared": {
+    "icons": {
+      "achievement": {
+        "path": "public/assets/shared/icons/achievement.svg",
+        "size": "32x32",
+        "format": "svg",
+        "description": "Achievement unlock icon"
+      },
+      "leaderboard": {
+        "path": "public/assets/shared/icons/leaderboard.svg",
+        "size": "32x32",
+        "format": "svg",
+        "description": "Leaderboard ranking icon"
+      }
+    },
+    "audio": {
+      "ui-click": {
+        "path": "public/assets/shared/audio/ui-click.ogg",
+        "duration": "0.1s",
+        "format": "ogg",
+        "description": "Standard UI click sound"
+      },
+      "achievement-unlock": {
+        "path": "public/assets/shared/audio/achievement.ogg",
+        "duration": "1.2s",
+        "format": "ogg",
+        "description": "Achievement unlock fanfare"
+      }
+    }
   }
 }

@@ -6,7 +6,7 @@ import { logger } from "@/app/lib/logger";
 import { db } from "@/lib/db";
 import { problem } from "@/lib/http/problem";
 import { reqId } from "@/lib/log";
-import { creditPetals } from "@/lib/petals";
+import { creditPetals } from "@/lib/petals-db";
 import { submitScoreReq } from "@/lib/schemas/minigames";
 
 export const runtime = "nodejs";

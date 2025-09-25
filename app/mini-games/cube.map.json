@@ -1,0 +1,30 @@
+{
+  "faces": {
+    "up": {
+      "label": "Trade Center",
+      "action": "route",
+      "href": "/trade"
+    },
+    "left": {
+      "label": "Mini-Games",
+      "action": "panel",
+      "panel": "games"
+    },
+    "right": {
+      "label": "Avatar / Community Hub",
+      "action": "route",
+      "href": "/community"
+    },
+    "down": {
+      "label": "Music / Extras",
+      "action": "panel",
+      "panel": "extras"
+    }
+  },
+  "frontOverlay": {
+    "enabled": true,
+    "title": "Otaku-mori Mini-Games",
+    "subtitle": "Spin the cube. Choose a panel.",
+    "dismissible": true
+  }
+}

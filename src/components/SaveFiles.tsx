@@ -90,6 +90,7 @@ export default function SaveFiles({ files = [], onUpload, onDelete, onDownload }
                     onClick={() => onDownload(file.id)}
                     className="text-blue-400 hover:text-blue-300 transition-colors"
                     title="Download"
+                    aria-label="Download file"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -106,6 +107,7 @@ export default function SaveFiles({ files = [], onUpload, onDelete, onDownload }
                     onClick={() => onDelete(file.id)}
                     className="text-red-400 hover:text-red-300 transition-colors"
                     title="Delete"
+                    aria-label="Delete file"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path

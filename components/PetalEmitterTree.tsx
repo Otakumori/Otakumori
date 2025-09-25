@@ -264,7 +264,12 @@ export default function PetalEmitterTree({
 
   return (
     <div ref={wrapRef} className={`relative overflow-hidden ${className}`}>
-      <canvas ref={canvasRef} className="absolute inset-0" />
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0"
+        aria-label="Interactive cherry blossom tree with falling petals"
+        role="img"
+      />
     </div>
   );
 }

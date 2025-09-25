@@ -52,13 +52,55 @@ export async function POST(req: NextRequest) {
     const topic = req.headers.get('x-printify-topic') || payload?.type || payload?.event;
     logger.info('webhook received', { requestId, route, extra: { topic } });
 
+    // Use advanced service for webhook handling
+    const { getAdvancedPrintifyService } = await import('@/app/lib/printify/advanced-service');
+    const advancedService = getAdvancedPrintifyService();
+
+    // Handle webhook event with advanced service for caching and analytics
+    await advancedService.handleWebhookEvent({
+      type: topic,
+      data: payload.data || payload,
+      timestamp: payload.created_at || new Date().toISOString(),
+    });
+
     switch (topic) {
       case 'order:created':
-      case 'order:sent_to_production':
-      case 'order:shipment_created':
-      case 'order:shipment_delivered':
-      case 'order:cancelled':
+        logger.info('order created', { requestId, route, extra: { orderId: payload.data?.id } });
         // TODO: implement your order sync logic here
+        break;
+      case 'order:sent_to_production':
+        logger.info('order sent to production', {
+          requestId,
+          route,
+          extra: { orderId: payload.data?.id },
+        });
+        break;
+      case 'order:shipment_created':
+        logger.info('shipment created', { requestId, route, extra: { orderId: payload.data?.id } });
+        break;
+      case 'order:shipment_delivered':
+        logger.info('shipment delivered', {
+          requestId,
+          route,
+          extra: { orderId: payload.data?.id },
+        });
+        break;
+      case 'order:cancelled':
+        logger.info('order cancelled', { requestId, route, extra: { orderId: payload.data?.id } });
+        break;
+      case 'product:updated':
+        logger.info('product updated', {
+          requestId,
+          route,
+          extra: { productId: payload.data?.id },
+        });
+        break;
+      case 'inventory:updated':
+        logger.info('inventory updated', {
+          requestId,
+          route,
+          extra: { productId: payload.data?.id },
+        });
         break;
       default:
         logger.warn('unhandled topic', { requestId, route, extra: { topic } });

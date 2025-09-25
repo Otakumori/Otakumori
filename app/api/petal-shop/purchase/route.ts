@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import { prisma } from '@/app/lib/prisma';
-import { debitPetals, ensureUserByClerkId } from '@/lib/petals';
+import { debitPetals, ensureUserByClerkId } from '@/lib/petals-db';
 import { rateLimit } from '@/app/api/rate-limit';
 import { InventoryKind } from '@prisma/client';
 import { logger } from '@/app/lib/logger';

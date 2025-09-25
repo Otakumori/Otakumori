@@ -22,7 +22,11 @@ export default function SearchBar() {
   return (
     <form onSubmit={handleSubmit} className="relative w-full max-w-2xl mx-auto">
       <div className="relative">
+        <label htmlFor="search-input" className="sr-only">
+          Search products
+        </label>
         <input
+          id="search-input"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

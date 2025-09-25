@@ -1,0 +1,103 @@
+description: Zero mocks, idempotent writes
+
+alwaysApply: true
+
+# Zero Mock Data Policy
+
+## Production Data Only
+
+### No Mock Content
+
+- **Never** introduce mock data or placeholder content
+- **Never** create fake routes that don't lead to real functionality
+- **Always** connect to real APIs and database operations
+- **Always** use actual Prisma models and schemas
+
+### Real Data Sources
+
+- **Orders**: From Stripe webhooks → Prisma Order table
+- **Products**: From Printify API → Prisma Product table
+- **Users**: From Clerk webhooks → Prisma User table
+- **Game Data**: From actual play sessions → game_saves table
+
+## Idempotency Requirements
+
+### Headers
+
+All writes must support `Idempotency-Key` header:
+
+```typescript
+headers: {
+  'Idempotency-Key': 'uuid-v4-string',
+  'Content-Type': 'application/json'
+}
+```
+
+### Database Constraints
+
+Enforce uniqueness as specified:
+
+- **Wishlist**: `(userId, productId)` composite unique
+- **Praise**: `(senderId, receiverId, dayKey)` composite unique
+- **Orders**: `stripeId` unique
+- **Game Saves**: `(userId, gameId, slot)` composite unique
+
+### Retry Semantics
+
+Implement retry-once on `UniqueViolation`:
+
+```typescript
+try {
+  await db.model.create(data);
+} catch (error) {
+  if (error.code === 'P2002') {
+    // Unique constraint violation - return existing record
+    return await db.model.findUnique({ where: uniqueFields });
+  }
+  throw error;
+}
+```
+
+### API Response Standards
+
+All mutating endpoints return:
+
+```typescript
+{
+  ok: true,
+  data: T,
+  requestId: string
+} | {
+  ok: false,
+  error: { code: string, message: string },
+  requestId: string
+}
+```
+
+## Data Integrity
+
+### Validation
+
+- **Zod schemas**: validate all inputs server-side
+- **Type safety**: use discriminated unions for complex states
+- **Sanitization**: clean user inputs, escape HTML
+- **Rate limiting**: protect against abuse
+
+### Consistency
+
+- **Transactions**: use Prisma transactions for multi-model operations
+- **Foreign keys**: validate relationships exist
+- **Cascading deletes**: proper cleanup on record removal
+- **Audit trails**: track changes for important operations
+
+### Error Handling
+
+- **Graceful degradation**: fallback behavior for failures
+- **User-friendly errors**: clear, actionable error messages
+- **Logging**: structured error logs with request IDs
+- **Monitoring**: alert on error rate spikes
+  description:
+  globs:
+  alwaysApply: true
+
+---
