@@ -17,29 +17,36 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     return <div>Authentication configuration error</div>;
   }
 
-  // Environment-specific configuration
+  // Environment-specific configuration - use the actual env var that's set
   const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
-
+  const isDevelopment = typeof window !== 'undefined' ? 
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' :
+    !isProduction;
+  
   // Dynamic props based on environment
   const clerkProps: any = {
     publishableKey,
-    nonce,
-    // Basic URL configuration - keep existing sign-in/up URLs
-    signInUrl: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in',
-    signUpUrl: env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up',
     // Use fallbackRedirectUrl instead of deprecated afterSignInUrl/afterSignUpUrl
     fallbackRedirectUrl: '/',
+    signInUrl: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+    signUpUrl: env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+    nonce,
   };
 
-  // Production configuration: use domain, no proxy
+  // Production: use custom domain, no proxy
   if (isProduction) {
     clerkProps.domain = 'clerk.otaku-mori.com';
-  } else {
-    // Preview/Local configuration: use proxy, no domain
+  } 
+  // Development/Preview: use proxy, no domain
+  else {
     if (env.NEXT_PUBLIC_CLERK_PROXY_URL) {
       clerkProps.proxyUrl = env.NEXT_PUBLIC_CLERK_PROXY_URL;
     }
   }
 
-  return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;
+  return (
+    <ClerkProvider {...clerkProps}>
+      {children}
+    </ClerkProvider>
+  );
 }

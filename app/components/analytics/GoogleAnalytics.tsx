@@ -11,8 +11,8 @@ export default function GoogleAnalytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Only enable GA in production environment
-  const isProduction = env.NODE_ENV === 'production' || env.NEXT_PUBLIC_VERCEL_ENV === 'production';
+  // Only enable GA in production environment using client-safe variables
+  const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
   const isGAEnabled = isProduction && env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true';
 
   useEffect(() => {
@@ -67,7 +67,8 @@ export default function GoogleAnalytics() {
 
 // GA4 Event tracking functions with production check
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
-  const isProduction = env.NODE_ENV === 'production' || env.NEXT_PUBLIC_VERCEL_ENV === 'production';
+  // Use client-safe environment check
+  const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
   if (
     typeof window !== 'undefined' &&
     window.gtag &&
