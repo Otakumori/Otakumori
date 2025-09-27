@@ -19,10 +19,11 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   // Environment-specific configuration - use the actual env var that's set
   const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
-  const isDevelopment = typeof window !== 'undefined' ? 
-    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' :
-    !isProduction;
-  
+  const isDevelopment =
+    typeof window !== 'undefined'
+      ? window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      : !isProduction;
+
   // Dynamic props based on environment
   const clerkProps: any = {
     publishableKey,
@@ -33,10 +34,10 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  // Production: use custom domain, no proxy
+  // Production: use main domain (not subdomain), no proxy
   if (isProduction) {
-    clerkProps.domain = 'clerk.otaku-mori.com';
-  } 
+    clerkProps.domain = 'otaku-mori.com';
+  }
   // Development/Preview: use proxy, no domain
   else {
     if (env.NEXT_PUBLIC_CLERK_PROXY_URL) {
@@ -44,9 +45,5 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     }
   }
 
-  return (
-    <ClerkProvider {...clerkProps}>
-      {children}
-    </ClerkProvider>
-  );
+  return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;
 }
