@@ -10,37 +10,80 @@ import { useAuthContext } from '@/app/contexts/AuthContext';
 
 // Game registry for mega-menu
 const FEATURED_GAMES = [
-  { id: 'samurai-petal-slice', title: 'Samurai Petal Slice', summary: "Draw the Tetsusaiga's arc…", status: 'ready' },
-  { id: 'anime-memory-match', title: 'Anime Memory Match', summary: 'Recall the faces bound by fate.', status: 'ready' },
-  { id: 'bubble-pop-gacha', title: 'Bubble-Pop Gacha', summary: 'Pop for spy-craft secrets…', status: 'ready' },
-  { id: 'petal-storm-rhythm', title: 'Petal Storm Rhythm', summary: "Sync to the Moon Prism's pulse.", status: 'ready' },
-  { id: 'quick-math', title: 'Quick Math', summary: 'Answer fast. Pressure builds with each correct streak.', status: 'ready' },
-  { id: 'dungeon-of-desire', title: 'Dungeon of Desire', summary: 'Descend into the dungeon. Survive rooms and claim rewards.', status: 'beta' }
+  {
+    id: 'samurai-petal-slice',
+    title: 'Samurai Petal Slice',
+    summary: "Draw the Tetsusaiga's arc…",
+    status: 'ready',
+  },
+  {
+    id: 'anime-memory-match',
+    title: 'Anime Memory Match',
+    summary: 'Recall the faces bound by fate.',
+    status: 'ready',
+  },
+  {
+    id: 'bubble-pop-gacha',
+    title: 'Bubble-Pop Gacha',
+    summary: 'Pop for spy-craft secrets…',
+    status: 'ready',
+  },
+  {
+    id: 'petal-storm-rhythm',
+    title: 'Petal Storm Rhythm',
+    summary: "Sync to the Moon Prism's pulse.",
+    status: 'ready',
+  },
+  {
+    id: 'quick-math',
+    title: 'Quick Math',
+    summary: 'Answer fast. Pressure builds with each correct streak.',
+    status: 'ready',
+  },
+  {
+    id: 'dungeon-of-desire',
+    title: 'Dungeon of Desire',
+    summary: 'Descend into the dungeon. Survive rooms and claim rewards.',
+    status: 'beta',
+  },
 ];
 
 const SAMPLE_PRODUCTS = [
-  { id: '1', name: 'Sakura Cherry Blossom T-Shirt', price: 2999, image: '/placeholder-product.jpg' },
+  {
+    id: '1',
+    name: 'Sakura Cherry Blossom T-Shirt',
+    price: 2999,
+    image: '/placeholder-product.jpg',
+  },
   { id: '2', name: 'Anime Gaming Controller', price: 4999, image: '/placeholder-product.jpg' },
   { id: '3', name: 'Otaku-mori Sticker Pack', price: 1499, image: '/placeholder-product.jpg' },
-  { id: '4', name: 'Mini-Games Poster Collection', price: 1999, image: '/placeholder-product.jpg' }
+  { id: '4', name: 'Mini-Games Poster Collection', price: 1999, image: '/placeholder-product.jpg' },
 ];
 
 const SAMPLE_POSTS = [
   { id: '1', title: 'Welcome to Otaku-mori: Your New Digital Haven', date: '2024-09-20' },
   { id: '2', title: 'Mini-Games Hub: Complete Guide for Beginners', date: '2024-09-18' },
-  { id: '3', title: 'Building a Positive Community Together', date: '2024-09-15' }
+  { id: '3', title: 'Building a Positive Community Together', date: '2024-09-15' },
 ];
 
 // Search suggestions with easter eggs
 const SEARCH_SUGGESTIONS = [
-  'sakura', 'gaming', 'anime', 'merch', 'petals', 'mini-games',
-  'what are ya buyin', 'stranger', 'gamecube', 'otaku'
+  'sakura',
+  'gaming',
+  'anime',
+  'merch',
+  'petals',
+  'mini-games',
+  'what are ya buyin',
+  'stranger',
+  'gamecube',
+  'otaku',
 ];
 
 const EASTER_EGGS: Record<string, string> = {
   'what are ya buyin': 'The classic merchant greeting! 🛍️',
-  'stranger': 'Ah, a fellow RE4 fan! Welcome!',
-  'gamecube': 'Ready for some nostalgic gaming? 🎮'
+  stranger: 'Ah, a fellow RE4 fan! Welcome!',
+  gamecube: 'Ready for some nostalgic gaming? 🎮',
 };
 
 export default function Navbar() {
@@ -67,8 +110,8 @@ export default function Navbar() {
 
     if (query.length >= 2) {
       // Fuzzy search suggestions
-      const filtered = SEARCH_SUGGESTIONS.filter(suggestion =>
-        suggestion.toLowerCase().includes(query.toLowerCase())
+      const filtered = SEARCH_SUGGESTIONS.filter((suggestion) =>
+        suggestion.toLowerCase().includes(query.toLowerCase()),
       ).slice(0, 5);
       setSearchSuggestions(filtered);
       setShowSearchDropdown(true);
@@ -131,7 +174,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center space-x-2 group">
           <div className="relative w-8 h-8">
             <Image
-              src="/circlelogo.png"
+              src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
               fill
               className="object-contain group-hover:scale-110 transition-transform"
@@ -164,7 +207,12 @@ export default function Navbar() {
             >
               Shop
               <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
@@ -186,7 +234,9 @@ export default function Navbar() {
                         <span className="text-xs text-white">IMG</span>
                       </div>
                       <div>
-                        <p className="text-white text-sm font-medium line-clamp-2">{product.name}</p>
+                        <p className="text-white text-sm font-medium line-clamp-2">
+                          {product.name}
+                        </p>
                         <p className="text-pink-400 text-sm">${(product.price / 100).toFixed(2)}</p>
                       </div>
                     </Link>
@@ -212,7 +262,12 @@ export default function Navbar() {
             >
               Mini-Games
               <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
@@ -265,7 +320,12 @@ export default function Navbar() {
             >
               Blog
               <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
@@ -327,7 +387,12 @@ export default function Navbar() {
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </button>
             </form>
@@ -356,8 +421,9 @@ export default function Navbar() {
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-8 h-8 border border-white/20 hover:border-pink-400/50 transition-colors"
-                }
+                  avatarBox:
+                    'w-8 h-8 border border-white/20 hover:border-pink-400/50 transition-colors',
+                },
               }}
             />
           ) : (
@@ -370,12 +436,14 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden text-white"
-        >
+        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-white">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
       </nav>
@@ -384,11 +452,21 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/20">
           <div className="px-4 py-2 space-y-2">
-            <Link href="/" className="block text-white hover:text-pink-400 py-2">Home</Link>
-            <Link href="/shop" className="block text-white hover:text-pink-400 py-2">Shop</Link>
-            <Link href="/mini-games" className="block text-white hover:text-pink-400 py-2">Mini-Games</Link>
-            <Link href="/blog" className="block text-white hover:text-pink-400 py-2">Blog</Link>
-            <Link href="/about" className="block text-white hover:text-pink-400 py-2">About</Link>
+            <Link href="/" className="block text-white hover:text-pink-400 py-2">
+              Home
+            </Link>
+            <Link href="/shop" className="block text-white hover:text-pink-400 py-2">
+              Shop
+            </Link>
+            <Link href="/mini-games" className="block text-white hover:text-pink-400 py-2">
+              Mini-Games
+            </Link>
+            <Link href="/blog" className="block text-white hover:text-pink-400 py-2">
+              Blog
+            </Link>
+            <Link href="/about" className="block text-white hover:text-pink-400 py-2">
+              About
+            </Link>
           </div>
         </div>
       )}
