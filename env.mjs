@@ -113,6 +113,8 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().default('on'),
     // Sentry
     NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+    // Vercel Environment
+    NEXT_PUBLIC_VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
     // Feature flags
     NEXT_PUBLIC_FEATURE_MINIGAMES: z.enum(['on', 'off']).default('on'),
     NEXT_PUBLIC_FEATURE_RUNE: z.enum(['on', 'off']).default('off'),
