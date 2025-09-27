@@ -37,6 +37,7 @@ const isPublic = createRouteMatcher([
   // API routes (handled separately)
   '/api/health',
   '/api/printify(.*)',
+  '/api/v1/printify(.*)',
   '/api/v1/products(.*)',
   '/api/v1/content(.*)',
   '/api/v1/games(.*)',
