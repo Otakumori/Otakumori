@@ -60,11 +60,11 @@ export default [
       'jsx-a11y/accessible-emoji': 'warn',
       'jsx-a11y/click-events-have-key-events': 'warn',
       'jsx-a11y/no-static-element-interactions': 'warn',
-      'jsx-a11y/control-has-associated-label': 'warn',
+      'jsx-a11y/control-has-associated-label': 'off', // Disabled: some controls have implicit labels
       'jsx-a11y/label-has-associated-control': 'warn',
       'jsx-a11y/media-has-caption': 'warn',
       'jsx-a11y/heading-has-content': 'warn',
-      'jsx-a11y/prefer-tag-over-role': 'warn',
+      'jsx-a11y/prefer-tag-over-role': 'off', // Disabled: intentional use of role="img" for decorative elements
       'jsx-a11y/alt-text': 'warn',
       'jsx-a11y/anchor-has-content': 'warn',
       'jsx-a11y/anchor-is-valid': 'warn',

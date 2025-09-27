@@ -18,8 +18,10 @@
     "mori",
     "NEXTAUTH",
     "nosniff",
+    "otakumori",
     "printify",
     "SAMEORIGIN",
-    "Supabase"
+    "Supabase",
+    "whsec"
   ]
 }

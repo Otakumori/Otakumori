@@ -9,3 +9,5 @@ node_modules
 .DS_Store
 .vscode/settings.json
 .vscode/tasks.json
+
+.vercel
