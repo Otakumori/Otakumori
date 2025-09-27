@@ -42,8 +42,23 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { user, isLoaded } = useUser();
-  const { signOut } = useAuth();
+  // Safely use Clerk hooks with error handling
+  let user: User | null = null;
+  let isLoaded = false;
+  let signOut: (() => Promise<void>) | undefined;
+
+  try {
+    const clerkUser = useUser();
+    const clerkAuth = useAuth();
+    user = clerkUser.user as User | null;
+    isLoaded = clerkUser.isLoaded;
+    signOut = clerkAuth.signOut;
+  } catch (error) {
+    // Clerk is not available, use mock state
+    console.warn('Clerk hooks not available, using mock auth state:', error);
+    isLoaded = true;
+  }
+
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [authModal, setAuthModal] = useState<AuthModalState>({
@@ -74,15 +89,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (action: 'sign-in' | 'sign-up', redirectUrl?: string, message?: string) => {
       // Create a unique key for this modal request
       const modalKey = `${action}-${message || 'default'}`;
-      
+
       // Check if we've already shown this modal in this session
       if (shownThisSession.has(modalKey)) {
         return; // Don't show duplicate modal
       }
-      
+
       // Mark as shown for this session
-      setShownThisSession(prev => new Set(prev).add(modalKey));
-      
+      setShownThisSession((prev) => new Set(prev).add(modalKey));
+
       setAuthModal({
         isOpen: true,
         action,

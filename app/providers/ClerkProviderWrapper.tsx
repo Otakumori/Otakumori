@@ -25,28 +25,36 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
       (window.location.hostname.includes('otaku-mori') &&
         !window.location.hostname.includes('.com')));
 
-  // For localhost, skip Clerk entirely to avoid production key errors
-  if (isLocalhost) {
-    return <>{children}</>;
+  // Determine which publishable key to use
+  let publishableKey = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // For non-production environments, use development key if available
+  if (!isActualProduction) {
+    // Check if we have a development key configured
+    const devKey =
+      env.NEXT_PUBLIC_CLERK_DEV_PUBLISHABLE_KEY ||
+      process.env.NEXT_PUBLIC_CLERK_DEV_PUBLISHABLE_KEY;
+
+    if (devKey) {
+      publishableKey = devKey;
+      console.log('🔧 Using Clerk development keys for preview environment');
+    } else if (publishableKey?.startsWith('pk_live_')) {
+      // If we only have production keys and we're not in production, warn but continue
+      console.warn(
+        '⚠️ Using production Clerk keys on non-production domain. Consider setting up development keys.',
+      );
+    }
   }
 
-  // For Vercel preview domains, use development mode
-  if (isVercelPreview && !isActualProduction) {
-    console.warn('⚠️ Running on Vercel preview domain. Clerk may have limited functionality.');
-  }
-
-  // If not production domain and using production keys, disable Clerk to prevent errors
-  if (!isActualProduction && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.startsWith('pk_live_')) {
-    console.warn(
-      '⚠️ Production Clerk keys detected on non-production domain. Disabling Clerk to prevent errors.',
-    );
-    return <>{children}</>;
+  // Always provide a ClerkProvider to prevent hook errors
+  if (!publishableKey || publishableKey === 'pk_test_mock') {
+    console.warn('⚠️ No valid Clerk keys found. Using disabled Clerk provider.');
   }
 
   const clerkProps: any = {
     dynamic: true,
     nonce,
-    publishableKey: env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    publishableKey: publishableKey,
   };
 
   // Basic Clerk configuration

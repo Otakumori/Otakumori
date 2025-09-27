@@ -9,8 +9,17 @@
     "editor.defaultFormatter": "Prisma.prisma"
   },
   "cSpell.words": [
+    "configcat",
+    "cooldown",
+    "flagsmith",
     "HSTS",
+    "INNGEST",
+    "MINIGAMES",
     "mori",
-    "printify"
+    "NEXTAUTH",
+    "nosniff",
+    "printify",
+    "SAMEORIGIN",
+    "Supabase"
   ]
 }
