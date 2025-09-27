@@ -2,7 +2,158 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import Image from 'next/image';
 import type { PrintifyProduct } from '@/app/lib/printify/service';
+
+// Enterprise-grade Product Card for Real Printify Products
+function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
+  const [selectedVariant, setSelectedVariant] = useState(product.variants[0] || null);
+  const [selectedImage, setSelectedImage] = useState(product.images[0] || null);
+
+  // Get available colors and sizes from product options
+  const colorOptions = product.options?.find((opt) => opt.name.toLowerCase().includes('color'));
+  const sizeOptions = product.options?.find((opt) => opt.name.toLowerCase().includes('size'));
+
+  // Get variant-specific image
+  const variantImages = selectedVariant
+    ? product.images.filter(
+        (img) => img.variant_ids.length === 0 || img.variant_ids.includes(selectedVariant.id),
+      )
+    : product.images;
+
+  const displayImage = variantImages[0] || product.images[0];
+
+  // Calculate price range
+  const prices = product.variants.map((v) => v.price).filter((p) => p > 0);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const priceDisplay =
+    minPrice === maxPrice
+      ? `$${(minPrice / 100).toFixed(2)}`
+      : `$${(minPrice / 100).toFixed(2)} - $${(maxPrice / 100).toFixed(2)}`;
+
+  // Get available variants for current color
+  const availableVariants = product.variants.filter((v) => v.is_enabled && v.is_available);
+
+  return (
+    <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden hover:border-pink-500/50 transition-all duration-300">
+      {/* Product Image */}
+      <div className="relative aspect-square bg-white/5">
+        {displayImage ? (
+          <Image
+            src={displayImage.src}
+            alt={product.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+            <div className="text-white/60 text-lg font-medium">No Image</div>
+          </div>
+        )}
+
+        {/* Badge for stock status */}
+        {availableVariants.length === 0 && (
+          <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
+            Out of Stock
+          </div>
+        )}
+
+        {/* Express eligible badge */}
+        {product.is_printify_express_eligible && (
+          <div className="absolute top-2 left-2 bg-green-500/80 text-white text-xs px-2 py-1 rounded-lg">
+            Express
+          </div>
+        )}
+      </div>
+
+      {/* Product Info */}
+      <div className="p-4 space-y-3">
+        {/* Title and Price */}
+        <div>
+          <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 group-hover:text-pink-300 transition-colors">
+            {product.title}
+          </h3>
+          <div className="text-pink-400 font-bold text-xl">{priceDisplay}</div>
+        </div>
+
+        {/* Description */}
+        <p className="text-zinc-300 text-sm line-clamp-2 leading-relaxed">
+          {product.description || 'High-quality print-on-demand product'}
+        </p>
+
+        {/* Color Variants */}
+        {colorOptions && colorOptions.values.length > 1 && (
+          <div>
+            <div className="text-white text-xs font-medium mb-2">Colors:</div>
+            <div className="flex flex-wrap gap-1">
+              {colorOptions.values.slice(0, 6).map((colorValue) => (
+                <div key={colorValue.id} className="group/color relative" title={colorValue.title}>
+                  {colorValue.colors && colorValue.colors.length > 0 ? (
+                    <div
+                      className="w-6 h-6 rounded-full border-2 border-white/30 cursor-pointer hover:border-pink-400 transition-colors"
+                      style={{ backgroundColor: colorValue.colors[0] }}
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 border-2 border-white/30 cursor-pointer hover:border-pink-400 transition-colors" />
+                  )}
+                </div>
+              ))}
+              {colorOptions.values.length > 6 && (
+                <div className="text-zinc-400 text-xs self-center">
+                  +{colorOptions.values.length - 6} more
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Size Options */}
+        {sizeOptions && sizeOptions.values.length > 1 && (
+          <div>
+            <div className="text-white text-xs font-medium mb-2">Sizes Available:</div>
+            <div className="flex flex-wrap gap-1">
+              {sizeOptions.values.slice(0, 4).map((sizeValue) => (
+                <span
+                  key={sizeValue.id}
+                  className="text-xs bg-white/10 text-zinc-300 px-2 py-1 rounded-lg"
+                >
+                  {sizeValue.title}
+                </span>
+              ))}
+              {sizeOptions.values.length > 4 && (
+                <span className="text-xs text-zinc-400">+{sizeOptions.values.length - 4} more</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Tags */}
+        {product.tags && product.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {product.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-lg"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Action Button */}
+        <button
+          className="w-full bg-gradient-to-r from-pink-500/80 to-purple-500/80 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={availableVariants.length === 0}
+        >
+          {availableVariants.length > 0 ? 'View Details' : 'Out of Stock'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 interface ProductSearchResult {
   products: PrintifyProduct[];
@@ -355,18 +506,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
           {products.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
               {products.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-4"
-                >
-                  <h3 className="text-white font-semibold mb-2">{product.title}</h3>
-                  <p className="text-zinc-300 text-sm">{product.description}</p>
-                  <div className="mt-4">
-                    <span className="text-pink-400 font-bold">
-                      ${product.variants?.[0]?.price || 0}
-                    </span>
-                  </div>
-                </div>
+                <RealPrintifyProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
