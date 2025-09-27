@@ -2,44 +2,34 @@ import GlassPanel from './GlassPanel';
 import Image from 'next/image';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
+import { getPrintifyService } from '@/app/lib/printify/service';
+import type { PrintifyProduct } from '@/app/lib/printify/service';
 
-type Product = { id: string; name: string; price: number; image: string; slug?: string };
-
-// Mock featured products for now until Printify integration is properly set up
-const SAMPLE_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Sakura Cherry Blossom T-Shirt',
-    price: 2999, // Price in cents
-    image: '/placeholder-product.jpg',
-    slug: 'sakura-cherry-blossom-tshirt',
-  },
-  {
-    id: '2',
-    name: 'Anime Gaming Controller',
-    price: 4999,
-    image: '/placeholder-product.jpg',
-    slug: 'anime-gaming-controller',
-  },
-  {
-    id: '3',
-    name: 'Otaku-mori Sticker Pack',
-    price: 1499,
-    image: '/placeholder-product.jpg',
-    slug: 'otaku-mori-sticker-pack',
-  },
-  {
-    id: '4',
-    name: 'Mini-Games Poster Collection',
-    price: 1999,
-    image: '/placeholder-product.jpg',
-    slug: 'mini-games-poster-collection',
-  },
-];
+async function getFeaturedProducts(): Promise<PrintifyProduct[]> {
+  try {
+    const printifyService = getPrintifyService();
+    const response = await printifyService.getProducts(1, 4); // Get first 4 products for homepage
+    return response.data || [];
+  } catch (error) {
+    console.error('Failed to fetch featured products:', error);
+    return [];
+  }
+}
 
 export default async function ShopTeaser() {
-  // Use sample products for now, later replace with real Printify service
-  const products = SAMPLE_PRODUCTS;
+  // Fetch real Printify products for homepage
+  const printifyProducts = await getFeaturedProducts();
+
+  // Transform Printify products to display format
+  const products = printifyProducts.map((product) => ({
+    id: product.id,
+    title: product.title,
+    description: product.description,
+    image: product.images?.[0]?.src || '/placeholder-product.jpg',
+    price: product.variants?.[0]?.price || 0,
+    available: product.variants?.some((v) => v.is_enabled && v.is_available) || false,
+    slug: product.id, // Use product ID as slug for now
+  }));
 
   return (
     <section id="shop" className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
@@ -56,23 +46,38 @@ export default async function ShopTeaser() {
       {/* Products Grid or Empty State */}
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-          {products.map((p) => (
+          {products.map((product) => (
             <GlassPanel
-              key={p.id}
+              key={product.id}
               className="group relative overflow-hidden hover:scale-105 transition-all duration-300"
             >
-              <Link href={`/shop/${p.slug}`} className="block">
+              <Link href={`/shop?productId=${product.id}`} className="block">
                 <div className="aspect-square relative mb-4">
                   <Image
-                    src={p.image}
-                    alt={p.name}
+                    src={product.image}
+                    alt={product.title}
                     fill
                     className="object-cover rounded-lg group-hover:scale-110 transition-transform duration-300"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
+
+                  {/* Stock status badge */}
+                  {!product.available && (
+                    <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
+                      Out of Stock
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-white font-semibold mb-2 line-clamp-2">{p.name}</h3>
-                <p className="text-pink-400 font-bold">${(p.price / 100).toFixed(2)}</p>
+
+                <h3 className="text-white font-semibold mb-2 line-clamp-2">{product.title}</h3>
+
+                {/* Price display */}
+                <p className="text-pink-400 font-bold">${(product.price / 100).toFixed(2)}</p>
+
+                {/* Description preview */}
+                {product.description && (
+                  <p className="text-gray-300 text-sm mt-2 line-clamp-2">{product.description}</p>
+                )}
               </Link>
             </GlassPanel>
           ))}

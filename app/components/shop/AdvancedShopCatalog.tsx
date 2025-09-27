@@ -268,6 +268,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
       sortOrder: (searchParams.sortOrder as string) || 'desc',
       page: Number(searchParams.page) || 1,
       limit: Number(searchParams.limit) || 20,
+      productId: (searchParams.productId as string) || undefined, // Handle direct product linking from homepage
     }),
     [searchParams],
   );
@@ -289,6 +290,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         if (filters.sizes.length > 0) params.append('sizes', filters.sizes.join(','));
         if (filters.inStock) params.append('inStock', 'true');
         if (filters.expressEligible) params.append('expressEligible', 'true');
+        if (filters.productId) params.append('productId', filters.productId); // Handle direct product linking
         params.append('sortBy', filters.sortBy);
         params.append('sortOrder', filters.sortOrder);
         params.append('page', filters.page.toString());

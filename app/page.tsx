@@ -9,6 +9,9 @@ import MiniGameTeaser from './components/MiniGameTeaser';
 import StickySoapstones from './components/StickySoapstones';
 import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
 
+// Enable ISR to refresh homepage with new products every 5 minutes
+export const revalidate = 300;
+
 export default function HomePage() {
   return (
     <div className="min-h-screen relative overflow-hidden">
