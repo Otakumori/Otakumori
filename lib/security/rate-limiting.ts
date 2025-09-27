@@ -10,7 +10,7 @@
  * - Burst protection
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
@@ -498,7 +498,7 @@ export function withRateLimit(handler: Function, ruleKey: string) {
       nextUrl: { pathname: req.url || '/api/unknown' },
       headers: new Map(Object.entries(req.headers || {})),
     } as any;
-    
+
     const result = await rateLimiter.checkLimit(mockRequest);
 
     if (!result.allowed) {

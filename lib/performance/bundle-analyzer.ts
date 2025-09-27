@@ -326,8 +326,8 @@ export class CoreWebVitalsMonitor {
       });
     }
 
-    // Log in development (check process.env directly on client side)
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    // Log in development (check client-side localhost only)
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       console.log(`📈 ${name}: ${Math.round(value)}${name === 'CLS' ? '' : 'ms'}`);
     }
   }
@@ -377,7 +377,7 @@ export async function initializePerformanceMonitoring(): Promise<void> {
     const cwvMonitor = initializeCoreWebVitalsMonitoring();
 
     // Initialize bundle analysis in development
-    if (process.env.NODE_ENV === 'development') {
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       const bundleAnalyzer = initializeBundleAnalysis();
       console.log('🚀 Performance monitoring initialized');
     }
@@ -385,7 +385,7 @@ export async function initializePerformanceMonitoring(): Promise<void> {
     // Track performance initialization
     if ('gtag' in window) {
       (window as any).gtag('event', 'performance_monitoring_initialized', {
-        environment: process.env.NODE_ENV,
+        environment: 'production', // Always report as production to avoid client-side env access
       });
     }
   } catch (error) {
