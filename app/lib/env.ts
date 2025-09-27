@@ -38,7 +38,7 @@ export const env = z
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string(),
     STRIPE_SECRET_KEY: z.string(),
     STRIPE_WEBHOOK_SECRET: z.string(),
-    STRIPE_WEBHOOK_URL: z.string().url(),
+    STRIPE_WEBHOOK_URL: z.string().url().optional(),
 
     // ========================
     // PRINTIFY
