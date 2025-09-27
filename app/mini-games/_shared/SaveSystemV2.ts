@@ -12,6 +12,7 @@
  */
 
 import { auth } from '@clerk/nextjs/server';
+import { env } from '@/env.mjs';
 
 export interface GameSaveDataV2 {
   gameId: string;
@@ -335,7 +336,7 @@ export class GameSaveSystemV2 {
       unlocks: [],
       timestamp: Date.now(),
       saveVersion: CURRENT_SAVE_VERSION,
-      buildVersion: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+      buildVersion: env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
       platform: this.getPlatform(),
       checksum: '',
       compressed: false,

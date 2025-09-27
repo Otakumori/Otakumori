@@ -44,7 +44,6 @@ export default function AchievementBadge({
     <svg
       className={cn('w-20 h-20 drop-shadow-sm', className)}
       viewBox="0 0 24 24"
-      role="img"
       aria-label={label}
     >
       <defs>

@@ -64,7 +64,7 @@ const nextConfig = {
     minimumCacheTTL: 60,
   },
 
-  // Production-grade security headers with CSP for GA, GTM, and Clerk
+  // Production-grade security headers with enhanced CSP for all required domains
   async headers() {
     const isProd = env.NODE_ENV === 'production';
 
@@ -78,20 +78,55 @@ const nextConfig = {
       "default-src 'self'",
       "base-uri 'self'",
       "object-src 'none'",
-      "img-src 'self' data: blob: https:",
+      // Enhanced img-src for all required domains
+      "img-src 'self' data: blob: https: https://*.vercel-storage.com https://*.printify.com https://*.clerk.com",
       "media-src 'self' data: blob:",
+      // Enhanced font-src for Google Fonts
       "font-src 'self' data: https: https://fonts.gstatic.com",
+      // Enhanced style-src for Google Fonts and inline styles
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // Enhanced script-src for GTM and Clerk
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com https://www.googletagmanager.com https://www.google-analytics.com",
+      // Enhanced worker-src for service workers and blob workers
       "worker-src 'self' blob:",
       "frame-ancestors 'self'",
     ];
 
+    // Enhanced connect-src for production with all required domains
     const connectProd =
-      "connect-src 'self' https: wss: https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://clerk.otaku-mori.com https://accounts.otaku-mori.com https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://www.otaku-mori.com https://otaku-mori.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io https://www.google-analytics.com";
+      "connect-src 'self' https: wss: " +
+      // Clerk domains
+      'https://clerk.otaku-mori.com https://accounts.otaku-mori.com https://api.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com ' +
+      // Printify domains
+      'https://api.printify.com https://*.printify.com ' +
+      // Vercel domains
+      'https://*.vercel.app https://*.vercel-blob.com https://vitals.vercel-insights.com ' +
+      // Analytics and monitoring
+      'https://www.google-analytics.com https://www.googletagmanager.com ' +
+      // Sentry
+      'https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io ' +
+      // Other services
+      'https://api.stripe.com https://maps.googleapis.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io ' +
+      // App domains
+      'https://www.otaku-mori.com https://otaku-mori.com';
 
+    // Enhanced connect-src for development/preview with additional local and preview domains
     const connectDev =
-      "connect-src 'self' https: wss: ws: ws://localhost:8787 https://clerk-telemetry.com https://*.clerk-telemetry.com https://api.stripe.com https://maps.googleapis.com https://api.clerk.com https://*.clerk.accounts.dev https://api.printify.com https://*.printify.com https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io https://vitals.vercel-insights.com https://*.vercel-blob.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io https://www.google-analytics.com";
+      "connect-src 'self' https: wss: ws: " +
+      // Local development
+      'ws://localhost:8787 ' +
+      // Clerk domains (including dev)
+      'https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://api.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com ' +
+      // Printify domains
+      'https://api.printify.com https://*.printify.com ' +
+      // Vercel domains (including preview)
+      'https://*.vercel.app https://*.vercel-blob.com https://vitals.vercel-insights.com ' +
+      // Analytics and monitoring
+      'https://www.google-analytics.com https://www.googletagmanager.com ' +
+      // Sentry
+      'https://*.ingest.sentry.io https://o4509520271114240.ingest.us.sentry.io https://*.sentry.io https://sentry.io ' +
+      // Other services
+      'https://api.stripe.com https://maps.googleapis.com https://ydbhokoxqwqbtqqeibef.supabase.co https://*.upstash.io';
 
     const csp = [...cspCommon, isProd ? connectProd : connectDev].join('; ');
 

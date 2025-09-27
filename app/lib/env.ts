@@ -109,7 +109,7 @@ export const env = z
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PRINTIFY_API_URL: z.string().url().default('https://api.printify.com/v1'),
   })
-  .parse(process.env); // eslint-disable-line no-restricted-syntax
+  .parse(process.env);
 
 // Helper constants for easier access
 export const IS_PROD = env.NODE_ENV === 'production';

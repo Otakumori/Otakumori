@@ -1,7 +1,7 @@
 import { env } from '../../app/env';
+import { getRuntimeOrigin } from '../../lib/runtimeOrigin';
 
-export const appUrl =
-  env.NEXT_PUBLIC_SITE_URL || env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+export const appUrl = getRuntimeOrigin();
 
 export function getCanonicalUrl(path: string = '') {
   const baseUrl = appUrl.replace(/\/$/, '');

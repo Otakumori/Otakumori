@@ -4,6 +4,7 @@
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
+import { getRuntimeOrigin } from '../runtimeOrigin';
 
 interface SecurityHeadersConfig {
   contentSecurityPolicy?: string | CSPConfig;
@@ -164,7 +165,7 @@ export const withSecurityHeaders = (handler: Function) => {
 
     // Get environment info
     const isDev = env.NODE_ENV === 'development';
-    const appUrl = env.NEXT_PUBLIC_APP_URL || 'https://localhost:3000';
+    const appUrl = getRuntimeOrigin();
 
     // Add security headers
     if (response instanceof Response) {

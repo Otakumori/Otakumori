@@ -1,5 +1,6 @@
 // Client-safe canonical URL functions
 import { env } from '@/env';
+import { getRuntimeOrigin } from './runtimeOrigin';
 
 const PROD_ORIGIN = 'https://www.otaku-mori.com';
 
@@ -15,8 +16,8 @@ export function canonicalOrigin() {
   // Infer in dev/preview
   if (typeof window !== 'undefined') return window.location.origin;
 
-  // Server-side fallback
-  return 'http://localhost:3000';
+  // Server-side fallback - use runtime origin helper instead of hardcoded localhost
+  return getRuntimeOrigin();
 }
 
 export function appUrl(path = '/') {

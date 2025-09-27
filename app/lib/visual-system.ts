@@ -6,6 +6,8 @@
  * DO NOT modify these values without design system approval
  */
 
+import { env } from '@/env.mjs';
+
 // =============================================================================
 // TYPOGRAPHY SYSTEM
 // =============================================================================
@@ -474,7 +476,7 @@ export const CSS_VARS = {
 
 // Runtime validation for development
 export const validateDesignToken = (category: string, token: string) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (env.NODE_ENV === 'development') {
     // Add validation logic for design tokens
     console.warn('Design token validation not yet implemented');
   }

@@ -17,16 +17,29 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     return <div>Authentication configuration error</div>;
   }
 
-  // Simple props object - let Vercel environment variables handle the complexity
-  const clerkProps = {
+  // Environment-specific configuration
+  const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
+
+  // Dynamic props based on environment
+  const clerkProps: any = {
     publishableKey,
     nonce,
-    // Basic URL configuration
+    // Basic URL configuration - keep existing sign-in/up URLs
     signInUrl: env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in',
     signUpUrl: env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up',
-    afterSignInUrl: env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || '/',
-    afterSignUpUrl: env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || '/',
+    // Use fallbackRedirectUrl instead of deprecated afterSignInUrl/afterSignUpUrl
+    fallbackRedirectUrl: '/',
   };
+
+  // Production configuration: use domain, no proxy
+  if (isProduction) {
+    clerkProps.domain = 'clerk.otaku-mori.com';
+  } else {
+    // Preview/Local configuration: use proxy, no domain
+    if (env.NEXT_PUBLIC_CLERK_PROXY_URL) {
+      clerkProps.proxyUrl = env.NEXT_PUBLIC_CLERK_PROXY_URL;
+    }
+  }
 
   return <ClerkProvider {...clerkProps}>{children}</ClerkProvider>;
 }

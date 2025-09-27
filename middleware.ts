@@ -2,6 +2,14 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
+// Validate required Clerk environment variables at startup
+if (!env.CLERK_SECRET_KEY) {
+  throw new Error('Missing CLERK_SECRET_KEY environment variable');
+}
+if (!env.CLERK_ENCRYPTION_KEY) {
+  throw new Error('Missing CLERK_ENCRYPTION_KEY environment variable');
+}
+
 // Define route patterns for comprehensive auth management
 const isPublic = createRouteMatcher([
   // Public pages
@@ -233,11 +241,8 @@ export default clerkMiddleware(
 
     return res;
   },
-  {
-    // Clerk middleware options
-    publishableKey: env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-    secretKey: env.CLERK_SECRET_KEY,
-  },
+  // Let Clerk middleware auto-detect configuration from environment variables
+  // Remove manual publishableKey and secretKey passing
 );
 
 export const config = {

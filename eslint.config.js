@@ -90,7 +90,7 @@ export default [
   },
   {
     // Allow process.env in env.ts file
-    files: ['env.ts', 'app/env.ts'],
+    files: ['env.ts', 'app/env.ts', '**/env.ts', 'app/lib/env.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },
