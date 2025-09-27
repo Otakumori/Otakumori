@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import StarfieldPurple from '../components/StarfieldPurple';
 import FooterDark from '../components/FooterDark';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
@@ -29,11 +28,9 @@ export default async function ShopPage({
   const logger = await getLogger();
 
   try {
-    // Log shop page visit for analytics
-    const headersList = await headers();
+    // Log shop page visit for analytics (removed headers() for static generation)
     logger.info('shop_page_view', {
       extra: {
-        userAgent: headersList.get('user-agent'),
         timestamp: Date.now(),
       },
     });
