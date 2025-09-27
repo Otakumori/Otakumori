@@ -11,8 +11,9 @@ export default function GoogleAnalytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Check feature flag
-  const isGAEnabled = env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true';
+  // Only enable GA in production environment
+  const isProduction = env.NODE_ENV === 'production' || env.NEXT_PUBLIC_VERCEL_ENV === 'production';
+  const isGAEnabled = isProduction && env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true';
 
   useEffect(() => {
     if (!isGAEnabled) return;
@@ -64,11 +65,13 @@ export default function GoogleAnalytics() {
   );
 }
 
-// GA4 Event tracking functions with feature flag check
+// GA4 Event tracking functions with production check
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
+  const isProduction = env.NODE_ENV === 'production' || env.NEXT_PUBLIC_VERCEL_ENV === 'production';
   if (
     typeof window !== 'undefined' &&
     window.gtag &&
+    isProduction &&
     env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true'
   ) {
     window.gtag('event', eventName, parameters);

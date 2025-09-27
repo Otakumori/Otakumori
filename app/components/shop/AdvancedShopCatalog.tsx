@@ -296,17 +296,74 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         params.append('page', filters.page.toString());
         params.append('limit', filters.limit.toString());
 
-        const response = await fetch(`/api/v1/printify/search?${params.toString()}`);
+        const response = await fetch(`/api/v1/printify/search?${params.toString()}`, {
+          credentials: 'same-origin',
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          // Handle HTTP errors gracefully
+          const errorText = await response.text();
+          console.warn(`Printify API returned ${response.status}: ${errorText}`);
+          setSearchResult({
+            products: [],
+            total: 0,
+            page: 1,
+            totalPages: 0,
+            filters: {
+              availableCategories: [],
+              priceRange: { min: 0, max: 0 },
+              availableColors: [],
+              availableSizes: [],
+            },
+          });
+          setProducts([]);
+          setError('Unable to load products at this time. Please try again later.');
+          return;
+        }
+
         const result = await response.json();
 
-        if (result.ok) {
-          setSearchResult(result.data);
-          setProducts(result.data.products);
+        if (result.ok || result.products) {
+          // Handle both envelope and direct response formats
+          const data = result.data || result;
+          setSearchResult(data);
+          setProducts(data.products || []);
+          setError(null);
         } else {
-          setError(result.error || 'Failed to load products');
+          setSearchResult({
+            products: [],
+            total: 0,
+            page: 1,
+            totalPages: 0,
+            filters: {
+              availableCategories: [],
+              priceRange: { min: 0, max: 0 },
+              availableColors: [],
+              availableSizes: [],
+            },
+          });
+          setProducts([]);
+          setError('No products found. Please try different search criteria.');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load products');
+        console.warn('Shop catalog fetch error:', err);
+        setSearchResult({
+          products: [],
+          total: 0,
+          page: 1,
+          totalPages: 0,
+          filters: {
+            availableCategories: [],
+            priceRange: { min: 0, max: 0 },
+            availableColors: [],
+            availableSizes: [],
+          },
+        });
+        setProducts([]);
+        setError('Connection error. Please check your internet connection and try again.');
       } finally {
         setLoading(false);
       }

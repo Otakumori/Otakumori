@@ -9,7 +9,7 @@
  * - Real-time filter suggestions
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
 import { z } from 'zod';
 
@@ -101,13 +101,44 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'Search failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+    // Check if it's a Printify authentication error
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    if (errorMessage.includes('401') || errorMessage.includes('Unauthenticated')) {
+      console.warn('Printify authentication failed - returning empty results');
+      // Return empty results instead of failing the entire page
+      return NextResponse.json({
+        ok: true,
+        data: {
+          products: [],
+          pagination: {
+            page: 1,
+            totalPages: 0,
+            total: 0,
+            limit: 20,
+          },
+          filters: {},
+          searchQuery: '',
+          appliedFilters: {},
+        },
+      });
+    }
+
+    // For other errors, also return empty results to prevent page breaks
+    console.warn('Printify search failed - returning empty results:', errorMessage);
+    return NextResponse.json({
+      ok: true,
+      data: {
+        products: [],
+        pagination: {
+          page: 1,
+          totalPages: 0,
+          total: 0,
+          limit: 20,
+        },
+        filters: {},
+        searchQuery: '',
+        appliedFilters: {},
       },
-      { status: 500 },
-    );
+    });
   }
 }
