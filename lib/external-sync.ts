@@ -1,4 +1,4 @@
-import { env } from '../app/lib/env';
+import { env } from '@/env';
 
 // Clerk API sync
 export async function syncClerkUsers() {

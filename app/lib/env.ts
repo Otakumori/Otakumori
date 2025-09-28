@@ -78,7 +78,7 @@ export const env = z
     // ADDITIONAL SERVICES
     // ========================
     RESEND_API_KEY: z.string().optional(),
-    EMAIL_FROM: z.string().email().optional(),
+    EMAIL_FROM: z.string().optional(),
 
     // ========================
     // GITHUB

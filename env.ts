@@ -17,7 +17,7 @@ const server = z.object({
   SENTRY_DSN: z.string().optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
-  EMAIL_FROM: z.string().email().optional(),
+  EMAIL_FROM: z.string().optional(),
   INNGEST_SERVE_URL: z.string().url().optional(),
 });
 
