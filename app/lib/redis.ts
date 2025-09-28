@@ -12,8 +12,8 @@ export async function getRedis() {
   // Lazy import so nothing runs at build time
   const { default: IORedis } = await import('ioredis');
 
-  const url = env.UPSTASH_REDIS_REST_URL;
-  const token = env.UPSTASH_REDIS_REST_TOKEN;
+  const url = env.UPSTASH_REDIS_REST_URL?.trim();
+  const token = env.UPSTASH_REDIS_REST_TOKEN?.trim();
   if (!url || !token) throw new Error('Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN');
 
   // For Upstash Redis, we need to use the REST API format
