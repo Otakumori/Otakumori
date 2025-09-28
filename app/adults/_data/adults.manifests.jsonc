@@ -1,0 +1,478 @@
+[
+  {
+    "slug": "midnight_set_A",
+    "title": "Midnight Set A",
+    "rarity": "legendary",
+    "type": "outfit",
+    "isAdultOnly": true,
+    "regionAllowlist": ["us", "ca", "eu", "jp"],
+    "pricePetals": 2500,
+    "priceUsdCents": 1999,
+    "physicsProfile": {
+      "id": "enhanced_physics",
+      "softBody": {
+        "enable": true,
+        "mass": 1.2,
+        "stiffness": 0.5,
+        "damping": 0.3,
+        "maxDisplacement": 0.08,
+        "collision": {
+          "pelvis": true,
+          "chest": true,
+          "spine": true,
+          "thighs": true
+        }
+      },
+      "clothSim": {
+        "enable": true,
+        "bendStiffness": 0.6,
+        "stretchStiffness": 0.7,
+        "damping": 0.25,
+        "wind": 0.3,
+        "colliders": ["hips", "chest", "thighL", "thighR"]
+      }
+    },
+    "interactions": [
+      {
+        "id": "pose:flair_A",
+        "kind": "pose",
+        "intensity": 0.7,
+        "gated": true
+      },
+      {
+        "id": "emote:wink_A",
+        "kind": "emote",
+        "intensity": 0.5,
+        "gated": false
+      },
+      {
+        "id": "camera:orbit_slow",
+        "kind": "camera",
+        "intensity": 0.3,
+        "gated": false
+      }
+    ],
+    "materials": {
+      "shader": "AnimeToon",
+      "params": {
+        "glossStrength": 0.8,
+        "rimStrength": 0.4,
+        "colorA": "#1a1a2e",
+        "colorB": "#16213e",
+        "rimColor": "#e94560"
+      }
+    },
+    "layers": ["outfit", "accessories"],
+    "assets": {
+      "albedo": "https://cdn.otaku-mori.com/adults/midnight_set_A_albedo.ktx2",
+      "normal": "https://cdn.otaku-mori.com/adults/midnight_set_A_normal.ktx2",
+      "orm": "https://cdn.otaku-mori.com/adults/midnight_set_A_orm.ktx2",
+      "mask": "https://cdn.otaku-mori.com/adults/midnight_set_A_mask.ktx2"
+    },
+    "sliders": [
+      {
+        "id": "outfit.tightness",
+        "label": "Outfit Tightness",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.5,
+        "affects": ["outfit_morph"]
+      },
+      {
+        "id": "outfit.hemLength",
+        "label": "Hem Length",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.3,
+        "affects": ["hem_morph"]
+      },
+      {
+        "id": "accessories.gloss",
+        "label": "Accessory Gloss",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.7,
+        "affects": ["accessory_shader"]
+      }
+    ]
+  },
+  {
+    "slug": "neo_street_fighter",
+    "title": "Neo Street Fighter",
+    "rarity": "rare",
+    "type": "outfit",
+    "isAdultOnly": true,
+    "regionAllowlist": ["us", "ca", "eu", "jp"],
+    "pricePetals": 1500,
+    "priceUsdCents": 1299,
+    "physicsProfile": {
+      "id": "standard_physics",
+      "softBody": {
+        "enable": false,
+        "mass": 1.0,
+        "stiffness": 0.4,
+        "damping": 0.2,
+        "maxDisplacement": 0.06,
+        "collision": {
+          "pelvis": true,
+          "chest": true,
+          "spine": false,
+          "thighs": true
+        }
+      },
+      "clothSim": {
+        "enable": false,
+        "bendStiffness": 0.5,
+        "stretchStiffness": 0.6,
+        "damping": 0.2,
+        "wind": 0.0,
+        "colliders": []
+      }
+    },
+    "interactions": [
+      {
+        "id": "pose:combat_ready",
+        "kind": "pose",
+        "intensity": 0.8,
+        "gated": false
+      },
+      {
+        "id": "emote:determined",
+        "kind": "emote",
+        "intensity": 0.6,
+        "gated": false
+      }
+    ],
+    "materials": {
+      "shader": "AnimeToon",
+      "params": {
+        "glossStrength": 0.4,
+        "rimStrength": 0.3,
+        "colorA": "#2c3e50",
+        "colorB": "#34495e",
+        "rimColor": "#3498db"
+      }
+    },
+    "layers": ["outfit"],
+    "assets": {
+      "albedo": "https://cdn.otaku-mori.com/adults/neo_street_fighter_albedo.ktx2",
+      "normal": "https://cdn.otaku-mori.com/adults/neo_street_fighter_normal.ktx2"
+    },
+    "sliders": [
+      {
+        "id": "outfit.muscleDefinition",
+        "label": "Muscle Definition",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.6,
+        "affects": ["muscle_morph"]
+      },
+      {
+        "id": "outfit.athleticFit",
+        "label": "Athletic Fit",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.8,
+        "affects": ["fit_morph"]
+      }
+    ]
+  },
+  {
+    "slug": "succubus_queen",
+    "title": "Succubus Queen",
+    "rarity": "legendary",
+    "type": "outfit",
+    "isAdultOnly": true,
+    "regionAllowlist": ["us", "ca", "eu", "jp"],
+    "pricePetals": 3000,
+    "priceUsdCents": 2499,
+    "physicsProfile": {
+      "id": "enhanced_physics",
+      "softBody": {
+        "enable": true,
+        "mass": 1.3,
+        "stiffness": 0.6,
+        "damping": 0.35,
+        "maxDisplacement": 0.1,
+        "collision": {
+          "pelvis": true,
+          "chest": true,
+          "spine": true,
+          "thighs": true
+        }
+      },
+      "clothSim": {
+        "enable": true,
+        "bendStiffness": 0.7,
+        "stretchStiffness": 0.8,
+        "damping": 0.3,
+        "wind": 0.5,
+        "colliders": ["hips", "chest", "thighL", "thighR", "wings"]
+      }
+    },
+    "interactions": [
+      {
+        "id": "pose:seductive_A",
+        "kind": "pose",
+        "intensity": 0.9,
+        "gated": true
+      },
+      {
+        "id": "emote:flirt_A",
+        "kind": "emote",
+        "intensity": 0.8,
+        "gated": true
+      },
+      {
+        "id": "fx:wing_flutter",
+        "kind": "fx",
+        "intensity": 0.6,
+        "gated": false
+      }
+    ],
+    "materials": {
+      "shader": "AnimeToon",
+      "params": {
+        "glossStrength": 0.9,
+        "rimStrength": 0.5,
+        "colorA": "#2d1b69",
+        "colorB": "#11998e",
+        "rimColor": "#ff6b9d"
+      }
+    },
+    "layers": ["outfit", "wings", "horns", "accessories"],
+    "assets": {
+      "albedo": "https://cdn.otaku-mori.com/adults/succubus_queen_albedo.ktx2",
+      "normal": "https://cdn.otaku-mori.com/adults/succubus_queen_normal.ktx2",
+      "orm": "https://cdn.otaku-mori.com/adults/succubus_queen_orm.ktx2",
+      "mask": "https://cdn.otaku-mori.com/adults/succubus_queen_mask.ktx2",
+      "decals": "https://cdn.otaku-mori.com/adults/succubus_queen_decals.ktx2"
+    },
+    "sliders": [
+      {
+        "id": "outfit.seductiveness",
+        "label": "Seductiveness",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.7,
+        "affects": ["pose_morph", "outfit_morph"]
+      },
+      {
+        "id": "wings.size",
+        "label": "Wing Size",
+        "min": 0.5,
+        "max": 1.5,
+        "step": 0.01,
+        "default": 1.0,
+        "affects": ["wing_morph"]
+      },
+      {
+        "id": "horns.style",
+        "label": "Horn Style",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.5,
+        "affects": ["horn_morph"]
+      }
+    ]
+  },
+  {
+    "slug": "sakura_storm",
+    "title": "Sakura Storm",
+    "rarity": "rare",
+    "type": "outfit",
+    "isAdultOnly": true,
+    "regionAllowlist": ["us", "ca", "eu", "jp"],
+    "pricePetals": 1800,
+    "priceUsdCents": 1499,
+    "physicsProfile": {
+      "id": "cloth_focused",
+      "softBody": {
+        "enable": false,
+        "mass": 1.0,
+        "stiffness": 0.4,
+        "damping": 0.2,
+        "maxDisplacement": 0.06,
+        "collision": {
+          "pelvis": true,
+          "chest": true,
+          "spine": false,
+          "thighs": true
+        }
+      },
+      "clothSim": {
+        "enable": true,
+        "bendStiffness": 0.4,
+        "stretchStiffness": 0.5,
+        "damping": 0.15,
+        "wind": 0.8,
+        "colliders": ["hips", "chest", "thighL", "thighR"]
+      }
+    },
+    "interactions": [
+      {
+        "id": "pose:graceful_A",
+        "kind": "pose",
+        "intensity": 0.6,
+        "gated": false
+      },
+      {
+        "id": "emote:serene_A",
+        "kind": "emote",
+        "intensity": 0.4,
+        "gated": false
+      },
+      {
+        "id": "fx:petal_dance",
+        "kind": "fx",
+        "intensity": 0.7,
+        "gated": false
+      }
+    ],
+    "materials": {
+      "shader": "AnimeToon",
+      "params": {
+        "glossStrength": 0.3,
+        "rimStrength": 0.2,
+        "colorA": "#ff9a9e",
+        "colorB": "#fecfef",
+        "rimColor": "#ff6b9d"
+      }
+    },
+    "layers": ["outfit", "accessories"],
+    "assets": {
+      "albedo": "https://cdn.otaku-mori.com/adults/sakura_storm_albedo.ktx2",
+      "normal": "https://cdn.otaku-mori.com/adults/sakura_storm_normal.ktx2",
+      "orm": "https://cdn.otaku-mori.com/adults/sakura_storm_orm.ktx2"
+    },
+    "sliders": [
+      {
+        "id": "outfit.flow",
+        "label": "Flow",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.6,
+        "affects": ["flow_morph"]
+      },
+      {
+        "id": "outfit.transparency",
+        "label": "Transparency",
+        "min": 0,
+        "max": 0.5,
+        "step": 0.01,
+        "default": 0.1,
+        "affects": ["transparency_shader"]
+      },
+      {
+        "id": "accessories.petal_density",
+        "label": "Petal Density",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.7,
+        "affects": ["petal_fx"]
+      }
+    ]
+  },
+  {
+    "slug": "nocturne_rider",
+    "title": "Nocturne Rider",
+    "rarity": "rare",
+    "type": "outfit",
+    "isAdultOnly": true,
+    "regionAllowlist": ["us", "ca", "eu", "jp"],
+    "pricePetals": 1600,
+    "priceUsdCents": 1399,
+    "physicsProfile": {
+      "id": "standard_physics",
+      "softBody": {
+        "enable": false,
+        "mass": 1.0,
+        "stiffness": 0.4,
+        "damping": 0.2,
+        "maxDisplacement": 0.06,
+        "collision": {
+          "pelvis": true,
+          "chest": true,
+          "spine": false,
+          "thighs": true
+        }
+      },
+      "clothSim": {
+        "enable": false,
+        "bendStiffness": 0.5,
+        "stretchStiffness": 0.6,
+        "damping": 0.2,
+        "wind": 0.0,
+        "colliders": []
+      }
+    },
+    "interactions": [
+      {
+        "id": "pose:confident_A",
+        "kind": "pose",
+        "intensity": 0.7,
+        "gated": false
+      },
+      {
+        "id": "emote:smirk_A",
+        "kind": "emote",
+        "intensity": 0.5,
+        "gated": false
+      }
+    ],
+    "materials": {
+      "shader": "AnimeToon",
+      "params": {
+        "glossStrength": 0.7,
+        "rimStrength": 0.4,
+        "colorA": "#1a1a2e",
+        "colorB": "#16213e",
+        "rimColor": "#0f3460"
+      }
+    },
+    "layers": ["outfit", "accessories"],
+    "assets": {
+      "albedo": "https://cdn.otaku-mori.com/adults/nocturne_rider_albedo.ktx2",
+      "normal": "https://cdn.otaku-mori.com/adults/nocturne_rider_normal.ktx2",
+      "orm": "https://cdn.otaku-mori.com/adults/nocturne_rider_orm.ktx2"
+    },
+    "sliders": [
+      {
+        "id": "outfit.leather_shine",
+        "label": "Leather Shine",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.8,
+        "affects": ["leather_shader"]
+      },
+      {
+        "id": "outfit.fit",
+        "label": "Fit",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.7,
+        "affects": ["fit_morph"]
+      },
+      {
+        "id": "accessories.metal_luster",
+        "label": "Metal Luster",
+        "min": 0,
+        "max": 1,
+        "step": 0.01,
+        "default": 0.9,
+        "affects": ["metal_shader"]
+      }
+    ]
+  }
+]

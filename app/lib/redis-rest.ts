@@ -10,7 +10,9 @@ export const redis = {
     if (opts?.nx) url.searchParams.set('nx', 'true');
     if (opts?.ex) url.searchParams.set('ex', String(opts.ex));
     const r = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '')}` },
+      headers: {
+        Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '')}`,
+      },
     });
     const j = await r.json();
     return j?.result; // "OK" or null
@@ -21,7 +23,9 @@ export const redis = {
     if (!baseUrl) throw new Error('Missing UPSTASH_REDIS_REST_URL');
 
     const r = await fetch(`${baseUrl}/get/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '')}` },
+      headers: {
+        Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '')}`,
+      },
     });
     const j = await r.json();
     return j?.result as string | null;

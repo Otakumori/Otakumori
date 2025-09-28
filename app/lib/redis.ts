@@ -15,9 +15,11 @@ export async function getRedis() {
   // Properly handle environment variables with potential newlines/whitespace
   const url = env.UPSTASH_REDIS_REST_URL?.trim().replace(/\r?\n/g, '');
   const token = env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '');
-  
+
   if (!url || !token) {
-    console.warn('Redis not configured - UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN missing');
+    console.warn(
+      'Redis not configured - UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN missing',
+    );
     throw new Error('Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN');
   }
 

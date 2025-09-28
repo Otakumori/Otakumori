@@ -113,6 +113,21 @@ try {
       FEATURE_FLAG_API_KEY: z.string().optional(),
       FEATURE_FLAG_BASE_URL: z.string().url().optional(),
       FEATURE_EASYPOST: z.string().optional(),
+      // Adult Zone Feature Flags
+      FEATURE_ADULT_ZONE: z.string().optional(),
+      FEATURE_GATED_COSMETICS: z.string().optional(),
+      FEATURE_AVATARS: z.string().optional(),
+      FEATURE_AVATAR_STYLIZED_SHADERS: z.string().optional(),
+      // Storage/CDN
+      CLOUDINARY_CLOUD_NAME: z.string().optional(),
+      CLOUDINARY_API_KEY: z.string().optional(),
+      CLOUDINARY_API_SECRET: z.string().optional(),
+      S3_ACCESS_KEY_ID: z.string().optional(),
+      S3_SECRET_ACCESS_KEY: z.string().optional(),
+      S3_BUCKET: z.string().optional(),
+      S3_REGION: z.string().optional(),
+      // Gated Content
+      ADULTS_STORAGE_INDEX_URL: z.string().url().optional(),
     },
     client: {
       NEXT_PUBLIC_APP_URL: z.string().url(),
