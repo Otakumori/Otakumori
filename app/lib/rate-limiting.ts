@@ -1,12 +1,5 @@
 import { type NextRequest } from 'next/server';
-import { Redis } from '@upstash/redis';
-import { env } from '../../env.mjs';
-
-// Initialize Redis client
-const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
-});
+import { redis } from './redis';
 
 export interface RateLimitConfig {
   windowMs: number;

@@ -46,7 +46,7 @@ export async function GET() {
   // Stripe
   const stripeStart = performance.now();
   try {
-    const stripe = new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY, { apiVersion: '2024-06-20' });
     await stripe.prices.list({ limit: 1 });
     checks.stripe = { ok: true, ms: ms(stripeStart) };
   } catch (e: any) {
@@ -64,14 +64,11 @@ export async function GET() {
     checks.printify = { ok: false, ms: ms(printifyStart), error: e?.message };
   }
 
-  // Redis (Upstash REST)
+  // Redis (ioredis)
   const redisStart = performance.now();
   try {
-    const res = await fetch(`${env.UPSTASH_REDIS_REST_URL}/GET/otakumori_healthcheck`, {
-      headers: { Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN}` },
-      cache: 'no-store',
-    });
-    if (!res.ok) throw new Error(`status ${res.status}`);
+    const { redis } = await import('@/lib/redis');
+    await redis.get('otakumori_healthcheck');
     checks.redis = { ok: true, ms: ms(redisStart) };
   } catch (e: any) {
     checks.redis = { ok: false, ms: ms(redisStart), error: e?.message };

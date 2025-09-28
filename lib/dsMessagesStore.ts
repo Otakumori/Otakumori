@@ -1,4 +1,4 @@
-import { redis } from '@/lib/redis';
+import { getRedis } from '@/app/lib/redis';
 import { DSMessage } from '@/lib/z';
 import { randomUUID } from 'crypto';
 
@@ -6,17 +6,22 @@ const mem = new Map<string, DSMessage[]>();
 const key = (slug: string) => `dsmsg:${slug}`;
 
 export async function listDSMessages(slug: string) {
-  if (!redis) return mem.get(slug) ?? [];
-  const raw = await redis.get<string>(key(slug));
-  return raw ? (JSON.parse(raw) as DSMessage[]) : [];
+  try {
+    const redis = await getRedis();
+    const raw = await redis.get(key(slug));
+    return raw ? (JSON.parse(raw) as DSMessage[]) : [];
+  } catch {
+    return mem.get(slug) ?? [];
+  }
 }
 
 async function save(slug: string, arr: DSMessage[]) {
-  if (!redis) {
+  try {
+    const redis = await getRedis();
+    await redis.set(key(slug), JSON.stringify(arr), 'EX', 86400);
+  } catch {
     mem.set(slug, arr);
-    return;
   }
-  await redis.setex(key(slug), 86400, JSON.stringify(arr));
 }
 
 export async function addDSMessage(slug: string, phrase: string, userId: string | null) {

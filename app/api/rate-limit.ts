@@ -1,4 +1,4 @@
-import { redis } from '@/lib/redis';
+import { getRedis } from '../lib/redis';
 import { type NextRequest, NextResponse } from 'next/server';
 
 interface RateLimitConfig {
@@ -19,28 +19,26 @@ export async function rateLimit(
   const now = Date.now();
   const windowKey = `${config.keyPrefix}:${key}`;
 
-  if (redis) {
+  try {
+    const redis = await getRedis();
     // Redis-based rate limiting
-    try {
-      const current = await redis.get<number>(windowKey);
-      if (current && current >= config.maxRequests) {
-        return { limited: true, remaining: 0, resetTime: now + config.windowMs };
-      }
-
-      const multi = redis.pipeline();
-      multi.incr(windowKey);
-      multi.expire(windowKey, Math.ceil(config.windowMs / 1000));
-      const results = await multi.exec();
-      const count = results[0] as number;
-
-      return {
-        limited: false,
-        remaining: Math.max(0, config.maxRequests - count),
-        resetTime: now + config.windowMs,
-      };
-    } catch (error) {
-      console.warn('Redis rate limit failed, falling back to memory:', error);
+    const current = await redis.get(windowKey);
+    if (current && parseInt(current) >= config.maxRequests) {
+      return { limited: true, remaining: 0, resetTime: now + config.windowMs };
     }
+
+    const count = await redis.incr(windowKey);
+    if (count === 1) {
+      await redis.expire(windowKey, Math.ceil(config.windowMs / 1000));
+    }
+
+    return {
+      limited: false,
+      remaining: Math.max(0, config.maxRequests - count),
+      resetTime: now + config.windowMs,
+    };
+  } catch (error) {
+    console.warn('Redis rate limit failed, falling back to memory:', error);
   }
 
   // In-memory fallback

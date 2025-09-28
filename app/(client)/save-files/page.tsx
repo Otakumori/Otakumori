@@ -2,13 +2,12 @@
 'use client';
 
 import { useState } from 'react';
-import Header from '@/components/Header';
+// Header removed - using global navbar from layout
 import SaveFiles from '@/components/SaveFiles';
 
 export default function SaveFilesPage() {
   return (
     <main className="min-h-screen bg-pink-50">
-      <Header />
       <div className="mx-auto max-w-7xl px-4 py-8">
         <h1 className="mb-8 text-3xl font-bold text-pink-900">
           {

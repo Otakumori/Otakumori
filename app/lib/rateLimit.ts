@@ -49,34 +49,24 @@ class RateLimiter {
     const redisKey = `rate_limit:${key}:${windowStart}`;
 
     try {
-      const [count, ttl] = await Promise.all([redis.get(redisKey), redis.ttl(redisKey)]);
+      // Atomic rate limiting: INCR + first-hit EXPIRE
+      const windowTtl = Math.ceil(config.windowMs / 1000);
+      const currentCount = await redis.incr(redisKey);
 
-      const currentCount = parseInt(count as string) || 0;
-      const remaining = Math.max(0, config.maxRequests - currentCount);
-      const reset = windowStart + config.windowMs;
-
-      if (currentCount >= config.maxRequests) {
-        return {
-          success: false,
-          limit: config.maxRequests,
-          remaining: 0,
-          reset,
-          retryAfter: Math.ceil((reset - Date.now()) / 1000),
-        };
+      // Set TTL only on first increment (when count becomes 1)
+      if (currentCount === 1) {
+        await redis.expire(redisKey, windowTtl);
       }
 
-      // Increment counter
-      await redis
-        .multi()
-        .incr(redisKey)
-        .expire(redisKey, Math.ceil(config.windowMs / 1000))
-        .exec();
+      const reset = windowStart + config.windowMs;
+      const overLimit = currentCount > config.maxRequests;
 
       return {
-        success: true,
+        success: !overLimit,
         limit: config.maxRequests,
-        remaining: remaining - 1,
+        remaining: Math.max(0, config.maxRequests - currentCount),
         reset,
+        retryAfter: overLimit ? Math.ceil((reset - Date.now()) / 1000) : 0,
       };
     } catch (error) {
       console.error('Redis rate limiting error:', error);

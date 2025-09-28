@@ -40,7 +40,7 @@ export async function checkHealth(): Promise<Result<HealthStatus>> {
 
       const missingEnvs = requiredEnvs.filter((envVar) => {
         const value = env[envVar as keyof typeof env];
-        return !value || value.trim() === '';
+        return !value || (typeof value === 'string' && value.trim() === '');
       });
 
       const hasRequiredEnvs = missingEnvs.length === 0;

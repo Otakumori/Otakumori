@@ -1,23 +1,23 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { createRateLimitMiddleware } from '@/app/api/rate-limit';
+// import { createRateLimitMiddleware } from '@/app/api/rate-limit';
 import { log } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
 
 // Rate limit: 10 requests per minute for flag operations
-const rateLimitMiddleware = createRateLimitMiddleware({
-  windowMs: 60 * 1000, // 1 minute
-  maxRequests: 10,
-  keyPrefix: 'admin_flags',
-});
+// const rateLimitMiddleware = createRateLimitMiddleware({
+//   windowMs: 60 * 1000, // 1 minute
+//   maxRequests: 10,
+//   keyPrefix: 'admin_flags',
+// });
 
 export async function GET(req: NextRequest) {
-  // Rate limiting
-  const rateLimitResult = await rateLimitMiddleware(req);
-  if (rateLimitResult) return rateLimitResult;
+  // Rate limiting - temporarily disabled
+  // const rateLimitResult = await rateLimitMiddleware(req);
+  // if (rateLimitResult) return rateLimitResult;
 
   try {
     const { userId } = await auth();
@@ -74,9 +74,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  // Rate limiting
-  const rateLimitResult = await rateLimitMiddleware(req);
-  if (rateLimitResult) return rateLimitResult;
+  // Rate limiting - temporarily disabled
+  // const rateLimitResult = await rateLimitMiddleware(req);
+  // if (rateLimitResult) return rateLimitResult;
 
   try {
     const { userId } = await auth();

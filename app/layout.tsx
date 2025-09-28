@@ -1,3 +1,4 @@
+import 'server-only';
 import './globals.css';
 import type { Metadata } from 'next';
 import Footer from './components/Footer';
@@ -62,7 +63,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <div className="text-center p-8">
                   <h1 className="text-2xl font-bold text-pink-400 mb-4">Something went wrong</h1>
                   <p className="text-zinc-300">
-                    We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
+                    We&apos;re sorry, but something unexpected happened. Please try refreshing the
+                    page.
                   </p>
                 </div>
               </div>

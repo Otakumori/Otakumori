@@ -44,9 +44,47 @@ try {
       NODE_OPTIONS: z.string().optional(),
       RESEND_API_KEY: z.string(),
       EMAIL_FROM: z.string().email().optional(),
+      // Stripe
+      STRIPE_SECRET_KEY: z.string(),
+      STRIPE_WEBHOOK_SECRET: z.string(),
+      // EasyPost
+      EASYPOST_API_KEY: z.string().optional(),
+      EASYPOST_WEBHOOK_SECRET: z.string().optional(),
+      DEFAULT_SHIP_FROM_NAME: z.string().optional(),
+      DEFAULT_SHIP_FROM_STREET: z.string().optional(),
+      DEFAULT_SHIP_FROM_CITY: z.string().optional(),
+      DEFAULT_SHIP_FROM_STATE: z.string().optional(),
+      DEFAULT_SHIP_FROM_ZIP: z.string().optional(),
+      DEFAULT_SHIP_FROM_COUNTRY: z.string().optional(),
+      // Sanity
+      SANITY_PROJECT_ID: z.string().optional(),
+      SANITY_DATASET: z.string().optional(),
+      SANITY_API_READ_TOKEN: z.string().optional(),
+      SANITY_WEBHOOK_SECRET: z.string().optional(),
+      // Algolia
+      NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().optional(),
+      ALGOLIA_ADMIN_API_KEY: z.string().optional(),
+      ALGOLIA_INDEX_BLOG: z.string().optional(),
+      ALGOLIA_INDEX_GAMES: z.string().optional(),
+      ALGOLIA_INDEX_PAGES: z.string().optional(),
+      // Redis / Rate-limits / Idempotency
+      IDEMPOTENCY_TTL_SECONDS: z.coerce.number().default(86400),
+      PETALS_DAILY_CAP: z.coerce.number().default(500),
+      RATE_LIMIT_COLLECT_PER_MINUTE: z.coerce.number().default(30),
+      RATE_LIMIT_SUBMIT_PER_MINUTE: z.coerce.number().default(10),
+      // Game/Economy security
+      GAME_HMAC_SECRET: z.string().min(32),
+      // Analytics/Observability (optional)
+      NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+      NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
+      SENTRY_DSN: z.string().url().optional(),
+      // Anti-bot (Cloudflare Turnstile) – optional
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
+      TURNSTILE_SECRET_KEY: z.string().optional(),
       INNGEST_SERVE_URL: z.string().url().optional(),
       BASE_URL: z.string().url().optional(),
       SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+      OTEL_SDK_DISABLED: z.string().optional(),
       // Google OAuth
       GOOGLE_CLIENT_ID: z.string().optional(),
       GOOGLE_CLIENT_SECRET: z.string().optional(),
@@ -74,6 +112,7 @@ try {
         .default('local'),
       FEATURE_FLAG_API_KEY: z.string().optional(),
       FEATURE_FLAG_BASE_URL: z.string().url().optional(),
+      FEATURE_EASYPOST: z.string().optional(),
     },
     client: {
       NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -98,6 +137,13 @@ try {
       NEXT_PUBLIC_CLERK_IS_SATELLITE: z.string().optional(),
       // Stripe
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string(),
+      // Algolia (site-wide search only, not catalog)
+      NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().optional(),
+      // Analytics/Observability (optional)
+      NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+      NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
+      // Anti-bot (Cloudflare Turnstile) – optional
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
       // Stack
       NEXT_PUBLIC_STACK_PROJECT_ID: z.string().optional(),
       NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: z.string().optional(),
@@ -124,6 +170,9 @@ try {
       NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().default('on'),
       // Sentry
       NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+      SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
+      SENTRY_UPLOAD_SOURCE_MAPS: z.string().optional(),
+      SENTRY_IGNORE_API_RESOLUTION_ERROR: z.string().optional(),
       // Vercel Environment
       NEXT_PUBLIC_VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
       // App Version
@@ -176,6 +225,42 @@ try {
       PETAL_SALT: process.env.PETAL_SALT,
       RESEND_API_KEY: process.env.RESEND_API_KEY,
       EMAIL_FROM: process.env.EMAIL_FROM,
+      // Stripe
+      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+      // EasyPost
+      EASYPOST_API_KEY: process.env.EASYPOST_API_KEY,
+      EASYPOST_WEBHOOK_SECRET: process.env.EASYPOST_WEBHOOK_SECRET,
+      DEFAULT_SHIP_FROM_NAME: process.env.DEFAULT_SHIP_FROM_NAME,
+      DEFAULT_SHIP_FROM_STREET: process.env.DEFAULT_SHIP_FROM_STREET,
+      DEFAULT_SHIP_FROM_CITY: process.env.DEFAULT_SHIP_FROM_CITY,
+      DEFAULT_SHIP_FROM_STATE: process.env.DEFAULT_SHIP_FROM_STATE,
+      DEFAULT_SHIP_FROM_ZIP: process.env.DEFAULT_SHIP_FROM_ZIP,
+      DEFAULT_SHIP_FROM_COUNTRY: process.env.DEFAULT_SHIP_FROM_COUNTRY,
+      // Sanity
+      SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
+      SANITY_DATASET: process.env.SANITY_DATASET,
+      SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN,
+      SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET,
+      // Algolia
+      ALGOLIA_ADMIN_API_KEY: process.env.ALGOLIA_ADMIN_API_KEY,
+      ALGOLIA_INDEX_BLOG: process.env.ALGOLIA_INDEX_BLOG,
+      ALGOLIA_INDEX_GAMES: process.env.ALGOLIA_INDEX_GAMES,
+      ALGOLIA_INDEX_PAGES: process.env.ALGOLIA_INDEX_PAGES,
+      // Redis / Rate-limits / Idempotency
+      IDEMPOTENCY_TTL_SECONDS: process.env.IDEMPOTENCY_TTL_SECONDS,
+      PETALS_DAILY_CAP: process.env.PETALS_DAILY_CAP,
+      RATE_LIMIT_COLLECT_PER_MINUTE: process.env.RATE_LIMIT_COLLECT_PER_MINUTE,
+      RATE_LIMIT_SUBMIT_PER_MINUTE: process.env.RATE_LIMIT_SUBMIT_PER_MINUTE,
+      // Game/Economy security
+      GAME_HMAC_SECRET: process.env.GAME_HMAC_SECRET,
+      // Analytics/Observability (optional)
+      NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+      NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      SENTRY_DSN: process.env.SENTRY_DSN,
+      // Anti-bot (Cloudflare Turnstile) – optional
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+      TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
       INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
       BASE_URL: process.env.BASE_URL,
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -199,6 +284,7 @@ try {
       PRISMA_ACCELERATE_API_KEY: process.env.PRISMA_ACCELERATE_API_KEY,
       // Misc
       DEBUG_MODE: process.env.DEBUG_MODE,
+      FEATURE_EASYPOST: process.env.FEATURE_EASYPOST,
       VERCEL: process.env.VERCEL,
       VERCEL_URL: process.env.VERCEL_URL,
       AUTHORIZED_PARTIES: process.env.AUTHORIZED_PARTIES,
@@ -227,6 +313,13 @@ try {
       NEXT_PUBLIC_CLERK_IS_SATELLITE: process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE,
       // Stripe
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+      // Algolia
+      NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
+      // Analytics/Observability (optional)
+      NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+      NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      // Anti-bot (Cloudflare Turnstile) – optional
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
       // Stack
       NEXT_PUBLIC_STACK_PROJECT_ID: process.env.NEXT_PUBLIC_STACK_PROJECT_ID,
       NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY:
@@ -307,6 +400,48 @@ try {
     RESEND_API_KEY: process.env.RESEND_API_KEY || '',
     EMAIL_FROM: process.env.EMAIL_FROM || '',
 
+    // Stripe
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
+
+    // EasyPost
+    EASYPOST_API_KEY: process.env.EASYPOST_API_KEY || '',
+    EASYPOST_WEBHOOK_SECRET: process.env.EASYPOST_WEBHOOK_SECRET || '',
+    DEFAULT_SHIP_FROM_NAME: process.env.DEFAULT_SHIP_FROM_NAME || '',
+    DEFAULT_SHIP_FROM_STREET: process.env.DEFAULT_SHIP_FROM_STREET || '',
+    DEFAULT_SHIP_FROM_CITY: process.env.DEFAULT_SHIP_FROM_CITY || '',
+    DEFAULT_SHIP_FROM_STATE: process.env.DEFAULT_SHIP_FROM_STATE || '',
+    DEFAULT_SHIP_FROM_ZIP: process.env.DEFAULT_SHIP_FROM_ZIP || '',
+    DEFAULT_SHIP_FROM_COUNTRY: process.env.DEFAULT_SHIP_FROM_COUNTRY || '',
+
+    // Sanity
+    SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID || '',
+    SANITY_DATASET: process.env.SANITY_DATASET || '',
+    SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN || '',
+    SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET || '',
+
+    // Algolia
+    ALGOLIA_ADMIN_API_KEY: process.env.ALGOLIA_ADMIN_API_KEY || '',
+    ALGOLIA_INDEX_BLOG: process.env.ALGOLIA_INDEX_BLOG || '',
+    ALGOLIA_INDEX_GAMES: process.env.ALGOLIA_INDEX_GAMES || '',
+    ALGOLIA_INDEX_PAGES: process.env.ALGOLIA_INDEX_PAGES || '',
+
+    // Redis / Rate-limits / Idempotency
+    IDEMPOTENCY_TTL_SECONDS: process.env.IDEMPOTENCY_TTL_SECONDS || 86400,
+    PETALS_DAILY_CAP: process.env.PETALS_DAILY_CAP || 500,
+    RATE_LIMIT_COLLECT_PER_MINUTE: process.env.RATE_LIMIT_COLLECT_PER_MINUTE || 30,
+    RATE_LIMIT_SUBMIT_PER_MINUTE: process.env.RATE_LIMIT_SUBMIT_PER_MINUTE || 10,
+    // Game/Economy security
+    GAME_HMAC_SECRET: process.env.GAME_HMAC_SECRET || '',
+    // Analytics/Observability (optional)
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || '',
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
+    SENTRY_DSN: process.env.SENTRY_DSN || '',
+    // Anti-bot (Cloudflare Turnstile) – optional
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
+    TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY || '',
+    FEATURE_EASYPOST: process.env.FEATURE_EASYPOST || '',
+
     // Supabase
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
 
@@ -329,6 +464,10 @@ try {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+    NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || '',
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || '',
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
     NEXT_PUBLIC_FEATURE_GA_ENABLED: process.env.NEXT_PUBLIC_FEATURE_GA_ENABLED || 'false',
     NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '',
     NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500',

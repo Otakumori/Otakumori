@@ -1,70 +1,62 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-export const dynamic = 'force-dynamic';
-
 import { type NextRequest, NextResponse } from 'next/server';
-import { checkPrintifyHealth } from '@/lib/api/printify';
 import { env } from '@/env.mjs';
+
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
-    // Check environment variables
-    const envCheck = {
-      PRINTIFY_API_KEY: env.PRINTIFY_API_KEY ? '✅ Set' : '❌ Missing',
-      PRINTIFY_SHOP_ID: env.PRINTIFY_SHOP_ID ? '✅ Set' : '❌ Missing',
-      NODE_ENV: env.NODE_ENV || 'Not set',
-      VERCEL_ENV: env.VERCEL_ENVIRONMENT || 'Not set',
-    };
+    // Check if environment variables are loaded
+    const printifyApiKey = env.PRINTIFY_API_KEY;
+    const printifyApiUrl = env.PRINTIFY_API_URL;
+    const printifyShopId = env.PRINTIFY_SHOP_ID;
 
-    // Check Printify API health
-    const health = await checkPrintifyHealth();
+    // Don't expose the full API key, just show if it exists and first few characters
+    const maskedApiKey = printifyApiKey ? `${printifyApiKey.substring(0, 20)}...` : 'NOT_FOUND';
 
-    // Test direct API call
-    let directTest = null;
-    try {
-      const response = await fetch(
-        `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json?page=1&limit=1`,
-        {
-          headers: {
-            Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-          },
-          cache: 'no-store',
+    return NextResponse.json({
+      ok: true,
+      debug: {
+        PRINTIFY_API_KEY: maskedApiKey,
+        PRINTIFY_API_KEY_LENGTH: printifyApiKey?.length || 0,
+        PRINTIFY_API_URL: printifyApiUrl || 'NOT_FOUND',
+        PRINTIFY_SHOP_ID: printifyShopId || 'NOT_FOUND',
+        NODE_ENV: env.NODE_ENV,
+        // Test the actual API call
+        testApiCall: await testPrintifyApi(),
+      },
+    });
+  } catch (error: any) {
+    return NextResponse.json({
+      ok: false,
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+}
+
+async function testPrintifyApi() {
+  try {
+    const res = await fetch(
+      `${env.PRINTIFY_API_URL}shops/${env.PRINTIFY_SHOP_ID}/products.json?page=1&per_page=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+          'Content-Type': 'application/json',
+          'User-Agent': 'Otaku-mori/1.0.0 (Node.js)',
         },
-      );
-
-      directTest = {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: Object.fromEntries(response.headers.entries()),
-      };
-    } catch (error) {
-      directTest = {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
-
-    return NextResponse.json(
-      {
-        timestamp: new Date().toISOString(),
-        environment: envCheck,
-        health: health,
-        directTest: directTest,
-        recommendations: [
-          'Check if PRINTIFY_API_KEY and PRINTIFY_SHOP_ID are set in Vercel environment variables',
-          'Verify the API key has proper permissions',
-          'Check if the shop ID is correct',
-          'Ensure the API key is not expired',
-        ],
+        cache: 'no-store',
       },
-      { status: 200 },
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'An unexpected error occurred',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 },
-    );
+
+    return {
+      status: res.status,
+      statusText: res.statusText,
+      headers: Object.fromEntries(res.headers.entries()),
+      body: res.ok ? await res.text() : await res.text(),
+    };
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
   }
 }

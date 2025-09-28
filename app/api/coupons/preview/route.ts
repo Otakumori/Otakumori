@@ -3,7 +3,7 @@ import { logger } from '@/app/lib/logger';
 import { prisma } from '@/app/lib/prisma';
 import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
 import { problem } from '@/lib/http/problem';
-import { redis } from '@/lib/redis';
+import { getRedis } from '../../../lib/redis';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 
@@ -55,11 +55,11 @@ export async function POST(req: NextRequest) {
     for (const code of codes) {
       const cacheKey = `coupon:meta:${code}`;
       let cached: any = null;
-      if (redis) {
-        try {
-          cached = await redis.get(cacheKey);
-        } catch {}
-      }
+      try {
+        const redisClient = await getRedis();
+        const cachedStr = await redisClient.get(cacheKey);
+        cached = cachedStr ? JSON.parse(cachedStr) : null;
+      } catch {}
       if (cached && cached.code) {
         metas.push({
           code: cached.code,
@@ -103,35 +103,35 @@ export async function POST(req: NextRequest) {
         oneTimeCode: row.oneTimeCode,
       };
       metas.push(meta);
-      if (redis) {
-        try {
-          await redis.set(
-            cacheKey,
-            {
-              id: row.id,
-              code: row.code,
-              type: row.type,
-              value: row.valueCents,
-              valueCents: meta.valueCents ?? null,
-              valuePct: meta.valuePct ?? null,
-              enabled: row.enabled,
-              startsAt: row.startsAt?.toISOString() ?? null,
-              endsAt: row.endsAt?.toISOString() ?? null,
-              maxRedemptions: row.maxRedemptions,
-              maxRedemptionsPerUser: row.maxRedemptionsPerUser,
-              minSubtotal: row.minSubtotalCents,
-              minSubtotalCents: row.minSubtotalCents,
-              allowedProductIds: row.allowedProductIds,
-              excludedProductIds: row.excludedProductIds,
-              allowedCollections: row.allowedCollections,
-              excludedCollections: row.excludedCollections,
-              stackable: row.stackable,
-              oneTimeCode: row.oneTimeCode,
-            },
-            { ex: 60 },
-          );
-        } catch {}
-      }
+      try {
+        const redisClient = await getRedis();
+        await redisClient.set(
+          cacheKey,
+          JSON.stringify({
+            id: row.id,
+            code: row.code,
+            type: row.type,
+            value: row.valueCents,
+            valueCents: meta.valueCents ?? null,
+            valuePct: meta.valuePct ?? null,
+            enabled: row.enabled,
+            startsAt: row.startsAt?.toISOString() ?? null,
+            endsAt: row.endsAt?.toISOString() ?? null,
+            maxRedemptions: row.maxRedemptions,
+            maxRedemptionsPerUser: row.maxRedemptionsPerUser,
+            minSubtotal: row.minSubtotalCents,
+            minSubtotalCents: row.minSubtotalCents,
+            allowedProductIds: row.allowedProductIds,
+            excludedProductIds: row.excludedProductIds,
+            allowedCollections: row.allowedCollections,
+            excludedCollections: row.excludedCollections,
+            stackable: row.stackable,
+            oneTimeCode: row.oneTimeCode,
+          }),
+          'EX',
+          60,
+        );
+      } catch {}
     }
 
     // Compute usage tallies for caps

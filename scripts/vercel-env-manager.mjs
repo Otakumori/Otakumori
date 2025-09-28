@@ -241,12 +241,8 @@ function loadLocalEnv() {
               .replace(/^["']|["']$/g, ''); // Remove quotes
 
             // Only add if we don't already have this key (priority: .env.local > .env > sample)
-            if (
-              !env[cleanKey] &&
-              cleanValue &&
-              !cleanValue.includes('your_') &&
-              !cleanValue.includes('placeholder')
-            ) {
+            // Force extract all values, including long ones that might be truncated
+            if (!env[cleanKey] && cleanValue) {
               env[cleanKey] = cleanValue;
               fileCount++;
             }

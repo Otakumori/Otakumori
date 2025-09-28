@@ -7,11 +7,6 @@
  *
  * Usage: VERCEL_TOKEN=xxx node scripts/audit-vercel-env.ts
  * Or: VERCEL_TOKEN=xxx PROJECT_NAME=otakumori node scripts/audit-vercel-env.ts
- */
-
-import { execSync } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
 
 // Required environment variables by category
 const REQUIRED_SERVER = [
@@ -23,14 +18,14 @@ const REQUIRED_SERVER = [
   'PRINTIFY_SHOP_ID',
   'STRIPE_SECRET_KEY',
   'STRIPE_WEBHOOK_SECRET',
-];
+] as const;
 
 const REQUIRED_CLIENT = [
   'NEXT_PUBLIC_SITE_URL',
   'NEXT_PUBLIC_APP_URL',
   'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
   'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
-];
+] as const;
 
 const RECOMMENDED = [
   'NEXT_PUBLIC_CANONICAL_ORIGIN',
@@ -39,7 +34,10 @@ const RECOMMENDED = [
   'UPSTASH_REDIS_REST_URL',
   'UPSTASH_REDIS_REST_TOKEN',
   'BLOB_READ_WRITE_TOKEN',
-];
+] as const;
+
+type RequiredServer = typeof REQUIRED_SERVER[number];
+type RequiredClient = typeof REQUIRED_CLIENT[number];
 
 interface VercelEnvVar {
   type: string;
@@ -53,27 +51,48 @@ interface VercelEnvVar {
   createdAt: number;
 }
 
+interface SuspiciousEntry {
+  key: string;
+  value: string;
+  reason: string;
+}
+
 interface EnvAuditResult {
   missing: string[];
   empty: string[];
-  suspicious: { key: string; value: string; reason: string }[];
+  suspicious: SuspiciousEntry[];
   present: string[];
 }
 
-interface LocalEnv {
-  [key: string]: string;
+type LocalEnv = Record<string, string>;
+
+interface LocalComparison {
+  localOnly: string[];
+  vercelOnly: string[];
+  different: { key: string; local: string; vercel: string }[];
 }
 
 // Utility functions
+import { join } from 'path';
+import { existsSync, readFileSync } from 'fs';
+import { execSync } from 'child_process';
+
 function runVercelCommand(command: string): string {
   try {
     const projectFlag = process.env.PROJECT_NAME ? `--project ${process.env.PROJECT_NAME}` : '';
     const fullCommand = `vercel ${command} ${projectFlag}`.trim();
     console.log(`Running: ${fullCommand}`);
-    return execSync(fullCommand, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
-  } catch (error: any) {
+    // Ensure VERCEL_TOKEN and current env are forwarded
+    const env = { ...process.env, VERCEL_TOKEN: otmEnv.VERCEL_TOKEN ?? '' };
+    return execSync(fullCommand, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to run Vercel command: ${command}`);
-    console.error(`Error: ${error.message}`);
+    console.error(`Error: ${message}`);
     process.exit(1);
   }
 }
@@ -109,9 +128,10 @@ function loadLocalEnv(): LocalEnv {
   return env;
 }
 
-function fetchVercelEnvs(environment: string): VercelEnvVar[] {
+function fetchVercelEnvs(environment: 'production' | 'preview' | 'development'): VercelEnvVar[] {
   try {
-    const output = runVercelCommand(`env list ${environment}`);
+    // Vercel supports `vercel env ls <env>` and `vercel env list <env>`
+    const output = runVercelCommand(`env ls ${environment}`);
     // Parse the text output from Vercel CLI table format
     const lines = output.split('\n').filter((line) => line.trim());
     const envVars: VercelEnvVar[] = [];
@@ -122,9 +142,9 @@ function fetchVercelEnvs(environment: string): VercelEnvVar[] {
 
       // Start data section after header line with 'name'
       if (
-        trimmed.includes('name') &&
-        trimmed.includes('value') &&
-        trimmed.includes('environments')
+        trimmed.toLowerCase().includes('name') &&
+        trimmed.toLowerCase().includes('value') &&
+        trimmed.toLowerCase().includes('environments')
       ) {
         inDataSection = true;
         continue;
@@ -134,10 +154,10 @@ function fetchVercelEnvs(environment: string): VercelEnvVar[] {
       if (
         !inDataSection ||
         !trimmed ||
-        trimmed.includes('Environment Variables found') ||
-        trimmed.includes('Vercel CLI') ||
+        /Environment Variables found/i.test(trimmed) ||
+        /Vercel CLI/i.test(trimmed) ||
         trimmed.startsWith('>') ||
-        trimmed.includes('created')
+        /created/i.test(trimmed)
       ) {
         continue;
       }
@@ -168,7 +188,7 @@ function fetchVercelEnvs(environment: string): VercelEnvVar[] {
     }
 
     return envVars;
-  } catch (error) {
+  } catch {
     console.error(`❌ Failed to fetch ${environment} environment variables`);
     return [];
   }
@@ -176,7 +196,7 @@ function fetchVercelEnvs(environment: string): VercelEnvVar[] {
 
 function analyzeEnvironment(
   envVars: VercelEnvVar[],
-  environment: string,
+  environment: 'production' | 'preview' | 'development',
   localEnv: LocalEnv,
 ): EnvAuditResult {
   const result: EnvAuditResult = {
@@ -193,7 +213,7 @@ function analyzeEnvironment(
   });
 
   // Check required variables
-  const allRequired = [...REQUIRED_SERVER, ...REQUIRED_CLIENT];
+  const allRequired: string[] = [...REQUIRED_SERVER, ...REQUIRED_CLIENT];
 
   for (const requiredVar of allRequired) {
     if (!envMap.has(requiredVar)) {
@@ -224,7 +244,11 @@ function analyzeEnvironment(
   return result;
 }
 
-function checkSuspiciousValue(key: string, value: string, environment: string): string | null {
+function checkSuspiciousValue(
+  key: string,
+  value: string,
+  environment: 'production' | 'preview' | 'development',
+): string | null {
   // Domain/origin checks for production
   if (environment === 'production') {
     if (key === 'NEXT_PUBLIC_SITE_URL' && value !== 'https://www.otaku-mori.com') {
@@ -272,28 +296,21 @@ function checkSuspiciousValue(key: string, value: string, environment: string): 
 
   // URL format checks
   const urlKeys = ['NEXT_PUBLIC_SITE_URL', 'NEXT_PUBLIC_APP_URL', 'PRINTIFY_API_URL'];
-  if (urlKeys.includes(key) && !value.startsWith('http')) {
+  if (urlKeys.includes(key) && !/^https?:\/\//i.test(value)) {
     return 'Should be a valid HTTP/HTTPS URL';
   }
 
   return null;
 }
 
-function compareWithLocal(
-  vercelEnvs: VercelEnvVar[],
-  localEnv: LocalEnv,
-): {
-  localOnly: string[];
-  vercelOnly: string[];
-  different: { key: string; local: string; vercel: string }[];
-} {
+function compareWithLocal(vercelEnvs: VercelEnvVar[], localEnv: LocalEnv): LocalComparison {
   const vercelMap = new Map(vercelEnvs.map((env) => [env.key, env.value]));
   const localKeys = new Set(Object.keys(localEnv));
   const vercelKeys = new Set(vercelEnvs.map((env) => env.key));
 
   const localOnly = Array.from(localKeys).filter((key) => !vercelKeys.has(key));
   const vercelOnly = Array.from(vercelKeys).filter((key) => !localKeys.has(key));
-  const different: { key: string; local: string; vercel: string }[] = [];
+  const different: LocalComparison['different'] = [];
 
   for (const [key, localValue] of Object.entries(localEnv)) {
     const vercelValue = vercelMap.get(key);
@@ -310,9 +327,9 @@ function compareWithLocal(
 }
 
 function printReport(
-  environment: string,
+  environment: 'production' | 'preview' | 'development',
   result: EnvAuditResult,
-  localComparison?: { localOnly: string[]; vercelOnly: string[]; different: any[] },
+  localComparison?: LocalComparison,
 ) {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`🔍 ${environment.toUpperCase()} ENVIRONMENT AUDIT`);
@@ -342,7 +359,7 @@ function printReport(
 
   if (result.present.length > 0) {
     console.log(`\n✅ PRESENT VARIABLES (${result.present.length}):`);
-    const chunks = [];
+    const chunks: string[][] = [];
     for (let i = 0; i < result.present.length; i += 4) {
       chunks.push(result.present.slice(i, i + 4));
     }
@@ -375,7 +392,7 @@ function printReport(
   }
 }
 
-function printFixSuggestions(results: { [env: string]: EnvAuditResult }) {
+function printFixSuggestions(results: Record<string, EnvAuditResult>) {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`🔧 RECOMMENDED FIXES`);
   console.log(`${'='.repeat(60)}`);
@@ -424,7 +441,7 @@ function printFixSuggestions(results: { [env: string]: EnvAuditResult }) {
 }
 
 function getExampleValue(key: string): string {
-  const examples: { [key: string]: string } = {
+  const examples: Record<string, string> = {
     DATABASE_URL: 'postgresql://user:pass@host:5432/db',
     CLERK_SECRET_KEY: 'sk_live_...',
     CLERK_ENCRYPTION_KEY: 'your-encryption-key',
@@ -446,11 +463,12 @@ function getExampleValue(key: string): string {
 }
 
 // Main execution
-async function main() {
+async function main(): Promise<void> {
   console.log('🚀 Starting Vercel Environment Variables Audit...\n');
 
   // Check prerequisites
-  if (!process.env.VERCEL_TOKEN) {
+  const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
+  if (!VERCEL_TOKEN) {
     console.error('❌ VERCEL_TOKEN environment variable is required');
     console.error('   Get it from: https://vercel.com/account/tokens');
     console.error('   Usage: VERCEL_TOKEN=xxx node scripts/audit-vercel-env.ts');
@@ -468,8 +486,12 @@ async function main() {
   const localEnv = loadLocalEnv();
 
   // Fetch environments
-  const environments = ['production', 'preview', 'development'];
-  const results: { [env: string]: EnvAuditResult } = {};
+  const environments: Array<'production' | 'preview' | 'development'> = [
+    'production',
+    'preview',
+    'development',
+  ];
+  const results: Record<string, EnvAuditResult> = {};
 
   for (const env of environments) {
     console.log(`\n📊 Fetching ${env} environment variables...`);
@@ -500,8 +522,7 @@ async function main() {
   console.log(`   4. Test authentication on each environment`);
 }
 
-// Run the audit
 main().catch((error) => {
-  console.error('💥 Audit failed:', error.message);
+  console.error('💥 Audit failed:', error instanceof Error ? error.message : error);
   process.exit(1);
-});
+});*/

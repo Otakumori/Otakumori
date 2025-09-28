@@ -139,4 +139,4 @@ If you encounter issues:
 
 ---
 
-**Happy Deploying! 🎮✨**
+Happy Deploying! 🎮✨**

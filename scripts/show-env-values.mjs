@@ -56,6 +56,9 @@ const missingVars = {
   CLERK_WEBHOOK_SECRET: ['production', 'preview', 'development'],
   DATABASE_URL: ['preview'],
   PRINTIFY_SHOP_ID: ['preview', 'development'],
+  PRINTIFY_API_KEY: ['production'], // This might be expired in production
+  PRINTIFY_API_URL: ['production', 'preview', 'development'],
+  PRINTIFY_WEBHOOK_SECRET: ['production', 'preview', 'development'],
 };
 
 console.log('🔑 ENVIRONMENT VARIABLE VALUES FOR VERCEL\n');

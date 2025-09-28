@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2024-06-20',
 });
 
 export interface StripeProduct {

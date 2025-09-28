@@ -143,8 +143,34 @@ const nextConfig = {
     ];
   },
 
-  // Webpack configuration to handle client/server module splitting
-  webpack: (config, { isServer }) => {
+  // PostHog rewrites for ingestion and assets
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+    ];
+  },
+  // This is required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
+
+  // Webpack configuration to handle client/server module splitting and build performance
+  webpack: (config, { isServer, webpack }) => {
+    // Reduce polyfills and giant blobs entering the cache
+    config.resolve.fallback = { ...config.resolve.fallback, buffer: false };
+
+    // Keep cache but avoid extra compression overhead
+    config.cache = {
+      type: 'filesystem',
+      compression: false,
+      store: 'pack',
+    };
+
     if (!isServer) {
       // Alias server-only modules to false for client builds
       config.resolve.alias = {
@@ -152,6 +178,7 @@ const nextConfig = {
         'require-in-the-middle': false,
         '@sentry/node': false,
         '@prisma/instrumentation': false,
+        ioredis: false,
       };
     }
     return config;

@@ -15,28 +15,33 @@ import BackdropAbyssMystique from '../components/BackdropAbyssMystique';
 import QuakeHUD from './components/hud/QuakeHUD';
 import GlobalBackground from './components/GlobalBackground';
 import { usePathname } from 'next/navigation';
+import PostHogProvider from './providers/PostHogProvider.safe';
+import ClerkPostHogBridge from './(site)/_providers/ClerkPostHogBridge.safe';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const pathname = (typeof window !== 'undefined' ? window.location.pathname : '/') as string;
   const showTree = pathname === '/about';
   return (
-    <AuthProvider>
-      <WorldProvider>
-        <PetalProvider>
-          <CartProvider>
-            <GlobalMusicProvider>
-              {/* Site-wide background (fixed, behind everything) */}
-              {showTree && <GlobalBackground />}
-              {/* Navigation */}
-              <Navbar />
-              {children}
-              <GlobalMusicBar />
-              <SoapstoneDock />
-              <QuakeHUD />
-            </GlobalMusicProvider>
-          </CartProvider>
-        </PetalProvider>
-      </WorldProvider>
-    </AuthProvider>
+    <PostHogProvider>
+      <ClerkPostHogBridge />
+      <AuthProvider>
+        <WorldProvider>
+          <PetalProvider>
+            <CartProvider>
+              <GlobalMusicProvider>
+                {/* Site-wide background (fixed, behind everything) */}
+                {showTree && <GlobalBackground />}
+                {/* Navigation */}
+                <Navbar />
+                {children}
+                <GlobalMusicBar />
+                <SoapstoneDock />
+                <QuakeHUD />
+              </GlobalMusicProvider>
+            </CartProvider>
+          </PetalProvider>
+        </WorldProvider>
+      </AuthProvider>
+    </PostHogProvider>
   );
 }

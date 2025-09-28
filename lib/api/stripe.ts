@@ -4,7 +4,7 @@ import { env } from '@/env';
 
 // Initialize Stripe client
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2024-06-20',
 });
 
 // Zod schemas for Stripe webhook events
