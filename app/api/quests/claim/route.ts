@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { z } from 'zod';
 
-import { awardStreakShardIfEligible, userDayNY } from "@/app/lib/quests/server";
-import { db } from "@/lib/db";
-import { redis } from "@/lib/redis";
+import { awardStreakShardIfEligible, userDayNY } from '@/app/lib/quests/server';
+import { db } from '@/lib/db';
+// import { redis } from "@/lib/redis"; // Disabled due to Redis config issues
 
 const ClaimRequestSchema = z.object({
   assignmentId: z.string().min(1),
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   try {
     const { userId: clerkId } = await auth();
     if (!clerkId) {
-      return NextResponse.json({ error: "auth" }, { status: 401 });
+      return NextResponse.json({ error: 'auth' }, { status: 401 });
     }
 
     const body = ClaimRequestSchema.parse(await request.json());
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     });
 
     if (!assignment) {
-      return NextResponse.json({ error: "notfound" }, { status: 404 });
+      return NextResponse.json({ error: 'notfound' }, { status: 404 });
     }
 
     const user = await db.user.findUnique({
@@ -37,41 +37,42 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "notfound" }, { status: 404 });
+      return NextResponse.json({ error: 'notfound' }, { status: 404 });
     }
 
     if (assignment.userId !== user.id) {
-      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 });
     }
 
     if (!assignment.completedAt) {
-      return NextResponse.json({ error: "incomplete" }, { status: 400 });
+      return NextResponse.json({ error: 'incomplete' }, { status: 400 });
     }
 
     if (assignment.claimedAt) {
-      return NextResponse.json({ ok: true, already: true, message: "Already claimed" });
+      return NextResponse.json({ ok: true, already: true, message: 'Already claimed' });
     }
 
     const quest = assignment.quest;
     if (!quest) {
-      return NextResponse.json({ error: "quest_not_found" }, { status: 404 });
+      return NextResponse.json({ error: 'quest_not_found' }, { status: 404 });
     }
 
     const day = assignment.day ?? userDayNY();
     const dailyCapKey = `petals:cap:${user.id}:${day}`;
 
     let usedToday = 0;
-    try {
-      const current = await redis.get<number>(dailyCapKey);
-      if (typeof current === "number") {
-        usedToday = current;
-      }
-    } catch (error) {
-      console.warn("Redis get failed", error);
-    }
+    // Redis disabled due to config issues - using database fallback
+    // try {
+    //   const current = await redis.get<number>(dailyCapKey);
+    //   if (typeof current === "number") {
+    //     usedToday = current;
+    //   }
+    // } catch (error) {
+    //   console.warn("Redis get failed", error);
+    // }
 
     const baseReward = quest.basePetals ?? 0;
-    const bonusReward = assignment.bonusEligible ? quest.bonusPetals ?? 0 : 0;
+    const bonusReward = assignment.bonusEligible ? (quest.bonusPetals ?? 0) : 0;
     const totalReward = baseReward + bonusReward;
 
     const availableToday = Math.max(0, DAILY_CAP - usedToday);
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
         await tx.petalLedger.create({
           data: {
             userId: user.id,
-            type: "earn",
+            type: 'earn',
             amount: actualReward,
             reason: `quest:${quest.key}`,
           },
@@ -101,13 +102,14 @@ export async function POST(request: Request) {
     });
 
     if (actualReward > 0) {
-      try {
-        await redis.set(dailyCapKey, usedToday + actualReward, {
-          ex: CAP_TTL_SECONDS,
-        });
-      } catch (error) {
-        console.warn("Redis set failed", error);
-      }
+      // Redis disabled due to config issues - using database fallback
+      // try {
+      //   await redis.set(dailyCapKey, usedToday + actualReward, {
+      //     ex: CAP_TTL_SECONDS,
+      //   });
+      // } catch (error) {
+      //   console.warn("Redis set failed", error);
+      // }
     }
 
     const streakShardAwarded = await awardStreakShardIfEligible(user.id, day);
@@ -135,7 +137,7 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Quest claim error", error);
-    return NextResponse.json({ error: "internal" }, { status: 500 });
+    console.error('Quest claim error', error);
+    return NextResponse.json({ error: 'internal' }, { status: 500 });
   }
 }
