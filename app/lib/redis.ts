@@ -12,9 +12,14 @@ export async function getRedis() {
   // Lazy import so nothing runs at build time
   const { default: IORedis } = await import('ioredis');
 
-  const url = env.UPSTASH_REDIS_REST_URL?.trim();
-  const token = env.UPSTASH_REDIS_REST_TOKEN?.trim();
-  if (!url || !token) throw new Error('Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN');
+  // Properly handle environment variables with potential newlines/whitespace
+  const url = env.UPSTASH_REDIS_REST_URL?.trim().replace(/\r?\n/g, '');
+  const token = env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '');
+  
+  if (!url || !token) {
+    console.warn('Redis not configured - UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN missing');
+    throw new Error('Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN');
+  }
 
   // For Upstash Redis, we need to use the REST API format
   const redisUrl = `rediss://:${token}@${url.replace('https://', '')}`;
