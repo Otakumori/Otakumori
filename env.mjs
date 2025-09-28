@@ -42,8 +42,8 @@ try {
       AUTHORIZED_PARTIES: z.string().optional(),
       NEXT_TELEMETRY_DISABLED: z.string().optional(),
       NODE_OPTIONS: z.string().optional(),
-      RESEND_API_KEY: z.string(),
-      EMAIL_FROM: z.string().email().optional(),
+      RESEND_API_KEY: z.string().optional(),
+      EMAIL_FROM: z.string().optional(),
       // Stripe
       STRIPE_SECRET_KEY: z.string(),
       STRIPE_WEBHOOK_SECRET: z.string(),
