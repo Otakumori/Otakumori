@@ -1,6 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
-import { redis } from '@/lib/redis';
 import { log } from '@/lib/logger';
 import { DatabaseAccess } from '@/app/lib/db';
 
@@ -39,11 +38,12 @@ export async function GET(req: NextRequest) {
       })),
     }));
 
-    // Optional short TTL cache key
-    if (redis) {
-      const cacheKey = `products:${q || 'all'}`;
-      await redis.setex(cacheKey, 30, JSON.stringify(transformedProducts));
-    }
+    // Optional short TTL cache key - disabled for now due to Redis config issues
+    // TODO: Re-enable Redis caching once environment variables are fixed
+    // if (redis) {
+    //   const cacheKey = `products:${q || 'all'}`;
+    //   await redis.setex(cacheKey, 30, JSON.stringify(transformedProducts));
+    // }
 
     return NextResponse.json({ ok: true, items: transformedProducts });
   } catch (e) {
