@@ -1,76 +1,112 @@
-import React, { useEffect, useState } from 'react';
+'use client';
 
-const BodyLayer = ({ color }: { color: string }) => (
-  <ellipse cx="100" cy="140" rx="60" ry="90" fill={color} />
-);
-const HairLayer = ({ color, style }: { color: string; style: 'short' | 'long' }) =>
-  style === 'short' ? (
-    <ellipse cx="100" cy="70" rx="50" ry="30" fill={color} />
-  ) : (
-    <ellipse cx="100" cy="100" rx="55" ry="50" fill={color} />
-  );
-const EyesLayer = ({ color }: { color: string }) => (
-  <>
-    <ellipse cx="75" cy="130" rx="10" ry="6" fill={color} />
-    <ellipse cx="125" cy="130" rx="10" ry="6" fill={color} />
-  </>
-);
-const OutfitLayer = ({ type }: { type: 'dress' | 'nude' }) =>
-  type === 'dress' ? <rect x="55" y="170" width="90" height="60" rx="20" fill="#eab0d1" /> : null;
-
-interface AvatarState {
-  bodyColor: string;
-  hairColor: string;
-  hairStyle: 'short' | 'long';
-  eyeColor: string;
-  outfit: 'dress' | 'nude';
-  nsfw: boolean;
-}
+import { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { AvatarRenderer } from '@/app/adults/_components/AvatarRenderer.safe';
 
 interface AvatarDisplayProps {
-  idle?: boolean; // If true, animate breathing
+  userId?: string;
+  size?: 'small' | 'medium' | 'large';
+  showEditButton?: boolean;
+  className?: string;
 }
 
-export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({ idle = true }) => {
-  const [avatar, setAvatar] = useState<AvatarState | null>(null);
-  const [breath, setBreath] = useState(1);
+export function AvatarDisplay({
+  userId,
+  size = 'medium',
+  showEditButton = false,
+  className = '',
+}: AvatarDisplayProps) {
+  const { user } = useUser();
+  const [isHovered, setIsHovered] = useState(false);
 
-  useEffect(() => {
-    const data = localStorage.getItem('otakumori_avatar');
-    if (data) setAvatar(JSON.parse(data));
-  }, []);
+  // Fetch user's avatar configuration
+  const { data: avatarData, isLoading } = useQuery({
+    queryKey: ['user-avatar', userId || user?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/avatar/load`);
+      if (!response.ok) throw new Error('Failed to load avatar');
+      const result = await response.json();
+      return result.data;
+    },
+    enabled: !!userId || !!user?.id,
+  });
 
-  // Simple breathing animation
-  useEffect(() => {
-    if (!idle) return;
-    let frame = 0;
-    let anim: number;
-    const animate = () => {
-      setBreath(1 + 0.04 * Math.sin(frame / 30));
-      frame++;
-      anim = requestAnimationFrame(animate);
-    };
-    anim = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(anim);
-  }, [idle]);
+  const sizeClasses = {
+    small: 'w-16 h-16',
+    medium: 'w-32 h-32',
+    large: 'w-64 h-64',
+  };
 
-  if (!avatar)
+  const isOwnProfile = !userId || userId === user?.id;
+
+  if (isLoading) {
     return (
-      <div className="flex h-64 w-48 items-center justify-center rounded-lg bg-pink-200/10 text-pink-200">
-        No Avatar
+      <div className={`${sizeClasses[size]} rounded-lg bg-white/10 animate-pulse ${className}`}>
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
+  }
+
+  if (!avatarData?.avatarConfig) {
+    return (
+      <div
+        className={`${sizeClasses[size]} rounded-lg bg-white/10 border border-white/20 ${className}`}
+      >
+        <div className="w-full h-full flex flex-col items-center justify-center text-center p-2">
+          <div className="w-8 h-8 mb-2 rounded-full bg-pink-500/20 flex items-center justify-center">
+            <span className="text-pink-400 text-lg">👤</span>
+          </div>
+          <p className="text-xs text-zinc-400">{isOwnProfile ? 'No avatar yet' : 'No avatar'}</p>
+          {isOwnProfile && showEditButton && (
+            <Link
+              href="/adults/editor"
+              className="mt-2 text-xs text-pink-400 hover:text-pink-300 transition-colors"
+            >
+              Create Avatar
+            </Link>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-64 w-48 items-center justify-center rounded-lg border border-pink-400/30 bg-pink-200/10 shadow-lg">
-      <svg width={200} height={260} viewBox="0 0 200 260">
-        <g style={{ transform: `scaleY(${breath})`, transformOrigin: '100px 170px' }}>
-          <BodyLayer color={avatar.bodyColor} />
-          <HairLayer color={avatar.hairColor} style={avatar.hairStyle} />
-          <EyesLayer color={avatar.eyeColor} />
-          <OutfitLayer type={avatar.outfit} />
-        </g>
-      </svg>
-    </div>
+    <motion.div
+      className={`${sizeClasses[size]} rounded-lg overflow-hidden border border-white/20 ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* 3D Avatar Renderer */}
+      <div className="w-full h-full relative">
+        <AvatarRenderer config={avatarData.avatarConfig} size={size} showInteractions={true} />
+
+        {/* Overlay for edit button */}
+        {isOwnProfile && showEditButton && (
+          <motion.div
+            className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Link
+              href="/adults/editor"
+              className="px-3 py-1 bg-pink-500 text-white text-sm rounded-lg hover:bg-pink-600 transition-colors"
+            >
+              Edit Avatar
+            </Link>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   );
-};
+}
+
+export default AvatarDisplay;

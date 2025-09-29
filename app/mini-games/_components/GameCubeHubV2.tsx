@@ -15,6 +15,7 @@ const allGames = [
     href: '/mini-games/samurai-petal-slice',
     icon: '><',
     status: 'available',
+    category: 'action',
   },
   {
     id: 'anime-memory-match',
@@ -23,6 +24,7 @@ const allGames = [
     href: '/mini-games/anime-memory-match',
     icon: '[@]',
     status: 'available',
+    category: 'puzzle',
   },
   {
     id: 'bubble-pop-gacha',
@@ -31,6 +33,7 @@ const allGames = [
     href: '/mini-games/bubble-pop-gacha',
     icon: '(.)',
     status: 'available',
+    category: 'puzzle',
   },
   {
     id: 'rhythm-beat-em-up',
@@ -39,6 +42,7 @@ const allGames = [
     href: '/mini-games/rhythm-beat-em-up',
     icon: '♪',
     status: 'available',
+    category: 'action',
   },
   {
     id: 'memory-match',
@@ -47,6 +51,7 @@ const allGames = [
     href: '/mini-games/memory-match',
     icon: '[]',
     status: 'available',
+    category: 'puzzle',
   },
   {
     id: 'bubble-girl',
@@ -123,7 +128,7 @@ const allGames = [
 ];
 
 type FacePosition = 'front' | 'up' | 'left' | 'right' | 'down';
-type ActivePanel = 'games' | 'extras' | null;
+type ActivePanel = 'games' | 'extras' | 'avatar-community' | null;
 
 export default function GameCubeHubV2() {
   const [currentFace, setCurrentFace] = useState<FacePosition>('front');
@@ -485,6 +490,109 @@ export default function GameCubeHubV2() {
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
                       🎨 Gallery
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Avatar/Community Panel */}
+      <AnimatePresence>
+        {activePanel === 'avatar-community' && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-end justify-center z-30 p-8"
+          >
+            <div className="bg-gradient-to-br from-purple-900/90 to-black/90 rounded-2xl border border-purple-300/30 p-6 max-w-6xl w-full max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-white">Avatar & Community Hub</h2>
+                <button
+                  onClick={() => setActivePanel(null)}
+                  className="text-purple-300 hover:text-white transition-colors text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Avatar Section */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-pink-300">Character Creator</h3>
+
+                  <div className="bg-gradient-to-br from-pink-600/20 to-purple-600/20 rounded-xl border border-pink-400/30 p-6">
+                    <div className="text-center mb-4">
+                      <div className="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                        <span className="text-2xl">👤</span>
+                      </div>
+                      <h4 className="text-white font-medium">Ultra Detailed Character Creator</h4>
+                      <p className="text-zinc-300 text-sm mt-1">Code Vein-level customization</p>
+                    </div>
+
+                    <button
+                      onClick={() => router.push('/adults/editor')}
+                      className="w-full p-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 font-medium"
+                    >
+                      Create Your Avatar
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="text-lg font-semibold text-white">Quick Actions</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => router.push('/profile')}
+                        className="p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors"
+                      >
+                        <div className="text-lg mb-1">👤</div>
+                        <div className="text-sm font-medium">View Profile</div>
+                      </button>
+                      <button
+                        onClick={() => router.push('/community')}
+                        className="p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors"
+                      >
+                        <div className="text-lg mb-1">👥</div>
+                        <div className="text-sm font-medium">Community</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Community Section */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-pink-300">Community Features</h3>
+
+                  <div className="space-y-4">
+                    <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-xl border border-blue-400/30 p-4">
+                      <h4 className="text-white font-medium mb-2">Avatar Showcase</h4>
+                      <p className="text-zinc-300 text-sm mb-3">
+                        Share your creations with the community
+                      </p>
+                      <button className="w-full p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-lg transition-colors text-sm">
+                        Browse Gallery
+                      </button>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-xl border border-green-400/30 p-4">
+                      <h4 className="text-white font-medium mb-2">Gated Content</h4>
+                      <p className="text-zinc-300 text-sm mb-3">
+                        Access adult-only avatar features
+                      </p>
+                      <button className="w-full p-2 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg transition-colors text-sm">
+                        Verify Age
+                      </button>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 rounded-xl border border-yellow-400/30 p-4">
+                      <h4 className="text-white font-medium mb-2">Avatar Packs</h4>
+                      <p className="text-zinc-300 text-sm mb-3">Premium outfits and accessories</p>
+                      <button className="w-full p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-lg transition-colors text-sm">
+                        Shop Packs
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

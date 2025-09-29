@@ -31,9 +31,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Check idempotency
-    const idempotencyResult = await checkIdempotency(req, userId);
-    if (idempotencyResult.response) {
-      return idempotencyResult.response;
+    const idempotencyKey = req.headers.get('x-idempotency-key');
+    if (idempotencyKey) {
+      const idempotencyResult = await checkIdempotency(idempotencyKey);
+      if (idempotencyResult.response) {
+        return idempotencyResult.response;
+      }
     }
 
     // Apply rate limiting
@@ -120,13 +123,7 @@ export async function POST(req: NextRequest) {
       // Store idempotency response
       const idempotencyKey = req.headers.get('idempotency-key');
       if (idempotencyKey) {
-        await storeIdempotencyResponse(
-          idempotencyKey,
-          'POST',
-          '/api/v1/wishlist/toggle',
-          userId,
-          response,
-        );
+        await storeIdempotencyResponse(idempotencyKey, response);
       }
 
       return NextResponse.json(response, { status: 200 });

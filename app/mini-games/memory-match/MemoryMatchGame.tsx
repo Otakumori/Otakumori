@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
+import { GameAvatarIntegration } from '../_shared/GameAvatarIntegration';
 
 interface Card {
   id: number;
@@ -225,7 +226,17 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
   }
 
   return (
-    <div className="h-full flex flex-col p-4">
+    <div className="h-full flex flex-col p-4 relative">
+      {/* Avatar Integration */}
+      <GameAvatarIntegration
+        gameMode="puzzle"
+        performance="balanced"
+        showSelector={true}
+        position="top-right"
+        size="medium"
+        interactive={true}
+      />
+
       {/* Game Stats */}
       <div className="flex justify-between items-center mb-4 text-white">
         <div className="flex gap-6">

@@ -120,19 +120,45 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       const rect = root.getBoundingClientRect();
       const cx = rect.width / 2,
         cy = rect.height / 2;
-      const N = 64;
+      const N = 96; // More petals for better effect
 
-      for (let i = 0; i < N; i++) {
-        const p = document.createElement('div');
-        p.className = 'petal';
-        const ang = Math.PI * 2 * (i / N) + Math.random() * 0.6;
-        const dist = 60 + Math.random() * 140;
-        p.style.left = cx + 'px';
-        p.style.top = cy + 'px';
-        p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
-        p.style.setProperty('--dy', Math.sin(ang) * dist + (24 + Math.random() * 46) + 'px');
-        root.appendChild(p);
-        setTimeout(() => p.remove(), 1300);
+      // Create multiple burst waves
+      for (let wave = 0; wave < 3; wave++) {
+        setTimeout(() => {
+          for (let i = 0; i < N / 3; i++) {
+            const p = document.createElement('div');
+            p.className = 'petal';
+
+            // Enhanced petal variety
+            const size = Math.random() * 8 + 4;
+            p.style.width = size + 'px';
+            p.style.height = size * 0.7 + 'px';
+
+            // Color variation
+            const colors = ['#ec4899', '#8b5cf6', '#f59e0b', '#10b981'];
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+            const ang = Math.PI * 2 * (i / (N / 3)) + Math.random() * 0.8;
+            const dist = 80 + Math.random() * 160 + wave * 40;
+            const speed = 0.8 + Math.random() * 0.4;
+
+            p.style.left = cx + 'px';
+            p.style.top = cy + 'px';
+            p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+            p.style.setProperty('--dy', Math.sin(ang) * dist + (30 + Math.random() * 60) + 'px');
+            p.style.setProperty('--speed', speed.toString());
+
+            root.appendChild(p);
+            setTimeout(() => p.remove(), 1800);
+          }
+        }, wave * 150);
+      }
+
+      // Add hollow center glow effect
+      const hollowCenter = root.querySelector('.hollow-center');
+      if (hollowCenter) {
+        (hollowCenter as HTMLElement).style.opacity = '1';
+        (hollowCenter as HTMLElement).style.animation = 'hollowGlow 2s ease-out forwards';
       }
     }
 
@@ -219,16 +245,19 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       data-test="gc-boot-overlay"
       style={
         {
-          '--cubesize': '150px',
+          '--cubesize': '180px',
           '--c': 'calc(var(--cubesize) / 3)',
-          '--step-ms': '90ms',
-          '--start-wait-ms': '250ms',
+          '--step-ms': '75ms',
+          '--start-wait-ms': '300ms',
           '--easing': 'cubic-bezier(.22,.85,.25,1)',
-          '--pink': '#FF7FA3',
-          '--pink-deep': '#FF5F95',
-          '--glassA': 'rgba(255,127,163,.28)',
-          '--glassB': 'rgba(255,127,163,.44)',
-          '--glassStroke': 'rgba(255,127,163,.75)',
+          '--pink': '#ec4899',
+          '--pink-deep': '#be185d',
+          '--purple': '#8b5cf6',
+          '--purple-deep': '#6d28d9',
+          '--glassA': 'rgba(236,72,153,.25)',
+          '--glassB': 'rgba(139,92,246,.35)',
+          '--glassStroke': 'rgba(236,72,153,.85)',
+          '--glow-color': 'rgba(236,72,153,.4)',
         } as React.CSSProperties
       }
     >
@@ -268,27 +297,54 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
               transformStyle: 'preserve-3d',
             }}
           >
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="square"
-                style={{
-                  position: 'absolute',
-                  width: 'var(--c)',
-                  height: 'var(--c)',
-                  background: 'linear-gradient(160deg, var(--glassB), var(--glassA))',
-                  border: '1.5px solid var(--glassStroke)',
-                  boxSizing: 'border-box',
-                  opacity: 0,
-                  transform: 'scale(.94)',
-                  transition:
-                    'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                  backdropFilter: 'blur(6px) saturate(160%)',
-                  top: i === 0 ? '0' : i === 1 ? '0' : i === 2 ? 'var(--c)' : 'calc(var(--c) * 2)',
-                  left: i === 0 ? 'var(--c)' : i === 1 ? '0' : i === 2 ? '0' : '0',
-                }}
-              />
-            ))}
+            {/* O-shape formation - 8 squares arranged in a circle */}
+            {Array.from({ length: 8 }).map((_, i) => {
+              const angle = (i / 8) * Math.PI * 2;
+              const radius = 1.2; // Distance from center
+              const centerX = 1.5; // Center of O-shape
+              const centerY = 1.5;
+              const x = centerX + Math.cos(angle) * radius;
+              const y = centerY + Math.sin(angle) * radius;
+
+              return (
+                <div
+                  key={i}
+                  className="square"
+                  style={{
+                    position: 'absolute',
+                    width: 'var(--c)',
+                    height: 'var(--c)',
+                    background: 'linear-gradient(160deg, var(--glassB), var(--glassA))',
+                    border: '1.5px solid var(--glassStroke)',
+                    boxSizing: 'border-box',
+                    opacity: 0,
+                    transform: 'scale(.94)',
+                    transition:
+                      'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
+                    backdropFilter: 'blur(6px) saturate(160%)',
+                    top: `calc(var(--c) * ${y})`,
+                    left: `calc(var(--c) * ${x})`,
+                  }}
+                />
+              );
+            })}
+
+            {/* Hollow center */}
+            <div
+              className="hollow-center"
+              style={{
+                position: 'absolute',
+                width: 'calc(var(--c) * 1.5)',
+                height: 'calc(var(--c) * 1.5)',
+                background: 'transparent',
+                border: '2px solid rgba(236,72,153,.3)',
+                borderRadius: '50%',
+                top: 'calc(var(--c) * 0.75)',
+                left: 'calc(var(--c) * 0.75)',
+                opacity: 0,
+                transition: 'opacity 300ms var(--easing)',
+              }}
+            />
           </div>
 
           <div
@@ -531,26 +587,45 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
 
         .petal {
           position: absolute;
-          width: 12px;
-          height: 8px;
-          border-radius: 12px/8px;
-          background: var(--pink);
-          filter: drop-shadow(0 0 6px rgba(255, 157, 179, 0.65));
+          border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+          filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.8));
           pointer-events: none;
           opacity: 0.98;
-          animation: petalFall 1200ms ease-out forwards;
+          animation: petalFall var(--speed, 1) 1800ms ease-out forwards;
+          transform-origin: center;
         }
 
         @keyframes petalFall {
           0% {
-            transform: translate(0, 0) rotate(0deg);
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+          }
+          20% {
+            transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) rotate(90deg) scale(1.1);
+            opacity: 0.9;
           }
           60% {
-            transform: translate(var(--dx), var(--dy)) rotate(240deg);
+            transform: translate(calc(var(--dx) * 0.8), calc(var(--dy) * 0.8)) rotate(240deg) scale(0.9);
+            opacity: 0.7;
           }
           100% {
-            transform: translate(calc(var(--dx) * 1.2), calc(var(--dy) * 1.25)) rotate(420deg);
+            transform: translate(var(--dx), var(--dy)) rotate(420deg) scale(0.6);
             opacity: 0;
+          }
+        }
+
+        @keyframes hollowGlow {
+          0% {
+            box-shadow: 0 0 0 rgba(236, 72, 153, 0);
+            border-color: rgba(236,72,153,.3);
+          }
+          50% {
+            box-shadow: 0 0 40px rgba(236, 72, 153, 0.6), 0 0 80px rgba(139, 92, 246, 0.4);
+            border-color: rgba(236,72,153,.8);
+          }
+          100% {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+            border-color: rgba(236,72,153,.5);
           }
         }
       `}</style>

@@ -157,7 +157,11 @@ model User {
   username                  String                   @unique
   display_name              String?
   avatarUrl                 String?
+  avatarConfig              Json? // Complete character parameters
+  avatarBundle              Json? // Rendered bundle for games
+  avatarRendering           String? // "2d" | "3d" | "hybrid"
   createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
   petalBalance              Int                      @default(0)
   hideRewardsExplainer      Boolean                  @default(false)
   activeCosmetic            String?
@@ -247,6 +251,8 @@ model User {
   tradeOffersInitiated      TradeOffer[]             @relation("TradeOfferInitiator")
   tradeOffersReceived       TradeOffer[]             @relation("TradeOfferTarget")
   tradeResponses            TradeResponse[]          @relation("TradeResponder")
+  avatarPacks               UserAvatarPack[]
+  avatarCustomizations      AvatarCustomization[]
 
   @@index([clerkId])
 }
@@ -1504,6 +1510,62 @@ model QuestClaim {
   @@unique([userId, date, questId])
   @@index([userId])
   @@index([questId])
+}
+
+// Avatar System Models
+model AvatarPack {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  description     String?
+  rarity          String           @default("rare") // common, rare, legendary
+  type            String           @default("outfit") // outfit, accessory, hair, decal
+  isAdultOnly     Boolean          @default(false)
+  regionAllowlist String[] // JSON array of allowed regions
+  pricePetals     Int              @default(0)
+  priceUsdCents   Int              @default(0)
+  physicsProfile  Json // Physics configuration
+  interactions    Json // Available interactions
+  materials       Json // Material parameters
+  layers          String[] // Available layers
+  assets          Json // Asset URLs
+  sliders         Json // Additional sliders
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  users           UserAvatarPack[]
+
+  @@index([slug])
+  @@index([rarity])
+  @@index([type])
+}
+
+model UserAvatarPack {
+  id          String     @id @default(cuid())
+  userId      String
+  packId      String
+  purchasedAt DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pack        AvatarPack @relation(fields: [packId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, packId])
+  @@index([userId])
+  @@index([packId])
+}
+
+model AvatarCustomization {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String? // Custom name for the configuration
+  config    Json // Complete character configuration
+  isDefault Boolean  @default(false)
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDefault])
+  @@index([isPublic])
 }
 
 model Soapstone {
