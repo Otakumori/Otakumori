@@ -133,10 +133,10 @@ export async function POST(request: NextRequest) {
           },
           update: {
             score: validatedData.score,
-            statsJson: validatedData.meta || {},
+            statsJson: (validatedData.meta || {}) as any,
             boardId: leaderboard.id,
             profileId: currentUser.id,
-            meta: validatedData.meta || {},
+            meta: (validatedData.meta || {}) as any,
             createdAt: new Date(),
           },
           create: {
@@ -144,10 +144,10 @@ export async function POST(request: NextRequest) {
             game: validatedData.gameCode,
             diff: leaderboard.period,
             score: validatedData.score,
-            statsJson: validatedData.meta || {},
+            statsJson: (validatedData.meta || {}) as any,
             boardId: leaderboard.id,
             profileId: currentUser.id,
-            meta: validatedData.meta || {},
+            meta: (validatedData.meta || {}) as any,
           },
         });
 

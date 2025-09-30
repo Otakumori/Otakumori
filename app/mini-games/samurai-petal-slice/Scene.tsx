@@ -246,7 +246,21 @@ export default function SamuraiSlice() {
 
     function draw(now: number) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, W, H);
+
+      // Use dirty rectangle optimization
+      import('@/app/lib/canvas-rendering-optimizer').then(({ canvasOptimizer }) => {
+        const dirtyRegions = canvasOptimizer.getDirtyRegions();
+
+        if (dirtyRegions.length > 0) {
+          // Only clear dirty regions
+          dirtyRegions.forEach((region) => {
+            ctx.clearRect(region.x, region.y, region.width, region.height);
+          });
+        } else {
+          // Fallback to full clear if no dirty regions
+          ctx.clearRect(0, 0, W, H);
+        }
+      });
       // bg
       if (bgImg.complete && bgImg.naturalWidth > 0) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);

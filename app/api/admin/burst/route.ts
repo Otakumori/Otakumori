@@ -1,11 +1,11 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { NextResponse, type NextRequest } from 'next/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { z } from 'zod';
 
-import { db } from "@/lib/db";
-import type { BurstConfig } from "@/types/runes";
+import { db } from '@/lib/db';
+import type { BurstConfig } from '@/types/runes';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
 const ParticleCountSchema = z.object({
   small: z.number().int().min(0).max(500),
@@ -58,26 +58,29 @@ const DEFAULT_BURST_CONFIG: BurstConfig = {
 async function requireAdmin() {
   const { userId } = await auth();
   if (!userId) {
-    throw new ResponseError("Unauthorized", 401);
+    throw new ResponseError('Unauthorized', 401);
   }
 
   const user = await currentUser();
-  if (user?.publicMetadata?.role !== "admin") {
-    throw new ResponseError("Forbidden", 403);
+  if (user?.publicMetadata?.role !== 'admin') {
+    throw new ResponseError('Forbidden', 403);
   }
 
   return userId;
 }
 
 class ResponseError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
     super(message);
   }
 }
 
 async function getBurstConfig(): Promise<BurstConfig> {
   const siteConfig = await db.siteConfig.findUnique({
-    where: { id: "singleton" },
+    where: { id: 'singleton' },
   });
 
   const parsed = BurstConfigSchema.safeParse(siteConfig?.burst ?? DEFAULT_BURST_CONFIG);
@@ -99,8 +102,8 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     }
 
-    console.error("Burst config fetch error", error);
-    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+    console.error('Burst config fetch error', error);
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -111,14 +114,14 @@ export async function POST(request: NextRequest) {
     const config = BurstConfigSchema.parse(body);
 
     const siteConfig = await db.siteConfig.upsert({
-      where: { id: "singleton" },
+      where: { id: 'singleton' },
       update: {
         burst: config,
         updatedAt: new Date(),
         updatedBy: userId,
       },
       create: {
-        id: "singleton",
+        id: 'singleton',
         guestCap: 50,
         burst: config,
         tree: {
@@ -162,7 +165,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       data: {
         config: updated,
-        message: "Burst configuration updated successfully",
+        message: 'Burst configuration updated successfully',
       },
     });
   } catch (error) {
@@ -172,12 +175,12 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { ok: false, error: error.errors.map((issue) => issue.message).join(", ") },
+        { ok: false, error: error.issues.map((issue) => issue.message).join(', ') },
         { status: 400 },
       );
     }
 
-    console.error("Burst config save error", error);
-    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+    console.error('Burst config save error', error);
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

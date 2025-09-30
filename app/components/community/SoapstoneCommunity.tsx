@@ -27,7 +27,7 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [characterCount, setCharacterCount] = useState(0);
   const maxCharacters = 280;
-  const glowTimeoutRef = useRef<NodeJS.Timeout>();
+  const glowTimeoutRef = useRef<any>(undefined);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

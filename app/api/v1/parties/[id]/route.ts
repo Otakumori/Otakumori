@@ -119,7 +119,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const updatedParty = await db.party.update({
       where: { id: params.id },
-      data: validatedData,
+      data: {
+        ...validatedData,
+        settings: validatedData.settings as any,
+      },
       include: {
         leader: {
           select: {

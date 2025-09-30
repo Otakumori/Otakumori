@@ -8,7 +8,7 @@
  * - Trending products (popularity-based)
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
         {
           ok: false,
           error: 'Invalid recommendation parameters',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 },
       );

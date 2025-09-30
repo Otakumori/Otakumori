@@ -1,10 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
+import { env } from '@/env.mjs';
 
 // Database singleton for server-side use only
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-export const db = globalForPrisma.prisma ?? new PrismaClient();
+export const db =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    datasources: {
+      db: {
+        url: env.DATABASE_URL,
+      },
+    },
+    log: ['query', 'error', 'warn'],
+    errorFormat: 'pretty',
+  });
 
 if (globalThis.process?.env?.NODE_ENV !== 'production') globalForPrisma.prisma = db;
 

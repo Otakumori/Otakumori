@@ -50,10 +50,19 @@ export default function PetalEmitterTree({
     let running = true;
     let last = performance.now();
     let spawnAcc = 0;
-    const petals: Petal[] = [];
     let pointerDown = false;
     let px = 0,
       py = 0;
+
+    // Use optimized particle system
+    let particleSystem: any = null;
+    import('@/app/lib/optimized-particle-system').then(({ particleSystem: ps }) => {
+      particleSystem = ps;
+      particleSystem.setViewport(0, 0, W, H);
+    });
+
+    // Petals array for fallback
+    const petals: Petal[] = [];
 
     // prefers-reduced-motion -> reduce spawn
     const prefersReducedMotion =
@@ -111,6 +120,10 @@ export default function PetalEmitterTree({
     resize();
     window.addEventListener('resize', resize);
 
+    // ResizeObserver for better resize handling
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(wrap);
+
     // utilities
     function noise(t: number) {
       return Math.sin(t * 0.7) * 0.5 + Math.sin(t * 1.4 + 1.7) * 0.3;
@@ -131,7 +144,7 @@ export default function PetalEmitterTree({
       for (let i = 0; i < n && petals.length < maxPetals; i++) {
         const p0 = canopyPoint();
         const z = Math.random(); // fake depth
-        petals.push({
+        const particle = {
           id: pid++,
           x: p0.x + (Math.random() * 12 - 6),
           y: p0.y + (Math.random() * 12 - 6),
@@ -144,7 +157,29 @@ export default function PetalEmitterTree({
           settled: false,
           life: 0,
           maxLife: 10000,
-        });
+        };
+
+        // Add to optimized particle system if available
+        if (particleSystem) {
+          particleSystem.addParticle({
+            x: particle.x,
+            y: particle.y,
+            z: particle.z,
+            vx: particle.vx,
+            vy: particle.vy,
+            vz: 0,
+            life: particle.life,
+            maxLife: particle.maxLife,
+            size: particle.s,
+            rotation: particle.r,
+            rotationSpeed: particle.vr,
+            alpha: 1,
+            color: '#ff69b4',
+            layer: 0,
+          });
+        }
+
+        petals.push(particle);
       }
     }
 
@@ -216,35 +251,58 @@ export default function PetalEmitterTree({
 
       const gust = windBase + noise(tNoise) * 0.6;
 
-      // physics & draw petals
-      for (let i = 0; i < petals.length; i++) {
-        const p = petals[i];
-        if (!p.settled) {
-          p.life += dt;
-          p.x += (p.vx + gust) * dt * 0.04 + Math.sin((p.y + p.life) * 0.01) * 0.22;
-          p.y += p.vy * dt * 0.05;
-          // settle when reaching ground band
-          if (p.y >= groundY - 6) {
-            p.y = groundY - 6 + Math.random() * 2;
-            p.vx *= 0.2;
-            p.vy = 0;
-            p.vr *= 0.2;
-            p.settled = true;
-          }
-        } else {
-          // gentle slide along ground to create a pile that looks fluid
-          p.x += gust * 0.02 + Math.sin((p.id + tNoise) * 1.7) * 0.1;
-        }
+      // Use optimized particle system if available
+      if (particleSystem) {
+        particleSystem.update(dt);
+        const visibleParticles = particleSystem.getVisibleParticles();
 
-        // draw opaque petal (no global fade)
-        if (petalImg.complete) {
-          const wPet = 18 * p.s,
-            hPet = 12 * p.s;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.r);
-          ctx.drawImage(petalImg, -wPet / 2, -hPet / 2, wPet, hPet);
-          ctx.restore();
+        // Update viewport
+        particleSystem.setViewport(0, 0, W, H);
+
+        // Draw visible particles
+        visibleParticles.forEach((p: any) => {
+          if (petalImg.complete) {
+            const wPet = 18 * p.size,
+              hPet = 12 * p.size;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.globalAlpha = p.alpha;
+            ctx.drawImage(petalImg, -wPet / 2, -hPet / 2, wPet, hPet);
+            ctx.restore();
+          }
+        });
+      } else {
+        // Fallback to original particle logic
+        for (let i = 0; i < petals.length; i++) {
+          const p = petals[i];
+          if (!p.settled) {
+            p.life += dt;
+            p.x += (p.vx + gust) * dt * 0.04 + Math.sin((p.y + p.life) * 0.01) * 0.22;
+            p.y += p.vy * dt * 0.05;
+            // settle when reaching ground band
+            if (p.y >= groundY - 6) {
+              p.y = groundY - 6 + Math.random() * 2;
+              p.vx *= 0.2;
+              p.vy = 0;
+              p.vr *= 0.2;
+              p.settled = true;
+            }
+          } else {
+            // gentle slide along ground to create a pile that looks fluid
+            p.x += gust * 0.02 + Math.sin((p.id + tNoise) * 1.7) * 0.1;
+          }
+
+          // draw opaque petal (no global fade)
+          if (petalImg.complete) {
+            const wPet = 18 * p.s,
+              hPet = 12 * p.s;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.r);
+            ctx.drawImage(petalImg, -wPet / 2, -hPet / 2, wPet, hPet);
+            ctx.restore();
+          }
         }
       }
 
@@ -259,6 +317,11 @@ export default function PetalEmitterTree({
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
+
+      // Clean up ResizeObserver
+      if (ro) {
+        ro.disconnect();
+      }
     };
   }, [treeSrc, petalSrc, spawnPerSec, windBase, maxPetals, onCollect]);
 

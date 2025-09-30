@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 
 'use client';
 
@@ -37,7 +37,7 @@ export function Ps1Petals({
 }: Ps1PetalsProps) {
   const [petals, setPetals] = useState<Petal[]>([]);
   const [isVisible, setIsVisible] = useState(true);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const lastSpawnTime = useRef<number>(0);
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 

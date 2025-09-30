@@ -8,10 +8,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGamesStore, type HubPanel } from '@/app/lib/state/games';
 import { COPY } from '@/app/lib/copy';
 import Link from 'next/link';
+import type { Mesh } from 'three';
 
 // Cube component with labels
 function Cube() {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<Mesh>(null);
   const { camera } = useThree();
   const { activePanel, isPanelOpen } = useGamesStore();
 
@@ -96,7 +97,7 @@ function HubFaceOverlay() {
       y: 0,
       transition: {
         duration: isReducedMotion ? 0.1 : 0.3,
-        ease: 'easeOut',
+        ease: 'easeOut' as const,
       },
     },
   };

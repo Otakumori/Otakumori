@@ -40,7 +40,7 @@ export function validateEnv(): EnvSchema {
     return envSchema.parse(env);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map((e) => e.path.join('.')).join(', ');
+      const missingVars = error.issues.map((e) => e.path.join('.')).join(', ');
       console.error(`❌ Environment validation failed. Missing or invalid: ${missingVars}`);
 
       // In production, throw to prevent app from starting with invalid config

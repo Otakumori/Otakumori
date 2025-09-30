@@ -3,7 +3,15 @@
 import { Suspense, useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
-import { ACESFilmicToneMapping, Vector3, Color, DirectionalLight, AmbientLight } from 'three';
+import {
+  ACESFilmicToneMapping,
+  Vector3,
+  Color,
+  DirectionalLight,
+  AmbientLight,
+  type Group,
+  type Mesh,
+} from 'three';
 
 interface AvatarRendererProps {
   config: any;
@@ -15,7 +23,7 @@ interface AvatarRendererProps {
 
 // AnimeToon Material Component
 function AnimeToonMaterial({ config }: { config: any }) {
-  const materialRef = useRef<any>();
+  const materialRef = useRef<any>(undefined);
 
   useEffect(() => {
     if (materialRef.current) {
@@ -43,7 +51,7 @@ function AnimeToonMaterial({ config }: { config: any }) {
 
 // Simple Physics Component (Spring-based)
 function SimplePhysics({ config, children }: { config: any; children: React.ReactNode }) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<Group>(null);
   const [time, setTime] = useState(0);
 
   useFrame((state, delta) => {
@@ -77,7 +85,7 @@ function SimplePhysics({ config, children }: { config: any; children: React.Reac
 
 // Character Mesh Component
 function CharacterMesh({ config }: { config: any }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<Mesh>(null);
 
   useFrame((state) => {
     if (meshRef.current) {

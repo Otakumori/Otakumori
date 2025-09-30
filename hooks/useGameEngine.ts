@@ -116,7 +116,7 @@ export function useGameEngine(options: UseGameEngineOptions): GameEngineReturn {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
   // Refs for auto-save and session tracking
-  const autoSaveIntervalRef = useRef<NodeJS.Timeout>();
+  const autoSaveIntervalRef = useRef<any>(undefined);
   const sessionStartRef = useRef<number>(0);
 
   // Load game state

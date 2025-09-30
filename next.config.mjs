@@ -159,6 +159,15 @@ const nextConfig = {
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 
+  // Babel configuration to remove console statements in production
+  babel: {
+    plugins: [
+      ...(env.NODE_ENV === 'production'
+        ? [['babel-plugin-transform-remove-console', { exclude: ['error', 'warn'] }]]
+        : []),
+    ],
+  },
+
   // Webpack configuration to handle client/server module splitting and build performance
   webpack: (config, { isServer, webpack }) => {
     // Reduce polyfills and giant blobs entering the cache

@@ -1,5 +1,5 @@
 // Quick Math Game - Answer fast. Pressure builds with each correct streak.
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 
 'use client';
 

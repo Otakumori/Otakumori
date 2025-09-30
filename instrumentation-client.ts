@@ -1,45 +1,50 @@
 import * as Sentry from '@sentry/nextjs';
 import posthog from 'posthog-js';
+import { env } from './env.mjs';
 
 // Initialize PostHog client
-posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-  api_host: '/ingest',
-  ui_host: 'https://us.posthog.com',
-  defaults: '2025-05-24',
-  capture_exceptions: true, // Enables capturing exceptions via PostHog Error Tracking
-  debug: process.env.NODE_ENV === 'development',
-});
+if (env.NEXT_PUBLIC_POSTHOG_KEY) {
+  posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
+    api_host: '/ingest',
+    ui_host: 'https://us.posthog.com',
+    defaults: '2025-05-24',
+    capture_exceptions: true, // Enables capturing exceptions via PostHog Error Tracking
+    debug: env.NODE_ENV === 'development',
+  });
+}
 
-Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+if (env.NEXT_PUBLIC_SENTRY_DSN) {
+  Sentry.init({
+    dsn: env.NEXT_PUBLIC_SENTRY_DSN,
 
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    // Optional: Replay (great context for errors)
-    // Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
-  ],
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      // Optional: Replay (great context for errors)
+      // Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
+    ],
 
-  // Performance tracing
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    // Performance tracing
+    tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
-  // Propagate traces to API + your domains
-  tracePropagationTargets: [
-    'localhost',
-    /^https:\/\/.*vercel\.app$/,
-    /^https:\/\/(www\.)?otaku-mori\.com$/,
-    /^\/api\//,
-  ],
+    // Propagate traces to API + your domains
+    tracePropagationTargets: [
+      'localhost',
+      /^https:\/\/.*vercel\.app$/,
+      /^https:\/\/(www\.)?otaku-mori\.com$/,
+      /^\/api\//,
+    ],
 
-  // JS profiling (browser)
-  profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    // JS profiling (browser)
+    profilesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
-  // Optional: Replay sampling (uncomment if using replayIntegration above)
-  // replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.05 : 1.0,
-  // replaysOnErrorSampleRate: 1.0,
+    // Optional: Replay sampling (uncomment if using replayIntegration above)
+    // replaysSessionSampleRate: env.NODE_ENV === 'production' ? 0.05 : 1.0,
+    // replaysOnErrorSampleRate: 1.0,
 
-  // PII (ensure policy covers this)
-  sendDefaultPii: true,
-});
+    // PII (ensure policy covers this)
+    sendDefaultPii: true,
+  });
+}
 
 // Instrument client-side navigations for better routing spans
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

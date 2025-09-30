@@ -5,7 +5,7 @@ const path = require('path');
 const collector = spawn('ts-node', [path.join(__dirname, 'collect-metrics.ts')], {
   stdio: 'inherit',
   env: {
-    ...process.env, // eslint-disable-line no-restricted-syntax
+    ...process.env,  
     NODE_ENV: 'production',
   },
 });

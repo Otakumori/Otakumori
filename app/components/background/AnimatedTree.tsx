@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { motion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
 
 interface BranchProps {
   x: number;
@@ -17,7 +17,10 @@ function Branch({ x, y, angle, length, thickness, depth, maxDepth }: BranchProps
   const endX = x + Math.cos(angle) * length;
   const endY = y + Math.sin(angle) * length;
   const blossomCount = Math.max(1, Math.floor(length / 40));
-  const blossomOffsets = useMemo(() => Array.from({ length: blossomCount }, (_, index) => index), [blossomCount]);
+  const blossomOffsets = useMemo(
+    () => Array.from({ length: blossomCount }, (_, index) => index),
+    [blossomCount],
+  );
   const childAngles = useMemo(
     () => ({
       left: 0.3 + Math.random() * 0.4,
@@ -33,7 +36,7 @@ function Branch({ x, y, angle, length, thickness, depth, maxDepth }: BranchProps
       opacity: 1,
       transition: {
         duration: 0.8 + depth * 0.2,
-        ease: "easeOut",
+        ease: 'easeOut' as const,
       },
     },
   };
@@ -46,7 +49,7 @@ function Branch({ x, y, angle, length, thickness, depth, maxDepth }: BranchProps
       transition: {
         delay: 0.5 + depth * 0.1,
         duration: 0.6,
-        ease: "easeOut",
+        ease: 'easeOut' as const,
       },
     },
   };
@@ -148,12 +151,36 @@ export default function AnimatedTree() {
           rx={30}
           initial={{ scaleY: 0 }}
           animate={{ scaleY: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 1, ease: 'easeOut' }}
         />
 
-        <Branch x={80} y={650} angle={-Math.PI / 2 - 0.3} length={200} thickness={25} depth={0} maxDepth={4} />
-        <Branch x={80} y={650} angle={-Math.PI / 2 + 0.3} length={180} thickness={20} depth={0} maxDepth={4} />
-        <Branch x={80} y={650} angle={-Math.PI / 2} length={150} thickness={15} depth={0} maxDepth={3} />
+        <Branch
+          x={80}
+          y={650}
+          angle={-Math.PI / 2 - 0.3}
+          length={200}
+          thickness={25}
+          depth={0}
+          maxDepth={4}
+        />
+        <Branch
+          x={80}
+          y={650}
+          angle={-Math.PI / 2 + 0.3}
+          length={180}
+          thickness={20}
+          depth={0}
+          maxDepth={4}
+        />
+        <Branch
+          x={80}
+          y={650}
+          angle={-Math.PI / 2}
+          length={150}
+          thickness={15}
+          depth={0}
+          maxDepth={3}
+        />
 
         {Array.from({ length: 20 }).map((_, index) => (
           <motion.circle
@@ -173,7 +200,7 @@ export default function AnimatedTree() {
               duration: 3 + Math.random() * 2,
               repeat: Infinity,
               delay: Math.random() * 2,
-              ease: "easeOut",
+              ease: 'easeOut' as const,
             }}
           />
         ))}

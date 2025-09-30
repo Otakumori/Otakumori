@@ -8,7 +8,7 @@
  * - Performance optimized batch processing
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: 'Invalid sync parameters',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 },
       );

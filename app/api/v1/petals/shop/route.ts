@@ -21,7 +21,7 @@ const _ShopItemResponseSchema = z.object({
           kind: z.string(), // Changed from enum to string to match schema
           pricePetals: z.number().nullable(), // Made nullable to match schema
           eventTag: z.string().nullable(),
-          metadata: z.record(z.any()).nullable(),
+          metadata: z.record(z.string(), z.any()).nullable(),
           createdAt: z.string(),
           updatedAt: z.string(),
         }),

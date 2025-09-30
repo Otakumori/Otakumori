@@ -105,7 +105,7 @@ export default function Game({ mode }: Props) {
       cancelAnimationFrame(animationId);
       game.destroy();
     };
-  }, [mode, gameState.isRunning]);
+  }, [mode]); // Remove gameState.isRunning to prevent infinite re-renders
 
   // Handle card click
   const handleCardClick = useCallback(

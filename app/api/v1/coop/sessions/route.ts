@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         partyId: validatedData.partyId,
         gameType: validatedData.gameType,
         gameId: validatedData.gameId,
-        settings: validatedData.settings,
+        settings: validatedData.settings as any,
       },
       include: {
         party: {

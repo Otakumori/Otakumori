@@ -9,7 +9,7 @@ import { z } from 'zod';
 const SaveDataSchema = z.object({
   gameId: z.string().min(1),
   slot: z.number().int().min(0).max(2),
-  saveData: z.record(z.any()),
+  saveData: z.record(z.string(), z.any()),
   metadata: z
     .object({
       level: z.number().optional(),

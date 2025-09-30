@@ -6,13 +6,13 @@
  */
 
 import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const UnlockAchievementSchema = z.object({
   achievementId: z.string().min(1),
   progress: z.number().min(0).max(1).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 const GetAchievementsSchema = z.object({

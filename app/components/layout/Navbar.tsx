@@ -83,7 +83,7 @@ const SEARCH_SUGGESTIONS = [
 const EASTER_EGGS: Record<string, string> = {
   'what are ya buyin': 'The classic merchant greeting! 🛍️',
   stranger: 'Ah, a fellow RE4 fan! Welcome!',
-  gamecube: 'Ready for some nostalgic gaming? 🎮',
+  gamecube: 'Ready for some nostalgic gaming?',
 };
 
 export default function Navbar() {
@@ -286,7 +286,13 @@ export default function Navbar() {
                       className="flex items-center space-x-3 p-2 rounded hover:bg-white/10 transition-colors"
                     >
                       <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded flex items-center justify-center">
-                        <span className="text-white text-lg">🎮</span>
+                        <span
+                          className="text-white text-lg"
+                          role="img"
+                          aria-label="Game controller"
+                        >
+                          🎮
+                        </span>
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">{game.title}</p>

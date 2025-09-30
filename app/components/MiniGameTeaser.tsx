@@ -2,10 +2,10 @@ import GlassPanel from './GlassPanel';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
 
-type Game = { 
-  id: string; 
-  slug: string; 
-  title: string; 
+type Game = {
+  id: string;
+  slug: string;
+  title: string;
   summary: string;
   status: 'ready' | 'beta' | 'experimental' | 'hidden';
 };
@@ -17,50 +17,50 @@ const GAME_REGISTRY: Game[] = [
     slug: 'samurai-petal-slice',
     title: 'Samurai Petal Slice',
     summary: "Draw the Tetsusaiga's arc…",
-    status: 'ready'
+    status: 'ready',
   },
   {
     id: 'anime-memory-match',
-    slug: 'anime-memory-match', 
+    slug: 'anime-memory-match',
     title: 'Anime Memory Match',
     summary: 'Recall the faces bound by fate.',
-    status: 'ready'
+    status: 'ready',
   },
   {
     id: 'bubble-pop-gacha',
     slug: 'bubble-pop-gacha',
     title: 'Bubble-Pop Gacha',
     summary: 'Pop for spy-craft secrets…',
-    status: 'ready'
+    status: 'ready',
   },
   {
     id: 'petal-storm-rhythm',
     slug: 'petal-storm-rhythm',
     title: 'Petal Storm Rhythm',
     summary: "Sync to the Moon Prism's pulse.",
-    status: 'ready'
+    status: 'ready',
   },
   {
     id: 'quick-math',
     slug: 'quick-math',
     title: 'Quick Math',
     summary: 'Answer fast. Pressure builds with each correct streak.',
-    status: 'ready'
+    status: 'ready',
   },
   {
     id: 'dungeon-of-desire',
     slug: 'dungeon-of-desire',
     title: 'Dungeon of Desire',
     summary: 'Descend into the dungeon. Survive rooms and claim rewards.',
-    status: 'beta'
-  }
+    status: 'beta',
+  },
 ];
 
 export default async function MiniGameTeaser() {
   // Filter to only ready and beta games for home page
-  const featuredGames = GAME_REGISTRY
-    .filter(game => game.status === 'ready' || game.status === 'beta')
-    .slice(0, 6);
+  const featuredGames = GAME_REGISTRY.filter(
+    (game) => game.status === 'ready' || game.status === 'beta',
+  ).slice(0, 6);
 
   return (
     <section id="games" className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
@@ -77,7 +77,10 @@ export default async function MiniGameTeaser() {
       {/* Games Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {featuredGames.map((game) => (
-          <GlassPanel key={game.id} className="group hover:scale-105 transition-all duration-300 relative">
+          <GlassPanel
+            key={game.id}
+            className="group hover:scale-105 transition-all duration-300 relative"
+          >
             <Link href={`/mini-games/${game.slug}`} className="block p-6">
               {/* Status Badge */}
               {game.status === 'beta' && (
@@ -85,25 +88,35 @@ export default async function MiniGameTeaser() {
                   BETA
                 </div>
               )}
-              
+
               <div className="mb-4">
                 <div className="w-16 h-16 mx-auto bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl text-white">🎮</span>
+                  <span className="text-2xl text-white" role="img" aria-label="Game controller">
+                    🎮
+                  </span>
                 </div>
               </div>
-              
+
               <h3 className="text-xl font-semibold text-white mb-3 text-center group-hover:text-pink-300 transition-colors">
                 {game.title}
               </h3>
-              
-              <p className="text-gray-300 text-center mb-4 text-sm italic">
-                {game.summary}
-              </p>
-              
+
+              <p className="text-gray-300 text-center mb-4 text-sm italic">{game.summary}</p>
+
               <div className="flex items-center justify-center text-pink-400 text-sm font-medium">
                 Play Now
-                <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </div>
             </Link>

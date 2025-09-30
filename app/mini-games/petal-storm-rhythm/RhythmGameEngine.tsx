@@ -38,7 +38,7 @@ export default function RhythmGameEngine({
   const [gameStartTime, setGameStartTime] = useState(0);
 
   const { saveOnExit, autoSave } = useGameSave('petal-storm-rhythm');
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const gameRef = useRef<HTMLDivElement>(null);
 
   // Generate notes based on BPM

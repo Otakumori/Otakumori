@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: 'Validation failed',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
           requestId,
         },
         { status: 400 },

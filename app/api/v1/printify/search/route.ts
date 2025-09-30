@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
         {
           ok: false,
           error: 'Invalid search parameters',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 },
       );

@@ -52,6 +52,8 @@ export default function Hero() {
         const petal = document.createElement('div');
         petal.className = 'absolute text-2xl animate-bounce pointer-events-none';
         petal.textContent = '🌸';
+        petal.setAttribute('role', 'img');
+        petal.setAttribute('aria-label', 'Cherry blossom petal');
         petal.style.left = Math.random() * window.innerWidth + 'px';
         petal.style.top = Math.random() * window.innerHeight + 'px';
         document.body.appendChild(petal);
@@ -298,7 +300,19 @@ export default function Hero() {
           disabled={loading}
           className="px-6 py-3 bg-pink-600 hover:bg-pink-700 disabled:bg-pink-800 rounded-lg text-white font-semibold transition-colors disabled:cursor-not-allowed"
         >
-          {loading ? 'Collecting...' : '🌸 Click to Collect 🌸'}
+          {loading ? (
+            'Collecting...'
+          ) : (
+            <>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>{' '}
+              Click to Collect{' '}
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>
+            </>
+          )}
         </button>
       </div>
     </section>

@@ -1,35 +1,70 @@
+'use client';
+
 import GlassPanel from './GlassPanel';
 import Image from 'next/image';
 import Link from 'next/link';
 import { t } from '@/lib/microcopy';
-import { getPrintifyService } from '@/app/lib/printify/service';
-import type { PrintifyProduct } from '@/app/lib/printify/service';
+import { useState, useEffect } from 'react';
 
-async function getFeaturedProducts(): Promise<PrintifyProduct[]> {
-  try {
-    const printifyService = getPrintifyService();
-    const response = await printifyService.getProducts(1, 4); // Get first 4 products for homepage
-    return response.data || [];
-  } catch (error) {
-    console.error('Failed to fetch featured products:', error);
-    return [];
-  }
+interface Product {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  price: number;
+  available: boolean;
+  slug: string;
 }
 
-export default async function ShopTeaser() {
-  // Fetch real Printify products for homepage
-  const printifyProducts = await getFeaturedProducts();
+export default function ShopTeaser() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Transform Printify products to display format
-  const products = printifyProducts.map((product) => ({
-    id: product.id,
-    title: product.title,
-    description: product.description,
-    image: product.images?.[0]?.src || '/placeholder-product.jpg',
-    price: product.variants?.[0]?.price || 0,
-    available: product.variants?.some((v) => v.is_enabled && v.is_available) || false,
-    slug: product.id, // Use product ID as slug for now
-  }));
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/shop/products');
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.products && Array.isArray(data.products)) {
+            // Transform Printify products to display format and limit to 4
+            const transformedProducts = data.products.slice(0, 4).map((product: any) => ({
+              id: product.id,
+              title: product.title,
+              description: product.description,
+              image: product.images?.[0]?.src || product.images?.[0] || '/placeholder-product.jpg',
+              price: product.variants?.[0]?.price || product.price || 0,
+              available: product.variants?.some((v: any) => v.is_enabled && v.is_available) || true,
+              slug: product.id,
+            }));
+            
+            setProducts(transformedProducts);
+          } else {
+            console.warn('No products array in response');
+            setProducts([]);
+          }
+        } else {
+          console.error('API response not ok:', response.status, response.statusText);
+          setError(`API Error: ${response.status}`);
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        setError('Failed to fetch products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <section id="shop" className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">
@@ -43,8 +78,30 @@ export default async function ShopTeaser() {
         </p>
       </div>
 
-      {/* Products Grid or Empty State */}
-      {products.length > 0 ? (
+      {/* Products Grid or States */}
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+          </div>
+          <h3 className="text-xl text-white mb-2">Loading Products...</h3>
+          <p className="text-gray-400">Fetching featured items</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <div className="w-24 h-24 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+            <span className="text-2xl text-red-400">⚠️</span>
+          </div>
+          <h3 className="text-xl text-white mb-2">Unable to Load Products</h3>
+          <p className="text-gray-400">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      ) : products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
           {products.map((product) => (
             <GlassPanel

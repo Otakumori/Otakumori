@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
     const action = await db.moderationAction.create({
       data: {
         ...validatedData,
+        details: validatedData.details as any,
         moderatorId: userId,
         expiresAt: validatedData.expiresAt ? new Date(validatedData.expiresAt) : undefined,
       },

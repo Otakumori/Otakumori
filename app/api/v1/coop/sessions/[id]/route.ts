@@ -109,6 +109,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       where: { id: params.id },
       data: {
         ...validatedData,
+        settings: validatedData.settings as any,
+        progress: validatedData.progress as any,
         endedAt:
           validatedData.status === 'completed' || validatedData.status === 'abandoned'
             ? new Date()

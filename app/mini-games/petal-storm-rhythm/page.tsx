@@ -82,7 +82,7 @@ export default function PetalStormRhythm() {
   const [sessionId, setSessionId] = useState<string>('');
 
   // Refs for game loop
-  const gameLoopRef = useRef<number>();
+  const gameLoopRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 

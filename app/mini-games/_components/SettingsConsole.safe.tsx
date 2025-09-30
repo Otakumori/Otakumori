@@ -22,7 +22,7 @@ export default function SettingsConsole({
   const [controllerIndex, setControllerIndex] = useState(-1);
   
   const volumeRef = useRef<HTMLInputElement>(null);
-  const timeIntervalRef = useRef<NodeJS.Timeout>();
+  const timeIntervalRef = useRef<any>(undefined);
 
   // Update time every second
   useEffect(() => {

@@ -66,7 +66,7 @@ class ApiClient {
         'VALIDATION_ERROR',
         'Invalid data',
         generateRequestId(),
-        validation.error.errors,
+        validation.error.issues,
       );
     }
 
@@ -90,7 +90,7 @@ class ApiClient {
         'VALIDATION_ERROR',
         'Invalid data',
         generateRequestId(),
-        validation.error.errors,
+        validation.error.issues,
       );
     }
 
@@ -122,7 +122,7 @@ class ApiClient {
         'VALIDATION_ERROR',
         'Invalid data',
         generateRequestId(),
-        validation.error.errors,
+        validation.error.issues,
       );
     }
 
@@ -156,7 +156,7 @@ class ApiClient {
         'VALIDATION_ERROR',
         'Invalid data',
         generateRequestId(),
-        validation.error.errors,
+        validation.error.issues,
       );
     }
 

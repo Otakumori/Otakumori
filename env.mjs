@@ -100,6 +100,7 @@ try {
       GITHUB_PAT: z.string().optional(),
       // Sentry/Stack
       SENTRY_AUTH_TOKEN: z.string().optional(),
+      SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
       STACK_SECRET_SERVER_KEY: z.string().optional(),
       // Prisma Accelerate
       PRISMA_ACCELERATE_API_KEY: z.string().optional(),
@@ -192,6 +193,10 @@ try {
       NEXT_PUBLIC_VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
       // App Version
       NEXT_PUBLIC_APP_VERSION: z.string().optional().default('1.0.0'),
+      // Analytics
+      NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+      NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
+      SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
       // Feature flags
       NEXT_PUBLIC_FEATURE_MINIGAMES: z.enum(['on', 'off']).default('on'),
       NEXT_PUBLIC_FEATURE_RUNE: z.enum(['on', 'off']).default('off'),
@@ -451,7 +456,9 @@ try {
     // Analytics/Observability (optional)
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || '',
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
     SENTRY_DSN: process.env.SENTRY_DSN || '',
+    SENTRY_SKIP_AUTO_RELEASE: process.env.SENTRY_SKIP_AUTO_RELEASE || '',
     // Anti-bot (Cloudflare Turnstile) – optional
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
     TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY || '',
@@ -482,6 +489,7 @@ try {
     NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || '',
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || '',
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
     NEXT_PUBLIC_FEATURE_GA_ENABLED: process.env.NEXT_PUBLIC_FEATURE_GA_ENABLED || 'false',
     NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '',

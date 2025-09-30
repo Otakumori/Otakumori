@@ -10,13 +10,13 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { type AdultPackType, type AvatarRenderBundleType } from '@/app/adults/_schema/pack.safe';
 
 // AnimeToon Material Component
-function AnimeToonMaterial({ 
-  glossStrength = 0.6, 
-  rimStrength = 0.35, 
-  colorA = '#ffffff', 
+function AnimeToonMaterial({
+  glossStrength = 0.6,
+  rimStrength = 0.35,
+  colorA = '#ffffff',
   colorB = '#f0f0f0',
   rimColor = '#ff6b9d',
-  ...props 
+  ...props
 }: {
   glossStrength?: number;
   rimStrength?: number;
@@ -25,8 +25,8 @@ function AnimeToonMaterial({
   rimColor?: string;
   [key: string]: any;
 }) {
-  const materialRef = useRef<any>();
-  
+  const materialRef = useRef<any>(undefined);
+
   useFrame(({ camera, gl }) => {
     if (materialRef.current) {
       // Update rim lighting based on camera position
@@ -56,13 +56,13 @@ function AnimeToonMaterial({
 }
 
 // Soft Body Physics Component
-function SoftBodyPhysics({ 
-  enabled, 
-  mass = 1.0, 
-  stiffness = 0.4, 
-  damping = 0.2, 
+function SoftBodyPhysics({
+  enabled,
+  mass = 1.0,
+  stiffness = 0.4,
+  damping = 0.2,
   maxDisplacement = 0.06,
-  children 
+  children,
 }: {
   enabled: boolean;
   mass?: number;
@@ -71,44 +71,40 @@ function SoftBodyPhysics({
   maxDisplacement?: number;
   children: React.ReactNode;
 }) {
-  const meshRef = useRef<any>();
+  const meshRef = useRef<any>(undefined);
   const [springPositions, setSpringPositions] = useState<Vector3[]>([]);
-  
+
   useFrame((state, delta) => {
     if (!enabled || !meshRef.current) return;
-    
+
     // Simple spring-based soft body simulation
     // In production, this would be more sophisticated
     const time = state.clock.elapsedTime;
     const basePosition = meshRef.current.position;
-    
+
     // Apply subtle jiggle based on time and physics parameters
     const jiggleX = Math.sin(time * 2) * maxDisplacement * 0.1;
     const jiggleY = Math.cos(time * 1.5) * maxDisplacement * 0.05;
     const jiggleZ = Math.sin(time * 1.8) * maxDisplacement * 0.08;
-    
+
     meshRef.current.position.set(
       basePosition.x + jiggleX,
       basePosition.y + jiggleY,
-      basePosition.z + jiggleZ
+      basePosition.z + jiggleZ,
     );
   });
 
-  return (
-    <group ref={meshRef}>
-      {children}
-    </group>
-  );
+  return <group ref={meshRef}>{children}</group>;
 }
 
 // Cloth Simulation Component
-function ClothSimulation({ 
-  enabled, 
-  bendStiffness = 0.5, 
-  stretchStiffness = 0.6, 
-  damping = 0.2, 
+function ClothSimulation({
+  enabled,
+  bendStiffness = 0.5,
+  stretchStiffness = 0.6,
+  damping = 0.2,
   wind = 0.0,
-  children 
+  children,
 }: {
   enabled: boolean;
   bendStiffness?: number;
@@ -117,15 +113,15 @@ function ClothSimulation({
   wind?: number;
   children: React.ReactNode;
 }) {
-  const meshRef = useRef<any>();
-  
+  const meshRef = useRef<any>(undefined);
+
   useFrame((state, delta) => {
     if (!enabled || !meshRef.current) return;
-    
+
     // Simple cloth simulation
     // In production, this would use a proper cloth solver
     const time = state.clock.elapsedTime;
-    
+
     // Apply wind effect
     if (wind > 0) {
       const windEffect = Math.sin(time * 0.5) * wind * 0.1;
@@ -133,23 +129,19 @@ function ClothSimulation({
     }
   });
 
-  return (
-    <group ref={meshRef}>
-      {children}
-    </group>
-  );
+  return <group ref={meshRef}>{children}</group>;
 }
 
 // Avatar Model Component
-function AvatarModel({ 
-  bundle, 
-  physicsConfig 
-}: { 
+function AvatarModel({
+  bundle,
+  physicsConfig,
+}: {
   bundle: AvatarRenderBundleType;
   physicsConfig: any;
 }) {
-  const meshRef = useRef<any>();
-  
+  const meshRef = useRef<any>(undefined);
+
   // Apply morph targets based on slider values
   useEffect(() => {
     if (meshRef.current && bundle.morphs) {
@@ -196,15 +188,15 @@ function AvatarModel({
 }
 
 // Scene Setup Component
-function SceneSetup({ 
-  bundle, 
-  physicsConfig 
-}: { 
+function SceneSetup({
+  bundle,
+  physicsConfig,
+}: {
   bundle: AvatarRenderBundleType;
   physicsConfig: any;
 }) {
   const { gl } = useThree();
-  
+
   useEffect(() => {
     // Set up ACES tone mapping for better color grading
     gl.toneMapping = ACESFilmicToneMapping;
@@ -221,27 +213,17 @@ function SceneSetup({
         castShadow
         shadow-mapSize={[2048, 2048]}
       />
-      <directionalLight
-        position={[-5, 5, -5]}
-        intensity={0.3}
-        color="#ff6b9d"
-      />
-      
+      <directionalLight position={[-5, 5, -5]} intensity={0.3} color="#ff6b9d" />
+
       {/* Environment */}
       <Environment preset="studio" />
-      
+
       {/* Contact Shadows */}
-      <ContactShadows
-        position={[0, -1, 0]}
-        opacity={0.25}
-        scale={10}
-        blur={2}
-        far={4.5}
-      />
-      
+      <ContactShadows position={[0, -1, 0]} opacity={0.25} scale={10} blur={2} far={4.5} />
+
       {/* Avatar Model */}
       <AvatarModel bundle={bundle} physicsConfig={physicsConfig} />
-      
+
       {/* Controls */}
       <OrbitControls
         enablePan={false}
@@ -257,10 +239,10 @@ function SceneSetup({
 }
 
 // Main Preview Scene Component
-export function AdultPreviewScene({ 
-  pack, 
-  sliders = {}, 
-  physicsConfig 
+export function AdultPreviewScene({
+  pack,
+  sliders = {},
+  physicsConfig,
 }: {
   pack: AdultPackType;
   sliders?: Record<string, number>;
@@ -268,7 +250,7 @@ export function AdultPreviewScene({
 }) {
   const isReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const [isLoaded, setIsLoaded] = useState(false);
-  
+
   // Create avatar bundle from pack data
   const avatarBundle = useMemo((): AvatarRenderBundleType => {
     return {
@@ -309,21 +291,18 @@ export function AdultPreviewScene({
       <Canvas
         camera={{ position: [0, 1, 5], fov: 50 }}
         shadows
-        gl={{ 
+        gl={{
           antialias: true,
           alpha: false,
-          powerPreference: 'high-performance'
+          powerPreference: 'high-performance',
         }}
         onCreated={() => setIsLoaded(true)}
       >
         <Suspense fallback={null}>
-          <SceneSetup 
-            bundle={avatarBundle} 
-            physicsConfig={effectivePhysicsConfig} 
-          />
+          <SceneSetup bundle={avatarBundle} physicsConfig={effectivePhysicsConfig} />
         </Suspense>
       </Canvas>
-      
+
       {/* Loading overlay */}
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50">

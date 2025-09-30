@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+ 
 
 'use client';
 
@@ -75,7 +75,7 @@ export default function AdminReviewsClient() {
                 {r.imageUrls?.length > 0 && (
                   <div className="mt-3 flex gap-3">
                     {r.imageUrls.map((u) => (
-                      // eslint-disable-next-line @next/next/no-img-element
+                       
                       <img
                         key={u}
                         src={u}

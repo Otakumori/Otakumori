@@ -197,7 +197,7 @@ export default function OrdersPage() {
                     <div key={item.id} className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
                         {item.product?.primaryImageUrl ? (
-                          /* eslint-disable-next-line @next/next/no-img-element */
+                           
                           <img
                             src={item.product.primaryImageUrl}
                             alt={item.product.name}

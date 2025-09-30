@@ -4,7 +4,7 @@ import { env } from '@/env';
 
 // Initialize Stripe client
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2025-08-27.basil',
 });
 
 // Zod schemas for Stripe webhook events
@@ -32,7 +32,7 @@ export const StripeCheckoutSessionSchema = z.object({
   status: z.string(),
   amount_total: z.number(),
   currency: z.string(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
 });
 
 export const StripePaymentIntentSchema = z.object({
@@ -41,7 +41,7 @@ export const StripePaymentIntentSchema = z.object({
   currency: z.string(),
   status: z.string(),
   customer: z.string().nullable(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
 });
 
 // Webhook verification function

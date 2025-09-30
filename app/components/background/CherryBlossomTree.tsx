@@ -18,7 +18,7 @@ export default function CherryBlossomTree() {
   const [mounted, setMounted] = useState(false);
   const [petals, setPetals] = useState<Petal[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     setMounted(true);

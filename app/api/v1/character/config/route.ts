@@ -144,9 +144,9 @@ export async function POST(request: NextRequest) {
         userId: currentUser.id,
         name: validatedData.name,
         isActive: validatedData.isActive || false,
-        configData: validatedData.configData,
-        meshData: validatedData.configData, // For now, use configData as meshData
-        textureData: validatedData.configData, // For now, use configData as textureData
+        configData: validatedData.configData as any,
+        meshData: validatedData.configData as any, // For now, use configData as meshData
+        textureData: validatedData.configData as any, // For now, use configData as textureData
       },
     });
 

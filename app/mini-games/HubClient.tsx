@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import GameCubeBootOverlay from './_components/GameCubeBootOverlay';
+import GameCubeBootSequence from '@/app/components/gamecube/GameCubeBootSequence';
 import GameCubeHubV2 from './_components/GameCubeHubV2';
 
 export default function HubClient() {
@@ -68,7 +68,7 @@ export default function HubClient() {
   }
 
   if (bootState === 'boot') {
-    return <GameCubeBootOverlay onComplete={handleBootComplete} onSkip={handleBootSkip} />;
+    return <GameCubeBootSequence onComplete={handleBootComplete} skipable={true} />;
   }
 
   return <GameCubeHubV2 />;

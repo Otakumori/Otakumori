@@ -2,7 +2,7 @@ export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 export function log(level: LogLevel, message: string, meta?: Record<string, unknown>) {
   const ts = new Date().toISOString();
-  // eslint-disable-next-line no-console
+   
   console[level](`[${ts}] ${message}`, meta ?? {});
 }
 

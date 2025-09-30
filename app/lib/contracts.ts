@@ -285,7 +285,7 @@ export const PrintifyOrderDataSchema = z.object({
 // Admin schemas
 export const AdminActionSchema = z.object({
   action: z.enum(['sync_products', 'sync_orders', 'update_status']),
-  params: z.record(z.any()).optional(),
+  params: z.record(z.string(), z.any()).optional(),
 });
 
 // Petal system schemas
@@ -323,7 +323,7 @@ export const validateRequest = <T>(schema: z.ZodSchema<T>, data: unknown): T => 
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const message = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const message = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new Error(`Validation failed: ${message}`);
     }
     throw error;
@@ -335,7 +335,7 @@ export const validatePartial = <T>(schema: z.ZodObject<any>, data: unknown): any
     return schema.partial().parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const message = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const message = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new Error(`Validation failed: ${message}`);
     }
     throw error;
@@ -354,7 +354,7 @@ export const GameStartResponseSchema = z.object({
     .object({
       runId: z.string(),
       seed: z.number(),
-      flags: z.record(z.any()).optional(),
+      flags: z.record(z.string(), z.any()).optional().default({}),
     })
     .optional(),
   error: z.string().optional(),
@@ -364,7 +364,7 @@ export const GameFinishRequestSchema = z.object({
   runId: z.string().min(1),
   score: z.number().min(0),
   statsHash: z.string().min(1),
-  meta: z.record(z.any()).optional(),
+  meta: z.record(z.string(), z.any()).default({}).optional(),
   idempotencyKey: z.string().min(1),
 });
 
@@ -385,7 +385,7 @@ export const GameFinishResponseSchema = z.object({
 export const GameProgressRequestSchema = z.object({
   runId: z.string().min(1),
   checkpoint: z.string().min(1),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
   idempotencyKey: z.string().min(1),
 });
 
@@ -412,7 +412,7 @@ export const AchievementUnlockResponseSchema = z.object({
     .object({
       achievementId: z.string(),
       rewardGranted: z.boolean(),
-      rewardDetails: z.record(z.any()).optional(),
+      rewardDetails: z.record(z.string(), z.any()).default({}).optional(),
     })
     .optional(),
   error: z.string().optional(),
@@ -726,7 +726,7 @@ export const ActivitySchema = z.object({
   id: IdSchema,
   profileId: IdSchema,
   type: ActivityTypeSchema,
-  payload: z.record(z.any()),
+  payload: z.record(z.string(), z.any()).default({}),
   visibility: VisibilitySchema,
   createdAt: z.string().datetime(),
 });
@@ -759,7 +759,7 @@ export const NotificationSchema = z.object({
   id: IdSchema,
   profileId: IdSchema,
   type: NotificationTypeSchema,
-  payload: z.record(z.any()),
+  payload: z.record(z.string(), z.any()).default({}),
   read: z.boolean(),
   createdAt: z.string().datetime(),
 });
@@ -790,7 +790,7 @@ export const LeaderboardScoreSchema = z.object({
   boardId: IdSchema,
   profileId: IdSchema,
   score: z.number().int().min(0),
-  meta: z.record(z.any()).optional(),
+  meta: z.record(z.string(), z.any()).default({}).optional(),
   rank: z.number().int().min(1).optional(),
   createdAt: z.string().datetime(),
 });
@@ -814,7 +814,7 @@ export const LeaderboardResponseSchema = z.object({
       avatarUrl: z.string().nullable(),
       score: z.number().int().min(0),
       rank: z.number().int().min(1),
-      meta: z.record(z.any()).optional(),
+      meta: z.record(z.string(), z.any()).default({}).optional(),
       createdAt: z.string().datetime(),
     }),
   ),
@@ -830,7 +830,7 @@ export const LeaderboardResponseSchema = z.object({
 export const SubmitScoreRequestSchema = z.object({
   gameCode: z.string().min(1),
   score: z.number().int().min(0),
-  meta: z.record(z.any()).optional(),
+  meta: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const SubmitScoreResponseSchema = z.object({
@@ -860,11 +860,11 @@ export const CharacterPresetSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   category: z.enum(['hair', 'face', 'body', 'clothing', 'accessories']),
-  meshData: z.record(z.any()),
-  textureData: z.record(z.any()),
+  meshData: z.record(z.string(), z.any()).default({}),
+  textureData: z.record(z.string(), z.any()).default({}),
   colorPalette: z.array(z.string()),
   rarity: z.enum(['common', 'rare', 'epic', 'legendary']),
-  unlockCondition: z.record(z.any()).optional(),
+  unlockCondition: z.record(z.string(), z.any()).default({}).optional(),
   isDefault: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -875,9 +875,9 @@ export const CharacterConfigSchema = z.object({
   userId: z.string(),
   name: z.string(),
   isActive: z.boolean(),
-  configData: z.record(z.any()),
-  meshData: z.record(z.any()),
-  textureData: z.record(z.any()),
+  configData: z.record(z.string(), z.any()),
+  meshData: z.record(z.string(), z.any()),
+  textureData: z.record(z.string(), z.any()),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -887,8 +887,8 @@ export const CharacterReactionSchema = z.object({
   characterConfigId: z.string(),
   context: z.enum(['home', 'shop', 'games', 'social', 'achievements']),
   reactionType: z.enum(['idle', 'happy', 'excited', 'focused', 'sleepy']),
-  animationData: z.record(z.any()),
-  triggerConditions: z.record(z.any()).optional(),
+  animationData: z.record(z.string(), z.any()),
+  triggerConditions: z.record(z.string(), z.any()).default({}).optional(),
   createdAt: z.string(),
 });
 
@@ -900,7 +900,7 @@ export const CharacterPresetRequestSchema = z.object({
 
 export const CharacterConfigRequestSchema = z.object({
   name: z.string().min(1).max(50),
-  configData: z.record(z.any()),
+  configData: z.record(z.string(), z.any()),
   isActive: z.boolean().optional(),
 });
 
@@ -914,8 +914,8 @@ export const CharacterReactionRequestSchema = z.object({
   characterConfigId: z.string(),
   context: z.enum(['home', 'shop', 'games', 'social', 'achievements']),
   reactionType: z.enum(['idle', 'happy', 'excited', 'focused', 'sleepy']),
-  animationData: z.record(z.any()),
-  triggerConditions: z.record(z.any()).optional(),
+  animationData: z.record(z.string(), z.any()),
+  triggerConditions: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const CharacterPresetUnlockSchema = z.object({
@@ -1019,7 +1019,7 @@ export const PartySchema = z.object({
   isPublic: z.boolean(),
   gameMode: z.enum(['mini-games', 'exploration', 'social', 'custom']).optional(),
   status: z.enum(['open', 'full', 'in-game', 'closed']),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.any()).default({}).optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
   leader: z
@@ -1056,7 +1056,7 @@ export const PartyCreateSchema = z.object({
   maxMembers: z.number().int().min(2).max(8).default(4),
   isPublic: z.boolean().default(true),
   gameMode: z.enum(['mini-games', 'exploration', 'social', 'custom']).optional(),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const PartyUpdateSchema = z.object({
@@ -1066,7 +1066,7 @@ export const PartyUpdateSchema = z.object({
   isPublic: z.boolean().optional(),
   gameMode: z.enum(['mini-games', 'exploration', 'social', 'custom']).optional(),
   status: z.enum(['open', 'full', 'in-game', 'closed']).optional(),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const PartyInvitationSchema = z.object({
@@ -1116,8 +1116,8 @@ export const CoopSessionSchema = z.object({
   gameType: z.enum(['mini-game', 'exploration', 'social']),
   gameId: z.string().optional(),
   status: z.enum(['active', 'paused', 'completed', 'abandoned']),
-  settings: z.record(z.any()).optional(),
-  progress: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.any()).default({}).optional(),
+  progress: z.record(z.string(), z.any()).default({}).optional(),
   startedAt: z.string(),
   endedAt: z.string().optional(),
   createdAt: z.string(),
@@ -1130,7 +1130,7 @@ export const CoopSessionSchema = z.object({
         role: z.enum(['player', 'spectator', 'moderator']),
         joinedAt: z.string(),
         leftAt: z.string().optional(),
-        stats: z.record(z.any()).optional(),
+        stats: z.record(z.string(), z.any()).default({}).optional(),
         user: z.object({
           id: z.string(),
           username: z.string(),
@@ -1146,13 +1146,13 @@ export const CoopSessionCreateSchema = z.object({
   partyId: z.string(),
   gameType: z.enum(['mini-game', 'exploration', 'social']),
   gameId: z.string().optional(),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const CoopSessionUpdateSchema = z.object({
   status: z.enum(['active', 'paused', 'completed', 'abandoned']).optional(),
-  settings: z.record(z.any()).optional(),
-  progress: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.any()).default({}).optional(),
+  progress: z.record(z.string(), z.any()).default({}).optional(),
   endedAt: z.string().optional(),
 });
 
@@ -1162,7 +1162,7 @@ export const PartyMessageSchema = z.object({
   authorId: z.string(),
   content: z.string(),
   messageType: z.enum(['text', 'system', 'game_event']),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).default({}).optional(),
   createdAt: z.string(),
   author: z
     .object({
@@ -1178,7 +1178,7 @@ export const PartyMessageCreateSchema = z.object({
   partyId: z.string(),
   content: z.string().min(1).max(500),
   messageType: z.enum(['text', 'system', 'game_event']).default('text'),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const PartyListRequestSchema = z.object({
@@ -1233,7 +1233,7 @@ export const UserReportSchema = z.object({
   contentId: z.string().optional(),
   reason: z.enum(['spam', 'harassment', 'inappropriate', 'fake', 'underage', 'other']),
   description: z.string().optional(),
-  evidence: z.record(z.any()).optional(),
+  evidence: z.record(z.string(), z.any()).default({}).optional(),
   status: z.enum(['pending', 'reviewed', 'resolved', 'dismissed']),
   priority: z.enum(['low', 'medium', 'high', 'urgent']),
   assignedModeratorId: z.string().optional(),
@@ -1275,7 +1275,7 @@ export const UserReportCreateSchema = z.object({
   contentId: z.string().optional(),
   reason: z.enum(['spam', 'harassment', 'inappropriate', 'fake', 'underage', 'other']),
   description: z.string().max(1000).optional(),
-  evidence: z.record(z.any()).optional(),
+  evidence: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const UserReportUpdateSchema = z.object({
@@ -1294,7 +1294,7 @@ export const ModerationActionSchema = z.object({
   moderatorId: z.string(),
   actionType: z.enum(['warning', 'content_removed', 'suspension', 'ban', 'restriction']),
   reason: z.string(),
-  details: z.record(z.any()).optional(),
+  details: z.record(z.string(), z.any()).default({}).optional(),
   reportId: z.string().optional(),
   expiresAt: z.string().optional(),
   isActive: z.boolean(),
@@ -1323,7 +1323,7 @@ export const ModerationActionCreateSchema = z.object({
   userId: z.string(),
   actionType: z.enum(['warning', 'content_removed', 'suspension', 'ban', 'restriction']),
   reason: z.string().min(1).max(500),
-  details: z.record(z.any()).optional(),
+  details: z.record(z.string(), z.any()).default({}).optional(),
   reportId: z.string().optional(),
   expiresAt: z.string().optional(), // ISO string for temporary actions
 });
@@ -1338,7 +1338,7 @@ export const ContentModerationSchema = z.object({
   automatedScore: z.number().min(0).max(1).optional(),
   moderatorId: z.string().optional(),
   moderatorNotes: z.string().optional(),
-  flags: z.record(z.any()).optional(),
+  flags: z.record(z.string(), z.any()).default({}).optional(),
   createdAt: z.string(),
   reviewedAt: z.string().optional(),
   author: z
@@ -1392,7 +1392,7 @@ export const ModeratorRoleSchema = z.object({
   id: z.string(),
   userId: z.string(),
   role: z.enum(['moderator', 'senior_moderator', 'admin']),
-  permissions: z.record(z.any()),
+  permissions: z.record(z.string(), z.any()),
   assignedBy: z.string(),
   isActive: z.boolean(),
   createdAt: z.string(),
@@ -1418,7 +1418,7 @@ export const ModeratorRoleSchema = z.object({
 export const ModeratorRoleCreateSchema = z.object({
   userId: z.string(),
   role: z.enum(['moderator', 'senior_moderator', 'admin']),
-  permissions: z.record(z.any()),
+  permissions: z.record(z.string(), z.any()),
   expiresAt: z.string().optional(), // ISO string for temporary roles
 });
 
@@ -1427,7 +1427,7 @@ export const ModerationAppealSchema = z.object({
   actionId: z.string(),
   userId: z.string(),
   reason: z.string(),
-  evidence: z.record(z.any()).optional(),
+  evidence: z.record(z.string(), z.any()).default({}).optional(),
   status: z.enum(['pending', 'under_review', 'approved', 'denied']),
   reviewedBy: z.string().optional(),
   reviewNotes: z.string().optional(),
@@ -1455,7 +1455,7 @@ export const ModerationAppealSchema = z.object({
 export const ModerationAppealCreateSchema = z.object({
   actionId: z.string(),
   reason: z.string().min(1).max(1000),
-  evidence: z.record(z.any()).optional(),
+  evidence: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const ModerationAppealUpdateSchema = z.object({
@@ -1518,7 +1518,7 @@ export const SearchHistorySchema = z.object({
   userId: z.string(),
   query: z.string(),
   searchType: z.enum(['people', 'content', 'products', 'all']),
-  filters: z.record(z.any()).optional(),
+  filters: z.record(z.string(), z.any()).default({}).optional(),
   resultCount: z.number().int().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -1575,7 +1575,7 @@ export const SearchResultSchema = z.object({
   description: z.string().optional(),
   url: z.string(),
   relevanceScore: z.number().optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const SearchResponseSchema = z.object({
@@ -1583,7 +1583,7 @@ export const SearchResponseSchema = z.object({
   totalCount: z.number().int().min(0),
   hasMore: z.boolean(),
   suggestions: z.array(SearchSuggestionSchema).optional(),
-  filters: z.record(z.any()).optional(),
+  filters: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const SearchSuggestionRequestSchema = z.object({
@@ -1725,7 +1725,7 @@ export const GameSettingsSchema = z.object({
   music: z.boolean(),
   hapticFeedback: z.boolean(),
   autoSave: z.boolean(),
-  customSettings: z.record(z.any()).optional(),
+  customSettings: z.record(z.string(), z.any()).default({}).optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -1737,7 +1737,7 @@ export const GameSettingsUpdateSchema = z.object({
   music: z.boolean().optional(),
   hapticFeedback: z.boolean().optional(),
   autoSave: z.boolean().optional(),
-  customSettings: z.record(z.any()).optional(),
+  customSettings: z.record(z.string(), z.any()).default({}).optional(),
 });
 
 export const GameSettingsListRequestSchema = z.object({

@@ -37,7 +37,7 @@ export default function TierFrame({
 
   // Generate tier-specific visual elements
   const getTierElements = () => {
-    const elements: JSX.Element[] = [];
+    const elements: React.ReactElement[] = [];
     const center = size / 2;
     const radius = (size - 20) / 2;
 

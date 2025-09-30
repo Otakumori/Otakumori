@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -94,14 +92,36 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
         setSeed((response.data as any).seed);
       }
 
-      // Initialize PIXI app
-      const app = new PIXI.Application({
+      // Initialize PIXI app using manager
+      const { pixiManager } = await import('@/app/lib/pixi-application-manager');
+      const app = pixiManager.getApplication({
+        id: `samurai-petal-slice-${Date.now()}`,
         width: 800,
         height: 600,
         backgroundColor: 0xf8f9fa,
         antialias: true,
         resolution: window.devicePixelRatio || 1,
         autoDensity: true,
+        hello: false,
+        sharedTicker: false,
+        powerPreference: 'high-performance',
+        backgroundAlpha: 1,
+        clearBeforeRender: true,
+        preserveDrawingBuffer: false,
+        roundPixels: false,
+        premultipliedAlpha: true,
+        failIfMajorPerformanceCaveat: false,
+        textureGCActive: true,
+        textureGCAMaxIdle: 60 * 60,
+        textureGCMaxIdle: 60 * 60 * 2,
+        textureGCCheckCountMax: 600,
+        renderableGCActive: true,
+        renderableGCMaxUnusedTime: 60 * 60,
+        renderableGCFrequency: 60,
+        bezierSmoothness: 0.5,
+        context: null,
+        multiView: false,
+        forceFallbackAdapter: false,
       });
 
       canvasRef.current.appendChild(app.view as any);
@@ -599,7 +619,10 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
         gameLoopRef.current.dispose();
       }
       if (appRef.current) {
-        appRef.current.destroy(true);
+        // Use PIXI manager for proper cleanup
+        import('@/app/lib/pixi-application-manager').then(({ pixiManager }) => {
+          pixiManager.destroyApplication(`samurai-petal-slice-${Date.now()}`);
+        });
       }
     };
   }, [initializeGame]);

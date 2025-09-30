@@ -149,6 +149,7 @@ export async function POST(request: NextRequest) {
     const report = await db.userReport.create({
       data: {
         ...validatedData,
+        evidence: validatedData.evidence as any,
         reporterId: userId,
       },
       include: {

@@ -24,7 +24,7 @@ const PreviewRequest = z.object({
 
 // Mock pack data - in production this would come from your storage
 const mockPackData = {
-  'midnight_set_A': {
+  midnight_set_A: {
     slug: 'midnight_set_A',
     title: 'Midnight Set A',
     rarity: 'legendary',
@@ -79,12 +79,36 @@ const mockPackData = {
       mask: 'https://example.com/midnight_set_A_mask.ktx2',
     },
     sliders: [
-      { id: 'outfit.tightness', label: 'Outfit Tightness', min: 0, max: 1, step: 0.01, default: 0.5, affects: ['outfit_morph'] },
-      { id: 'outfit.hemLength', label: 'Hem Length', min: 0, max: 1, step: 0.01, default: 0.3, affects: ['hem_morph'] },
-      { id: 'accessories.gloss', label: 'Accessory Gloss', min: 0, max: 1, step: 0.01, default: 0.7, affects: ['accessory_shader'] },
+      {
+        id: 'outfit.tightness',
+        label: 'Outfit Tightness',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.5,
+        affects: ['outfit_morph'],
+      },
+      {
+        id: 'outfit.hemLength',
+        label: 'Hem Length',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.3,
+        affects: ['hem_morph'],
+      },
+      {
+        id: 'accessories.gloss',
+        label: 'Accessory Gloss',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.7,
+        affects: ['accessory_shader'],
+      },
     ],
   },
-  'neo_street_fighter': {
+  neo_street_fighter: {
     slug: 'neo_street_fighter',
     title: 'Neo Street Fighter',
     rarity: 'rare',
@@ -136,8 +160,24 @@ const mockPackData = {
       normal: 'https://example.com/neo_street_fighter_normal.ktx2',
     },
     sliders: [
-      { id: 'outfit.muscleDefinition', label: 'Muscle Definition', min: 0, max: 1, step: 0.01, default: 0.6, affects: ['muscle_morph'] },
-      { id: 'outfit.athleticFit', label: 'Athletic Fit', min: 0, max: 1, step: 0.01, default: 0.8, affects: ['fit_morph'] },
+      {
+        id: 'outfit.muscleDefinition',
+        label: 'Muscle Definition',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.6,
+        affects: ['muscle_morph'],
+      },
+      {
+        id: 'outfit.athleticFit',
+        label: 'Athletic Fit',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.8,
+        affects: ['fit_morph'],
+      },
     ],
   },
 };
@@ -145,25 +185,25 @@ const mockPackData = {
 // Merge slider values with pack defaults
 function mergeSliderDefaults(pack: any, userSliders: Record<string, number>) {
   const mergedSliders = { ...userSliders };
-  
+
   // Apply pack-specific slider defaults
   pack.sliders.forEach((slider: any) => {
     if (!(slider.id in mergedSliders)) {
       mergedSliders[slider.id] = slider.default;
     }
   });
-  
+
   return mergedSliders;
 }
 
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
-  
+
   try {
     // Check feature flags
     if (!checkFeatureFlags()) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'FEATURE_DISABLED',
@@ -171,7 +211,7 @@ export async function GET(request: NextRequest) {
           },
           requestId,
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -179,7 +219,7 @@ export async function GET(request: NextRequest) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'AUTH_REQUIRED',
@@ -187,7 +227,7 @@ export async function GET(request: NextRequest) {
           },
           requestId,
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -195,7 +235,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const packSlug = searchParams.get('packSlug');
     const slidersParam = searchParams.get('sliders');
-    
+
     let userSliders = {};
     if (slidersParam) {
       try {
@@ -214,7 +254,7 @@ export async function GET(request: NextRequest) {
     const pack = mockPackData[validatedRequest.packSlug as keyof typeof mockPackData];
     if (!pack) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'PACK_NOT_FOUND',
@@ -222,7 +262,7 @@ export async function GET(request: NextRequest) {
           },
           requestId,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -261,27 +301,26 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Preview API error:', error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Invalid request data',
-            details: error.errors,
+            details: error.issues,
           },
           requestId,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { 
+      {
         ok: false,
         error: {
           code: 'INTERNAL_ERROR',
@@ -290,7 +329,7 @@ export async function GET(request: NextRequest) {
         },
         requestId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

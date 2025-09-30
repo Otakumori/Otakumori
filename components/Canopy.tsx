@@ -13,7 +13,7 @@ export default function Canopy({ windDirection = 45, windSpeed = 1, className }:
   const [canopyBounds, setCanopyBounds] = useState({ x: 0, y: 0, width: 400, height: 300 });
   const [rotation, setRotation] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const updateBounds = () => {

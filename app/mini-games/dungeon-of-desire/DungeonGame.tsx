@@ -33,7 +33,7 @@ interface Spell {
 
 export default function DungeonGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
 
   // Game state

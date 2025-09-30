@@ -43,30 +43,38 @@ async function storeIdempotencyResponse(key: string, response: any): Promise<voi
 }
 
 // Petals purchase logic
-async function purchaseWithPetals(userId: string, packSlug: string, packPrice: number): Promise<boolean> {
+async function purchaseWithPetals(
+  userId: string,
+  packSlug: string,
+  packPrice: number,
+): Promise<boolean> {
   // This would integrate with your existing petals system
   // For now, we'll assume a successful purchase
   console.log(`User ${userId} purchasing ${packSlug} for ${packPrice} petals`);
-  
+
   // TODO: Implement actual petals debit logic
   // 1. Check user has enough petals
   // 2. Debit petals atomically
   // 3. Create UserCosmetic record
-  
+
   return true;
 }
 
 // Stripe purchase logic
-async function purchaseWithStripe(userId: string, packSlug: string, packPriceCents: number): Promise<{ checkoutUrl: string }> {
+async function purchaseWithStripe(
+  userId: string,
+  packSlug: string,
+  packPriceCents: number,
+): Promise<{ checkoutUrl: string }> {
   // This would integrate with your existing Stripe system
   // For now, we'll return a placeholder
   console.log(`User ${userId} purchasing ${packSlug} for ${packPriceCents} cents via Stripe`);
-  
+
   // TODO: Implement actual Stripe checkout session creation
   // 1. Create Stripe checkout session
   // 2. Return checkout URL
   // 3. Handle success via webhook
-  
+
   return {
     checkoutUrl: `https://checkout.stripe.com/pay/placeholder_${Date.now()}`,
   };
@@ -74,12 +82,12 @@ async function purchaseWithStripe(userId: string, packSlug: string, packPriceCen
 
 export async function POST(request: NextRequest) {
   const requestId = generateRequestId();
-  
+
   try {
     // Check feature flags
     if (!checkFeatureFlags()) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'FEATURE_DISABLED',
@@ -87,7 +95,7 @@ export async function POST(request: NextRequest) {
           },
           requestId,
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -95,7 +103,7 @@ export async function POST(request: NextRequest) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'AUTH_REQUIRED',
@@ -103,7 +111,7 @@ export async function POST(request: NextRequest) {
           },
           requestId,
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -111,7 +119,7 @@ export async function POST(request: NextRequest) {
     // const user = await currentUser();
     // if (!user?.publicMetadata?.adultVerified) {
     //   return NextResponse.json(
-    //     { 
+    //     {
     //       ok: false,
     //       error: {
     //         code: 'ADULT_VERIFICATION_REQUIRED',
@@ -128,8 +136,9 @@ export async function POST(request: NextRequest) {
     const validatedRequest = PurchaseRequest.parse(body);
 
     // Generate idempotency key
-    const idempotencyKey = request.headers.get('x-idempotency-key') || 
-                          `purchase_${userId}_${validatedRequest.packSlug}_${Date.now()}`;
+    const idempotencyKey =
+      request.headers.get('x-idempotency-key') ||
+      `purchase_${userId}_${validatedRequest.packSlug}_${Date.now()}`;
 
     // Check for duplicate request
     const cachedResponse = await checkIdempotency(idempotencyKey);
@@ -148,10 +157,14 @@ export async function POST(request: NextRequest) {
     let purchaseResult;
 
     if (validatedRequest.payment === 'petals') {
-      const success = await purchaseWithPetals(userId, validatedRequest.packSlug, packDetails.pricePetals);
+      const success = await purchaseWithPetals(
+        userId,
+        validatedRequest.packSlug,
+        packDetails.pricePetals,
+      );
       if (!success) {
         return NextResponse.json(
-          { 
+          {
             ok: false,
             error: {
               code: 'INSUFFICIENT_PETALS',
@@ -159,12 +172,16 @@ export async function POST(request: NextRequest) {
             },
             requestId,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
       purchaseResult = { success: true, method: 'petals' };
     } else if (validatedRequest.payment === 'stripe') {
-      const stripeResult = await purchaseWithStripe(userId, validatedRequest.packSlug, packDetails.priceUsdCents);
+      const stripeResult = await purchaseWithStripe(
+        userId,
+        validatedRequest.packSlug,
+        packDetails.priceUsdCents,
+      );
       purchaseResult = { success: true, method: 'stripe', checkoutUrl: stripeResult.checkoutUrl };
     }
 
@@ -183,27 +200,26 @@ export async function POST(request: NextRequest) {
     await storeIdempotencyResponse(idempotencyKey, response);
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Purchase API error:', error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { 
+        {
           ok: false,
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Invalid request data',
-            details: error.errors,
+            details: error.issues,
           },
           requestId,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { 
+      {
         ok: false,
         error: {
           code: 'INTERNAL_ERROR',
@@ -212,7 +228,7 @@ export async function POST(request: NextRequest) {
         },
         requestId,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

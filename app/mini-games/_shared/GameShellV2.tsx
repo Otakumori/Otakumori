@@ -1,6 +1,6 @@
 /**
  * Enterprise Game Shell V2 - Simplified
- * 
+ *
  * Production-ready game container with core features
  */
 
@@ -23,18 +23,18 @@ interface GameShellV2Props {
   gameKey: string;
   title: string;
   children: React.ReactNode;
-  
+
   // Game configuration
   enableBootAnimation?: boolean;
   enableLeaderboards?: boolean;
   enableAchievements?: boolean;
   enableTelemetry?: boolean;
-  
+
   // Callbacks
   onGameStart?: () => void;
   onGameEnd?: (score: number, level: number) => void;
   onError?: (error: Error) => void;
-  
+
   // Custom settings
   className?: string;
   maxPlayers?: number;
@@ -69,7 +69,7 @@ export default function GameShellV2({
   difficulty = 'medium',
 }: GameShellV2Props) {
   const { isSignedIn, userId } = useAuth();
-  
+
   // Game state
   const [gameState, setGameState] = useState<GameState>({
     isLoading: true,
@@ -95,7 +95,7 @@ export default function GameShellV2({
   const handleBootComplete = useCallback(() => {
     setShowBootAnimation(false);
     setGameState((prev) => ({ ...prev, isLoading: false }));
-    
+
     if (enableTelemetry) {
       telemetry.startSession(userId || undefined);
     }
@@ -221,7 +221,9 @@ export default function GameShellV2({
   }, [enableTelemetry, telemetry, gameState.isComplete, saveSystem]);
 
   return (
-    <div className={`relative min-h-screen bg-gradient-to-b from-purple-900 to-black overflow-hidden ${className}`}>
+    <div
+      className={`relative min-h-screen bg-gradient-to-b from-purple-900 to-black overflow-hidden ${className}`}
+    >
       {/* Boot Animation */}
       <AnimatePresence>
         {showBootAnimation && (
@@ -241,7 +243,7 @@ export default function GameShellV2({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <h1 className="text-2xl font-bold text-white">{title}</h1>
-                
+
                 {gameState.isPlaying && (
                   <div className="flex items-center space-x-4 text-white/80">
                     <span>Score: {gameState.currentScore.toLocaleString()}</span>
@@ -260,7 +262,7 @@ export default function GameShellV2({
                     ⏸️
                   </button>
                 )}
-                
+
                 <button
                   onClick={() => window.history.back()}
                   className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
@@ -282,7 +284,7 @@ export default function GameShellV2({
               }
             >
               {React.cloneElement(children as React.ReactElement, {
-                gameState,
+                ...(children as any).props,
                 onScoreUpdate: (score: number) =>
                   setGameState((prev) => ({ ...prev, currentScore: score })),
                 onLevelUpdate: (level: number) =>
@@ -328,14 +330,14 @@ export default function GameShellV2({
               <div className="text-center text-white">
                 <h2 className="text-4xl font-bold mb-4">{title}</h2>
                 <p className="text-xl mb-8 text-white/80">Ready to play?</p>
-                
+
                 <button
                   onClick={startGame}
                   className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl text-xl font-bold transition-all transform hover:scale-105"
                 >
                   Start Game
                 </button>
-                
+
                 <div className="mt-8 text-sm text-white/60">
                   <p>Press SPACE to pause • ESC for menu • Ctrl+R to restart</p>
                 </div>
@@ -355,16 +357,13 @@ export default function GameShellV2({
                 <div className="text-2xl mb-8">
                   <p>
                     Final Score:{' '}
-                    <span className="text-pink-400">
-                      {gameState.currentScore.toLocaleString()}
-                    </span>
+                    <span className="text-pink-400">{gameState.currentScore.toLocaleString()}</span>
                   </p>
                   <p>
-                    Level Reached:{' '}
-                    <span className="text-purple-400">{gameState.currentLevel}</span>
+                    Level Reached: <span className="text-purple-400">{gameState.currentLevel}</span>
                   </p>
                 </div>
-                
+
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={restartGame}
@@ -372,7 +371,7 @@ export default function GameShellV2({
                   >
                     Play Again
                   </button>
-                  
+
                   <button
                     onClick={() => window.history.back()}
                     className="px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-xl font-bold transition-all"

@@ -11,7 +11,7 @@ type OrderCard = {
 export default function MemoryCardsDock() {
   const [cards, setCards] = useState<OrderCard[]>([]);
   const [newestCard, setNewestCard] = useState<string | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<any>(undefined);
 
   useEffect(() => {
     const fetchCards = async () => {

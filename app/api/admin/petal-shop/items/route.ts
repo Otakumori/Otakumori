@@ -25,7 +25,7 @@ const UpsertSchema = z.object({
   eventTag: z.string().nullable().optional(),
   visibleFrom: z.string().nullable().optional(),
   visibleTo: z.string().nullable().optional(),
-  metadata: z.record(z.any()).nullable().optional(),
+  metadata: z.record(z.string(), z.any()).nullable().optional(),
 });
 
 export async function POST(req: NextRequest) {

@@ -8,7 +8,7 @@ interface PetalFieldProps {
 
 export default function PetalField({ density = 'site' }: PetalFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
   const petalsRef = useRef<
     Array<{
       x: number;

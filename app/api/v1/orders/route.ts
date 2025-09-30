@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           error: 'Invalid order data',
-          details: error.errors,
+          details: error.issues,
           requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         },
         { status: 400 },
