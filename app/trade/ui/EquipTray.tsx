@@ -108,7 +108,7 @@ export default function EquipTray() {
                   className="w-8 h-8 object-contain"
                 />
               ) : (
-                <span className="text-2xl">🖼️</span>
+                <span className="text-2xl">️</span>
               )}
             </div>
             <div className="flex-1">
@@ -141,7 +141,7 @@ export default function EquipTray() {
                   className="w-8 h-8 object-contain"
                 />
               ) : (
-                <span className="text-2xl">✨</span>
+                <span className="text-2xl"></span>
               )}
             </div>
             <div className="flex-1">
@@ -167,7 +167,7 @@ export default function EquipTray() {
             className="flex items-center gap-3 p-3 bg-neutral-800/50 rounded-lg border border-neutral-700"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">👑</span>
+              <span className="text-2xl"></span>
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
@@ -199,7 +199,7 @@ export default function EquipTray() {
                   className="flex items-center gap-2 p-2 bg-neutral-800/30 rounded border border-neutral-700"
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded flex items-center justify-center">
-                    <span className="text-lg">🏅</span>
+                    <span className="text-lg"></span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-medium text-white truncate">{badge.name}</div>
@@ -225,7 +225,7 @@ export default function EquipTray() {
               animate={{ opacity: 1 }}
               className="text-center py-8 text-neutral-500"
             >
-              <div className="text-4xl mb-3">🎭</div>
+              <div className="text-4xl mb-3"></div>
               <p className="text-sm">No items equipped yet</p>
               <p className="text-xs text-neutral-600 mt-1">Visit the petal store to get started!</p>
             </motion.div>

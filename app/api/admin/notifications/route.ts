@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     // TODO: Integrate HTTP-based Redis client to store notification history
 
     // Log notification
-    console.log(`Site notification sent: ${message}`);
+    // Site notification sent
 
     return NextResponse.json({
       success: true,

@@ -5,10 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import {
   ACESFilmicToneMapping,
-  Vector3,
   Color,
-  DirectionalLight,
-  AmbientLight,
   type Group,
   type Mesh,
 } from 'three';

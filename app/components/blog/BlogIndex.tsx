@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
-import { t } from '../../lib/microcopy';
 import { env } from '@/env.mjs';
 
 type BlogPost = {
@@ -64,7 +63,7 @@ export default async function BlogIndex() {
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-gradient-to-br from-fuchsia-500/20 to-purple-500/20">
-                    <span className="text-6xl">📝</span>
+                    <span className="text-6xl"></span>
                   </div>
                 )}
               </div>
@@ -104,7 +103,7 @@ export default async function BlogIndex() {
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center bg-gradient-to-br from-fuchsia-500/20 to-purple-500/20">
-                    <span className="text-4xl">📝</span>
+                    <span className="text-4xl"></span>
                   </div>
                 )}
               </div>

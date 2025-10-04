@@ -60,7 +60,7 @@ export function AvatarDisplay({
       >
         <div className="w-full h-full flex flex-col items-center justify-center text-center p-2">
           <div className="w-8 h-8 mb-2 rounded-full bg-pink-500/20 flex items-center justify-center">
-            <span className="text-pink-400 text-lg">👤</span>
+            <span className="text-pink-400 text-lg"></span>
           </div>
           <p className="text-xs text-zinc-400">{isOwnProfile ? 'No avatar yet' : 'No avatar'}</p>
           {isOwnProfile && showEditButton && (

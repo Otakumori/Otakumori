@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { initInput } from './InputController';
-import FaceLabel from './FaceLabel';
 
 const ConsoleCard = dynamic(() => import('../console/ConsoleCard'), { ssr: false });
 
@@ -12,7 +11,7 @@ const iconMap: Record<string, string> = {
   swords: '><',
   psychology: '[@]',
   bubble_chart: '(.)',
-  music_note: '♪',
+  music_note: '',
   spa: '*',
   grid_view: '[]',
   thunderstorm: '~',
@@ -367,7 +366,7 @@ export default function GameCubeHub() {
                   onClick={() => setShowGamesList(false)}
                   className="text-purple-300 hover:text-white transition-colors text-xl"
                 >
-                  ✕
+                  
                 </button>
               </div>
 

@@ -42,8 +42,8 @@ export function reportWebVitals(metric: ExtendedMetric) {
 
   // Log performance metrics
   if (env.NODE_ENV === 'development') {
-    const emoji = rating === 'good' ? '✅' : rating === 'needs-improvement' ? '⚠️' : '❌';
-    console.log(`${emoji} ${metric.name}: ${Math.round(metric.value)}ms (${rating})`);
+    const emoji = rating === 'good' ? '' : rating === 'needs-improvement' ? '' : '';
+    // Web Vitals metric logged
   }
 
   // Send to analytics
@@ -120,7 +120,7 @@ export class GameCubePerformanceTracker {
       });
     }
 
-    console.log(`🎮 GameCube FPS: ${Math.round(fps)} (${fps >= 58 ? 'good' : 'poor'})`);
+    // GameCube FPS logged
   }
 
   private trackFrame(): void {

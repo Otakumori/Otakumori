@@ -17,7 +17,6 @@ import { db } from '@/app/lib/db';
 import { 
   calculateEarning, 
   validateEarning, 
-  isCooldownExpired, 
   applyDailyCap,
   calculateStreakBonus,
   formatPetals,

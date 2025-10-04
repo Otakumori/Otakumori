@@ -41,9 +41,7 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    console.log(
-      `Shop API: Transformed ${transformedProducts.length} products from v1 Printify API`,
-    );
+    // Shop API: Transformed products from v1 Printify API
 
     return NextResponse.json(
       {

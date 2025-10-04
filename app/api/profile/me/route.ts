@@ -3,7 +3,6 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/env';
 
 export async function GET() {
   const { userId } = await auth();

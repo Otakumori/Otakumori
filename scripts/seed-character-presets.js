@@ -245,7 +245,7 @@ async function seedCharacterPresets() {
         update: preset,
         create: preset,
       });
-      console.log(`✓ Seeded preset: ${preset.name}`);
+      console.log(` Seeded preset: ${preset.name}`);
     }
 
     console.log('Character presets seeded successfully!');

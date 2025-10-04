@@ -3,7 +3,7 @@
 import { Suspense, useMemo, useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
-import { ACESFilmicToneMapping, Vector3, Color, DirectionalLight, AmbientLight } from 'three';
+import { ACESFilmicToneMapping, Vector3, Color } from 'three';
 // Note: @react-three/rapier would be used for advanced physics in production
 // For now, we'll use simple spring-based physics
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -147,7 +147,7 @@ function AvatarModel({
     if (meshRef.current && bundle.morphs) {
       // In production, this would apply actual morph targets
       // For now, we'll just log the morph values
-      console.log('Applying morphs:', bundle.morphs);
+      // Applying morphs
     }
   }, [bundle.morphs]);
 

@@ -12,7 +12,7 @@ export default function AnimeMemoryMatch({ gameDef }: AnimeMemoryMatchProps) {
       <div className="text-center">
         <div className="text-6xl mb-4">
           <span role="img" aria-label="Playing cards">
-            🎴
+            
           </span>
         </div>
         <h3 className="text-xl font-semibold text-gray-700 mb-2">{gameDef.name}</h3>
@@ -20,7 +20,7 @@ export default function AnimeMemoryMatch({ gameDef }: AnimeMemoryMatchProps) {
         <div className="text-sm text-gray-400">
           Coming Soon!{' '}
           <span role="img" aria-label="Construction">
-            🚧
+            
           </span>
         </div>
       </div>

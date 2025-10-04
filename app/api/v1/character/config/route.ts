@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { CharacterConfigRequestSchema, CharacterConfigResponseSchema } from '@/app/lib/contracts';
+import { CharacterConfigRequestSchema } from '@/app/lib/contracts';
 
 export const runtime = 'nodejs';
 

@@ -49,7 +49,7 @@ export default function GlobalMusicBar() {
               className="rounded px-2 py-1 hover:bg-zinc-900"
               aria-label={playing ? 'Pause' : 'Play'}
             >
-              {playing ? '⏸' : '▶️'}
+              {playing ? '⏸' : '▶'}
             </button>
             <button
               onClick={next}
@@ -79,7 +79,7 @@ export default function GlobalMusicBar() {
               aria-label="Mute"
             >
               <span role="img" aria-label="Muted speaker">
-                🔇
+                
               </span>
             </button>
           </>

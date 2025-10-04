@@ -98,7 +98,7 @@ function ProductsGrid({ products }: { products: Product[] }) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="rounded-2xl bg-black/20 backdrop-blur-xl border border-white/10 p-8 text-center">
-          <div className="text-6xl mb-4">♡</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-2xl font-bold text-white mb-2">No Products Available</h2>
           <p className="text-gray-400 max-w-md">
             We're working on bringing you amazing products. Check back soon!

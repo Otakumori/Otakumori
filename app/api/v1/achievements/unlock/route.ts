@@ -2,7 +2,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
-import { AchievementUnlockRequestSchema } from '@/app/lib/contracts';
 
 async function getDb() {
   const { db } = await import('@/lib/db');

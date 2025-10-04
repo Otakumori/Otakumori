@@ -11,7 +11,7 @@ export default function AchievementsGrid() {
           key={a.code}
           className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
         >
-          <div className="badge">🏆</div>
+          <div className="badge"></div>
           <div>
             <div className="font-semibold">{a.name}</div>
             <div className="text-sm opacity-80">{a.desc}</div>

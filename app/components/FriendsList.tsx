@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import GlassCard from '@/app/components/ui/GlassCard';
-import { FriendsPresenceResponse, type PresenceResponse } from '@/app/lib/contracts';
+import { type PresenceResponse } from '@/app/lib/contracts';
 
 interface FriendsListProps {
   className?: string;
@@ -113,7 +113,7 @@ export default function FriendsList({ className = '' }: FriendsListProps) {
           </div>
         ) : friends.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-2">👥</div>
+            <div className="text-4xl mb-2"></div>
             <p className="text-pink-300/70 text-sm">No friends yet</p>
             <p className="text-pink-300/50 text-xs mt-1">
               Start following people to see them here!

@@ -61,7 +61,7 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
             transition={{ duration: 0.3 }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <div className="text-8xl">{happiness >= 100 ? '😸' : '🐱'}</div>
+            <div className="text-8xl">{happiness >= 100 ? '' : ''}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -77,7 +77,7 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
           >
             <div className="text-4xl">
               <span role="img" aria-label="Heart">
-                💕
+                
               </span>
             </div>
           </motion.div>

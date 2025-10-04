@@ -151,7 +151,7 @@ export default function AdminRunesPage() {
   };
 
   const getDefaultRuneDisplay = (canonicalId: CanonicalRuneId) => {
-    return DEFAULT_RUNE_DISPLAYS[canonicalId] || { name: 'Unknown Rune', glyph: '✶' };
+    return DEFAULT_RUNE_DISPLAYS[canonicalId] || { name: 'Unknown Rune', glyph: '' };
   };
 
   if (loading) {

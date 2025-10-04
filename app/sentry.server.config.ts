@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/nextjs';
-import { env } from '../env.mjs';
 
 Sentry.init({
   dsn: 'https://388fd3ecd8a41c61b6cf6c9e7f42e15d@o4509520271114240.ingest.us.sentry.io/4509520275701760',

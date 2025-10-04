@@ -430,7 +430,7 @@ export default function MemoryMatchGame() {
                     >
                       {/* Card Back */}
                       <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl border-2 border-pink-400/50 flex items-center justify-center">
-                        <div className="text-4xl">🌸</div>
+                        <div className="text-4xl"></div>
                       </div>
                       {/* Card Front */}
                       <div
@@ -442,22 +442,22 @@ export default function MemoryMatchGame() {
                       >
                         <div className="text-2xl mb-1">
                           {card.character === 'Senku Ishigami'
-                            ? '🧪'
+                            ? ''
                             : card.character === 'Edward Elric'
-                              ? '⚡'
+                              ? ''
                               : card.character === 'Tanjiro Kamado'
-                                ? '⚔️'
+                                ? ''
                                 : card.character === 'Rimuru Tempest'
-                                  ? '💧'
+                                  ? ''
                                   : card.character === 'Ainz Ooal Gown'
-                                    ? '💀'
+                                    ? ''
                                     : card.character === 'Saitama'
-                                      ? '👊'
+                                      ? ''
                                       : card.character === 'Natsu Dragneel'
-                                        ? '🔥'
+                                        ? ''
                                         : card.character === 'Ichigo Kurosaki'
-                                          ? '🗡️'
-                                          : '❓'}
+                                          ? '†'
+                                          : ''}
                         </div>
                         <div className="text-xs text-white font-medium">{card.character}</div>
                         <div className="text-xs text-slate-400">{card.series}</div>
@@ -477,7 +477,7 @@ export default function MemoryMatchGame() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 text-center"
           >
-            <h2 className="text-3xl font-bold text-pink-400 mb-4">🎉 Memory Master!</h2>
+            <h2 className="text-3xl font-bold text-pink-400 mb-4"> Memory Master!</h2>
             <p className="text-slate-300 mb-6">
               "I didn't lose. Just ran out of health." – Edward Elric
             </p>

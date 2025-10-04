@@ -139,14 +139,14 @@ export default function MessageManager() {
                       <span>•</span>
                       <span>{new Date(message.created_at).toLocaleDateString()}</span>
                       <span>•</span>
-                      <span>👍 {message.upvotes}</span>
+                      <span> {message.upvotes}</span>
                     </div>
                   </div>
                   <button
                     onClick={() => deleteMessage(message.id)}
                     className="p-2 text-red-400 transition-colors hover:text-red-300"
                   >
-                    🗑️
+                    ️
                   </button>
                 </div>
               </motion.div>

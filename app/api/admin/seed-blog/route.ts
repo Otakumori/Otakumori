@@ -56,7 +56,7 @@ const samplePosts = [
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Seeding blog posts...');
+    // Seeding blog posts...
 
     for (const post of samplePosts) {
       await db.contentPage.upsert({
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         update: post,
         create: post,
       });
-      console.log(`Created/updated blog post: ${post.title}`);
+      // Created/updated blog post
     }
 
     return NextResponse.json({

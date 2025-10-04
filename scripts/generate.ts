@@ -221,7 +221,7 @@ async function main() {
       vibe = getVibeForAvatar(avatar);
       if (!vibe) throw new Error(`Unknown vibe for avatar: ${avatar}`);
 
-      console.log(`🎯 Avatar "${avatar}" resolved to vibe: ${vibe}`);
+      console.log(` Avatar "${avatar}" resolved to vibe: ${vibe}`);
     } catch (error) {
       console.error('Failed to import style-map:', error);
       throw new Error(`Could not resolve vibe for avatar: ${avatar}`);
@@ -234,12 +234,12 @@ async function main() {
     presetId = family[classKey];
 
     console.log(
-      `🎯 Generating ${classKey} for avatar "${avatar}" (${vibe} vibe) → preset: ${presetId}`,
+      ` Generating ${classKey} for avatar "${avatar}" (${vibe} vibe) → preset: ${presetId}`,
     );
   } else {
     // User passed a direct preset id like "minigame.noir.tech"
     presetId = targetOrPreset;
-    console.log(`🎯 Using direct preset: ${presetId}`);
+    console.log(` Using direct preset: ${presetId}`);
   }
 
   const preset = gen.presets[presetId];
@@ -265,7 +265,7 @@ async function main() {
 
   if (ditherCfg) {
     console.log(
-      `🎨 Dithering: ${ditherCfg.mode} (strength: ${ditherCfg.strength}, alpha: ${ditherCfg.alphaThreshold})`,
+      ` Dithering: ${ditherCfg.mode} (strength: ${ditherCfg.strength}, alpha: ${ditherCfg.alphaThreshold})`,
     );
   }
 
@@ -426,12 +426,12 @@ async function main() {
 
   await fsp.writeFile(ASSET_CFG, JSON.stringify(assets, null, 2), 'utf8');
 
-  console.log('\n✅ Generated:');
+  console.log('\n Generated:');
   for (const r of results) console.log(' •', r.publicPath);
-  console.log(`\n📝 Next: run 'npm run assets:sync' to ensure the manifest includes these.`);
+  console.log(`\n Next: run 'npm run assets:sync' to ensure the manifest includes these.`);
 }
 
 main().catch((e) => {
-  console.error('❌ Generation failed:', e);
+  console.error(' Generation failed:', e);
   process.exit(1);
 });

@@ -30,8 +30,8 @@ interface AccessibleEmojiProps {
  * AccessibleEmoji - Enterprise-grade emoji component with full a11y compliance
  *
  * @example
- * <AccessibleEmoji emoji="🌸" label="Cherry blossom" />
- * <AccessibleEmoji emoji="🎮" label="Gaming controller" decorative />
+ * <AccessibleEmoji emoji="" label="Cherry blossom" />
+ * <AccessibleEmoji emoji="" label="Gaming controller" decorative />
  */
 export function AccessibleEmoji({
   emoji,
@@ -59,23 +59,23 @@ export function AccessibleEmoji({
  * Common emoji components used throughout the application
  */
 export const CherryBlossom = (props: Omit<AccessibleEmojiProps, 'emoji' | 'label'>) => (
-  <AccessibleEmoji emoji="🌸" label="Cherry blossom" {...props} />
+  <AccessibleEmoji emoji="" label="Cherry blossom" {...props} />
 );
 
 export const GameController = (props: Omit<AccessibleEmojiProps, 'emoji' | 'label'>) => (
-  <AccessibleEmoji emoji="🎮" label="Gaming controller" {...props} />
+  <AccessibleEmoji emoji="" label="Gaming controller" {...props} />
 );
 
 export const SpeakerOn = (props: Omit<AccessibleEmojiProps, 'emoji' | 'label'>) => (
-  <AccessibleEmoji emoji="🔊" label="Speaker on" {...props} />
+  <AccessibleEmoji emoji="" label="Speaker on" {...props} />
 );
 
 export const SpeakerOff = (props: Omit<AccessibleEmojiProps, 'emoji' | 'label'>) => (
-  <AccessibleEmoji emoji="🔇" label="Speaker off" {...props} />
+  <AccessibleEmoji emoji="" label="Speaker off" {...props} />
 );
 
 export const Vibration = (props: Omit<AccessibleEmojiProps, 'emoji' | 'label'>) => (
-  <AccessibleEmoji emoji="📳" label="Vibration" {...props} />
+  <AccessibleEmoji emoji="" label="Vibration" {...props} />
 );
 
 export default AccessibleEmoji;

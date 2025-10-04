@@ -69,12 +69,12 @@ export default function MaidCafeGame() {
 
   // Menu items
   const menuItems: MenuItem[] = [
-    { id: 'tea', name: 'Earl Grey Tea', prepTime: 3, price: 8, emoji: '🍵' },
-    { id: 'coffee', name: 'Mocha Latte', prepTime: 4, price: 10, emoji: '☕' },
-    { id: 'cake', name: 'Strawberry Cake', prepTime: 6, price: 15, emoji: '🍰' },
-    { id: 'sandwich', name: 'Club Sandwich', prepTime: 8, price: 18, emoji: '🥪' },
-    { id: 'parfait', name: 'Berry Parfait', prepTime: 5, price: 12, emoji: '🍨' },
-    { id: 'curry', name: 'Maid Special Curry', prepTime: 10, price: 25, emoji: '🍛' },
+    { id: 'tea', name: 'Earl Grey Tea', prepTime: 3, price: 8, emoji: '' },
+    { id: 'coffee', name: 'Mocha Latte', prepTime: 4, price: 10, emoji: '' },
+    { id: 'cake', name: 'Strawberry Cake', prepTime: 6, price: 15, emoji: '' },
+    { id: 'sandwich', name: 'Club Sandwich', prepTime: 8, price: 18, emoji: '' },
+    { id: 'parfait', name: 'Berry Parfait', prepTime: 5, price: 12, emoji: '' },
+    { id: 'curry', name: 'Maid Special Curry', prepTime: 10, price: 25, emoji: '' },
   ];
 
   // Initialize tables
@@ -94,9 +94,9 @@ export default function MaidCafeGame() {
 
   // Avatar options
   const avatarOptions = {
-    classic: { emoji: '👩‍🍳', outfit: 'Classic Maid' },
-    gothic: { emoji: '🧛‍♀️', outfit: 'Gothic Lolita' },
-    modern: { emoji: '👩‍💼', outfit: 'Modern Casual' },
+    classic: { emoji: '‍', outfit: 'Classic Maid' },
+    gothic: { emoji: '‍️', outfit: 'Gothic Lolita' },
+    modern: { emoji: '‍', outfit: 'Modern Casual' },
   };
 
   // Start game
@@ -315,7 +315,7 @@ export default function MaidCafeGame() {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-900 via-purple-900 to-indigo-900">
         <div className="text-center text-white max-w-md">
-          <div className="text-6xl mb-6">☕</div>
+          <div className="text-6xl mb-6"></div>
           <h2 className="text-3xl font-bold mb-4">Maid Café Manager</h2>
           <p className="text-gray-300 mb-8">
             Manage shifts and keep guests smiling.
@@ -350,10 +350,10 @@ export default function MaidCafeGame() {
           </button>
 
           <div className="text-sm text-gray-400 space-y-1">
-            <p>📋 Click customers to take orders</p>
-            <p>🍽️ Click ready orders to serve</p>
-            <p>🧹 Click dirty tables to clean</p>
-            <p>💰 Earn money and tips for good service</p>
+            <p> Click customers to take orders</p>
+            <p>️ Click ready orders to serve</p>
+            <p> Click dirty tables to clean</p>
+            <p> Earn money and tips for good service</p>
           </div>
 
           <p className="text-sm text-gray-400 mt-6">
@@ -384,7 +384,7 @@ export default function MaidCafeGame() {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-900 via-purple-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-4">💸</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-3xl font-bold mb-4">Shift Ended</h2>
           <div className="space-y-2 mb-6">
             <div className="text-xl">Final Score: {score.toLocaleString()}</div>
@@ -448,7 +448,7 @@ export default function MaidCafeGame() {
                 <div className="flex items-center justify-between">
                   <span>{order.item.emoji} {order.item.name}</span>
                   <span className="text-xs">
-                    {order.status === 'ready' ? '✅ Ready!' : '⏱️ Cooking...'}
+                    {order.status === 'ready' ? ' Ready!' : '⏱️ Cooking...'}
                   </span>
                 </div>
               </div>
@@ -470,7 +470,7 @@ export default function MaidCafeGame() {
             style={{ left: table.x, top: table.y }}
             onClick={() => table.needsCleaning && cleanTable(table.id)}
           >
-            {table.needsCleaning ? '🧹' : table.occupied ? '🪑' : '✨'}
+            {table.needsCleaning ? '' : table.occupied ? '' : ''}
           </div>
         ))}
 
@@ -492,9 +492,9 @@ export default function MaidCafeGame() {
             >
               {/* Customer */}
               <div className="text-2xl mb-1">
-                {customer.status === 'waiting' ? '🙋‍♂️' : 
-                 customer.status === 'ordering' ? '📝' :
-                 customer.status === 'eating' ? '😋' : '💸'}
+                {customer.status === 'waiting' ? '‍️' : 
+                 customer.status === 'ordering' ? '' :
+                 customer.status === 'eating' ? '' : ''}
               </div>
               
               {/* Order bubble */}
@@ -533,9 +533,9 @@ export default function MaidCafeGame() {
         </div>
 
         {/* Café Decoration */}
-        <div className="absolute bottom-4 left-4 text-6xl opacity-20">☕</div>
-        <div className="absolute bottom-4 right-4 text-6xl opacity-20">🍰</div>
-        <div className="absolute top-1/2 left-1/2 text-8xl opacity-10 transform -translate-x-1/2 -translate-y-1/2">🏪</div>
+        <div className="absolute bottom-4 left-4 text-6xl opacity-20"></div>
+        <div className="absolute bottom-4 right-4 text-6xl opacity-20"></div>
+        <div className="absolute top-1/2 left-1/2 text-8xl opacity-10 transform -translate-x-1/2 -translate-y-1/2"></div>
       </div>
     </div>
   );

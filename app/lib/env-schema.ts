@@ -41,7 +41,7 @@ export function validateEnv(): EnvSchema {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.issues.map((e) => e.path.join('.')).join(', ');
-      console.error(`❌ Environment validation failed. Missing or invalid: ${missingVars}`);
+      console.error(` Environment validation failed. Missing or invalid: ${missingVars}`);
 
       // In production, throw to prevent app from starting with invalid config
       if (env.NODE_ENV === 'production') {
@@ -50,7 +50,7 @@ export function validateEnv(): EnvSchema {
     }
 
     // In development, return partial config and log warnings
-    console.warn('⚠️ Environment validation failed, continuing with partial config');
+    console.warn(' Environment validation failed, continuing with partial config');
     return env as any;
   }
 }

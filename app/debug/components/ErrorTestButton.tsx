@@ -126,7 +126,7 @@ export default function ErrorTestButton() {
       </div>
 
       <div className="mt-6 p-4 bg-yellow-900/20 border border-yellow-500 rounded-lg">
-        <h3 className="text-lg font-semibold mb-2 text-yellow-300">⚠️ Warning</h3>
+        <h3 className="text-lg font-semibold mb-2 text-yellow-300"> Warning</h3>
         <p className="text-sm text-yellow-200">
           These buttons will trigger actual errors and send data to Sentry. Only use this page for
           testing purposes. Make sure you have Sentry properly configured before testing.

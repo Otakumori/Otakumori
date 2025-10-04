@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react';
+import React, { createContext, useContext, useCallback, type ReactNode } from 'react';
 
 // World Event Types
 export type WorldEvent =
@@ -68,7 +68,7 @@ export function WorldProvider({ children, debug = false }: WorldProviderProps) {
 
   const dispatch = useCallback((event: WorldEvent) => {
     // Handle world events here
-    console.log('World Event:', event);
+    // World Event
 
     // Update settings based on events
     setState((prev) => ({

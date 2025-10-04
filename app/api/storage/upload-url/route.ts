@@ -4,7 +4,6 @@ import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
 import { prisma } from '@/app/lib/prisma';
 import { v4 as uuidv4 } from 'uuid';
-import { env } from '@/env';
 
 export async function POST(req: NextRequest) {
   try {

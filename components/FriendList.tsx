@@ -117,7 +117,7 @@ export const FriendList = () => {
                   onClick={() => handleToggleFavorite(friend.id)}
                   className="text-white/50 transition-colors hover:text-pink-500"
                 >
-                  {friend.favorite ? '★' : '☆'}
+                  {friend.favorite ? '' : ''}
                 </button>
               </motion.div>
             ))}

@@ -1,7 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
-import { useState } from 'react';
 // Header removed - using global navbar from layout
 import SaveFiles from '@/components/SaveFiles';
 

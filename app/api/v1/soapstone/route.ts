@@ -3,11 +3,9 @@ import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import {
   SoapstoneCreateSchema,
-  SoapstoneResponseSchema,
   createApiSuccess,
   createApiError,
   generateRequestId,
-  API_ERROR_CODES,
 } from '../../../lib/api-contracts';
 import { checkIdempotency, storeIdempotencyResponse } from '../../../lib/idempotency';
 import { withRateLimit } from '../../../lib/rate-limiting';

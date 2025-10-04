@@ -1,7 +1,5 @@
 'use client';
 
-import { CherryTree } from './CherryTree';
-import { PetalHUD } from './PetalHUD';
 import { useEffect, useState } from 'react';
 
 export function HeroShrine() {

@@ -148,7 +148,7 @@ export const SoundSettings: React.FC = () => {
           gap: '8px',
         }}
       >
-        🔊 Sound Settings
+         Sound Settings
         <span style={{ fontSize: '12px' }}>{isOpen ? '▼' : '▶'}</span>
       </button>
 

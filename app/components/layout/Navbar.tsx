@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
-import { SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
+import { SignInButton, UserButton } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
 
 // Game registry for mega-menu
@@ -81,7 +81,7 @@ const SEARCH_SUGGESTIONS = [
 ];
 
 const EASTER_EGGS: Record<string, string> = {
-  'what are ya buyin': 'The classic merchant greeting! 🛍️',
+  'what are ya buyin': 'The classic merchant greeting! ',
   stranger: 'Ah, a fellow RE4 fan! Welcome!',
   gamecube: 'Ready for some nostalgic gaming?',
 };
@@ -291,7 +291,7 @@ export default function Navbar() {
                           role="img"
                           aria-label="Game controller"
                         >
-                          🎮
+                          
                         </span>
                       </div>
                       <div>

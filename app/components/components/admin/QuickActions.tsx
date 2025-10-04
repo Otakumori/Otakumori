@@ -73,7 +73,7 @@ export default function QuickActions() {
       id: 'view-users',
       title: 'View Users',
       description: 'Browse and manage user accounts',
-      icon: '👥',
+      icon: '',
       color: 'bg-blue-500/20 hover:bg-blue-500/30',
       action: async () => {
         setIsLoading('view-users');
@@ -89,7 +89,7 @@ export default function QuickActions() {
       id: 'manage-content',
       title: 'Manage Content',
       description: 'Edit blog posts and shop items',
-      icon: '📝',
+      icon: '',
       color: 'bg-green-500/20 hover:bg-green-500/30',
       action: async () => {
         setIsLoading('manage-content');
@@ -105,7 +105,7 @@ export default function QuickActions() {
       id: 'view-analytics',
       title: 'View Analytics',
       description: 'Check site performance and user stats',
-      icon: '📊',
+      icon: '',
       color: 'bg-purple-500/20 hover:bg-purple-500/30',
       action: async () => {
         setIsLoading('view-analytics');
@@ -123,7 +123,7 @@ export default function QuickActions() {
       description: maintenanceStatus
         ? 'Disable site maintenance mode'
         : 'Enable site maintenance mode',
-      icon: maintenanceStatus ? '🟢' : '🔧',
+      icon: maintenanceStatus ? '🟢' : '',
       color: maintenanceStatus
         ? 'bg-green-500/20 hover:bg-green-500/30'
         : 'bg-yellow-500/20 hover:bg-yellow-500/30',
@@ -140,7 +140,7 @@ export default function QuickActions() {
       id: 'backup-data',
       title: 'Backup Data',
       description: 'Create database and file backups',
-      icon: '💾',
+      icon: '',
       color: 'bg-indigo-500/20 hover:bg-indigo-500/30',
       action: async () => {
         setIsLoading('backup-data');
@@ -170,7 +170,7 @@ export default function QuickActions() {
       id: 'clear-cache',
       title: 'Clear Cache',
       description: 'Clear Redis cache and temporary files',
-      icon: '🧹',
+      icon: '',
       color: 'bg-orange-500/20 hover:bg-orange-500/30',
       action: async () => {
         setIsLoading('clear-cache');
@@ -200,7 +200,7 @@ export default function QuickActions() {
       id: 'system-health',
       title: 'System Health',
       description: 'Check system status and performance',
-      icon: '🏥',
+      icon: '',
       color: 'bg-red-500/20 hover:bg-red-500/30',
       action: async () => {
         setIsLoading('system-health');
@@ -229,7 +229,7 @@ export default function QuickActions() {
       id: 'send-notification',
       title: 'Send Notification',
       description: 'Send site-wide notification to users',
-      icon: '📢',
+      icon: '',
       color: 'bg-pink-500/20 hover:bg-pink-500/30',
       action: async () => {
         setIsLoading('send-notification');

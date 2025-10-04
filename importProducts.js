@@ -81,26 +81,26 @@ fs.createReadStream(csvFilePath)
             create: productData,
           });
 
-          console.log(`✅ Imported/Updated: ${result.name} (ID: ${result.id})`);
+          console.log(` Imported/Updated: ${result.name} (ID: ${result.id})`);
           successCount++;
         } catch (error) {
-          console.error(`❌ Error importing product ${product.name || 'Unknown'}:`, error.message);
+          console.error(` Error importing product ${product.name || 'Unknown'}:`, error.message);
           errorCount++;
         }
       }
 
       console.log('\n=== Import Summary ===');
-      console.log(`✅ Successfully imported/updated: ${successCount} products`);
-      console.log(`❌ Errors: ${errorCount} products`);
-      console.log(`📊 Total processed: ${products.length} products`);
+      console.log(` Successfully imported/updated: ${successCount} products`);
+      console.log(` Errors: ${errorCount} products`);
+      console.log(` Total processed: ${products.length} products`);
 
       if (errorCount > 0) {
-        console.log('\n⚠️  Some products failed to import. Check the error messages above.');
+        console.log('\n  Some products failed to import. Check the error messages above.');
       } else {
-        console.log('\n🎉 All products imported successfully!');
+        console.log('\n All products imported successfully!');
       }
     } catch (error) {
-      console.error('❌ Database error during import:', error);
+      console.error(' Database error during import:', error);
     } finally {
       // Close Prisma connection
       await prisma.$disconnect();
@@ -110,13 +110,13 @@ fs.createReadStream(csvFilePath)
 
 // Handle process termination
 process.on('SIGINT', async () => {
-  console.log('\n⚠️  Import interrupted by user');
+  console.log('\n  Import interrupted by user');
   await prisma.$disconnect();
   process.exit(1);
 });
 
 process.on('SIGTERM', async () => {
-  console.log('\n⚠️  Import terminated');
+  console.log('\n  Import terminated');
   await prisma.$disconnect();
   process.exit(1);
 });

@@ -50,7 +50,7 @@ export async function sendOrderConfirmation(data: OrderConfirmationData) {
       throw new Error(`Failed to send email: ${error.message}`);
     }
 
-    console.log('Order confirmation email sent:', emailData?.id);
+    // Order confirmation email sent
     return { success: true, emailId: emailData?.id };
   } catch (error) {
     console.error('Email sending error:', error);

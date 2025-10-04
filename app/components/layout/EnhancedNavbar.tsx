@@ -4,10 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useCart } from '../cart/CartProvider';
-import { motionVariants } from '../motion/MotionProvider';
 import GlassPanel from '../GlassPanel';
 
 const EnhancedNavbar: React.FC = () => {

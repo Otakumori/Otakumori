@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('🔧 Fixing warnings automatically...');
+console.log(' Fixing warnings automatically...');
 
 // Function to recursively find all TypeScript/JavaScript files
 function findFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
@@ -122,20 +122,20 @@ function main() {
         if (modified) {
           fs.writeFileSync(file, imgResult.content, 'utf8');
           totalFixed++;
-          console.log(`✅ Fixed: ${path.relative(projectRoot, file)}`);
+          console.log(` Fixed: ${path.relative(projectRoot, file)}`);
         }
       } catch (error) {
-        console.log(`⚠️  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
+        console.log(`  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
       }
     }
 
-    console.log(`\n🎉 Fixed ${totalFixed} files!`);
+    console.log(`\n Fixed ${totalFixed} files!`);
 
     // Run lint to check remaining issues
-    console.log('\n🔍 Running lint check...');
+    console.log('\n⌕ Running lint check...');
     execSync('npm run lint', { stdio: 'inherit' });
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(' Error:', error.message);
     process.exit(1);
   }
 }

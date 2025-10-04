@@ -42,7 +42,7 @@ const InteractivePetals: React.FC<InteractivePetalsProps> = ({
   // Safety check - unmount if not on home page
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.pathname !== '/') {
-      console.warn('⚠️ InteractivePetals mounted outside home page - unmounting');
+      console.warn(' InteractivePetals mounted outside home page - unmounting');
       return () => {
         // Component will unmount
       };
@@ -74,7 +74,7 @@ const InteractivePetals: React.FC<InteractivePetalsProps> = ({
   const handlePetalClick = useCallback((petalId: string) => {
     const reward = petalShopHandler.collectPetal(petalId);
     if (reward) {
-      console.log('Petal collected:', reward);
+      // Petal collected
     }
   }, []);
 
@@ -84,7 +84,7 @@ const InteractivePetals: React.FC<InteractivePetalsProps> = ({
     const { x, y, physics } = spawnerRef.current.spawnPetal();
     const id = `petal_${Date.now()}_${Math.random()}`;
 
-    console.log('Spawning petal at:', x, y);
+    // Spawning petal
 
     const element = createPetalElement(x, y, petalColor, true);
     element.addEventListener('click', () => handlePetalClick(id));
@@ -100,7 +100,7 @@ const InteractivePetals: React.FC<InteractivePetalsProps> = ({
           spawnY: y,
         },
       ];
-      console.log('Total petals:', newPetals.length);
+      // Total petals logged
       return newPetals;
     });
   }, [petals.length, maxPetals, petalColor, handlePetalClick]);
@@ -166,16 +166,16 @@ const InteractivePetals: React.FC<InteractivePetalsProps> = ({
   // Mount petal elements to DOM
   useEffect(() => {
     if (!containerRef.current) {
-      console.log('No container ref available');
+      // No container ref available
       return;
     }
 
-    console.log('Mounting', petals.length, 'petals to DOM');
+    // Mounting petals to DOM
 
     petals.forEach((petal) => {
       if (!containerRef.current?.contains(petal.element)) {
         containerRef.current?.appendChild(petal.element);
-        console.log('Mounted petal element');
+        // Mounted petal element
       }
     });
 

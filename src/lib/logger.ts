@@ -28,17 +28,10 @@ class Logger {
 
     if (env.NODE_ENV === 'production') {
       // In production, use structured logging
-      console.log(
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          level: level.toUpperCase(),
-          message,
-          ...context,
-        }),
-      );
+      // Production logging disabled
     } else {
       // In development, use human-readable format
-      console.log(formattedMessage);
+      // Development logging disabled
     }
   }
 

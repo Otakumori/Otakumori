@@ -269,7 +269,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                   transition={{ delay: 0.6 }}
                   className="text-pink-300/80 text-sm italic tracking-wide"
                 >
-                  made with ♡
+                  made with 
                 </motion.p>
               </motion.div>
             </motion.div>
@@ -296,7 +296,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                 OTAKU-MORI
               </h1>
               <p className="text-pink-300/80 text-sm italic tracking-wide">
-                made with ♡
+                made with 
               </p>
 
               {/* Petal Explosion */}
@@ -376,7 +376,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                 OTAKU-MORI
               </h1>
               <p className="text-pink-300/80 text-sm italic tracking-wide">
-                made with ♡
+                made with 
               </p>
             </motion.div>
           )}

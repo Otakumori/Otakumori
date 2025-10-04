@@ -19,7 +19,7 @@ const ACHIEVEMENTS: Achievement[] = [
     requirement: 10,
     reward: 'WELCOME10',
     unlocked: false,
-    icon: '🌸',
+    icon: '',
   },
   {
     id: 'petal_collector_2',
@@ -28,7 +28,7 @@ const ACHIEVEMENTS: Achievement[] = [
     requirement: 50,
     reward: 'BLOOM25',
     unlocked: false,
-    icon: '🌺',
+    icon: '',
   },
   {
     id: 'petal_collector_3',
@@ -37,7 +37,7 @@ const ACHIEVEMENTS: Achievement[] = [
     requirement: 100,
     reward: 'SAKURA50',
     unlocked: false,
-    icon: '🌹',
+    icon: '',
   },
   {
     id: 'petal_collector_4',
@@ -46,7 +46,7 @@ const ACHIEVEMENTS: Achievement[] = [
     requirement: 500,
     reward: 'LEGENDARY100',
     unlocked: false,
-    icon: '🏆',
+    icon: '',
   },
 ];
 

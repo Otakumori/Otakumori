@@ -97,7 +97,7 @@ export default function ThankYouPage() {
         <div className="text-center">
           <div className="mb-4 text-6xl text-red-400">
             <span role="img" aria-label="Warning">
-              ⚠️
+              
             </span>
           </div>
           <h1 className="mb-4 text-2xl font-bold text-white">Order Not Found</h1>
@@ -136,7 +136,7 @@ export default function ThankYouPage() {
                 className="mb-4 text-8xl"
               >
                 <span role="img" aria-label="Cherry blossom">
-                  🌸
+                  
                 </span>
               </motion.div>
               <motion.p
@@ -253,7 +253,7 @@ export default function ThankYouPage() {
                           animated={true}
                         />
                       </div>
-                      <div className="mb-3 text-4xl hidden">{rune.glyph || '✶'}</div>
+                      <div className="mb-3 text-4xl hidden">{rune.glyph || ''}</div>
                       <h3 className="mb-2 text-lg font-bold text-white">
                         {rune.displayName ||
                           `Rune ${rune.canonicalId.split('_')[1]?.toUpperCase()}`}

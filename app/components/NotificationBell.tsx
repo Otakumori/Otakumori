@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
-import GlassCard from '@/app/components/ui/GlassCard';
-import { NotificationResponse, type Notification } from '@/app/lib/contracts';
+import { type Notification } from '@/app/lib/contracts';
 
 interface NotificationBellProps {
   className?: string;
@@ -69,21 +68,21 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'follow':
-        return '👥';
+        return '';
       case 'request':
-        return '📨';
+        return '';
       case 'achievement':
-        return '🏆';
+        return '';
       case 'trade':
-        return '🔄';
+        return '';
       case 'score-beaten':
-        return '🎯';
+        return '';
       case 'comment':
-        return '💬';
+        return '';
       case 'system':
-        return '⚙️';
+        return '';
       default:
-        return '📢';
+        return '';
     }
   };
 
@@ -188,7 +187,7 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="text-center py-8">
-                  <div className="text-4xl mb-2">🔔</div>
+                  <div className="text-4xl mb-2"></div>
                   <p className="text-pink-300/70 text-sm">No notifications</p>
                 </div>
               ) : (

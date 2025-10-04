@@ -143,7 +143,7 @@ export default function Game({ mode }: Props) {
             meta: { game: 'petal-samurai' },
           };
           // TODO: Implement score submission API
-          console.log('Score to submit:', payload);
+          // Score to submit
         } catch (error) {
           console.error('Failed to submit score:', error);
         }

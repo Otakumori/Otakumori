@@ -395,7 +395,7 @@ export default function GameShellV2({
                   className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-4 shadow-2xl max-w-sm"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="text-2xl">🏆</div>
+                    <div className="text-2xl"></div>
                     <div>
                       <h4 className="font-bold text-white">Achievement Unlocked!</h4>
                       <p className="text-white/90 text-sm">{achievement.name}</p>

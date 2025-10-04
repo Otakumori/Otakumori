@@ -94,28 +94,28 @@ function isValidUrl(string: string): boolean {
 export function logEnvironmentStatus(): void {
   const validation = validateEnvironment();
 
-  console.log('\n🔍 Environment Validation Report');
+  console.log('\n⌕ Environment Validation Report');
   console.log('================================');
 
   if (validation.isValid) {
-    console.log('✅ All required environment variables are set');
+    console.log(' All required environment variables are set');
   } else {
-    console.log('❌ Missing required environment variables:');
+    console.log(' Missing required environment variables:');
     validation.missing.forEach((key) => {
       console.log(`   - ${key}`);
     });
   }
 
   if (validation.warnings.length > 0) {
-    console.log('\n⚠️  Warnings:');
+    console.log('\n  Warnings:');
     validation.warnings.forEach((warning) => {
       console.log(`   - ${warning}`);
     });
   }
 
-  console.log('\n📋 Environment Details:');
+  console.log('\n Environment Details:');
   Object.entries(validation.details).forEach(([key, detail]) => {
-    const status = detail.status === 'valid' ? '✅' : detail.status === 'missing' ? '❌' : '⚠️';
+    const status = detail.status === 'valid' ? '' : detail.status === 'missing' ? '' : '';
     const value = detail.value ? `${detail.value.substring(0, 20)}...` : 'undefined';
     console.log(`   ${status} ${key}: ${value}`);
   });

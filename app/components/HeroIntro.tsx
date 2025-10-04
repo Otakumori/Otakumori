@@ -1,8 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import GlassPanel from './GlassPanel';
-import { t } from '../lib/microcopy';
 
 export default function HeroIntro() {
   return (

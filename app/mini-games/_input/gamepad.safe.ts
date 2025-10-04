@@ -46,12 +46,12 @@ export class GamepadManager {
 
   private setupEventListeners() {
     window.addEventListener('gamepadconnected', (e) => {
-      console.log('Gamepad connected:', e.gamepad.id);
+      // Gamepad connected
       this.startPolling();
     });
 
     window.addEventListener('gamepaddisconnected', (e) => {
-      console.log('Gamepad disconnected:', e.gamepad.id);
+      // Gamepad disconnected
       this.gamepads.delete(e.gamepad.index);
       this.lastButtonStates.delete(e.gamepad.index);
 

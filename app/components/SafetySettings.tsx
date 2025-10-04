@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Shield, Users, MessageSquare, Bell, Filter, UserX } from 'lucide-react';
+import { Shield, MessageSquare, Bell, Filter, UserX } from 'lucide-react';
 import GlassCard from './ui/GlassCard';
 import GlassButton from './ui/GlassButton';
 import { type UserSafetySettings, type UserSafetySettingsUpdate } from '@/app/lib/contracts';

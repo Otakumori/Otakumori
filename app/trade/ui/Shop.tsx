@@ -15,7 +15,7 @@ export default function Shop() {
 
   const handlePurchase = async (sku: string) => {
     // TODO: Implement purchase logic
-    console.log(`Purchasing ${sku}`);
+    // Purchasing item
     // Refresh data after purchase
     await mutate();
   };

@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-ragdoll\Scene.tsx instead.
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import '../_shared/cohesion.css';
 
 export default function MemoryMatch() {
@@ -12,14 +12,14 @@ export default function MemoryMatch() {
 
   // Simple card data
   const cardData = [
-    { id: 1, emoji: '🌸', matched: false },
-    { id: 2, emoji: '🌸', matched: false },
-    { id: 3, emoji: '⭐', matched: false },
-    { id: 4, emoji: '⭐', matched: false },
-    { id: 5, emoji: '🎮', matched: false },
-    { id: 6, emoji: '🎮', matched: false },
-    { id: 7, emoji: '🎯', matched: false },
-    { id: 8, emoji: '🎯', matched: false },
+    { id: 1, emoji: '', matched: false },
+    { id: 2, emoji: '', matched: false },
+    { id: 3, emoji: '', matched: false },
+    { id: 4, emoji: '', matched: false },
+    { id: 5, emoji: '', matched: false },
+    { id: 6, emoji: '', matched: false },
+    { id: 7, emoji: '', matched: false },
+    { id: 8, emoji: '', matched: false },
   ];
 
   const handleCardClick = (cardId: number) => {
@@ -86,7 +86,7 @@ export default function MemoryMatch() {
         {gameWon && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
             <div className="bg-pink-300/20 border border-pink-400 rounded-2xl p-6 text-center">
-              <h3 className="text-2xl font-bold text-pink-100 mb-2">🎉 You Won! 🎉</h3>
+              <h3 className="text-2xl font-bold text-pink-100 mb-2"> You Won! </h3>
               <p className="text-pink-200">All pairs matched!</p>
             </div>
           </div>

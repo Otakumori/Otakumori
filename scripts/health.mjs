@@ -26,7 +26,7 @@ const checks = [
 const main = async () => {
   const results = await Promise.all(checks.map(GET));
   const bad = results.filter((r) => !r.ok);
-  results.forEach((r) => console.log(`${r.ok ? '✅' : '❌'} ${r.status} ${r.path}`));
+  results.forEach((r) => console.log(`${r.ok ? '' : ''} ${r.status} ${r.path}`));
   if (bad.length) {
     console.error('\nHealth check failures:');
     bad.forEach((r) => console.error(` - ${r.path}: ${r.status}`));

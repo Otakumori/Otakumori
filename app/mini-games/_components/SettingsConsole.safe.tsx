@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Volume2, VolumeX, Calendar, Clock, Gamepad2, Palette, RotateCcw } from 'lucide-react';
+import { Volume2, VolumeX, Clock, Gamepad2, Palette, RotateCcw } from 'lucide-react';
 
 interface SettingsConsoleProps {
   onVolumeChange?: (volume: number) => void;

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { COPY } from '../../lib/copy';
 import GlassButton from '../../components/ui/GlassButton';
 import GlassCard from '../../components/ui/GlassCard';
-import { petalEconomy, type LeaderboardEntry } from '@/app/lib/economy/petalEconomy';
+import { type LeaderboardEntry } from '@/app/lib/economy/petalEconomy';
 
 export default function LeaderboardPage() {
   const [activeGame, setActiveGame] = useState<string>('all');
@@ -14,11 +14,11 @@ export default function LeaderboardPage() {
   const [userRank, setUserRank] = useState<Map<string, number>>(new Map());
 
   const games = [
-    { id: 'all', name: 'Overall', icon: '🏆' },
-    { id: 'petal-samurai', name: 'Petal Samurai', icon: '⚔️' },
-    { id: 'puzzle-reveal', name: 'Puzzle Reveal', icon: '🧩' },
-    { id: 'bubble-girl', name: 'Bubble Girl', icon: '🫧' },
-    { id: 'memory-match', name: 'Memory Match', icon: '🧠' },
+    { id: 'all', name: 'Overall', icon: '' },
+    { id: 'petal-samurai', name: 'Petal Samurai', icon: '' },
+    { id: 'puzzle-reveal', name: 'Puzzle Reveal', icon: '' },
+    { id: 'bubble-girl', name: 'Bubble Girl', icon: '' },
+    { id: 'memory-match', name: 'Memory Match', icon: '' },
   ];
 
   // Mock data - in real app, this would come from API
@@ -235,11 +235,11 @@ export default function LeaderboardPage() {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return '🥇';
+        return '';
       case 2:
-        return '🥈';
+        return '';
       case 3:
-        return '🥉';
+        return '';
       default:
         return `#${rank}`;
     }
@@ -388,7 +388,7 @@ export default function LeaderboardPage() {
 
           {getCurrentLeaderboard().length === 0 && (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">🏆</div>
+              <div className="text-6xl mb-4"></div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No Rankings Yet</h3>
               <p className="text-gray-600 mb-4">Be the first to set a high score in this game!</p>
               <GlassButton href="/mini-games" variant="primary">
@@ -404,7 +404,7 @@ export default function LeaderboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">⚡</span>
+                <span className="text-2xl"></span>
                 <div>
                   <h3 className="font-semibold text-green-900">Petal Samurai Boost</h3>
                   <p className="text-sm text-green-700">+50% petals today!</p>
@@ -413,7 +413,7 @@ export default function LeaderboardPage() {
             </div>
             <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">🔥</span>
+                <span className="text-2xl"></span>
                 <div>
                   <h3 className="font-semibold text-blue-900">Streak Bonus</h3>
                   <p className="text-sm text-blue-700">Play daily for extra rewards</p>

@@ -73,9 +73,9 @@ export async function getCatalog(page = 1, limit = 50) {
     const shopId = getShopId();
     const url = `${PRINTIFY_BASE}/shops/${shopId}/products.json?page=${page}&limit=${limit}`;
 
-    console.log(`Fetching Printify catalog from: ${url}`);
-    console.log(`Shop ID: ${shopId}`);
-    console.log(`API Key present: ${!!env.PRINTIFY_API_KEY}`);
+    // Fetching Printify catalog
+    // Shop ID logged
+    // API Key presence logged
 
     const result = await http.get(url, PrintifyCatalogSchema, {
       headers: getAuthHeaders(),
@@ -84,7 +84,7 @@ export async function getCatalog(page = 1, limit = 50) {
       cache: 'no-store',
     });
 
-    console.log(`Printify catalog fetched successfully: ${result.data.length} products`);
+    // Printify catalog fetched successfully
     return result;
   } catch (error) {
     console.error('Error fetching Printify catalog:', error);
@@ -150,8 +150,8 @@ export async function publishProduct(productId: string) {
 // Health check function with detailed diagnostics
 export async function checkPrintifyHealth() {
   try {
-    console.log('Starting Printify health check...');
-    console.log(`Environment check:`, {
+    // Starting Printify health check...
+    console.log('Environment check logged', {
       NODE_ENV: env.NODE_ENV,
       VERCEL_ENV: env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
       hasApiKey: !!env.PRINTIFY_API_KEY,
@@ -166,9 +166,7 @@ export async function checkPrintifyHealth() {
       cache: 'no-store',
     });
 
-    console.log(
-      `Printify API connectivity test: ${testResponse.status} ${testResponse.statusText}`,
-    );
+    // Printify API connectivity test
 
     if (!testResponse.ok) {
       return {
@@ -180,7 +178,7 @@ export async function checkPrintifyHealth() {
 
     // Test shop info
     const shopInfo = await getShopInfo();
-    console.log('Shop info retrieved successfully:', shopInfo);
+    // Shop info retrieved successfully
 
     return {
       healthy: true,

@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import GlassPanel from '../GlassPanel';
-import { t } from '../../lib/microcopy';
 
 type Achievement = {
   id: string;

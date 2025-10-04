@@ -154,7 +154,7 @@ export function AvatarSelector({
           <div
             className={`w-24 h-24 rounded-xl border-2 border-dashed border-white/40 bg-white/5 flex flex-col items-center justify-center ${className}`}
           >
-            <div className="text-2xl mb-1">🎭</div>
+            <div className="text-2xl mb-1"></div>
             <p className="text-xs text-zinc-400 text-center">Default</p>
             <p className="text-xs text-zinc-400 text-center">Avatars</p>
           </div>

@@ -25,7 +25,7 @@ export function FeaturedProducts() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log('API Response:', data); // Debug log
+          // API Response logged
 
           if (data.products && Array.isArray(data.products)) {
             // Transform Printify data and limit to 8 items

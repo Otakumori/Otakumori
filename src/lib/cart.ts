@@ -1,6 +1,5 @@
 'use server';
 import { revalidatePath } from 'next/cache';
-import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
 
 export async function addToCart(productId: string, qty = 1) {
@@ -9,7 +8,7 @@ export async function addToCart(productId: string, qty = 1) {
 
   // For now, just log the cart addition
   // You can implement actual cart storage later
-  console.log(`Adding to cart: Product ${productId}, Quantity ${qty} for user ${userId}`);
+  // Adding to cart
 
   // TODO: Implement actual cart storage
   // await prisma.cartItem.upsert({
@@ -40,7 +39,7 @@ export async function removeFromCart(productId: string) {
   if (!userId) throw new Error('UNAUTHENTICATED');
 
   // TODO: Implement actual cart removal
-  console.log(`Removing from cart: Product ${productId} for user ${userId}`);
+  // Removing from cart
 
   revalidatePath('/cart');
   return { ok: true } as const;
@@ -55,7 +54,7 @@ export async function updateCartItem(productId: string, qty: number) {
   }
 
   // TODO: Implement actual cart update
-  console.log(`Updating cart: Product ${productId}, Quantity ${qty} for user ${userId}`);
+  // Updating cart
 
   revalidatePath('/cart');
   return { ok: true } as const;

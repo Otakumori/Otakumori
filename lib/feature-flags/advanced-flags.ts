@@ -10,7 +10,6 @@
  * - Rollback mechanisms
  */
 
-import { z } from 'zod';
 import { metricsCollector } from '@/lib/monitoring/advanced-metrics';
 
 export interface User {

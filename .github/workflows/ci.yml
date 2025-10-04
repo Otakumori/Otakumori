@@ -83,6 +83,13 @@ jobs:
             exit 1
           fi
           echo "✅ No hardcoded secrets found"
+          
+          echo "🔍 Checking for console.log statements..."
+          if grep -r "console\.log" app/ --exclude-dir=node_modules; then
+            echo "❌ Found console.log statements - use console.warn or console.error instead"
+            exit 1
+          fi
+          echo "✅ No console.log statements found"
 
       - name: Validate environment schema
         run: pnpm run validate:env || echo "Environment validation skipped in CI"
@@ -118,6 +125,9 @@ jobs:
 
       - name: Prettier formatting check
         run: pnpm run format:check
+
+      - name: Emoji policy enforcement
+        run: pnpm run scan:emojis
 
       - name: Asset verification
         run: pnpm run assets:verify

@@ -1,5 +1,3 @@
- 
-
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/app/hooks/hooks/useLocalStorage';
 
@@ -38,7 +36,7 @@ export const usePetals = () => {
 
   const claimReward = (code: string) => {
     // Here you would typically make an API call to validate and apply the discount
-    console.log(`Claiming reward: ${code}`);
+    // Claiming reward
     setShowReward(null);
   };
 

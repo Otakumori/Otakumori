@@ -15,7 +15,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SignIn, SignUp, useAuth } from '@clerk/nextjs';
-import { X, Sparkles, Crown, Heart } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ const CONTEXT_CONFIGS = {
   soapstone: {
     action: 'Sign in to leave a sign for fellow travelers',
     description: 'Share your wisdom and messages with the community',
-    icon: '🗿',
+    icon: '',
     color: 'from-amber-500 to-orange-600',
     benefits: [
       'Leave meaningful messages',
@@ -60,7 +60,7 @@ const CONTEXT_CONFIGS = {
   praise: {
     action: 'Sign in to send praise to other travelers',
     description: 'Spread positivity and recognition in the community',
-    icon: '✨',
+    icon: '',
     color: 'from-pink-500 to-purple-600',
     benefits: [
       'Appreciate great content',
@@ -72,7 +72,7 @@ const CONTEXT_CONFIGS = {
   wishlist: {
     action: 'Sign in to add items to your wishlist',
     description: 'Curate your perfect collection of anime treasures',
-    icon: '💝',
+    icon: '',
     color: 'from-red-500 to-pink-600',
     benefits: [
       'Save favorite items',
@@ -84,7 +84,7 @@ const CONTEXT_CONFIGS = {
   trade: {
     action: 'Sign in to present offers in the Scarlet Bazaar',
     description: 'Join the bustling marketplace of rare finds',
-    icon: '⚖️',
+    icon: '',
     color: 'from-emerald-500 to-teal-600',
     benefits: [
       'Trade rare items',
@@ -96,7 +96,7 @@ const CONTEXT_CONFIGS = {
   community: {
     action: 'Sign in to participate in community discussions',
     description: 'Join conversations with fellow otaku',
-    icon: '👥',
+    icon: '',
     color: 'from-blue-500 to-indigo-600',
     benefits: [
       'Join discussions',

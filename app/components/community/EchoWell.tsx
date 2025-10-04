@@ -52,7 +52,7 @@ export default function EchoWell({ className }: EchoWellProps) {
       {
         id: '1',
         content:
-          'Just finished watching the latest episode of Demon Slayer! The animation quality is absolutely stunning. What did everyone think? 🌸',
+          'Just finished watching the latest episode of Demon Slayer! The animation quality is absolutely stunning. What did everyone think? ',
         author: {
           id: 'user1',
           username: 'SakuraFan',
@@ -69,7 +69,7 @@ export default function EchoWell({ className }: EchoWellProps) {
       {
         id: '2',
         content:
-          'Found this amazing cosplay at the convention today! The attention to detail is incredible. Anyone else going to AnimeCon next month? 🎭',
+          'Found this amazing cosplay at the convention today! The attention to detail is incredible. Anyone else going to AnimeCon next month? ',
         author: {
           id: 'user2',
           username: 'CosplayQueen',
@@ -86,7 +86,7 @@ export default function EchoWell({ className }: EchoWellProps) {
       {
         id: '3',
         content:
-          'Working on a new fan art piece inspired by Studio Ghibli. The process is so therapeutic! Anyone else love drawing anime characters? ✏️',
+          'Working on a new fan art piece inspired by Studio Ghibli. The process is so therapeutic! Anyone else love drawing anime characters? ️',
         author: {
           id: 'user3',
           username: 'ArtOtaku',

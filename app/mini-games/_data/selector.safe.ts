@@ -1,4 +1,4 @@
-import { games, type Game } from './registry.safe';
+import { games } from './registry.safe';
 
 // Map registry games to hub component props
 export interface HubGameCard {

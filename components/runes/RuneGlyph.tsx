@@ -31,7 +31,7 @@ export default function RuneGlyph({
   const id = canonicalId || runeId;
   
   // Use the first available glyph
-  const glyphText = glyphOverride || glyph || '✧';
+  const glyphText = glyphOverride || glyph || '';
   
   // Size classes
   const sizeClasses = {

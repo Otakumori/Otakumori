@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AvatarRenderer } from '../../components/avatar/AvatarRenderer';
-import { SliderControl } from './SliderControl.safe';
 import { PhysicsPresetSelector } from './PhysicsPresetSelector.safe';
 import { OutfitSelector } from './OutfitSelector.safe';
 import { HairCustomizer } from './HairCustomizer.safe';
@@ -14,7 +13,6 @@ import { BodyCustomizer } from './BodyCustomizer.safe';
 import { NSFWCustomizer } from './NSFWCustomizer.safe';
 import { MaterialEditor } from './MaterialEditor.safe';
 import { InteractionTester } from './InteractionTester.safe';
-import { AvatarPreview } from './AvatarPreview.safe';
 
 // Types for the ultra-detailed character system
 interface UltraDetailedCharacterParams {
@@ -412,12 +410,12 @@ export function UltraDetailedCharacterCreator({
 
   // Tab configuration
   const tabs = [
-    { id: 'basic', label: 'Basic Info', icon: '👤', description: 'Gender, age, body type' },
-    { id: 'body', label: 'Body Anatomy', icon: '🏃', description: 'Detailed body customization' },
+    { id: 'basic', label: 'Basic Info', icon: '', description: 'Gender, age, body type' },
+    { id: 'body', label: 'Body Anatomy', icon: '', description: 'Detailed body customization' },
     {
       id: 'face',
       label: 'Facial Features',
-      icon: '😊',
+      icon: '',
       description: 'Face shape, eyes, nose, mouth',
     },
     { id: 'hair', label: 'Hair & Style', description: 'Hair, accessories, styling' },

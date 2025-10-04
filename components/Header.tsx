@@ -4,8 +4,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { useUser, useClerk } from '@clerk/nextjs';
 
 const navLinks = [

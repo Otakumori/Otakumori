@@ -12,11 +12,11 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
   const [zoomLevel, setZoomLevel] = useState(1);
 
   const poses = [
-    { emoji: '💪', label: 'Muscle flex' },
-    { emoji: '🔥', label: 'Fire' },
-    { emoji: '⚡', label: 'Lightning' },
-    { emoji: '🌟', label: 'Star' },
-    { emoji: '💥', label: 'Explosion' },
+    { emoji: '', label: 'Muscle flex' },
+    { emoji: '', label: 'Fire' },
+    { emoji: '', label: 'Lightning' },
+    { emoji: '', label: 'Star' },
+    { emoji: '', label: 'Explosion' },
   ];
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
           >
             <div className="text-6xl">
               <span role="img" aria-label="Explosion effect">
-                💥
+                
               </span>
             </div>
           </motion.div>

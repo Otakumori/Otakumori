@@ -67,7 +67,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
               className="text-6xl"
             >
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
             </motion.div>
             <motion.div
@@ -79,7 +79,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
               className="text-6xl"
             >
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
             </motion.div>
           </div>

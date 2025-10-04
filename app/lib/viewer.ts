@@ -1,4 +1,3 @@
-import { cookies } from 'next/headers';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 

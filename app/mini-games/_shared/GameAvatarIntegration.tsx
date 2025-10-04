@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAvatarRenderer } from './useAvatarForGame';
 import { AvatarRenderer } from '@/app/components/avatar/AvatarRenderer';
@@ -84,7 +84,7 @@ export function GameAvatarIntegration({
           className={`${size === 'small' ? 'w-12 h-12' : size === 'medium' ? 'w-16 h-16' : 'w-24 h-24'} rounded-lg bg-white/10 border border-dashed border-white/30 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors`}
           onClick={handleAvatarClick}
         >
-          <span className="text-white/60 text-lg">👤</span>
+          <span className="text-white/60 text-lg"></span>
         </div>
       </div>
     );
@@ -114,7 +114,7 @@ export function GameAvatarIntegration({
           {/* Custom Avatar Indicator */}
           {isCustomAvatar && (
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full flex items-center justify-center">
-              <span className="text-xs text-white">★</span>
+              <span className="text-xs text-white"></span>
             </div>
           )}
         </motion.div>
@@ -143,7 +143,7 @@ export function GameAvatarIntegration({
                   onClick={() => setShowAvatarSelector(false)}
                   className="text-white/60 hover:text-white transition-colors"
                 >
-                  ✕
+                  
                 </button>
               </div>
 

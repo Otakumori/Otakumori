@@ -434,7 +434,7 @@ export default function DungeonGame() {
     ctx.fillStyle = player.invulnerable > 0 ? '#ff6b9d80' : '#ff6b9d';
     ctx.fillRect(player.x, player.y, 40, 40);
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('🎭', player.x + 12, player.y + 25);
+    ctx.fillText('', player.x + 12, player.y + 25);
 
     // Draw enemies
     enemies.forEach(enemy => {
@@ -449,7 +449,7 @@ export default function DungeonGame() {
       
       // Enemy symbol
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(enemy.type === 'boss' ? '👹' : '👻', enemy.x + 12, enemy.y + 25);
+      ctx.fillText(enemy.type === 'boss' ? '' : '', enemy.x + 12, enemy.y + 25);
     });
 
     // Draw spells
@@ -473,9 +473,9 @@ export default function DungeonGame() {
       ctx.fillRect(pickup.x, pickup.y, 20, 20);
       
       const symbols = {
-        health: '❤️',
-        mana: '💙',
-        treasure: '💰',
+        health: '️',
+        mana: '',
+        treasure: '',
       };
       ctx.fillStyle = '#ffffff';
       ctx.fillText(symbols[pickup.type], pickup.x + 2, pickup.y + 15);
@@ -515,7 +515,7 @@ export default function DungeonGame() {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-6">🏰</div>
+          <div className="text-6xl mb-6"></div>
           <h2 className="text-3xl font-bold mb-4">Dungeon of Desire</h2>
           <p className="text-gray-300 mb-8 max-w-md">
             Descend into the dungeon. Survive rooms and claim rewards.
@@ -528,9 +528,9 @@ export default function DungeonGame() {
               Enter Dungeon
             </button>
             <div className="text-sm text-gray-400 space-y-1">
-              <p>🏃 WASD/Arrow Keys - Move</p>
-              <p>✨ Space - Cast Spell</p>
-              <p>⚡ Collect pickups to survive longer</p>
+              <p> WASD/Arrow Keys - Move</p>
+              <p> Space - Cast Spell</p>
+              <p> Collect pickups to survive longer</p>
               <p>⏰ 1-hour time limit (optional)</p>
             </div>
           </div>
@@ -563,7 +563,7 @@ export default function DungeonGame() {
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-900 via-purple-900 to-black">
         <div className="text-center text-white">
           <div className="text-6xl mb-4">
-            {gameState === 'victory' ? '👑' : '💀'}
+            {gameState === 'victory' ? '' : ''}
           </div>
           <h2 className="text-3xl font-bold mb-4">
             {gameState === 'victory' ? 'Victory!' : 'Defeated'}
@@ -573,7 +573,7 @@ export default function DungeonGame() {
             <div className="text-lg text-gray-300">Stage Reached: {stage}</div>
             <div className="text-lg text-gray-300">Survival Time: {formatTime(gameTime)}</div>
             {gameState === 'victory' && (
-              <div className="text-yellow-400 font-bold">Dungeon Conquered! 🏆</div>
+              <div className="text-yellow-400 font-bold">Dungeon Conquered! </div>
             )}
           </div>
           <div className="space-x-4">

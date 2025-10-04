@@ -162,11 +162,11 @@ export class PsychologicalTriggersSystem {
     celebration: string;
   } {
     const celebrations = [
-      '🎉 Congratulations!',
-      '🏆 Achievement unlocked!',
-      '✨ Amazing work!',
-      '🌟 You did it!',
-      '🎊 Fantastic!',
+      ' Congratulations!',
+      ' Achievement unlocked!',
+      ' Amazing work!',
+      ' You did it!',
+      ' Fantastic!',
     ];
 
     const celebration = celebrations[Math.floor(Math.random() * celebrations.length)];

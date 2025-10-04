@@ -58,9 +58,9 @@
 
     // Console logging for development
     if (metric.rating === 'poor') {
-      console.warn('⚠️ Poor performance detected:', metric);
+      console.warn(' Poor performance detected:', metric);
     } else if (metric.rating === 'good') {
-      console.log('✅ Good performance:', metric);
+      console.log(' Good performance:', metric);
     }
 
     // Send to analytics (replace with your analytics endpoint)
@@ -221,7 +221,7 @@
       const poorMetrics = recentMetrics.filter((m) => m.rating === 'poor');
 
       if (poorMetrics.length > 0) {
-        console.warn(`🚨 ${poorMetrics.length} performance issues in last 30s`, poorMetrics);
+        console.warn(` ${poorMetrics.length} performance issues in last 30s`, poorMetrics);
       }
     }, 30000);
   }
@@ -237,7 +237,7 @@
     initGameCubeMonitoring();
     setupBudgetAlerts();
 
-    console.log('🔍 Web Vitals monitoring initialized');
+    console.log('⌕ Web Vitals monitoring initialized');
   }
 
   // Start monitoring when DOM is ready

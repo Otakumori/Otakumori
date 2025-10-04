@@ -19,16 +19,16 @@ interface Friend {
 
 export const FriendChat: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([
-    { id: '1', name: 'KawaiiOtaku', avatar: '🌸', status: 'online' },
-    { id: '2', name: 'GamingSenpai', avatar: '🎮', status: 'away' },
+    { id: '1', name: 'KawaiiOtaku', avatar: '', status: 'online' },
+    { id: '2', name: 'GamingSenpai', avatar: '', status: 'away' },
     {
       id: '3',
       name: 'AnimeLover',
-      avatar: '🌟',
+      avatar: '',
       status: 'offline',
       lastSeen: new Date(Date.now() - 3600000),
     },
-    { id: '4', name: 'CosplayQueen', avatar: '👑', status: 'online' },
+    { id: '4', name: 'CosplayQueen', avatar: '', status: 'online' },
   ]);
 
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
@@ -52,12 +52,12 @@ export const FriendChat: React.FC = () => {
           // Simulate receiving a message
           if (Math.random() > 0.5) {
             const responses = [
-              "That's so cool! 😊",
+              "That's so cool! ",
               'I totally agree!',
               'Have you seen the latest episode?',
               "Let's play together sometime!",
               'Thanks for the recommendation!',
-              "That's hilarious! 😂",
+              "That's hilarious! ",
               "I'm so jealous!",
               "Can't wait to see more!",
             ];
@@ -275,7 +275,7 @@ export const FriendChat: React.FC = () => {
                     fontSize: '14px',
                   }}
                 >
-                  Start a conversation with {selectedFriend.name}! 💬
+                  Start a conversation with {selectedFriend.name}! 
                 </div>
               )}
 
@@ -393,7 +393,7 @@ export const FriendChat: React.FC = () => {
               fontSize: '16px',
             }}
           >
-            Select a friend to start chatting! 💬
+            Select a friend to start chatting! 
           </div>
         )}
       </div>

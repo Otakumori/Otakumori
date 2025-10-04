@@ -86,7 +86,7 @@ export default function TestSentryPage() {
           <h2 className="text-xl font-semibold mb-4 text-red-300">
             {
               <>
-                '' 🚨' '
+                '' ' '
                 <span role="img" aria-label="emoji">
                   E
                 </span>
@@ -751,7 +751,7 @@ export default function TestSentryPage() {
               <>
                 ''
                 <span role="img" aria-label="emoji">
-                  ✅
+                  
                 </span>
                 ' '
                 <span role="img" aria-label="emoji">

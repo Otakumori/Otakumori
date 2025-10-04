@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 
-console.log('🔧 Fixing script files...');
+console.log(' Fixing script files...');
 
 // Function to recursively find all script files
 function findScriptFiles(dir) {
@@ -52,16 +52,16 @@ function main() {
         if (result.modified) {
           fs.writeFileSync(file, result.content, 'utf8');
           totalFixed++;
-          console.log(`✅ Fixed: ${path.relative(projectRoot, file)}`);
+          console.log(` Fixed: ${path.relative(projectRoot, file)}`);
         }
       } catch (error) {
-        console.log(`⚠️  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
+        console.log(`  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
       }
     }
 
-    console.log(`\n🎉 Fixed ${totalFixed} script files!`);
+    console.log(`\n Fixed ${totalFixed} script files!`);
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(' Error:', error.message);
     process.exit(1);
   }
 }

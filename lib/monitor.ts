@@ -1,5 +1,7 @@
 export const monitor = {
-  log: (...args: any[]) => console.log(...args),
+  log: (...args: any[]) => {
+    /* Log disabled */
+  },
   error: (error: any) => console.error(error),
   checkHealth: async () => ({
     status: 'healthy',

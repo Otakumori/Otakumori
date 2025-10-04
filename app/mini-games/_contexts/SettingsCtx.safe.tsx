@@ -40,7 +40,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         setThemeState(savedTheme);
       }
     } catch (error) {
-      console.log('Failed to load settings from localStorage:', error);
+      // Failed to load settings from localStorage
     }
   }, []);
 
@@ -49,7 +49,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     try {
       localStorage.setItem('otm-master-volume', masterVolume.toString());
     } catch (error) {
-      console.log('Failed to save volume to localStorage:', error);
+      // Failed to save volume to localStorage
     }
   }, [masterVolume]);
 
@@ -57,7 +57,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     try {
       localStorage.setItem('otm-muted', isMuted.toString());
     } catch (error) {
-      console.log('Failed to save muted state to localStorage:', error);
+      // Failed to save muted state to localStorage
     }
   }, [isMuted]);
 
@@ -65,7 +65,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     try {
       localStorage.setItem('otm-theme', theme);
     } catch (error) {
-      console.log('Failed to save theme to localStorage:', error);
+      // Failed to save theme to localStorage
     }
   }, [theme]);
 

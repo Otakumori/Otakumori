@@ -140,26 +140,26 @@ function generateCreditsJson(): void {
   }
 
   writeFileSync(creditsPath, JSON.stringify(credits, null, 2));
-  console.log(`✅ Generated credits.json at ${creditsPath}`);
+  console.log(` Generated credits.json at ${creditsPath}`);
 }
 
 function validateAssetRoles(): void {
   const rolesPath = join(process.cwd(), 'assets-roles.json');
 
   if (!existsSync(rolesPath)) {
-    console.error('❌ assets-roles.json not found');
+    console.error(' assets-roles.json not found');
     process.exit(1);
   }
 
   try {
     const roles = JSON.parse(readFileSync(rolesPath, 'utf8'));
-    console.log('✅ assets-roles.json is valid JSON');
+    console.log(' assets-roles.json is valid JSON');
 
     // Check for required sections
     const requiredSections = ['ui', 'games', 'sections', 'cosmetics', 'fallbacks'];
     for (const section of requiredSections) {
       if (!roles[section]) {
-        console.warn(`⚠️  Missing section: ${section}`);
+        console.warn(`  Missing section: ${section}`);
       }
     }
 
@@ -168,34 +168,34 @@ function validateAssetRoles(): void {
       const fallbackTypes = ['image', 'audio', 'video'];
       for (const type of fallbackTypes) {
         if (!roles.fallbacks[type]) {
-          console.warn(`⚠️  Missing fallback for: ${type}`);
+          console.warn(`  Missing fallback for: ${type}`);
         }
       }
     }
 
-    console.log('✅ Asset roles validation complete');
+    console.log(' Asset roles validation complete');
   } catch (error) {
-    console.error('❌ Failed to validate assets-roles.json:', error);
+    console.error(' Failed to validate assets-roles.json:', error);
     process.exit(1);
   }
 }
 
 function main(): void {
-  console.log('🎮 Otakumori Assets Compilation');
+  console.log(' Otakumori Assets Compilation');
   console.log('================================\n');
 
   try {
     validateAssetRoles();
     generateCreditsJson();
 
-    console.log('\n✨ Assets compilation completed successfully!');
+    console.log('\n Assets compilation completed successfully!');
     console.log('\nNext steps:');
     console.log('1. Place actual asset files in /public/assets/');
     console.log('2. Update assets-roles.json with real paths');
     console.log('3. Verify all fallback assets exist');
     console.log('4. Test asset loading in development');
   } catch (error) {
-    console.error('\n❌ Assets compilation failed:', error);
+    console.error('\n Assets compilation failed:', error);
     process.exit(1);
   }
 }

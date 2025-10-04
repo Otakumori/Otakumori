@@ -78,7 +78,7 @@ export default function AvatarEditorPage() {
   // Handle avatar preview
   const handlePreview = (config: any) => {
     // Preview is handled internally by the component
-    console.log('Preview updated:', config);
+    // Preview updated
   };
 
   if (!mounted) {

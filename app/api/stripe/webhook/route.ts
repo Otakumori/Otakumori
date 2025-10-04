@@ -36,18 +36,13 @@ export async function POST(req: NextRequest) {
     // Verify webhook signature
     const event = await verifyWebhookSignature(body, signature, env.STRIPE_WEBHOOK_SECRET);
 
-    console.log(`Processing Stripe webhook: ${event.type}`);
+    // Processing Stripe webhook
 
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed':
         const session = parseWebhookEvent(event, StripeCheckoutSessionSchema);
-        console.log('Checkout completed:', {
-          sessionId: session.id,
-          customerEmail: session.customer_email,
-          amount: session.amount_total,
-          status: session.status,
-        });
+        // Checkout completed
 
         // Update order status and create Printify order
         await handleCheckoutCompleted(session);
@@ -55,28 +50,20 @@ export async function POST(req: NextRequest) {
 
       case 'payment_intent.succeeded':
         const paymentIntent = parseWebhookEvent(event, StripePaymentIntentSchema);
-        console.log('Payment succeeded:', {
-          paymentIntentId: paymentIntent.id,
-          amount: paymentIntent.amount,
-          customer: paymentIntent.customer,
-        });
+        // Payment succeeded
 
         // Update order status if needed
         break;
 
       case 'payment_intent.payment_failed':
         const failedPayment = parseWebhookEvent(event, StripePaymentIntentSchema);
-        console.log('Payment failed:', {
-          paymentIntentId: failedPayment.id,
-          amount: failedPayment.amount,
-          customer: failedPayment.customer,
-        });
+        // Payment failed
 
         // Update order status to failed
         break;
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+      // Unhandled event type
     }
 
     return NextResponse.json({ received: true });

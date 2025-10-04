@@ -178,11 +178,11 @@ const showHelp = args.includes('--help') || args.includes('-h');
  */
 function log(message, level = 'info') {
   const prefix = {
-    info: '📋',
-    success: '✅',
-    warning: '⚠️',
-    error: '❌',
-    debug: '🔍',
+    info: '',
+    success: '',
+    warning: '',
+    error: '',
+    debug: '⌕',
   }[level];
 
   if (level === 'debug' && !isVerbose) return;
@@ -516,25 +516,25 @@ function checkSuspiciousValue(key, value, environment) {
 
 function printEnvironmentReport(environment, result) {
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`🔍 ${environment.toUpperCase()} ENVIRONMENT AUDIT`);
+  console.log(`⌕ ${environment.toUpperCase()} ENVIRONMENT AUDIT`);
   console.log(`${'='.repeat(60)}`);
 
   if (result.missing.length > 0) {
-    console.log(`\n❌ MISSING REQUIRED VARIABLES (${result.missing.length}):`);
+    console.log(`\n MISSING REQUIRED VARIABLES (${result.missing.length}):`);
     result.missing.forEach((key) => {
       console.log(`   • ${key}`);
     });
   }
 
   if (result.empty.length > 0) {
-    console.log(`\n⚠️  EMPTY VALUES (${result.empty.length}):`);
+    console.log(`\n  EMPTY VALUES (${result.empty.length}):`);
     result.empty.forEach((key) => {
       console.log(`   • ${key}`);
     });
   }
 
   if (result.suspicious.length > 0) {
-    console.log(`\n🚨 SUSPICIOUS VALUES (${result.suspicious.length}):`);
+    console.log(`\n SUSPICIOUS VALUES (${result.suspicious.length}):`);
     result.suspicious.forEach(({ key, value, reason }) => {
       console.log(`   • ${key}: ${reason}`);
       console.log(`     Value: ${value}`);
@@ -542,7 +542,7 @@ function printEnvironmentReport(environment, result) {
   }
 
   if (result.present.length > 0) {
-    console.log(`\n✅ PRESENT VARIABLES (${result.present.length}):`);
+    console.log(`\n PRESENT VARIABLES (${result.present.length}):`);
     const chunks = [];
     for (let i = 0; i < result.present.length; i += 4) {
       chunks.push(result.present.slice(i, i + 4));
@@ -555,7 +555,7 @@ function printEnvironmentReport(environment, result) {
   // Development-specific comparisons
   if (environment === 'development') {
     if (result.localOnly.length > 0) {
-      console.log(`\n📁 IN LOCAL .env.local BUT NOT ON VERCEL (${result.localOnly.length}):`);
+      console.log(`\n IN LOCAL .env.local BUT NOT ON VERCEL (${result.localOnly.length}):`);
       result.localOnly.slice(0, 10).forEach((key) => console.log(`   • ${key}`));
       if (result.localOnly.length > 10) {
         console.log(`   ... and ${result.localOnly.length - 10} more`);
@@ -563,7 +563,7 @@ function printEnvironmentReport(environment, result) {
     }
 
     if (result.different.length > 0) {
-      console.log(`\n🔄 VALUE DIFFERENCES (${result.different.length}):`);
+      console.log(`\n VALUE DIFFERENCES (${result.different.length}):`);
       result.different.slice(0, 5).forEach(({ key, local, vercel }) => {
         console.log(`   • ${key}:`);
         console.log(`     Local:  ${local}`);
@@ -578,12 +578,12 @@ function printEnvironmentReport(environment, result) {
 
 async function fixMissingVariables(results, localEnv) {
   if (!shouldApply) {
-    console.log(`\n💡 To fix missing variables, run with --apply flag`);
+    console.log(`\n To fix missing variables, run with --apply flag`);
     return;
   }
 
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`🔧 APPLYING FIXES WITH REAL VALUES`);
+  console.log(` APPLYING FIXES WITH REAL VALUES`);
   console.log(`${'='.repeat(60)}`);
 
   const allMissing = new Set();
@@ -597,7 +597,7 @@ async function fixMissingVariables(results, localEnv) {
   }
 
   log(`Found ${allMissing.size} missing variables to add with real values`, 'info');
-  log('🔧 Using values from local environment files or generating appropriate ones', 'info');
+  log(' Using values from local environment files or generating appropriate ones', 'info');
 
   let successCount = 0;
   let failCount = 0;
@@ -614,28 +614,28 @@ async function fixMissingVariables(results, localEnv) {
       }
 
       // Show the command that will be run
-      console.log(`   📝 Command: vercel env add ${key} ${environment}`);
-      console.log(`   🔑 Value: ${maskSecret(realValue)}`);
+      console.log(`    Command: vercel env add ${key} ${environment}`);
+      console.log(`    Value: ${maskSecret(realValue)}`);
 
       // Note: Vercel CLI env add is interactive, so we show the command and value
       // The user would need to run these manually or we'd need to use expect/spawn
-      log(`⚠️  Run the above command manually and paste the value when prompted`, 'warning');
+      log(`  Run the above command manually and paste the value when prompted`, 'warning');
 
       successCount++; // Count as success since we provided the command
     } catch (error) {
-      log(`❌ Failed to prepare ${key} for ${environment}: ${error.message}`, 'error');
+      log(` Failed to prepare ${key} for ${environment}: ${error.message}`, 'error');
       failCount++;
     }
   }
 
-  console.log(`\n📊 RESULTS:`);
-  console.log(`   📝 Commands prepared: ${successCount}`);
-  console.log(`   ❌ Failed to prepare: ${failCount}`);
+  console.log(`\n RESULTS:`);
+  console.log(`    Commands prepared: ${successCount}`);
+  console.log(`    Failed to prepare: ${failCount}`);
 
   if (successCount > 0) {
-    log('🎉 Commands and real values prepared!', 'success');
-    log('💡 Run the commands above manually to add variables to Vercel', 'info');
-    log('💡 After adding, redeploy your application for changes to take effect', 'info');
+    log(' Commands and real values prepared!', 'success');
+    log(' Run the commands above manually to add variables to Vercel', 'info');
+    log(' After adding, redeploy your application for changes to take effect', 'info');
   }
 }
 
@@ -648,8 +648,8 @@ async function pullVercelEnvs() {
     const pullCommand = 'env pull .env.vercel';
     runVercelCommand(pullCommand);
 
-    log('✅ Environment variables pulled to .env.vercel', 'success');
-    log('💡 You can now compare .env.vercel with your .env.local', 'info');
+    log(' Environment variables pulled to .env.vercel', 'success');
+    log(' You can now compare .env.vercel with your .env.local', 'info');
 
     return true;
   } catch (error) {
@@ -660,7 +660,7 @@ async function pullVercelEnvs() {
 
 function printSummaryAndRecommendations(results) {
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`📊 SUMMARY & RECOMMENDATIONS`);
+  console.log(` SUMMARY & RECOMMENDATIONS`);
   console.log(`${'='.repeat(60)}`);
 
   // Count issues across all environments
@@ -681,17 +681,17 @@ function printSummaryAndRecommendations(results) {
   });
 
   if (criticalIssues.length > 0) {
-    console.log(`\n🚨 CRITICAL ISSUES (${criticalIssues.length}):`);
+    console.log(`\n CRITICAL ISSUES (${criticalIssues.length}):`);
     console.log(`   These will cause health checks to fail and mark the app as DOWN:`);
     criticalIssues.forEach((issue) => console.log(`   • ${issue}`));
   }
 
-  console.log(`\n📈 STATISTICS:`);
+  console.log(`\n STATISTICS:`);
   console.log(`   • Missing variables: ${totalMissing}`);
   console.log(`   • Suspicious values: ${totalSuspicious}`);
   console.log(`   • Critical issues: ${criticalIssues.length}`);
 
-  console.log(`\n🎯 NEXT STEPS:`);
+  console.log(`\n NEXT STEPS:`);
   if (totalMissing > 0) {
     console.log(
       `   1. Add missing variables in Vercel Dashboard → Settings → Environment Variables`,
@@ -702,10 +702,10 @@ function printSummaryAndRecommendations(results) {
     console.log(`   3. Review and fix suspicious values listed above`);
   }
   if (criticalIssues.length === 0) {
-    console.log(`   ✅ All critical variables are present - health checks should pass`);
+    console.log(`    All critical variables are present - health checks should pass`);
   }
 
-  console.log(`\n🔗 USEFUL LINKS:`);
+  console.log(`\n USEFUL LINKS:`);
   console.log(`   • Vercel Dashboard: https://vercel.com/dashboard`);
   console.log(`   • Health Check: https://www.otaku-mori.com/api/health`);
   console.log(`   • Documentation: Run with --verbose for detailed logs`);
@@ -713,7 +713,7 @@ function printSummaryAndRecommendations(results) {
 
 function printHelp() {
   console.log(`
-🚀 Vercel Environment Variables Manager
+ Vercel Environment Variables Manager
 
 USAGE:
   node scripts/vercel-env-manager.mjs [OPTIONS]
@@ -743,11 +743,11 @@ REQUIREMENTS:
   - Project linked: vercel link
 
 WHAT IT CHECKS:
-  ✅ Required variables from health service (${REQUIRED_SERVER.length + REQUIRED_CLIENT.length} total)
-  ✅ Recommended variables (${RECOMMENDED.length} total)
-  ✅ Suspicious values (wrong environment, malformed URLs, etc.)
-  ✅ Local vs Vercel differences
-  ✅ Missing critical variables that cause health check failures
+   Required variables from health service (${REQUIRED_SERVER.length + REQUIRED_CLIENT.length} total)
+   Recommended variables (${RECOMMENDED.length} total)
+   Suspicious values (wrong environment, malformed URLs, etc.)
+   Local vs Vercel differences
+   Missing critical variables that cause health check failures
 
 SAFETY:
   - Read-only by default (--apply shows manual commands)
@@ -765,7 +765,7 @@ async function main() {
     process.exit(0);
   }
 
-  console.log('🚀 Vercel Environment Variables Manager\n');
+  console.log(' Vercel Environment Variables Manager\n');
 
   // Check prerequisites
   if (!process.env.VERCEL_TOKEN) {

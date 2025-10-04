@@ -11,10 +11,8 @@ import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
 import Navbar from './components/layout/Navbar';
-import BackdropAbyssMystique from '../components/BackdropAbyssMystique';
 import QuakeHUD from './components/hud/QuakeHUD';
 import GlobalBackground from './components/GlobalBackground';
-import { usePathname } from 'next/navigation';
 import PostHogProvider from './providers/PostHogProvider.safe';
 import ClerkPostHogBridge from './(site)/_providers/ClerkPostHogBridge.safe';
 

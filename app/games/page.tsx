@@ -3,11 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
 import Navbar from '../components/layout/Navbar';
 import FooterDark from '../components/FooterDark';
 import GlassPanel from '../components/GlassPanel';
-import { t } from '@/lib/microcopy';
 
 export default function GameCubePage() {
   const [bootComplete, setBootComplete] = useState(false);
@@ -62,7 +60,7 @@ export default function GameCubePage() {
       title: 'Samurai Petal Slice',
       tooltip: "Draw the Tetsusaiga's arc…",
       description: 'Slice through falling petals with precision',
-      icon: '⚔️',
+      icon: '',
       difficulty: 'medium',
       rewards: { petals: 50, achievements: ['Blade Master'] },
       progress: gameProgress['samurai-petal-slice'] || {
@@ -76,7 +74,7 @@ export default function GameCubePage() {
       title: 'Anime Memory Match',
       tooltip: 'Recall the faces bound by fate.',
       description: 'Match anime character pairs from memory',
-      icon: '🧠',
+      icon: '',
       difficulty: 'easy',
       rewards: { petals: 30, achievements: ['Memory Keeper'] },
       progress: gameProgress['anime-memory-match'] || {
@@ -90,7 +88,7 @@ export default function GameCubePage() {
       title: 'Bubble-Pop Gacha',
       tooltip: 'Pop for spy-craft secrets…',
       description: 'Pop bubbles to reveal hidden treasures',
-      icon: '🎯',
+      icon: '',
       difficulty: 'easy',
       rewards: { petals: 40, achievements: ['Treasure Hunter'] },
       progress: gameProgress['bubble-pop-gacha'] || {
@@ -104,7 +102,7 @@ export default function GameCubePage() {
       title: 'Rhythm Beat-Em-Up',
       tooltip: "Sync to the Moon Prism's pulse.",
       description: 'Fight to the rhythm of the music',
-      icon: '🎵',
+      icon: '',
       difficulty: 'hard',
       rewards: { petals: 60, achievements: ['Rhythm Master'] },
       progress: gameProgress['rhythm-beat-em-up'] || {
@@ -208,7 +206,7 @@ export default function GameCubePage() {
             <div className="space-y-2">
               {isCompleted && (
                 <div className="flex items-center justify-center text-green-400 text-sm">
-                  <span className="mr-1">✓</span>
+                  <span className="mr-1"></span>
                   Completed
                 </div>
               )}

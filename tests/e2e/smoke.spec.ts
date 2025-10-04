@@ -26,7 +26,7 @@ test('Footer components work', async ({ page }) => {
   await page.goto('/');
 
   // Footer copyright
-  await expect(page.getByText(/© \d{4} Otaku-mori\. Made with ♥/)).toBeVisible();
+  await expect(page.getByText(/© \d{4} Otaku-mori\. Made with /)).toBeVisible();
 
   // Soapstone CTA opens modal
   await page.getByRole('button', { name: /soapstone/i }).click();

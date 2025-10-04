@@ -4,7 +4,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
-import { useSound } from '@/lib/hooks/useSound';
 import { useHaptic } from '@/lib/hooks/useHaptic';
 import { useAchievements } from '@/lib/hooks/useAchievements';
 import { useUserStore } from '@/lib/store/userStore';
@@ -43,10 +42,10 @@ export const ReactiveAvatar = ({ className = '' }: ReactiveAvatarProps) => {
 
   // Avatar expressions based on mood
   const expressions = {
-    neutral: '⚜️',
-    happy: '✧',
-    excited: '❈',
-    thinking: '❋',
+    neutral: '',
+    happy: '',
+    excited: '',
+    thinking: '',
   };
 
   // Animation variants

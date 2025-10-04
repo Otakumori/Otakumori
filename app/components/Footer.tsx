@@ -75,7 +75,7 @@ export default function Footer() {
             <p>
               © {new Date().getFullYear()} Otaku-mori. All petals accounted for. Don't go hollow.
             </p>
-            <p>Otakumori ™ made with ♡</p>
+            <p>Otakumori ™ made with </p>
             <p>
               <a href="/#leave-a-sign" className="hover:text-white transition-colors">
                 Leave a sign

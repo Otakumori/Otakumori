@@ -143,7 +143,7 @@ function fixUnusedVars(filePath) {
 
     return false;
   } catch (error) {
-    console.error(`❌ Error fixing ${filePath}:`, error.message);
+    console.error(` Error fixing ${filePath}:`, error.message);
     return false;
   }
 }
@@ -173,5 +173,5 @@ for (let i = 0; i < allFiles.length; i += batchSize) {
 }
 
 console.log(
-  `\n🎉 Fixed unused variables in ${fixedCount} files out of ${allFiles.length} total files`,
+  `\n Fixed unused variables in ${fixedCount} files out of ${allFiles.length} total files`,
 );

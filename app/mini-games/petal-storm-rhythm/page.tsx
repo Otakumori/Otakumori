@@ -624,8 +624,8 @@ export default function PetalStormRhythm() {
                             }`}
                             style={{ top }}
                           >
-                            {note.type === 'normal' && '🌸'}
-                            {note.type === 'hold' && '📏'}
+                            {note.type === 'normal' && ''}
+                            {note.type === 'hold' && ''}
                             {note.type === 'slide' && (note.direction === 'left' ? '←' : '→')}
                           </motion.div>
                         );
@@ -647,7 +647,7 @@ export default function PetalStormRhythm() {
         >
           <div className="bg-slate-800/90 rounded-2xl p-8 max-w-2xl w-full text-center">
             <h2 className="text-3xl font-bold text-pink-400 mb-4">
-              {health > 0 ? '🎵 Rhythm Master!' : '💔 Song Ended'}
+              {health > 0 ? ' Rhythm Master!' : ' Song Ended'}
             </h2>
             <p className="text-slate-300 mb-6">"Perfect timing creates the most beautiful storms."</p>
             

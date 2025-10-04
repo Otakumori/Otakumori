@@ -3,16 +3,16 @@ import { PrismaClient, PhraseCategory } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function testSoapstone() {
-  console.log('🎮 Testing Dark Souls-style Comments System\n');
+  console.log(' Testing Dark Souls-style Comments System\n');
 
   // Show all phrase categories and counts
-  console.log('📝 PHRASE CATEGORIES:');
+  console.log(' PHRASE CATEGORIES:');
   for (const category of Object.values(PhraseCategory)) {
     const count = await prisma.phrase.count({ where: { category } });
     console.log(`  ${category}: ${count} phrases`);
   }
 
-  console.log('\n🎯 SAMPLE PHRASES BY CATEGORY:');
+  console.log('\n SAMPLE PHRASES BY CATEGORY:');
 
   // Show sample phrases from each category
   for (const category of Object.values(PhraseCategory)) {
@@ -25,7 +25,7 @@ async function testSoapstone() {
     phrases.forEach((p) => console.log(`  - "${p.text}"`));
   }
 
-  console.log('\n🔧 MESSAGE TEMPLATES:');
+  console.log('\n MESSAGE TEMPLATES:');
   const templates = await prisma.messageTemplate.findMany({
     include: {
       slots: {
@@ -37,7 +37,7 @@ async function testSoapstone() {
   });
 
   templates.forEach((template) => {
-    console.log(`\n📋 ${template.name}:`);
+    console.log(`\n ${template.name}:`);
     console.log(`   Pattern: "${template.pattern}"`);
     console.log(`   Slots:`);
     template.slots.forEach((slot) => {
@@ -48,7 +48,7 @@ async function testSoapstone() {
     });
   });
 
-  console.log('\n✨ EXAMPLE MESSAGE BUILDS:');
+  console.log('\n EXAMPLE MESSAGE BUILDS:');
 
   // Build some example messages
   const examples = [
@@ -98,7 +98,7 @@ async function testSoapstone() {
     }
   }
 
-  console.log('\n🎭 FUNNY/MEME PHRASES:');
+  console.log('\n FUNNY/MEME PHRASES:');
   const humorPhrases = await prisma.phrase.findMany({
     where: {
       OR: [{ category: PhraseCategory.HUMOR }, { category: PhraseCategory.MEME }],
@@ -111,7 +111,7 @@ async function testSoapstone() {
     console.log(`  [${p.category}] "${p.text}"`);
   });
 
-  console.log('\n✅ Dark Souls Comments System is ready!');
+  console.log('\n Dark Souls Comments System is ready!');
   console.log('   - Users can build messages from curated phrases');
   console.log('   - Templates constrain message structure');
   console.log('   - Appraisal system for Good/Poor votes');
@@ -121,7 +121,7 @@ async function testSoapstone() {
 
 testSoapstone()
   .catch((e) => {
-    console.error('❌ Error:', e);
+    console.error(' Error:', e);
     process.exit(1);
   })
   .finally(async () => {

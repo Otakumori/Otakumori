@@ -88,7 +88,7 @@ export default function PlaygroundPage() {
         oscillator.stop(ctx.currentTime + 0.1);
       });
     } catch (error) {
-      console.log('Audio playback failed:', error);
+      // Audio playback failed
     }
 
     setTimeout(() => setPlayingSfx(null), 100);
@@ -117,7 +117,7 @@ export default function PlaygroundPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slatey-200 mb-4">🎮 Asset Playground</h1>
+          <h1 className="text-4xl font-bold text-slatey-200 mb-4"> Asset Playground</h1>
           <p className="text-lg text-slatey-400 max-w-2xl mx-auto">
             Try out our retro gaming assets with interactive hover effects and SFX. Click on
             anything to see it in action!
@@ -143,12 +143,10 @@ export default function PlaygroundPage() {
               <div className="aspect-square bg-slate-700 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
                 {asset.imageId ? (
                   <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
-                    <span className="text-4xl text-slatey-300">🎨</span>
+                    <span className="text-4xl text-slatey-300"></span>
                   </div>
                 ) : (
-                  <div className="text-6xl text-slatey-400">
-                    {asset.type === 'sfx' ? '🔊' : '🎮'}
-                  </div>
+                  <div className="text-6xl text-slatey-400">{asset.type === 'sfx' ? '' : ''}</div>
                 )}
               </div>
 
@@ -184,16 +182,14 @@ export default function PlaygroundPage() {
               <button
                 onClick={() => setSelectedAsset(null)}
                 className="text-slatey-400 hover:text-slatey-200 text-xl"
-              >
-                ✕
-              </button>
+              ></button>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* Asset Preview */}
               <div className="bg-slate-700 rounded-xl p-6 flex items-center justify-center">
                 <div className="text-8xl text-slatey-300">
-                  {selectedAsset.type === 'sfx' ? '🔊' : '🎨'}
+                  {selectedAsset.type === 'sfx' ? '' : ''}
                 </div>
               </div>
 

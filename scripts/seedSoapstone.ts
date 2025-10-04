@@ -133,7 +133,7 @@ async function main() {
   const jsonPath = path.join(process.cwd(), 'prisma', 'data', 'otaku_mori_phrases.json');
   await seedPhrases(jsonPath);
   await seedTemplates();
-  console.log('✅ Seeded phrases & templates');
+  console.log(' Seeded phrases & templates');
 }
 
 main()

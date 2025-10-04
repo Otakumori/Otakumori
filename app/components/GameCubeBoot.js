@@ -7,10 +7,10 @@ import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SEASONAL_PETALS = {
-  spring: { color: '#FF69B4', shape: '🌸', particles: 20 },
-  summer: { color: '#FF1493', shape: '🌹', particles: 15 },
-  autumn: { color: '#FF4500', shape: '🍁', particles: 25 },
-  winter: { color: '#B0E0E6', shape: '❄️', particles: 30 },
+  spring: { color: '#FF69B4', shape: '', particles: 20 },
+  summer: { color: '#FF1493', shape: '', particles: 15 },
+  autumn: { color: '#FF4500', shape: '', particles: 25 },
+  winter: { color: '#B0E0E6', shape: '️', particles: 30 },
 };
 
 const ABYSS_PETALS = {

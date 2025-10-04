@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌸 Seeding Rune System...');
+  console.log(' Seeding Rune System...');
 
   // Create or update site configuration
   await prisma.siteConfig.upsert({
@@ -72,7 +72,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Site configuration created/updated');
+  console.log(' Site configuration created/updated');
 
   // Create initial rune definitions
   const runeDefs = [
@@ -80,7 +80,7 @@ async function main() {
       id: 'rune_sakura_blossom',
       canonicalId: 'rune_a',
       displayName: 'Sakura Blossom',
-      glyph: '🌸',
+      glyph: '',
       lore: 'The first bloom of spring, carrying hope and renewal.',
       printifyUPCs: ['SAKURA001', 'SAKURA002'],
       isActive: true,
@@ -89,7 +89,7 @@ async function main() {
       id: 'rune_moonlight',
       canonicalId: 'rune_b',
       displayName: 'Moonlight',
-      glyph: '🌙',
+      glyph: '',
       lore: 'Silver light that guides travelers through darkness.',
       printifyUPCs: ['MOON001', 'MOON002'],
       isActive: true,
@@ -98,7 +98,7 @@ async function main() {
       id: 'rune_star_fire',
       canonicalId: 'rune_c',
       displayName: 'Star Fire',
-      glyph: '⭐',
+      glyph: '',
       lore: 'Burning bright with the passion of a thousand suns.',
       printifyUPCs: ['STAR001', 'STAR002'],
       isActive: true,
@@ -107,7 +107,7 @@ async function main() {
       id: 'rune_water_flow',
       canonicalId: 'rune_d',
       displayName: 'Water Flow',
-      glyph: '💧',
+      glyph: '',
       lore: 'Adaptable and persistent, finding paths where none exist.',
       printifyUPCs: ['WATER001', 'WATER002'],
       isActive: true,
@@ -116,7 +116,7 @@ async function main() {
       id: 'rune_earth_stone',
       canonicalId: 'rune_e',
       displayName: 'Earth Stone',
-      glyph: '🪨',
+      glyph: '',
       lore: 'Unmovable foundation, the bedrock of all creation.',
       printifyUPCs: ['EARTH001', 'EARTH002'],
       isActive: true,
@@ -125,7 +125,7 @@ async function main() {
       id: 'rune_wind_song',
       canonicalId: 'rune_f',
       displayName: 'Wind Song',
-      glyph: '🌪️',
+      glyph: '️',
       lore: 'Whispers secrets carried from distant lands.',
       printifyUPCs: ['WIND001', 'WIND002'],
       isActive: true,
@@ -134,7 +134,7 @@ async function main() {
       id: 'rune_lightning_bolt',
       canonicalId: 'rune_g',
       displayName: 'Lightning Bolt',
-      glyph: '⚡',
+      glyph: '',
       lore: 'Sudden power that illuminates the darkest moments.',
       printifyUPCs: ['LIGHT001', 'LIGHT002'],
       isActive: true,
@@ -143,7 +143,7 @@ async function main() {
       id: 'rune_ice_crystal',
       canonicalId: 'rune_h',
       displayName: 'Ice Crystal',
-      glyph: '❄️',
+      glyph: '️',
       lore: 'Perfect clarity frozen in time, reflecting truth.',
       printifyUPCs: ['ICE001', 'ICE002'],
       isActive: true,
@@ -162,7 +162,7 @@ async function main() {
     });
   }
 
-  console.log('✅ Rune definitions created/updated');
+  console.log(' Rune definitions created/updated');
 
   // Create initial rune combos
   const runeCombos = [
@@ -235,7 +235,7 @@ async function main() {
     }
   }
 
-  console.log('✅ Rune combos created/updated');
+  console.log(' Rune combos created/updated');
 
   // Update site config with rune data
   await prisma.siteConfig.update({
@@ -251,16 +251,16 @@ async function main() {
     },
   });
 
-  console.log('✅ Site configuration updated with rune data');
+  console.log(' Site configuration updated with rune data');
 
-  console.log('🎉 Rune System seeding completed!');
-  console.log(`📊 Created ${runeDefs.length} rune definitions`);
-  console.log(`🔗 Created ${runeCombos.length} rune combos`);
+  console.log(' Rune System seeding completed!');
+  console.log(` Created ${runeDefs.length} rune definitions`);
+  console.log(` Created ${runeCombos.length} rune combos`);
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seeding failed:', e);
+    console.error(' Seeding failed:', e);
     process.exit(1);
   })
   .finally(() => {

@@ -90,7 +90,7 @@ export default function ShopTeaser() {
       ) : error ? (
         <div className="text-center py-12">
           <div className="w-24 h-24 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
-            <span className="text-2xl text-red-400">⚠️</span>
+            <span className="text-2xl text-red-400"></span>
           </div>
           <h3 className="text-xl text-white mb-2">Unable to Load Products</h3>
           <p className="text-gray-400">{error}</p>
@@ -142,7 +142,7 @@ export default function ShopTeaser() {
       ) : (
         <div className="text-center py-12">
           <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
-            <span className="text-2xl text-white/60">🛍️</span>
+            <span className="text-2xl text-white/60"></span>
           </div>
           <h3 className="text-xl text-white mb-2">Shop Coming Soon</h3>
           <p className="text-gray-400">Featured products will appear here</p>

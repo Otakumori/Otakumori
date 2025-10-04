@@ -1,6 +1,4 @@
 'use client';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { z } from 'zod';
 // TODO: Update this file to use the new mini-games API structure
 // This file is temporarily disabled until the new API structure is implemented
 

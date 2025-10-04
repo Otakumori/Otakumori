@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log(' Starting database seed...');
 
   // Clear existing data (optional - remove in production)
   await prisma.product.deleteMany({});
@@ -12,7 +12,7 @@ async function main() {
   await prisma.reward.deleteMany({});
 
   // Seed Products
-  console.log('📦 Seeding products...');
+  console.log(' Seeding products...');
   const products = [
     {
       id: 'prod_cherry_hoodie',
@@ -129,7 +129,7 @@ async function main() {
   }
 
   // Create product variants for each product
-  console.log('🔧 Creating product variants...');
+  console.log(' Creating product variants...');
   const productVariants = [
     // Cherry Blossom Hoodie variants
     {
@@ -224,7 +224,7 @@ async function main() {
   }
 
   // Seed Achievements
-  console.log('🏆 Seeding achievements...');
+  console.log(' Seeding achievements...');
   const achievements = [
     {
       id: 'ach_first_petal',
@@ -279,7 +279,7 @@ async function main() {
   }
 
   // Seed Rewards
-  console.log('🎁 Seeding rewards...');
+  console.log(' Seeding rewards...');
   const rewards = [
     {
       id: 'reward_petal_bonus_100',
@@ -313,7 +313,7 @@ async function main() {
   }
 
   // Seed Site Config
-  console.log('⚙️ Seeding site configuration...');
+  console.log(' Seeding site configuration...');
   await prisma.siteConfig.upsert({
     where: { id: 'singleton' },
     create: {
@@ -371,8 +371,8 @@ async function main() {
     },
   });
 
-  console.log('✅ Database seed completed successfully!');
-  console.log(`📊 Seeded:`);
+  console.log(' Database seed completed successfully!');
+  console.log(` Seeded:`);
   console.log(`  - ${products.length} products`);
   console.log(`  - ${productVariants.length} product variants`);
   console.log(`  - ${achievements.length} achievements`);
@@ -382,7 +382,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Seed failed:', e);
+    console.error(' Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {

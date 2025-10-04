@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
@@ -22,9 +22,9 @@ export default function CharacterEditorPage() {
   const categories = [
     { id: 'hair', name: 'Hair', icon: '𓍯𓂃' },
     { id: 'face', name: 'Face', icon: '(˶˃ ᵕ ˂˶)' },
-    { id: 'body', name: 'Body', icon: '❔' },
-    { id: 'clothing', name: 'Clothing', icon: '👕' },
-    { id: 'accessories', name: 'Accessories', icon: '👓' },
+    { id: 'body', name: 'Body', icon: '' },
+    { id: 'clothing', name: 'Clothing', icon: '' },
+    { id: 'accessories', name: 'Accessories', icon: '' },
   ];
 
   useEffect(() => {
@@ -197,11 +197,11 @@ export default function CharacterEditorPage() {
                         </div>
                         {preset.isUnlocked ? (
                           <span className="text-green-400 text-sm" role="img" aria-label="unlocked">
-                            ✓
+                            
                           </span>
                         ) : (
                           <span className="text-gray-500 text-sm" role="img" aria-label="locked">
-                            🔒
+                            
                           </span>
                         )}
                       </div>

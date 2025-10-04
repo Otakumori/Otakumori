@@ -54,7 +54,7 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
       <div className="mt-2 flex items-center space-x-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button key={star} onClick={() => handleRate(star)} className="text-xl">
-            {star <= rating ? '⭐' : '☆'}
+            {star <= rating ? '' : ''}
           </button>
         ))}
       </div>
@@ -67,7 +67,7 @@ export default function SoapstoneMessage({ message, onRate }: SoapstoneMessagePr
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
         >
-          <span className="text-2xl">🌸</span>
+          <span className="text-2xl"></span>
         </motion.div>
       )}
     </motion.div>

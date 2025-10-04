@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import GlassPanel from '../GlassPanel';
-import { t } from '../../lib/microcopy';
 
 type Soapstone = {
   id: string;
@@ -173,7 +172,7 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-                  <span className="text-sm text-fuchsia-300">🌸</span>
+                  <span className="text-sm text-fuchsia-300"></span>
                 </div>
                 <div>
                   <div className="font-medium text-white">{soapstone.author}</div>
@@ -201,12 +200,12 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
                 disabled={!isSignedIn}
                 className="flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                <span>💬</span>
+                <span></span>
                 Reply
               </button>
 
               <button className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-300 transition-colors">
-                <span>⭐</span>
+                <span></span>
                 Rate
               </button>
             </div>

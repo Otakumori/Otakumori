@@ -168,7 +168,7 @@ export default function AbyssLayout({ children }) {
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-pink-500">🌸</span>
+                <span className="text-pink-500"></span>
                 <span className="text-gray-300">{petals}</span>
               </div>
               <Link href="/" className="text-sm font-medium text-gray-300 hover:text-pink-400">

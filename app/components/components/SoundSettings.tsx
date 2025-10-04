@@ -10,7 +10,7 @@ export const SoundSettings = () => {
       <div className="flex items-center space-x-2">
         {/* Mute Toggle */}
         <button onClick={toggleMute} className="text-xl text-white focus:outline-none">
-          {isMuted ? '🔇' : '🔊'}
+          {isMuted ? '' : ''}
         </button>
 
         {/* Volume Slider */}

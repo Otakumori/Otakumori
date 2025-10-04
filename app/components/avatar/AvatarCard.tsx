@@ -123,7 +123,7 @@ export function AvatarCard({
 
       {/* Gender/Age Indicator */}
       <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full flex items-center justify-center">
-        <span className="text-xs text-white">{gender === 'male' ? '♂' : '♀'}</span>
+        <span className="text-xs text-white">{gender === 'male' ? '' : ''}</span>
       </div>
     </motion.div>
   );

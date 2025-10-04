@@ -30,12 +30,12 @@ export class PetalShopHandler {
 
   start() {
     this.state.isActive = true;
-    console.log('Petal Shop mini-game started!');
+    // Petal Shop mini-game started!
   }
 
   stop() {
     this.state.isActive = false;
-    console.log('Petal Shop mini-game stopped!');
+    // Petal Shop mini-game stopped!
   }
 
   collectPetal(petalId: string): PetalReward | null {

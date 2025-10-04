@@ -63,7 +63,7 @@ export default function Hero() {
             <span role="img" aria-label="emoji">
               i
             </span>
-            ' '🌸
+            ' '
           </>
         }
       </h1>

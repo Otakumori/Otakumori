@@ -197,7 +197,7 @@ try {
       NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
       NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
       SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
-      // Feature flags
+      // Feature flags - consolidated definitions
       NEXT_PUBLIC_FEATURE_MINIGAMES: z.enum(['on', 'off']).default('on'),
       NEXT_PUBLIC_FEATURE_RUNE: z.enum(['on', 'off']).default('off'),
       NEXT_PUBLIC_FEATURE_SOAPSTONE: z.enum(['on', 'off']).default('on'),
@@ -213,6 +213,14 @@ try {
       NEXT_PUBLIC_FEATURE_CUBE_HUB: z.string().optional(),
       NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().optional(),
       NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
+      NEXT_PUBLIC_LIVE_DATA: z.string().default('0'),
+      NEXT_PUBLIC_PROBE_MODE: z.string().default('1'),
+      // Homepage feature flags
+      NEXT_PUBLIC_FEATURE_HERO: z.string().default('1'),
+      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: z.string().default('1'),
+      NEXT_PUBLIC_FEATURE_SHOP: z.string().default('0'),
+      NEXT_PUBLIC_FEATURE_BLOG: z.string().default('0'),
+      NEXT_PUBLIC_FEATURE_SOAPSTONES: z.string().default('0'),
       NEXT_PUBLIC_EVENT_CODE: z.string().optional(),
       // Misc
       NEXT_PUBLIC_API_KEY: z.string().optional(),
@@ -369,6 +377,14 @@ try {
       NEXT_PUBLIC_FEATURE_CUBE_HUB: process.env.NEXT_PUBLIC_FEATURE_CUBE_HUB,
       NEXT_PUBLIC_FEATURE_PETALS_ABOUT: process.env.NEXT_PUBLIC_FEATURE_PETALS_ABOUT,
       NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT,
+      NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA,
+      NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE,
+      // Homepage feature flags
+      NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO,
+      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
+      NEXT_PUBLIC_FEATURE_SHOP: process.env.NEXT_PUBLIC_FEATURE_SHOP,
+      NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG,
+      NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES,
       NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE,
       // Misc
       NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
@@ -380,12 +396,12 @@ try {
     skipValidation: true, // Always skip validation to prevent crashes
     // Fail fast in development if required server vars are missing
     onValidationError: (error) => {
-      console.warn('⚠️ Environment validation warnings:', error.errors);
+      console.warn(' Environment validation warnings:', error.errors);
       return error;
     },
   });
 } catch (err) {
-  console.warn('⚠️ Environment validation failed, using fallback values:', err.message);
+  console.warn(' Environment validation failed, using fallback values:', err.message);
   // Comprehensive fallback environment object with safe defaults for all used variables
   safeEnv = {
     // Core server environment
@@ -513,6 +529,14 @@ try {
     NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: process.env.NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2 || 'on',
     NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: process.env.NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY || 'on',
     NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: process.env.NEXT_PUBLIC_FEATURE_TRADE_PROPOSE || 'off',
+    NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA || '0',
+    NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE || '1',
+    // Homepage feature flags
+    NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO || '1',
+    NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE || '1',
+    NEXT_PUBLIC_FEATURE_SHOP: process.env.NEXT_PUBLIC_FEATURE_SHOP || '0',
+    NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG || '0',
+    NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES || '0',
 
     // Additional missing variables
     NEXT_PUBLIC_CLERK_DOMAIN: process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',

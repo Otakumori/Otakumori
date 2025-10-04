@@ -2,13 +2,13 @@
 
 export default function NewPagesNav() {
   const navItems = [
-    { href: '/starter-pack', label: 'Free Starter Pack', emoji: '🎁' },
-    { href: '/play', label: 'Asset Playground', emoji: '🎮' },
-    { href: '/collections/gamecube-nostalgia', label: 'GameCube Collection', emoji: '🎯' },
-    { href: '/collections/ps1-lofi-portraits', label: 'PS1 Lofi Collection', emoji: '🎭' },
-    { href: '/collections/kawaii-hud', label: 'Kawaii HUD Collection', emoji: '🌸' },
-    { href: '/collections/soulslike-runes', label: 'Soulslike Runes', emoji: '⚔️' },
-    { href: '/collab', label: 'Creator Collab', emoji: '🤝' },
+    { href: '/starter-pack', label: 'Free Starter Pack', emoji: '' },
+    { href: '/play', label: 'Asset Playground', emoji: '' },
+    { href: '/collections/gamecube-nostalgia', label: 'GameCube Collection', emoji: '' },
+    { href: '/collections/ps1-lofi-portraits', label: 'PS1 Lofi Collection', emoji: '' },
+    { href: '/collections/kawaii-hud', label: 'Kawaii HUD Collection', emoji: '' },
+    { href: '/collections/soulslike-runes', label: 'Soulslike Runes', emoji: '' },
+    { href: '/collab', label: 'Creator Collab', emoji: '' },
   ];
 
   return (

@@ -99,13 +99,13 @@ export default function SearchInterface({}: SearchInterfaceProps) {
   const getResultIcon = (type: string) => {
     switch (type) {
       case 'product':
-        return '🛍️';
+        return '';
       case 'post':
-        return '📝';
+        return '';
       case 'game':
-        return '🎮';
+        return '';
       default:
-        return '🔍';
+        return '⌕';
     }
   };
 
@@ -142,7 +142,7 @@ export default function SearchInterface({}: SearchInterfaceProps) {
               type="submit"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
             >
-              🔍
+              ⌕
             </button>
           </div>
 

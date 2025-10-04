@@ -102,7 +102,7 @@ async function main() {
           : path.join(ROOT, item.file);
 
       if (!fs.existsSync(abs)) {
-        console.warn(`⚠ Skipping ${item.id}: local file not found -> ${abs}`);
+        console.warn(` Skipping ${item.id}: local file not found -> ${abs}`);
         continue;
       }
 
@@ -120,7 +120,7 @@ async function main() {
         bytes,
         sha256: fileHash,
       };
-      console.log(`✓ Local file: ${item.id} -> ${publicPath}`);
+      console.log(` Local file: ${item.id} -> ${publicPath}`);
       continue;
     }
 
@@ -186,7 +186,7 @@ async function main() {
 
     // --- existing non-zip download handling stays as-is ---
     if (!item.url) {
-      console.warn(`⚠ Skipping ${item.id}: no URL and no local file`);
+      console.warn(` Skipping ${item.id}: no URL and no local file`);
       continue;
     }
 
@@ -237,11 +237,11 @@ async function main() {
   const dts = `// AUTO‑GENERATED keys for getAsset()/getGame()\nexport type AssetId = ${keys || 'string'};\n`;
   await fsp.writeFile(MANIFEST_D_TS, dts, 'utf8');
 
-  console.log(`\n✔ Done. ${Object.keys(manifest).length} items processed.`);
+  console.log(`\n Done. ${Object.keys(manifest).length} items processed.`);
   console.log(`• Manifest: ${path.relative(ROOT, MANIFEST_TS)}`);
 }
 
 main().catch((err) => {
-  console.error('✖ assets.ts failed:\n', err);
+  console.error(' assets.ts failed:\n', err);
   process.exit(1);
 });

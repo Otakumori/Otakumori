@@ -5,12 +5,12 @@ import { useHub, ORDER } from './store';
 
 // Fallback icons - you can replace these with actual icon paths later
 const iconMap: Record<string, string> = {
-  games: '🎮',
-  trade: '💎',
-  avatar: '👤',
-  music: '🎵',
-  drawerTop: '💾',
-  drawerBottom: '📝',
+  games: '',
+  trade: '◆',
+  avatar: '',
+  music: '',
+  drawerTop: '',
+  drawerBottom: '',
 };
 
 export default function FrontSelector() {

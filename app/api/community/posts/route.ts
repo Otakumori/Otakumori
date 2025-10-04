@@ -6,7 +6,7 @@ const mockPosts = [
     id: '1',
     image: '/assets/images/community/cosplay-1.jpg',
     caption:
-      'My first attempt at a Dark Souls cosplay! The armor took forever but totally worth it 🗡️',
+      'My first attempt at a Dark Souls cosplay! The armor took forever but totally worth it †',
     author: {
       name: 'SolaireFan',
       avatar: '/assets/images/avatars/solaire-fan.jpg',
@@ -20,7 +20,7 @@ const mockPosts = [
     id: '2',
     image: '/assets/images/community/purchase-1.jpg',
     caption:
-      'Just got my new Otaku-mori hoodie! The quality is amazing and the design is perfect 🌸',
+      'Just got my new Otaku-mori hoodie! The quality is amazing and the design is perfect ',
     author: {
       name: 'AnimeLover',
       avatar: '/assets/images/avatars/anime-lover.jpg',
@@ -34,7 +34,7 @@ const mockPosts = [
     id: '3',
     image: '/assets/images/community/cosplay-2.jpg',
     caption:
-      'Kill la Kill cosplay for the community meetup! The scissors were a pain to make but they turned out great ✂️',
+      'Kill la Kill cosplay for the community meetup! The scissors were a pain to make but they turned out great ️',
     author: {
       name: 'RyukoCosplayer',
       avatar: '/assets/images/avatars/ryuko.jpg',
@@ -47,7 +47,7 @@ const mockPosts = [
   {
     id: '4',
     image: '/assets/images/community/purchase-2.jpg',
-    caption: 'My collection is growing! The new limited edition prints are absolutely stunning 🎨',
+    caption: 'My collection is growing! The new limited edition prints are absolutely stunning ',
     author: {
       name: 'ArtCollector',
       avatar: '/assets/images/avatars/art-collector.jpg',
@@ -61,7 +61,7 @@ const mockPosts = [
     id: '5',
     image: '/assets/images/community/cosplay-3.jpg',
     caption:
-      'Bloodborne hunter cosplay! The trick weapon was challenging but so satisfying to complete 🩸',
+      'Bloodborne hunter cosplay! The trick weapon was challenging but so satisfying to complete ',
     author: {
       name: 'HunterCosplayer',
       avatar: '/assets/images/avatars/hunter.jpg',
@@ -75,7 +75,7 @@ const mockPosts = [
     id: '6',
     image: '/assets/images/community/purchase-3.jpg',
     caption:
-      'Finally got my hands on the exclusive Otaku-mori merch! The attention to detail is incredible ✨',
+      'Finally got my hands on the exclusive Otaku-mori merch! The attention to detail is incredible ',
     author: {
       name: 'MerchHunter',
       avatar: '/assets/images/avatars/merch-hunter.jpg',

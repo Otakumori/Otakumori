@@ -185,11 +185,11 @@ export function AvatarGallery() {
               {/* Stats */}
               <div className="flex justify-between items-center text-sm text-zinc-400">
                 <div className="flex items-center space-x-1">
-                  <span>❤️</span>
+                  <span>️</span>
                   <span>{avatar.likes}</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <span>📥</span>
+                  <span></span>
                   <span>{avatar.downloads}</span>
                 </div>
               </div>
@@ -210,7 +210,7 @@ export function AvatarGallery() {
 
       {filteredAvatars.length === 0 && (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔍</div>
+          <div className="text-6xl mb-4">⌕</div>
           <h3 className="text-xl font-semibold text-white mb-2">No avatars found</h3>
           <p className="text-zinc-400">Try adjusting your search or filters</p>
         </div>

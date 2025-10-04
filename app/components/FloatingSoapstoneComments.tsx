@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { env } from '@/env.mjs';
+import { useState } from 'react';
 // import { createClient } from '@supabase/supabase-js';
 
 interface SoapstoneMessage {
@@ -89,7 +88,7 @@ export default function FloatingSoapstoneComments() {
         className="fixed bottom-6 right-6 z-50 bg-pink-500 hover:bg-pink-600 text-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
         aria-label="Toggle comments"
       >
-        💬
+        
       </button>
 
       {/* Comments Panel */}

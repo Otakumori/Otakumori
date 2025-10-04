@@ -55,7 +55,7 @@ export default function StarterPackPage() {
     return (
       <main className="min-h-screen bg-gradient-to-br from-cube-900 via-cube-800 to-slate-900 flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="mb-6 text-6xl">🎉</div>
+          <div className="mb-6 text-6xl"></div>
           <h1 className="text-2xl font-bold text-slatey-200 mb-4">Welcome to the Adventure!</h1>
           <p className="text-slatey-400 mb-6">
             Your starter pack is downloading now. We've also sent the link to your email so you can
@@ -87,7 +87,7 @@ export default function StarterPackPage() {
       <div className="max-w-lg w-full">
         {/* Hero Section */}
         <div className="text-center mb-8">
-          <div className="mb-4 text-6xl">🎮</div>
+          <div className="mb-4 text-6xl"></div>
           <h1 className="text-3xl font-bold text-slatey-200 mb-4">Free Starter Pack</h1>
           <p className="text-lg text-slatey-400">
             Get your first taste of Otakumori's retro gaming assets. No strings attached, just pure
@@ -99,7 +99,7 @@ export default function StarterPackPage() {
         <div className="grid gap-4 mb-8">
           <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="text-2xl">🎨</div>
+              <div className="text-2xl"></div>
               <div>
                 <h3 className="text-slatey-200 font-medium">PS1-Style UI Elements</h3>
                 <p className="text-sm text-slatey-400">Authentic retro buttons and frames</p>
@@ -109,7 +109,7 @@ export default function StarterPackPage() {
 
           <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="text-2xl">🔊</div>
+              <div className="text-2xl"></div>
               <div>
                 <h3 className="text-slatey-200 font-medium">Retro SFX Collection</h3>
                 <p className="text-sm text-slatey-400">Chiptune-style audio for your games</p>
@@ -119,7 +119,7 @@ export default function StarterPackPage() {
 
           <div className="bg-slate-800/30 rounded-xl p-4 border border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="text-2xl">🎯</div>
+              <div className="text-2xl"></div>
               <div>
                 <h3 className="text-slatey-200 font-medium">Ready to Use</h3>
                 <p className="text-sm text-slatey-400">PNG, PSD, and WAV files included</p>
@@ -175,9 +175,9 @@ export default function StarterPackPage() {
         <div className="text-center mt-8">
           <p className="text-slatey-400 text-sm mb-2">Trusted by indie developers worldwide</p>
           <div className="flex items-center justify-center gap-6 text-xs text-slatey-500">
-            <span>🎮 2,000+ Downloads</span>
-            <span>⭐ 4.8/5 Rating</span>
-            <span>🌍 50+ Countries</span>
+            <span> 2,000+ Downloads</span>
+            <span> 4.8/5 Rating</span>
+            <span> 50+ Countries</span>
           </div>
         </div>
       </div>

@@ -11,7 +11,6 @@
  * - Analytics tracking
  */
 
-import { auth } from '@clerk/nextjs/server';
 import { env } from '@/env.mjs';
 
 export interface GameSaveDataV2 {
@@ -659,7 +658,7 @@ export class GameSaveSystemV2 {
       const recoverSlot = (slot + i) % MAX_SLOTS;
       const data = await this.loadLocal(recoverSlot);
       if (data && (await this.validateChecksum(data))) {
-        console.log(`Recovered save from slot ${recoverSlot}`);
+        // Recovered save from slot
         return data;
       }
     }
@@ -668,7 +667,7 @@ export class GameSaveSystemV2 {
     if (this.userId) {
       const cloudData = await this.loadFromCloud();
       if (cloudData) {
-        console.log('Recovered save from cloud');
+        // Recovered save from cloud
         return cloudData;
       }
     }

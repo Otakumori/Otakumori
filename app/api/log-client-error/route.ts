@@ -6,22 +6,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // Log to console with structured format for easy parsing
-    console.log(
-      '[CLIENT-ERROR]',
-      JSON.stringify(
-        {
-          timestamp: body.timestamp,
-          type: body.type,
-          url: body.url,
-          userAgent: body.userAgent,
-          error: body.error || body.message,
-          stack: body.stack || body.errorInfo?.componentStack,
-          details: body,
-        },
-        null,
-        2,
-      ),
-    );
+    // Client error logged
 
     return NextResponse.json({ ok: true });
   } catch (error) {

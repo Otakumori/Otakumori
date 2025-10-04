@@ -272,13 +272,13 @@ export default function CommunityPage() {
                 onClick={() => handleLike(post.id)}
                 className="text-gray-600 hover:text-blue-500"
               >
-                ❤️ {post.likes}
+                ️ {post.likes}
               </button>
               <button
                 onClick={() => handleComment(post.id)}
                 className="text-gray-600 hover:text-blue-500"
               >
-                💬 {post.comments}
+                 {post.comments}
               </button>
             </div>
           </div>

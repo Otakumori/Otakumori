@@ -1,0 +1,13 @@
+{
+  "name": "eslint-plugin-otm",
+  "version": "1.0.0",
+  "description": "Custom ESLint plugin for Otaku-mori project rules",
+  "main": "index.js",
+  "keywords": [
+    "eslint",
+    "plugin",
+    "otaku-mori"
+  ],
+  "author": "Otaku-mori Team",
+  "license": "MIT"
+}

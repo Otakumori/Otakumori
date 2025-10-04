@@ -31,7 +31,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
             ) : (
               <div className="text-4xl opacity-50">
                 <span role="img" aria-label="Gaming controller">
-                  🎮
+                  
                 </span>
               </div>
             )}

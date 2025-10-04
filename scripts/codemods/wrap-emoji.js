@@ -1,6 +1,6 @@
 /**
  * Wraps standalone emoji characters inside JSXText with:
- *   <span role="img" aria-label="emoji">😤</span>
+ *   <span role="img" aria-label="emoji"></span>
  * Skips code blocks, attributes, and already-wrapped instances.
  */
 const j = require('jscodeshift');

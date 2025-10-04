@@ -1,7 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use components\hero\BlogTeaser.tsx instead.
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
-import { t } from '@/lib/microcopy';
 
 type Post = { id: string; slug: string; title: string; excerpt?: string; publishedAt?: string };
 

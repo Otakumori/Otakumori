@@ -180,7 +180,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
           <p className="mb-4 text-sm text-gray-500">
             Stay a while. Let's blossom together.{' '}
             <span role="img" aria-label="Cherry blossom">
-              🌸
+              
             </span>
           </p>
 
@@ -193,7 +193,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
           <p className="text-xs text-gray-600">
             &copy; {new Date().getFullYear()} Otaku-mori. Made with{' '}
             <span role="img" aria-label="Red heart">
-              ❤️
+              ️
             </span>
           </p>
         </div>

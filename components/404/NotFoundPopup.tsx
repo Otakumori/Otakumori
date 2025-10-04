@@ -190,7 +190,7 @@ export default function NotFoundPopup({ isOpen, onClose }: NotFoundPopupProps) {
                           top: `${target.y}px`,
                         }}
                       >
-                        {target.clicked ? '✓' : '🎯'}
+                        {target.clicked ? '' : ''}
                       </motion.button>
                     ))}
                   </div>

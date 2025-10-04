@@ -1,5 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { monitor } from '@/lib/monitor';
 // import { redis } from '../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed

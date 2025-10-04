@@ -73,7 +73,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-2xl">
                 <span role="img" aria-label="Oni demon">
-                  👹
+                  
                 </span>
               </div>
             </div>

@@ -1,7 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
-import { motion } from 'framer-motion';
 
 interface LeaderboardEntry {
   id: string;
@@ -128,11 +126,11 @@ export const Leaderboard: React.FC = () => {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return '🥇';
+        return '';
       case 2:
-        return '🥈';
+        return '';
       case 3:
-        return '🥉';
+        return '';
       default:
         return `#${rank}`;
     }

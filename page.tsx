@@ -1,6 +1,4 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
-import { Suspense } from 'react';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 export default function HomePage() {
   return (

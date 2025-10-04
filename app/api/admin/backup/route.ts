@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // TODO: Integrate HTTP-based Redis client to store backup metadata
 
     // Log backup event
-    console.log(`Backup initiated: ${backupId}`);
+    // Backup initiated
 
     return NextResponse.json({
       success: true,

@@ -40,7 +40,7 @@ export async function withTokenRetry<T>(
   } catch (error: any) {
     if (error?.status === 401 && maxRetries > 0) {
       // Token might be expired, retry once
-      console.log('Token expired, retrying operation...');
+      // Token expired, retrying operation...
       return await withTokenRetry(operation, maxRetries - 1);
     }
     throw error;

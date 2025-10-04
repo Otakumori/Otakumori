@@ -308,19 +308,19 @@ class GameEngine {
   private runeSets: RuneSet[] = [
     {
       name: 'cherry-blossom',
-      runes: ['🌸', '🌺', '🌼', '🌻', '🌷', '🌹', '🌿', '🍀'],
+      runes: ['', '', '', '', '', '', '', ''],
       theme: 'Spring Flowers',
       rarity: 'common',
     },
     {
       name: 'eternal-rune',
-      runes: ['⚡', '🔥', '❄️', '💧', '🌪️', '🌊', '🌙', '☀️'],
+      runes: ['', '', '️', '', '️', '', '', '️'],
       theme: 'Elemental Forces',
       rarity: 'rare',
     },
     {
       name: 'guardian-rune',
-      runes: ['🛡️', '⚔️', '🏹', '🗡️', '🔮', '📜', '🔑', '💎'],
+      runes: ['', '', '', '†', '', '', '', '◆'],
       theme: 'Guardian Symbols',
       rarity: 'legendary',
     },

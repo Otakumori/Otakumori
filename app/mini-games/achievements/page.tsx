@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { COPY } from '../../lib/copy';
-import GlassButton from '../../components/ui/GlassButton';
-import GlassCard from '../../components/ui/GlassCard';
 
 interface Achievement {
   id: string;

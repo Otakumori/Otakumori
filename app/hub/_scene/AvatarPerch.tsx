@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useHub } from './store';
 import { getAsset } from '@/app/mini-games/_shared/assets-resolver';
 

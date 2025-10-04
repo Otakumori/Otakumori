@@ -1,9 +1,8 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
-import { GameStartRequestSchema, GameStartResponseSchema } from '@/app/lib/contracts';
+import { GameStartRequestSchema } from '@/app/lib/contracts';
 import { getGameDef } from '@/app/lib/games';
 import { env } from '@/env.mjs';
 

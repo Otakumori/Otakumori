@@ -504,7 +504,7 @@ export class GDPRCompliance {
     // Store consent record in database for audit trail
     try {
       // This would integrate with your database
-      console.log('Storing consent record:', consent);
+      // Storing consent record
     } catch (error) {
       console.error('Failed to store consent record:', error);
     }
@@ -585,11 +585,11 @@ export class DataRetentionManager {
    */
   async scheduleCleanup(): Promise<void> {
     // This would run as a cron job or scheduled task
-    console.log('Scheduled data cleanup would run here');
+    // Scheduled data cleanup would run here
 
     for (const [category, retentionDays] of Object.entries(this.config.dataRetention)) {
       const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-      console.log(`Cleaning up ${category} data older than ${cutoffDate}`);
+      // Cleaning up old data
 
       // Database cleanup would happen here
     }

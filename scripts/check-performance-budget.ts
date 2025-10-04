@@ -120,7 +120,7 @@ class BundleAnalyzer {
   }
 
   logResults(metrics: PerformanceMetrics, budgetCheck: ReturnType<typeof this.checkBudget>): void {
-    console.group('📊 Bundle Analysis Results');
+    console.group(' Bundle Analysis Results');
 
     console.log('Bundle Sizes:');
     console.log(`  Main: ${(metrics.bundleSize.main / 1024).toFixed(1)}KB`);
@@ -129,12 +129,12 @@ class BundleAnalyzer {
 
     console.log('\nPerformance Budget:');
     console.log(`  Score: ${budgetCheck.score}/100`);
-    console.log(`  Status: ${budgetCheck.passed ? '✅ PASSED' : '❌ FAILED'}`);
+    console.log(`  Status: ${budgetCheck.passed ? ' PASSED' : ' FAILED'}`);
 
     if (budgetCheck.violations.length > 0) {
       console.log('\nBudget Violations:');
       budgetCheck.violations.forEach((violation) => {
-        console.log(`  ❌ ${violation}`);
+        console.log(`   ${violation}`);
       });
     }
 
@@ -142,7 +142,7 @@ class BundleAnalyzer {
     if (recommendations.length > 0) {
       console.log('\nRecommendations:');
       recommendations.forEach((rec) => {
-        console.log(`  💡 ${rec}`);
+        console.log(`   ${rec}`);
       });
     }
 
@@ -255,7 +255,7 @@ function getActualBuildSizes(): { [key: string]: number } {
  * Main execution
  */
 async function main() {
-  console.log('🎯 Checking Performance Budget...\n');
+  console.log(' Checking Performance Budget...\n');
 
   try {
     // Parse build statistics
@@ -315,19 +315,19 @@ async function main() {
     const reportFile = path.join(reportsDir, `budget-check-${Date.now()}.json`);
     fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
 
-    console.log(`\n📊 Report saved to: ${reportFile}`);
+    console.log(`\n Report saved to: ${reportFile}`);
 
     // Exit with appropriate code
     if (budgetCheck.passed) {
-      console.log('\n✅ Performance budget check PASSED');
+      console.log('\n Performance budget check PASSED');
       process.exit(0);
     } else {
-      console.log('\n❌ Performance budget check FAILED');
+      console.log('\n Performance budget check FAILED');
       console.log('Fix the violations above before deploying to production.');
       process.exit(1);
     }
   } catch (error) {
-    console.error('❌ Performance budget check failed:', error);
+    console.error(' Performance budget check failed:', error);
     process.exit(1);
   }
 }

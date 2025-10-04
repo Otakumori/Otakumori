@@ -7,7 +7,6 @@ import Providers from './Providers';
 import * as Sentry from '@sentry/nextjs';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import { headers } from 'next/headers';
-import CherryBlossomEffect from './components/CherryBlossomEffect';
 import CursorGlow from './components/effects/CursorGlow';
 import { isCursorGlowEnabled } from './flags';
 import PetalHUD from './components/petals/PetalHUD';

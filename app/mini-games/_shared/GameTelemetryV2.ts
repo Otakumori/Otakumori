@@ -190,7 +190,7 @@ export class GameTelemetryV2 {
     });
 
     if (this.config.debugMode) {
-      console.log(`🎮 Telemetry session started: ${sessionId}`);
+      // Telemetry session started
     }
 
     return sessionId;
@@ -221,7 +221,7 @@ export class GameTelemetryV2 {
     this.currentSession = null;
 
     if (this.config.debugMode) {
-      console.log(`🎮 Telemetry session ended: ${reason}`);
+      // Telemetry session ended
     }
   }
 
@@ -271,7 +271,7 @@ export class GameTelemetryV2 {
     this.updateSessionMetrics(eventType, gameData);
 
     if (this.config.debugMode) {
-      console.log(`📊 Event tracked: ${eventType}`, event);
+      // Event tracked
     }
 
     // Flush if queue is full
@@ -376,7 +376,7 @@ export class GameTelemetryV2 {
       await this.sendEvents(events);
 
       if (this.config.debugMode) {
-        console.log(`📤 Flushed ${events.length} events`);
+        // Flushed events
       }
     } catch (error) {
       console.error('Failed to send telemetry events:', error);

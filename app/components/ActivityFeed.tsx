@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import GlassCard from '@/app/components/ui/GlassCard';
-import { ActivityFeedResponse, type Activity } from '@/app/lib/contracts';
+import { type Activity } from '@/app/lib/contracts';
 
 interface ActivityFeedProps {
   className?: string;
@@ -72,19 +72,19 @@ export default function ActivityFeed({
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'achievement':
-        return '🏆';
+        return '';
       case 'score':
-        return '🎯';
+        return '';
       case 'purchase':
-        return '🛒';
+        return '';
       case 'unlock':
-        return '🔓';
+        return '';
       case 'trade':
-        return '🔄';
+        return '';
       case 'follow':
-        return '👥';
+        return '';
       default:
-        return '📢';
+        return '';
     }
   };
 
@@ -157,7 +157,7 @@ export default function ActivityFeed({
           </div>
         ) : activities.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-2">📢</div>
+            <div className="text-4xl mb-2"></div>
             <p className="text-pink-300/70 text-sm">No activities yet</p>
             <p className="text-pink-300/50 text-xs mt-1">
               Start playing games to see activity here!

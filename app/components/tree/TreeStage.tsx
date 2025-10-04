@@ -1,6 +1,6 @@
 'use client';
 
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { Suspense, useMemo, useEffect, useState } from 'react';
 import { LayerPlane } from './LayerPlane';
 import { useWorld } from '@/app/world/WorldProvider';

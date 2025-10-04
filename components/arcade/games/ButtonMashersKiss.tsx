@@ -63,7 +63,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               className="text-6xl"
             >
               <span role="img" aria-label="Person silhouette">
-                👤
+                
               </span>
             </motion.div>
             <motion.div
@@ -75,7 +75,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               className="text-6xl"
             >
               <span role="img" aria-label="Person silhouette">
-                👤
+                
               </span>
             </motion.div>
           </div>
@@ -92,7 +92,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
           >
             <div className="text-6xl">
               <span role="img" aria-label="Kiss">
-                💋
+                
               </span>
             </div>
           </motion.div>

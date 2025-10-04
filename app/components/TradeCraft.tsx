@@ -28,7 +28,7 @@ export default function TradeCraft() {
       rarity: 'common',
       type: 'material',
       quantity: 10,
-      image: '🌸',
+      image: '',
     },
     {
       id: 'petal_rare',
@@ -37,7 +37,7 @@ export default function TradeCraft() {
       rarity: 'rare',
       type: 'material',
       quantity: 3,
-      image: '✨',
+      image: '',
     },
     {
       id: 'petal_epic',
@@ -46,7 +46,7 @@ export default function TradeCraft() {
       rarity: 'epic',
       type: 'material',
       quantity: 1,
-      image: '🌟',
+      image: '',
     },
   ]);
 
@@ -134,7 +134,7 @@ export default function TradeCraft() {
           rarity: 'epic',
           type: 'crafted',
           quantity: recipe.result.quantity,
-          image: '🎨',
+          image: '',
         },
       ]);
     }
@@ -193,11 +193,11 @@ export default function TradeCraft() {
               className="shadow-glow flex flex-col items-center rounded-xl border-2 border-pink-900 bg-black/60 p-4 text-center"
             >
               <div className="drop-shadow-glow animate-glow mb-2 select-none text-4xl font-extrabold">
-                {item.image === '🌸'
-                  ? '✦'
-                  : item.image === '✨'
+                {item.image === ''
+                  ? ''
+                  : item.image === ''
                     ? '꧁𝔂𝓪𝓼𝓼꧂'
-                    : item.image === '🌟'
+                    : item.image === ''
                       ? '( • )( • )'
                       : item.image}
               </div>
@@ -239,11 +239,11 @@ export default function TradeCraft() {
                       <span
                         className={hasEnough ? 'font-bold text-pink-200' : 'font-bold text-red-400'}
                       >
-                        {inventoryItem?.image === '🌸'
-                          ? '✦'
-                          : inventoryItem?.image === '✨'
+                        {inventoryItem?.image === ''
+                          ? ''
+                          : inventoryItem?.image === ''
                             ? '꧁𝔂𝓪𝓼𝓼꧂'
-                            : inventoryItem?.image === '🌟'
+                            : inventoryItem?.image === ''
                               ? '( • )( • )'
                               : inventoryItem?.image}{' '}
                         {material.quantity}x

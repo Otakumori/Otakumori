@@ -967,7 +967,7 @@
       "type": "raw"
     },
     {
-      "text": "Join the Blossom 🌸",
+      "text": "Join the Blossom ",
       "file": "app\\(client)\\join-the-blossom\\page.tsx",
       "line": 48,
       "type": "raw"
@@ -1651,7 +1651,7 @@
       "type": "raw"
     },
     {
-      "text": "🛍️",
+      "text": "",
       "file": "app\\account\\petals\\page.tsx",
       "line": 332,
       "type": "raw"
@@ -2125,7 +2125,7 @@
       "type": "raw"
     },
     {
-      "text": "No pending reviews 🎉",
+      "text": "No pending reviews ",
       "file": "app\\admin\\reviews\\review-client.tsx",
       "line": 58,
       "type": "raw"
@@ -2149,7 +2149,7 @@
       "type": "raw"
     },
     {
-      "text": "{r.rating} ★",
+      "text": "{r.rating} ",
       "file": "app\\admin\\reviews\\review-client.tsx",
       "line": 73,
       "type": "raw"
@@ -2431,7 +2431,7 @@
       "type": "raw"
     },
     {
-      "text": "{m.isFlagged ? '⚑' : ''}",
+      "text": "{m.isFlagged ? '' : ''}",
       "file": "app\\admin\\soapstones\\ui.tsx",
       "line": 50,
       "type": "raw"
@@ -2791,7 +2791,7 @@
       "type": "raw"
     },
     {
-      "text": "✨ {thanks}",
+      "text": " {thanks}",
       "file": "app\\checkout\\page.tsx",
       "line": 333,
       "type": "raw"
@@ -2959,7 +2959,7 @@
       "type": "raw"
     },
     {
-      "text": "✓ Unlocked",
+      "text": " Unlocked",
       "file": "app\\components\\achievements\\AchievementCard.tsx",
       "line": 75,
       "type": "raw"
@@ -3007,7 +3007,7 @@
       "type": "raw"
     },
     {
-      "text": "✓ Unlocked",
+      "text": " Unlocked",
       "file": "app\\components\\achievements\\AchievementDetails.tsx",
       "line": 69,
       "type": "raw"
@@ -3433,7 +3433,7 @@
       "type": "raw"
     },
     {
-      "text": "{comment.isLiked ? '♥' : '♡'}",
+      "text": "{comment.isLiked ? '' : ''}",
       "file": "app\\components\\CommentsSection.tsx",
       "line": 204,
       "type": "raw"
@@ -3625,7 +3625,7 @@
       "type": "raw"
     },
     {
-      "text": "👍 {message.upvotes}",
+      "text": " {message.upvotes}",
       "file": "app\\components\\components\\admin\\MessageManager.tsx",
       "line": 142,
       "type": "raw"
@@ -3673,7 +3673,7 @@
       "type": "raw"
     },
     {
-      "text": "Welcome to OtakuMori 🌸",
+      "text": "Welcome to OtakuMori ",
       "file": "app\\components\\components\\Layout.jsx",
       "line": 9,
       "type": "raw"
@@ -7009,7 +7009,7 @@
       "type": "raw"
     },
     {
-      "text": "🎉 You Won! 🎉",
+      "text": " You Won! ",
       "file": "app\\mini-games\\memory-match\\Scene.tsx",
       "line": 91,
       "type": "raw"
@@ -7627,7 +7627,7 @@
       "type": "raw"
     },
     {
-      "text": "Max: {gameDef.maxRewardPerRun} 🌸",
+      "text": "Max: {gameDef.maxRewardPerRun} ",
       "file": "app\\mini-games\\[slug]\\page.tsx",
       "line": 137,
       "type": "raw"
@@ -8005,13 +8005,13 @@
       "type": "raw"
     },
     {
-      "text": "Otakumori Insiders 🌸✨",
+      "text": "Otakumori Insiders ",
       "file": "app\\pages\\Blog.jsx",
       "line": 9,
       "type": "raw"
     },
     {
-      "text": "No blog posts yet...but great things are coming soon. 🌸",
+      "text": "No blog posts yet...but great things are coming soon. ",
       "file": "app\\pages\\Blog.jsx",
       "line": 15,
       "type": "raw"
@@ -8077,7 +8077,7 @@
       "type": "raw"
     },
     {
-      "text": "Petals Collected: 🌸 {petals}",
+      "text": "Petals Collected:  {petals}",
       "file": "app\\pages\\Profile.jsx",
       "line": 50,
       "type": "raw"
@@ -8215,7 +8215,7 @@
       "type": "raw"
     },
     {
-      "text": "🚧 Community Features Coming Soon",
+      "text": " Community Features Coming Soon",
       "file": "app\\panel\\community\\page.tsx",
       "line": 161,
       "type": "raw"
@@ -8329,7 +8329,7 @@
       "type": "raw"
     },
     {
-      "text": "🎵 Full Music Experience Coming Soon",
+      "text": " Full Music Experience Coming Soon",
       "file": "app\\panel\\music\\page.tsx",
       "line": 233,
       "type": "raw"
@@ -8431,7 +8431,7 @@
       "type": "raw"
     },
     {
-      "text": "🚧 Trading System Coming Soon",
+      "text": " Trading System Coming Soon",
       "file": "app\\panel\\trade\\page.tsx",
       "line": 163,
       "type": "raw"
@@ -8461,7 +8461,7 @@
       "type": "raw"
     },
     {
-      "text": "🎮 Asset Playground",
+      "text": " Asset Playground",
       "file": "app\\play\\page.tsx",
       "line": 122,
       "type": "raw"
@@ -8887,7 +8887,7 @@
       "type": "raw"
     },
     {
-      "text": "🖼️",
+      "text": "️",
       "file": "app\\profile\\ui\\ProfileHeader.tsx",
       "line": 208,
       "type": "raw"
@@ -10105,19 +10105,19 @@
       "type": "raw"
     },
     {
-      "text": "🎮 2,000+ Downloads",
+      "text": " 2,000+ Downloads",
       "file": "app\\starter-pack\\page.tsx",
       "line": 180,
       "type": "raw"
     },
     {
-      "text": "⭐ 4.8/5 Rating",
+      "text": " 4.8/5 Rating",
       "file": "app\\starter-pack\\page.tsx",
       "line": 181,
       "type": "raw"
     },
     {
-      "text": "🌍 50+ Countries",
+      "text": " 50+ Countries",
       "file": "app\\starter-pack\\page.tsx",
       "line": 182,
       "type": "raw"
@@ -10465,7 +10465,7 @@
       "type": "raw"
     },
     {
-      "text": "{rune.glyph || '✶'}",
+      "text": "{rune.glyph || ''}",
       "file": "app\\thank-you\\page.tsx",
       "line": 243,
       "type": "raw"
@@ -10525,7 +10525,7 @@
       "type": "raw"
     },
     {
-      "text": "🖼️",
+      "text": "️",
       "file": "app\\trade\\ui\\EquipTray.tsx",
       "line": 113,
       "type": "raw"
@@ -11023,7 +11023,7 @@
       "type": "raw"
     },
     {
-      "text": "= 100 ? '😸' : '🐱'}",
+      "text": "= 100 ? '' : ''}",
       "file": "components\\arcade\\games\\NekoLapDance.tsx",
       "line": 64,
       "type": "raw"
@@ -11047,7 +11047,7 @@
       "type": "raw"
     },
     {
-      "text": "🌸🌸🌸",
+      "text": "",
       "file": "components\\arcade\\games\\PetalLick.tsx",
       "line": 116,
       "type": "raw"
@@ -11059,7 +11059,7 @@
       "type": "raw"
     },
     {
-      "text": "= 100 ? '🦵💨' : '🦵🦵'}",
+      "text": "= 100 ? '' : ''}",
       "file": "components\\arcade\\games\\ThighTrap.tsx",
       "line": 64,
       "type": "raw"
@@ -11539,7 +11539,7 @@
       "type": "raw"
     },
     {
-      "text": "Coming Soon! 🚧",
+      "text": "Coming Soon! ",
       "file": "components\\games\\AnimeMemoryMatch.tsx",
       "line": 18,
       "type": "raw"
@@ -11557,7 +11557,7 @@
       "type": "raw"
     },
     {
-      "text": "Coming Soon! 🚧",
+      "text": "Coming Soon! ",
       "file": "components\\games\\BubblePopGacha.tsx",
       "line": 18,
       "type": "raw"
@@ -11581,7 +11581,7 @@
       "type": "raw"
     },
     {
-      "text": "Coming Soon! 🚧",
+      "text": "Coming Soon! ",
       "file": "components\\games\\MemoryMatch.tsx",
       "line": 18,
       "type": "raw"
@@ -11665,7 +11665,7 @@
       "type": "raw"
     },
     {
-      "text": "Coming Soon! 🚧",
+      "text": "Coming Soon! ",
       "file": "components\\games\\PetalCollection.tsx",
       "line": 18,
       "type": "raw"
@@ -11683,7 +11683,7 @@
       "type": "raw"
     },
     {
-      "text": "Coming Soon! 🚧",
+      "text": "Coming Soon! ",
       "file": "components\\games\\QuickMath.tsx",
       "line": 18,
       "type": "raw"
@@ -11701,7 +11701,7 @@
       "type": "raw"
     },
     {
-      "text": "Coming Soon! 🚧",
+      "text": "Coming Soon! ",
       "file": "components\\games\\RhythmBeatEmUp.tsx",
       "line": 18,
       "type": "raw"
@@ -12499,7 +12499,7 @@
       "type": "raw"
     },
     {
-      "text": "Stay a while. Let's blossom together. 🌸",
+      "text": "Stay a while. Let's blossom together. ",
       "file": "components\\pages\\HomePage.tsx",
       "line": 169,
       "type": "raw"

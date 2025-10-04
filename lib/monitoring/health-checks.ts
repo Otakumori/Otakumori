@@ -716,7 +716,7 @@ export class HealthMonitor {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            text: `🚨 Alert: ${rule.name}`,
+            text: ` Alert: ${rule.name}`,
             attachments: [
               {
                 color: rule.severity === 'critical' ? 'danger' : 'warning',

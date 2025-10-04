@@ -125,7 +125,7 @@ export default function EnhancedLeaderboard({
           </div>
         ) : !leaderboard ? (
           <div className="text-center py-8">
-            <div className="text-4xl mb-2">🏆</div>
+            <div className="text-4xl mb-2"></div>
             <p className="text-pink-300/70 text-sm">No scores yet</p>
             <p className="text-pink-300/50 text-xs mt-1">Be the first to play and set a score!</p>
           </div>

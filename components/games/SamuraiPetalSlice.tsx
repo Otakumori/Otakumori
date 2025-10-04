@@ -5,7 +5,7 @@ import { useUser } from '@clerk/nextjs';
 import * as PIXI from 'pixi.js';
 import { type GameDefinition } from '@/app/lib/games';
 import { createGameLoop } from '@/app/lib/game-loop';
-import { bindAction, onInput, InputEvent } from '@/app/lib/input-manager';
+import { bindAction, onInput } from '@/app/lib/input-manager';
 import { playSfx, getSprite } from '@/app/lib/assets';
 import { gameApi } from '@/app/lib/http';
 

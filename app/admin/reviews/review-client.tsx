@@ -55,7 +55,7 @@ export default function AdminReviewsClient() {
   return (
     <div className="space-y-4">
       {items.length === 0 && !loading && (
-        <p className="text-sm text-zinc-500">No pending reviews 🎉</p>
+        <p className="text-sm text-zinc-500">No pending reviews </p>
       )}
       <ul className="space-y-4">
         {items.map((r) => (
@@ -69,7 +69,7 @@ export default function AdminReviewsClient() {
                   {' · '}user:
                   <span className="ml-1 font-mono text-xs">{r.userId}</span>
                 </div>
-                <div className="mt-1 text-yellow-400">{r.rating} ★</div>
+                <div className="mt-1 text-yellow-400">{r.rating} </div>
                 {r.title && <div className="mt-1 font-medium">{r.title}</div>}
                 <p className="mt-2 whitespace-pre-wrap text-sm">{r.body}</p>
                 {r.imageUrls?.length > 0 && (

@@ -23,7 +23,7 @@ export default function PetalCollectionGame() {
 
     try {
       await collectPetal();
-      setNotificationMessage('🌸 Petal collected!');
+      setNotificationMessage(' Petal collected!');
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 2000);
     } catch (error) {

@@ -51,7 +51,7 @@ export default function Hero() {
         // Add visual feedback
         const petal = document.createElement('div');
         petal.className = 'absolute text-2xl animate-bounce pointer-events-none';
-        petal.textContent = '🌸';
+        petal.textContent = '';
         petal.setAttribute('role', 'img');
         petal.setAttribute('aria-label', 'Cherry blossom petal');
         petal.style.left = Math.random() * window.innerWidth + 'px';
@@ -305,11 +305,11 @@ export default function Hero() {
           ) : (
             <>
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>{' '}
               Click to Collect{' '}
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
             </>
           )}

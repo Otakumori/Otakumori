@@ -1,4 +1,3 @@
-import { auth } from '@clerk/nextjs/server';
 
 export interface GameSaveData {
   gameId: string;

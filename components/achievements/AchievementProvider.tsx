@@ -85,7 +85,7 @@ const AchievementDrawer = () => {
       <div className="flex items-center justify-between border-b border-blue-200 px-6 py-4">
         <h2 className="text-2xl font-bold tracking-tight text-blue-600 drop-shadow">
           <span role="img" aria-label="Trophy">
-            🏆
+            
           </span>{' '}
           Achievements
         </h2>
@@ -101,7 +101,7 @@ const AchievementDrawer = () => {
         {achievements.length === 0 ? (
           <div className="mt-16 text-center text-blue-400">
             <span className="mb-2 block animate-bounce text-5xl" role="img" aria-label="Star">
-              🌟
+              
             </span>
             <p className="text-lg font-medium">No achievements unlocked yet!</p>
             <p className="text-sm text-blue-300">Keep exploring to earn achievements~</p>

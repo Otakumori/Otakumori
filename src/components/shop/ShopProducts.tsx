@@ -99,7 +99,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
       <div className="text-center py-12">
         <div className="text-6xl mb-4">
           <span role="img" aria-label="Disappointed face">
-            😔
+            
           </span>
         </div>
         <h3 className="text-xl font-semibold mb-2">Something went wrong</h3>
@@ -119,7 +119,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
       <div className="text-center py-12">
         <div className="text-6xl mb-4">
           <span role="img" aria-label="Cherry blossom">
-            🌸
+            
           </span>
         </div>
         <h3 className="text-xl font-semibold mb-2">No products found</h3>
@@ -206,9 +206,9 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
                 {defaultVariant && (
                   <div className="text-xs text-white/60 mb-3">
                     {defaultVariant.inStock ? (
-                      <span className="text-green-400">✓ In Stock</span>
+                      <span className="text-green-400"> In Stock</span>
                     ) : (
-                      <span className="text-red-400">✗ Out of Stock</span>
+                      <span className="text-red-400"> Out of Stock</span>
                     )}
                   </div>
                 )}

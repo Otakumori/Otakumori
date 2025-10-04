@@ -4,7 +4,7 @@
 import Image from 'next/image';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CherryBlossom from '@/components/animations/CherryBlossom';
-import { usePetalContext, eventBus } from '@/providers';
+import { usePetalContext } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';
 const MAX_PETALS = 30;
 const CLICK_THROTTLE = 300; // ms

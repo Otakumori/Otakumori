@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useFriendSystemStore, Friend } from '@/lib/store/friendSystemStore';
 import { motion } from 'framer-motion';
 
 interface Activity {

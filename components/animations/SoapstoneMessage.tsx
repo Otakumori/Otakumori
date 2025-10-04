@@ -20,7 +20,7 @@ export default function SoapstoneMessage() {
     const createMessage = () => {
       const newMessage: SoapstoneMessage = {
         id: Date.now().toString(),
-        text: 'Praise the sun! 🌸',
+        text: 'Praise the sun! ',
         author: 'Solaire',
         createdAt: new Date(),
         position: {

@@ -45,7 +45,7 @@ export default function TradeHallPage() {
         description: 'A delicate pink petal from the eternal cherry tree',
         rarity: 'common',
         category: 'collectible',
-        image: '🌸',
+        image: '',
         value: 10,
         owned: 5,
       },
@@ -55,7 +55,7 @@ export default function TradeHallPage() {
         description: 'A shimmering fragment of ancient power',
         rarity: 'rare',
         category: 'collectible',
-        image: '✨',
+        image: '',
         value: 50,
         owned: 2,
       },
@@ -65,7 +65,7 @@ export default function TradeHallPage() {
         description: 'Condensed energy from the petal storm',
         rarity: 'legendary',
         category: 'powerup',
-        image: '⚡',
+        image: '',
         value: 200,
         owned: 1,
       },
@@ -75,7 +75,7 @@ export default function TradeHallPage() {
         description: 'Preserves perfect recall moments',
         rarity: 'rare',
         category: 'cosmetic',
-        image: '💎',
+        image: '◆',
         value: 75,
         owned: 3,
       },
@@ -179,10 +179,10 @@ export default function TradeHallPage() {
         {/* Tab Navigation */}
         <div className="flex gap-2 mb-6">
           {[
-            { id: 'inventory', label: 'Inventory', icon: '🎒' },
-            { id: 'crafting', label: 'Crafting', icon: '⚒️' },
-            { id: 'trading', label: 'Trading', icon: '🤝' },
-            { id: 'market', label: 'Market', icon: '🏪' },
+            { id: 'inventory', label: 'Inventory', icon: '' },
+            { id: 'crafting', label: 'Crafting', icon: '️' },
+            { id: 'trading', label: 'Trading', icon: '' },
+            { id: 'market', label: 'Market', icon: '' },
           ].map((tab) => (
             <motion.button
               key={tab.id}
@@ -235,14 +235,14 @@ export default function TradeHallPage() {
                     name: 'Golden Rune Fragment',
                     description: 'Craft from 3 common items',
                     rarity: 'rare',
-                    image: '✨',
+                    image: '',
                     cost: 3,
                   },
                   {
                     name: 'Storm Cloud Essence',
                     description: 'Craft from 3 rare items',
                     rarity: 'legendary',
-                    image: '⚡',
+                    image: '',
                     cost: 3,
                   },
                 ].map((recipe) => (
@@ -388,19 +388,19 @@ export default function TradeHallPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-4">Market Trends</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-white/50 rounded-lg">
-                  <div className="text-2xl mb-2">📈</div>
+                  <div className="text-2xl mb-2"></div>
                   <div className="font-semibold text-gray-900">Rising</div>
                   <div className="text-sm text-gray-600">Storm Cloud Essence</div>
                   <div className="text-sm text-green-600">+15% this week</div>
                 </div>
                 <div className="text-center p-4 bg-white/50 rounded-lg">
-                  <div className="text-2xl mb-2">📉</div>
+                  <div className="text-2xl mb-2"></div>
                   <div className="font-semibold text-gray-900">Falling</div>
                   <div className="text-sm text-gray-600">Cherry Blossom Petal</div>
                   <div className="text-sm text-red-600">-8% this week</div>
                 </div>
                 <div className="text-center p-4 bg-white/50 rounded-lg">
-                  <div className="text-2xl mb-2">⭐</div>
+                  <div className="text-2xl mb-2"></div>
                   <div className="font-semibold text-gray-900">Hot Item</div>
                   <div className="text-sm text-gray-600">Memory Crystal</div>
                   <div className="text-sm text-blue-600">High demand</div>

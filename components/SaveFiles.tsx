@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Plus, Trash2, Download, Upload } from 'lucide-react';
+import { Save, Plus, Trash2, Download } from 'lucide-react';
 
 interface SaveFile {
   id: string;

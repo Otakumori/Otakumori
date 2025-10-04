@@ -45,11 +45,11 @@ export default function AdminSoapstones() {
             >
               <td className="px-3 py-3">{m.content}</td>
               <td className="px-3">{m.upvotes ?? 0}</td>
-              <td className="px-3">{m.isFlagged ? '⚑' : ''}</td>
+              <td className="px-3">{m.isFlagged ? '' : ''}</td>
               <td className="px-3">
                 {meLikes[m.id] && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-pink-500/20 px-2 py-1 text-xs text-pink-300">
-                    ♥ Liked
+                     Liked
                   </span>
                 )}
               </td>

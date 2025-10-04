@@ -615,7 +615,7 @@ export default function MusicPanel() {
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
               <span role="img" aria-label="musical note">
-                🎵
+                
               </span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
@@ -831,7 +831,7 @@ export default function MusicPanel() {
           <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
               <span role="img" aria-label="magnifying glass">
-                🔍
+                ⌕
               </span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
@@ -1048,7 +1048,7 @@ export default function MusicPanel() {
           <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
               <span role="img" aria-label="gear">
-                ⚙️
+                
               </span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
@@ -1235,7 +1235,7 @@ export default function MusicPanel() {
         <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">
             <span role="img" aria-label="musical note">
-              🎵
+              
             </span>
             {
               <>

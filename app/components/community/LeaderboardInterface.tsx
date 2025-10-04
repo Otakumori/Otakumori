@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import GlassPanel from '../GlassPanel';
-import { t } from '../../lib/microcopy';
 
 type LeaderboardEntry = {
   rank: number;
@@ -34,11 +33,11 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return '👑';
+        return '';
       case 2:
-        return '🥈';
+        return '';
       case 3:
-        return '🥉';
+        return '';
       default:
         return `#${rank}`;
     }
@@ -133,7 +132,7 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
                   </div>
 
                   <div className="w-8 h-8 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-                    <span className="text-sm text-fuchsia-300">{entry.avatar || '🌸'}</span>
+                    <span className="text-sm text-fuchsia-300">{entry.avatar || ''}</span>
                   </div>
 
                   <div>

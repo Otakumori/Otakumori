@@ -22,7 +22,7 @@ interface Manifest {
 }
 
 function validateAssets() {
-  console.log('🔍 Validating assets...\n');
+  console.log('⌕ Validating assets...\n');
 
   // Load files
   const rolesPath = join(process.cwd(), 'assets-roles.json');
@@ -30,17 +30,17 @@ function validateAssets() {
   const creditsPath = join(process.cwd(), 'public/assets/credits.json');
 
   if (!existsSync(rolesPath)) {
-    console.error('❌ assets-roles.json not found');
+    console.error(' assets-roles.json not found');
     return false;
   }
 
   if (!existsSync(manifestPath)) {
-    console.error('❌ manifest.json not found');
+    console.error(' manifest.json not found');
     return false;
   }
 
   if (!existsSync(creditsPath)) {
-    console.error('❌ credits.json not found');
+    console.error(' credits.json not found');
     return false;
   }
 
@@ -68,13 +68,13 @@ function validateAssets() {
   // Validate bubble-ragdoll specifically
   const bubbleGame = roles['bubble-ragdoll'];
   if (bubbleGame) {
-    console.log('🫧 Validating bubble-ragdoll assets:');
+    console.log(' Validating bubble-ragdoll assets:');
 
     // Check required assets exist
     const requiredAssets = ['bg', 'bubbleSprite', 'popSfx', 'bounceSfx', 'failSfx'];
     for (const asset of requiredAssets) {
       if (!bubbleGame[asset]) {
-        console.error(`  ❌ Missing ${asset}`);
+        console.error(`   Missing ${asset}`);
         hasErrors = true;
       }
     }
@@ -91,7 +91,7 @@ function validateAssets() {
     ];
     for (const field of themeFields) {
       if (!bubbleGame[field]) {
-        console.error(`  ❌ Missing theme field: ${field}`);
+        console.error(`   Missing theme field: ${field}`);
         hasErrors = true;
       }
     }
@@ -99,7 +99,7 @@ function validateAssets() {
     // Validate showCreditsInPause value
     const showCredits = bubbleGame.showCreditsInPause;
     if (showCredits && !['always', 'once', 'never'].includes(showCredits)) {
-      console.error(`  ❌ Invalid showCreditsInPause: ${showCredits} (must be always/once/never)`);
+      console.error(`   Invalid showCreditsInPause: ${showCredits} (must be always/once/never)`);
       hasErrors = true;
     }
 
@@ -111,23 +111,23 @@ function validateAssets() {
           credit.creator.toLowerCase().includes('kenney'),
       );
       if (!hasMatchingCredit) {
-        console.warn(`  ⚠️  Credits text found but no matching entry in credits.json`);
+        console.warn(`    Credits text found but no matching entry in credits.json`);
       }
     }
 
-    console.log('  ✅ bubble-ragdoll validation complete\n');
+    console.log('   bubble-ragdoll validation complete\n');
   }
 
   // Validate petal-collection specifically
   const petalGame = roles['petal-collection'];
   if (petalGame) {
-    console.log('🌸 Validating petal-collection assets:');
+    console.log(' Validating petal-collection assets:');
 
     // Check required assets exist
     const requiredAssets = ['bg', 'petalParticle', 'collectSfx', 'missSfx'];
     for (const asset of requiredAssets) {
       if (!petalGame[asset]) {
-        console.error(`  ❌ Missing ${asset}`);
+        console.error(`   Missing ${asset}`);
         hasErrors = true;
       }
     }
@@ -144,24 +144,24 @@ function validateAssets() {
     ];
     for (const field of themeFields) {
       if (!petalGame[field]) {
-        console.error(`  ❌ Missing theme field: ${field}`);
+        console.error(`   Missing theme field: ${field}`);
         hasErrors = true;
       }
     }
 
-    console.log('  ✅ petal-collection validation complete\n');
+    console.log('   petal-collection validation complete\n');
   }
 
   // Validate quick-math specifically
   const mathGame = roles['quick-math'];
   if (mathGame) {
-    console.log('🧮 Validating quick-math assets:');
+    console.log(' Validating quick-math assets:');
 
     // Check required assets exist
     const requiredAssets = ['successSfx', 'failSfx'];
     for (const asset of requiredAssets) {
       if (!mathGame[asset]) {
-        console.error(`  ❌ Missing ${asset}`);
+        console.error(`   Missing ${asset}`);
         hasErrors = true;
       }
     }
@@ -178,19 +178,19 @@ function validateAssets() {
     ];
     for (const field of themeFields) {
       if (!mathGame[field]) {
-        console.error(`  ❌ Missing theme field: ${field}`);
+        console.error(`   Missing theme field: ${field}`);
         hasErrors = true;
       }
     }
 
-    console.log('  ✅ quick-math validation complete\n');
+    console.log('   quick-math validation complete\n');
   }
 
   // Validate other games
   for (const [gameKey, gameRoles] of Object.entries(roles)) {
     if (gameKey === 'bubble-ragdoll') continue; // Already validated above
 
-    console.log(`🎮 Validating ${gameKey}:`);
+    console.log(` Validating ${gameKey}:`);
 
     // Check if game has theme fields
     const hasThemeFields = [
@@ -203,10 +203,10 @@ function validateAssets() {
     if (hasThemeFields) {
       // Must have showCreditsInPause
       if (!gameRoles.showCreditsInPause) {
-        console.error(`  ❌ Has credits/pledge but missing showCreditsInPause`);
+        console.error(`   Has credits/pledge but missing showCreditsInPause`);
         hasErrors = true;
       } else if (!['always', 'once', 'never'].includes(gameRoles.showCreditsInPause)) {
-        console.error(`  ❌ Invalid showCreditsInPause: ${gameRoles.showCreditsInPause}`);
+        console.error(`   Invalid showCreditsInPause: ${gameRoles.showCreditsInPause}`);
         hasErrors = true;
       }
     }
@@ -218,18 +218,18 @@ function validateAssets() {
         const manifestPath = resolveFromManifest(url);
         if (manifestPath && !manifestPath.startsWith('/assets/')) {
           console.error(
-            `  ❌ Asset for role ${role} in ${gameKey} must live under /public/assets/* (got: ${url})`,
+            `   Asset for role ${role} in ${gameKey} must live under /public/assets/* (got: ${url})`,
           );
           hasErrors = true;
         }
       }
     }
 
-    console.log(`  ✅ ${gameKey} validation complete`);
+    console.log(`   ${gameKey} validation complete`);
   }
 
   // Validate manifest paths
-  console.log('\n📁 Validating manifest paths...');
+  console.log('\n Validating manifest paths...');
 
   function validateManifestPaths(obj: any, prefix: string = '') {
     for (const [key, value] of Object.entries(obj)) {
@@ -239,14 +239,14 @@ function validateAssets() {
         // Ensure all paths start with /assets/
         if (!value.startsWith('/assets/')) {
           console.error(
-            `  ❌ Asset for ${currentPath} must live under /public/assets/* (got: ${value})`,
+            `   Asset for ${currentPath} must live under /public/assets/* (got: ${value})`,
           );
           hasErrors = true;
         }
 
         const fullPath = join(process.cwd(), 'public', value);
         if (!existsSync(fullPath)) {
-          console.warn(`  ⚠️  Asset not found: ${value}`);
+          console.warn(`    Asset not found: ${value}`);
         }
       } else if (typeof value === 'object' && value !== null) {
         // Recursively validate nested objects
@@ -258,10 +258,10 @@ function validateAssets() {
   validateManifestPaths(manifest);
 
   if (hasErrors) {
-    console.log('\n❌ Validation failed with errors');
+    console.log('\n Validation failed with errors');
     return false;
   } else {
-    console.log('\n✅ All validations passed!');
+    console.log('\n All validations passed!');
     return true;
   }
 }

@@ -40,7 +40,7 @@ const allGames = [
     label: 'Rhythm Beat-Em-Up',
     desc: "Sync to the Moon Prism's pulse.",
     href: '/mini-games/rhythm-beat-em-up',
-    icon: '♪',
+    icon: '',
     status: 'available',
     category: 'action',
   },
@@ -292,7 +292,7 @@ export default function GameCubeHubV2() {
               aria-label="Open Trade Center"
             >
               <div className="text-center">
-                <div className="text-lg mb-1">⚖️</div>
+                <div className="text-lg mb-1"></div>
                 <div className="text-xs">{cubeConfig.faces.up.label}</div>
               </div>
             </button>
@@ -309,7 +309,7 @@ export default function GameCubeHubV2() {
               aria-label="Open Mini-Games panel"
             >
               <div className="text-center">
-                <div className="text-lg mb-1">🎮</div>
+                <div className="text-lg mb-1"></div>
                 <div className="text-xs">{cubeConfig.faces.left.label}</div>
               </div>
             </button>
@@ -326,7 +326,7 @@ export default function GameCubeHubV2() {
               aria-label="Open Avatar / Community Hub"
             >
               <div className="text-center">
-                <div className="text-lg mb-1">👥</div>
+                <div className="text-lg mb-1"></div>
                 <div className="text-xs">{cubeConfig.faces.right.label}</div>
               </div>
             </button>
@@ -343,7 +343,7 @@ export default function GameCubeHubV2() {
               aria-label="Open Music / Extras panel"
             >
               <div className="text-center">
-                <div className="text-lg mb-1">🎵</div>
+                <div className="text-lg mb-1"></div>
                 <div className="text-xs">{cubeConfig.faces.down.label}</div>
               </div>
             </button>
@@ -406,7 +406,7 @@ export default function GameCubeHubV2() {
                   onClick={() => setActivePanel(null)}
                   className="text-purple-300 hover:text-white transition-colors text-xl"
                 >
-                  ✕
+                  
                 </button>
               </div>
 
@@ -458,7 +458,7 @@ export default function GameCubeHubV2() {
                   onClick={() => setActivePanel(null)}
                   className="text-purple-300 hover:text-white transition-colors text-xl"
                 >
-                  ✕
+                  
                 </button>
               </div>
 
@@ -467,13 +467,13 @@ export default function GameCubeHubV2() {
                   <h3 className="text-lg font-semibold text-pink-300">Sound Test</h3>
                   <div className="space-y-2">
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                      🎵 Main Theme
+                       Main Theme
                     </button>
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                      🎮 Game Selection
+                       Game Selection
                     </button>
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                      ⚔️ Battle Theme
+                       Battle Theme
                     </button>
                   </div>
                 </div>
@@ -482,13 +482,13 @@ export default function GameCubeHubV2() {
                   <h3 className="text-lg font-semibold text-pink-300">Bonus Features</h3>
                   <div className="space-y-2">
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                      📊 Statistics
+                       Statistics
                     </button>
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                      🏆 Achievements
+                       Achievements
                     </button>
                     <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                      🎨 Gallery
+                       Gallery
                     </button>
                   </div>
                 </div>
@@ -514,7 +514,7 @@ export default function GameCubeHubV2() {
                   onClick={() => setActivePanel(null)}
                   className="text-purple-300 hover:text-white transition-colors text-xl"
                 >
-                  ✕
+                  
                 </button>
               </div>
 
@@ -526,7 +526,7 @@ export default function GameCubeHubV2() {
                   <div className="bg-gradient-to-br from-pink-600/20 to-purple-600/20 rounded-xl border border-pink-400/30 p-6">
                     <div className="text-center mb-4">
                       <div className="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                        <span className="text-2xl">👤</span>
+                        <span className="text-2xl"></span>
                       </div>
                       <h4 className="text-white font-medium">Ultra Detailed Character Creator</h4>
                       <p className="text-zinc-300 text-sm mt-1">Code Vein-level customization</p>
@@ -547,14 +547,14 @@ export default function GameCubeHubV2() {
                         onClick={() => router.push('/profile')}
                         className="p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors"
                       >
-                        <div className="text-lg mb-1">👤</div>
+                        <div className="text-lg mb-1"></div>
                         <div className="text-sm font-medium">View Profile</div>
                       </button>
                       <button
                         onClick={() => router.push('/community')}
                         className="p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors"
                       >
-                        <div className="text-lg mb-1">👥</div>
+                        <div className="text-lg mb-1"></div>
                         <div className="text-sm font-medium">Community</div>
                       </button>
                     </div>

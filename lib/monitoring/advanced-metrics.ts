@@ -9,7 +9,6 @@
  * - Resource optimization
  */
 
-import { z } from 'zod';
 import { env } from '@/env';
 
 export interface MetricPoint {
@@ -276,7 +275,7 @@ export class AdvancedMetricsCollector {
     };
 
     // Log the alert
-    console.warn(`🚨 Alert triggered: ${rule.name}`, alert);
+    console.warn(` Alert triggered: ${rule.name}`, alert);
 
     // Send to external alerting systems
     await this.sendAlert(alert, rule.channels);
@@ -309,17 +308,17 @@ export class AdvancedMetricsCollector {
 
   private async sendSlackAlert(alert: any): Promise<void> {
     // Slack integration placeholder
-    console.log('📢 Slack alert sent:', alert);
+    // Slack alert sent
   }
 
   private async sendEmailAlert(alert: any): Promise<void> {
     // Email integration placeholder
-    console.log('📧 Email alert sent:', alert);
+    // Email alert sent
   }
 
   private async sendWebhookAlert(alert: any): Promise<void> {
     // Webhook integration placeholder
-    console.log('🔗 Webhook alert sent:', alert);
+    // Webhook alert sent
   }
 
   /**

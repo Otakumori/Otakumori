@@ -27,7 +27,7 @@ class DatabaseStressTester {
   private results: StressTestResult[] = [];
 
   async runAllTests() {
-    console.log('🔥 Starting Database Stress Tests...\n');
+    console.log(' Starting Database Stress Tests...\n');
 
     // Test scenarios
     await this.testPraiseVolume();
@@ -42,7 +42,7 @@ class DatabaseStressTester {
   }
 
   private async testPraiseVolume() {
-    console.log('📊 Testing Praise Volume (Daily Limits)...');
+    console.log(' Testing Praise Volume (Daily Limits)...');
 
     const users = await this.createTestUsers(100);
     const latencies: number[] = [];
@@ -96,11 +96,11 @@ class DatabaseStressTester {
       throughput: (successCount / totalTime) * 1000,
     });
 
-    console.log(`  ✅ ${successCount} successful, ${errorCount} failed\n`);
+    console.log(`   ${successCount} successful, ${errorCount} failed\n`);
   }
 
   private async testWishlistToggling() {
-    console.log('💖 Testing Wishlist Toggling...');
+    console.log(' Testing Wishlist Toggling...');
 
     const users = await this.createTestUsers(50);
     const products = await this.createTestProducts(20);
@@ -159,11 +159,11 @@ class DatabaseStressTester {
       throughput: (successCount / totalTime) * 1000,
     });
 
-    console.log(`  ✅ ${successCount} successful, ${errorCount} failed\n`);
+    console.log(`   ${successCount} successful, ${errorCount} failed\n`);
   }
 
   private async testSoapstoneMessages() {
-    console.log('🪨 Testing Soapstone Message Creation...');
+    console.log(' Testing Soapstone Message Creation...');
 
     const users = await this.createTestUsers(75);
     const latencies: number[] = [];
@@ -225,11 +225,11 @@ class DatabaseStressTester {
       throughput: (successCount / totalTime) * 1000,
     });
 
-    console.log(`  ✅ ${successCount} successful, ${errorCount} failed\n`);
+    console.log(`   ${successCount} successful, ${errorCount} failed\n`);
   }
 
   private async testTradeOffers() {
-    console.log('🤝 Testing Trade Offers...');
+    console.log(' Testing Trade Offers...');
 
     const users = await this.createTestUsers(30);
     const latencies: number[] = [];
@@ -285,11 +285,11 @@ class DatabaseStressTester {
       throughput: (successCount / totalTime) * 1000,
     });
 
-    console.log(`  ✅ ${successCount} successful, ${errorCount} failed\n`);
+    console.log(`   ${successCount} successful, ${errorCount} failed\n`);
   }
 
   private async testIdempotencyKeys() {
-    console.log('🔑 Testing Idempotency Key Performance...');
+    console.log(' Testing Idempotency Key Performance...');
 
     const latencies: number[] = [];
     let successCount = 0;
@@ -342,7 +342,7 @@ class DatabaseStressTester {
       throughput: (successCount / totalTime) * 1000,
     });
 
-    console.log(`  ✅ ${successCount} successful, ${errorCount} failed\n`);
+    console.log(`   ${successCount} successful, ${errorCount} failed\n`);
   }
 
   private async createTestUsers(count: number) {
@@ -387,11 +387,11 @@ class DatabaseStressTester {
 
   private printSummary() {
     console.log('\n' + '='.repeat(80));
-    console.log('📊 DATABASE STRESS TEST SUMMARY');
+    console.log(' DATABASE STRESS TEST SUMMARY');
     console.log('='.repeat(80));
 
     this.results.forEach((result) => {
-      console.log(`\n🔍 ${result.operation}:`);
+      console.log(`\n⌕ ${result.operation}:`);
       console.log(`   Operations: ${result.totalOperations}`);
       console.log(
         `   Success Rate: ${((result.successCount / result.totalOperations) * 100).toFixed(1)}%`,
@@ -403,16 +403,16 @@ class DatabaseStressTester {
 
       // Performance evaluation
       if (result.avgLatency > 100) {
-        console.log(`   ⚠️  HIGH LATENCY DETECTED`);
+        console.log(`     HIGH LATENCY DETECTED`);
       } else if (result.avgLatency < 20) {
-        console.log(`   ✅ EXCELLENT PERFORMANCE`);
+        console.log(`    EXCELLENT PERFORMANCE`);
       } else {
-        console.log(`   👍 GOOD PERFORMANCE`);
+        console.log(`    GOOD PERFORMANCE`);
       }
     });
 
     console.log('\n' + '='.repeat(80));
-    console.log('🎯 RECOMMENDATIONS:');
+    console.log(' RECOMMENDATIONS:');
 
     const avgLatency = this.results.reduce((sum, r) => sum + r.avgLatency, 0) / this.results.length;
     const totalThroughput = this.results.reduce((sum, r) => sum + r.throughput, 0);
@@ -427,7 +427,7 @@ class DatabaseStressTester {
       console.log('   • Consider database scaling (read replicas)');
       console.log('   • Implement caching layer (Redis)');
     } else {
-      console.log('   ✅ Database performance is excellent for production');
+      console.log('    Database performance is excellent for production');
     }
 
     console.log('='.repeat(80) + '\n');

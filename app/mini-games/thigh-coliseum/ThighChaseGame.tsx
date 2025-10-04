@@ -487,9 +487,9 @@ export default function ThighChaseGame() {
       ctx.shadowBlur = 0;
 
       const symbols = {
-        speed: '💨',
-        shield: '🛡️',
-        points: '⭐',
+        speed: '',
+        shield: '',
+        points: '',
       };
       ctx.fillStyle = '#ffffff';
       ctx.fillText(symbols[powerup.type], powerup.x + 2, powerup.y + 15);
@@ -510,7 +510,7 @@ export default function ThighChaseGame() {
     // Pursuer symbol
     ctx.fillStyle = '#ffffff';
     ctx.font = '24px monospace';
-    ctx.fillText('🦵', pursuer.x + 25, pursuer.y + 50);
+    ctx.fillText('', pursuer.x + 25, pursuer.y + 50);
 
     // Draw player
     const playerColor =
@@ -534,7 +534,7 @@ export default function ThighChaseGame() {
     // Player symbol
     ctx.fillStyle = '#ffffff';
     ctx.font = '16px monospace';
-    ctx.fillText('🏃‍♀️', player.x + 5, player.y + 25);
+    ctx.fillText('‍️', player.x + 5, player.y + 25);
 
     // Draw UI
     ctx.fillStyle = '#ffffff';
@@ -573,7 +573,7 @@ export default function ThighChaseGame() {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-red-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-6">🏃‍♀️💨🦵</div>
+          <div className="text-6xl mb-6">‍️</div>
           <h2 className="text-3xl font-bold mb-4">Thigh Colosseum</h2>
           <p className="text-gray-300 mb-8 max-w-md">
             Enter the arena. Win rounds and advance the bracket.
@@ -586,11 +586,11 @@ export default function ThighChaseGame() {
               Enter Arena
             </button>
             <div className="text-sm text-gray-400 space-y-1">
-              <p>🏃 A/D or Arrow Keys - Move Left/Right</p>
-              <p>⬆️ W/Space/Up Arrow - Jump</p>
-              <p>🛡️ Collect powerups for advantages</p>
-              <p>🦵 Avoid the pursuing thighs!</p>
-              <p>🏆 Survive as long as possible</p>
+              <p> A/D or Arrow Keys - Move Left/Right</p>
+              <p>↑ W/Space/Up Arrow - Jump</p>
+              <p> Collect powerups for advantages</p>
+              <p> Avoid the pursuing thighs!</p>
+              <p> Survive as long as possible</p>
             </div>
           </div>
           <p className="text-sm text-gray-400 mt-6">
@@ -621,7 +621,7 @@ export default function ThighChaseGame() {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-900 via-purple-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-4">💀</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-3xl font-bold mb-4">Caught!</h2>
           <div className="space-y-2 mb-6">
             <div className="text-xl">Final Score: {score.toLocaleString()}</div>

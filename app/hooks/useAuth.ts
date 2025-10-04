@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuthContext } from '../contexts/AuthContext';
-import { useAuth as useClerkAuth, useUser } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 
 // This hook now delegates to the main AuthContext to avoid conflicts
 export function useAuth() {

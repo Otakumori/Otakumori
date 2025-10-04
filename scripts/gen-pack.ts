@@ -1,9 +1,5 @@
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import fs from 'node:fs';
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { access } from 'node:fs/promises';
 
 const execAsync = promisify(exec);
 
@@ -30,15 +26,15 @@ async function main() {
 
   // Handle both positional and named arguments
   let workflow = arg('workflow', '');
-  console.log(`🔍 Debug: argv = ${JSON.stringify(argv)}`);
-  console.log(`🔍 Debug: named workflow = ${workflow}`);
+  console.log(`⌕ Debug: argv = ${JSON.stringify(argv)}`);
+  console.log(`⌕ Debug: named workflow = ${workflow}`);
 
   if (!workflow && argv.length > 0) {
     // If no named workflow, check if first positional arg is a workflow file
     const firstArg = argv[0];
     if (firstArg && !firstArg.startsWith('--') && firstArg.endsWith('.json')) {
       workflow = firstArg;
-      console.log(`📁 Using positional workflow: ${workflow}`);
+      console.log(` Using positional workflow: ${workflow}`);
     }
   }
 
@@ -51,7 +47,7 @@ async function main() {
 
   // Validate required workflows exist
   if (!workflow) {
-    console.error('❌ Missing required workflow for visual generation');
+    console.error(' Missing required workflow for visual generation');
     console.error(
       'Usage: npm run gen:pack <avatar> -- --workflow ./comfy/ui-workflow.json [--avatars-workflow ./comfy/char-workflow.json]',
     );
@@ -61,9 +57,9 @@ async function main() {
   // Check if workflow file exists
   try {
     // await access(workflow);
-    console.log(`✅ Workflow file found: ${workflow}`);
+    console.log(` Workflow file found: ${workflow}`);
   } catch (error) {
-    console.error(`❌ Workflow file not found: ${workflow}`);
+    console.error(` Workflow file not found: ${workflow}`);
     console.error('Please check the path and ensure the file exists');
     process.exit(1);
   }
@@ -77,14 +73,14 @@ async function main() {
     ditherArgs.push('--no-dither');
   }
 
-  console.log(`🎨 Dithering config: ${ditherArgs.length > 0 ? ditherArgs.join(' ') : 'none'}`);
+  console.log(` Dithering config: ${ditherArgs.length > 0 ? ditherArgs.join(' ') : 'none'}`);
 
   const baseArgs = workflow ? `--workflow ${workflow}` : '';
   const seedArgs = seed !== '-1' ? `--seed ${seed}` : '';
 
-  console.log(`🎭 Generating complete asset pack for avatar: ${avatar}`);
-  console.log(`🔧 Workflow: ${workflow || 'default'}`);
-  console.log(`🎲 Seed: ${seed}`);
+  console.log(` Generating complete asset pack for avatar: ${avatar}`);
+  console.log(` Workflow: ${workflow || 'default'}`);
+  console.log(` Seed: ${seed}`);
   console.log('');
 
   // Get avatar vibe from style-map
@@ -96,24 +92,24 @@ async function main() {
     //   const getVibeForAvatar = styleMap.getVibeForAvatar as (a: string, o?: string) => string;
     //   vibe = getVibeForAvatar ? getVibeForAvatar(avatar, packVibeOverride) : (styleMap.avatarVibes?.[avatar.toLowerCase()] ?? "neutral");
     // }
-    console.log('⚠ Using default vibe: neutral');
+    console.log(' Using default vibe: neutral');
   } catch (error) {
-    console.warn("⚠ Could not determine avatar vibe, using 'neutral'");
+    console.warn(" Could not determine avatar vibe, using 'neutral'");
   }
 
-  console.log(`🎨 Avatar vibe detected: ${vibe}`);
+  console.log(` Avatar vibe detected: ${vibe}`);
   if (packVibeOverride) {
-    console.log(`🎭 Pack-level vibe override: ${packVibeOverride}`);
+    console.log(` Pack-level vibe override: ${packVibeOverride}`);
   }
 
   const classes = ['ui', 'icons', 'textures', 'avatars'] as const;
 
   for (const className of classes) {
-    console.log(`🎨 Generating ${className}...`);
+    console.log(` Generating ${className}...`);
 
     // Check if we have a workflow for this class
     if (!workflow) {
-      console.log(`  ⚠️ Skipping ${className} - no workflow specified`);
+      console.log(`   Skipping ${className} - no workflow specified`);
       continue;
     }
 
@@ -126,9 +122,9 @@ async function main() {
       if (stdout) console.log(stdout);
       if (stderr) console.log(stderr);
 
-      console.log(`✅ ${className} generated successfully\n`);
+      console.log(` ${className} generated successfully\n`);
     } catch (error: any) {
-      console.error(`❌ Failed to generate ${className}:`, error.message);
+      console.error(` Failed to generate ${className}:`, error.message);
       if (error.stdout) console.log(error.stdout);
       if (error.stderr) console.log(error.stderr);
       console.log('');
@@ -136,7 +132,7 @@ async function main() {
   }
 
   // Auto-run SFX generation at the end
-  console.log(`🎵 Generating SFX for ${avatar} (${vibe} vibe)...`);
+  console.log(` Generating SFX for ${avatar} (${vibe} vibe)...`);
   try {
     const cmd = `npm run gen:sfx -- --avatar ${avatar} --vibe ${vibe} --count 6`.trim();
     console.log(`  → ${cmd}`);
@@ -145,19 +141,19 @@ async function main() {
     if (stdout) console.log(stdout);
     if (stderr) console.log(stderr);
 
-    console.log(`✅ SFX generated successfully\n`);
+    console.log(` SFX generated successfully\n`);
   } catch (error: any) {
-    console.error(`❌ Failed to generate SFX:`, error.message);
+    console.error(` Failed to generate SFX:`, error.message);
     if (error.stdout) console.log(error.stdout);
     if (error.stderr) console.log(error.stderr);
     console.log('');
   }
 
-  console.log('🎉 Asset pack generation complete!');
-  console.log("📝 Next: run 'npm run assets:sync' to update the manifest.");
+  console.log(' Asset pack generation complete!');
+  console.log(" Next: run 'npm run assets:sync' to update the manifest.");
 }
 
 main().catch((e) => {
-  console.error('❌ Pack generation failed:', e);
+  console.error(' Pack generation failed:', e);
   process.exit(1);
 });

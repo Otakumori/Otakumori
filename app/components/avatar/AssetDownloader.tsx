@@ -18,23 +18,23 @@ export function AssetDownloader({ config, className = '' }: AssetDownloaderProps
       id: 'glb',
       name: 'GLB (3D Model)',
       description: 'Universal 3D format for games and VR',
-      icon: '🎮',
+      icon: '',
     },
     {
       id: 'fbx',
       name: 'FBX (3D Model)',
       description: 'Industry standard for animation',
-      icon: '🎬',
+      icon: '',
     },
     {
       id: 'obj',
       name: 'OBJ (3D Model)',
       description: 'Simple 3D format for 3D printing',
-      icon: '🖨️',
+      icon: '️',
     },
-    { id: 'png', name: 'PNG (Image)', description: 'High-quality 2D render', icon: '🖼️' },
-    { id: 'jpg', name: 'JPG (Image)', description: 'Compressed 2D render', icon: '📷' },
-    { id: 'svg', name: 'SVG (Vector)', description: 'Scalable vector graphics', icon: '📐' },
+    { id: 'png', name: 'PNG (Image)', description: 'High-quality 2D render', icon: '️' },
+    { id: 'jpg', name: 'JPG (Image)', description: 'Compressed 2D render', icon: '' },
+    { id: 'svg', name: 'SVG (Vector)', description: 'Scalable vector graphics', icon: '' },
   ];
 
   const handleExport = async (format: string) => {

@@ -4,7 +4,6 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import sharp from 'sharp'; // npm i sharp
 import AchievementBadge from '@/components/graphics/AchievementBadge';
-import TierFrame from '@/components/graphics/TierFrame';
 import FramedBadge from '@/components/graphics/FramedBadge';
 
 type Cluster = { prefix: string; items: string[] };

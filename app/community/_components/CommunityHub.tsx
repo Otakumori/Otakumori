@@ -18,10 +18,10 @@ export function CommunityHub() {
   const isAdultVerified = user?.publicMetadata?.adultVerified === true;
 
   const tabs = [
-    { id: 'showcase' as const, label: 'Avatar Showcase', icon: '👤' },
-    { id: 'gallery' as const, label: 'Community Gallery', icon: '🖼️' },
-    { id: 'settings' as const, label: 'Community Settings', icon: '⚙️' },
-    ...(isAdultVerified ? [{ id: 'gated' as const, label: 'Gated Content', icon: '🔒' }] : []),
+    { id: 'showcase' as const, label: 'Avatar Showcase', icon: '' },
+    { id: 'gallery' as const, label: 'Community Gallery', icon: '️' },
+    { id: 'settings' as const, label: 'Community Settings', icon: '' },
+    ...(isAdultVerified ? [{ id: 'gated' as const, label: 'Gated Content', icon: '' }] : []),
   ];
 
   return (
@@ -127,7 +127,7 @@ function AvatarShowcase() {
         <div className="space-y-3">
           <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
             <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">👤</span>
+              <span className="text-white text-sm"></span>
             </div>
             <div className="flex-1">
               <p className="text-white text-sm">
@@ -138,7 +138,7 @@ function AvatarShowcase() {
           </div>
           <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">❤️</span>
+              <span className="text-white text-sm">️</span>
             </div>
             <div className="flex-1">
               <p className="text-white text-sm">Someone liked your avatar design</p>
@@ -147,7 +147,7 @@ function AvatarShowcase() {
           </div>
           <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
             <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">📥</span>
+              <span className="text-white text-sm"></span>
             </div>
             <div className="flex-1">
               <p className="text-white text-sm">Your avatar was downloaded by a community member</p>

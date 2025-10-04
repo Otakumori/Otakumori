@@ -82,12 +82,12 @@ export function AdultContentGate() {
   ];
 
   const categories = [
-    { id: 'outfits' as const, label: 'Adult Outfits', icon: '👗', count: adultOutfits.length },
-    { id: 'physics' as const, label: 'Enhanced Physics', icon: '🌊', count: adultPhysics.length },
+    { id: 'outfits' as const, label: 'Adult Outfits', icon: '', count: adultOutfits.length },
+    { id: 'physics' as const, label: 'Enhanced Physics', icon: '', count: adultPhysics.length },
     {
       id: 'interactions' as const,
       label: 'Adult Interactions',
-      icon: '🤝',
+      icon: '',
       count: adultInteractions.length,
     },
   ];
@@ -108,7 +108,7 @@ export function AdultContentGate() {
   if (!user?.publicMetadata?.adultVerified) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">🔒</div>
+        <div className="text-6xl mb-4"></div>
         <h3 className="text-2xl font-bold text-white mb-4">Adult Content Restricted</h3>
         <p className="text-zinc-300 mb-6">
           You must verify your age to access adult content and features.
@@ -130,7 +130,7 @@ export function AdultContentGate() {
         <p className="text-zinc-300 mb-6">Access premium adult content and features (18+ only)</p>
         <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg max-w-md mx-auto">
           <p className="text-red-200 text-sm">
-            ⚠️ This content is for adults only. By accessing this area, you confirm you are 18+
+             This content is for adults only. By accessing this area, you confirm you are 18+
             years old.
           </p>
         </div>
@@ -194,7 +194,7 @@ export function AdultContentGate() {
 
               {/* Downloads */}
               <div className="flex justify-center items-center text-sm text-zinc-400">
-                <span>📥</span>
+                <span></span>
                 <span className="ml-1">{item.downloads} downloads</span>
               </div>
 

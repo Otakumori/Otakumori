@@ -14,7 +14,6 @@ import {
   type FeatureFlagValue,
   type FeatureFlagEvaluationContext,
   type FeatureFlagProviderConfig,
-  ABTest,
   type ABTestVariant,
 } from './types';
 import { FEATURE_FLAG_CONFIG, getEnvironmentOverrides, AB_TESTS } from './config';

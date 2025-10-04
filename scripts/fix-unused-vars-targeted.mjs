@@ -97,13 +97,13 @@ function fixUnusedVars(filePath) {
 
     if (changed) {
       fs.writeFileSync(filePath, content, 'utf8');
-      console.log(`✅ Fixed unused vars in: ${filePath}`);
+      console.log(` Fixed unused vars in: ${filePath}`);
       return true;
     }
 
     return false;
   } catch (error) {
-    console.error(`❌ Error fixing ${filePath}:`, error.message);
+    console.error(` Error fixing ${filePath}:`, error.message);
     return false;
   }
 }
@@ -116,4 +116,4 @@ for (const file of targetFiles) {
   }
 }
 
-console.log(`\n🎉 Fixed unused variables in ${fixedCount} files`);
+console.log(`\n Fixed unused variables in ${fixedCount} files`);

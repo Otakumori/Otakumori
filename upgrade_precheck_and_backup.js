@@ -39,10 +39,10 @@ async function runQuery(query, filename) {
     const output = `---- OUTPUT ----\n${JSON.stringify(result, null, 2)}`;
     fs.writeFileSync(path.join(OUTDIR, `${filename}.out`), output);
 
-    console.log(`✓ Saved ${filename}.out`);
+    console.log(` Saved ${filename}.out`);
     return result;
   } catch (error) {
-    console.log(`⚠ Error running ${filename}: ${error.message}`);
+    console.log(` Error running ${filename}: ${error.message}`);
     const output = `---- ERROR ----\n${error.message}`;
     fs.writeFileSync(path.join(OUTDIR, `${filename}.out`), output);
     return null;
@@ -94,16 +94,16 @@ async function main() {
             `pg_dump "${dbUrl}" --clean --if-exists --quote-all-identifiers --no-owner --no-privileges > "${dumpFile}"`,
             { stdio: 'pipe' },
           );
-          console.log(`✓ Database backup created: ${dumpFile}`);
+          console.log(` Database backup created: ${dumpFile}`);
         } catch (pgDumpError) {
-          console.log('⚠ pg_dump not available, skipping database backup');
+          console.log(' pg_dump not available, skipping database backup');
           console.log('  Install PostgreSQL client tools to enable database backup');
         }
       } else {
-        console.log('⚠ No DATABASE_URL found, skipping database backup');
+        console.log(' No DATABASE_URL found, skipping database backup');
       }
     } catch (error) {
-      console.log(`⚠ Error creating backup: ${error.message}`);
+      console.log(` Error creating backup: ${error.message}`);
     }
 
     console.log('\n==========================================');

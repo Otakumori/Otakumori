@@ -328,7 +328,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
     } catch (error) {
       if (error instanceof PetalCreditError && error.isRateLimited) {
         setDailyCapReached(true);
-        console.log('Daily petal collection cap reached');
+        // Daily petal collection cap reached
       } else {
         console.error('Failed to collect petals:', error);
       }

@@ -11,10 +11,8 @@ import {
   Heart,
   Share2,
   User,
-  Clock,
   Plus,
   Search,
-  Filter,
   Tag,
   Users as UsersIcon,
 } from 'lucide-react';

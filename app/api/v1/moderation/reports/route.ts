@@ -5,7 +5,6 @@ import { db } from '@/lib/db';
 import {
   UserReportCreateSchema,
   ReportListRequestSchema,
-  UserReportSchema,
 } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 

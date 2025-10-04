@@ -198,7 +198,7 @@ export default function PetalCollector() {
             powerUp.active && (
               <div key={powerUp.id} className="mb-2">
                 <span className="text-pink-400">
-                  {powerUp.type === 'time' ? '⏰' : powerUp.type === 'multiplier' ? '✨' : '🧲'}
+                  {powerUp.type === 'time' ? '⏰' : powerUp.type === 'multiplier' ? '' : ''}
                   {powerUp.duration}s
                 </span>
               </div>

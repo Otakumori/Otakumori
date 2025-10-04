@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Zap, Clock, BarChart3, Settings, Sparkles } from 'lucide-react';
+import { Save, Zap, BarChart3, Settings, Sparkles } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { type BurstConfig } from '@/types/runes';

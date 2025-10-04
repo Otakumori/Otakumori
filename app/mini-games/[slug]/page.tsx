@@ -111,7 +111,7 @@ export default function GamePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
+          <div className="text-6xl mb-4"></div>
           <h3 className="text-xl font-semibold text-gray-700 mb-2">Game Not Found</h3>
           <p className="text-gray-500 mb-4">The requested game could not be found.</p>
           <button
@@ -131,7 +131,7 @@ export default function GamePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🚧</div>
+          <div className="text-6xl mb-4"></div>
           <h3 className="text-xl font-semibold text-gray-700 mb-2">Game Under Development</h3>
           <p className="text-gray-500 mb-4">
             {gameDef.name} is currently being developed. Check back soon!
@@ -191,7 +191,7 @@ export default function GamePage() {
               >
                 {gameDef.difficulty}
               </div>
-              <div className="text-sm text-gray-600">Max: {gameDef.maxRewardPerRun} 🌸</div>
+              <div className="text-sm text-gray-600">Max: {gameDef.maxRewardPerRun} </div>
               <button
                 onClick={() => setShowLb((s) => !s)}
                 className="lg:hidden rounded-md border px-2 py-1 text-xs hover:bg-gray-100"

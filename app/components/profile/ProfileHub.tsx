@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import ProfileLoadout from './ProfileLoadout';
-import { t } from '../../lib/microcopy';
 
 type ProfileData = {
   id: string;
@@ -51,7 +50,7 @@ export default function ProfileHub({ profileData }: ProfileHubProps) {
         <GlassPanel className="p-6">
           <div className="text-center mb-6">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-              <span className="text-2xl text-fuchsia-300">{profileData.avatar ? '👤' : '🌸'}</span>
+              <span className="text-2xl text-fuchsia-300">{profileData.avatar ? '' : ''}</span>
             </div>
             <h2 className="text-xl font-semibold text-white">{profileData.username}</h2>
             <p className="text-sm text-zinc-400">{profileData.email}</p>

@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/env';
 
 export const runtime = 'nodejs';
 

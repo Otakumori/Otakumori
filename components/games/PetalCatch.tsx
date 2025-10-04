@@ -1,9 +1,8 @@
  
 
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { PetalEffect } from '@/components/PetalEffect';
 import { useSound } from '@/lib/hooks/useSound';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -68,7 +67,7 @@ export const PetalCatch = () => {
     vibrate('success');
 
     if (gameState.score > gameState.highScore) {
-      showToast('New High Score! 🏆', 'achievement', '🏆');
+      showToast('New High Score! ', 'achievement', '');
       unlockAchievement('high-score');
     }
   };

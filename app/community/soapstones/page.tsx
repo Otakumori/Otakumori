@@ -4,7 +4,6 @@ import StarfieldPurple from '../../components/StarfieldPurple';
 import Navbar from '../../components/layout/Navbar';
 import FooterDark from '../../components/FooterDark';
 import SoapstoneCommunity from '../../components/community/SoapstoneCommunity';
-import { t } from '@/lib/microcopy';
 
 export const metadata: Metadata = {
   title: 'Soapstone Community — Otaku-mori',

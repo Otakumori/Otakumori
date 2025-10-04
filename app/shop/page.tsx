@@ -3,8 +3,6 @@ import type { Metadata } from 'next';
 import StarfieldPurple from '../components/StarfieldPurple';
 import FooterDark from '../components/FooterDark';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
-import { t } from '@/lib/microcopy';
-import { env } from '@/env.mjs';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');

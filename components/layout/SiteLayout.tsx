@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import FriendsButton from '@/app/components/FriendsButton';
 import NotificationBell from '@/app/components/NotificationBell';
 import CharacterReaction from '@/app/components/CharacterReaction';
@@ -132,7 +132,7 @@ export default function SiteLayout({
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-xl bg-pink-500/90 grid place-items-center shadow-lg select-none">
               <span role="img" aria-label="Crossed swords">
-                ⚔️
+                
               </span>
             </div>
             <a href="/" className="text-lg font-semibold tracking-wide hover:text-pink-200">
@@ -244,7 +244,7 @@ export default function SiteLayout({
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-pink-500/90 grid place-items-center">
                 <span role="img" aria-label="Crossed swords">
-                  ⚔️
+                  
                 </span>
               </div>
               <span className="font-semibold">Otakumori</span>

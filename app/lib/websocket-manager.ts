@@ -78,7 +78,7 @@ export class WebSocketManager {
     // Send queued messages
     this.sendQueuedMessages(connectionId);
 
-    console.log(`WebSocket connected: ${connectionId} for user ${userId}`);
+    // WebSocket connected
   }
 
   /**
@@ -271,7 +271,7 @@ export class WebSocketManager {
   private handleDisconnect(connectionId: string): void {
     const connection = this.connections.get(connectionId);
     if (connection) {
-      console.log(`WebSocket disconnected: ${connectionId} for user ${connection.userId}`);
+      // WebSocket disconnected
       this.connections.delete(connectionId);
     }
   }
@@ -334,7 +334,7 @@ export class WebSocketManager {
     this.heartbeatInterval = setInterval(() => {
       for (const [connectionId, connection] of this.connections) {
         if (!connection.isAlive) {
-          console.log(`Terminating dead connection: ${connectionId}`);
+          // Terminating dead connection
           connection.ws.terminate();
           this.connections.delete(connectionId);
           continue;

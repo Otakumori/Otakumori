@@ -303,13 +303,13 @@ async function generateA11yReport(results: A11yResult[]) {
 
 async function main() {
   try {
-    console.log('🚀 Starting accessibility preflight checks...');
+    console.log(' Starting accessibility preflight checks...');
     await ensureArtifactsDir();
 
     const results = await runA11yPreflight();
     const report = await generateA11yReport(results);
 
-    console.log(`\n📊 Accessibility Summary:`);
+    console.log(`\n Accessibility Summary:`);
     console.log(`   Total pages: ${report.summary.totalPages}`);
     console.log(`   Total violations: ${report.summary.totalViolations}`);
     console.log(`   Critical: ${report.summary.criticalViolations}`);
@@ -323,7 +323,7 @@ async function main() {
     );
 
     if (criticalOrSerious.length > 0) {
-      console.log('\n❌ Critical or serious accessibility violations detected:');
+      console.log('\n Critical or serious accessibility violations detected:');
       criticalOrSerious.forEach((result) => {
         console.log(
           `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`,
@@ -332,10 +332,10 @@ async function main() {
       process.exit(1);
     }
 
-    console.log('\n✅ All accessibility checks passed!');
-    console.log(`📁 Reports saved to: ${ARTIFACTS_DIR}`);
+    console.log('\n All accessibility checks passed!');
+    console.log(` Reports saved to: ${ARTIFACTS_DIR}`);
   } catch (error) {
-    console.error('❌ Accessibility preflight failed:', error);
+    console.error(' Accessibility preflight failed:', error);
     process.exit(1);
   }
 }

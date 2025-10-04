@@ -8,6 +8,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import OwnedRunesGrid from '../_components/OwnedRunesGrid';
 import gamesMeta from '../games.meta.json';
+// import { env } from '@/env.mjs';
 
 type Mode = 'boot' | 'cube' | 'loadingGame' | 'playingGame';
 
@@ -59,7 +60,7 @@ export default function ConsoleCard({
   }, []);
   useEffect(() => {
     // Only preload audio if not in reduced motion mode and audio is supported
-    const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+    const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
     if (
       !isReducedMotion &&
       audioEnabled &&
@@ -139,7 +140,7 @@ export default function ConsoleCard({
         else if (face === 1) setFace(0);
         audio.unlock();
         try {
-          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
           if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
           }
@@ -154,7 +155,7 @@ export default function ConsoleCard({
         else if (face === 2) setFace(0);
         audio.unlock();
         try {
-          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
           if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
           }
@@ -170,7 +171,7 @@ export default function ConsoleCard({
         else if (face === 4) setFace(0);
         audio.unlock();
         try {
-          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
           if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
           }
@@ -185,7 +186,7 @@ export default function ConsoleCard({
         else if (face === 3) setFace(0);
         audio.unlock();
         try {
-          const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
           if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
           }
@@ -366,7 +367,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -389,7 +390,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -412,7 +413,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -435,7 +436,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -479,7 +480,7 @@ export default function ConsoleCard({
               tabIndex={0}
               onClick={() => {
                 try {
-                  const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                  const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                   if (audioEnabled) {
                     audio.unlock();
                     // Small delay to ensure audio context is unlocked
@@ -496,7 +497,8 @@ export default function ConsoleCard({
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   try {
-                    const audioEnabled = process.env.NEXT_PUBLIC_ENABLE_AUDIO !== 'false';
+                    const audioEnabled =
+                      (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                     if (audioEnabled) {
                       audio.unlock();
                       // Small delay to ensure audio context is unlocked
@@ -981,7 +983,7 @@ export default function ConsoleCard({
         <div>Arrows/Stick: rotate • A/Enter: select • B/Esc: back</div>
         <div className="inline-flex items-center gap-2">
           <span className="material-symbols-outlined">view_in_ar</span>
-          <span className="emoji-noto">🎮</span>
+          <span className="emoji-noto">🃝</span>
         </div>
       </div>
     </section>
@@ -1266,8 +1268,8 @@ function CommunityFace() {
     };
     const connect = () => {
       // Only connect if WebSocket is explicitly enabled
-      const wsEnabled = process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === '1';
-      console.log('WebSocket connection attempt:', {
+      const wsEnabled = (process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === '1';
+      console.log('WebSocket connection attempt', {
         wsEnabled,
         envVar: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
         envVarType: typeof process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
@@ -1277,23 +1279,23 @@ function CommunityFace() {
       // WebSocket is disabled by default to prevent "Insufficient resources" errors
       if (
         !wsEnabled ||
-        process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === 'false' ||
+        (process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === 'false' ||
         process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === undefined
       ) {
-        console.log('WebSocket disabled, using polling instead');
+        // WebSocket disabled, using polling instead
         setWsDegraded(true);
         bc('ws.disabled');
         startPolling();
         return;
       }
 
-      console.log('WebSocket enabled, proceeding with connection');
+      // WebSocket enabled, proceeding with connection
 
       let ws: WebSocket | null = null;
       try {
         const url =
           process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
-        console.log('Creating WebSocket connection to:', url);
+        // Creating WebSocket connection
         ws = new WebSocket(url);
       } catch (e) {
         setWsFailures((n) => n + 1);

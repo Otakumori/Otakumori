@@ -4,6 +4,8 @@ import drizzle from 'eslint-plugin-drizzle';
 import reactHooks from 'eslint-plugin-react-hooks';
 import nextPlugin from '@next/eslint-plugin-next';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import unusedImports from 'eslint-plugin-unused-imports';
+import otmPlugin from './eslint-plugin-otm/index.js';
 
 export default [
   {
@@ -27,6 +29,8 @@ export default [
       'react-hooks': reactHooks,
       '@next/next': nextPlugin,
       'jsx-a11y': jsxA11y,
+      'unused-imports': unusedImports,
+      otm: otmPlugin,
     },
     rules: {
       ...tseslint.configs['flat/recommended'].rules,
@@ -42,11 +46,21 @@ export default [
       '@typescript-eslint/no-var-requires': 'warn',
       '@typescript-eslint/require-await': 'off',
       '@typescript-eslint/no-misused-promises': 'off', // Disabled due to type information requirements
+      // Unused imports cleanup
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      ],
+      // Console.log restriction
+      'no-console': ['error', { allow: ['warn', 'error'] }],
+      // No emoji policy
+      // 'otm/no-emoji': 'error', // Disabled - use CSS to control emoji display
       'no-restricted-syntax': [
         'error',
         {
           selector: "MemberExpression[object.name='process'][property.name='env']",
-          message: "🚫 Do not use `process.env` directly. Use `env` from '@/env' instead.",
+          message: " Do not use `process.env` directly. Use `env` from '@/env' instead.",
         },
       ],
       'drizzle/enforce-delete-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],

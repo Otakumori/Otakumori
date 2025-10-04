@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
 import path from 'path';
 
-console.log('🔧 Fixing Clerk auth() calls to use await...');
+console.log(' Fixing Clerk auth() calls to use await...');
 
 // Recursively find all TypeScript files
 function findTsFiles(dir, files = []) {
@@ -61,13 +61,13 @@ for (const file of files) {
 
       if (hasChanges) {
         writeFileSync(file, newContent, 'utf8');
-        console.log(`✅ Fixed: ${file}`);
+        console.log(` Fixed: ${file}`);
         fixedCount++;
       }
     }
   } catch (error) {
-    console.error(`❌ Error processing ${file}:`, error.message);
+    console.error(` Error processing ${file}:`, error.message);
   }
 }
 
-console.log(`\n🎉 Fixed ${fixedCount} files!`);
+console.log(`\n Fixed ${fixedCount} files!`);

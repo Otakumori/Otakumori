@@ -115,13 +115,13 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
           >
             <div className="text-4xl">
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
             </div>
           </motion.div>

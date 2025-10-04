@@ -9,7 +9,7 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🧪 Testing Admin Dashboard & Resend Setup...\n');
+console.log(' Testing Admin Dashboard & Resend Setup...\n');
 
 // Check environment variables
 console.log('1. Checking environment variables...');
@@ -26,12 +26,12 @@ if (fs.existsSync(envPath)) {
 
   const missing = requiredVars.filter((varName) => !envContent.includes(varName));
   if (missing.length === 0) {
-    console.log('✅ All required environment variables found');
+    console.log(' All required environment variables found');
   } else {
-    console.log('❌ Missing environment variables:', missing.join(', '));
+    console.log(' Missing environment variables:', missing.join(', '));
   }
 } else {
-  console.log('❌ .env.local file not found');
+  console.log(' .env.local file not found');
 }
 
 // Check if dependencies are installed
@@ -42,13 +42,13 @@ try {
   const missingDeps = requiredDeps.filter((dep) => !packageJson.dependencies[dep]);
 
   if (missingDeps.length === 0) {
-    console.log('✅ All required dependencies installed');
+    console.log(' All required dependencies installed');
   } else {
-    console.log('❌ Missing dependencies:', missingDeps.join(', '));
+    console.log(' Missing dependencies:', missingDeps.join(', '));
     console.log('Run: npm install ' + missingDeps.join(' '));
   }
 } catch (err) {
-  console.log('❌ Error reading package.json:', err.message);
+  console.log(' Error reading package.json:', err.message);
 }
 
 // Check if admin files exist
@@ -69,9 +69,9 @@ const adminFiles = [
 
 adminFiles.forEach((file) => {
   if (fs.existsSync(file)) {
-    console.log(`✅ ${file}`);
+    console.log(` ${file}`);
   } else {
-    console.log(`❌ ${file} - missing`);
+    console.log(` ${file} - missing`);
   }
 });
 
@@ -79,10 +79,10 @@ adminFiles.forEach((file) => {
 console.log('\n4. Checking database migration...');
 const migrationFile = 'supabase/migrations/20241201000000_admin_tables.sql';
 if (fs.existsSync(migrationFile)) {
-  console.log('✅ Database migration file exists');
+  console.log(' Database migration file exists');
   console.log('   Run this SQL in your Supabase SQL editor');
 } else {
-  console.log('❌ Database migration file missing');
+  console.log(' Database migration file missing');
 }
 
 // Check Stripe webhook
@@ -91,19 +91,19 @@ const webhookFile = 'app/api/webhooks/stripe/route.ts';
 if (fs.existsSync(webhookFile)) {
   const content = fs.readFileSync(webhookFile, 'utf8');
   if (content.includes('sendOrderConfirmation') && content.includes('createPrintifyOrder')) {
-    console.log('✅ Stripe webhook updated with Resend integration');
+    console.log(' Stripe webhook updated with Resend integration');
   } else {
-    console.log('❌ Stripe webhook needs Resend integration');
+    console.log(' Stripe webhook needs Resend integration');
   }
 } else {
-  console.log('❌ Stripe webhook file not found');
+  console.log(' Stripe webhook file not found');
 }
 
-console.log('\n🎯 Next Steps:');
+console.log('\n Next Steps:');
 console.log('1. Add missing environment variables to .env.local');
 console.log('2. Run the database migration in Supabase');
 console.log('3. Set your Clerk user role to "admin"');
 console.log('4. Test the admin dashboard at /admin');
 console.log('5. Test email sending with a Stripe webhook');
 
-console.log('\n📚 See ADMIN_SETUP.md for detailed instructions');
+console.log('\n See ADMIN_SETUP.md for detailed instructions');

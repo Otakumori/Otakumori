@@ -33,7 +33,7 @@ const ACHIEVEMENT_DEFINITIONS: Record<string, any> = {
     category: 'gaming',
     rarity: 'common',
     points: 10,
-    icon: '🌸',
+    icon: '',
     requirements: { gamesPlayed: 1 },
   },
   'memory-master': {
@@ -43,7 +43,7 @@ const ACHIEVEMENT_DEFINITIONS: Record<string, any> = {
     category: 'gaming',
     rarity: 'rare',
     points: 50,
-    icon: '🧠',
+    icon: '',
     requirements: { gameId: 'memory-match', accuracy: 1.0 },
   },
   // Add more achievements as needed

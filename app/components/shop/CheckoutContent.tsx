@@ -286,7 +286,7 @@ export default function CheckoutContent() {
             You'll be redirected to Stripe for secure payment processing.
           </p>
           <div className="flex items-center gap-2 text-sm text-zinc-400">
-            <span>🔒</span>
+            <span></span>
             <span>Secure payment powered by Stripe</span>
           </div>
         </GlassPanel>

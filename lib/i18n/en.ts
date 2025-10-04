@@ -304,7 +304,7 @@ export const en = {
   // Footer
   footer: {
     copyright: "© {year} Otaku-mori. All petals accounted for. Don't go hollow.",
-    trademark: 'Otakumori ™ made with ♡',
+    trademark: 'Otakumori ™ made with ',
     links: {
       leaveSign: 'Leave a sign',
       cookieSettings: 'Cookie Settings',

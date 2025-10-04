@@ -1,5 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { type WebhookEvent } from '@clerk/nextjs/server';
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   if (eventType === 'user.created') {
     const { id, email_addresses, public_metadata } = evt.data;
 
-    console.log(`New user created: ${id}`);
+    // New user created
 
     // Set default avatar preset if not already set
     if (!public_metadata?.avatarPreset) {
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        console.log(`Set default avatar preset for user: ${id}`);
+        // Set default avatar preset for user
       } catch (error) {
         console.error('Error setting avatar preset:', error);
         // Don't fail the webhook if avatar preset setting fails
@@ -98,11 +98,11 @@ export async function POST(req: NextRequest) {
 
   if (eventType === 'user.updated') {
     const { id, public_metadata } = evt.data;
-    console.log(`User updated: ${id}`);
+    // User updated
 
     // Log avatar preset changes for debugging
     if (public_metadata?.avatarPreset) {
-      console.log(`Avatar preset updated for user: ${id}`, public_metadata.avatarPreset);
+      // Avatar preset updated for user
     }
   }
 

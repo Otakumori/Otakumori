@@ -260,10 +260,10 @@ export default function LeaderboardSystemV2({
   }, []);
 
   const getRankIcon = useCallback((rank: number): string => {
-    if (rank === 1) return '👑';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
-    if (rank <= 10) return '⭐';
+    if (rank === 1) return '';
+    if (rank === 2) return '';
+    if (rank === 3) return '';
+    if (rank <= 10) return '';
     return '';
   }, []);
 
@@ -396,8 +396,8 @@ export default function LeaderboardSystemV2({
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="text-white font-medium">{entry.displayName}</span>
-                    {entry.verified && <span className="text-blue-400 text-sm">✓</span>}
-                    {entry.isFriend && <span className="text-green-400 text-sm">👥</span>}
+                    {entry.verified && <span className="text-blue-400 text-sm"></span>}
+                    {entry.isFriend && <span className="text-green-400 text-sm"></span>}
                   </div>
                   <div className="text-white/60 text-sm">
                     {entry.achievements.length} achievements
@@ -427,7 +427,7 @@ export default function LeaderboardSystemV2({
             className="fixed bottom-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 border border-white/20 shadow-2xl z-50 max-w-sm"
           >
             <div className="flex items-center space-x-3">
-              <div className="text-2xl">🏆</div>
+              <div className="text-2xl"></div>
               <div>
                 <h4 className="text-white font-semibold">Achievement Unlocked!</h4>
                 <p className="text-white/80 text-sm">{achievement.name}</p>

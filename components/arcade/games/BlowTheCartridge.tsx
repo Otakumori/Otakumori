@@ -92,7 +92,7 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
           >
             <div className="text-4xl">
               <span role="img" aria-label="Wind effect">
-                💨
+                
               </span>
             </div>
           </motion.div>

@@ -56,7 +56,7 @@ async function testRoute(route: string): Promise<TestResult> {
 }
 
 async function runSmokeTests() {
-  console.log('🚀 Starting Otaku-mori smoke tests...\n');
+  console.log(' Starting Otaku-mori smoke tests...\n');
 
   const routes = [
     '/',
@@ -75,7 +75,7 @@ async function runSmokeTests() {
     const result = await testRoute(route);
     results.push(result);
 
-    const statusIcon = result.status >= 200 && result.status < 300 ? '✅' : '❌';
+    const statusIcon = result.status >= 200 && result.status < 300 ? '' : '';
     console.log(`  ${statusIcon} ${result.status} (${result.responseTime}ms)`);
 
     if (result.error) {
@@ -86,17 +86,17 @@ async function runSmokeTests() {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  console.log('\n📊 Test Results Summary:');
+  console.log('\n Test Results Summary:');
   console.log('========================');
 
   const successful = results.filter((r) => r.status >= 200 && r.status < 300);
   const failed = results.filter((r) => r.status < 200 || r.status >= 300);
 
-  console.log(`✅ Successful: ${successful.length}/${results.length}`);
-  console.log(`❌ Failed: ${failed.length}/${results.length}`);
+  console.log(` Successful: ${successful.length}/${results.length}`);
+  console.log(` Failed: ${failed.length}/${results.length}`);
 
   if (failed.length > 0) {
-    console.log('\n❌ Failed Routes:');
+    console.log('\n Failed Routes:');
     failed.forEach((result) => {
       console.log(`  ${result.route}: ${result.status} - ${result.error || 'HTTP Error'}`);
     });
@@ -110,23 +110,23 @@ async function runSmokeTests() {
   if (printifyResult?.data) {
     const source = printifyResult.data.source;
     if (source === 'mock') {
-      console.log('\n⚠️  WARNING: Printify API is returning mock data!');
+      console.log('\n  WARNING: Printify API is returning mock data!');
       console.log('   Check environment variables: PRINTIFY_API_KEY, PRINTIFY_SHOP_ID');
     } else if (source === 'live') {
-      console.log('\n✅ Printify API is returning live data');
+      console.log('\n Printify API is returning live data');
     }
   }
 
   const healthResult = results.find((r) => r.route === '/api/health');
   if (healthResult?.data) {
-    console.log('\n🏥 Health Check Status:');
+    console.log('\n Health Check Status:');
     console.log(`   Overall: ${healthResult.data.status}`);
     console.log(`   Clerk: ${healthResult.data.services?.clerk}`);
     console.log(`   Database: ${healthResult.data.services?.database}`);
     console.log(`   Printify: ${healthResult.data.services?.printify}`);
   }
 
-  console.log('\n🎯 Next Steps:');
+  console.log('\n Next Steps:');
   if (failed.length === 0) {
     console.log('   All routes are working! Ready for production.');
   } else {

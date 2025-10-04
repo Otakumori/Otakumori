@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { PhoneCall } from './PhoneCall';
 import { useSound } from '@/lib/hooks/useSound';
 import { useHaptic } from '@/lib/hooks/useHaptic';
@@ -28,7 +28,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🎮',
+      avatar: '🃝',
       role: 'Your Guide',
     },
     messages: [
@@ -47,7 +47,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🎮',
+      avatar: '🃝',
       role: 'Your Guide',
     },
     messages: [
@@ -68,7 +68,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🎮',
+      avatar: '🃝',
       role: 'Your Guide',
     },
     messages: [
@@ -89,7 +89,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🎮',
+      avatar: '🃝',
       role: 'Your Guide',
     },
     messages: [

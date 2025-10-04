@@ -106,7 +106,7 @@ export const SPECIFIC_CONTENT_FIXES = {
   footer: {
     copyright: (year: number) =>
       `© ${year} Otaku-mori. All petals accounted for. Don't go hollow.`,
-    trademark: 'Otakumori ™ made with ♡',
+    trademark: 'Otakumori ™ made with ',
   },
   soapstone: {
     cta: 'Leave a sign for fellow travelers',

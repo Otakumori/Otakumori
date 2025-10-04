@@ -77,7 +77,7 @@ export default async function AccountPage() {
             </h2>
             <UsernameSuggestion
               onUsernameSelect={(username) => {
-                console.log('Username selected:', username);
+                // Username selected
                 // TODO: Implement username update logic
               }}
             />
@@ -452,7 +452,7 @@ export default async function AccountPage() {
               }
             </h2>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🌸</span>
+              <span className="text-2xl"></span>
               <span className="text-lg font-medium text-gray-900">
                 {
                   <>

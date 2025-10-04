@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
-import { t } from '../../lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 
 type Product = {

@@ -69,8 +69,8 @@ export default function ExternalSyncPage() {
               <h3 className="font-medium">Clerk Users</h3>
               <p className={results.clerk.success ? 'text-green-600' : 'text-red-600'}>
                 {results.clerk.success
-                  ? `✅ Synced ${results.clerk.count} users`
-                  : `❌ Error: ${results.clerk.error}`}
+                  ? ` Synced ${results.clerk.count} users`
+                  : ` Error: ${results.clerk.error}`}
               </p>
             </div>
 
@@ -78,8 +78,8 @@ export default function ExternalSyncPage() {
               <h3 className="font-medium">Stripe Customers</h3>
               <p className={results.stripeCustomers.success ? 'text-green-600' : 'text-red-600'}>
                 {results.stripeCustomers.success
-                  ? `✅ Synced ${results.stripeCustomers.count} customers`
-                  : `❌ Error: ${results.stripeCustomers.error}`}
+                  ? ` Synced ${results.stripeCustomers.count} customers`
+                  : ` Error: ${results.stripeCustomers.error}`}
               </p>
             </div>
 
@@ -87,8 +87,8 @@ export default function ExternalSyncPage() {
               <h3 className="font-medium">Stripe Products</h3>
               <p className={results.stripeProducts.success ? 'text-green-600' : 'text-red-600'}>
                 {results.stripeProducts.success
-                  ? `✅ Synced ${results.stripeProducts.count} products`
-                  : `❌ Error: ${results.stripeProducts.error}`}
+                  ? ` Synced ${results.stripeProducts.count} products`
+                  : ` Error: ${results.stripeProducts.error}`}
               </p>
             </div>
 
@@ -96,8 +96,8 @@ export default function ExternalSyncPage() {
               <h3 className="font-medium">Printify Products</h3>
               <p className={results.printifyProducts.success ? 'text-green-600' : 'text-red-600'}>
                 {results.printifyProducts.success
-                  ? `✅ Synced ${results.printifyProducts.count} products`
-                  : `❌ Error: ${results.printifyProducts.error}`}
+                  ? ` Synced ${results.printifyProducts.count} products`
+                  : ` Error: ${results.printifyProducts.error}`}
               </p>
             </div>
           </div>

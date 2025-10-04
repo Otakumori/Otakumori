@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌸 Seeding products...');
+  console.log(' Seeding products...');
 
   // Basic example product
   const product = await prisma.product.upsert({
@@ -39,7 +39,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Products seeded');
+  console.log(' Products seeded');
 }
 
 main()

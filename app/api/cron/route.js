@@ -25,7 +25,7 @@ function log(message, level = 'INFO', error = null) {
     ...(error && { error: error.message, stack: error.stack }),
   };
 
-  console.log(`[${timestamp}] ${level}: ${message}`, error ? error : '');
+  // Log entry written
 
   // Write to log file
   const logDir = path.join(process.cwd(), 'logs');

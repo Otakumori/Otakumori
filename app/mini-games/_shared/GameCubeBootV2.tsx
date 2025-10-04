@@ -378,7 +378,7 @@ export default function GameCubeBootV2({
               animate={{ scale: 1, rotate: 360 }}
               transition={{ duration: 1.5 }}
             >
-              🌸
+              
             </motion.div>
           ))}
         </div>

@@ -61,19 +61,19 @@ const missingVars = {
   PRINTIFY_WEBHOOK_SECRET: ['production', 'preview', 'development'],
 };
 
-console.log('🔑 ENVIRONMENT VARIABLE VALUES FOR VERCEL\n');
+console.log(' ENVIRONMENT VARIABLE VALUES FOR VERCEL\n');
 console.log('Copy these values when running the vercel env add commands:\n');
 
 const localEnv = loadLocalEnv();
 
 for (const [key, environments] of Object.entries(missingVars)) {
-  console.log(`📋 ${key}:`);
+  console.log(` ${key}:`);
 
   if (localEnv[key]) {
     console.log(`   Value: ${localEnv[key]}`);
   } else {
     console.log(
-      `   ⚠️  Not found in local files - you'll need to get this from your service provider`,
+      `     Not found in local files - you'll need to get this from your service provider`,
     );
   }
 
@@ -81,7 +81,7 @@ for (const [key, environments] of Object.entries(missingVars)) {
   console.log('');
 }
 
-console.log('🚀 COMMANDS TO RUN:');
+console.log(' COMMANDS TO RUN:');
 console.log('');
 
 for (const [key, environments] of Object.entries(missingVars)) {
@@ -90,4 +90,4 @@ for (const [key, environments] of Object.entries(missingVars)) {
   }
 }
 
-console.log('\n💡 After adding all variables, redeploy your application!');
+console.log('\n After adding all variables, redeploy your application!');

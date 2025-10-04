@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import StarfieldPurple from '../../components/StarfieldPurple';
 // import NavBar from '../../components/NavBar'; // Removed to prevent nav overlay
 import FooterDark from '../../components/FooterDark';
 import ProductDetail from '../../components/shop/ProductDetail';
-import { t } from '@/lib/microcopy';
 
 export const runtime = 'nodejs';
 

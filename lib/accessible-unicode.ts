@@ -7,12 +7,12 @@
 
 export const UNICODE = {
   // Hearts
-  HEART: '♥',
-  HEART_OUTLINE: '♡',
+  HEART: '',
+  HEART_OUTLINE: '',
 
   // Stars
-  STAR: '★',
-  STAR_OUTLINE: '☆',
+  STAR: '',
+  STAR_OUTLINE: '',
 
   // Arrows
   ARROW_RIGHT: '→',
@@ -23,14 +23,14 @@ export const UNICODE = {
   DOUBLE_ARROW_LEFT: '⇐',
 
   // Checkmarks
-  CHECK: '✓',
-  CHECK_BOLD: '✔',
-  CROSS: '✗',
-  CROSS_BOLD: '✘',
+  CHECK: '',
+  CHECK_BOLD: '',
+  CROSS: '',
+  CROSS_BOLD: '',
 
   // Symbols
   EXCLAMATION: '!',
-  WARNING: '⚠',
+  WARNING: '',
   INFO: 'ℹ',
   QUESTION: '?',
 
@@ -43,7 +43,7 @@ export const UNICODE = {
   CIRCLE: '●',
   SQUARE: '■',
   TRIANGLE: '▲',
-  DIAMOND: '♦',
+  DIAMOND: '',
 
   // Currency
   DOLLAR: '$',
@@ -56,29 +56,29 @@ export const UNICODE = {
   HOURGLASS: '⌛',
 
   // Weather
-  SUN: '☀',
-  CLOUD: '☁',
-  SNOW: '❄',
+  SUN: '',
+  CLOUD: '',
+  SNOW: '',
 
   // Tools
-  GEAR: '⚙',
-  SCISSORS: '✂',
+  GEAR: '',
+  SCISSORS: '',
 
   // Cards
-  SPADE: '♠',
-  CLUB: '♣',
+  SPADE: '',
+  CLUB: '',
 
   // Faces
-  SMILE: '☺',
-  FROWN: '☹',
+  SMILE: '',
+  FROWN: '',
 
   // Special for Otakumori
-  PETAL: '🏵',
-  GAME: '🎮',
-  MAGIC: '✨',
-  CRYSTAL: '🔮',
+  PETAL: '',
+  GAME: '',
+  MAGIC: '',
+  CRYSTAL: '',
   INFINITY: '∞',
-  LIGHTNING: '⚡',
+  LIGHTNING: '',
   FIRE: '⽕',
 } as const;
 

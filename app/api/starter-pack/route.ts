@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { appUrl } from '@/lib/canonical';
-import { env } from '@/env';
 
 const prisma = new PrismaClient();
 
@@ -29,7 +28,7 @@ export async function POST(req: Request) {
       `;
     } catch (dbError) {
       // If Subscriber table doesn't exist yet, that's okay for now
-      console.log('Subscriber table not found, skipping database storage');
+      // Subscriber table not found, skipping database storage
     }
 
     // Return the starter pack download URL

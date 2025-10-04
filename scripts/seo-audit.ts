@@ -58,16 +58,16 @@ class SEOAuditor {
   private warnings: string[] = [];
 
   async audit(): Promise<boolean> {
-    console.log('🔍 Starting SEO audit...');
+    console.log('⌕ Starting SEO audit...');
 
     for (const route of TARGET_ROUTES) {
       try {
-        console.log(`\n📄 Auditing ${route}...`);
+        console.log(`\n Auditing ${route}...`);
         const result = await this.auditRoute(route);
         this.results.push(result);
         this.validateResult(result);
       } catch (error) {
-        this.errors.push(`❌ Failed to audit ${route}: ${error}`);
+        this.errors.push(` Failed to audit ${route}: ${error}`);
       }
     }
 
@@ -201,80 +201,80 @@ class SEOAuditor {
 
     // Title validation
     if (!result.title.present) {
-      this.errors.push(`❌ ${route}: Missing title tag`);
+      this.errors.push(` ${route}: Missing title tag`);
     } else if (!result.title.valid) {
       this.warnings.push(
-        `⚠️  ${route}: Title length ${result.title.length} chars (should be 40-60)`,
+        `  ${route}: Title length ${result.title.length} chars (should be 40-60)`,
       );
     }
 
     // Description validation
     if (!result.description.present) {
-      this.errors.push(`❌ ${route}: Missing meta description`);
+      this.errors.push(` ${route}: Missing meta description`);
     } else if (!result.description.valid) {
       this.warnings.push(
-        `⚠️  ${route}: Description length ${result.description.length} chars (should be 120-160)`,
+        `  ${route}: Description length ${result.description.length} chars (should be 120-160)`,
       );
     }
 
     // H1 validation
     if (!result.h1.valid) {
       if (result.h1.count === 0) {
-        this.errors.push(`❌ ${route}: Missing H1 tag`);
+        this.errors.push(` ${route}: Missing H1 tag`);
       } else if (result.h1.count > 1) {
-        this.errors.push(`❌ ${route}: Multiple H1 tags (${result.h1.count})`);
+        this.errors.push(` ${route}: Multiple H1 tags (${result.h1.count})`);
       }
     }
 
     // Canonical validation
     if (!result.canonical.present) {
-      this.warnings.push(`⚠️  ${route}: Missing canonical URL`);
+      this.warnings.push(`  ${route}: Missing canonical URL`);
     }
 
     // Open Graph validation
     const og = result.openGraph;
-    if (!og.title) this.warnings.push(`⚠️  ${route}: Missing og:title`);
-    if (!og.description) this.warnings.push(`⚠️  ${route}: Missing og:description`);
-    if (!og.image) this.warnings.push(`⚠️  ${route}: Missing og:image`);
-    if (!og.type) this.warnings.push(`⚠️  ${route}: Missing og:type`);
+    if (!og.title) this.warnings.push(`  ${route}: Missing og:title`);
+    if (!og.description) this.warnings.push(`  ${route}: Missing og:description`);
+    if (!og.image) this.warnings.push(`  ${route}: Missing og:image`);
+    if (!og.type) this.warnings.push(`  ${route}: Missing og:type`);
 
     // JSON-LD validation for key pages
     if (['/shop', '/mini-games', '/'].includes(route) && !result.jsonLd.present) {
-      this.warnings.push(`⚠️  ${route}: Missing JSON-LD structured data`);
+      this.warnings.push(`  ${route}: Missing JSON-LD structured data`);
     }
   }
 
   private printResults(): void {
-    console.log('\n📊 SEO Audit Results:');
+    console.log('\n SEO Audit Results:');
     console.log('========================');
 
     this.results.forEach((result) => {
-      console.log(`\n📄 ${result.route}`);
-      console.log(`   Title: ${result.title.present ? '✅' : '❌'} (${result.title.length} chars)`);
+      console.log(`\n ${result.route}`);
+      console.log(`   Title: ${result.title.present ? '' : ''} (${result.title.length} chars)`);
       console.log(
-        `   Description: ${result.description.present ? '✅' : '❌'} (${result.description.length} chars)`,
+        `   Description: ${result.description.present ? '' : ''} (${result.description.length} chars)`,
       );
-      console.log(`   H1: ${result.h1.valid ? '✅' : '❌'} (${result.h1.count} found)`);
-      console.log(`   Canonical: ${result.canonical.present ? '✅' : '❌'}`);
+      console.log(`   H1: ${result.h1.valid ? '' : ''} (${result.h1.count} found)`);
+      console.log(`   Canonical: ${result.canonical.present ? '' : ''}`);
       console.log(
         `   Open Graph: ${Object.values(result.openGraph).filter(Boolean).length}/4 tags`,
       );
       console.log(
-        `   JSON-LD: ${result.jsonLd.present ? '✅' : '❌'} (${result.jsonLd.types.join(', ')})`,
+        `   JSON-LD: ${result.jsonLd.present ? '' : ''} (${result.jsonLd.types.join(', ')})`,
       );
     });
 
     if (this.warnings.length > 0) {
-      console.log('\n⚠️  Warnings:');
+      console.log('\n  Warnings:');
       this.warnings.forEach((warning) => console.log(warning));
     }
 
     if (this.errors.length > 0) {
-      console.log('\n❌ Errors:');
+      console.log('\n Errors:');
       this.errors.forEach((error) => console.log(error));
-      console.log(`\n💥 SEO audit failed with ${this.errors.length} errors!`);
+      console.log(`\n SEO audit failed with ${this.errors.length} errors!`);
     } else {
-      console.log('\n🎉 SEO audit passed!');
+      console.log('\n SEO audit passed!');
     }
 
     // Summary stats
@@ -283,7 +283,7 @@ class SEOAuditor {
       0,
       Math.round(((this.results.length * 6 - totalIssues) / (this.results.length * 6)) * 100),
     );
-    console.log(`\n📈 SEO Score: ${scorePercentage}%`);
+    console.log(`\n SEO Score: ${scorePercentage}%`);
   }
 }
 
@@ -293,7 +293,7 @@ async function main() {
     const success = await auditor.audit();
     process.exit(success ? 0 : 1);
   } catch (error) {
-    console.error('💥 SEO audit script failed:', error);
+    console.error(' SEO audit script failed:', error);
     process.exit(1);
   }
 }

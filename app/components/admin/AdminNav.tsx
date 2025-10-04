@@ -10,15 +10,15 @@ interface AdminLayoutProps {
 }
 
 const adminNavItems = [
-  { href: '/admin', label: 'Dashboard', icon: '📊' },
-  { href: '/admin/users', label: 'Users', icon: '👥' },
-  { href: '/admin/products', label: 'Products', icon: '🛍️' },
-  { href: '/admin/orders', label: 'Orders', icon: '📦' },
-  { href: '/admin/reviews', label: 'Reviews', icon: '⭐' },
-  { href: '/admin/runes', label: 'Runes', icon: '🔮' },
-  { href: '/admin/rewards', label: 'Rewards', icon: '🎁' },
-  { href: '/admin/burst', label: 'Burst', icon: '💥' },
-  { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
+  { href: '/admin', label: 'Dashboard', icon: '' },
+  { href: '/admin/users', label: 'Users', icon: '' },
+  { href: '/admin/products', label: 'Products', icon: '' },
+  { href: '/admin/orders', label: 'Orders', icon: '' },
+  { href: '/admin/reviews', label: 'Reviews', icon: '' },
+  { href: '/admin/runes', label: 'Runes', icon: '' },
+  { href: '/admin/rewards', label: 'Rewards', icon: '' },
+  { href: '/admin/burst', label: 'Burst', icon: '' },
+  { href: '/admin/settings', label: 'Settings', icon: '' },
 ];
 
 export function AdminLayout({ children }: AdminLayoutProps) {

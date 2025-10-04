@@ -266,7 +266,7 @@ export default function Profile() {
             </>
           }
           <span role="img" aria-label="cherry blossom">
-            🌸
+            
           </span>{' '}
           {petals}
         </p>

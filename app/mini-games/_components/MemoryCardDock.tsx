@@ -200,7 +200,7 @@ export default function MemoryCardDock({ className = '' }: MemoryCardDockProps) 
                 className="text-purple-300 hover:text-white transition-colors text-xl"
                 aria-label="Close detail view"
               >
-                ✕
+                
               </button>
             </div>
 

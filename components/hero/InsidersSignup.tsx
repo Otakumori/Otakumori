@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Sparkles, Crown, Eye, Lock } from 'lucide-react';
+import { Mail, Crown, Eye, Lock } from 'lucide-react';
 
 export function InsidersSignup() {
   const [email, setEmail] = useState('');
@@ -135,7 +135,7 @@ export function InsidersSignup() {
               <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm text-center">
                 <div className="mb-3 text-3xl">
                   <span role="img" aria-label="Cherry blossom">
-                    🌸
+                    
                   </span>
                 </div>
                 <h4 className="mb-2 text-lg font-semibold text-white">Early Access</h4>
@@ -145,7 +145,7 @@ export function InsidersSignup() {
               <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm text-center">
                 <div className="mb-3 text-3xl">
                   <span role="img" aria-label="Video game controller">
-                    🎮
+                    
                   </span>
                 </div>
                 <h4 className="mb-2 text-lg font-semibold text-white">Hidden Petals</h4>
@@ -155,7 +155,7 @@ export function InsidersSignup() {
               <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm text-center">
                 <div className="mb-3 text-3xl">
                   <span role="img" aria-label="Lightning bolt">
-                    ⚡
+                    
                   </span>
                 </div>
                 <h4 className="mb-2 text-lg font-semibold text-white">Inner Circle</h4>

@@ -7,11 +7,11 @@
 
 const VERCEL_URL = process.argv[2] || 'https://otaku-mori-mamd260cs-otaku-mori-babe.vercel.app';
 
-console.log('🔍 Testing Vercel Environment Variables...\n');
+console.log('⌕ Testing Vercel Environment Variables...\n');
 
 async function testVercelEnv() {
   try {
-    console.log(`🌐 Testing: ${VERCEL_URL}/api/debug-env`);
+    console.log(` Testing: ${VERCEL_URL}/api/debug-env`);
 
     const response = await fetch(`${VERCEL_URL}/api/debug-env`, {
       headers: {
@@ -22,15 +22,15 @@ async function testVercelEnv() {
     const data = await response.json();
 
     if (response.ok && data.ok) {
-      console.log('✅ Debug endpoint accessible\n');
+      console.log(' Debug endpoint accessible\n');
 
-      console.log('📊 Environment Status:');
+      console.log(' Environment Status:');
       Object.entries(data.data.envStatus).forEach(([key, value]) => {
-        const status = value === 'Set' ? '✅' : value === 'Missing' ? '❌' : '⚠️';
+        const status = value === 'Set' ? '' : value === 'Missing' ? '' : '';
         console.log(`  ${status} ${key}: ${value}`);
       });
 
-      console.log('\n🌍 Domain Info:');
+      console.log('\n Domain Info:');
       console.log(`  Current Domain: ${data.data.domainInfo.currentDomain}`);
       console.log(
         `  Using Production Clerk: ${data.data.domainInfo.isProductionClerk ? 'Yes' : 'No'}`,
@@ -43,25 +43,25 @@ async function testVercelEnv() {
         .map(([key]) => key);
 
       if (missing.length > 0) {
-        console.log('\n❌ Missing Environment Variables:');
+        console.log('\n Missing Environment Variables:');
         missing.forEach((key) => console.log(`  - ${key}`));
-        console.log('\n💡 Add these to your Vercel project settings under Environment Variables');
+        console.log('\n Add these to your Vercel project settings under Environment Variables');
       } else {
-        console.log('\n🎉 All critical environment variables are configured!');
+        console.log('\n All critical environment variables are configured!');
       }
     } else {
-      console.error('❌ Debug endpoint failed');
+      console.error(' Debug endpoint failed');
       console.error('Status:', response.status);
       console.error('Response:', data);
     }
   } catch (error) {
-    console.error('❌ Network error:', error.message);
+    console.error(' Network error:', error.message);
   }
 }
 
 // Test Printify API specifically
 async function testPrintifyAPI() {
-  console.log('\n🧪 Testing Printify API on Vercel...');
+  console.log('\n Testing Printify API on Vercel...');
 
   try {
     const response = await fetch(`${VERCEL_URL}/api/v1/printify/products`, {
@@ -73,17 +73,17 @@ async function testPrintifyAPI() {
     const data = await response.json();
 
     if (response.ok && data.ok) {
-      console.log('✅ Printify API working on Vercel');
-      console.log(`📦 Found ${data.data.length} products`);
+      console.log(' Printify API working on Vercel');
+      console.log(` Found ${data.data.length} products`);
     } else {
-      console.error('❌ Printify API failed on Vercel');
+      console.error(' Printify API failed on Vercel');
       console.error('Error:', data.error);
       if (data.details) {
         console.error('Details:', data.details);
       }
     }
   } catch (error) {
-    console.error('❌ Printify API test error:', error.message);
+    console.error(' Printify API test error:', error.message);
   }
 }
 

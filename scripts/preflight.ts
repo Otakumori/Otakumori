@@ -252,12 +252,12 @@ async function generateReport(results: PreflightResult[]) {
       <tr>
         <td>${r.url}</td>
         <td class="${r.status >= 200 && r.status < 400 ? 'pass' : 'fail'}">${r.status}</td>
-        <td class="${r.assertions.headerVisible ? 'pass' : 'fail'}">${r.assertions.headerVisible ? '✓' : '✗'}</td>
-        <td class="${r.assertions.footerVisible ? 'pass' : 'fail'}">${r.assertions.footerVisible ? '✓' : '✗'}</td>
-        <td class="${r.assertions.authButtonRendered ? 'pass' : 'fail'}">${r.assertions.authButtonRendered ? '✓' : '✗'}</td>
-        <td class="${r.assertions.purpleStarsPresent ? 'pass' : 'fail'}">${r.assertions.purpleStarsPresent ? '✓' : '✗'}</td>
-        <td class="${r.assertions.productCardVisible ? 'pass' : 'fail'}">${r.assertions.productCardVisible ? '✓' : '✗'}</td>
-        <td class="${r.assertions.petalsContainerClickable ? 'pass' : 'fail'}">${r.assertions.petalsContainerClickable ? '✓' : '✗'}</td>
+        <td class="${r.assertions.headerVisible ? 'pass' : 'fail'}">${r.assertions.headerVisible ? '' : ''}</td>
+        <td class="${r.assertions.footerVisible ? 'pass' : 'fail'}">${r.assertions.footerVisible ? '' : ''}</td>
+        <td class="${r.assertions.authButtonRendered ? 'pass' : 'fail'}">${r.assertions.authButtonRendered ? '' : ''}</td>
+        <td class="${r.assertions.purpleStarsPresent ? 'pass' : 'fail'}">${r.assertions.purpleStarsPresent ? '' : ''}</td>
+        <td class="${r.assertions.productCardVisible ? 'pass' : 'fail'}">${r.assertions.productCardVisible ? '' : ''}</td>
+        <td class="${r.assertions.petalsContainerClickable ? 'pass' : 'fail'}">${r.assertions.petalsContainerClickable ? '' : ''}</td>
         <td class="${r.errors.length === 0 ? 'pass' : 'fail'}">${r.errors.length}</td>
       </tr>
     `,
@@ -276,13 +276,13 @@ async function generateReport(results: PreflightResult[]) {
 
 async function main() {
   try {
-    console.log('🚀 Starting preflight checks...');
+    console.log(' Starting preflight checks...');
     await ensureArtifactsDir();
 
     const results = await runPreflight();
     const report = await generateReport(results);
 
-    console.log(`\n📊 Preflight Summary:`);
+    console.log(`\n Preflight Summary:`);
     console.log(`   Total pages: ${report.summary.totalPages}`);
     console.log(`   Passed: ${report.summary.passed}`);
     console.log(`   Failed: ${report.summary.failed}`);
@@ -299,17 +299,17 @@ async function main() {
     );
 
     if (criticalFailures.length > 0) {
-      console.log('\n❌ Critical failures detected:');
+      console.log('\n Critical failures detected:');
       criticalFailures.forEach((failure) => {
         console.log(`   ${failure.url}: ${failure.errors.join(', ')}`);
       });
       process.exit(1);
     }
 
-    console.log('\n✅ All preflight checks passed!');
-    console.log(`📁 Reports saved to: ${ARTIFACTS_DIR}`);
+    console.log('\n All preflight checks passed!');
+    console.log(` Reports saved to: ${ARTIFACTS_DIR}`);
   } catch (error) {
-    console.error('❌ Preflight failed:', error);
+    console.error(' Preflight failed:', error);
     process.exit(1);
   }
 }

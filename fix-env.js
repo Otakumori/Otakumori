@@ -28,7 +28,7 @@ envContent = envContent.replace(
 // Write the updated content back
 fs.writeFileSync(envPath, envContent);
 
-console.log('✅ Updated sign-in URL to: /sign-in');
-console.log('✅ Updated sign-up URL to: /sign-up');
+console.log(' Updated sign-in URL to: /sign-in');
+console.log(' Updated sign-up URL to: /sign-up');
 console.log('=== Environment file updated! ===');
 console.log('Please restart your dev server: npm run dev');

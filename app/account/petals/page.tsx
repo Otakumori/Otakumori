@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { ShoppingBag, Star, Crown, Sparkles, Coins, Filter, Search, Gamepad2 } from 'lucide-react';
+import { ShoppingBag, Sparkles, Coins, Search, Gamepad2 } from 'lucide-react';
 
 interface ShopItem {
   id: string;
@@ -32,11 +32,11 @@ interface PetalStoreResponse {
 }
 
 const CATEGORIES = [
-  { id: 'all', name: 'All Items', icon: '🎁' },
-  { id: 'COSMETIC', name: 'Cosmetics', icon: '✨' },
-  { id: 'OVERLAY', name: 'Overlays', icon: '🌈' },
-  { id: 'TEXT', name: 'Text Effects', icon: '💬' },
-  { id: 'CURSOR', name: 'Cursors', icon: '👆' },
+  { id: 'all', name: 'All Items', icon: '' },
+  { id: 'COSMETIC', name: 'Cosmetics', icon: '' },
+  { id: 'OVERLAY', name: 'Overlays', icon: '' },
+  { id: 'TEXT', name: 'Text Effects', icon: '' },
+  { id: 'CURSOR', name: 'Cursors', icon: '' },
 ];
 
 export default function PetalStorePage() {
@@ -131,15 +131,15 @@ export default function PetalStorePage() {
   const getCategoryIcon = (kind: string) => {
     switch (kind) {
       case 'COSMETIC':
-        return '✨';
+        return '';
       case 'OVERLAY':
-        return '🌈';
+        return '';
       case 'TEXT':
-        return '💬';
+        return '';
       case 'CURSOR':
-        return '👆';
+        return '';
       default:
-        return '🎁';
+        return '';
     }
   };
 
@@ -194,7 +194,7 @@ export default function PetalStorePage() {
         {/* Petal Balance */}
         {user && (
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 mb-8 text-center">
-            <div className="text-4xl mb-2">🌸</div>
+            <div className="text-4xl mb-2"></div>
             <div className="text-3xl font-bold text-pink-400">{petalBalance}</div>
             <div className="text-lg text-neutral-400">Petals Available</div>
           </div>
@@ -332,7 +332,7 @@ export default function PetalStorePage() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🛍️</div>
+            <div className="text-6xl mb-4"></div>
             <h3 className="text-xl font-semibold text-neutral-400 mb-2">No items found</h3>
             <p className="text-neutral-500">
               {searchQuery ? 'Try adjusting your search terms.' : 'Check back later for new items!'}
@@ -349,19 +349,19 @@ export default function PetalStorePage() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-4xl mb-3">🎮</div>
+              <div className="text-4xl mb-3"></div>
               <h3 className="font-semibold text-white mb-2">Play Mini-Games</h3>
               <p className="text-sm text-neutral-400">
                 Earn petals by playing and improving your scores
               </p>
             </div>
             <div className="text-center">
-              <div className="text-4xl mb-3">🏆</div>
+              <div className="text-4xl mb-3"></div>
               <h3 className="font-semibold text-white mb-2">Unlock Achievements</h3>
               <p className="text-sm text-neutral-400">Complete milestones for big petal rewards</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl mb-3">📅</div>
+              <div className="text-4xl mb-3"></div>
               <h3 className="font-semibold text-white mb-2">Daily Challenges</h3>
               <p className="text-sm text-neutral-400">Complete daily tasks for bonus petals</p>
             </div>

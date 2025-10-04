@@ -12,6 +12,8 @@ const nextConfig = {
   staticPageGenerationTimeout: 120,
   // Enable source maps for Edge Tools debugging
   productionBrowserSourceMaps: true,
+  // Fix lockfile detection warning
+  outputFileTracingRoot: process.cwd(),
   // Temporarily disable ESLint during build for deployment
   eslint: {
     ignoreDuringBuilds: true,
@@ -159,14 +161,7 @@ const nextConfig = {
   // This is required to support PostHog trailing slash API requests
   skipTrailingSlashRedirect: true,
 
-  // Babel configuration to remove console statements in production
-  babel: {
-    plugins: [
-      ...(env.NODE_ENV === 'production'
-        ? [['babel-plugin-transform-remove-console', { exclude: ['error', 'warn'] }]]
-        : []),
-    ],
-  },
+  // Note: Babel configuration moved to babel.config.js for Next.js 15 compatibility
 
   // Webpack configuration to handle client/server module splitting and build performance
   webpack: (config, { isServer, webpack }) => {

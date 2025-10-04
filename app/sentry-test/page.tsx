@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 export default function SentryTestPage() {
   useEffect(() => {
     // Trigger errors immediately when page loads
-    console.log('🚨 Triggering Sentry test errors...');
+    console.log(' Triggering Sentry test errors...');
 
     // Test 1: Throw an error
     setTimeout(() => {
@@ -46,7 +46,7 @@ export default function SentryTestPage() {
         <h1 className="text-4xl font-bold mb-8 text-center text-red-400">
           {
             <>
-              '' 🚨' '
+              '' ' '
               <span role="img" aria-label="emoji">
                 S
               </span>
@@ -113,7 +113,7 @@ export default function SentryTestPage() {
             {
               <>
                 <span role="img" aria-label="emoji">
-                  ✅
+                  
                 </span>
                 ' '
                 <span role="img" aria-label="emoji">
@@ -1014,7 +1014,7 @@ export default function SentryTestPage() {
           >
             {
               <>
-                '' 🔥' '
+                '' ' '
                 <span role="img" aria-label="emoji">
                   T
                 </span>
@@ -1065,7 +1065,7 @@ export default function SentryTestPage() {
               <>
                 ''
                 <span role="img" aria-label="emoji">
-                  ⚡
+                  
                 </span>
                 ' '
                 <span role="img" aria-label="emoji">
@@ -1110,7 +1110,7 @@ export default function SentryTestPage() {
           >
             {
               <>
-                '' 📨' '
+                '' ' '
                 <span role="img" aria-label="emoji">
                   S
                 </span>
@@ -1155,7 +1155,7 @@ export default function SentryTestPage() {
           <h3 className="text-xl font-semibold mb-4 text-green-300">
             {
               <>
-                '' 🎯' '
+                '' ' '
                 <span role="img" aria-label="emoji">
                   C
                 </span>

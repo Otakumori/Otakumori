@@ -134,7 +134,7 @@ export default function GameCubeBootSequence({ onBootComplete }: GameCubeBootSeq
         {stage === 'complete' && (
           <div className="mb-8">
             <div className="w-16 h-16 mx-auto mb-4 bg-green-500 rounded-lg flex items-center justify-center">
-              <div className="text-2xl text-white">✓</div>
+              <div className="text-2xl text-white"></div>
             </div>
             <div className="text-lg text-green-300">Ready!</div>
           </div>

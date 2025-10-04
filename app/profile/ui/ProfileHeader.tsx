@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Crown, Star, Zap, Palette, Sparkles } from 'lucide-react';
+import { Crown, Star, Zap, Palette } from 'lucide-react';
 
 interface EquippedItem {
   id: string;
@@ -144,7 +144,7 @@ export default function ProfileHeader() {
           <div className="text-center">
             {/* Avatar Placeholder */}
             <div className="w-24 h-24 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full border-4 border-pink-500/30 mx-auto mb-4 flex items-center justify-center">
-              <span className="text-4xl">👤</span>
+              <span className="text-4xl"></span>
             </div>
 
             {/* Title */}
@@ -178,7 +178,7 @@ export default function ProfileHeader() {
                     className="w-8 h-8 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30 flex items-center justify-center"
                     title={badge.name}
                   >
-                    <span className="text-sm">🏅</span>
+                    <span className="text-sm"></span>
                   </div>
                 ))}
                 {equippedState.badges.length > 3 && (
@@ -204,7 +204,7 @@ export default function ProfileHeader() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {equippedState?.frame && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
-            <div className="text-2xl mb-2">🖼️</div>
+            <div className="text-2xl mb-2">️</div>
             <div className="text-xs font-medium text-white truncate">
               {equippedState.frame.name}
             </div>
@@ -218,7 +218,7 @@ export default function ProfileHeader() {
 
         {equippedState?.overlay && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
-            <div className="text-2xl mb-2">✨</div>
+            <div className="text-2xl mb-2"></div>
             <div className="text-xs font-medium text-white truncate">
               {equippedState.overlay.name}
             </div>
@@ -232,7 +232,7 @@ export default function ProfileHeader() {
 
         {equippedState?.title && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
-            <div className="text-2xl mb-2">👑</div>
+            <div className="text-2xl mb-2"></div>
             <div className="text-xs font-medium text-white truncate">
               {equippedState.title.name}
             </div>
@@ -245,7 +245,7 @@ export default function ProfileHeader() {
         )}
 
         <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
-          <div className="text-2xl mb-2">🏅</div>
+          <div className="text-2xl mb-2"></div>
           <div className="text-xs font-medium text-white">
             {equippedState?.badges?.length || 0} Badges
           </div>

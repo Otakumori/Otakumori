@@ -2,7 +2,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { type Achievement } from '../../app/types/achievements';
-import { useAchievements } from '../../app/components/achievements/AchievementProvider';
 
 interface AchievementCardProps {
   achievement: Achievement;

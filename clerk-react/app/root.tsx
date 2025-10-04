@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
@@ -8,7 +7,6 @@ import {
   ScrollRestoration,
 } from 'react-router-dom';
 import './app.css';
-import type { OutletProps } from 'react-router-dom';
 
 export const links = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

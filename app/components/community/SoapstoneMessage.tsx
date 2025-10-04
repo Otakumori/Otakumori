@@ -35,7 +35,7 @@ export default function SoapstoneMessage({ preview, full }: SoapstoneMessageProp
                 onClick={() => setIsOpen(false)}
                 className="text-zinc-400 hover:text-zinc-200"
               >
-                ✕
+                
               </button>
             </div>
             <p className="text-sm leading-relaxed text-zinc-200">{full}</p>

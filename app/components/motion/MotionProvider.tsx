@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { ReactNode } from 'react';
 
 // Motion variants for consistent animations

@@ -114,7 +114,7 @@ export const AvatarCustomizer = ({ imageSrc, onComplete, onClose }: AvatarCustom
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-pink-400">Forge Your Legend</h2>
           <button onClick={onClose} className="text-white/70 transition-colors hover:text-white">
-            ✕
+            
           </button>
         </div>
 

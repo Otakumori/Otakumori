@@ -1,4 +1,3 @@
-import { env } from '../../app/env';
 import { getRuntimeOrigin } from '../../lib/runtimeOrigin';
 
 export const appUrl = getRuntimeOrigin();

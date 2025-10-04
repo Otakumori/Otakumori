@@ -14,8 +14,6 @@ import {
   type ProductRecommendationAlgorithm,
   isGameCubeBootFrequency,
   isPerformanceMonitoringLevel,
-  isMiniGameDifficulty,
-  isProductRecommendationAlgorithm,
 } from './types';
 import { evaluateFeatureFlag, isFeatureEnabled, getFeatureFlagValue } from './provider';
 import { env } from '@/env.mjs';
@@ -265,9 +263,9 @@ export class FeatureFlagDebugger {
     }
 
     this.getAllFlags().then((flags) => {
-      console.group('🚩 Feature Flags Status');
+      console.group(' Feature Flags Status');
       Object.entries(flags).forEach(([key, value]) => {
-        console.log(`${key}: ${value}`);
+        // Feature flag value logged
       });
       console.groupEnd();
     });

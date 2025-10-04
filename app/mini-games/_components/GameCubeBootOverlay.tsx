@@ -524,7 +524,7 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
             transition: 'opacity 220ms ease',
           }}
         >
-          <em>made with ♡</em>
+          <em>made with </em>
         </div>
       </div>
 

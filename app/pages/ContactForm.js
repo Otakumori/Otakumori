@@ -26,7 +26,7 @@ export default function ContactForm() {
 
     // TODO: Replace with Prisma API call when migration is complete
     // For now, just show success message
-    console.log('Contact form would be submitted:', formData);
+    // Contact form would be submitted
 
     setStatus({
       type: 'success',

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     // TODO: Add newsletter signup to Prisma schema and implement proper storage
     // For now, just log the email and return success
-    console.log('Newsletter signup:', email);
+    // Newsletter signup
 
     return NextResponse.json({ success: true });
   } catch (error) {

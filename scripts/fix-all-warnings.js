@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
-console.log('🔧 Fixing ALL remaining warnings aggressively...');
+console.log(' Fixing ALL remaining warnings aggressively...');
 
 // Function to recursively find all TypeScript/JavaScript files
 function findFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
@@ -68,20 +68,20 @@ function main() {
         if (result.modified) {
           fs.writeFileSync(file, result.content, 'utf8');
           totalFixed++;
-          console.log(`✅ Fixed: ${path.relative(projectRoot, file)}`);
+          console.log(` Fixed: ${path.relative(projectRoot, file)}`);
         }
       } catch (error) {
-        console.log(`⚠️  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
+        console.log(`  Skipped: ${path.relative(projectRoot, file)} (${error.message})`);
       }
     }
 
-    console.log(`\n🎉 Fixed ${totalFixed} files!`);
+    console.log(`\n Fixed ${totalFixed} files!`);
 
     // Test build
-    console.log('\n🔍 Testing build...');
+    console.log('\n⌕ Testing build...');
     execSync('npm run build', { stdio: 'inherit' });
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(' Error:', error.message);
     process.exit(1);
   }
 }

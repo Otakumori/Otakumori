@@ -53,7 +53,7 @@ export const FriendActivity = () => {
             className="flex items-start space-x-3 rounded-lg bg-white/5 p-3"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-500 text-white">
-              {activity.type === 'game' ? '🎮' : activity.type === 'achievement' ? '🏆' : '👥'}
+              {activity.type === 'game' ? '' : activity.type === 'achievement' ? '' : ''}
             </div>
             <div className="flex-1">
               <p className="text-sm text-white">{activity.message}</p>

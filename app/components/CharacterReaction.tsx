@@ -31,7 +31,7 @@ export default function CharacterReaction({
   const reactions = {
     idle: {
       message: 'Ready for adventure?!',
-      emoji: '°❀⋆.ೃ࿔*:･',
+      emoji: '°⋆.ೃ࿔*:･',
       color: 'from-pink-400 to-purple-400',
     },
     happy: {
@@ -41,7 +41,7 @@ export default function CharacterReaction({
     },
     excited: {
       message: 'This is amaze-balls!',
-      emoji: 'ദ്ദി ˉ͈̀꒳ˉ͈́ )✧',
+      emoji: 'ദ്ദി ˉ͈̀꒳ˉ͈́ )',
       color: 'from-red-400 to-pink-400',
     },
     focused: {

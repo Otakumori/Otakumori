@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db as prisma } from '@/lib/db';
-import { CartItemSchema, CartUpdateSchema } from '@/app/lib/contracts';
+import { CartUpdateSchema } from '@/app/lib/contracts';
 
 export async function GET(req: NextRequest) {
   try {

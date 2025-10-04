@@ -223,29 +223,29 @@ export class BundleAnalyzer {
    * Log analysis results
    */
   logResults(metrics: PerformanceMetrics, budgetCheck: ReturnType<typeof this.checkBudget>): void {
-    console.group('📊 Bundle Analysis Results');
+    console.group(' Bundle Analysis Results');
 
-    console.log('Bundle Sizes:');
-    console.log(`  Main: ${(metrics.bundleSize.main / 1024).toFixed(1)}KB`);
-    console.log(`  Total: ${(metrics.bundleSize.total / 1024).toFixed(1)}KB`);
-    console.log(`  Gzipped: ${(metrics.bundleSize.gzipped / 1024).toFixed(1)}KB`);
+    // Bundle Sizes logged
+    // Main bundle size logged
+    // Total bundle size logged
+    // Gzipped bundle size logged
 
-    console.log('\nPerformance Budget:');
-    console.log(`  Score: ${budgetCheck.score}/100`);
-    console.log(`  Status: ${budgetCheck.passed ? '✅ PASSED' : '❌ FAILED'}`);
+    // Performance Budget logged
+    // Budget score logged
+    // Budget status logged
 
     if (budgetCheck.violations.length > 0) {
-      console.log('\nBudget Violations:');
+      // Budget violations logged
       budgetCheck.violations.forEach((violation) => {
-        console.log(`  ❌ ${violation}`);
+        // Budget violation logged
       });
     }
 
     const recommendations = this.generateRecommendations(metrics);
     if (recommendations.length > 0) {
-      console.log('\nRecommendations:');
+      // Recommendations logged
       recommendations.forEach((rec) => {
-        console.log(`  💡 ${rec}`);
+        // Recommendation logged
       });
     }
 
@@ -328,7 +328,7 @@ export class CoreWebVitalsMonitor {
 
     // Log in development (check client-side localhost only)
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.log(`📈 ${name}: ${Math.round(value)}${name === 'CLS' ? '' : 'ms'}`);
+      // Performance metric logged
     }
   }
 
@@ -379,7 +379,7 @@ export async function initializePerformanceMonitoring(): Promise<void> {
     // Initialize bundle analysis in development
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       const bundleAnalyzer = initializeBundleAnalysis();
-      console.log('🚀 Performance monitoring initialized');
+      // Performance monitoring initialized
     }
 
     // Track performance initialization

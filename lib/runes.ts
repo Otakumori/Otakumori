@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { DEFAULT_RUNE_DISPLAYS } from '@/lib/runes-emoji';
 import {
   BURST_THRESHOLDS,
   DEFAULT_RUNE_LORE,
@@ -373,7 +372,7 @@ export function getRuneDisplay(runeDef: RuneDef): {
 } {
   const defaults = {
     name: `Rune ${runeDef.canonicalId.split('_')[1]?.toUpperCase() || '?'}`,
-    glyph: '✶',
+    glyph: '',
   };
 
   return {

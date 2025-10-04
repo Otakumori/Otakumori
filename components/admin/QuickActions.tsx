@@ -4,9 +4,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const actions = [
-  { id: 'users', label: 'Manage Users', icon: '👥' },
-  { id: 'settings', label: 'Settings', icon: '⚙️' },
-  { id: 'logs', label: 'View Logs', icon: '📜' },
+  { id: 'users', label: 'Manage Users', icon: '' },
+  { id: 'settings', label: 'Settings', icon: '' },
+  { id: 'logs', label: 'View Logs', icon: '' },
 ];
 
 export default function QuickActions() {

@@ -47,7 +47,7 @@ async function addPetalLedger() {
       ON "petal_ledger"("userId","type","createdAt");
     `;
 
-    console.log('✅ PetalLedger table created successfully!');
+    console.log(' PetalLedger table created successfully!');
 
     // Optional: Add a one-time backfill for existing users
     console.log('Adding initial balance records for existing users...');
@@ -68,13 +68,13 @@ async function addPetalLedger() {
             metadata: { note: 'Initial balance backfill' },
           },
         });
-        console.log(`✅ Added initial balance record for user ${user.id}: ${user.petals} petals`);
+        console.log(` Added initial balance record for user ${user.id}: ${user.petals} petals`);
       }
     }
 
-    console.log('✅ Migration completed successfully!');
+    console.log(' Migration completed successfully!');
   } catch (error) {
-    console.error('❌ Error during migration:', error);
+    console.error(' Error during migration:', error);
     throw error;
   } finally {
     await prisma.$disconnect();

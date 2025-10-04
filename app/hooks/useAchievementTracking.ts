@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useAchievements } from './hooks/useAchievements';
-import { useCommunityAchievements } from './useCommunityAchievements';
 
 // Site Interaction Achievements
 export function useSiteInteractionTracking() {

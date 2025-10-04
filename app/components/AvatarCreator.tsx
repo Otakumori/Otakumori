@@ -17,22 +17,22 @@ const AVATAR_PARTS: AvatarPart[] = [
   {
     id: 'hair',
     name: 'Crown',
-    options: ['⚜️', '👑', '🎭', '🎪', '🎨'],
+    options: ['', '', '', '', ''],
   },
   {
     id: 'eyes',
     name: 'Soul',
-    options: ['✧', '❈', '❋', '❆', '❉'],
+    options: ['', '', '', '', ''],
   },
   {
     id: 'mouth',
     name: 'Spirit',
-    options: ['❀', '✿', '❁', '✾', '✽'],
+    options: ['', '', '', '', ''],
   },
   {
     id: 'accessories',
     name: 'Relics',
-    options: ['⚔️', '🛡️', '📜', '🎯', '🎲'],
+    options: ['', '', '', '', ''],
   },
 ];
 
@@ -77,7 +77,7 @@ export const AvatarCreator = ({ onClose }: AvatarCreatorProps) => {
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-pink-400">Forge Your Legend</h2>
           <button onClick={onClose} className="text-white/70 transition-colors hover:text-white">
-            ✕
+            
           </button>
         </div>
 

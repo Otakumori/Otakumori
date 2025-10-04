@@ -1,5 +1,4 @@
 import GlassPanel from '../GlassPanel';
-import { t } from '../../lib/microcopy';
 
 type PetalTransaction = {
   id: string;

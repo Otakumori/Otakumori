@@ -11,8 +11,8 @@
  * - Detailed reporting
  */
 
-import { readFileSync, existsSync, statSync } from 'fs';
-import { join, resolve, extname } from 'path';
+import { readFileSync, statSync } from 'fs';
+import { join } from 'path';
 import { glob } from 'glob';
 
 interface PerformanceBudget {
@@ -110,7 +110,7 @@ class PerformanceBudgetValidator {
   }
 
   async validate(): Promise<PerformanceReport> {
-    console.log('🚀 Starting performance budget validation...');
+    console.log(' Starting performance budget validation...');
 
     // Analyze bundle sizes
     await this.analyzeBundles();
@@ -131,7 +131,7 @@ class PerformanceBudgetValidator {
   }
 
   private async analyzeBundles(): Promise<void> {
-    console.log('📦 Analyzing bundle sizes...');
+    console.log(' Analyzing bundle sizes...');
 
     try {
       // Analyze Next.js build output
@@ -176,12 +176,12 @@ class PerformanceBudgetValidator {
         });
       }
     } catch (error) {
-      console.warn('⚠️  Could not analyze bundles:', error);
+      console.warn('  Could not analyze bundles:', error);
     }
   }
 
   private async analyzeAssets(): Promise<void> {
-    console.log('🖼️  Analyzing asset sizes...');
+    console.log('️  Analyzing asset sizes...');
 
     try {
       const publicDir = 'public';
@@ -220,7 +220,7 @@ class PerformanceBudgetValidator {
         }
       }
     } catch (error) {
-      console.warn('⚠️  Could not analyze assets:', error);
+      console.warn('  Could not analyze assets:', error);
     }
   }
 
@@ -388,39 +388,39 @@ class PerformanceBudgetValidator {
     const hasLargeAssets = this.violations.some((v) => v.type === 'asset_size');
 
     if (hasLargeBundles) {
-      recommendations.push('🔧 Implement dynamic imports for heavy components');
-      recommendations.push('📦 Analyze bundle composition with webpack-bundle-analyzer');
-      recommendations.push('🌳 Enable tree shaking for all dependencies');
+      recommendations.push(' Implement dynamic imports for heavy components');
+      recommendations.push(' Analyze bundle composition with webpack-bundle-analyzer');
+      recommendations.push(' Enable tree shaking for all dependencies');
     }
 
     if (hasLargeChunks) {
-      recommendations.push('✂️  Split large pages into smaller components');
-      recommendations.push('🚚 Use React.lazy() for heavy route components');
+      recommendations.push('️  Split large pages into smaller components');
+      recommendations.push(' Use React.lazy() for heavy route components');
     }
 
     if (hasLargeAssets) {
-      recommendations.push('🖼️  Implement next/image for automatic optimization');
-      recommendations.push('📱 Use responsive images with multiple sizes');
-      recommendations.push('🗂️  Consider using a CDN for static assets');
+      recommendations.push('️  Implement next/image for automatic optimization');
+      recommendations.push(' Use responsive images with multiple sizes');
+      recommendations.push('️  Consider using a CDN for static assets');
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('✅ Performance budget is within limits');
-      recommendations.push('📊 Consider implementing Progressive Web App features');
-      recommendations.push('⚡ Monitor Core Web Vitals in production');
+      recommendations.push(' Performance budget is within limits');
+      recommendations.push(' Consider implementing Progressive Web App features');
+      recommendations.push(' Monitor Core Web Vitals in production');
     }
 
     return recommendations;
   }
 
   private printReport(report: PerformanceReport): void {
-    console.log('\n📊 Performance Budget Report');
+    console.log('\n Performance Budget Report');
     console.log('================================');
 
     // Summary
-    console.log(`\n📋 Summary:`);
+    console.log(`\n Summary:`);
     console.log(`   Score: ${report.score}/100`);
-    console.log(`   Status: ${report.passed ? '✅ PASSED' : '❌ FAILED'}`);
+    console.log(`   Status: ${report.passed ? ' PASSED' : ' FAILED'}`);
     console.log(`   Total Bundle Size: ${(report.summary.totalSize / 1024).toFixed(1)}KB`);
     console.log(`   Main Bundle: ${(report.summary.mainBundleSize / 1024).toFixed(1)}KB`);
     console.log(`   Vendor Bundle: ${(report.summary.vendorSize / 1024).toFixed(1)}KB`);
@@ -428,38 +428,38 @@ class PerformanceBudgetValidator {
 
     // Violations
     if (report.violations.length > 0) {
-      console.log(`\n🚨 Violations (${report.violations.length}):`);
+      console.log(`\n Violations (${report.violations.length}):`);
       for (const violation of report.violations) {
         const icon =
-          violation.severity === 'critical' ? '🔴' : violation.severity === 'error' ? '🟠' : '🟡';
+          violation.severity === 'critical' ? '●' : violation.severity === 'error' ? '🟠' : '🟡';
         console.log(`   ${icon} ${violation.description}`);
         if (violation.file) {
           console.log(`      File: ${violation.file}`);
         }
-        console.log(`      💡 ${violation.recommendation}`);
+        console.log(`       ${violation.recommendation}`);
         console.log('');
       }
     }
 
     // Recommendations
     if (report.recommendations.length > 0) {
-      console.log(`\n💡 Recommendations:`);
+      console.log(`\n Recommendations:`);
       for (const recommendation of report.recommendations) {
         console.log(`   ${recommendation}`);
       }
     }
 
-    console.log('\n🎯 Performance Targets:');
+    console.log('\n Performance Targets:');
     console.log(`   Main Bundle: ≤ ${PERFORMANCE_BUDGET.bundles.main}KB`);
     console.log(`   Vendor Bundle: ≤ ${PERFORMANCE_BUDGET.bundles.vendor}KB`);
     console.log(`   Route Chunks: ≤ ${PERFORMANCE_BUDGET.bundles.chunks}KB each`);
     console.log(`   Total Initial Load: ≤ ${PERFORMANCE_BUDGET.bundles.total}KB`);
 
     if (!report.passed) {
-      console.log('\n💥 Performance budget validation failed!');
+      console.log('\n Performance budget validation failed!');
       process.exit(1);
     } else {
-      console.log('\n🎉 Performance budget validation passed!');
+      console.log('\n Performance budget validation passed!');
     }
   }
 
@@ -503,7 +503,7 @@ async function main() {
     const validator = new PerformanceBudgetValidator();
     await validator.validate();
   } catch (error) {
-    console.error('💥 Performance budget validation failed:', error);
+    console.error(' Performance budget validation failed:', error);
     process.exit(1);
   }
 }

@@ -11,7 +11,6 @@
  */
 
 import { getPrintifyService, type PrintifyProduct } from './service';
-import { env } from '@/env.mjs';
 
 export interface ProductFilters {
   categories?: string[];

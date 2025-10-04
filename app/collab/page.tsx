@@ -19,7 +19,7 @@ export default function CollabPage() {
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-6 text-6xl">🤝</div>
+          <div className="mb-6 text-6xl"></div>
           <h1 className="text-5xl md:text-6xl font-bold text-slatey-200 mb-6">
             Creator Collaboration
           </h1>
@@ -37,7 +37,7 @@ export default function CollabPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-4">🎨</div>
+              <div className="text-4xl mb-4"></div>
               <h3 className="text-xl font-semibold text-slatey-200 mb-3">Custom Assets</h3>
               <p className="text-slatey-400">
                 Get 1-2 custom assets tailored to your style. UI elements, character portraits, or
@@ -46,7 +46,7 @@ export default function CollabPage() {
             </div>
 
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-4">📱</div>
+              <div className="text-4xl mb-4"></div>
               <h3 className="text-xl font-semibold text-slatey-200 mb-3">Social Promotion</h3>
               <p className="text-slatey-400">
                 We'll share your content across our channels, helping you reach new audiences and
@@ -55,7 +55,7 @@ export default function CollabPage() {
             </div>
 
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center">
-              <div className="text-4xl mb-4">💎</div>
+              <div className="text-4xl mb-4">◆</div>
               <h3 className="text-xl font-semibold text-slatey-200 mb-3">Exclusive Access</h3>
               <p className="text-slatey-400">
                 Early access to new collections, beta testing opportunities, and special
@@ -130,7 +130,7 @@ export default function CollabPage() {
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center text-xl">
-                  🎮
+                  
                 </div>
                 <div>
                   <h4 className="text-slatey-200 font-semibold">PixelPunk Dev</h4>
@@ -146,7 +146,7 @@ export default function CollabPage() {
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center text-xl">
-                  📺
+                  
                 </div>
                 <div>
                   <h4 className="text-slatey-200 font-semibold">RetroGamerTV</h4>

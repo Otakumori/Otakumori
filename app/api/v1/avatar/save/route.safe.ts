@@ -1,3 +1,14 @@
+/**
+ * Avatar Configuration Save API Route
+ *
+ * Handles secure saving of user avatar configurations with NSFW content validation,
+ * adult verification checks, and comprehensive data validation.
+ *
+ * @fileoverview Avatar configuration persistence with security validation
+ * @author Otaku-mori Team
+ * @since 1.0.0
+ */
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -183,6 +194,23 @@ const AvatarSaveSchema = z.object({
     .optional(),
 });
 
+/**
+ * Handles POST requests for avatar configuration saving
+ *
+ * Validates authentication, checks adult verification for NSFW content,
+ * validates avatar data against comprehensive schema, and persists to database.
+ *
+ * @param {NextRequest} request - The incoming request with avatar configuration
+ * @returns {Promise<NextResponse>} Save result or error response
+ *
+ * @example
+ * // Save avatar configuration
+ * const response = await fetch('/api/v1/avatar/save', {
+ *   method: 'POST',
+ *   headers: { 'x-idempotency-key': 'unique-key' },
+ *   body: JSON.stringify(avatarData)
+ * });
+ */
 export async function POST(request: NextRequest) {
   const requestId = generateRequestId();
 
@@ -241,9 +269,25 @@ export async function POST(request: NextRequest) {
 
     // Check if user has adult verification for NSFW content
     if (avatarConfig.nsfw?.enabled) {
-      // TODO: Get adult verification from Clerk metadata
-      // For now, we'll allow it but log for moderation
-      console.log(`NSFW content enabled for user ${userId} - adult verification check needed`);
+      // Check adult verification from Clerk metadata
+      const { currentUser } = await import('@clerk/nextjs/server');
+      const user = await currentUser();
+
+      if (!user?.publicMetadata?.adultVerified) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: {
+              code: 'ADULT_VERIFICATION_REQUIRED',
+              message: 'Adult verification required for NSFW content',
+            },
+            requestId,
+          },
+          { status: 403 },
+        );
+      }
+
+      // NSFW content enabled for verified adult user
     }
 
     // Save avatar configuration

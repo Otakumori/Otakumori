@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     });
 
     // Log the unlock for telemetry
-    console.log(`Rune unlocked: ${slug} by user ${userId} at ${unlock.unlockedAt}`);
+    // Rune unlocked
 
     return NextResponse.json({
       ok: true,

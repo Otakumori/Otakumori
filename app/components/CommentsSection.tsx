@@ -201,7 +201,7 @@ export default function CommentsSection({
                         comment.isLiked ? 'text-pink-400' : 'text-gray-400'
                       }`}
                     >
-                      <span>{comment.isLiked ? '♥' : '♡'}</span>
+                      <span>{comment.isLiked ? '' : ''}</span>
                       <span>{comment.likeCount}</span>
                     </button>
 

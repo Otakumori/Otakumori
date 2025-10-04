@@ -41,7 +41,7 @@ class WebVitalsMonitor {
   };
 
   async generateMonitoringScript(): Promise<void> {
-    console.log('🔍 Generating Web Vitals monitoring script...\n');
+    console.log('⌕ Generating Web Vitals monitoring script...\n');
 
     const monitoringScript = this.createClientMonitoringScript();
     const hookScript = this.createNextJSHook();
@@ -64,11 +64,11 @@ class WebVitalsMonitor {
     console.log(`Writing Next.js integration to: ${libPath}`);
     await fs.writeFile(libPath, hookScript);
 
-    console.log('✅ Web Vitals monitoring files generated:');
-    console.log('   📄 public/web-vitals-monitor.js - Client-side monitoring');
-    console.log('   📄 app/lib/web-vitals.ts - Next.js integration');
+    console.log(' Web Vitals monitoring files generated:');
+    console.log('    public/web-vitals-monitor.js - Client-side monitoring');
+    console.log('    app/lib/web-vitals.ts - Next.js integration');
 
-    console.log('\n📋 Integration Steps:');
+    console.log('\n Integration Steps:');
     console.log('1. Add to app/layout.tsx:');
     console.log('   import { reportWebVitals } from "@/lib/web-vitals"');
     console.log('   useEffect(() => { reportWebVitals(); }, []);');
@@ -132,9 +132,9 @@ class WebVitalsMonitor {
 
     // Console logging for development
     if (metric.rating === 'poor') {
-      console.warn('⚠️ Poor performance detected:', metric);
+      console.warn(' Poor performance detected:', metric);
     } else if (metric.rating === 'good') {
-      console.log('✅ Good performance:', metric);
+      console.log(' Good performance:', metric);
     }
 
     // Send to analytics (replace with your analytics endpoint)
@@ -294,7 +294,7 @@ class WebVitalsMonitor {
       const poorMetrics = recentMetrics.filter(m => m.rating === 'poor');
       
       if (poorMetrics.length > 0) {
-        console.warn(\`🚨 \${poorMetrics.length} performance issues in last 30s\`, poorMetrics);
+        console.warn(\` \${poorMetrics.length} performance issues in last 30s\`, poorMetrics);
       }
     }, 30000);
   }
@@ -310,7 +310,7 @@ class WebVitalsMonitor {
     initGameCubeMonitoring();
     setupBudgetAlerts();
 
-    console.log('🔍 Web Vitals monitoring initialized');
+    console.log('⌕ Web Vitals monitoring initialized');
   }
 
   // Start monitoring when DOM is ready
@@ -366,8 +366,8 @@ export function reportWebVitals(metric: ExtendedMetric) {
   const rating = getRating(metric.name, metric.value);
   
   // Log performance metrics
-  if (process.env.NODE_ENV === 'development') {
-    const emoji = rating === 'good' ? '✅' : rating === 'needs-improvement' ? '⚠️' : '❌';
+  if (env.NODE_ENV === 'development') {
+    const emoji = rating === 'good' ? '' : rating === 'needs-improvement' ? '' : '';
     console.log(\`\${emoji} \${metric.name}: \${Math.round(metric.value)}ms (\${rating})\`);
   }
 
@@ -445,7 +445,7 @@ export class GameCubePerformanceTracker {
       });
     }
 
-    console.log(\`🎮 GameCube FPS: \${Math.round(fps)} (\${fps >= 58 ? 'good' : 'poor'})\`);
+    console.log(\` GameCube FPS: \${Math.round(fps)} (\${fps >= 58 ? 'good' : 'poor'})\`);
   }
 
   private trackFrame(): void {
@@ -495,31 +495,31 @@ export function trackUserJourney(journeyName: string, action: 'start' | 'complet
   }
 
   private generatePerformanceDashboard(): void {
-    console.log('\n📊 Performance Monitoring Dashboard Setup:');
+    console.log('\n Performance Monitoring Dashboard Setup:');
     console.log('='.repeat(60));
 
-    console.log('\n🎯 Performance Budgets:');
+    console.log('\n Performance Budgets:');
     Object.entries(this.budgets).forEach(([metric, budget]) => {
       console.log(`   ${metric}: Good ≤ ${budget.good}, Poor > ${budget.poor}`);
     });
 
-    console.log('\n🔧 Development Monitoring:');
+    console.log('\n Development Monitoring:');
     console.log('   • Console logs for poor performance');
     console.log('   • Real-time FPS tracking for GameCube');
     console.log('   • Automatic budget violation alerts');
 
-    console.log('\n📈 Production Analytics:');
+    console.log('\n Production Analytics:');
     console.log('   • Google Analytics 4 integration');
     console.log('   • Custom API endpoint support');
     console.log('   • User journey performance tracking');
 
-    console.log('\n🎮 GameCube Specific Metrics:');
+    console.log('\n GameCube Specific Metrics:');
     console.log('   • 60fps target monitoring');
     console.log('   • Animation smoothness tracking');
     console.log('   • Frame drop detection');
     console.log('   • Component-level performance');
 
-    console.log('\n💡 Usage Examples:');
+    console.log('\n Usage Examples:');
     console.log(`
     // In GameCube components:
     import { useGameCubePerformance } from '@/lib/web-vitals';
@@ -547,8 +547,8 @@ async function main() {
   const monitor = new WebVitalsMonitor();
   await monitor.generateMonitoringScript();
 
-  console.log('\n✅ Web Vitals monitoring system ready!');
-  console.log('📋 Next steps:');
+  console.log('\n Web Vitals monitoring system ready!');
+  console.log(' Next steps:');
   console.log('1. Integrate monitoring scripts into your app');
   console.log('2. Run performance audit: npm run performance:audit');
   console.log('3. Monitor GameCube interface performance');

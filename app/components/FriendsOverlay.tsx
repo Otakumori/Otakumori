@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
-import GlassCard from '@/app/components/ui/GlassCard';
-import GlassButton from '@/app/components/ui/GlassButton';
 
 interface Friend {
   id: string;
@@ -441,7 +439,7 @@ function FriendItem({ friend, onToggleFavorite }: FriendItemProps) {
         <div>
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-pink-200">{friend.displayName}</h4>
-            {friend.isFavorite && <span className="text-yellow-400">★</span>}
+            {friend.isFavorite && <span className="text-yellow-400"></span>}
           </div>
           <p className="text-sm text-pink-300/70">@{friend.username}</p>
           {friend.game && <p className="text-xs text-green-400">Playing {friend.game}</p>}

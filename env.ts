@@ -57,7 +57,7 @@ const client = z.object({
 const _server = server.safeParse(process.env);
 if (!_server.success) {
   // Only crash on server at runtime (won't run in the browser)
-  console.error('❌ Invalid server env:', _server.error.flatten().fieldErrors);
+  console.error(' Invalid server env:', _server.error.flatten().fieldErrors);
   process.exit(1);
 }
 
@@ -80,7 +80,7 @@ const _client = client.safeParse({
 });
 
 if (!_client.success) {
-  console.warn('⚠️ Invalid client env:', _client.error.flatten().fieldErrors);
+  console.warn(' Invalid client env:', _client.error.flatten().fieldErrors);
 }
 
 export const env = { ..._server.data, ..._client.data };

@@ -58,13 +58,13 @@ const envPath = path.join(__dirname, '.env.local');
 
 if (!fs.existsSync(envPath)) {
   fs.writeFileSync(envPath, envContent);
-  console.log('✅ Created .env.local file with basic configuration');
-  console.log('⚠️  Please update the values with your actual API keys and database URL');
+  console.log(' Created .env.local file with basic configuration');
+  console.log('  Please update the values with your actual API keys and database URL');
 } else {
-  console.log('⚠️  .env.local already exists - not overwriting');
+  console.log('  .env.local already exists - not overwriting');
 }
 
-console.log('\n📝 Next steps:');
+console.log('\n Next steps:');
 console.log('1. Update DATABASE_URL with your actual database connection string');
 console.log('2. Add your Clerk authentication keys');
 console.log('3. Optionally add Stripe, Printify, and other service keys');

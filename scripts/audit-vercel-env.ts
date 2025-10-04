@@ -91,7 +91,7 @@ function runVercelCommand(command: string): string {
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to run Vercel command: ${command}`);
+    console.error(` Failed to run Vercel command: ${command}`);
     console.error(`Error: ${message}`);
     process.exit(1);
   }
@@ -102,7 +102,7 @@ function loadLocalEnv(): LocalEnv {
   const env: LocalEnv = {};
 
   if (!existsSync(envPath)) {
-    console.log('ℹ️  No .env.local file found');
+    console.log('ⓘ  No .env.local file found');
     return env;
   }
 
@@ -120,9 +120,9 @@ function loadLocalEnv(): LocalEnv {
       }
     }
 
-    console.log(`ℹ️  Loaded ${Object.keys(env).length} variables from .env.local`);
+    console.log(`ⓘ  Loaded ${Object.keys(env).length} variables from .env.local`);
   } catch (error) {
-    console.warn(`⚠️  Could not read .env.local: ${error}`);
+    console.warn(`  Could not read .env.local: ${error}`);
   }
 
   return env;
@@ -189,7 +189,7 @@ function fetchVercelEnvs(environment: 'production' | 'preview' | 'development'):
 
     return envVars;
   } catch {
-    console.error(`❌ Failed to fetch ${environment} environment variables`);
+    console.error(` Failed to fetch ${environment} environment variables`);
     return [];
   }
 }
@@ -332,25 +332,25 @@ function printReport(
   localComparison?: LocalComparison,
 ) {
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`🔍 ${environment.toUpperCase()} ENVIRONMENT AUDIT`);
+  console.log(`⌕ ${environment.toUpperCase()} ENVIRONMENT AUDIT`);
   console.log(`${'='.repeat(60)}`);
 
   if (result.missing.length > 0) {
-    console.log(`\n❌ MISSING REQUIRED VARIABLES (${result.missing.length}):`);
+    console.log(`\n MISSING REQUIRED VARIABLES (${result.missing.length}):`);
     result.missing.forEach((key) => {
       console.log(`   • ${key}`);
     });
   }
 
   if (result.empty.length > 0) {
-    console.log(`\n⚠️  EMPTY VALUES (${result.empty.length}):`);
+    console.log(`\n  EMPTY VALUES (${result.empty.length}):`);
     result.empty.forEach((key) => {
       console.log(`   • ${key}`);
     });
   }
 
   if (result.suspicious.length > 0) {
-    console.log(`\n🚨 SUSPICIOUS VALUES (${result.suspicious.length}):`);
+    console.log(`\n SUSPICIOUS VALUES (${result.suspicious.length}):`);
     result.suspicious.forEach(({ key, value, reason }) => {
       console.log(`   • ${key}: ${reason}`);
       console.log(`     Value: ${value}`);
@@ -358,7 +358,7 @@ function printReport(
   }
 
   if (result.present.length > 0) {
-    console.log(`\n✅ PRESENT VARIABLES (${result.present.length}):`);
+    console.log(`\n PRESENT VARIABLES (${result.present.length}):`);
     const chunks: string[][] = [];
     for (let i = 0; i < result.present.length; i += 4) {
       chunks.push(result.present.slice(i, i + 4));
@@ -372,17 +372,17 @@ function printReport(
     const { localOnly, vercelOnly, different } = localComparison;
 
     if (localOnly.length > 0) {
-      console.log(`\n📁 IN LOCAL .env.local BUT NOT ON VERCEL (${localOnly.length}):`);
+      console.log(`\n IN LOCAL .env.local BUT NOT ON VERCEL (${localOnly.length}):`);
       localOnly.forEach((key) => console.log(`   • ${key}`));
     }
 
     if (vercelOnly.length > 0) {
-      console.log(`\n☁️  ON VERCEL BUT NOT IN LOCAL .env.local (${vercelOnly.length}):`);
+      console.log(`\n️  ON VERCEL BUT NOT IN LOCAL .env.local (${vercelOnly.length}):`);
       vercelOnly.forEach((key) => console.log(`   • ${key}`));
     }
 
     if (different.length > 0) {
-      console.log(`\n🔄 VALUE DIFFERENCES (${different.length}):`);
+      console.log(`\n VALUE DIFFERENCES (${different.length}):`);
       different.forEach(({ key, local, vercel }) => {
         console.log(`   • ${key}:`);
         console.log(`     Local:  ${local}`);
@@ -394,7 +394,7 @@ function printReport(
 
 function printFixSuggestions(results: Record<string, EnvAuditResult>) {
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`🔧 RECOMMENDED FIXES`);
+  console.log(` RECOMMENDED FIXES`);
   console.log(`${'='.repeat(60)}`);
 
   const allMissing = new Set<string>();
@@ -403,7 +403,7 @@ function printFixSuggestions(results: Record<string, EnvAuditResult>) {
   });
 
   if (allMissing.size > 0) {
-    console.log(`\n📝 ADD THESE VARIABLES TO VERCEL:`);
+    console.log(`\n ADD THESE VARIABLES TO VERCEL:`);
     console.log(`   Go to: Vercel Dashboard → Project → Settings → Environment Variables`);
     console.log('');
 
@@ -414,26 +414,26 @@ function printFixSuggestions(results: Record<string, EnvAuditResult>) {
   }
 
   // Clerk-specific recommendations
-  console.log(`\n🔐 CLERK CONFIGURATION CHECKLIST:`);
+  console.log(`\n CLERK CONFIGURATION CHECKLIST:`);
 
   const prodResult = results.production;
   if (prodResult?.suspicious.some((s) => s.key.includes('CLERK'))) {
-    console.log(`   ❌ Production Clerk configuration issues detected`);
-    console.log(`   📌 Fix: Ensure production uses live Clerk keys (pk_live_*, sk_live_*)`);
-    console.log(`   📌 Fix: Set NEXT_PUBLIC_SITE_URL=https://www.otaku-mori.com`);
-    console.log(`   📌 Fix: In Clerk Dashboard → Domains, add both:`);
+    console.log(`    Production Clerk configuration issues detected`);
+    console.log(`    Fix: Ensure production uses live Clerk keys (pk_live_*, sk_live_*)`);
+    console.log(`    Fix: Set NEXT_PUBLIC_SITE_URL=https://www.otaku-mori.com`);
+    console.log(`    Fix: In Clerk Dashboard → Domains, add both:`);
     console.log(`          - https://www.otaku-mori.com`);
     console.log(`          - https://otaku-mori.com`);
   }
 
   const previewResult = results.preview;
   if (previewResult?.suspicious.some((s) => s.key.includes('CLERK'))) {
-    console.log(`   ⚠️  Preview environment using production Clerk keys`);
-    console.log(`   📌 Fix: Use development/test Clerk keys for preview deployments`);
-    console.log(`   📌 Fix: Add *.vercel.app domains to Clerk allowed origins`);
+    console.log(`     Preview environment using production Clerk keys`);
+    console.log(`    Fix: Use development/test Clerk keys for preview deployments`);
+    console.log(`    Fix: Add *.vercel.app domains to Clerk allowed origins`);
   }
 
-  console.log(`\n🌐 DOMAIN/ORIGIN QUICK CHECKS:`);
+  console.log(`\n DOMAIN/ORIGIN QUICK CHECKS:`);
   console.log(`   • Production NEXT_PUBLIC_SITE_URL must be: https://www.otaku-mori.com`);
   console.log(`   • Production NEXT_PUBLIC_APP_URL must be: https://otaku-mori.com`);
   console.log(`   • Clerk production keys only work with approved domains`);
@@ -464,12 +464,12 @@ function getExampleValue(key: string): string {
 
 // Main execution
 async function main(): Promise<void> {
-  console.log('🚀 Starting Vercel Environment Variables Audit...\n');
+  console.log(' Starting Vercel Environment Variables Audit...\n');
 
   // Check prerequisites
   const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
   if (!VERCEL_TOKEN) {
-    console.error('❌ VERCEL_TOKEN environment variable is required');
+    console.error(' VERCEL_TOKEN environment variable is required');
     console.error('   Get it from: https://vercel.com/account/tokens');
     console.error('   Usage: VERCEL_TOKEN=xxx node scripts/audit-vercel-env.ts');
     process.exit(1);
@@ -478,7 +478,7 @@ async function main(): Promise<void> {
   try {
     runVercelCommand('--version');
   } catch {
-    console.error('❌ Vercel CLI not found. Install it with: npm i -g vercel');
+    console.error(' Vercel CLI not found. Install it with: npm i -g vercel');
     process.exit(1);
   }
 
@@ -494,11 +494,11 @@ async function main(): Promise<void> {
   const results: Record<string, EnvAuditResult> = {};
 
   for (const env of environments) {
-    console.log(`\n📊 Fetching ${env} environment variables...`);
+    console.log(`\n Fetching ${env} environment variables...`);
     const envVars = fetchVercelEnvs(env);
 
     if (envVars.length === 0) {
-      console.log(`⚠️  No variables found for ${env} environment`);
+      console.log(`  No variables found for ${env} environment`);
       continue;
     }
 
@@ -513,9 +513,9 @@ async function main(): Promise<void> {
   printFixSuggestions(results);
 
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`✅ AUDIT COMPLETE`);
+  console.log(` AUDIT COMPLETE`);
   console.log(`${'='.repeat(60)}`);
-  console.log(`\n📋 NEXT STEPS:`);
+  console.log(`\n NEXT STEPS:`);
   console.log(`   1. Fix missing variables in Vercel Dashboard`);
   console.log(`   2. Update Clerk domain settings if needed`);
   console.log(`   3. Restart deployments to pick up new environment variables`);
@@ -523,6 +523,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error('💥 Audit failed:', error instanceof Error ? error.message : error);
+  console.error(' Audit failed:', error instanceof Error ? error.message : error);
   process.exit(1);
 });*/

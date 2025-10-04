@@ -16,17 +16,17 @@ export function RandomAvatarGenerator({ onGenerate, className = '' }: RandomAvat
   const [gender, setGender] = useState('random');
 
   const themes = [
-    { id: 'anime', name: 'Anime', icon: '🎌', description: 'Classic anime style' },
-    { id: 'cyberpunk', name: 'Cyberpunk', icon: '🤖', description: 'Futuristic tech aesthetic' },
-    { id: 'fantasy', name: 'Fantasy', icon: '🧙‍♀️', description: 'Magical fantasy world' },
-    { id: 'kawaii', name: 'Kawaii', icon: '🌸', description: 'Cute and colorful' },
-    { id: 'gothic', name: 'Gothic', icon: '🦇', description: 'Dark and mysterious' },
+    { id: 'anime', name: 'Anime', icon: '', description: 'Classic anime style' },
+    { id: 'cyberpunk', name: 'Cyberpunk', icon: '', description: 'Futuristic tech aesthetic' },
+    { id: 'fantasy', name: 'Fantasy', icon: '‍️', description: 'Magical fantasy world' },
+    { id: 'kawaii', name: 'Kawaii', icon: '', description: 'Cute and colorful' },
+    { id: 'gothic', name: 'Gothic', icon: '', description: 'Dark and mysterious' },
   ];
 
   const genders = [
-    { id: 'random', name: 'Random', icon: '🎲' },
-    { id: 'male', name: 'Male', icon: '♂️' },
-    { id: 'female', name: 'Female', icon: '♀️' },
+    { id: 'random', name: 'Random', icon: '' },
+    { id: 'male', name: 'Male', icon: '️' },
+    { id: 'female', name: 'Female', icon: '️' },
   ];
 
   const handleGenerate = async () => {
@@ -137,7 +137,7 @@ export function RandomAvatarGenerator({ onGenerate, className = '' }: RandomAvat
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <span>🎲</span>
+              <span></span>
               <span>Generate Random Avatar</span>
             </div>
           )}

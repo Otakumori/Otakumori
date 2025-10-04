@@ -29,9 +29,9 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
 
   // Card symbols for different decks
   const deckSymbols = {
-    anime: ['👨‍🦱', '👩‍🦰', '🧑‍🎤', '👸', '🤴', '🧙‍♂️', '🧙‍♀️', '🦸‍♂️', '🦸‍♀️', '👻', '🤖', '👽'],
-    gaming: ['🎮', '🕹️', '👾', '🎯', '🏆', '🎲', '♠️', '♣️', '♥️', '♦️', '🃏', '🎰'],
-    runes: ['⚡', '🔥', '💧', '🌪️', '🌟', '🌙', '☀️', '❄️', '🔮', '💎', '⚔️', '🛡️'],
+    anime: ['‍', '‍', '‍', '', '', '‍️', '‍️', '‍️', '‍️', '', '', ''],
+    gaming: ['', '️', '', '', '', '', '️', '️', '️', '️', '🃝', ''],
+    runes: ['', '', '', '️', '', '', '️', '️', '', '◆', '', ''],
   };
 
   // Initialize game
@@ -192,7 +192,7 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center text-white">
-          <div className="text-6xl mb-4">{gameState === 'won' ? '🎉' : '⏰'}</div>
+          <div className="text-6xl mb-4">{gameState === 'won' ? '' : '⏰'}</div>
           <h2 className="text-3xl font-bold mb-4">
             {gameState === 'won' ? 'Victory!' : "Time's Up!"}
           </h2>
@@ -202,7 +202,7 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
               <div className="text-lg text-gray-300">Moves: {moves}</div>
               <div className="text-lg text-gray-300">Time Left: {formatTime(timeLeft)}</div>
               {moves === pairs && (
-                <div className="text-yellow-400 font-bold">Perfect Game Bonus! 🌟</div>
+                <div className="text-yellow-400 font-bold">Perfect Game Bonus! </div>
               )}
             </div>
           )}
@@ -274,7 +274,7 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
             {card.isFlipped || card.isMatched ? (
               card.value
             ) : (
-              <div className="text-pink-400 text-lg font-bold">🌸</div>
+              <div className="text-pink-400 text-lg font-bold"></div>
             )}
           </div>
         ))}

@@ -26,21 +26,21 @@ export default function FeaturedCarousel() {
 
   const fetchFeaturedProducts = async () => {
     try {
-      console.log('🛍️ Fetching featured products...');
+      // Fetching featured products...
       const response = await fetch('/api/v1/shop/products?limit=6');
-      console.log('📡 Response status:', response.status);
+      // Response status logged
 
       const data = await response.json();
-      console.log('📦 API response data:', data);
+      // API response data logged
 
       if (data.ok && data.data && data.data.products) {
-        console.log('✅ Setting products:', data.data.products.length, 'products');
+        // Setting products
         setProducts(data.data.products);
       } else {
-        console.log('❌ No products in response:', data);
+        // No products in response
       }
     } catch (error) {
-      console.error('❌ Error fetching featured products:', error);
+      console.error(' Error fetching featured products:', error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +74,7 @@ export default function FeaturedCarousel() {
       <div className="text-center py-12">
         <div className="text-6xl mb-4">
           <span role="img" aria-label="Cherry blossom">
-            🌸
+            
           </span>
         </div>
         <h3 className="text-xl font-semibold text-white mb-2">Featured Collection</h3>

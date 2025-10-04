@@ -16,7 +16,7 @@ function Box() {
 export default function DiagCube() {
   useEffect(() => {
     // Explicit boot signal to the console
-    console.log('%c[DiagCube] mounted → attempting WebGL render', 'color:#9AE6B4');
+    // DiagCube mounted - attempting WebGL render
   }, []);
 
   return (

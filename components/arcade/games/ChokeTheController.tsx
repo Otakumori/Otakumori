@@ -86,7 +86,7 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
           >
             <div className="text-4xl">
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                
               </span>
             </div>
           </motion.div>
