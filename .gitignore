@@ -2,6 +2,9 @@
 .env.local
 .env.local.backup
 .env*.local
+.env.vercel
+.env.production
+.env.staging
 node_modules
 .next
 .vercel
