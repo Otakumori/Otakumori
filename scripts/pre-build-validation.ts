@@ -15,25 +15,45 @@ interface ValidationResult {
   warnings: string[];
 }
 
-// Simple glob function
+// Simple glob function with directory exclusions
 function glob(pattern: string, baseDir: string = '.'): string[] {
   const results: string[] = [];
+  const excludedDirs = new Set([
+    'node_modules',
+    '.git',
+    '.next',
+    'dist',
+    'build',
+    '.vercel',
+    'coverage',
+  ]);
 
-  function walkDir(dir: string, pattern: string) {
-    const items = readdirSync(dir);
+  function walkDir(dir: string, pattern: string, depth: number = 0) {
+    // Prevent infinite recursion
+    if (depth > 10) return;
 
-    for (const item of items) {
-      const fullPath = path.join(dir, item);
-      const stat = statSync(fullPath);
+    try {
+      const items = readdirSync(dir);
 
-      if (stat.isDirectory()) {
-        walkDir(fullPath, pattern);
-      } else if (stat.isFile()) {
-        const relativePath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
-        if (matchesPattern(relativePath, pattern)) {
-          results.push(relativePath);
+      for (const item of items) {
+        // Skip excluded directories
+        if (excludedDirs.has(item)) continue;
+
+        const fullPath = path.join(dir, item);
+        const stat = statSync(fullPath);
+
+        if (stat.isDirectory()) {
+          walkDir(fullPath, pattern, depth + 1);
+        } else if (stat.isFile()) {
+          const relativePath = path.relative(baseDir, fullPath).replace(/\\/g, '/');
+          if (matchesPattern(relativePath, pattern)) {
+            results.push(relativePath);
+          }
         }
       }
+    } catch (error) {
+      // Skip directories that can't be read
+      console.warn(`Warning: Could not read directory ${dir}:`, error.message);
     }
   }
 
@@ -250,12 +270,27 @@ class PreBuildValidator {
   }
 }
 
-// Run validation
+// Run validation with timeout
 async function main() {
   const validator = new PreBuildValidator();
-  const result = await validator.validate();
 
-  if (!result.success) {
+  try {
+    // Add timeout to prevent hanging
+    const result = await Promise.race([
+      validator.validate(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Validation timeout after 30 seconds')), 30000),
+      ),
+    ]);
+
+    if (!result.success) {
+      console.error('Validation failed:', result.errors);
+      process.exit(1);
+    }
+
+    console.log('✅ Pre-build validation completed successfully');
+  } catch (error) {
+    console.error('❌ Validation error:', error.message);
     process.exit(1);
   }
 }
