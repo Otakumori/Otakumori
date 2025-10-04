@@ -1,6 +1,6 @@
 'use client';
 import { motion, useAnimationFrame } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useWind from '@/app/hooks/useWind';
 
 // Normalized canopy points (0-1, relative to image width/height)
@@ -21,20 +21,54 @@ const TREE_IMG = '/assets/images/CherryTree.png';
 
 const CherryTree: React.FC = () => {
   const { swayPhase } = useWind();
-  // Sway: ±0.5deg, ±4px X, disables on reduced motion
-  const prefersReducedMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [phase, setPhase] = useState(0);
+  const [isVisible, setIsVisible] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Pause animation when document is hidden
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleVisibilityChange = () => {
+      setIsVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   useAnimationFrame((t) => {
-    if (!prefersReducedMotion) setPhase(t / 4000);
+    if (!prefersReducedMotion && isVisible) {
+      setPhase(t / 4000);
+    }
   });
-  const rotate = prefersReducedMotion ? 0 : Math.sin(phase) * 0.5;
-  const translateX = prefersReducedMotion ? 0 : Math.sin(phase * 0.7) * 4;
+
+  // Sway: ±0.5deg, ±2-4px X, disables on reduced motion or when hidden
+  const rotate = prefersReducedMotion || !isVisible ? 0 : Math.sin(phase) * 0.5;
+  const translateX = prefersReducedMotion || !isVisible ? 0 : Math.sin(phase * 0.7) * 3;
+
   return (
     <motion.img
       src={TREE_IMG}
       alt="Cherry Blossom Tree"
-      style={{ rotate: `${rotate}deg`, translateX }}
+      style={{
+        rotate: `${rotate}deg`,
+        translateX,
+        willChange: prefersReducedMotion || !isVisible ? 'auto' : 'transform',
+      }}
       className="object-contain object-left-bottom h-[100svh] w-auto pointer-events-none select-none"
       draggable={false}
       aria-hidden="true"
