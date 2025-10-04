@@ -77,7 +77,7 @@ export default function CharacterEditorPage() {
 
       if (response.ok) {
         // Show success message
-        console.log('Character saved successfully!');
+        // 'Character saved successfully!'
       }
     } catch (error) {
       console.error('Failed to save character:', error);

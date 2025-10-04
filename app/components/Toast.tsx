@@ -15,7 +15,7 @@ export const useToast = () => {
   // Placeholder hook
   return {
     toast: ({ title, description }: { title: string; description?: string }) => {
-      console.log('Toast:', title, description);
+      // 'Toast:', title, description
     },
   };
 };

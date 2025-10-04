@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     // const totalCleared = keys.length;
 
     // Log cache clear event
-    // console.log(`Cache cleared: ${totalCleared} keys`);
+    // // `Cache cleared: ${totalCleared} keys`
 
     return NextResponse.json({
       success: true,

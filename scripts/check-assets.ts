@@ -8,7 +8,7 @@ try {
     console.error('[assets] Missing files in public/:', missing);
     process.exit(1);
   }
-  console.log('[assets] OK');
+  // '[assets] OK'
 } catch (e) {
   console.error('[assets] Invalid manifest:', e);
   process.exit(1);

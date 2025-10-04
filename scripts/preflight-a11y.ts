@@ -72,7 +72,7 @@ async function testPageA11y(browser: any, page: string): Promise<A11yResult> {
 
   try {
     const url = `${BASE_URL}${page}`;
-    console.log(`Testing A11y: ${url}`);
+    // `Testing A11y: ${url}`
 
     const response = await pageInstance.goto(url, {
       waitUntil: 'networkidle2',
@@ -303,19 +303,19 @@ async function generateA11yReport(results: A11yResult[]) {
 
 async function main() {
   try {
-    console.log(' Starting accessibility preflight checks...');
+    // ' Starting accessibility preflight checks...'
     await ensureArtifactsDir();
 
     const results = await runA11yPreflight();
     const report = await generateA11yReport(results);
 
-    console.log(`\n Accessibility Summary:`);
-    console.log(`   Total pages: ${report.summary.totalPages}`);
-    console.log(`   Total violations: ${report.summary.totalViolations}`);
-    console.log(`   Critical: ${report.summary.criticalViolations}`);
-    console.log(`   Serious: ${report.summary.seriousViolations}`);
-    console.log(`   Moderate: ${report.summary.moderateViolations}`);
-    console.log(`   Minor: ${report.summary.minorViolations}`);
+    // `\n Accessibility Summary:`
+    // `   Total pages: ${report.summary.totalPages}`
+    // `   Total violations: ${report.summary.totalViolations}`
+    // `   Critical: ${report.summary.criticalViolations}`
+    // `   Serious: ${report.summary.seriousViolations}`
+    // `   Moderate: ${report.summary.moderateViolations}`
+    // `   Minor: ${report.summary.minorViolations}`
 
     // Check if any critical or serious violations exist
     const criticalOrSerious = results.filter(
@@ -323,17 +323,17 @@ async function main() {
     );
 
     if (criticalOrSerious.length > 0) {
-      console.log('\n Critical or serious accessibility violations detected:');
+      // '\n Critical or serious accessibility violations detected:'
       criticalOrSerious.forEach((result) => {
-        console.log(
+        // 
           `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`,
-        );
+        
       });
       process.exit(1);
     }
 
-    console.log('\n All accessibility checks passed!');
-    console.log(` Reports saved to: ${ARTIFACTS_DIR}`);
+    // '\n All accessibility checks passed!'
+    // ` Reports saved to: ${ARTIFACTS_DIR}`
   } catch (error) {
     console.error(' Accessibility preflight failed:', error);
     process.exit(1);

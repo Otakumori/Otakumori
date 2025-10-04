@@ -91,7 +91,7 @@ async function testPage(browser: any, page: string): Promise<PreflightResult> {
 
   try {
     const url = `${BASE_URL}${page}`;
-    console.log(`Testing: ${url}`);
+    // `Testing: ${url}`
 
     const response = await pageInstance.goto(url, {
       waitUntil: 'networkidle2',
@@ -276,17 +276,17 @@ async function generateReport(results: PreflightResult[]) {
 
 async function main() {
   try {
-    console.log(' Starting preflight checks...');
+    // ' Starting preflight checks...'
     await ensureArtifactsDir();
 
     const results = await runPreflight();
     const report = await generateReport(results);
 
-    console.log(`\n Preflight Summary:`);
-    console.log(`   Total pages: ${report.summary.totalPages}`);
-    console.log(`   Passed: ${report.summary.passed}`);
-    console.log(`   Failed: ${report.summary.failed}`);
-    console.log(`   Warnings: ${report.summary.warnings}`);
+    // `\n Preflight Summary:`
+    // `   Total pages: ${report.summary.totalPages}`
+    // `   Passed: ${report.summary.passed}`
+    // `   Failed: ${report.summary.failed}`
+    // `   Warnings: ${report.summary.warnings}`
 
     // Check if any critical assertions failed
     const criticalFailures = results.filter(
@@ -299,15 +299,15 @@ async function main() {
     );
 
     if (criticalFailures.length > 0) {
-      console.log('\n Critical failures detected:');
+      // '\n Critical failures detected:'
       criticalFailures.forEach((failure) => {
-        console.log(`   ${failure.url}: ${failure.errors.join(', ')}`);
+        // `   ${failure.url}: ${failure.errors.join(', '}`);
       });
       process.exit(1);
     }
 
-    console.log('\n All preflight checks passed!');
-    console.log(` Reports saved to: ${ARTIFACTS_DIR}`);
+    // '\n All preflight checks passed!'
+    // ` Reports saved to: ${ARTIFACTS_DIR}`
   } catch (error) {
     console.error(' Preflight failed:', error);
     process.exit(1);

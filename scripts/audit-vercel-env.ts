@@ -81,7 +81,7 @@ function runVercelCommand(command: string): string {
   try {
     const projectFlag = process.env.PROJECT_NAME ? `--project ${process.env.PROJECT_NAME}` : '';
     const fullCommand = `vercel ${command} ${projectFlag}`.trim();
-    console.log(`Running: ${fullCommand}`);
+    // `Running: ${fullCommand}`
     // Ensure VERCEL_TOKEN and current env are forwarded
     const env = { ...process.env, VERCEL_TOKEN: otmEnv.VERCEL_TOKEN ?? '' };
     return execSync(fullCommand, {
@@ -102,7 +102,7 @@ function loadLocalEnv(): LocalEnv {
   const env: LocalEnv = {};
 
   if (!existsSync(envPath)) {
-    console.log('ⓘ  No .env.local file found');
+    // 'ⓘ  No .env.local file found'
     return env;
   }
 
@@ -120,7 +120,7 @@ function loadLocalEnv(): LocalEnv {
       }
     }
 
-    console.log(`ⓘ  Loaded ${Object.keys(env).length} variables from .env.local`);
+    // `ⓘ  Loaded ${Object.keys(env.length} variables from .env.local`);
   } catch (error) {
     console.warn(`  Could not read .env.local: ${error}`);
   }
@@ -331,40 +331,40 @@ function printReport(
   result: EnvAuditResult,
   localComparison?: LocalComparison,
 ) {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`⌕ ${environment.toUpperCase()} ENVIRONMENT AUDIT`);
-  console.log(`${'='.repeat(60)}`);
+  // `\n${'='.repeat(60}`);
+  // `⌕ ${environment.toUpperCase(} ENVIRONMENT AUDIT`);
+  // `${'='.repeat(60}`);
 
   if (result.missing.length > 0) {
-    console.log(`\n MISSING REQUIRED VARIABLES (${result.missing.length}):`);
+    // `\n MISSING REQUIRED VARIABLES (${result.missing.length}:`);
     result.missing.forEach((key) => {
-      console.log(`   • ${key}`);
+      // `   • ${key}`
     });
   }
 
   if (result.empty.length > 0) {
-    console.log(`\n  EMPTY VALUES (${result.empty.length}):`);
+    // `\n  EMPTY VALUES (${result.empty.length}:`);
     result.empty.forEach((key) => {
-      console.log(`   • ${key}`);
+      // `   • ${key}`
     });
   }
 
   if (result.suspicious.length > 0) {
-    console.log(`\n SUSPICIOUS VALUES (${result.suspicious.length}):`);
+    // `\n SUSPICIOUS VALUES (${result.suspicious.length}:`);
     result.suspicious.forEach(({ key, value, reason }) => {
-      console.log(`   • ${key}: ${reason}`);
-      console.log(`     Value: ${value}`);
+      // `   • ${key}: ${reason}`
+      // `     Value: ${value}`
     });
   }
 
   if (result.present.length > 0) {
-    console.log(`\n PRESENT VARIABLES (${result.present.length}):`);
+    // `\n PRESENT VARIABLES (${result.present.length}:`);
     const chunks: string[][] = [];
     for (let i = 0; i < result.present.length; i += 4) {
       chunks.push(result.present.slice(i, i + 4));
     }
     chunks.forEach((chunk) => {
-      console.log(`   ${chunk.join(', ')}`);
+      // `   ${chunk.join(', '}`);
     });
   }
 
@@ -372,30 +372,30 @@ function printReport(
     const { localOnly, vercelOnly, different } = localComparison;
 
     if (localOnly.length > 0) {
-      console.log(`\n IN LOCAL .env.local BUT NOT ON VERCEL (${localOnly.length}):`);
-      localOnly.forEach((key) => console.log(`   • ${key}`));
+      // `\n IN LOCAL .env.local BUT NOT ON VERCEL (${localOnly.length}:`);
+      localOnly.forEach((key) => // `   • ${key}`);
     }
 
     if (vercelOnly.length > 0) {
-      console.log(`\n️  ON VERCEL BUT NOT IN LOCAL .env.local (${vercelOnly.length}):`);
-      vercelOnly.forEach((key) => console.log(`   • ${key}`));
+      // `\n️  ON VERCEL BUT NOT IN LOCAL .env.local (${vercelOnly.length}:`);
+      vercelOnly.forEach((key) => // `   • ${key}`);
     }
 
     if (different.length > 0) {
-      console.log(`\n VALUE DIFFERENCES (${different.length}):`);
+      // `\n VALUE DIFFERENCES (${different.length}:`);
       different.forEach(({ key, local, vercel }) => {
-        console.log(`   • ${key}:`);
-        console.log(`     Local:  ${local}`);
-        console.log(`     Vercel: ${vercel}`);
+        // `   • ${key}:`
+        // `     Local:  ${local}`
+        // `     Vercel: ${vercel}`
       });
     }
   }
 }
 
 function printFixSuggestions(results: Record<string, EnvAuditResult>) {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(` RECOMMENDED FIXES`);
-  console.log(`${'='.repeat(60)}`);
+  // `\n${'='.repeat(60}`);
+  // ` RECOMMENDED FIXES`
+  // `${'='.repeat(60}`);
 
   const allMissing = new Set<string>();
   Object.values(results).forEach((result) => {
@@ -403,41 +403,41 @@ function printFixSuggestions(results: Record<string, EnvAuditResult>) {
   });
 
   if (allMissing.size > 0) {
-    console.log(`\n ADD THESE VARIABLES TO VERCEL:`);
-    console.log(`   Go to: Vercel Dashboard → Project → Settings → Environment Variables`);
-    console.log('');
+    // `\n ADD THESE VARIABLES TO VERCEL:`
+    // `   Go to: Vercel Dashboard → Project → Settings → Environment Variables`
+    // ''
 
     Array.from(allMissing).forEach((key) => {
       const example = getExampleValue(key);
-      console.log(`   ${key}=${example}`);
+      // `   ${key}=${example}`
     });
   }
 
   // Clerk-specific recommendations
-  console.log(`\n CLERK CONFIGURATION CHECKLIST:`);
+  // `\n CLERK CONFIGURATION CHECKLIST:`
 
   const prodResult = results.production;
   if (prodResult?.suspicious.some((s) => s.key.includes('CLERK'))) {
-    console.log(`    Production Clerk configuration issues detected`);
-    console.log(`    Fix: Ensure production uses live Clerk keys (pk_live_*, sk_live_*)`);
-    console.log(`    Fix: Set NEXT_PUBLIC_SITE_URL=https://www.otaku-mori.com`);
-    console.log(`    Fix: In Clerk Dashboard → Domains, add both:`);
-    console.log(`          - https://www.otaku-mori.com`);
-    console.log(`          - https://otaku-mori.com`);
+    // `    Production Clerk configuration issues detected`
+    // `    Fix: Ensure production uses live Clerk keys (pk_live_*, sk_live_*`);
+    // `    Fix: Set NEXT_PUBLIC_SITE_URL=https://www.otaku-mori.com`
+    // `    Fix: In Clerk Dashboard → Domains, add both:`
+    // `          - https://www.otaku-mori.com`
+    // `          - https://otaku-mori.com`
   }
 
   const previewResult = results.preview;
   if (previewResult?.suspicious.some((s) => s.key.includes('CLERK'))) {
-    console.log(`     Preview environment using production Clerk keys`);
-    console.log(`    Fix: Use development/test Clerk keys for preview deployments`);
-    console.log(`    Fix: Add *.vercel.app domains to Clerk allowed origins`);
+    // `     Preview environment using production Clerk keys`
+    // `    Fix: Use development/test Clerk keys for preview deployments`
+    // `    Fix: Add *.vercel.app domains to Clerk allowed origins`
   }
 
-  console.log(`\n DOMAIN/ORIGIN QUICK CHECKS:`);
-  console.log(`   • Production NEXT_PUBLIC_SITE_URL must be: https://www.otaku-mori.com`);
-  console.log(`   • Production NEXT_PUBLIC_APP_URL must be: https://otaku-mori.com`);
-  console.log(`   • Clerk production keys only work with approved domains`);
-  console.log(`   • Preview deployments should use test/dev Clerk keys`);
+  // `\n DOMAIN/ORIGIN QUICK CHECKS:`
+  // `   • Production NEXT_PUBLIC_SITE_URL must be: https://www.otaku-mori.com`
+  // `   • Production NEXT_PUBLIC_APP_URL must be: https://otaku-mori.com`
+  // `   • Clerk production keys only work with approved domains`
+  // `   • Preview deployments should use test/dev Clerk keys`
 }
 
 function getExampleValue(key: string): string {
@@ -464,7 +464,7 @@ function getExampleValue(key: string): string {
 
 // Main execution
 async function main(): Promise<void> {
-  console.log(' Starting Vercel Environment Variables Audit...\n');
+  // ' Starting Vercel Environment Variables Audit...\n'
 
   // Check prerequisites
   const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
@@ -494,11 +494,11 @@ async function main(): Promise<void> {
   const results: Record<string, EnvAuditResult> = {};
 
   for (const env of environments) {
-    console.log(`\n Fetching ${env} environment variables...`);
+    // `\n Fetching ${env} environment variables...`
     const envVars = fetchVercelEnvs(env);
 
     if (envVars.length === 0) {
-      console.log(`  No variables found for ${env} environment`);
+      // `  No variables found for ${env} environment`
       continue;
     }
 
@@ -512,14 +512,14 @@ async function main(): Promise<void> {
   // Print fix suggestions
   printFixSuggestions(results);
 
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(` AUDIT COMPLETE`);
-  console.log(`${'='.repeat(60)}`);
-  console.log(`\n NEXT STEPS:`);
-  console.log(`   1. Fix missing variables in Vercel Dashboard`);
-  console.log(`   2. Update Clerk domain settings if needed`);
-  console.log(`   3. Restart deployments to pick up new environment variables`);
-  console.log(`   4. Test authentication on each environment`);
+  // `\n${'='.repeat(60}`);
+  // ` AUDIT COMPLETE`
+  // `${'='.repeat(60}`);
+  // `\n NEXT STEPS:`
+  // `   1. Fix missing variables in Vercel Dashboard`
+  // `   2. Update Clerk domain settings if needed`
+  // `   3. Restart deployments to pick up new environment variables`
+  // `   4. Test authentication on each environment`
 }
 
 main().catch((error) => {

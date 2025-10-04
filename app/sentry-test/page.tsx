@@ -6,37 +6,37 @@ import * as Sentry from '@sentry/nextjs';
 export default function SentryTestPage() {
   useEffect(() => {
     // Trigger errors immediately when page loads
-    console.log(' Triggering Sentry test errors...');
+    // Triggering Sentry test errors...
 
     // Test 1: Throw an error
     setTimeout(() => {
-      console.log('Throwing test error...');
+      // Throwing test error...
       throw new Error('Sentry Test Error - This should appear in your dashboard!');
     }, 1000);
 
     // Test 2: Capture a message
-    console.log('Sending test message...');
+    // Sending test message...
     Sentry.captureMessage('Sentry Test Message - This should appear in your dashboard!', 'info');
 
     // Test 3: Capture an exception
-    console.log('Capturing test exception...');
+    // Capturing test exception...
     Sentry.captureException(
       new Error('Sentry Test Exception - This should appear in your dashboard!'),
     );
   }, []);
 
   const triggerError = () => {
-    console.log('Manual error triggered!');
+    // Manual error triggered!
     throw new Error('Manual Sentry Test Error!');
   };
 
   const triggerAsyncError = async () => {
-    console.log('Async error triggered!');
+    // Async error triggered!
     throw new Error('Async Sentry Test Error!');
   };
 
   const sendMessage = () => {
-    console.log('Message sent!');
+    // Message sent!
     Sentry.captureMessage('Manual Sentry Test Message!', 'warning');
   };
 
@@ -112,10 +112,7 @@ export default function SentryTestPage() {
           <h2 className="text-2xl font-semibold mb-4 text-red-300">
             {
               <>
-                <span role="img" aria-label="emoji">
-                  
-                </span>
-                ' '
+                <span role="img" aria-label="emoji"></span>' '
                 <span role="img" aria-label="emoji">
                   E
                 </span>
@@ -1064,10 +1061,7 @@ export default function SentryTestPage() {
             {
               <>
                 ''
-                <span role="img" aria-label="emoji">
-                  
-                </span>
-                ' '
+                <span role="img" aria-label="emoji"></span>' '
                 <span role="img" aria-label="emoji">
                   A
                 </span>

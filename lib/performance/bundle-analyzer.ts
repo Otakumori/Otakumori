@@ -223,7 +223,7 @@ export class BundleAnalyzer {
    * Log analysis results
    */
   logResults(metrics: PerformanceMetrics, budgetCheck: ReturnType<typeof this.checkBudget>): void {
-    console.group(' Bundle Analysis Results');
+    // Bundle Analysis Results
 
     // Bundle Sizes logged
     // Main bundle size logged
@@ -249,7 +249,7 @@ export class BundleAnalyzer {
       });
     }
 
-    console.groupEnd();
+    // Group end
   }
 }
 

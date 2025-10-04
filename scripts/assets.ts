@@ -120,13 +120,13 @@ async function main() {
         bytes,
         sha256: fileHash,
       };
-      console.log(` Local file: ${item.id} -> ${publicPath}`);
+      // ` Local file: ${item.id} -> ${publicPath}`
       continue;
     }
 
     // --- existing ZIP handling stays as-is ---
     if (type === 'zip') {
-      console.log(`→ Fetching ZIP ${item.id} from ${item.url}`);
+      // `→ Fetching ZIP ${item.id} from ${item.url}`
       const { tmpPath, bytes } = await downloadToTemp(item.url!);
       const zip = new AdmZip(tmpPath);
 
@@ -193,7 +193,7 @@ async function main() {
     // single file
     const destAbs = path.join(baseDirAbs, item.dest || '');
     ensureDir(destAbs);
-    console.log(`→ Fetching ${item.id} from ${item.url}`);
+    // `→ Fetching ${item.id} from ${item.url}`
     const { tmpPath, bytes } = await downloadToTemp(item.url);
     const actualHash = await sha256File(tmpPath);
     if (item.checksum && item.checksum.length > 0 && item.checksum.toLowerCase() !== actualHash) {
@@ -237,8 +237,8 @@ async function main() {
   const dts = `// AUTO‑GENERATED keys for getAsset()/getGame()\nexport type AssetId = ${keys || 'string'};\n`;
   await fsp.writeFile(MANIFEST_D_TS, dts, 'utf8');
 
-  console.log(`\n Done. ${Object.keys(manifest).length} items processed.`);
-  console.log(`• Manifest: ${path.relative(ROOT, MANIFEST_TS)}`);
+  // `\n Done. ${Object.keys(manifest.length} items processed.`);
+  // `• Manifest: ${path.relative(ROOT, MANIFEST_TS}`);
 }
 
 main().catch((err) => {

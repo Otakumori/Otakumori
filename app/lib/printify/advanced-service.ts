@@ -602,24 +602,24 @@ export class AdvancedPrintifyService {
 
   private async handleOrderCreated(orderData: any): Promise<void> {
     // Handle new order webhook
-    console.log('Order created:', orderData);
+    // 'Order created:', orderData
   }
 
   private async handleOrderUpdated(orderData: any): Promise<void> {
     // Handle order update webhook
-    console.log('Order updated:', orderData);
+    // 'Order updated:', orderData
   }
 
   private async handleProductUpdated(productData: any): Promise<void> {
     // Handle product update webhook
     this.clearCache(`product:${productData.id}`);
-    console.log('Product updated:', productData);
+    // 'Product updated:', productData
   }
 
   private async handleInventoryUpdated(inventoryData: any): Promise<void> {
     // Handle inventory update webhook
     this.clearCache('inventory:all');
-    console.log('Inventory updated:', inventoryData);
+    // 'Inventory updated:', inventoryData
   }
 
   private clearRelatedCaches(eventType: string, eventData: any): void {

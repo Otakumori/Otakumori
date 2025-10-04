@@ -46,7 +46,7 @@ class PerformanceAuditor {
   };
 
   async runAudit(): Promise<PerformanceResult> {
-    console.log(' Starting Performance Budget Audit...\n');
+    // ' Starting Performance Budget Audit...\n'
 
     const chunks = await this.analyzeChunks();
     const violations = this.checkBudgetViolations(chunks);
@@ -86,7 +86,7 @@ class PerformanceAuditor {
         .then(() => true)
         .catch(() => false);
       if (!buildExists) {
-        console.log(' Build directory not found. Running build first...');
+        // ' Build directory not found. Running build first...'
         await this.runBuild();
       }
 
@@ -110,7 +110,7 @@ class PerformanceAuditor {
           }
         }
       } catch (error) {
-        console.log(' JavaScript chunks directory not found');
+        // ' JavaScript chunks directory not found'
       }
 
       // Analyze CSS chunks
@@ -133,7 +133,7 @@ class PerformanceAuditor {
           }
         }
       } catch (error) {
-        console.log(' CSS chunks directory not found');
+        // ' CSS chunks directory not found'
       }
 
       return chunks;
@@ -189,7 +189,7 @@ class PerformanceAuditor {
   }
 
   private async runLighthouseAudit(): Promise<void> {
-    console.log('\n⌕ Running Lighthouse Performance Audit...');
+    // '\n⌕ Running Lighthouse Performance Audit...'
 
     try {
       // Check if Lighthouse is available
@@ -197,77 +197,77 @@ class PerformanceAuditor {
 
       lighthouse.on('close', (code) => {
         if (code === 0) {
-          console.log(
+          // 
             ' Lighthouse is available. Run manually: lighthouse http://localhost:3000 --only-categories=performance',
-          );
+          
         } else {
-          console.log(' Lighthouse not installed. Install with: npm install -g lighthouse');
+          // ' Lighthouse not installed. Install with: npm install -g lighthouse'
         }
       });
 
       lighthouse.on('error', () => {
-        console.log(' Lighthouse not available. Install with: npm install -g lighthouse');
+        // ' Lighthouse not available. Install with: npm install -g lighthouse'
       });
     } catch (error) {
-      console.log(' Could not check Lighthouse availability');
+      // ' Could not check Lighthouse availability'
     }
   }
 
   private printResults(result: PerformanceResult): void {
-    console.log('\n' + '='.repeat(80));
-    console.log(' PERFORMANCE BUDGET AUDIT RESULTS');
-    console.log('='.repeat(80));
+    // '\n' + '='.repeat(80);
+    // ' PERFORMANCE BUDGET AUDIT RESULTS'
+    // '='.repeat(80);
 
-    console.log(`\n Budget Targets:`);
-    console.log(`   Max Chunk Size: ${this.formatBytes(result.budget.maxChunkSize)} (gzip)`);
-    console.log(`   Max Total JS: ${this.formatBytes(result.budget.maxTotalJS)} (gzip)`);
-    console.log(`   Target LCP: ${result.budget.lcp}ms`);
-    console.log(`   Target FPS: ${result.budget.targetFps}fps (GameCube)`);
+    // `\n Budget Targets:`
+    // `   Max Chunk Size: ${this.formatBytes(result.budget.maxChunkSize} (gzip)`);
+    // `   Max Total JS: ${this.formatBytes(result.budget.maxTotalJS} (gzip)`);
+    // `   Target LCP: ${result.budget.lcp}ms`
+    // `   Target FPS: ${result.budget.targetFps}fps (GameCube`);
 
-    console.log(`\n Chunk Analysis:`);
-    console.log(`   Total Chunks: ${result.results.chunks.length}`);
-    console.log(`   Total JS Size: ${this.formatBytes(result.results.totalJSSize)} (gzip)`);
+    // `\n Chunk Analysis:`
+    // `   Total Chunks: ${result.results.chunks.length}`
+    // `   Total JS Size: ${this.formatBytes(result.results.totalJSSize} (gzip)`);
 
     if (result.results.largestChunks.length > 0) {
-      console.log(`\n Largest JavaScript Chunks:`);
+      // `\n Largest JavaScript Chunks:`
       result.results.largestChunks.slice(0, 5).forEach((chunk, i) => {
         const status = chunk.gzipSize > result.budget.maxChunkSize ? '' : '';
-        console.log(`   ${i + 1}. ${status} ${chunk.name}: ${this.formatBytes(chunk.gzipSize)}`);
+        // `   ${i + 1}. ${status} ${chunk.name}: ${this.formatBytes(chunk.gzipSize}`);
       });
     }
 
     if (result.results.budgetViolations.length > 0) {
-      console.log(`\n Budget Violations:`);
+      // `\n Budget Violations:`
       result.results.budgetViolations.forEach((violation) => {
-        console.log(`   ${violation}`);
+        // `   ${violation}`
       });
 
-      console.log(`\n Optimization Recommendations:`);
-      console.log(`   • Use dynamic imports for heavy components`);
-      console.log(`   • Implement code splitting for routes`);
-      console.log(`   • Consider lazy loading for GameCube interface`);
-      console.log(`   • Use tree-shaking to remove unused code`);
-      console.log(`   • Optimize third-party dependencies`);
+      // `\n Optimization Recommendations:`
+      // `   • Use dynamic imports for heavy components`
+      // `   • Implement code splitting for routes`
+      // `   • Consider lazy loading for GameCube interface`
+      // `   • Use tree-shaking to remove unused code`
+      // `   • Optimize third-party dependencies`
     } else {
-      console.log(`\n All chunks pass performance budget!`);
+      // `\n All chunks pass performance budget!`
     }
 
-    console.log(`\n GameCube Performance Notes:`);
-    console.log(`   • Target 60fps for smooth animations`);
-    console.log(`   • Use requestAnimationFrame for frame-perfect updates`);
-    console.log(`   • Consider reduced motion preferences`);
-    console.log(`   • Optimize WebGL/Canvas rendering if applicable`);
+    // `\n GameCube Performance Notes:`
+    // `   • Target 60fps for smooth animations`
+    // `   • Use requestAnimationFrame for frame-perfect updates`
+    // `   • Consider reduced motion preferences`
+    // `   • Optimize WebGL/Canvas rendering if applicable`
 
-    console.log('\n' + '='.repeat(80));
+    // '\n' + '='.repeat(80);
 
     if (result.passed) {
-      console.log(' PERFORMANCE BUDGET: PASSED');
+      // ' PERFORMANCE BUDGET: PASSED'
     } else {
-      console.log(' PERFORMANCE BUDGET: VIOLATIONS DETECTED');
-      console.log('Please address the violations above before deployment.');
+      // ' PERFORMANCE BUDGET: VIOLATIONS DETECTED'
+      // 'Please address the violations above before deployment.'
     }
 
-    console.log('='.repeat(80) + '\n');
+    // '='.repeat(80 + '\n');
   }
 
   private formatBytes(bytes: number): string {
@@ -282,12 +282,12 @@ class PerformanceAuditor {
 // GameCube 60fps performance checker
 class GameCubePerformanceChecker {
   static checkFramePerformance(): void {
-    console.log('\n GameCube Performance Check:');
-    console.log('Add this to your GameCube components for runtime monitoring:');
-    console.log(`
+    // '\n GameCube Performance Check:'
+    // 'Add this to your GameCube components for runtime monitoring:'
+    // `
     // Frame rate monitoring
     let frameCount = 0;
-    let lastTime = performance.now();
+    let lastTime = performance.now(
     
     const checkFPS = () => {
       frameCount++;

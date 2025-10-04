@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     // Send notifications if requested
     if (params.notify === 'true' && alerts.length > 0) {
       // In a real implementation, this would send notifications
-      console.log(`Inventory alerts: ${alerts.length} items need attention`);
+      // Inventory alerts: ${alerts.length} items need attention
     }
 
     // Track inventory sync event

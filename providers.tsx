@@ -100,7 +100,7 @@ const usePetalStore = create<
       get().addPetals(petalReward);
 
       // TODO: Send to analytics/achievement system
-      console.log(`Reward claimed: ${code} for ${petalReward} petals`);
+      // Reward claimed: ${code} for ${petalReward} petals
 
       return { success: true, petals: petalReward };
     } catch (error) {
@@ -114,7 +114,7 @@ const usePetalStore = create<
   resetDailyLimit: () => set({ petals: 0 }),
   syncPetals: async (userId: string) => {
     // TODO: Fetch petals from Supabase for logged-in user (disabled for deployment)
-    console.log('syncPetals called for userId:', userId);
+    // syncPetals called for userId: ${userId}
     // For now, do nothing - use localStorage only
   },
 }));

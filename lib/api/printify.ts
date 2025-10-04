@@ -151,14 +151,7 @@ export async function publishProduct(productId: string) {
 export async function checkPrintifyHealth() {
   try {
     // Starting Printify health check...
-    console.log('Environment check logged', {
-      NODE_ENV: env.NODE_ENV,
-      VERCEL_ENV: env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
-      hasApiKey: !!env.PRINTIFY_API_KEY,
-      hasShopId: !!env.PRINTIFY_SHOP_ID,
-      apiKeyLength: env.PRINTIFY_API_KEY?.length || 0,
-      shopId: env.PRINTIFY_SHOP_ID || 'Not set',
-    });
+    // Environment check logged
 
     // Test basic connectivity first
     const testResponse = await fetch('https://api.printify.com/v1/health', {

@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log(' Seeding Rune System...');
+  // ' Seeding Rune System...'
 
   // Create or update site configuration
   await prisma.siteConfig.upsert({
@@ -72,7 +72,7 @@ async function main() {
     },
   });
 
-  console.log(' Site configuration created/updated');
+  // ' Site configuration created/updated'
 
   // Create initial rune definitions
   const runeDefs = [
@@ -162,7 +162,7 @@ async function main() {
     });
   }
 
-  console.log(' Rune definitions created/updated');
+  // ' Rune definitions created/updated'
 
   // Create initial rune combos
   const runeCombos = [
@@ -235,7 +235,7 @@ async function main() {
     }
   }
 
-  console.log(' Rune combos created/updated');
+  // ' Rune combos created/updated'
 
   // Update site config with rune data
   await prisma.siteConfig.update({
@@ -251,11 +251,11 @@ async function main() {
     },
   });
 
-  console.log(' Site configuration updated with rune data');
+  // ' Site configuration updated with rune data'
 
-  console.log(' Rune System seeding completed!');
-  console.log(` Created ${runeDefs.length} rune definitions`);
-  console.log(` Created ${runeCombos.length} rune combos`);
+  // ' Rune System seeding completed!'
+  // ` Created ${runeDefs.length} rune definitions`
+  // ` Created ${runeCombos.length} rune combos`
 }
 
 main()

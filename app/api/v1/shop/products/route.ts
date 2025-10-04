@@ -8,10 +8,10 @@ export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
   try {
     // Debug: Check environment variables
-    console.log('⌕ Environment check:');
-    console.log('Shop ID:', env.PRINTIFY_SHOP_ID);
-    console.log('API Key exists:', !!env.PRINTIFY_API_KEY);
-    console.log('API Key length:', env.PRINTIFY_API_KEY?.length);
+    // '⌕ Environment check:'
+    // 'Shop ID:', env.PRINTIFY_SHOP_ID
+    // 'API Key exists:', !!env.PRINTIFY_API_KEY
+    // 'API Key length:', env.PRINTIFY_API_KEY?.length
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     // Simple Printify API call
     const url = `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`;
-    console.log(' Calling URL:', url);
+    // ' Calling URL:', url
 
     const printifyResponse = await fetch(url, {
       headers: {
@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    console.log(' Response status:', printifyResponse.status);
-    console.log(' Response headers:', Object.fromEntries(printifyResponse.headers.entries()));
+    // ' Response status:', printifyResponse.status
+    // ' Response headers:', Object.fromEntries(printifyResponse.headers.entries());
 
     if (!printifyResponse.ok) {
       const errorText = await printifyResponse.text();
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     const printifyData = await printifyResponse.json();
-    console.log(' Success! Products found:', printifyData.data?.length || 0);
+    // ' Success! Products found:', printifyData.data?.length || 0
 
     // Transform products
     const products = printifyData.data.map((product: any) => ({

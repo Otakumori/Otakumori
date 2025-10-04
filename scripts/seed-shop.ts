@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log(' Seeding shop items...');
+  // ' Seeding shop items...'
 
   // Sakura Frame
   await prisma.petalShopItem.upsert({
@@ -63,7 +63,7 @@ async function main() {
     },
   });
 
-  console.log(' Shop items seeded successfully!');
+  // ' Shop items seeded successfully!'
 }
 
 main()

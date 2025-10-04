@@ -162,5 +162,5 @@ async function processFile(path: string) {
     if (ok) edited++;
   }
    
-  console.log(`[prefix-unused] Updated ${edited} file(s).`);
+  // `[prefix-unused] Updated ${edited} file(s.`);
 })();

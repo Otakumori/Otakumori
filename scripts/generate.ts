@@ -221,7 +221,7 @@ async function main() {
       vibe = getVibeForAvatar(avatar);
       if (!vibe) throw new Error(`Unknown vibe for avatar: ${avatar}`);
 
-      console.log(` Avatar "${avatar}" resolved to vibe: ${vibe}`);
+      // ` Avatar "${avatar}" resolved to vibe: ${vibe}`
     } catch (error) {
       console.error('Failed to import style-map:', error);
       throw new Error(`Could not resolve vibe for avatar: ${avatar}`);
@@ -233,13 +233,13 @@ async function main() {
     }
     presetId = family[classKey];
 
-    console.log(
-      ` Generating ${classKey} for avatar "${avatar}" (${vibe} vibe) → preset: ${presetId}`,
+    // 
+      ` Generating ${classKey} for avatar "${avatar}" (${vibe} vibe → preset: ${presetId}`,
     );
   } else {
     // User passed a direct preset id like "minigame.noir.tech"
     presetId = targetOrPreset;
-    console.log(` Using direct preset: ${presetId}`);
+    // ` Using direct preset: ${presetId}`
   }
 
   const preset = gen.presets[presetId];
@@ -264,8 +264,8 @@ async function main() {
       };
 
   if (ditherCfg) {
-    console.log(
-      ` Dithering: ${ditherCfg.mode} (strength: ${ditherCfg.strength}, alpha: ${ditherCfg.alphaThreshold})`,
+    // 
+      ` Dithering: ${ditherCfg.mode} (strength: ${ditherCfg.strength}, alpha: ${ditherCfg.alphaThreshold}`,
     );
   }
 
@@ -333,7 +333,7 @@ async function main() {
 
   for (let i = 0; i < count; i++) {
     const name = names[i];
-    console.log(`  → Generating ${name} (${i + 1}/${count})`);
+    // `  → Generating ${name} (${i + 1}/${count}`);
 
     // Prepare per-image workflow copy and patch prompts
     const wf = JSON.parse(JSON.stringify(workflow));
@@ -354,7 +354,7 @@ async function main() {
     const prompt_id = data.prompt_id || data.promptId || data?.['prompt_id'];
     if (!prompt_id) throw new Error('No prompt_id in ComfyUI response');
 
-    console.log(`    Waiting for ComfyUI to generate...`);
+    // `    Waiting for ComfyUI to generate...`
     const urls = await waitForImages(endpoint, prompt_id);
     if (!urls.length) throw new Error('No images generated');
 
@@ -366,7 +366,7 @@ async function main() {
 
     // Apply dithering if configured
     if (ditherCfg && preset.palette?.length) {
-      console.log(`    Applying ${ditherCfg.mode} dithering...`);
+      // `    Applying ${ditherCfg.mode} dithering...`
 
       // Pull raw pixels, dither to palette, then re-encode PNG
       const sharp = (await import('sharp')).default;
@@ -426,9 +426,9 @@ async function main() {
 
   await fsp.writeFile(ASSET_CFG, JSON.stringify(assets, null, 2), 'utf8');
 
-  console.log('\n Generated:');
-  for (const r of results) console.log(' •', r.publicPath);
-  console.log(`\n Next: run 'npm run assets:sync' to ensure the manifest includes these.`);
+  // '\n Generated:'
+  for (const r of results) // ' •', r.publicPath
+  // `\n Next: run 'npm run assets:sync' to ensure the manifest includes these.`
 }
 
 main().catch((e) => {

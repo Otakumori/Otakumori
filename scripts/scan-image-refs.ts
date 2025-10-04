@@ -52,4 +52,4 @@ for (const [file, paths] of results.entries()) {
 const out = path.join(root, 'content', 'IMAGE_REF_SCAN.md');
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, lines.join('\n'), 'utf-8');
-console.log(`[scan] Wrote → ${out}`);
+// `[scan] Wrote → ${out}`

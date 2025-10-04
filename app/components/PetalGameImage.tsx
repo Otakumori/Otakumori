@@ -40,7 +40,7 @@ export default function PetalGameImage() {
   // Fetch global and user petal counts - disabled during Supabase migration
   useEffect(() => {
     // Temporarily disabled while migrating to Prisma
-    console.log('Petal fetching disabled during migration');
+    // 'Petal fetching disabled during migration'
     // const fetchGlobal = async () => {
     //   if (!supabase) {
     //     console.warn('Supabase client not available');

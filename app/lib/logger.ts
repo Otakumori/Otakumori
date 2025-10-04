@@ -68,10 +68,10 @@ class Logger {
       const routeInfo = ctx?.route ? ` ${colors.debug}[${ctx.route}]${colors.reset}` : '';
       const requestInfo = ctx?.requestId ? ` ${colors.debug}[${ctx.requestId}]${colors.reset}` : '';
 
-      console.log(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
+      // `${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`
 
       if (data) {
-        console.log(`${colors.debug}Data:${colors.reset}`, data);
+        // `${colors.debug}Data:${colors.reset}`, data
       }
 
       if (error) {
@@ -90,7 +90,7 @@ class Logger {
           if (!this.isTest) console.debug(line);
           break;
         default:
-          console.log(line);
+          // line
       }
     }
 

@@ -58,11 +58,11 @@ class SEOAuditor {
   private warnings: string[] = [];
 
   async audit(): Promise<boolean> {
-    console.log('⌕ Starting SEO audit...');
+    // '⌕ Starting SEO audit...'
 
     for (const route of TARGET_ROUTES) {
       try {
-        console.log(`\n Auditing ${route}...`);
+        // `\n Auditing ${route}...`
         const result = await this.auditRoute(route);
         this.results.push(result);
         this.validateResult(result);
@@ -245,36 +245,36 @@ class SEOAuditor {
   }
 
   private printResults(): void {
-    console.log('\n SEO Audit Results:');
-    console.log('========================');
+    // '\n SEO Audit Results:'
+    // '========================'
 
     this.results.forEach((result) => {
-      console.log(`\n ${result.route}`);
-      console.log(`   Title: ${result.title.present ? '' : ''} (${result.title.length} chars)`);
-      console.log(
-        `   Description: ${result.description.present ? '' : ''} (${result.description.length} chars)`,
+      // `\n ${result.route}`
+      // `   Title: ${result.title.present ? '' : ''} (${result.title.length} chars`);
+      // 
+        `   Description: ${result.description.present ? '' : ''} (${result.description.length} chars`,
       );
-      console.log(`   H1: ${result.h1.valid ? '' : ''} (${result.h1.count} found)`);
-      console.log(`   Canonical: ${result.canonical.present ? '' : ''}`);
-      console.log(
-        `   Open Graph: ${Object.values(result.openGraph).filter(Boolean).length}/4 tags`,
+      // `   H1: ${result.h1.valid ? '' : ''} (${result.h1.count} found`);
+      // `   Canonical: ${result.canonical.present ? '' : ''}`
+      // 
+        `   Open Graph: ${Object.values(result.openGraph.filter(Boolean).length}/4 tags`,
       );
-      console.log(
-        `   JSON-LD: ${result.jsonLd.present ? '' : ''} (${result.jsonLd.types.join(', ')})`,
+      // 
+        `   JSON-LD: ${result.jsonLd.present ? '' : ''} (${result.jsonLd.types.join(', '})`,
       );
     });
 
     if (this.warnings.length > 0) {
-      console.log('\n  Warnings:');
-      this.warnings.forEach((warning) => console.log(warning));
+      // '\n  Warnings:'
+      this.warnings.forEach((warning) => // warning);
     }
 
     if (this.errors.length > 0) {
-      console.log('\n Errors:');
-      this.errors.forEach((error) => console.log(error));
-      console.log(`\n SEO audit failed with ${this.errors.length} errors!`);
+      // '\n Errors:'
+      this.errors.forEach((error) => // error);
+      // `\n SEO audit failed with ${this.errors.length} errors!`
     } else {
-      console.log('\n SEO audit passed!');
+      // '\n SEO audit passed!'
     }
 
     // Summary stats
@@ -283,7 +283,7 @@ class SEOAuditor {
       0,
       Math.round(((this.results.length * 6 - totalIssues) / (this.results.length * 6)) * 100),
     );
-    console.log(`\n SEO Score: ${scorePercentage}%`);
+    // `\n SEO Score: ${scorePercentage}%`
   }
 }
 

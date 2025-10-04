@@ -60,8 +60,8 @@ class AssetVerifier {
   }
 
   async verify(): Promise<boolean> {
-    console.log('⌕ Starting asset verification...');
-    console.log(` Manifest version: ${this.manifest.version}`);
+    // '⌕ Starting asset verification...'
+    // ` Manifest version: ${this.manifest.version}`
 
     await this.verifyAssetSection('ui', this.manifest.ui);
     await this.verifyAssetSection('shared', this.manifest.shared);
@@ -76,7 +76,7 @@ class AssetVerifier {
   }
 
   private async verifyAssetSection(section: string, assets: any): Promise<void> {
-    console.log(`\n Verifying ${section} assets...`);
+    // `\n Verifying ${section} assets...`
 
     for (const [key, asset] of Object.entries(assets)) {
       if (typeof asset === 'object' && asset.path) {
@@ -93,7 +93,7 @@ class AssetVerifier {
   }
 
   private async verifyGameAssets(gameId: string, gameAssets: any): Promise<void> {
-    console.log(`\n Verifying ${gameId} assets...`);
+    // `\n Verifying ${gameId} assets...`
 
     const processAssets = async (obj: any, prefix = ''): Promise<void> => {
       for (const [key, value] of Object.entries(obj)) {
@@ -155,7 +155,7 @@ class AssetVerifier {
       }
 
       this.stats.validated++;
-      console.log(` ${section}.${key} - ${this.formatBytes(stats.size)}`);
+      // ` ${section}.${key} - ${this.formatBytes(stats.size}`);
     } catch (error) {
       this.errors.push(` ${section}.${key}: File not found - ${asset.path}`);
       this.stats.missingAssets++;
@@ -198,7 +198,7 @@ class AssetVerifier {
     }
 
     this.stats.validated += matches.length;
-    console.log(` ${section}.${key} - ${matches.length} files`);
+    // ` ${section}.${key} - ${matches.length} files`
   }
 
   private isValidFormat(ext: string): boolean {
@@ -212,24 +212,24 @@ class AssetVerifier {
   }
 
   private printResults(): void {
-    console.log('\n Verification Results:');
-    console.log(` Total assets: ${this.stats.totalAssets}`);
-    console.log(` Validated: ${this.stats.validated}`);
-    console.log(` Missing: ${this.stats.missingAssets}`);
-    console.log(` Oversized: ${this.stats.oversizedAssets}`);
-    console.log(`  Invalid formats: ${this.stats.invalidFormats}`);
+    // '\n Verification Results:'
+    // ` Total assets: ${this.stats.totalAssets}`
+    // ` Validated: ${this.stats.validated}`
+    // ` Missing: ${this.stats.missingAssets}`
+    // ` Oversized: ${this.stats.oversizedAssets}`
+    // `  Invalid formats: ${this.stats.invalidFormats}`
 
     if (this.warnings.length > 0) {
-      console.log('\n  Warnings:');
-      this.warnings.forEach((warning) => console.log(warning));
+      // '\n  Warnings:'
+      this.warnings.forEach((warning) => // warning);
     }
 
     if (this.errors.length > 0) {
-      console.log('\n Errors:');
-      this.errors.forEach((error) => console.log(error));
-      console.log(`\n Asset verification failed with ${this.errors.length} errors!`);
+      // '\n Errors:'
+      this.errors.forEach((error) => // error);
+      // `\n Asset verification failed with ${this.errors.length} errors!`
     } else {
-      console.log('\n All assets verified successfully!');
+      // '\n All assets verified successfully!'
     }
   }
 }

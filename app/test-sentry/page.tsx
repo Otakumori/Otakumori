@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 export default function TestSentryPage() {
   useEffect(() => {
     // Trigger a client-side error immediately when the page loads
-    console.log('Triggering test error for Sentry...');
+    // Triggering test error for Sentry...
 
     // Method 1: Throw an error
     setTimeout(() => {
@@ -750,10 +750,7 @@ export default function TestSentryPage() {
             {
               <>
                 ''
-                <span role="img" aria-label="emoji">
-                  
-                </span>
-                ' '
+                <span role="img" aria-label="emoji"></span>' '
                 <span role="img" aria-label="emoji">
                   C
                 </span>

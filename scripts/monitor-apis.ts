@@ -24,10 +24,10 @@ class APIMonitor {
 
   async start(): Promise<void> {
     this.isRunning = true;
-    console.log(' Starting API Monitoring...');
-    console.log(
+    // ' Starting API Monitoring...'
+    // 
       ` Checking ${this.config.endpoints.length} endpoints every ${this.config.checkInterval / 1000}s`,
-    );
+    
 
     while (this.isRunning) {
       await this.runHealthCheck();
@@ -37,12 +37,12 @@ class APIMonitor {
 
   stop(): void {
     this.isRunning = false;
-    console.log(' API Monitoring stopped');
+    // ' API Monitoring stopped'
   }
 
   private async runHealthCheck(): Promise<void> {
     const timestamp = new Date().toISOString();
-    console.log(`\n⌕ [${timestamp}] Running health check...`);
+    // `\n⌕ [${timestamp}] Running health check...`
 
     for (const endpoint of this.config.endpoints) {
       try {
@@ -69,10 +69,10 @@ class APIMonitor {
 
   private async processResult(endpoint: string, result: any): Promise<void> {
     if (result.status === 200) {
-      console.log(` ${endpoint}: ${result.status} (${result.responseTime}ms)`);
+      // ` ${endpoint}: ${result.status} (${result.responseTime}ms`);
       this.failureCount.set(endpoint, 0); // Reset failure count
     } else {
-      console.log(` ${endpoint}: ${result.status} (${result.responseTime}ms)`);
+      // ` ${endpoint}: ${result.status} (${result.responseTime}ms`);
       await this.recordFailure(endpoint);
     }
   }
@@ -89,7 +89,7 @@ class APIMonitor {
 
   private async sendAlert(endpoint: string, failureCount: number): Promise<void> {
     const message = ` API ALERT: ${endpoint} has failed ${failureCount} consecutive times!`;
-    console.log(message);
+    // message
 
     if (this.config.webhookUrl) {
       try {
@@ -140,13 +140,13 @@ if (require.main === module) {
 
   // Graceful shutdown
   process.on('SIGINT', () => {
-    console.log('\n Received SIGINT, shutting down gracefully...');
+    // '\n Received SIGINT, shutting down gracefully...'
     monitor.stop();
     process.exit(0);
   });
 
   process.on('SIGTERM', () => {
-    console.log('\n Received SIGTERM, shutting down gracefully...');
+    // '\n Received SIGTERM, shutting down gracefully...'
     monitor.stop();
     process.exit(0);
   });

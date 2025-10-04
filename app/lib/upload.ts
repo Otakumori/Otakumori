@@ -176,7 +176,7 @@ export async function cleanupOldFiles(
 ): Promise<void> {
   // This would clean up old temporary files
   // Implementation depends on your storage solution
-  console.log(`Cleaning up old files in ${directory}`);
+  // `Cleaning up old files in ${directory}`
 }
 
 // Get file info

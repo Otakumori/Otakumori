@@ -19,7 +19,7 @@ export default function ErrorTestButton() {
       // or is a non-fatal issue we still want to track.
       const data = null;
       // @ts-ignore
-      console.log(data.property); // This will throw a TypeError
+      // data.property // This will throw a TypeError
     } catch (error) {
       Sentry.captureException(error);
       console.error('Custom error captured by Sentry:', error);

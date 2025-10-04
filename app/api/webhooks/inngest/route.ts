@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const eventType = body.type;
     const eventData = body.data;
 
-    console.log(`Received webhook: ${eventType}`);
+    // `Received webhook: ${eventType}`
 
     // Route different webhook types to appropriate Inngest functions
     switch (eventType) {
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        console.log(`Unhandled webhook type: ${eventType}`);
+        // `Unhandled webhook type: ${eventType}`
     }
 
     return NextResponse.json({

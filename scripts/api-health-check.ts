@@ -79,36 +79,36 @@ class APIHealthChecker {
   }
 
   async runAllTests(): Promise<void> {
-    console.log('⌕ Starting Comprehensive API Health Check...\n');
+    // '⌕ Starting Comprehensive API Health Check...\n'
 
     // Test 1: Health endpoints
-    console.log(' Testing Health Endpoints...');
+    // ' Testing Health Endpoints...'
     this.results.push(await this.testEndpoint('/api/health'));
     this.results.push(await this.testEndpoint('/api/health/comprehensive'));
 
     // Test 2: Public shop endpoints
-    console.log(' Testing Shop Endpoints...');
+    // ' Testing Shop Endpoints...'
     this.results.push(await this.testEndpoint('/api/v1/shop/products?limit=3'));
     this.results.push(await this.testEndpoint('/api/shop/products?limit=3'));
 
     // Test 3: Authentication-required endpoints (should return 401)
-    console.log(' Testing Protected Endpoints...');
+    // ' Testing Protected Endpoints...'
     this.results.push(await this.testEndpoint('/api/gacha', 'POST', 401));
     this.results.push(await this.testEndpoint('/api/v1/petals/balance', 'GET', 401));
     this.results.push(await this.testEndpoint('/api/profile/me', 'GET', 401));
 
     // Test 4: Public game endpoints
-    console.log(' Testing Game Endpoints...');
+    // ' Testing Game Endpoints...'
     this.results.push(await this.testEndpoint('/api/v1/games/stats', 'GET', 401)); // Should be protected
     this.results.push(await this.testEndpoint('/api/leaderboard/game', 'GET', 200)); // Should be public
 
     // Test 5: Blog and content endpoints
-    console.log(' Testing Content Endpoints...');
+    // ' Testing Content Endpoints...'
     this.results.push(await this.testEndpoint('/api/blog/posts'));
     this.results.push(await this.testEndpoint('/api/community/posts', 'GET', 200));
 
     // Test 6: System endpoints
-    console.log(' Testing System Endpoints...');
+    // ' Testing System Endpoints...'
     this.results.push(await this.testEndpoint('/api/system-check'));
     this.results.push(await this.testEndpoint('/api/metrics'));
 
@@ -116,48 +116,48 @@ class APIHealthChecker {
   }
 
   private printResults(): void {
-    console.log('\n API Health Check Results:\n');
+    // '\n API Health Check Results:\n'
 
     const passed = this.results.filter((r) => r.status === 'PASS').length;
     const failed = this.results.filter((r) => r.status === 'FAIL').length;
     const total = this.results.length;
 
-    console.log(` PASSED: ${passed}/${total}`);
-    console.log(` FAILED: ${failed}/${total}`);
-    console.log(` SUCCESS RATE: ${((passed / total) * 100).toFixed(1)}%\n`);
+    // ` PASSED: ${passed}/${total}`
+    // ` FAILED: ${failed}/${total}`
+    // ` SUCCESS RATE: ${((passed / total * 100).toFixed(1)}%\n`);
 
     // Show failed tests
     const failedTests = this.results.filter((r) => r.status === 'FAIL');
     if (failedTests.length > 0) {
-      console.log(' FAILED TESTS:');
+      // ' FAILED TESTS:'
       failedTests.forEach((test) => {
-        console.log(`  • ${test.method} ${test.endpoint}`);
-        if (test.statusCode) console.log(`    Status: ${test.statusCode}`);
-        if (test.error) console.log(`    Error: ${test.error}`);
-        if (test.responseTime) console.log(`    Time: ${test.responseTime}ms`);
+        // `  • ${test.method} ${test.endpoint}`
+        if (test.statusCode) // `    Status: ${test.statusCode}`
+        if (test.error) // `    Error: ${test.error}`
+        if (test.responseTime) // `    Time: ${test.responseTime}ms`
       });
     }
 
     // Show passed tests
     const passedTests = this.results.filter((r) => r.status === 'PASS');
     if (passedTests.length > 0) {
-      console.log('\n PASSED TESTS:');
+      // '\n PASSED TESTS:'
       passedTests.forEach((test) => {
-        console.log(
-          `  • ${test.method} ${test.endpoint} (${test.statusCode}) - ${test.responseTime}ms`,
+        // 
+          `  • ${test.method} ${test.endpoint} (${test.statusCode} - ${test.responseTime}ms`,
         );
       });
     }
 
     // Recommendations
     if (failed > 0) {
-      console.log('\n RECOMMENDATIONS:');
-      console.log('  • Fix failed endpoints before deployment');
-      console.log('  • Check database connections');
-      console.log('  • Verify environment variables');
-      console.log('  • Check Clerk authentication setup');
+      // '\n RECOMMENDATIONS:'
+      // '  • Fix failed endpoints before deployment'
+      // '  • Check database connections'
+      // '  • Verify environment variables'
+      // '  • Check Clerk authentication setup'
     } else {
-      console.log('\n ALL TESTS PASSED! Ready for deployment.');
+      // '\n ALL TESTS PASSED! Ready for deployment.'
     }
   }
 }

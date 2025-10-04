@@ -27,7 +27,7 @@ class AudioMgr {
 
       const buf = await this.ctx.decodeAudioData(arr);
       this.buffers.set(name, buf);
-      console.log(`Successfully loaded audio: ${name} (${buf.duration.toFixed(2)}s)`);
+      // `Successfully loaded audio: ${name} (${buf.duration.toFixed(2}s)`);
     } catch (error) {
       console.warn(`Failed to load audio: ${name}`, error);
       // Don't throw, just log the error and continue

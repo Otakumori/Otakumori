@@ -579,10 +579,10 @@ export function useGameEngine(options: UseGameEngineOptions): GameEngineReturn {
 // Utility functions for notifications
 function showAchievementNotification(achievement: any, rewards: any) {
   // This would integrate with your notification system
-  console.log('Achievement unlocked:', achievement.definition.name, rewards);
+  // Achievement unlocked: ${achievement.definition.name} with rewards: ${JSON.stringify(rewards)}
 }
 
 function showLeaderboardNotification(data: any) {
   // This would integrate with your notification system
-  console.log('New personal best! Rank:', data.ranking);
+  // New personal best! Rank: ${data.ranking}
 }

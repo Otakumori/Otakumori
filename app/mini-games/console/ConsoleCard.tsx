@@ -1269,11 +1269,11 @@ function CommunityFace() {
     const connect = () => {
       // Only connect if WebSocket is explicitly enabled
       const wsEnabled = (process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === '1';
-      console.log('WebSocket connection attempt', {
-        wsEnabled,
-        envVar: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
-        envVarType: typeof process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
-      });
+      // console.log('WebSocket connection attempt', {
+      //   wsEnabled,
+      //   envVar: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+      //   envVarType: typeof process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+      // });
 
       // Always disable WebSocket for now to prevent connection errors
       // WebSocket is disabled by default to prevent "Insufficient resources" errors

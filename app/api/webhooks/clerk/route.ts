@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(`User profile created for ${id}`);
+      // `User profile created for ${id}`
     } catch (error) {
       console.error('Error creating user profile:', error);
       // Don't throw error to avoid webhook retry
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(`User profile updated for ${id}`);
+      // `User profile updated for ${id}`
     } catch (error) {
       console.error('Error updating user profile:', error);
     }
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(`User profile soft deleted for ${id}`);
+      // `User profile soft deleted for ${id}`
     } catch (error) {
       console.error('Error soft deleting user profile:', error);
     }

@@ -8,11 +8,11 @@ export const syncPrintifyProducts = inngest.createFunction(
   async ({ event, step }) => {
     return await step.run('sync-products', async () => {
       try {
-        console.log('Starting scheduled Printify sync...');
+        // 'Starting scheduled Printify sync...'
 
         const products = await getPrintifyService().getAllProducts();
 
-        console.log(`Sync completed: ${products.length} products fetched`);
+        // `Sync completed: ${products.length} products fetched`
 
         // Here you would save to your database
         // await saveProductsToDatabase(products);
@@ -37,11 +37,11 @@ export const manualPrintifySync = inngest.createFunction(
   async ({ event, step }) => {
     return await step.run('manual-sync', async () => {
       try {
-        console.log('Starting manual Printify sync...');
+        // 'Starting manual Printify sync...'
 
         const products = await getPrintifyService().getAllProducts();
 
-        console.log(`Manual sync completed: ${products.length} products fetched`);
+        // `Manual sync completed: ${products.length} products fetched`
 
         // Here you would save to your database
         // await saveProductsToDatabase(products);
@@ -68,7 +68,7 @@ export const syncOnProductChange = inngest.createFunction(
       try {
         const { productId } = event.data;
 
-        console.log(`Syncing changed product: ${productId}`);
+        // `Syncing changed product: ${productId}`
 
         const product = await getPrintifyService().getProduct(productId);
 

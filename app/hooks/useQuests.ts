@@ -24,7 +24,7 @@ export function useQuests() {
       if (response.ok) {
         const result = await response.json();
         if (result.updated > 0) {
-          console.log(` Quest progress updated: ${result.updated} quest(s)`);
+          // ` Quest progress updated: ${result.updated} quest(s`);
         }
         return result;
       }

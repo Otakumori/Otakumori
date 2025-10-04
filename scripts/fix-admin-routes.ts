@@ -30,8 +30,8 @@ for (const route of adminRoutes) {
     );
 
     fs.writeFileSync(filePath, content);
-    console.log(`Fixed ${route}`);
+    // `Fixed ${route}`
   }
 }
 
-console.log('All admin routes fixed!');
+// 'All admin routes fixed!'

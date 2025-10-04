@@ -122,27 +122,27 @@ class BundleAnalyzer {
   logResults(metrics: PerformanceMetrics, budgetCheck: ReturnType<typeof this.checkBudget>): void {
     console.group(' Bundle Analysis Results');
 
-    console.log('Bundle Sizes:');
-    console.log(`  Main: ${(metrics.bundleSize.main / 1024).toFixed(1)}KB`);
-    console.log(`  Total: ${(metrics.bundleSize.total / 1024).toFixed(1)}KB`);
-    console.log(`  Gzipped: ${(metrics.bundleSize.gzipped / 1024).toFixed(1)}KB`);
+    // 'Bundle Sizes:'
+    // `  Main: ${(metrics.bundleSize.main / 1024.toFixed(1)}KB`);
+    // `  Total: ${(metrics.bundleSize.total / 1024.toFixed(1)}KB`);
+    // `  Gzipped: ${(metrics.bundleSize.gzipped / 1024.toFixed(1)}KB`);
 
-    console.log('\nPerformance Budget:');
-    console.log(`  Score: ${budgetCheck.score}/100`);
-    console.log(`  Status: ${budgetCheck.passed ? ' PASSED' : ' FAILED'}`);
+    // '\nPerformance Budget:'
+    // `  Score: ${budgetCheck.score}/100`
+    // `  Status: ${budgetCheck.passed ? ' PASSED' : ' FAILED'}`
 
     if (budgetCheck.violations.length > 0) {
-      console.log('\nBudget Violations:');
+      // '\nBudget Violations:'
       budgetCheck.violations.forEach((violation) => {
-        console.log(`   ${violation}`);
+        // `   ${violation}`
       });
     }
 
     const recommendations = this.generateRecommendations(metrics);
     if (recommendations.length > 0) {
-      console.log('\nRecommendations:');
+      // '\nRecommendations:'
       recommendations.forEach((rec) => {
-        console.log(`   ${rec}`);
+        // `   ${rec}`
       });
     }
 
@@ -255,7 +255,7 @@ function getActualBuildSizes(): { [key: string]: number } {
  * Main execution
  */
 async function main() {
-  console.log(' Checking Performance Budget...\n');
+  // ' Checking Performance Budget...\n'
 
   try {
     // Parse build statistics
@@ -315,15 +315,15 @@ async function main() {
     const reportFile = path.join(reportsDir, `budget-check-${Date.now()}.json`);
     fs.writeFileSync(reportFile, JSON.stringify(report, null, 2));
 
-    console.log(`\n Report saved to: ${reportFile}`);
+    // `\n Report saved to: ${reportFile}`
 
     // Exit with appropriate code
     if (budgetCheck.passed) {
-      console.log('\n Performance budget check PASSED');
+      // '\n Performance budget check PASSED'
       process.exit(0);
     } else {
-      console.log('\n Performance budget check FAILED');
-      console.log('Fix the violations above before deploying to production.');
+      // '\n Performance budget check FAILED'
+      // 'Fix the violations above before deploying to production.'
       process.exit(1);
     }
   } catch (error) {

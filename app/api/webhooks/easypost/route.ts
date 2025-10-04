@@ -11,6 +11,6 @@ export async function POST(req: Request) {
     }
   }
   // TODO: handle tracker.updated, delivered → update order status
-  console.log("EasyPost webhook received:", raw);
+  // "EasyPost webhook received:", raw
   return new Response("ok");
 }

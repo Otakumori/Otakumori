@@ -1,68 +1,80 @@
-import PixelatedStarfield from './components/background/PixelatedStarfield';
-import FallingPetals from './components/background/FallingPetals';
-import CherryBlossomTree from './components/background/CherryBlossomTree';
-import CherryBlossomEffect from './components/CherryBlossomEffect';
-import HeroIntro from './components/HeroIntro';
-import ShopTeaser from './components/ShopTeaser';
-import BlogTeaser from './components/BlogTeaser';
-import MiniGameTeaser from './components/MiniGameTeaser';
-import StickySoapstones from './components/StickySoapstones';
-import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
+// app/page.tsx
+import { Suspense } from 'react';
+import { env } from '@/env';
 
-// Enable ISR to refresh homepage with new products every 5 minutes
-export const revalidate = 300;
+// Server components - conditionally imported based on feature flags
+import ShopSection from '@/app/(site)/home/ShopSection';
+import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
+import BlogSection from '@/app/(site)/home/BlogSection';
+import FooterSection from '@/app/(site)/home/FooterSection';
+import InteractivePetals from '@/components/hero/InteractivePetals';
 
-export default function HomePage() {
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const {
+    NEXT_PUBLIC_FEATURE_HERO,
+    NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
+    NEXT_PUBLIC_FEATURE_SHOP,
+    NEXT_PUBLIC_FEATURE_MINIGAMES,
+    NEXT_PUBLIC_FEATURE_BLOG,
+    NEXT_PUBLIC_FEATURE_SOAPSTONES,
+  } = env;
+
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background layers */}
-      <PixelatedStarfield />
-      <FallingPetals />
-      <div data-tree-root>
-        <CherryBlossomTree />
-      </div>
-      <CherryBlossomEffect density="home" />
+    <main className="pt-14">
+      {/* HERO */}
+      {NEXT_PUBLIC_FEATURE_HERO === '1' && (
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-pink-300 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]">
+            Welcome home, traveler
+          </h1>
 
-      {/* Main content with improved spacing and layout */}
-      <div className="relative z-10">
-        {/* Hero Section - Full viewport height */}
-        <section className="min-h-screen flex items-center justify-center pt-20">
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <HeroIntro />
-          </div>
+          {/* Interactive petals in hero only */}
+          {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
+            <div className="relative mt-6 h-48">
+              <InteractivePetals variant="hero" />
+            </div>
+          )}
         </section>
+      )}
 
-        {/* Shop Section */}
-        <section className="py-24 bg-gradient-to-b from-transparent via-black/10 to-black/30">
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <ShopTeaser />
-          </div>
+      {/* SPACER - breathing room for visible petals before content */}
+      {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
+        <section aria-hidden className="relative z-40 h-[28vh] sm:h-[24vh] lg:h-[32vh]">
+          <InteractivePetals variant="spacer" />
         </section>
+      )}
 
-        {/* Blog Section */}
-        <section className="py-24 bg-gradient-to-b from-black/30 via-black/20 to-transparent">
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <BlogTeaser />
-          </div>
+      {/* SHOP */}
+      {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <Suspense fallback={<div className="text-pink-200/70">Loading products…</div>}>
+            <ShopSection />
+          </Suspense>
         </section>
+      )}
 
-        {/* Mini Games Section */}
-        <section className="py-24 bg-gradient-to-b from-transparent via-black/20 to-black/40">
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <MiniGameTeaser />
-          </div>
+      {/* MINI-GAMES */}
+      {NEXT_PUBLIC_FEATURE_MINIGAMES === '1' && (
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
+            <MiniGamesSection />
+          </Suspense>
         </section>
+      )}
 
-        {/* Soapstones Section */}
-        <section className="py-24 bg-gradient-to-b from-black/40 to-black/60">
-          <div className="w-full max-w-7xl mx-auto px-4">
-            <StickySoapstones />
-          </div>
+      {/* BLOG */}
+      {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <Suspense fallback={<div className="text-pink-200/70">Loading posts…</div>}>
+            <BlogSection />
+          </Suspense>
         </section>
-      </div>
+      )}
 
-      {/* Soapstone drift animation */}
-      <SoapstoneHomeDrift />
-    </div>
+      {/* FOOTER with Soapstones */}
+      <FooterSection showSoapstones={NEXT_PUBLIC_FEATURE_SOAPSTONES === '1'} />
+    </main>
   );
 }

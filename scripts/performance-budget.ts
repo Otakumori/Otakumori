@@ -110,7 +110,7 @@ class PerformanceBudgetValidator {
   }
 
   async validate(): Promise<PerformanceReport> {
-    console.log(' Starting performance budget validation...');
+    // ' Starting performance budget validation...'
 
     // Analyze bundle sizes
     await this.analyzeBundles();
@@ -131,7 +131,7 @@ class PerformanceBudgetValidator {
   }
 
   private async analyzeBundles(): Promise<void> {
-    console.log(' Analyzing bundle sizes...');
+    // ' Analyzing bundle sizes...'
 
     try {
       // Analyze Next.js build output
@@ -181,7 +181,7 @@ class PerformanceBudgetValidator {
   }
 
   private async analyzeAssets(): Promise<void> {
-    console.log('️  Analyzing asset sizes...');
+    // '️  Analyzing asset sizes...'
 
     try {
       const publicDir = 'public';
@@ -414,52 +414,52 @@ class PerformanceBudgetValidator {
   }
 
   private printReport(report: PerformanceReport): void {
-    console.log('\n Performance Budget Report');
-    console.log('================================');
+    // '\n Performance Budget Report'
+    // '================================'
 
     // Summary
-    console.log(`\n Summary:`);
-    console.log(`   Score: ${report.score}/100`);
-    console.log(`   Status: ${report.passed ? ' PASSED' : ' FAILED'}`);
-    console.log(`   Total Bundle Size: ${(report.summary.totalSize / 1024).toFixed(1)}KB`);
-    console.log(`   Main Bundle: ${(report.summary.mainBundleSize / 1024).toFixed(1)}KB`);
-    console.log(`   Vendor Bundle: ${(report.summary.vendorSize / 1024).toFixed(1)}KB`);
-    console.log(`   Route Chunks: ${report.summary.chunkCount}`);
+    // `\n Summary:`
+    // `   Score: ${report.score}/100`
+    // `   Status: ${report.passed ? ' PASSED' : ' FAILED'}`
+    // `   Total Bundle Size: ${(report.summary.totalSize / 1024.toFixed(1)}KB`);
+    // `   Main Bundle: ${(report.summary.mainBundleSize / 1024.toFixed(1)}KB`);
+    // `   Vendor Bundle: ${(report.summary.vendorSize / 1024.toFixed(1)}KB`);
+    // `   Route Chunks: ${report.summary.chunkCount}`
 
     // Violations
     if (report.violations.length > 0) {
-      console.log(`\n Violations (${report.violations.length}):`);
+      // `\n Violations (${report.violations.length}:`);
       for (const violation of report.violations) {
         const icon =
           violation.severity === 'critical' ? '●' : violation.severity === 'error' ? '🟠' : '🟡';
-        console.log(`   ${icon} ${violation.description}`);
+        // `   ${icon} ${violation.description}`
         if (violation.file) {
-          console.log(`      File: ${violation.file}`);
+          // `      File: ${violation.file}`
         }
-        console.log(`       ${violation.recommendation}`);
-        console.log('');
+        // `       ${violation.recommendation}`
+        // ''
       }
     }
 
     // Recommendations
     if (report.recommendations.length > 0) {
-      console.log(`\n Recommendations:`);
+      // `\n Recommendations:`
       for (const recommendation of report.recommendations) {
-        console.log(`   ${recommendation}`);
+        // `   ${recommendation}`
       }
     }
 
-    console.log('\n Performance Targets:');
-    console.log(`   Main Bundle: ≤ ${PERFORMANCE_BUDGET.bundles.main}KB`);
-    console.log(`   Vendor Bundle: ≤ ${PERFORMANCE_BUDGET.bundles.vendor}KB`);
-    console.log(`   Route Chunks: ≤ ${PERFORMANCE_BUDGET.bundles.chunks}KB each`);
-    console.log(`   Total Initial Load: ≤ ${PERFORMANCE_BUDGET.bundles.total}KB`);
+    // '\n Performance Targets:'
+    // `   Main Bundle: ≤ ${PERFORMANCE_BUDGET.bundles.main}KB`
+    // `   Vendor Bundle: ≤ ${PERFORMANCE_BUDGET.bundles.vendor}KB`
+    // `   Route Chunks: ≤ ${PERFORMANCE_BUDGET.bundles.chunks}KB each`
+    // `   Total Initial Load: ≤ ${PERFORMANCE_BUDGET.bundles.total}KB`
 
     if (!report.passed) {
-      console.log('\n Performance budget validation failed!');
+      // '\n Performance budget validation failed!'
       process.exit(1);
     } else {
-      console.log('\n Performance budget validation passed!');
+      // '\n Performance budget validation passed!'
     }
   }
 

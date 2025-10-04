@@ -1,9 +1,9 @@
 /**
  * Petal Collection API - Complete Implementation
- * 
+ *
  * Features:
  * - Daily earning caps with rollover
- * - Streak bonuses and multipliers  
+ * - Streak bonuses and multipliers
  * - Anti-cheat validation
  * - Source tracking and analytics
  * - Cooldown management
@@ -14,13 +14,13 @@ import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
-import { 
-  calculateEarning, 
-  validateEarning, 
+import {
+  calculateEarning,
+  validateEarning,
   applyDailyCap,
   calculateStreakBonus,
   formatPetals,
-  generateTransactionId 
+  generateTransactionId,
 } from '@/lib/petals';
 import { ensureUserByClerkId } from '@/lib/petals-db';
 import { withRateLimit } from '@/lib/security/rate-limiting';
@@ -31,25 +31,27 @@ const CollectPetalsSchema = z.object({
   amount: z.number().min(1).max(10000),
   source: z.enum([
     'game_completion',
-    'achievement_unlock', 
+    'achievement_unlock',
     'daily_login',
     'streak_bonus',
     'perfect_score',
     'community_activity',
     'special_event',
-    'admin_grant'
+    'admin_grant',
   ]),
   sourceId: z.string().optional(), // Game ID, achievement ID, etc.
-  metadata: z.object({
-    gameScore: z.number().optional(),
-    achievementId: z.string().optional(),
-    streakLength: z.number().optional(),
-    eventId: z.string().optional(),
-    difficulty: z.string().optional(),
-    accuracy: z.number().min(0).max(1).optional(),
-    timePlayed: z.number().optional(),
-    multiplier: z.number().min(1).max(10).optional(),
-  }).optional(),
+  metadata: z
+    .object({
+      gameScore: z.number().optional(),
+      achievementId: z.string().optional(),
+      streakLength: z.number().optional(),
+      eventId: z.string().optional(),
+      difficulty: z.string().optional(),
+      accuracy: z.number().min(0).max(1).optional(),
+      timePlayed: z.number().optional(),
+      multiplier: z.number().min(1).max(10).optional(),
+    })
+    .optional(),
   validateCheat: z.boolean().default(true),
 });
 
@@ -61,7 +63,7 @@ async function handler(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { ok: false, error: 'Authentication required' },
-        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } }
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
       );
     }
 
@@ -71,7 +73,7 @@ async function handler(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { ok: false, error: 'Invalid collection request', details: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,7 +97,7 @@ async function handler(request: NextRequest) {
     if (!validation_result.valid) {
       return NextResponse.json(
         { ok: false, error: validation_result.reason || 'Validation failed' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -103,12 +105,12 @@ async function handler(request: NextRequest) {
     // const lastTransaction = await getLastTransaction(user.id, source, sourceId);
     // if (lastTransaction && !isCooldownExpired(lastTransaction.createdAt, earningConfig.cooldownMs)) {
     //   const remainingCooldown = getRemainingCooldown(lastTransaction.createdAt, earningConfig.cooldownMs);
-    //   
+    //
     //   return NextResponse.json(
-    //     { 
-    //       ok: false, 
+    //     {
+    //       ok: false,
     //       error: 'Cooldown active',
-    //       cooldownRemaining: remainingCooldown 
+    //       cooldownRemaining: remainingCooldown
     //     },
     //     { status: 429 }
     //   );
@@ -121,17 +123,17 @@ async function handler(request: NextRequest) {
         // Log suspicious activity
         await metricsCollector.track('petal_cheat_attempt', {
           value: amount,
-          tags: { 
-            userId: user.id, 
-            source, 
+          tags: {
+            userId: user.id,
+            source,
             reason: cheatCheck.reason || 'unknown',
-            sourceId: sourceId || 'none'
-          }
+            sourceId: sourceId || 'none',
+          },
         });
 
         return NextResponse.json(
           { ok: false, error: 'Validation failed', reason: cheatCheck.reason },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -143,24 +145,27 @@ async function handler(request: NextRequest) {
     // Apply daily cap
     const cappedResult = applyDailyCap(amount, dailyStats.totalEarned, earningConfig.dailyCap);
     const cappedAmount = cappedResult.amount;
-    
+
     if (cappedResult.capped) {
       await metricsCollector.track('petal_daily_cap_hit', {
         value: amount - cappedAmount,
-        tags: { userId: user.id, source, dailyCap: earningConfig.dailyCap.toString() }
+        tags: { userId: user.id, source, dailyCap: earningConfig.dailyCap.toString() },
       });
     }
 
     if (cappedAmount <= 0) {
-      return NextResponse.json({
-        ok: false,
-        error: 'Daily earning limit reached',
-        dailyStats: {
-          earned: dailyStats.totalEarned,
-          cap: earningConfig.dailyCap,
-          resetsAt: getNextDayReset()
-        }
-      }, { status: 429 });
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Daily earning limit reached',
+          dailyStats: {
+            earned: dailyStats.totalEarned,
+            cap: earningConfig.dailyCap,
+            resetsAt: getNextDayReset(),
+          },
+        },
+        { status: 429 },
+      );
     }
 
     // Calculate streak bonuses
@@ -202,11 +207,11 @@ async function handler(request: NextRequest) {
     // Update user balance
     const updatedUser = await db.user.update({
       where: { id: user.id },
-      data: { 
+      data: {
         petalBalance: { increment: actualAmount },
         // lastPetalEarn: new Date(), // Remove if field doesn't exist
       },
-      select: { petalBalance: true }
+      select: { petalBalance: true },
     });
 
     // Update streak if applicable
@@ -217,22 +222,22 @@ async function handler(request: NextRequest) {
     // Track metrics
     await metricsCollector.track('petals_collected', {
       value: actualAmount,
-      tags: { 
-        source, 
+      tags: {
+        source,
         userId: user.id,
         sourceId: sourceId || 'none',
-        hasBonus: streakBonus > 0 ? 'true' : 'false'
-      }
+        hasBonus: streakBonus > 0 ? 'true' : 'false',
+      },
     });
 
     // Track economy metrics
     await metricsCollector.track('petal_economy_earn', {
       value: actualAmount,
-      tags: { 
+      tags: {
         source,
         streakLevel: getStreakLevel(streak),
-        earningTier: getEarningTier(actualAmount)
-      }
+        earningTier: getEarningTier(actualAmount),
+      },
     });
 
     // Achievement check for earning milestones
@@ -264,32 +269,28 @@ async function handler(request: NextRequest) {
           current: streak,
           bonus: streakBonus,
           nextThreshold: getNextStreakThreshold(streak),
-        }
-      }
+        },
+      },
     };
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Petal collection error:', error);
-    
+
     await metricsCollector.track('petal_collection_error', {
       value: 1,
-      tags: { 
+      tags: {
         error: error instanceof Error ? error.message : 'Unknown error',
-        userId: 'unknown'
-      }
+        userId: 'unknown',
+      },
     });
 
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   } finally {
     const duration = Date.now() - startTime;
     await metricsCollector.track('api_response_time', {
       value: duration,
-      tags: { endpoint: 'petal_collect' }
+      tags: { endpoint: 'petal_collect' },
     });
   }
 }
@@ -343,12 +344,11 @@ function getRemainingCooldown(lastTransaction: Date, cooldownMs: number): number
 }
 
 async function performAntiCheatValidation(
-  userId: string, 
-  source: string, 
-  amount: number, 
-  metadata: any
+  userId: string,
+  source: string,
+  amount: number,
+  metadata: any,
 ): Promise<{ valid: boolean; reason?: string }> {
-  
   // Simplified rate limiting check
   // const recentTransactions = await db.petalTransaction.count({
   //   where: {
@@ -368,11 +368,13 @@ async function performAntiCheatValidation(
   switch (source) {
     case 'game_completion':
       if (amount > 500) return { valid: false, reason: 'Amount too high for game completion' };
-      if (metadata.gameScore && metadata.gameScore < 0) return { valid: false, reason: 'Invalid game score' };
+      if (metadata.gameScore && metadata.gameScore < 0)
+        return { valid: false, reason: 'Invalid game score' };
       break;
 
     case 'perfect_score':
-      if (metadata.accuracy && metadata.accuracy < 0.95) return { valid: false, reason: 'Accuracy too low for perfect score' };
+      if (metadata.accuracy && metadata.accuracy < 0.95)
+        return { valid: false, reason: 'Accuracy too low for perfect score' };
       break;
 
     case 'achievement_unlock':
@@ -419,7 +421,6 @@ async function getUserStreak(userId: string, source: string): Promise<number> {
 async function updateUserStreak(userId: string, source: string) {
   // Mock implementation
   // const today = new Date().toISOString().split('T')[0];
-  
   // await db.userStreak.upsert({
   //   where: {
   //     userId_category: { userId, category: source }
@@ -467,18 +468,18 @@ function getEarningTier(amount: number): string {
 
 function getNextStreakThreshold(currentStreak: number): number {
   const thresholds = [3, 7, 14, 30, 60, 100];
-  return thresholds.find(t => t > currentStreak) || currentStreak + 30;
+  return thresholds.find((t) => t > currentStreak) || currentStreak + 30;
 }
 
 async function checkEarningAchievements(
-  userId: string, 
-  earnedAmount: number, 
-  totalBalance: number, 
-  source: string
+  userId: string,
+  earnedAmount: number,
+  totalBalance: number,
+  source: string,
 ) {
   // This would integrate with the achievement system
   // Check for earning milestones, balance thresholds, etc.
-  
+
   const milestones = [
     { threshold: 1000, achievementId: 'petal_collector_bronze' },
     { threshold: 10000, achievementId: 'petal_collector_silver' },
@@ -488,7 +489,7 @@ async function checkEarningAchievements(
   for (const milestone of milestones) {
     if (totalBalance >= milestone.threshold && totalBalance - earnedAmount < milestone.threshold) {
       // Would trigger achievement unlock
-      console.log(`Achievement unlocked: ${milestone.achievementId} for user ${userId}`);
+      // Achievement unlocked: ${milestone.achievementId} for user ${userId}
     }
   }
 }

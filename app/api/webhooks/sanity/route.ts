@@ -11,6 +11,6 @@ export async function POST(req: Request) {
   if (sig !== expected) return new Response('bad sig', { status: 401 });
 
   // TODO: revalidateTag('blog'), reindex Algolia
-  console.log('Sanity webhook received:', raw);
+  // 'Sanity webhook received:', raw
   return new Response('ok');
 }

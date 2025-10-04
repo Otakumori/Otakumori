@@ -51,7 +51,7 @@ class PreBuildValidator {
   private warnings: string[] = [];
 
   async validate(): Promise<ValidationResult> {
-    console.log('⌕ Running pre-build validation...\n');
+    // '⌕ Running pre-build validation...\n'
 
     // 1. TypeScript compilation check
     await this.checkTypeScript();
@@ -74,29 +74,33 @@ class PreBuildValidator {
     const success = this.errors.length === 0;
 
     if (this.warnings.length > 0) {
-      console.log('\n  Warnings:');
-      this.warnings.forEach((warning) => console.log(`  - ${warning}`));
+      // '\n  Warnings:'
+      this.warnings.forEach((warning) => {
+        // `  - ${warning}`
+      });
     }
 
     if (this.errors.length > 0) {
-      console.log('\n Errors:');
-      this.errors.forEach((error) => console.log(`  - ${error}`));
+      // '\n Errors:'
+      this.errors.forEach((error) => {
+        // `  - ${error}`
+      });
     }
 
     if (success) {
-      console.log('\n All validations passed! Ready to build.');
+      // '\n All validations passed! Ready to build.'
     } else {
-      console.log('\n Validation failed. Fix errors before building.');
+      // '\n Validation failed. Fix errors before building.'
     }
 
     return { success, errors: this.errors, warnings: this.warnings };
   }
 
   private async checkTypeScript(): Promise<void> {
-    console.log(' Checking TypeScript compilation...');
+    // ' Checking TypeScript compilation...'
     try {
       execSync('npx tsc --noEmit --skipLibCheck', { stdio: 'pipe' });
-      console.log('   TypeScript compilation OK');
+      // '   TypeScript compilation OK'
     } catch (error) {
       const output = error instanceof Error ? error.message : String(error);
       this.errors.push(`TypeScript compilation failed: ${output}`);
@@ -104,10 +108,10 @@ class PreBuildValidator {
   }
 
   private async checkPrismaSchema(): Promise<void> {
-    console.log('️  Checking Prisma schema...');
+    // '️  Checking Prisma schema...'
     try {
       execSync('npx prisma validate', { stdio: 'pipe' });
-      console.log('   Prisma schema valid');
+      // '   Prisma schema valid'
     } catch (error) {
       const output = error instanceof Error ? error.message : String(error);
       this.errors.push(`Prisma schema validation failed: ${output}`);
@@ -115,7 +119,7 @@ class PreBuildValidator {
   }
 
   private async checkImportPaths(): Promise<void> {
-    console.log(' Checking import paths...');
+    // ' Checking import paths...'
 
     const apiFiles = await glob('app/api/**/*.ts');
     const componentFiles = await glob('app/**/*.tsx');
@@ -176,12 +180,12 @@ class PreBuildValidator {
     }
 
     if (this.errors.length === 0) {
-      console.log('   Import paths OK');
+      // '   Import paths OK'
     }
   }
 
   private async checkMissingComponents(): Promise<void> {
-    console.log(' Checking for missing components...');
+    // ' Checking for missing components...'
 
     const componentFiles = await glob('app/**/*.tsx');
     const missingComponents = new Set<string>();
@@ -204,12 +208,12 @@ class PreBuildValidator {
     if (missingComponents.size > 0) {
       this.errors.push(`Missing components: ${Array.from(missingComponents).join(', ')}`);
     } else {
-      console.log('   All components exist');
+      // '   All components exist'
     }
   }
 
   private async checkTypeConsistency(): Promise<void> {
-    console.log(' Checking type consistency...');
+    // ' Checking type consistency...'
 
     // Check for common type mismatches
     const apiFiles = await glob('app/api/**/*.ts');
@@ -228,11 +232,11 @@ class PreBuildValidator {
       }
     }
 
-    console.log('   Type consistency check complete');
+    // '   Type consistency check complete'
   }
 
   private async checkEnvironmentVariables(): Promise<void> {
-    console.log(' Checking environment variables...');
+    // ' Checking environment variables...'
 
     if (!existsSync('.env')) {
       this.warnings.push('No .env file found');
@@ -242,7 +246,7 @@ class PreBuildValidator {
       this.errors.push('env.mjs file missing');
     }
 
-    console.log('   Environment check complete');
+    // '   Environment check complete'
   }
 }
 

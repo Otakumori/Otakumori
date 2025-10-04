@@ -61,7 +61,7 @@ async function appendItems(newItems: any[]) {
 
   await fsp.mkdir(path.dirname(CONFIG_PATH), { recursive: true });
   await fsp.writeFile(CONFIG_PATH, JSON.stringify(cfg, null, 2), 'utf8');
-  console.log('→ assets.config.json appended', newItems.length, 'item(s)');
+  // '→ assets.config.json appended', newItems.length, 'item(s');
 }
 
 const ROOT = process.cwd();
@@ -106,10 +106,10 @@ async function main() {
     avatar = String(args[0]).toLowerCase();
     vibe = String(args[1]).toLowerCase();
     count = parseInt(String(args[2]), 10);
-    console.log(' Using positional arguments');
+    // ' Using positional arguments'
   }
 
-  console.log(` Generating ${count} SFX for avatar: ${avatar} (${vibe} vibe)`);
+  // ` Generating ${count} SFX for avatar: ${avatar} (${vibe} vibe`);
 
   const presets = vibePresets(vibe);
   const itemsToAppend: any[] = [];
@@ -119,7 +119,7 @@ async function main() {
     let samples: Float32Array;
 
     // Use sine wave generation as fallback
-    console.log(`   Generated SFX ${i + 1} with sine wave fallback`);
+    // `   Generated SFX ${i + 1} with sine wave fallback`
     samples = generateSineWave(400 + i * 100, 0.1 + i * 0.05);
 
     const id = `${vibe}-${avatar}-sfx${i + 1}`;
@@ -127,7 +127,7 @@ async function main() {
     const absFile = path.join(ROOT, 'public', relFile);
 
     await saveWav(absFile, samples);
-    console.log(`   Saved ${relFile}`);
+    // `   Saved ${relFile}`
 
     itemsToAppend.push({
       id,
@@ -139,7 +139,7 @@ async function main() {
   }
 
   await appendItems(itemsToAppend);
-  console.log(`\n Generated ${count} SFX files in ${OUTDIR}`);
+  // `\n Generated ${count} SFX files in ${OUTDIR}`
 }
 
 main().catch((err) => {

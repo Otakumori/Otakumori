@@ -424,7 +424,7 @@ async function updateUserSoapstoneStats(userId: string) {
   // });
   
   // Just log for now
-  console.log(`Updated soapstone stats for user ${userId}`);
+  // `Updated soapstone stats for user ${userId}`
 }
 
 async function getSoapstoneCount(userId: string): Promise<number> {
@@ -441,7 +441,7 @@ function getQualityTier(score: number): string {
 
 async function checkSoapstoneAchievements(userId: string, message: any) {
   // Mock achievement checks
-  console.log(`Soapstone message placed by user ${userId}`);
+  // `Soapstone message placed by user ${userId}`
 }
 
 export const POST = withSecurityHeaders(withRateLimit(handler, 'SOAPSTONE_PLACE'));

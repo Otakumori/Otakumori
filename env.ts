@@ -52,6 +52,15 @@ const client = z.object({
   NEXT_PUBLIC_GA_ID: z.string().optional(),
   NEXT_PUBLIC_FEATURE_CUBE_HUB: z.string().optional(),
   NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().optional(),
+  // Homepage feature flags
+  NEXT_PUBLIC_FEATURE_HERO: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_SHOP: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_MINIGAMES: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_BLOG: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_SOAPSTONES: z.string().optional(),
+  NEXT_PUBLIC_LIVE_DATA: z.string().optional(),
+  NEXT_PUBLIC_PROBE_MODE: z.string().optional(),
 });
 
 const _server = server.safeParse(process.env);
@@ -77,6 +86,15 @@ const _client = client.safeParse({
   NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
   NEXT_PUBLIC_FEATURE_CUBE_HUB: process.env.NEXT_PUBLIC_FEATURE_CUBE_HUB,
   NEXT_PUBLIC_FEATURE_PETALS_ABOUT: process.env.NEXT_PUBLIC_FEATURE_PETALS_ABOUT,
+  // Homepage feature flags
+  NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO,
+  NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
+  NEXT_PUBLIC_FEATURE_SHOP: process.env.NEXT_PUBLIC_FEATURE_SHOP,
+  NEXT_PUBLIC_FEATURE_MINIGAMES: process.env.NEXT_PUBLIC_FEATURE_MINIGAMES,
+  NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG,
+  NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES,
+  NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA,
+  NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE,
 });
 
 if (!_client.success) {

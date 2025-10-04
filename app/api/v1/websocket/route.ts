@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       wsManager.connect(userId, ws);
     });
 
-    console.log('WebSocket server started on port 8080');
+    // 'WebSocket server started on port 8080'
   }
 
   return new Response('WebSocket server running', { status: 200 });

@@ -37,7 +37,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
       audioRef.current = new Audio('/audio/gamecube-boot.mp3'); // Optional boot sound
       audioRef.current.volume = 0.3;
     } catch (error) {
-      console.log('Boot audio not available');
+      // 'Boot audio not available'
     }
 
     // Boot sequence timing
@@ -48,7 +48,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
         try {
           await audioRef.current.play();
         } catch (error) {
-          console.log('Audio autoplay blocked');
+          // 'Audio autoplay blocked'
         }
       }
 

@@ -116,7 +116,7 @@ async function main() {
       const label = makeLabel(cl.prefix, item);
       const hue = hueFor(cl.prefix);
       await writeSvgPng(fileBase, label, keyId, hue);
-      console.log('[gen]', keyId);
+      // '[gen]', keyId
     }
   }
 
@@ -137,7 +137,7 @@ async function main() {
       // copy existing PNG into achievements folder for consistency if desired
       const dest = path.join(OUT_DIR, `${t.key}.png`);
       if (!fs.existsSync(dest)) fs.copyFileSync(existingPng, dest);
-      console.log('[gen] preserved existing tier PNG:', t.key);
+      // '[gen] preserved existing tier PNG:', t.key
     }
   }
 }

@@ -60,5 +60,5 @@ function write(file: string, text: string) {
 
   const dest = path.join(process.cwd(), 'content', 'ASSET_TODO.md');
   write(dest, out.join('\n'));
-  console.log(`[assets] Wrote checklist → ${dest}`);
+  // `[assets] Wrote checklist → ${dest}`
 })();

@@ -5,8 +5,8 @@ import { env } from '../env.mjs';
 
 // If we got here, validation passed
 // Provide a concise log for CI
-console.log('ENV OK:', {
+// 'ENV OK:', {
   NODE_ENV: env.NODE_ENV,
   hasStripe: !!env.STRIPE_SECRET_KEY,
   hasClerk: !!env.CLERK_SECRET_KEY,
-});
+}

@@ -39,8 +39,8 @@ export async function appendAsset(entry: AssetEntry) {
       avatar: entry.avatar,
     });
     await fsp.writeFile(MANIFEST, JSON.stringify(data, null, 2), 'utf8');
-    console.log('→ Manifest appended:', entry.id);
+    // '→ Manifest appended:', entry.id
   } else {
-    console.log('→ Manifest already has:', entry.id);
+    // '→ Manifest already has:', entry.id
   }
 }

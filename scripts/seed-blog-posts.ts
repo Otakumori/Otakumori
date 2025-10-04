@@ -51,7 +51,7 @@ const samplePosts = [
 
 async function seedBlogPosts() {
   try {
-    console.log('Seeding blog posts...');
+    // 'Seeding blog posts...'
 
     for (const post of samplePosts) {
       await db.contentPage.upsert({
@@ -59,10 +59,10 @@ async function seedBlogPosts() {
         update: post,
         create: post,
       });
-      console.log(`Created/updated blog post: ${post.title}`);
+      // `Created/updated blog post: ${post.title}`
     }
 
-    console.log('Blog posts seeded successfully!');
+    // 'Blog posts seeded successfully!'
   } catch (error) {
     console.error('Error seeding blog posts:', error);
   } finally {

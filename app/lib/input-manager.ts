@@ -225,11 +225,11 @@ export class InputManager {
   }
 
   private handleGamepadConnected(event: GamepadEvent): void {
-    console.log('Gamepad connected:', event.gamepad);
+    // 'Gamepad connected:', event.gamepad
   }
 
   private handleGamepadDisconnected(event: GamepadEvent): void {
-    console.log('Gamepad disconnected:', event.gamepad);
+    // 'Gamepad disconnected:', event.gamepad
     this.gamepadState.delete(event.gamepad.index);
   }
 

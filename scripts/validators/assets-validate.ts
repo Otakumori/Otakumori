@@ -22,7 +22,7 @@ interface Manifest {
 }
 
 function validateAssets() {
-  console.log('⌕ Validating assets...\n');
+  // '⌕ Validating assets...\n'
 
   // Load files
   const rolesPath = join(process.cwd(), 'assets-roles.json');
@@ -68,7 +68,7 @@ function validateAssets() {
   // Validate bubble-ragdoll specifically
   const bubbleGame = roles['bubble-ragdoll'];
   if (bubbleGame) {
-    console.log(' Validating bubble-ragdoll assets:');
+    // ' Validating bubble-ragdoll assets:'
 
     // Check required assets exist
     const requiredAssets = ['bg', 'bubbleSprite', 'popSfx', 'bounceSfx', 'failSfx'];
@@ -115,13 +115,13 @@ function validateAssets() {
       }
     }
 
-    console.log('   bubble-ragdoll validation complete\n');
+    // '   bubble-ragdoll validation complete\n'
   }
 
   // Validate petal-collection specifically
   const petalGame = roles['petal-collection'];
   if (petalGame) {
-    console.log(' Validating petal-collection assets:');
+    // ' Validating petal-collection assets:'
 
     // Check required assets exist
     const requiredAssets = ['bg', 'petalParticle', 'collectSfx', 'missSfx'];
@@ -149,13 +149,13 @@ function validateAssets() {
       }
     }
 
-    console.log('   petal-collection validation complete\n');
+    // '   petal-collection validation complete\n'
   }
 
   // Validate quick-math specifically
   const mathGame = roles['quick-math'];
   if (mathGame) {
-    console.log(' Validating quick-math assets:');
+    // ' Validating quick-math assets:'
 
     // Check required assets exist
     const requiredAssets = ['successSfx', 'failSfx'];
@@ -183,14 +183,14 @@ function validateAssets() {
       }
     }
 
-    console.log('   quick-math validation complete\n');
+    // '   quick-math validation complete\n'
   }
 
   // Validate other games
   for (const [gameKey, gameRoles] of Object.entries(roles)) {
     if (gameKey === 'bubble-ragdoll') continue; // Already validated above
 
-    console.log(` Validating ${gameKey}:`);
+    // ` Validating ${gameKey}:`
 
     // Check if game has theme fields
     const hasThemeFields = [
@@ -225,11 +225,11 @@ function validateAssets() {
       }
     }
 
-    console.log(`   ${gameKey} validation complete`);
+    // `   ${gameKey} validation complete`
   }
 
   // Validate manifest paths
-  console.log('\n Validating manifest paths...');
+  // '\n Validating manifest paths...'
 
   function validateManifestPaths(obj: any, prefix: string = '') {
     for (const [key, value] of Object.entries(obj)) {
@@ -258,10 +258,10 @@ function validateAssets() {
   validateManifestPaths(manifest);
 
   if (hasErrors) {
-    console.log('\n Validation failed with errors');
+    // '\n Validation failed with errors'
     return false;
   } else {
-    console.log('\n All validations passed!');
+    // '\n All validations passed!'
     return true;
   }
 }

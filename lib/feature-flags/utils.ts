@@ -263,11 +263,11 @@ export class FeatureFlagDebugger {
     }
 
     this.getAllFlags().then((flags) => {
-      console.group(' Feature Flags Status');
+      // Feature Flags Status
       Object.entries(flags).forEach(([key, value]) => {
         // Feature flag value logged
       });
-      console.groupEnd();
+      // Group end
     });
   }
 }

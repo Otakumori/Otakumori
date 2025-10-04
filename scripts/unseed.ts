@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Unseeding app data...');
+  // 'Unseeding app data...'
 
   // Remove seeded products by integrationRef prefix
   const seededProducts = await prisma.product.findMany({
@@ -24,7 +24,7 @@ async function main() {
     await prisma.user.delete({ where: { id: user.id } });
   }
 
-  console.log('Unseed complete.');
+  // 'Unseed complete.'
 }
 
 main()

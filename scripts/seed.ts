@@ -159,16 +159,16 @@ async function upsertDemoUser() {
 }
 
 async function main() {
-  console.log('Seeding app data...');
+  // 'Seeding app data...'
   const usedLive = await trySeedFromPrintify();
   if (!usedLive) {
-    console.log('Printify not available, seeding fallback products.');
+    // 'Printify not available, seeding fallback products.'
     await seedPrintifyFallback();
   } else {
-    console.log('Seeded from live Printify API.');
+    // 'Seeded from live Printify API.'
   }
   await upsertDemoUser();
-  console.log('Seed complete.');
+  // 'Seed complete.'
 }
 
 main()

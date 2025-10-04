@@ -18,7 +18,7 @@ export const syncUserToSupabase = inngest.createFunction(
 
     return await step.run('sync-user-data', async () => {
       // This will be implemented in the actual function
-      console.log(`Syncing user ${user.id} to Supabase`);
+      // `Syncing user ${user.id} to Supabase`
 
       // Simulate API call to sync user
       const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL}/api/webhooks/clerk`, {
@@ -45,7 +45,7 @@ export const updatePrintifyProducts = inngest.createFunction(
   { event: 'printify/products.update' },
   async ({ event, step }: { event: any; step: any }) => {
     return await step.run('fetch-printify-products', async () => {
-      console.log('Fetching products from Printify');
+      // 'Fetching products from Printify'
 
       // This replaces your current cron job
       const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL}/api/shop/products`);
@@ -68,7 +68,7 @@ export const syncInventory = inngest.createFunction(
   { event: 'inventory/sync' },
   async ({ event, step }) => {
     return await step.run('sync-inventory', async () => {
-      console.log('Syncing inventory levels');
+      // 'Syncing inventory levels'
 
       // Update inventory from Printify
       // Update local database
@@ -95,25 +95,25 @@ export const processOrder = inngest.createFunction(
 
     // Step 1: Validate order
     const validation = await step.run('validate-order', async () => {
-      console.log(`Validating order ${order.id}`);
+      // `Validating order ${order.id}`
       return { valid: true, orderId: order.id };
     });
 
     // Step 2: Check inventory
     const inventory = await step.run('check-inventory', async () => {
-      console.log(`Checking inventory for order ${order.id}`);
+      // `Checking inventory for order ${order.id}`
       return { inStock: true, orderId: order.id };
     });
 
     // Step 3: Process payment
     const payment = await step.run('process-payment', async () => {
-      console.log(`Processing payment for order ${order.id}`);
+      // `Processing payment for order ${order.id}`
       return { success: true, orderId: order.id };
     });
 
     // Step 4: Send confirmation
     await step.run('send-confirmation', async () => {
-      console.log(`Sending confirmation for order ${order.id}`);
+      // `Sending confirmation for order ${order.id}`
       return { sent: true, orderId: order.id };
     });
 
@@ -136,7 +136,7 @@ export const sendOrderConfirmation = inngest.createFunction(
     const order = event.data;
 
     return await step.run('send-email', async () => {
-      console.log(`Sending confirmation email for order ${order.id}`);
+      // `Sending confirmation email for order ${order.id}`
 
       // Send email logic here
       // Could integrate with SendGrid, Resend, etc.
@@ -161,7 +161,7 @@ export const processPaymentWebhook = inngest.createFunction(
     const webhook = event.data;
 
     return await step.run('process-webhook', async () => {
-      console.log(`Processing Stripe webhook: ${webhook.type}`);
+      // `Processing Stripe webhook: ${webhook.type}`
 
       switch (webhook.type) {
         case 'payment_intent.succeeded':
@@ -173,7 +173,7 @@ export const processPaymentWebhook = inngest.createFunction(
           // Send notification
           break;
         default:
-          console.log(`Unhandled webhook type: ${webhook.type}`);
+          // `Unhandled webhook type: ${webhook.type}`
       }
 
       return { success: true, webhookType: webhook.type };
@@ -194,7 +194,7 @@ export const dailyInventorySync = inngest.createFunction(
   { cron: '0 2 * * *' },
   async ({ step }) => {
     return await step.run('sync-inventory', async () => {
-      console.log('Running daily inventory sync');
+      // 'Running daily inventory sync'
 
       // Trigger inventory sync
       await inngest.send({ name: 'inventory/sync' });
@@ -213,7 +213,7 @@ export const weeklyProductUpdate = inngest.createFunction(
   { cron: '0 3 * * 1' },
   async ({ step }) => {
     return await step.run('update-products', async () => {
-      console.log('Running weekly product update');
+      // 'Running weekly product update'
 
       // Trigger product update
       await inngest.send({ name: 'printify/products.update' });
@@ -238,7 +238,7 @@ export const retryFailedOperation = inngest.createFunction(
     const operation = event.data;
 
     return await step.run('retry-operation', async () => {
-      console.log(`Retrying failed operation: ${operation.type}`);
+      // `Retrying failed operation: ${operation.type}`
 
       // Implement retry logic with exponential backoff
       // Could retry API calls, database operations, etc.
@@ -257,7 +257,7 @@ export const cleanupOldData = inngest.createFunction(
   { cron: '0 4 * * 0' }, // Every Sunday at 4 AM
   async ({ step }) => {
     return await step.run('cleanup', async () => {
-      console.log('Running data cleanup');
+      // 'Running data cleanup'
 
       // Clean up old logs, temporary files, etc.
       // Archive old orders, clean up expired sessions
