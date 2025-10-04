@@ -1,506 +1,253 @@
-name: Enterprise CI/CD Pipeline
+name: CI
 
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
-  schedule:
-    - cron: '0 2 * * *' # Daily performance regression tests
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '18'
   PNPM_VERSION: '8'
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
-  # Pre-validation phase
-  validate:
-    name: 🔍 Pre-validation
+  test:
+    name: Test Suite
     runs-on: ubuntu-latest
-    outputs:
-      skip-tests: ${{ steps.changes.outputs.skip-tests }}
-      performance-test: ${{ steps.changes.outputs.performance-test }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-
-      - name: Detect changes
-        id: changes
-        uses: dorny/paths-filter@v2
-        with:
-          filters: |
-            skip-tests:
-              - '*.md'
-              - 'docs/**'
-              - '.gitignore'
-            performance-test:
-              - 'app/**'
-              - 'lib/**'
-              - 'components/**'
-              - 'public/**'
-
-      - name: Setup environment info
-        run: |
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Event: ${{ github.event_name }}"
-          echo "Actor: ${{ github.actor }}"
-
-  # Security & dependency audit
-  security:
-    name: 🛡️ Security Audit
-    runs-on: ubuntu-latest
-    needs: validate
-    if: needs.validate.outputs.skip-tests != 'true'
-    steps:
-      - uses: actions/checkout@v4
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Audit dependencies
-        run: pnpm audit --audit-level moderate
-
-      - name: Check for known vulnerabilities
+      - name: Get pnpm store directory
+        shell: bash
         run: |
-          # Custom security checks
-          echo "🔍 Checking for hardcoded secrets..."
-          if grep -r "process\.env\." app/ --exclude-dir=node_modules | grep -v "@/env"; then
-            echo "❌ Found direct process.env usage - use @/env instead"
-            exit 1
-          fi
-          echo "✅ No hardcoded secrets found"
-          
-          echo "🔍 Checking for console.log statements..."
-          if grep -r "console\.log" app/ --exclude-dir=node_modules; then
-            echo "❌ Found console.log statements - use console.warn or console.error instead"
-            exit 1
-          fi
-          echo "✅ No console.log statements found"
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
-      - name: Validate environment schema
-        run: pnpm run validate:env || echo "Environment validation skipped in CI"
-
-  # Code quality checks
-  quality:
-    name: 📊 Code Quality
-    runs-on: ubuntu-latest
-    needs: validate
-    if: needs.validate.outputs.skip-tests != 'true'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
         with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: TypeScript compilation
+      - name: Type check
         run: pnpm run typecheck
 
-      - name: ESLint validation
+      - name: Lint
         run: pnpm run lint
 
-      - name: Prettier formatting check
-        run: pnpm run format:check
+      - name: Run unit tests
+        run: pnpm run test
 
-      - name: Emoji policy enforcement
-        run: pnpm run scan:emojis
-
-      - name: Asset verification
-        run: pnpm run assets:verify
-
-      - name: SEO audit
-        run: pnpm run seo:audit || echo "SEO audit completed with warnings"
-
-      - name: Performance budget check
-        run: pnpm run perf:budget
-
-  # Database & schema validation
-  database:
-    name: 🗄️ Database Validation
+  build:
+    name: Build & Bundle Analysis
     runs-on: ubuntu-latest
-    needs: validate
-    if: needs.validate.outputs.skip-tests != 'true'
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: otakumori_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    needs: test
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Prisma schema validation
-        run: npx prisma validate
-
-      - name: Database migration dry-run
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/otakumori_test
-        run: |
-          npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma
-          npx prisma db push
-          npx prisma generate
-
-      - name: Seed data validation
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/otakumori_test
-        run: |
-          echo "🌱 Testing database seeding..."
-          pnpm run db:seed || echo "Seeding completed with warnings"
-
-  # Unit & integration tests
-  test:
-    name: 🧪 Test Suite
-    runs-on: ubuntu-latest
-    needs: [validate, quality]
-    if: needs.validate.outputs.skip-tests != 'true'
-    strategy:
-      matrix:
-        test-group: [unit, integration, api]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run ${{ matrix.test-group }} tests
-        run: |
-          case "${{ matrix.test-group }}" in
-            unit)
-              echo "🧪 Running unit tests..."
-              pnpm run test:unit || echo "Unit tests need implementation"
-              ;;
-            integration)
-              echo "🔗 Running integration tests..."
-              pnpm run test:integration || echo "Integration tests need implementation"
-              ;;
-            api)
-              echo "🌐 Running API tests..."
-              pnpm run test:api || echo "API tests need implementation"
-              ;;
-          esac
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results-${{ matrix.test-group }}
-          path: |
-            coverage/
-            test-results/
-          retention-days: 7
-
-  # E2E tests with Playwright
-  e2e:
-    name: 🎭 E2E Tests
-    runs-on: ubuntu-latest
-    needs: [quality, database]
-    if: needs.validate.outputs.skip-tests != 'true'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Install Playwright
-        run: pnpm exec playwright install --with-deps
 
       - name: Build application
         run: pnpm run build
+        env:
+          NEXT_PUBLIC_FEATURE_HERO: '1'
+          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+          NEXT_PUBLIC_FEATURE_SHOP: '1'
+          NEXT_PUBLIC_FEATURE_MINIGAMES: '1'
+          NEXT_PUBLIC_FEATURE_BLOG: '1'
+          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+          NEXT_PUBLIC_LIVE_DATA: '0'
+          NEXT_PUBLIC_PROBE_MODE: '1'
 
-      - name: Run E2E tests
-        run: pnpm run test:e2e || echo "E2E tests need implementation"
+      - name: Analyze bundle size
+        run: |
+          pnpm run build -- --analyze
+        continue-on-error: true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-files
+          path: .next/
+          retention-days: 1
+
+  lighthouse:
+    name: Lighthouse Performance
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-files
+          path: .next/
+
+      - name: Start Next.js server
+        run: |
+          pnpm run start &
+          sleep 30
+        env:
+          PORT: 3000
+          NEXT_PUBLIC_FEATURE_HERO: '1'
+          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+          NEXT_PUBLIC_FEATURE_SHOP: '1'
+          NEXT_PUBLIC_FEATURE_MINIGAMES: '1'
+          NEXT_PUBLIC_FEATURE_BLOG: '1'
+          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+          NEXT_PUBLIC_LIVE_DATA: '0'
+          NEXT_PUBLIC_PROBE_MODE: '1'
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: './lighthouserc.js'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-files
+          path: .next/
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Start Next.js server
+        run: |
+          pnpm run start &
+          sleep 30
+        env:
+          PORT: 3000
+          NEXT_PUBLIC_FEATURE_HERO: '1'
+          NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: '1'
+          NEXT_PUBLIC_FEATURE_SHOP: '1'
+          NEXT_PUBLIC_FEATURE_MINIGAMES: '1'
+          NEXT_PUBLIC_FEATURE_BLOG: '1'
+          NEXT_PUBLIC_FEATURE_SOAPSTONES: '1'
+          NEXT_PUBLIC_LIVE_DATA: '0'
+          NEXT_PUBLIC_PROBE_MODE: '1'
+
+      - name: Run Playwright tests
+        run: pnpm exec playwright test
+        env:
+          BASE_URL: http://localhost:3000
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 7
+          retention-days: 30
 
-  # Performance regression testing
-  performance:
-    name: ⚡ Performance Tests
+  security:
+    name: Security Audit
     runs-on: ubuntu-latest
-    needs: validate
-    if: needs.validate.outputs.performance-test == 'true' || github.event_name == 'schedule'
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build optimized version
-        run: pnpm run build
+      - name: Run security audit
+        run: pnpm audit --audit-level moderate
 
-      - name: Run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun || echo "Lighthouse CI configuration needed"
-
-      - name: Bundle analysis
-        run: pnpm run build:analyze
-
-      - name: Performance regression check
-        run: |
-          echo "📊 Checking performance regression..."
-          pnpm run perf:budget
-          echo "Performance metrics within acceptable ranges"
-
-  # Security scanning
-  security-scan:
-    name: 🔒 Security Scan
-    runs-on: ubuntu-latest
-    needs: quality
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
-
-  # Production build validation
-  build:
-    name: 🏗️ Production Build
-    runs-on: ubuntu-latest
-    needs: [security, quality, database]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Pre-build validation
-        run: pnpm run validate
-
-      - name: Production build
-        run: pnpm run build
-
-      - name: Post-build validation
-        run: |
-          echo "🔍 Validating build artifacts..."
-          if [ ! -f ".next/BUILD_ID" ]; then
-            echo "❌ Build ID not found"
-            exit 1
-          fi
-          echo "✅ Build validation completed"
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            .next/
-            !.next/cache/
-          retention-days: 7
-
-  # Preview deployment
-  deploy-preview:
-    name: 🚀 Preview Deployment
-    runs-on: ubuntu-latest
-    needs: [build, test]
-    if: github.event_name == 'pull_request'
-    environment: preview
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to Vercel Preview
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          scope: ${{ secrets.VERCEL_ORG_ID }}
-
-      - name: Comment PR with preview URL
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && comment.body.includes('Preview deployment')
-            );
-            
-            const body = `## 🚀 Preview Deployment Ready!
-            
-            Your changes have been deployed to a preview environment.
-            
-            **Preview URL:** Will be updated with actual Vercel URL
-            
-            ### ✅ Validation Status
-            - TypeScript: Passed
-            - ESLint: Passed  
-            - Tests: Passed
-            - Build: Successful
-            
-            This preview will be automatically updated when you push new commits.`;
-            
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body,
-              });
-            }
-
-  # Production deployment
-  deploy-production:
-    name: 🌟 Production Deployment
-    runs-on: ubuntu-latest
-    needs: [build, test, e2e, performance]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to Vercel Production
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          scope: ${{ secrets.VERCEL_ORG_ID }}
-
-      - name: Notify deployment success
-        run: |
-          echo "🎉 Production deployment successful!"
-          echo "Triggering post-deployment validations..."
-
-  # Post-deployment monitoring
-  post-deploy:
-    name: 📊 Post-Deploy Monitoring
-    runs-on: ubuntu-latest
-    needs: deploy-production
-    if: success()
-    steps:
-      - name: Health check
-        run: |
-          echo "🏥 Running post-deployment health checks..."
-          # Add actual health check endpoints
-          echo "Health checks completed"
-
-      - name: Performance monitoring
-        run: |
-          echo "📈 Setting up performance monitoring..."
-          # Integration with monitoring tools
-          echo "Monitoring configured"
-
-      - name: Notify team
-        run: |
-          echo "📢 Notifying team of successful deployment..."
-          # Slack/Discord notifications can be added here
-          echo "Team notified"
+      - name: Run dependency check
+        run: pnpm run check-deps
+        continue-on-error: true

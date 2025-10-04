@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -23,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isAuthenticated = !!user;
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, _password: string) => {
     // Mock login
     setUser({
       id: '1',
@@ -71,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const verifyAge = async (verification: AgeVerification) => {
+  const verifyAge = async (_verification: AgeVerification) => {
     // Mock age verification
   };
 

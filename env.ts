@@ -14,6 +14,7 @@ const server = z.object({
   PRINTIFY_API_KEY: z.string().optional(),
   PRINTIFY_SHOP_ID: z.string().optional(),
   CRON_SECRET: z.string().optional(),
+  INTERNAL_AUTH_TOKEN: z.string().optional(),
   SENTRY_DSN: z.string().optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),

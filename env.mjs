@@ -34,6 +34,7 @@ try {
       BLOB_READ_WRITE_URL: z.string().url().optional(),
       API_KEY: z.string().optional(),
       CRON_SECRET: z.string().optional(),
+      INTERNAL_AUTH_TOKEN: z.string().optional(),
       UPSTASH_REDIS_REST_URL: z.string().url(),
       UPSTASH_REDIS_REST_TOKEN: z.string(),
       PETAL_SALT: z.string().optional(),

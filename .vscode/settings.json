@@ -9,12 +9,17 @@
     "editor.defaultFormatter": "Prisma.prisma"
   },
   "cSpell.words": [
+    "arrowdown",
+    "arrowleft",
+    "arrowright",
     "configcat",
     "cooldown",
+    "EASYPOST",
     "flagsmith",
     "gltf",
     "HSTS",
     "INNGEST",
+    "lighthouserc",
     "metalness",
     "MINIGAMES",
     "mori",
@@ -23,10 +28,12 @@
     "octx",
     "otaku",
     "otakumori",
+    "POSTHOG",
     "printify",
     "sakura",
     "SAMEORIGIN",
     "Supabase",
+    "treosh",
     "whsec"
   ]
 }
