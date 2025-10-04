@@ -181,6 +181,7 @@
     "@tanstack/react-query": "^5.90.2",
     "@tsparticles/react": "^3.0.0",
     "@types/glob": "^9.0.0",
+    "@types/ws": "^8.18.1",
     "@upstash/ratelimit": "^2.0.6",
     "@upstash/redis": "^1.35.4",
     "@vercel/blob": "^2.0.0",
@@ -240,6 +241,7 @@
     "wav-encoder": "^1.3.0",
     "web3": "^4.16.0",
     "winston": "^3.17.0",
+    "ws": "^8.18.3",
     "zod": "^4.1.11",
     "zustand": "^5.0.8"
   },
