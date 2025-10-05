@@ -1,94 +1,80 @@
 // app/page.tsx
-import { Suspense } from 'react';
-import { env } from '@/env';
+// BEFORE:
+// import PixelatedStarfield from './components/background/PixelatedStarfield';
+// import FallingPetals from './components/background/FallingPetals';
+// import CherryBlossomTree from './components/background/CherryBlossomTree';
+import CherryBlossomEffect from './components/CherryBlossomEffect';
+import HeroIntro from './components/HeroIntro';
+import ShopTeaser from './components/ShopTeaser';
+import BlogTeaser from './components/BlogTeaser';
+import MiniGameTeaser from './components/MiniGameTeaser';
+import StickySoapstones from './components/StickySoapstones';
+import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
 
-// Server components - conditionally imported based on feature flags
-import ShopSection from '@/app/(site)/home/ShopSection';
-import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
-import BlogSection from '@/app/(site)/home/BlogSection';
-import FooterSection from '@/app/(site)/home/FooterSection';
-import InteractivePetals from '@/components/hero/InteractivePetals';
-import ParallaxBackground from '@/components/background/ParallaxBackground';
+export const revalidate = 300;
 
-export const revalidate = 60;
-
-export default async function HomePage() {
-  const {
-    NEXT_PUBLIC_FEATURE_HERO,
-    NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
-    NEXT_PUBLIC_FEATURE_SHOP,
-    NEXT_PUBLIC_FEATURE_MINIGAMES,
-    NEXT_PUBLIC_FEATURE_BLOG,
-    NEXT_PUBLIC_FEATURE_SOAPSTONES,
-  } = env;
-
+export default function HomePage() {
   return (
-    <main className="relative min-h-screen">
-      {/* Parallax Background */}
-      <ParallaxBackground theme="cherry" className="fixed inset-0 z-0" />
-
-      {/* Theme Picker - temporarily disabled due to SSR issues */}
-      {/* <div className="fixed top-20 right-4 z-50">
-        <ThemePicker
-          currentTheme="cherry"
-          onThemeChange={(_theme) => {
-            // Theme change will be handled by client-side state
-          }}
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Static background: show the RIGHT half only */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* If you have /public/images/home-hero.jpg, use that path */}
+        <img
+          src="/images/cherry-blossom-tree.jpg"
+          alt="Cherry blossom background"
+          className="h-full w-[200%] translate-x-[-50%] object-cover"
+          loading="eager"
         />
-      </div> */}
+      </div>
 
-      {/* HERO */}
-      {NEXT_PUBLIC_FEATURE_HERO === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-pink-300 drop-shadow-[0_1px_0_rgba(0,0,0,0.8)]">
-            Welcome home, traveler
-          </h1>
+      {/* Soft light-pink wash for readability (optional) */}
+      <div className="absolute inset-0 bg-[#FFE4E1]/55" />
 
-          {/* Interactive petals in hero only */}
-          {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
-            <div className="relative mt-6 h-48">
-              <InteractivePetals variant="hero" />
-            </div>
-          )}
+      {/* Petals ON TOP of image */}
+      <div className="pointer-events-none absolute inset-0 z-10">
+        <CherryBlossomEffect density="home" />
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-20">
+        {/* Hero Section - full viewport height */}
+        <section className="min-h-screen flex items-center justify-center pt-20">
+          <div className="mx-auto w-full max-w-7xl px-4">
+            <HeroIntro />
+          </div>
         </section>
-      )}
 
-      {/* SPACER - breathing room for visible petals before content */}
-      {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
-        <section aria-hidden className="relative z-40 h-[28vh] sm:h-[24vh] lg:h-[32vh]">
-          <InteractivePetals variant="spacer" />
+        {/* Shop */}
+        <section className="bg-gradient-to-b from-transparent via-black/10 to-black/30 py-24">
+          <div className="mx-auto w-full max-w-7xl px-4">
+            <ShopTeaser />
+          </div>
         </section>
-      )}
 
-      {/* SHOP */}
-      {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading products…</div>}>
-            <ShopSection />
-          </Suspense>
+        {/* Blog */}
+        <section className="bg-gradient-to-b from-black/30 via-black/20 to-transparent py-24">
+          <div className="mx-auto w-full max-w-7xl px-4">
+            <BlogTeaser />
+          </div>
         </section>
-      )}
 
-      {/* MINI-GAMES */}
-      {NEXT_PUBLIC_FEATURE_MINIGAMES === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
-            <MiniGamesSection />
-          </Suspense>
+        {/* Mini Games */}
+        <section className="bg-gradient-to-b from-transparent via-black/20 to-black/40 py-24">
+          <div className="mx-auto w-full max-w-7xl px-4">
+            <MiniGameTeaser />
+          </div>
         </section>
-      )}
 
-      {/* BLOG */}
-      {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading posts…</div>}>
-            <BlogSection />
-          </Suspense>
+        {/* Soapstones */}
+        <section className="bg-gradient-to-b from-black/40 to-black/60 py-24">
+          <div className="mx-auto w-full max-w-7xl px-4">
+            <StickySoapstones />
+          </div>
         </section>
-      )}
+      </div>
 
-      {/* FOOTER with Soapstones */}
-      <FooterSection showSoapstones={NEXT_PUBLIC_FEATURE_SOAPSTONES === '1'} />
-    </main>
+      {/* Existing drift animation layer if you want to keep it */}
+      <SoapstoneHomeDrift />
+    </div>
   );
 }
