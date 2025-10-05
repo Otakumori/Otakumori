@@ -9,7 +9,6 @@ import BlogSection from '@/app/(site)/home/BlogSection';
 import FooterSection from '@/app/(site)/home/FooterSection';
 import InteractivePetals from '@/components/hero/InteractivePetals';
 import ParallaxBackground from '@/components/background/ParallaxBackground';
-import ThemePicker from '@/components/ui/ThemePicker';
 
 export const revalidate = 60;
 
@@ -28,15 +27,15 @@ export default async function HomePage() {
       {/* Parallax Background */}
       <ParallaxBackground theme="cherry" className="fixed inset-0 z-0" />
 
-      {/* Theme Picker - Fixed position */}
-      <div className="fixed top-20 right-4 z-50">
+      {/* Theme Picker - temporarily disabled due to SSR issues */}
+      {/* <div className="fixed top-20 right-4 z-50">
         <ThemePicker
           currentTheme="cherry"
           onThemeChange={(_theme) => {
             // Theme change will be handled by client-side state
           }}
         />
-      </div>
+      </div> */}
 
       {/* HERO */}
       {NEXT_PUBLIC_FEATURE_HERO === '1' && (

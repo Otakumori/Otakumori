@@ -1044,7 +1044,7 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
   const Map: Record<string, React.ComponentType<any>> = {
     'petal-collection': dynamic(() => import('../petal-collection/Scene'), { ssr: false }),
     'memory-match': dynamic(() => import('../memory-match/InCard'), { ssr: false }),
-    'rhythm-beat-em-up': dynamic(() => import('../rhythm-beat-em-up/Scene'), { ssr: false }),
+    'otaku-beat-em-up': dynamic(() => import('../otaku-beat-em-up/Scene'), { ssr: false }),
     'bubble-girl': dynamic(() => import('../bubble-girl/InCard'), { ssr: false }),
     'quick-math': dynamic(
       () => import('../quick-math/QuickMathWrapper').then((m) => m.QuickMathWrapper),

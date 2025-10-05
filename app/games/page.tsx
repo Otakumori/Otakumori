@@ -98,14 +98,14 @@ export default function GameCubePage() {
       },
     },
     {
-      id: 'rhythm-beat-em-up',
+      id: 'otaku-beat-em-up',
       title: 'Rhythm Beat-Em-Up',
       tooltip: "Sync to the Moon Prism's pulse.",
       description: 'Fight to the rhythm of the music',
       icon: '',
       difficulty: 'hard',
       rewards: { petals: 60, achievements: ['Rhythm Master'] },
-      progress: gameProgress['rhythm-beat-em-up'] || {
+      progress: gameProgress['otaku-beat-em-up'] || {
         completed: false,
         highScore: 0,
         unlocked: true,

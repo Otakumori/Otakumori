@@ -57,7 +57,7 @@ export default function Game({ mode }: Props) {
 
   // Initialize game engine
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || typeof window === 'undefined') return;
 
     const canvas = canvasRef.current;
     const game = new GameEngine(canvas, mode);

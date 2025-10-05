@@ -30,7 +30,7 @@ export default function InteractivePetals({
 
   // Check for WebGL support and performance
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || typeof window === 'undefined') return;
 
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');

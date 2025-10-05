@@ -34,7 +34,7 @@ const GAME_THEMES = {
     title: 'Bubble Ragdoll',
     description: 'Pop for spy-craft secrets',
   },
-  'rhythm-beat-em-up': {
+  'otaku-beat-em-up': {
     accent: '#96ceb4',
     overlayBg: 'rgba(150, 206, 180, 0.1)',
     title: 'Rhythm Beat-Em-Up',

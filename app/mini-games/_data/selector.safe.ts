@@ -41,7 +41,7 @@ export function getHubGameCards(): HubGameCard[] {
 export function getActionGames(): HubGameCard[] {
   const actionGameIds = [
     'samurai-petal-slice',
-    'rhythm-beat-em-up',
+    'otaku-beat-em-up',
     'petal-samurai',
     'thigh-coliseum',
     'dungeon-of-desire',
@@ -76,7 +76,7 @@ function getGameDescription(gameId: string): string {
     'samurai-petal-slice': "Draw the Tetsusaiga's arc…",
     'anime-memory-match': 'Recall the faces bound by fate.',
     'bubble-pop-gacha': 'Pop for spy-craft secrets…',
-    'rhythm-beat-em-up': "Sync to the Moon Prism's pulse.",
+    'otaku-beat-em-up': "Sync to the Moon Prism's pulse.",
     'memory-match': 'Simple pairs, endless fun.',
     'petal-collection': 'Economy pacing prototype.',
     'quick-math': 'Answer fast. Pressure builds with each correct streak.',

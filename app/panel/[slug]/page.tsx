@@ -52,7 +52,7 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
       },
       {
         name: 'Rhythm Beat-Em-Up',
-        href: '/mini-games/rhythm-beat-em-up',
+        href: '/mini-games/otaku-beat-em-up',
         description: "Sync to the Moon Prism's pulse",
       },
       { name: 'All Games', href: '/mini-games', description: 'Browse all available mini-games' },

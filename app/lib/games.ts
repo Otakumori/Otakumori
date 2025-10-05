@@ -114,8 +114,8 @@ export const games: Record<string, GameDefinition> = {
       touch: { tap: 'Pop', drag: 'Aim', 'double-tap': 'Special' },
     },
   },
-  'rhythm-beat-em-up': {
-    key: 'rhythm-beat-em-up',
+  'otaku-beat-em-up': {
+    key: 'otaku-beat-em-up',
     name: 'Rhythm Beat-Em-Up',
     tagline: "Sync to the Moon Prism's pulse.",
     iconKey: 'rhythm-icon',

@@ -9,7 +9,7 @@ import OwnedRunesGrid from './OwnedRunesGrid';
 const games = [
   { slug: 'petal-collection', name: 'Petal Collection' },
   { slug: 'memory-match', name: 'Memory Match' },
-  { slug: 'rhythm-beat-em-up', name: 'Rhythm Beat' },
+  { slug: 'otaku-beat-em-up', name: 'Rhythm Beat' },
   { slug: 'bubble-girl', name: 'Bubble Girl' },
   { slug: 'quick-math', name: 'Quick Math' },
   { slug: 'puzzle-reveal', name: 'Puzzle Reveal' },

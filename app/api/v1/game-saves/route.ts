@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
         'samurai-petal-slice',
         'anime-memory-match',
         'bubble-pop-gacha',
-        'rhythm-beat-em-up',
+        'otaku-beat-em-up',
         'petal-collection',
         'memory-match',
         'bubble-girl',
