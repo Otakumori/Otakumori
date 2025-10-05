@@ -10,6 +10,7 @@ import AccessibilitySettings, {
   loadAccessibilitySettings,
   applyAccessibilitySettings,
 } from '@/app/components/games/AccessibilitySettings';
+import ErrorBoundary3D from '@/components/ErrorBoundary3D';
 
 // Import games from registry
 import gamesRegistry from '@/lib/games.meta.json';
@@ -44,13 +45,84 @@ export default function GameCubeHubV2() {
   const [accessibilitySettings, setAccessibilitySettings] = useState<GameAccessibilitySettings>(
     loadAccessibilitySettings(),
   );
+  const [isLoading, setIsLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
 
   // Apply accessibility settings on mount and when they change
   useEffect(() => {
     applyAccessibilitySettings(accessibilitySettings);
   }, [accessibilitySettings]);
+
+  // Initialize ambient music
+  useEffect(() => {
+    if (typeof window !== 'undefined' && accessibilitySettings.volume > 0) {
+      ambientAudioRef.current = new Audio();
+      ambientAudioRef.current.src = '/sfx/gamecube-menu.mp3';
+      ambientAudioRef.current.volume = 0.2; // Subtle ambient volume
+      ambientAudioRef.current.loop = true;
+      ambientAudioRef.current.preload = 'auto';
+
+      // Start ambient music after a short delay
+      const startAmbient = setTimeout(() => {
+        if (ambientAudioRef.current) {
+          ambientAudioRef.current.play().catch(() => {
+            // Ignore audio play errors (user might not have interacted with page yet)
+          });
+        }
+      }, 1000);
+
+      return () => {
+        clearTimeout(startAmbient);
+        if (ambientAudioRef.current) {
+          ambientAudioRef.current.pause();
+          ambientAudioRef.current = null;
+        }
+      };
+    }
+  }, [accessibilitySettings.volume]);
+
+  // Keyboard navigation for GameCube face buttons
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isLoading) return; // Don't handle keys during loading
+
+      switch (event.key) {
+        case 'ArrowUp':
+          event.preventDefault();
+          handleFaceAction('up');
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          handleFaceAction('down');
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          handleFaceAction('left');
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          handleFaceAction('right');
+          break;
+        case 'Enter':
+        case ' ':
+          event.preventDefault();
+          if (currentFace && currentFace !== 'front') {
+            handleFaceAction(currentFace);
+          }
+          break;
+        case 'Escape':
+          event.preventDefault();
+          setCurrentFace('front');
+          setActivePanel(null);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentFace, isLoading]);
 
   // Check for reduced motion preference
   const prefersReducedMotion =
@@ -112,20 +184,29 @@ export default function GameCubeHubV2() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [currentFace, activePanel]);
 
-  const handleFaceAction = (face: FacePosition) => {
+  const handleFaceAction = async (face: FacePosition) => {
     if (face === 'front') {
       setShowFrontOverlay(false);
       return;
     }
 
+    if (isLoading) return; // Prevent multiple clicks during loading
+
     setCurrentFace(face);
+    setIsLoading(true);
+
     const faceConfig = cubeConfig.faces[face as keyof typeof cubeConfig.faces];
+
+    // Add loading delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     if (faceConfig.action === 'route') {
       router.push((faceConfig as any).href);
     } else if (faceConfig.action === 'panel') {
       setActivePanel((faceConfig as any).panel as ActivePanel);
     }
+
+    setIsLoading(false);
   };
 
   const handleGameSelect = async (game: (typeof allGames)[0]) => {
@@ -193,56 +274,58 @@ export default function GameCubeHubV2() {
           {/* GameCube Container */}
           <div className="relative w-96 h-96">
             {/* Central Rotating Chrome Cube - Authentic GameCube Style */}
-            <div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-              style={{
-                width: '120px',
-                height: '120px',
-                transformStyle: 'preserve-3d',
-                animation: 'gamecubeRotate 8s linear infinite',
-              }}
-            >
-              {/* Cube faces */}
-              {['front', 'back', 'right', 'left', 'top', 'bottom'].map((face) => (
-                <div
-                  key={face}
-                  className="absolute w-full h-full"
-                  style={{
-                    background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    transform:
-                      face === 'front'
-                        ? 'translateZ(60px)'
-                        : face === 'back'
-                          ? 'translateZ(-60px) rotateY(180deg)'
-                          : face === 'right'
-                            ? 'rotateY(90deg) translateZ(60px)'
-                            : face === 'left'
-                              ? 'rotateY(-90deg) translateZ(60px)'
-                              : face === 'top'
-                                ? 'rotateX(90deg) translateZ(60px)'
-                                : 'rotateX(-90deg) translateZ(60px)',
-                    transformStyle: 'preserve-3d',
-                  }}
-                >
-                  {/* Chrome highlights */}
+            <ErrorBoundary3D>
+              <div
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  transformStyle: 'preserve-3d',
+                  animation: 'gamecubeRotate 8s linear infinite',
+                }}
+              >
+                {/* Cube faces */}
+                {['front', 'back', 'right', 'left', 'top', 'bottom'].map((face) => (
                   <div
-                    className="absolute inset-0 pointer-events-none"
+                    key={face}
+                    className="absolute w-full h-full"
                     style={{
-                      background:
-                        'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+                      background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                      transform:
+                        face === 'front'
+                          ? 'translateZ(60px)'
+                          : face === 'back'
+                            ? 'translateZ(-60px) rotateY(180deg)'
+                            : face === 'right'
+                              ? 'rotateY(90deg) translateZ(60px)'
+                              : face === 'left'
+                                ? 'rotateY(-90deg) translateZ(60px)'
+                                : face === 'top'
+                                  ? 'rotateX(90deg) translateZ(60px)'
+                                  : 'rotateX(-90deg) translateZ(60px)',
+                      transformStyle: 'preserve-3d',
                     }}
-                  />
-                  <div
-                    className="absolute top-1 left-1 right-1 h-px pointer-events-none"
-                    style={{
-                      background:
-                        'linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%)',
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
+                  >
+                    {/* Chrome highlights */}
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+                      }}
+                    />
+                    <div
+                      className="absolute top-1 left-1 right-1 h-px pointer-events-none"
+                      style={{
+                        background:
+                          'linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%)',
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </ErrorBoundary3D>
 
             {/* Central Label */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-16">
@@ -266,9 +349,11 @@ export default function GameCubeHubV2() {
             {/* UP - Trade Center */}
             <button
               onClick={() => handleFaceAction('up')}
+              onTouchStart={() => {}} // Enable touch events
               className={`absolute top-8 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-                        w-16 h-16 rounded-full glass-card text-center
+                        w-16 h-16 md:w-16 md:h-16 sm:w-14 sm:h-14 rounded-full glass-card text-center
                         hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        active:scale-95 touch-manipulation
                         transition-all duration-300 focus:outline-none 
                         focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
                         ${currentFace === 'up' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
@@ -276,19 +361,29 @@ export default function GameCubeHubV2() {
               aria-label="Open Trade Center"
             >
               <div className="flex flex-col items-center justify-center h-full">
-                <div className="text-2xl mb-1">
-                  <span role="img" aria-label="Trade Center"></span>
-                </div>
-                <div className="text-xs font-medium">{cubeConfig.faces.up.label}</div>
+                {isLoading && currentFace === 'up' ? (
+                  <div className="animate-spin w-4 h-4 border-2 border-pink-400 border-t-transparent rounded-full"></div>
+                ) : (
+                  <>
+                    <div className="text-2xl mb-1">
+                      <span role="img" aria-label="Trade Center">
+                        TC
+                      </span>
+                    </div>
+                    <div className="text-xs font-medium">{cubeConfig.faces.up.label}</div>
+                  </>
+                )}
               </div>
             </button>
 
             {/* LEFT - Mini-Games */}
             <button
               onClick={() => handleFaceAction('left')}
+              onTouchStart={() => {}} // Enable touch events
               className={`absolute left-8 top-1/2 transform -translate-x-1/2 -translate-y-1/2
-                        w-16 h-16 rounded-full glass-card text-center
+                        w-16 h-16 md:w-16 md:h-16 sm:w-14 sm:h-14 rounded-full glass-card text-center
                         hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        active:scale-95 touch-manipulation
                         transition-all duration-300 focus:outline-none 
                         focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
                         ${currentFace === 'left' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
@@ -296,21 +391,29 @@ export default function GameCubeHubV2() {
               aria-label="Open Mini-Games panel"
             >
               <div className="flex flex-col items-center justify-center h-full">
-                <div className="text-2xl mb-1">
-                  <span role="img" aria-label="Mini-Games">
-                    MG
-                  </span>
-                </div>
-                <div className="text-xs font-medium">{cubeConfig.faces.left.label}</div>
+                {isLoading && currentFace === 'left' ? (
+                  <div className="animate-spin w-4 h-4 border-2 border-pink-400 border-t-transparent rounded-full"></div>
+                ) : (
+                  <>
+                    <div className="text-2xl mb-1">
+                      <span role="img" aria-label="Mini-Games">
+                        MG
+                      </span>
+                    </div>
+                    <div className="text-xs font-medium">{cubeConfig.faces.left.label}</div>
+                  </>
+                )}
               </div>
             </button>
 
             {/* RIGHT - Avatar/Community */}
             <button
               onClick={() => handleFaceAction('right')}
+              onTouchStart={() => {}} // Enable touch events
               className={`absolute right-8 top-1/2 transform translate-x-1/2 -translate-y-1/2
-                        w-16 h-16 rounded-full glass-card text-center
+                        w-16 h-16 md:w-16 md:h-16 sm:w-14 sm:h-14 rounded-full glass-card text-center
                         hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        active:scale-95 touch-manipulation
                         transition-all duration-300 focus:outline-none 
                         focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
                         ${currentFace === 'right' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
@@ -318,21 +421,29 @@ export default function GameCubeHubV2() {
               aria-label="Open Avatar / Community Hub"
             >
               <div className="flex flex-col items-center justify-center h-full">
-                <div className="text-2xl mb-1">
-                  <span role="img" aria-label="Avatar Community">
-                    AV
-                  </span>
-                </div>
-                <div className="text-xs font-medium">{cubeConfig.faces.right.label}</div>
+                {isLoading && currentFace === 'right' ? (
+                  <div className="animate-spin w-4 h-4 border-2 border-pink-400 border-t-transparent rounded-full"></div>
+                ) : (
+                  <>
+                    <div className="text-2xl mb-1">
+                      <span role="img" aria-label="Avatar Community">
+                        AV
+                      </span>
+                    </div>
+                    <div className="text-xs font-medium">{cubeConfig.faces.right.label}</div>
+                  </>
+                )}
               </div>
             </button>
 
             {/* DOWN - Music/Extras */}
             <button
               onClick={() => handleFaceAction('down')}
+              onTouchStart={() => {}} // Enable touch events
               className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 translate-y-1/2
-                        w-16 h-16 rounded-full glass-card text-center
+                        w-16 h-16 md:w-16 md:h-16 sm:w-14 sm:h-14 rounded-full glass-card text-center
                         hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        active:scale-95 touch-manipulation
                         transition-all duration-300 focus:outline-none 
                         focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
                         ${currentFace === 'down' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
@@ -340,12 +451,18 @@ export default function GameCubeHubV2() {
               aria-label="Open Music / Extras panel"
             >
               <div className="flex flex-col items-center justify-center h-full">
-                <div className="text-2xl mb-1">
-                  <span role="img" aria-label="Music Extras">
-                    ME
-                  </span>
-                </div>
-                <div className="text-xs font-medium">{cubeConfig.faces.down.label}</div>
+                {isLoading && currentFace === 'down' ? (
+                  <div className="animate-spin w-4 h-4 border-2 border-pink-400 border-t-transparent rounded-full"></div>
+                ) : (
+                  <>
+                    <div className="text-2xl mb-1">
+                      <span role="img" aria-label="Music Extras">
+                        ME
+                      </span>
+                    </div>
+                    <div className="text-xs font-medium">{cubeConfig.faces.down.label}</div>
+                  </>
+                )}
               </div>
             </button>
           </div>

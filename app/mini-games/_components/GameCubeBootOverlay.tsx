@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import ErrorBoundary3D from '@/components/ErrorBoundary3D';
 
 interface GameCubeBootOverlayProps {
   onComplete: () => void;
@@ -24,10 +25,9 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
     // Initialize audio
     if (typeof window !== 'undefined') {
       audioRef.current = new Audio();
-      audioRef.current.volume = 0.3; // Subtle volume
-      // Use a simple beep sound or create a GameCube-like chime
-      audioRef.current.src =
-        'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEZBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU1jdTyz3krBSF0yO/eizEIHWq+8+OWT';
+      audioRef.current.volume = 0.4; // GameCube startup volume
+      audioRef.current.src = '/assets/sounds/gamecube-startup.mp3';
+      audioRef.current.preload = 'auto';
     }
 
     // Allow skipping after 1.2s
@@ -313,10 +313,10 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
         GameCube-style boot animation loading. Press Space, Enter, or Escape to skip.
       </div>
 
-      <div id="cvs" className="h-full w-full relative" style={{ perspective: '2200px' }}>
-        <div
-          id="cube"
-          className="absolute"
+        <div id="cvs" className="h-full w-full relative" style={{ perspective: '2200px' }}>
+          <div
+            id="cube"
+            className="absolute"
           style={{
             width: 'var(--cubesize)',
             height: 'var(--cubesize)',
@@ -527,8 +527,9 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
             ))}
           </div>
         </div>
+        </div>
 
-        <div
+      <div
           id="gcLabel"
           className="absolute"
           style={{

@@ -710,15 +710,15 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
   const filteredSliders = sliders.filter((slider) => slider.category === activeTab);
 
   const categories = [
-    { id: 'body', label: 'Body', icon: '👤' },
-    { id: 'face', label: 'Face', icon: '😊' },
-    { id: 'head', label: 'Head', icon: '🧠' },
-    { id: 'eyes', label: 'Eyes', icon: '👁️' },
-    { id: 'nose', label: 'Nose', icon: '👃' },
-    { id: 'mouth', label: 'Mouth', icon: '👄' },
-    { id: 'hair', label: 'Hair', icon: '💇' },
-    { id: 'materials', label: 'Materials', icon: '🎨' },
-    { id: 'physics', label: 'Physics', icon: '⚡' },
+    { id: 'body', label: 'Body', icon: 'BD' },
+    { id: 'face', label: 'Face', icon: 'FC' },
+    { id: 'head', label: 'Head', icon: 'HD' },
+    { id: 'eyes', label: 'Eyes', icon: 'EY' },
+    { id: 'nose', label: 'Nose', icon: 'NS' },
+    { id: 'mouth', label: 'Mouth', icon: 'MH' },
+    { id: 'hair', label: 'Hair', icon: 'HR' },
+    { id: 'materials', label: 'Materials', icon: 'MT' },
+    { id: 'physics', label: 'Physics', icon: 'PH' },
   ];
 
   return (
