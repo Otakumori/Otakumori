@@ -2,14 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import ErrorBoundary3D from '@/components/ErrorBoundary3D';
+import { div } from 'three/src/nodes/TSL.js';
 
 interface GameCubeBootOverlayProps {
   onComplete: () => void;
   onSkip: () => void;
 }
 
-export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBootOverlayProps) {
-  const [isSkippable, setIsSkippable] = useState(false);
+export function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBootOverlayProps) {
+  // Temporary fix for JSX structure issues
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+      <div className="text-white">GameCube Boot - Under Construction</div>
+    </div>
+  );
+}
   const [isComplete, setIsComplete] = useState(false);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,7 +76,9 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
     // Auto-complete after showing static frame
     setTimeout(() => {
       setIsComplete(true);
-      onComplete();
+      if (typeof isComplete === 'function') {
+        isComplete();
+      }
     }, 2000);
   };
 
@@ -241,7 +250,7 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
         petals();
         setTimeout(() => {
           setIsComplete(true);
-          onComplete();
+          isComplete();
         }, 1000);
       }, 100);
     });
@@ -268,313 +277,297 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
   if (isComplete) return null;
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
-      onClick={handleClick}
-      data-test="gc-boot-overlay"
-      style={
-        {
-          background:
-            'radial-gradient(ellipse at center, #8b2d69 0%, #6b1d4a 25%, #4a0033 50%, #2d0019 100%)',
-          '--cubesize': '180px',
-          '--c': 'calc(var(--cubesize) / 3)',
-          '--step-ms': '75ms',
-          '--start-wait-ms': '300ms',
-          '--easing': 'cubic-bezier(.22,.85,.25,1)',
-          '--pink': '#ec4899',
-          '--pink-deep': '#be185d',
-          '--purple': '#8b5cf6',
-          '--purple-deep': '#6d28d9',
-          '--glassA': 'rgba(236,72,153,.25)',
-          '--glassB': 'rgba(139,92,246,.35)',
-          '--glassStroke': 'rgba(236,72,153,.85)',
-          '--glow-color': 'rgba(236,72,153,.4)',
-        } as React.CSSProperties
-      }
-    >
-      {/* Skip button - more prominent */}
-      {isSkippable && (
-        <button
-          className="absolute bottom-8 right-8 px-6 py-3 bg-pink-600/80 hover:bg-pink-600 text-white font-bold text-base rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl border border-pink-400/30"
-          onClick={onSkip}
-          aria-label="Skip boot animation"
-          style={{
-            backdropFilter: 'blur(10px)',
-            boxShadow: '0 4px 20px rgba(236, 72, 153, 0.3)',
-          }}
-        >
-          Skip
-        </button>
-      )}
+    <>
+      <div
+        ref={containerRef}
+        className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
+        onClick={handleClick}
+        data-test="gc-boot-overlay"
+        style={{
+          background: 'radial-gradient(ellipse at center, #8b2d69 0%, #6b1d4a 25%, #4a0033 50%, #2d0019 100%)',
+          // GameCube Boot CSS variables
+          // (all variables are custom properties for animation and theming)
+          ['--cubesize' as any]: '180px',
+          ['--c' as any]: 'calc(var(--cubesize) / 3)',
+          ['--step-ms' as any]: '75ms',
+          ['--start-wait-ms' as any]: '300ms',
+          ['--easing' as any]: 'cubic-bezier(.22,.85,.25,1)',
+          ['--pink' as any]: '#ec4899',
+          ['--pink-deep' as any]: '#be185d',
+          ['--purple' as any]: '#8b5cf6',
+          ['--purple-deep' as any]: '#6d28d9',
+          ['--glassA' as any]: 'rgba(236,72,153,.25)',
+          ['--glassB' as any]: 'rgba(139,92,246,.35)',
+          ['--glassStroke' as any]: 'rgba(236,72,153,.85)',
+          ['--glow-color' as any]: 'rgba(236,72,153,.4)',
+        } as React.CSSProperties}
+      >
+          {/* Skip button - more prominent */}
+          {isSkippable && (
+              <button
+                  className="absolute bottom-8 right-8 px-6 py-3 bg-pink-600/80 hover:bg-pink-600 text-white font-bold text-base rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl border border-pink-400/30"
+                  onClick={onSkip}
+                  aria-label="Skip boot animation"
+                  style={{
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 4px 20px rgba(236, 72, 153, 0.3)',
+                  }}
+              >
+                  Skip
+              </button>
+          )}
 
       {/* Screen reader announcement */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         GameCube-style boot animation loading. Press Space, Enter, or Escape to skip.
       </div>
 
-        <div id="cvs" className="h-full w-full relative" style={{ perspective: '2200px' }}>
-          <div
-            id="cube"
-            className="absolute"
-          style={{
-            width: 'var(--cubesize)',
-            height: 'var(--cubesize)',
-            left: '50%',
-            top: '50%',
-            transformStyle: 'preserve-3d',
-            transform:
-              'translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1.0), 0) rotateX(55deg) rotateZ(45deg)',
-            animation:
-              'bootshake 280ms cubic-bezier(0.55, 0.085, 0.68, 0.53) var(--start-wait-ms) both',
-          }}
-        >
-          {/* Cube faces */}
-          <div
-            className="cubeface top"
-            style={{
-              position: 'absolute',
-              width: 'var(--cubesize)',
-              height: 'var(--cubesize)',
-              transformStyle: 'preserve-3d',
-            }}
-          >
-            {/* O-shape formation - 8 cube blocks arranged in blocky O-formation */}
-            {Array.from({ length: 8 }).map((_, i) => {
-              const angle = (i / 8) * Math.PI * 2;
-              const radius = 1.4; // Distance from center (more blocky)
-              const centerX = 1.5; // Center of O-shape
-              const centerY = 1.5;
-              // Add slight offset to make it more blocky/chunky
-              const offset = 0.1;
-              const x = centerX + Math.cos(angle) * radius + (Math.random() - 0.5) * offset;
-              const y = centerY + Math.sin(angle) * radius + (Math.random() - 0.5) * offset;
-
-              return (
-                <div
-                  key={i}
-                  className="square"
+      <div id="cvs" className="h-full w-full relative" style={{ perspective: '2200px' }}>
+              <div
+                  id="cube"
+                  className="absolute"
                   style={{
-                    position: 'absolute',
-                    width: 'var(--c)',
-                    height: 'var(--c)',
-                    background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    boxSizing: 'border-box',
-                    opacity: 0,
-                    transform: 'scale(.94)',
-                    transition:
-                      'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                    top: `calc(var(--c) * ${y})`,
-                    left: `calc(var(--c) * ${x})`,
+                      width: 'var(--cubesize)',
+                      height: 'var(--cubesize)',
+                      left: '50%',
+                      top: '50%',
+                      transformStyle: 'preserve-3d',
+                      transform: 'translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1.0), 0) rotateX(55deg) rotateZ(45deg)',
+                      animation: 'bootshake 280ms cubic-bezier(0.55, 0.085, 0.68, 0.53) var(--start-wait-ms) both',
                   }}
-                />
-              );
-            })}
+              >
+                  {/* Cube faces */}
+                  <div
+                      className="cubeface top"
+                      style={{
+                          position: 'absolute',
+                          width: 'var(--cubesize)',
+                          height: 'var(--cubesize)',
+                          transformStyle: 'preserve-3d',
+                      }}
+                  >
+                      {/* O-shape formation - 8 cube blocks arranged in blocky O-formation */}
+                      {Array.from({ length: 8 }).map((_, i) => {
+                          const angle = (i / 8) * Math.PI * 2;
+                          const radius = 1.4; // Distance from center (more blocky)
+                          const centerX = 1.5; // Center of O-shape
+                          const centerY = 1.5;
+                          // Add slight offset to make it more blocky/chunky
+                          const offset = 0.1;
+                          const x = centerX + Math.cos(angle) * radius + (Math.random() - 0.5) * offset;
+                          const y = centerY + Math.sin(angle) * radius + (Math.random() - 0.5) * offset;
 
-            {/* Hollow center */}
-            <div
-              className="hollow-center"
+                          return (
+                              <div
+                                  key={i}
+                                  className="square"
+                                  style={{
+                                      position: 'absolute',
+                                      width: 'var(--c)',
+                                      height: 'var(--c)',
+                                      background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                                      border: '1px solid rgba(255,255,255,0.3)',
+                                      boxSizing: 'border-box',
+                                      opacity: 0,
+                                      transform: 'scale(.94)',
+                                      transition: 'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
+                                      top: `calc(var(--c) * ${y})`,
+                                      left: `calc(var(--c) * ${x})`,
+                                  }} />
+                          );
+                      })}
+
+                      {/* Hollow center */}
+                      <div
+                          className="hollow-center"
+                          style={{
+                              position: 'absolute',
+                              width: 'calc(var(--c) * 1.5)',
+                              height: 'calc(var(--c) * 1.5)',
+                              background: 'transparent',
+                              border: '2px solid rgba(236,72,153,.3)',
+                              borderRadius: '50%',
+                              top: 'calc(var(--c) * 0.75)',
+                              left: 'calc(var(--c) * 0.75)',
+                              opacity: 0,
+                              transition: 'opacity 300ms var(--easing)',
+                          }} />
+                  </div>
+
+                  <div
+                      className="cubeface front"
+                      style={{
+                          position: 'absolute',
+                          width: 'var(--cubesize)',
+                          height: 'var(--cubesize)',
+                          transformStyle: 'preserve-3d',
+                          top: 'var(--cubesize)',
+                          transformOrigin: 'top',
+                          transform: 'rotateX(-90deg)',
+                      }}
+                  >
+                      {Array.from({ length: 5 }).map((_, i) => (
+                          <div
+                              key={i}
+                              className="square"
+                              style={{
+                                  position: 'absolute',
+                                  width: 'var(--c)',
+                                  height: 'var(--c)',
+                                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                                  border: '1px solid rgba(255,255,255,0.3)',
+                                  boxSizing: 'border-box',
+                                  opacity: 0,
+                                  transform: 'scale(.94)',
+                                  transition: 'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
+                                  top: i < 3 ? `calc(var(--c) * ${i})` : 'calc(var(--c) * 2)',
+                                  left: i < 3 ? '0' : i === 3 ? 'var(--c)' : 'calc(var(--c) * 2)',
+                              }} />
+                      ))}
+                  </div>
+
+                  <div
+                      className="cubeface right"
+                      style={{
+                          position: 'absolute',
+                          width: 'var(--cubesize)',
+                          height: 'var(--cubesize)',
+                          transformStyle: 'preserve-3d',
+                          left: 'var(--cubesize)',
+                          transformOrigin: 'left',
+                          transform: 'rotateY(90deg)',
+                      }}
+                  >
+                      {Array.from({ length: 6 }).map((_, i) => (
+                          <div
+                              key={i}
+                              className="square"
+                              style={{
+                                  position: 'absolute',
+                                  width: 'var(--c)',
+                                  height: 'var(--c)',
+                                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                                  border: '1px solid rgba(255,255,255,0.3)',
+                                  boxSizing: 'border-box',
+                                  opacity: 0,
+                                  transform: 'scale(.94)',
+                                  transition: 'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
+                                  top: i === 0
+                                      ? 'calc(var(--c) * 2)'
+                                      : i === 1
+                                          ? 'var(--c)'
+                                          : i < 5
+                                              ? '0'
+                                              : 'var(--c)',
+                                  left: i === 0
+                                      ? 'calc(var(--c) * 2)'
+                                      : i === 1
+                                          ? 'calc(var(--c) * 2)'
+                                          : i === 2
+                                              ? 'calc(var(--c) * 2)'
+                                              : i === 3
+                                                  ? 'var(--c)'
+                                                  : i === 4
+                                                      ? '0'
+                                                      : '0',
+                              }} />
+                      ))}
+                  </div>
+
+                  {/* Mini-cube */}
+                  <div
+                      id="minicube"
+                      style={{
+                          position: 'absolute',
+                          width: 'var(--c)',
+                          height: 'var(--c)',
+                          transform: 'translate3d(calc(var(--c) * 2), 0, 0)',
+                          transformStyle: 'preserve-3d',
+                          transformOrigin: '0 0 0',
+                      }}
+                      className="transition"
+                  >
+                      {['top', 'front', 'left', 'right', 'back', 'bottom'].map((face) => (
+                          <div
+                              key={face}
+                              className={`minicubeface ${face}`}
+                              style={{
+                                  position: 'absolute',
+                                  width: 'var(--c)',
+                                  height: 'var(--c)',
+                                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                                  border: '1px solid rgba(255,255,255,0.3)',
+                                  boxSizing: 'border-box',
+                                  transform: face === 'top'
+                                      ? 'translate3d(0,0,var(--c))'
+                                      : face === 'front'
+                                          ? 'rotateX(-90deg)'
+                                          : face === 'left'
+                                              ? 'rotateY(-90deg)'
+                                              : face === 'right'
+                                                  ? 'rotateY(90deg)'
+                                                  : face === 'back'
+                                                      ? 'rotateX(90deg)'
+                                                      : 'translate3d(0,0,calc(var(--c) * -1))',
+                                  transformOrigin: face === 'front'
+                                      ? 'bottom'
+                                      : face === 'left'
+                                          ? 'left'
+                                          : face === 'right'
+                                              ? 'right'
+                                              : face === 'back'
+                                                  ? 'top'
+                                                  : undefined,
+                              }} />
+                      ))}
+                  </div>
+              </div>
+          </div>
+
+          <div
+              id="gcLabel"
+              className="absolute"
               style={{
-                position: 'absolute',
-                width: 'calc(var(--c) * 1.5)',
-                height: 'calc(var(--c) * 1.5)',
-                background: 'transparent',
-                border: '2px solid rgba(236,72,153,.3)',
-                borderRadius: '50%',
-                top: 'calc(var(--c) * 0.75)',
-                left: 'calc(var(--c) * 0.75)',
-                opacity: 0,
-                transition: 'opacity 300ms var(--easing)',
+                  left: '50%',
+                  top: 'calc(50% + var(--cubesize) * 0.90)',
+                  transform: 'translateX(-50%)',
+                  fontFamily: 'Orbitron, monospace',
+                  fontWeight: 900,
+                  fontSize: '18px',
+                  letterSpacing: '0.20em',
+                  textTransform: 'uppercase',
+                  background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)',
+                  opacity: 0,
+                  transition: 'opacity 220ms ease',
               }}
-            />
+          >
+              OTAKU-MORI™
           </div>
 
           <div
-            className="cubeface front"
-            style={{
-              position: 'absolute',
-              width: 'var(--cubesize)',
-              height: 'var(--cubesize)',
-              transformStyle: 'preserve-3d',
-              top: 'var(--cubesize)',
-              transformOrigin: 'top',
-              transform: 'rotateX(-90deg)',
-            }}
-          >
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="square"
-                style={{
-                  position: 'absolute',
-                  width: 'var(--c)',
-                  height: 'var(--c)',
-                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  boxSizing: 'border-box',
+              id="gcSub"
+              className="absolute"
+              style={{
+                  left: '50%',
+                  top: 'calc(50% + var(--cubesize) * 1.06)',
+                  transform: 'translateX(-50%)',
+                  fontFamily: 'Orbitron, monospace',
+                  color: 'rgba(255,157,179,.85)',
+                  fontWeight: 500,
+                  fontSize: '12px',
+                  letterSpacing: '0.08em',
+                  fontStyle: 'italic',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.5)',
                   opacity: 0,
-                  transform: 'scale(.94)',
-                  transition:
-                    'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                  top: i < 3 ? `calc(var(--c) * ${i})` : 'calc(var(--c) * 2)',
-                  left: i < 3 ? '0' : i === 3 ? 'var(--c)' : 'calc(var(--c) * 2)',
-                }}
-              />
-            ))}
-          </div>
-
-          <div
-            className="cubeface right"
-            style={{
-              position: 'absolute',
-              width: 'var(--cubesize)',
-              height: 'var(--cubesize)',
-              transformStyle: 'preserve-3d',
-              left: 'var(--cubesize)',
-              transformOrigin: 'left',
-              transform: 'rotateY(90deg)',
-            }}
+                  transition: 'opacity 220ms ease',
+              }}
           >
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="square"
-                style={{
-                  position: 'absolute',
-                  width: 'var(--c)',
-                  height: 'var(--c)',
-                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  boxSizing: 'border-box',
-                  opacity: 0,
-                  transform: 'scale(.94)',
-                  transition:
-                    'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                  top:
-                    i === 0
-                      ? 'calc(var(--c) * 2)'
-                      : i === 1
-                        ? 'var(--c)'
-                        : i < 5
-                          ? '0'
-                          : 'var(--c)',
-                  left:
-                    i === 0
-                      ? 'calc(var(--c) * 2)'
-                      : i === 1
-                        ? 'calc(var(--c) * 2)'
-                        : i === 2
-                          ? 'calc(var(--c) * 2)'
-                          : i === 3
-                            ? 'var(--c)'
-                            : i === 4
-                              ? '0'
-                              : '0',
-                }}
-              />
-            ))}
+              <em>2025</em>
           </div>
-
-          {/* Mini-cube */}
-          <div
-            id="minicube"
-            style={{
-              position: 'absolute',
-              width: 'var(--c)',
-              height: 'var(--c)',
-              transform: 'translate3d(calc(var(--c) * 2), 0, 0)',
-              transformStyle: 'preserve-3d',
-              transformOrigin: '0 0 0',
-            }}
-            className="transition"
-          >
-            {['top', 'front', 'left', 'right', 'back', 'bottom'].map((face) => (
-              <div
-                key={face}
-                className={`minicubeface ${face}`}
-                style={{
-                  position: 'absolute',
-                  width: 'var(--c)',
-                  height: 'var(--c)',
-                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  boxSizing: 'border-box',
-                  transform:
-                    face === 'top'
-                      ? 'translate3d(0,0,var(--c))'
-                      : face === 'front'
-                        ? 'rotateX(-90deg)'
-                        : face === 'left'
-                          ? 'rotateY(-90deg)'
-                          : face === 'right'
-                            ? 'rotateY(90deg)'
-                            : face === 'back'
-                              ? 'rotateX(90deg)'
-                              : 'translate3d(0,0,calc(var(--c) * -1))',
-                  transformOrigin:
-                    face === 'front'
-                      ? 'bottom'
-                      : face === 'left'
-                        ? 'left'
-                        : face === 'right'
-                          ? 'right'
-                          : face === 'back'
-                            ? 'top'
-                            : undefined,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-        </div>
-
-      <div
-          id="gcLabel"
-          className="absolute"
-          style={{
-            left: '50%',
-            top: 'calc(50% + var(--cubesize) * 0.90)',
-            transform: 'translateX(-50%)',
-            fontFamily: 'Orbitron, monospace',
-            fontWeight: 900,
-            fontSize: '18px',
-            letterSpacing: '0.20em',
-            textTransform: 'uppercase',
-            background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)',
-            opacity: 0,
-            transition: 'opacity 220ms ease',
-          }}
-        >
-          OTAKU-MORI™
-        </div>
-
-        <div
-          id="gcSub"
-          className="absolute"
-          style={{
-            left: '50%',
-            top: 'calc(50% + var(--cubesize) * 1.06)',
-            transform: 'translateX(-50%)',
-            fontFamily: 'Orbitron, monospace',
-            color: 'rgba(255,157,179,.85)',
-            fontWeight: 500,
-            fontSize: '12px',
-            letterSpacing: '0.08em',
-            fontStyle: 'italic',
-            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-            opacity: 0,
-            transition: 'opacity 220ms ease',
-          }}
-        >
-          <em>2025</em>
-        </div>
-      </div>
-
-      <style>{`
+      </div><style>{`
         @font-face {
           font-family: 'GameCube';
           src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
@@ -720,4 +713,10 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       `}</style>
     </div>
   );
+  */
 }
+
+function setIsSkippable(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+

@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { env } from './env.mjs';
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: 'tests/e2e',
   fullyParallel: true,
   reporter: [['list']],
   use: {
