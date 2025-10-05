@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: env.NODE_ENV,
-      version: process.env.npm_package_version || '1.0.0',
+      version: '1.0.0',
       features: {
         liveData: env.NEXT_PUBLIC_LIVE_DATA === '1',
         probeMode: env.NEXT_PUBLIC_PROBE_MODE === '1',

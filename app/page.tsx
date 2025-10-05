@@ -34,7 +34,6 @@ export default async function HomePage() {
           currentTheme="cherry"
           onThemeChange={(_theme) => {
             // Theme change will be handled by client-side state
-            // console.log('Theme changed to:', theme);
           }}
         />
       </div>

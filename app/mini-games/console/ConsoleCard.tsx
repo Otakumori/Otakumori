@@ -1269,9 +1269,6 @@ function CommunityFace() {
     const connect = () => {
       // Only connect if WebSocket is explicitly enabled
       const wsEnabled = (process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === '1';
-      // console.log('WebSocket connection attempt', {
-      //   wsEnabled,
-      //   envVar: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
       //   envVarType: typeof process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
       // });
 

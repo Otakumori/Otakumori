@@ -87,10 +87,11 @@ class Logger {
           console.warn(line);
           break;
         case 'debug':
-          if (!this.isTest) console.debug(line);
+          if (!this.isTest) console.warn(line);
           break;
         default:
-          // line
+          // Use console.warn for unknown log levels
+          console.warn(line);
       }
     }
 

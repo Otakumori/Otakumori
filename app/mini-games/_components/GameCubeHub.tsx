@@ -64,18 +64,18 @@ export default function GameCubeHub() {
   useEffect(() => {
     // Set up achievement system callbacks
     achievementSystem.setOnUnlock((achievement) => {
-      // console.log('Achievement unlocked:', achievement.name);
+      // Achievement unlocked (logging disabled for production)
       // Show achievement notification
     });
 
     // Set up leaderboard system callbacks
     leaderboardSystem.setOnEntryAdded((entry) => {
-      // console.log('New leaderboard entry:', entry);
+      // New leaderboard entry (logging disabled for production)
     });
 
     // Set up save system callbacks
     saveSystem.setOnSaveCreated((save) => {
-      // console.log('Save created:', save.id);
+      // Save created (logging disabled for production)
     });
 
     // Set current user context (this would come from auth)

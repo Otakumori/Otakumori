@@ -8,7 +8,7 @@ import { FriendActivity } from '../../components/FriendActivity';
 import { useLeaderboardStore } from '@/lib/store/leaderboardStore';
 
 export default function FriendsPage() {
-  const entries = useLeaderboardStore((state) => state.entries);
+  const _entries = useLeaderboardStore((state) => state.entries);
 
   return (
     <div className="container mx-auto px-4 py-8">

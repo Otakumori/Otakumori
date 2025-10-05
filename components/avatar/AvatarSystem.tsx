@@ -9,7 +9,7 @@ import {
   type ProceduralCharacterConfig,
 } from '@/lib/avatar/procedural-generator';
 import { GLBCharacterImporter, VRoidImporter } from '@/lib/avatar/glb-importer';
-import { AnimeToonMaterial, createCharacterPartMaterial } from '@/lib/avatar/anime-toon-material';  // eslint-disable-line
+import { createCharacterPartMaterial } from '@/lib/avatar/anime-toon-material';
 import {
   VerletPhysicsEngine,
   HairPhysicsSystem,

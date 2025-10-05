@@ -222,12 +222,12 @@ export class GameEngine {
     // Gamepad input
     window.addEventListener('gamepadconnected', (e) => {
       this.input.gamepad.connected = true;
-      // console.log('Gamepad connected:', e.gamepad.id);
+      // Gamepad connected (logging disabled for production)
     });
 
     window.addEventListener('gamepaddisconnected', () => {
       this.input.gamepad.connected = false;
-      // console.log('Gamepad disconnected');
+      // Gamepad disconnected (logging disabled for production)
     });
   }
 
