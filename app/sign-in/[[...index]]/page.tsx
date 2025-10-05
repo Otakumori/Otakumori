@@ -9,17 +9,25 @@ export default function SignInPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#0b0d1a] via-[#0f1021] to-[#0b0b13] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Space-pixel atmosphere */}
       <div className="absolute inset-0 opacity-[0.06]">
-        {Array.from({ length: 24 }, (_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 20}s`,
-            }}
-          />
-        ))}
+        {Array.from({ length: 24 }, (_, i) => {
+          // Use deterministic values based on index to avoid hydration mismatch
+          const seed = i * 7 + 13; // Simple deterministic seed
+          const top = (seed * 17) % 100;
+          const left = (seed * 23) % 100;
+          const delay = (seed * 31) % 20;
+
+          return (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
+              style={{
+                top: `${top}%`,
+                left: `${left}%`,
+                animationDelay: `${delay}s`,
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Petal Field Effect */}

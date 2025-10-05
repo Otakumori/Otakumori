@@ -7,46 +7,19 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { SignInButton, UserButton } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
+import gamesRegistry from '@/lib/games.meta.json';
+import { paths } from '@/lib/paths';
 
-// Game registry for mega-menu
-const FEATURED_GAMES = [
-  {
-    id: 'samurai-petal-slice',
-    title: 'Samurai Petal Slice',
-    summary: "Draw the Tetsusaiga's arc…",
-    status: 'ready',
-  },
-  {
-    id: 'anime-memory-match',
-    title: 'Anime Memory Match',
-    summary: 'Recall the faces bound by fate.',
-    status: 'ready',
-  },
-  {
-    id: 'bubble-pop-gacha',
-    title: 'Bubble-Pop Gacha',
-    summary: 'Pop for spy-craft secrets…',
-    status: 'ready',
-  },
-  {
-    id: 'petal-storm-rhythm',
-    title: 'Petal Storm Rhythm',
-    summary: "Sync to the Moon Prism's pulse.",
-    status: 'ready',
-  },
-  {
-    id: 'quick-math',
-    title: 'Quick Math',
-    summary: 'Answer fast. Pressure builds with each correct streak.',
-    status: 'ready',
-  },
-  {
-    id: 'dungeon-of-desire',
-    title: 'Dungeon of Desire',
-    summary: 'Descend into the dungeon. Survive rooms and claim rewards.',
-    status: 'beta',
-  },
-];
+// Get featured games from registry
+const FEATURED_GAMES = gamesRegistry.games
+  .filter((game) => game.enabled && game.featured)
+  .slice(0, 6)
+  .map((game) => ({
+    id: game.id,
+    title: game.title,
+    summary: game.description,
+    status: game.ageRating === 'M' ? 'beta' : 'ready',
+  }));
 
 const SAMPLE_PRODUCTS = [
   {
@@ -171,7 +144,7 @@ export default function Navbar() {
       </a>
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 group">
+        <Link href={paths.home()} className="flex items-center space-x-2 group">
           <div className="relative w-8 h-8">
             <Image
               src="/assets/images/circlelogo.png"
@@ -189,9 +162,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center space-x-8" ref={megaMenuRef}>
           {/* Home */}
           <Link
-            href="/"
+            href={paths.home()}
             className={`text-white hover:text-pink-400 transition-colors ${
-              pathname === '/' ? 'text-pink-400 border-b-2 border-pink-400' : ''
+              pathname === paths.home() ? 'text-pink-400 border-b-2 border-pink-400' : ''
             }`}
           >
             Home
@@ -243,7 +216,7 @@ export default function Navbar() {
                   ))}
                 </div>
                 <Link
-                  href="/shop"
+                  href={paths.shop()}
                   className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
                 >
                   View All Products →
@@ -290,9 +263,7 @@ export default function Navbar() {
                           className="text-white text-lg"
                           role="img"
                           aria-label="Game controller"
-                        >
-                          
-                        </span>
+                        ></span>
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">{game.title}</p>
@@ -458,19 +429,19 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/20">
           <div className="px-4 py-2 space-y-2">
-            <Link href="/" className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.home()} className="block text-white hover:text-pink-400 py-2">
               Home
             </Link>
-            <Link href="/shop" className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.shop()} className="block text-white hover:text-pink-400 py-2">
               Shop
             </Link>
-            <Link href="/mini-games" className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.games()} className="block text-white hover:text-pink-400 py-2">
               Mini-Games
             </Link>
-            <Link href="/blog" className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.blogIndex()} className="block text-white hover:text-pink-400 py-2">
               Blog
             </Link>
-            <Link href="/about" className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.help()} className="block text-white hover:text-pink-400 py-2">
               About
             </Link>
           </div>

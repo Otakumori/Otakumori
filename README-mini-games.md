@@ -305,25 +305,25 @@ npx prisma generate        # Generate client
 
 ### Common Issues
 
-**Game won't start**
+"Game won't start"
 
 - Check feature flags in environment
 - Verify user authentication
 - Check database connectivity
 
-**Assets not loading**
+"Assets not loading"
 
 - Verify Vercel Blob configuration
 - Check asset paths in registry
 - Fallback sprites should generate automatically
 
-**Performance issues**
+"Performance issues"
 
 - Monitor frame rate in browser dev tools
 - Check memory usage
 - Verify asset sizes and loading
 
-**API errors**
+"API errors"
 
 - Check authentication tokens
 - Verify rate limits

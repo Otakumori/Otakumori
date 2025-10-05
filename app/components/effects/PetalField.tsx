@@ -31,6 +31,12 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      return; // Skip animation for users who prefer reduced motion
+    }
+
     // Set canvas size
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -68,9 +74,31 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
       petalsRef.current.push(createPetal());
     }
 
-    // Animation loop
-    const animate = () => {
+    // Performance tracking
+    let lastTime = 0;
+    let frameCount = 0;
+    let fps = 60;
+
+    // Animation loop with FPS monitoring
+    const animate = (currentTime: number) => {
+      // Calculate FPS
+      frameCount++;
+      if (currentTime - lastTime >= 1000) {
+        fps = frameCount;
+        frameCount = 0;
+        lastTime = currentTime;
+      }
+
+      // Skip frame if FPS is too low (performance optimization)
+      if (fps < 30) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Batch draw operations for better performance
+      ctx.save();
 
       petalsRef.current.forEach((petal, index) => {
         // Update petal
@@ -83,8 +111,15 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
         const lifeRatio = petal.life / petal.maxLife;
         petal.opacity = (1 - lifeRatio) * 0.8;
 
+        // Skip drawing if petal is not visible
+        if (petal.opacity <= 0.01) {
+          if (petal.life > petal.maxLife || petal.y > canvas.height + 50) {
+            petalsRef.current[index] = createPetal();
+          }
+          return;
+        }
+
         // Draw petal
-        ctx.save();
         ctx.translate(petal.x, petal.y);
         ctx.rotate(petal.rotation);
         ctx.globalAlpha = petal.opacity;
@@ -95,7 +130,8 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
         ctx.ellipse(0, 0, petal.size, petal.size * 0.6, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.restore();
+        // Reset transform for next petal
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         // Remove old petals and add new ones
         if (petal.life > petal.maxLife || petal.y > canvas.height + 50) {
@@ -103,10 +139,12 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
         }
       });
 
+      ctx.restore();
+
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(0);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
@@ -124,6 +162,8 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
         background: 'transparent',
         opacity: 0.6,
       }}
+      aria-hidden="true"
+      role="presentation"
     />
   );
 }

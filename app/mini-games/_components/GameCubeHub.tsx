@@ -1,10 +1,17 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { initInput } from './InputController';
+import { getEnabledGames, type GameDefinition } from '../_data/registry.safe';
+import GameCubeBoot3D from './GameCubeBoot3D';
+import GameCubeMemoryCard from './GameCubeMemoryCard';
+import { createAchievementSystem } from '../_engine/AchievementSystem';
+import { createLeaderboardSystem } from '../_engine/LeaderboardSystem';
+import { createSaveSystem } from '../_engine/SaveSystem';
 
-const ConsoleCard = dynamic(() => import('../console/ConsoleCard'), { ssr: false });
+// const ConsoleCard = dynamic(() => import('../console/ConsoleCard'), { ssr: false });
+const SettingsConsole = dynamic(() => import('./SettingsConsole.safe'), { ssr: false });
 
 // Map of game metadata icons to ASCII-style representations
 const iconMap: Record<string, string> = {
@@ -24,153 +31,95 @@ const iconMap: Record<string, string> = {
   extension: '+',
 };
 
-// ALL available games from games.meta.json
-const allGames = [
-  {
-    id: 'samurai-petal-slice',
-    label: 'Samurai Petal Slice',
-    desc: "Draw the Tetsusaiga's arc…",
-    href: '/mini-games/samurai-petal-slice',
-    icon: iconMap.swords,
-    status: 'available',
-  },
-  {
-    id: 'anime-memory-match',
-    label: 'Anime Memory Match',
-    desc: 'Recall the faces bound by fate.',
-    href: '/mini-games/anime-memory-match',
-    icon: iconMap.psychology,
-    status: 'available',
-  },
-  {
-    id: 'bubble-pop-gacha',
-    label: 'Bubble-Pop Gacha',
-    desc: 'Pop for spy-craft secrets…',
-    href: '/mini-games/bubble-pop-gacha',
-    icon: iconMap.bubble_chart,
-    status: 'available',
-  },
-  {
-    id: 'rhythm-beat-em-up',
-    label: 'Rhythm Beat-Em-Up',
-    desc: "Sync to the Moon Prism's pulse.",
-    href: '/mini-games/rhythm-beat-em-up',
-    icon: iconMap.music_note,
-    status: 'available',
-  },
-  {
-    id: 'petal-collection',
-    label: 'Petal Collection',
-    desc: 'Collect falling petals and rack up combos.',
-    href: '/mini-games/petal-collection',
-    icon: iconMap.spa,
-    status: 'available',
-  },
-  {
-    id: 'memory-match',
-    label: 'Memory Match',
-    desc: 'Flip cards and match pairs. Perfect recall earns bonuses.',
-    href: '/mini-games/memory-match',
-    icon: iconMap.grid_view,
-    status: 'available',
-  },
-  {
-    id: 'bubble-girl',
-    label: 'Bubble Girl',
-    desc: 'Spawn bubbles, float and score. Sandbox or challenge mode.',
-    href: '/mini-games/bubble-girl',
-    icon: iconMap.bubble_chart,
-    status: 'available',
-  },
-  {
-    id: 'petal-storm-rhythm',
-    label: 'Petal Storm Rhythm',
-    desc: 'Stormy rhythm playlist—precision timing for petals.',
-    href: '/mini-games/petal-storm-rhythm',
-    icon: iconMap.thunderstorm,
-    status: 'available',
-  },
-  {
-    id: 'bubble-ragdoll',
-    label: 'Bubble Ragdoll',
-    desc: 'Toss the ragdoll into bubbles. Survive the chaos.',
-    href: '/mini-games/bubble-ragdoll',
-    icon: iconMap.toys,
-    status: 'available',
-  },
-  {
-    id: 'blossomware',
-    label: 'Blossomware Playlist',
-    desc: 'Chaotic micro-sessions—keep your petal streak alive.',
-    href: '/mini-games/blossomware',
-    icon: iconMap.playlist_play,
-    status: 'available',
-  },
-  {
-    id: 'dungeon-of-desire',
-    label: 'Dungeon of Desire',
-    desc: 'Descend into the dungeon. Survive rooms and claim rewards.',
-    href: '/mini-games/dungeon-of-desire',
-    icon: iconMap.skull,
-    status: 'available',
-  },
-  {
-    id: 'maid-cafe-manager',
-    label: 'Maid Cafe Manager',
-    desc: 'Manage shifts and keep guests smiling.',
-    href: '/mini-games/maid-cafe-manager',
-    icon: iconMap.local_cafe,
-    status: 'available',
-  },
-  {
-    id: 'thigh-coliseum',
-    label: 'Thigh Coliseum',
-    desc: 'Enter the arena. Win rounds and advance the bracket.',
-    href: '/mini-games/thigh-coliseum',
-    icon: iconMap.stadium,
-    status: 'available',
-  },
-  {
-    id: 'quick-math',
-    label: 'Quick Math',
-    desc: 'Answer fast. Pressure builds with each correct streak.',
-    href: '/mini-games/quick-math',
-    icon: iconMap.calculate,
-    status: 'available',
-  },
-  {
-    id: 'puzzle-reveal',
-    label: 'Puzzle Reveal',
-    desc: 'Clear the fog to reveal the art. Watch your energy.',
-    href: '/mini-games/puzzle-reveal',
-    icon: iconMap.extension,
-    status: 'available',
-  },
-  {
-    id: 'petal-samurai',
-    label: 'Petal Samurai',
-    desc: 'Slash petals with style. Master storm and endless modes.',
-    href: '/mini-games/petal-samurai',
-    icon: iconMap.swords,
-    status: 'available',
-  },
-];
+// Convert registry games to hub format
+const allGames = getEnabledGames().map((game: GameDefinition) => ({
+  id: game.id,
+  label: game.title,
+  desc: game.description,
+  href: `/mini-games/${game.slug}`,
+  icon: iconMap[game.icon as keyof typeof iconMap] || iconMap.grid_view,
+  status: game.status === 'ready' ? 'available' : game.status,
+}));
 
 const GAMES_PER_PAGE = 6; // Show 6 games at a time in a 2x3 grid
 
 export default function GameCubeHub() {
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedIdx, setSelectedIdx] = useState(0);
   const [showGamesList, setShowGamesList] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showBootScreen, setShowBootScreen] = useState(true);
+  const [showMemoryCard, setShowMemoryCard] = useState(false);
+  const [currentSaveData, setCurrentSaveData] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // Initialize game systems
+  const [achievementSystem] = useState(() => createAchievementSystem());
+  const [leaderboardSystem] = useState(() => createLeaderboardSystem());
+  const [saveSystem] = useState(() => createSaveSystem());
+
   const totalPages = Math.ceil(allGames.length / GAMES_PER_PAGE);
-  const currentGames = allGames.slice(
-    currentPage * GAMES_PER_PAGE,
-    (currentPage + 1) * GAMES_PER_PAGE,
-  );
-  const activeGame = currentGames[selectedIdx];
+
+  // Initialize systems on mount
+  useEffect(() => {
+    // Set up achievement system callbacks
+    achievementSystem.setOnUnlock((achievement) => {
+      // console.log('Achievement unlocked:', achievement.name);
+      // Show achievement notification
+    });
+
+    // Set up leaderboard system callbacks
+    leaderboardSystem.setOnEntryAdded((entry) => {
+      // console.log('New leaderboard entry:', entry);
+    });
+
+    // Set up save system callbacks
+    saveSystem.setOnSaveCreated((save) => {
+      // console.log('Save created:', save.id);
+    });
+
+    // Set current user context (this would come from auth)
+    const userId = 'user_123'; // Replace with actual user ID
+    leaderboardSystem.setCurrentUserId(userId);
+    saveSystem.setCurrentContext(userId, 'all');
+
+    // Check if boot screen should be shown
+    const lastBootDate = localStorage.getItem('otm-gamecube-boot');
+    const today = new Date().toISOString().split('T')[0];
+
+    if (lastBootDate !== today) {
+      setShowBootScreen(true);
+      localStorage.setItem('otm-gamecube-boot', today);
+    } else {
+      setShowBootScreen(false);
+    }
+  }, [achievementSystem, leaderboardSystem, saveSystem]);
+
+  // Handle boot screen completion
+  const handleBootComplete = useCallback(() => {
+    setShowBootScreen(false);
+  }, []);
+
+  // Handle boot screen skip
+  const handleBootSkip = useCallback(() => {
+    setShowBootScreen(false);
+  }, []);
+
+  // Handle memory card insert
+  const handleMemoryCardInsert = useCallback(() => {
+    setShowMemoryCard(false);
+    // Load save data
+    const saves = saveSystem.getSaveSlots();
+    if (saves.length > 0) {
+      setCurrentSaveData(saves[0]);
+    }
+  }, [saveSystem]);
+
+  // Handle memory card eject
+  const handleMemoryCardEject = useCallback(() => {
+    setShowMemoryCard(true);
+    setCurrentSaveData(null);
+  }, []);
 
   useEffect(() => {
     const node = containerRef.current;
@@ -201,30 +150,54 @@ export default function GameCubeHub() {
       onBack: () => {
         if (showGamesList) {
           setShowGamesList(false);
+        } else if (showSettings) {
+          setShowSettings(false);
         } else {
           setCurrentPage(0);
         }
       },
+      onSettings: () => {
+        setShowSettings(!showSettings);
+      },
     });
     return cleanup;
-  }, [showGamesList, totalPages]);
+  }, [showGamesList, showSettings, totalPages]);
 
-  const handlePageChange = (direction: 'prev' | 'next') => {
-    if (direction === 'prev' && currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-      setSelectedIdx(0);
-    } else if (direction === 'next' && currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-      setSelectedIdx(0);
-    }
-  };
+  // const handlePageChange = (direction: 'prev' | 'next') => {
+  //   if (direction === 'prev' && currentPage > 0) {
+  //     setCurrentPage(currentPage - 1);
+  //     setSelectedIdx(0);
+  //   } else if (direction === 'next' && currentPage < totalPages - 1) {
+  //     setCurrentPage(currentPage + 1);
+  //     setSelectedIdx(0);
+  //   }
+  // };
 
-  const listboxId = useMemo(() => `faces_${Math.random().toString(36).slice(2, 8)}`, []);
+  // Show boot screen if needed
+  if (showBootScreen) {
+    return <GameCubeBoot3D onComplete={handleBootComplete} onSkip={handleBootSkip} />;
+  }
+
+  // Show memory card if needed
+  if (showMemoryCard) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+        <div className="max-w-md w-full mx-4">
+          <GameCubeMemoryCard
+            onInsert={handleMemoryCardInsert}
+            onEject={handleMemoryCardEject}
+            isInserted={false}
+            saveData={currentSaveData}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section
       ref={containerRef}
-      tabIndex={0}
+      tabIndex={-1}
       data-gamecube-active="true"
       className="relative isolate z-0 mx-auto w-full max-w-[1200px] h-[min(85vh,95svh)] overflow-hidden outline-none"
       style={{
@@ -275,7 +248,6 @@ export default function GameCubeHub() {
           <button
             onClick={() => {
               setCurrentPage(0);
-              setSelectedIdx(0);
             }}
             className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 
               px-4 py-2 bg-gradient-to-b from-purple-500/30 to-purple-600/40 
@@ -294,7 +266,6 @@ export default function GameCubeHub() {
           <button
             onClick={() => {
               setCurrentPage(1);
-              setSelectedIdx(0);
             }}
             className={`absolute right-0 top-1/2 transform translate-x-2 -translate-y-1/2 
               px-4 py-2 bg-gradient-to-l from-purple-500/30 to-purple-600/40 
@@ -313,7 +284,6 @@ export default function GameCubeHub() {
           <button
             onClick={() => {
               setCurrentPage(2);
-              setSelectedIdx(0);
             }}
             className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 
               px-4 py-2 bg-gradient-to-t from-purple-500/30 to-purple-600/40 
@@ -346,6 +316,21 @@ export default function GameCubeHub() {
             </div>
           </button>
 
+          {/* Memory Card Slot */}
+          <button
+            onClick={() => setShowMemoryCard(true)}
+            className="absolute right-4 bottom-4 w-16 h-12 bg-gradient-to-br from-gray-700/50 to-gray-800/50 
+              rounded-lg border border-gray-600/30 text-white text-xs
+              hover:from-gray-600/60 hover:to-gray-700/60 transition-all duration-300
+              flex items-center justify-center group"
+            title="Memory Card Slot"
+          >
+            <div className="text-center">
+              <div className="text-lg mb-1 group-hover:scale-110 transition-transform">💾</div>
+              <div className="text-xs opacity-75">MC</div>
+            </div>
+          </button>
+
           {/* Navigation hints in corners */}
           <div className="absolute top-2 right-2 text-xs text-purple-300 opacity-60">
             {currentPage + 1}/{totalPages}
@@ -365,13 +350,11 @@ export default function GameCubeHub() {
                 <button
                   onClick={() => setShowGamesList(false)}
                   className="text-purple-300 hover:text-white transition-colors text-xl"
-                >
-                  
-                </button>
+                ></button>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {allGames.map((game, i) => (
+                {allGames.map((game, _i) => (
                   <button
                     key={game.id}
                     onClick={() => {
@@ -411,6 +394,28 @@ export default function GameCubeHub() {
           />
         ))}
       </div>
+
+      {/* Settings Console - No Disc Inserted */}
+      {showSettings && (
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center z-50">
+          <SettingsConsole
+            onVolumeChange={(_volume) => {
+              // Handle volume change - TODO: implement volume control
+            }}
+            onThemeChange={(_theme) => {
+              // Handle theme change - TODO: implement theme switching
+            }}
+            className="max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+          />
+          <button
+            onClick={() => setShowSettings(false)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            aria-label="Close settings"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Add CSS for line clamping */}
       <style

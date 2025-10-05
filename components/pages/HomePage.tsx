@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import InteractiveCherryBlossom from '@/components/animations/InteractiveCherryBlossom';
 import { type Product, type BlogPost, type SocialLink } from '../../app/types/index';
-import Header from '@/components/layout/Header';
+import Header from '@/app/components/layout/Navbar';
 
 const socialLinks: SocialLink[] = [
   {
@@ -179,9 +179,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
           <p className="text-lg font-bold text-gray-400">Otaku-mori</p>
           <p className="mb-4 text-sm text-gray-500">
             Stay a while. Let's blossom together.{' '}
-            <span role="img" aria-label="Cherry blossom">
-              
-            </span>
+            <span role="img" aria-label="Cherry blossom"></span>
           </p>
 
           <div className="mb-2 flex justify-center space-x-4 text-sm text-gray-500">

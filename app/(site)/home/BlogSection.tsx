@@ -1,6 +1,7 @@
 import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
+import { paths } from '@/lib/paths';
 
 interface BlogPost {
   id: string;
@@ -23,8 +24,8 @@ interface BlogData {
 }
 
 export default async function BlogSection() {
-  // Try latest endpoint first, then fallback to posts
-  const latestResult = await safeFetch<BlogData>('/api/blog/latest?limit=3', {
+  // Try blog content API first, then fallback
+  const blogResult = await safeFetch<BlogData>('/api/v1/content/blog?limit=3', {
     allowLive: true,
   });
 
@@ -32,14 +33,14 @@ export default async function BlogSection() {
     allowLive: true,
   });
 
-  const data = isSuccess(latestResult)
-    ? latestResult.data
+  const data = isSuccess(blogResult)
+    ? blogResult.data
     : isSuccess(postsResult)
       ? postsResult.data
       : null;
 
   const posts = data?.posts || data?.data || [];
-  const isBlockedData = isBlocked(latestResult) && isBlocked(postsResult);
+  const isBlockedData = isBlocked(blogResult) && isBlocked(postsResult);
 
   return (
     <div className="space-y-6">
@@ -50,12 +51,12 @@ export default async function BlogSection() {
 
       {isBlockedData ? (
         <div className="text-center py-12">
-          <div className="glass-panel rounded-2xl p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-pink-200 mb-4">Blog Coming Soon</h3>
-            <p className="text-pink-200/70 mb-6">
+          <div className="glass-card p-8 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-primary mb-4">Blog Coming Soon</h3>
+            <p className="text-secondary mb-6">
               We're preparing engaging content for you. Stay tuned!
             </p>
-            <Link href="/blog" className="btn-primary inline-block">
+            <Link href={paths.blogIndex()} className="btn-primary inline-block">
               Explore Blog
             </Link>
           </div>
@@ -63,8 +64,8 @@ export default async function BlogSection() {
       ) : posts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.slice(0, 3).map((post) => (
-            <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
-              <div className="glass-panel rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300">
+            <Link key={post.id} href={paths.blogPost(post.slug)} className="group block">
+              <div className="glass-card overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up">
                 {post.image && (
                   <div className="aspect-video relative overflow-hidden">
                     <Image
@@ -78,13 +79,13 @@ export default async function BlogSection() {
                   </div>
                 )}
                 <div className="p-6">
-                  <h3 className="font-semibold text-pink-200 group-hover:text-pink-100 transition-colors mb-3">
+                  <h3 className="font-semibold text-primary group-hover:text-accent-pink transition-colors mb-3">
                     {post.title}
                   </h3>
                   {post.excerpt && (
-                    <p className="text-pink-200/70 text-sm line-clamp-3 mb-4">{post.excerpt}</p>
+                    <p className="text-secondary text-sm line-clamp-3 mb-4">{post.excerpt}</p>
                   )}
-                  <div className="flex items-center justify-between text-xs text-pink-200/60">
+                  <div className="flex items-center justify-between text-xs text-muted">
                     <span>
                       {new Date(post.publishedAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -99,7 +100,7 @@ export default async function BlogSection() {
                       {post.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs text-pink-300/70 bg-pink-500/20 px-2 py-1 rounded-full"
+                          className="text-xs text-accent-pink/70 bg-accent-pink/20 px-2 py-1 rounded-full"
                         >
                           {tag}
                         </span>
@@ -113,12 +114,12 @@ export default async function BlogSection() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="glass-panel rounded-2xl p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-pink-200 mb-4">No Posts Available</h3>
-            <p className="text-pink-200/70 mb-6">
+          <div className="glass-card p-8 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-primary mb-4">No Posts Available</h3>
+            <p className="text-secondary mb-6">
               We're working on creating amazing content. Check back soon!
             </p>
-            <Link href="/blog" className="btn-primary inline-block">
+            <Link href={paths.blogIndex()} className="btn-primary inline-block">
               Explore Blog
             </Link>
           </div>
@@ -127,7 +128,7 @@ export default async function BlogSection() {
 
       {posts.length > 0 && (
         <div className="text-center mt-8">
-          <Link href="/blog" className="btn-secondary inline-block">
+          <Link href={paths.blogIndex()} className="btn-secondary inline-block">
             View All Posts
           </Link>
         </div>

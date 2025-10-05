@@ -5,6 +5,7 @@ type Handlers = {
   onRotateRight: () => void;
   onSelect: () => void;
   onBack: () => void;
+  onSettings?: () => void;
 };
 
 export function initInput(node: HTMLElement, h: Handlers) {
@@ -20,6 +21,9 @@ export function initInput(node: HTMLElement, h: Handlers) {
       e.preventDefault();
     } else if (e.key === 'Escape') {
       h.onBack();
+      e.preventDefault();
+    } else if (e.key === 's' || e.key === 'S') {
+      h.onSettings?.();
       e.preventDefault();
     }
   };

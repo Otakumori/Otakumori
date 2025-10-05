@@ -5,127 +5,32 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import cubeConfig from '../cube.map.json';
 import MemoryCardDock from './MemoryCardDock';
+import AccessibilitySettings, {
+  type GameAccessibilitySettings,
+  loadAccessibilitySettings,
+  applyAccessibilitySettings,
+} from '@/app/components/games/AccessibilitySettings';
 
-// Import the existing games list
-const allGames = [
-  {
-    id: 'samurai-petal-slice',
-    label: 'Samurai Petal Slice',
-    desc: "Draw the Tetsusaiga's arc…",
-    href: '/mini-games/samurai-petal-slice',
-    icon: '><',
+// Import games from registry
+import gamesRegistry from '@/lib/games.meta.json';
+
+// Transform registry games to component format
+const allGames = gamesRegistry.games
+  .filter((game) => game.enabled)
+  .sort((a, b) => a.order - b.order)
+  .map((game) => ({
+    id: game.id,
+    label: game.title,
+    desc: game.description,
+    href: `/mini-games/${game.slug}`,
+    icon: game.icon,
     status: 'available',
-    category: 'action',
-  },
-  {
-    id: 'anime-memory-match',
-    label: 'Anime Memory Match',
-    desc: 'Recall the faces bound by fate.',
-    href: '/mini-games/anime-memory-match',
-    icon: '[@]',
-    status: 'available',
-    category: 'puzzle',
-  },
-  {
-    id: 'bubble-pop-gacha',
-    label: 'Bubble-Pop Gacha',
-    desc: 'Pop for spy-craft secrets…',
-    href: '/mini-games/bubble-pop-gacha',
-    icon: '(.)',
-    status: 'available',
-    category: 'puzzle',
-  },
-  {
-    id: 'rhythm-beat-em-up',
-    label: 'Rhythm Beat-Em-Up',
-    desc: "Sync to the Moon Prism's pulse.",
-    href: '/mini-games/rhythm-beat-em-up',
-    icon: '',
-    status: 'available',
-    category: 'action',
-  },
-  {
-    id: 'memory-match',
-    label: 'Memory Match',
-    desc: 'Flip cards and match pairs. Perfect recall earns bonuses.',
-    href: '/mini-games/memory-match',
-    icon: '[]',
-    status: 'available',
-    category: 'puzzle',
-  },
-  {
-    id: 'bubble-girl',
-    label: 'Bubble Girl',
-    desc: 'Spawn bubbles, float and score. Sandbox or challenge mode.',
-    href: '/mini-games/bubble-girl',
-    icon: '(.)',
-    status: 'available',
-  },
-  {
-    id: 'petal-storm-rhythm',
-    label: 'Petal Storm Rhythm',
-    desc: 'Stormy rhythm playlist—precision timing for petals.',
-    href: '/mini-games/petal-storm-rhythm',
-    icon: '~',
-    status: 'available',
-  },
-  {
-    id: 'bubble-ragdoll',
-    label: 'Bubble Ragdoll',
-    desc: 'Toss the ragdoll into bubbles. Survive the chaos.',
-    href: '/mini-games/bubble-ragdoll',
-    icon: 'o',
-    status: 'available',
-  },
-  {
-    id: 'blossomware',
-    label: 'Blossomware Playlist',
-    desc: 'Chaotic micro-sessions—keep your petal streak alive.',
-    href: '/mini-games/blossomware',
-    icon: '≡',
-    status: 'available',
-  },
-  {
-    id: 'dungeon-of-desire',
-    label: 'Dungeon of Desire',
-    desc: 'Descend into the dungeon. Survive rooms and claim rewards.',
-    href: '/mini-games/dungeon-of-desire',
-    icon: 'x',
-    status: 'available',
-  },
-  {
-    id: 'maid-cafe-manager',
-    label: 'Maid Cafe Manager',
-    desc: 'Manage shifts and keep guests smiling.',
-    href: '/mini-games/maid-cafe-manager',
-    icon: 'U',
-    status: 'available',
-  },
-  {
-    id: 'thigh-coliseum',
-    label: 'Thigh Coliseum',
-    desc: 'Enter the arena. Win rounds and advance the bracket.',
-    href: '/mini-games/thigh-coliseum',
-    icon: '()',
-    status: 'available',
-  },
-  {
-    id: 'puzzle-reveal',
-    label: 'Puzzle Reveal',
-    desc: 'Clear the fog to reveal the art. Watch your energy.',
-    href: '/mini-games/puzzle-reveal',
-    icon: '+',
-    status: 'available',
-  },
-  {
-    id: 'petal-samurai',
-    label: 'Petal Samurai',
-    desc: 'Slash petals with style. Master storm and endless modes.',
-    href: '/mini-games/petal-samurai',
-    icon: '><',
-    status: 'available',
-  },
-];
+    category: game.category,
+    ageRating: game.ageRating,
+    nsfw: game.nsfw || false,
+    tooltips: game.tooltips,
+    features: game.features,
+  }));
 
 type FacePosition = 'front' | 'up' | 'left' | 'right' | 'down';
 type ActivePanel = 'games' | 'extras' | 'avatar-community' | null;
@@ -135,14 +40,24 @@ export default function GameCubeHubV2() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [showFrontOverlay, setShowFrontOverlay] = useState(true);
   const [loadingGame, setLoadingGame] = useState<string | null>(null);
+  const [showAccessibilitySettings, setShowAccessibilitySettings] = useState(false);
+  const [accessibilitySettings, setAccessibilitySettings] = useState<GameAccessibilitySettings>(
+    loadAccessibilitySettings(),
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  // Apply accessibility settings on mount and when they change
+  useEffect(() => {
+    applyAccessibilitySettings(accessibilitySettings);
+  }, [accessibilitySettings]);
+
   // Check for reduced motion preference
   const prefersReducedMotion =
-    typeof window !== 'undefined'
+    accessibilitySettings.reducedMotion ||
+    (typeof window !== 'undefined'
       ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false;
+      : false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -182,6 +97,13 @@ export default function GameCubeHubV2() {
         case 'Escape':
           setActivePanel(null);
           setShowFrontOverlay(false);
+          setShowAccessibilitySettings(false);
+          break;
+        case 'KeyS':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            setShowAccessibilitySettings(true);
+          }
           break;
       }
     };
@@ -221,17 +143,25 @@ export default function GameCubeHubV2() {
     }
   };
 
+  const handleAccessibilitySettingsChange = (newSettings: GameAccessibilitySettings) => {
+    setAccessibilitySettings(newSettings);
+  };
+
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen bg-black overflow-hidden"
+      className="relative min-h-screen overflow-hidden"
+      style={{
+        background:
+          'radial-gradient(ellipse at center, #8b2d69 0%, #6b1d4a 25%, #4a0033 50%, #2d0019 100%)',
+      }}
       aria-roledescription="3D menu"
       data-test="gc-cube"
     >
       {/* Background and ambient elements */}
       <div className="absolute inset-0">
         {/* Subtle ambient glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-purple-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-pink-900/20 via-transparent to-pink-900/20" />
 
         {/* Minimal particle field */}
         {!prefersReducedMotion && (
@@ -254,7 +184,7 @@ export default function GameCubeHubV2() {
       {/* Main Layout */}
       <div className="relative z-10 flex min-h-screen">
         {/* Left Side - Memory Cards */}
-        <div className="w-80 p-6 border-r border-purple-400/20">
+        <div className="w-80 p-6 border-r border-pink-400/20">
           <MemoryCardDock />
         </div>
 
@@ -262,89 +192,160 @@ export default function GameCubeHubV2() {
         <div className="flex-1 flex items-center justify-center relative">
           {/* GameCube Container */}
           <div className="relative w-96 h-96">
-            {/* Central Area */}
-            <div className="absolute inset-12 bg-gradient-to-br from-black/60 to-purple-900/40 rounded-2xl border border-purple-300/30 backdrop-blur-sm">
-              <div className="h-full flex flex-col items-center justify-center text-center p-6">
-                <h1 className="text-2xl font-bold text-white tracking-wider mb-2 font-[Roboto_Condensed]">
-                  OTAKU-MORI
-                </h1>
-                <p className="text-purple-200 text-sm mb-4">
-                  {cubeConfig.frontOverlay.enabled && showFrontOverlay
-                    ? cubeConfig.frontOverlay.subtitle
-                    : 'Select a face to navigate'}
-                </p>
-                <div className="text-xs text-purple-300 opacity-75">
-                  {allGames.length} Games Available
+            {/* Central Rotating Chrome Cube - Authentic GameCube Style */}
+            <div
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              style={{
+                width: '120px',
+                height: '120px',
+                transformStyle: 'preserve-3d',
+                animation: 'gamecubeRotate 8s linear infinite',
+              }}
+            >
+              {/* Cube faces */}
+              {['front', 'back', 'right', 'left', 'top', 'bottom'].map((face) => (
+                <div
+                  key={face}
+                  className="absolute w-full h-full"
+                  style={{
+                    background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    transform:
+                      face === 'front'
+                        ? 'translateZ(60px)'
+                        : face === 'back'
+                          ? 'translateZ(-60px) rotateY(180deg)'
+                          : face === 'right'
+                            ? 'rotateY(90deg) translateZ(60px)'
+                            : face === 'left'
+                              ? 'rotateY(-90deg) translateZ(60px)'
+                              : face === 'top'
+                                ? 'rotateX(90deg) translateZ(60px)'
+                                : 'rotateX(-90deg) translateZ(60px)',
+                    transformStyle: 'preserve-3d',
+                  }}
+                >
+                  {/* Chrome highlights */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
+                    }}
+                  />
+                  <div
+                    className="absolute top-1 left-1 right-1 h-px pointer-events-none"
+                    style={{
+                      background:
+                        'linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%)',
+                    }}
+                  />
                 </div>
-              </div>
+              ))}
             </div>
 
-            {/* Face Buttons */}
+            {/* Central Label */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-16">
+              <h1
+                className="text-lg font-bold tracking-wider text-center"
+                style={{
+                  fontFamily: 'Orbitron, monospace',
+                  fontWeight: 900,
+                  background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)',
+                }}
+              >
+                OTAKU-MORI
+              </h1>
+              <p className="text-pink-300 text-xs text-center mt-1">Select a face to navigate</p>
+            </div>
+
+            {/* Face Buttons - Positioned around the cube like authentic GameCube */}
             {/* UP - Trade Center */}
             <button
               onClick={() => handleFaceAction('up')}
-              className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 
-                        px-4 py-2 bg-gradient-to-b from-purple-500/30 to-purple-600/40 
-                        rounded-lg border border-purple-300/30 text-white text-sm
-                        hover:from-purple-400/40 hover:to-purple-500/50 transition-all duration-300
-                        focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-60"
+              className={`absolute top-8 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                        w-16 h-16 rounded-full glass-card text-center
+                        hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        transition-all duration-300 focus:outline-none 
+                        focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
+                        ${currentFace === 'up' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
               data-test="gc-face-up"
               aria-label="Open Trade Center"
             >
-              <div className="text-center">
-                <div className="text-lg mb-1"></div>
-                <div className="text-xs">{cubeConfig.faces.up.label}</div>
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="text-2xl mb-1">
+                  <span role="img" aria-label="Trade Center"></span>
+                </div>
+                <div className="text-xs font-medium">{cubeConfig.faces.up.label}</div>
               </div>
             </button>
 
             {/* LEFT - Mini-Games */}
             <button
               onClick={() => handleFaceAction('left')}
-              className="absolute left-0 top-1/2 transform -translate-x-2 -translate-y-1/2 
-                        px-4 py-2 bg-gradient-to-r from-purple-500/30 to-purple-600/40 
-                        rounded-lg border border-purple-300/30 text-white text-sm
-                        hover:from-purple-400/40 hover:to-purple-500/50 transition-all duration-300
-                        focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-60"
+              className={`absolute left-8 top-1/2 transform -translate-x-1/2 -translate-y-1/2
+                        w-16 h-16 rounded-full glass-card text-center
+                        hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        transition-all duration-300 focus:outline-none 
+                        focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
+                        ${currentFace === 'left' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
               data-test="gc-face-left"
               aria-label="Open Mini-Games panel"
             >
-              <div className="text-center">
-                <div className="text-lg mb-1"></div>
-                <div className="text-xs">{cubeConfig.faces.left.label}</div>
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="text-2xl mb-1">
+                  <span role="img" aria-label="Mini-Games">
+                    MG
+                  </span>
+                </div>
+                <div className="text-xs font-medium">{cubeConfig.faces.left.label}</div>
               </div>
             </button>
 
             {/* RIGHT - Avatar/Community */}
             <button
               onClick={() => handleFaceAction('right')}
-              className="absolute right-0 top-1/2 transform translate-x-2 -translate-y-1/2 
-                        px-4 py-2 bg-gradient-to-l from-purple-500/30 to-purple-600/40 
-                        rounded-lg border border-purple-300/30 text-white text-sm
-                        hover:from-purple-400/40 hover:to-purple-500/50 transition-all duration-300
-                        focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-60"
+              className={`absolute right-8 top-1/2 transform translate-x-1/2 -translate-y-1/2
+                        w-16 h-16 rounded-full glass-card text-center
+                        hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        transition-all duration-300 focus:outline-none 
+                        focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
+                        ${currentFace === 'right' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
               data-test="gc-face-right"
               aria-label="Open Avatar / Community Hub"
             >
-              <div className="text-center">
-                <div className="text-lg mb-1"></div>
-                <div className="text-xs">{cubeConfig.faces.right.label}</div>
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="text-2xl mb-1">
+                  <span role="img" aria-label="Avatar Community">
+                    AV
+                  </span>
+                </div>
+                <div className="text-xs font-medium">{cubeConfig.faces.right.label}</div>
               </div>
             </button>
 
             {/* DOWN - Music/Extras */}
             <button
               onClick={() => handleFaceAction('down')}
-              className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-2 
-                        px-4 py-2 bg-gradient-to-t from-purple-500/30 to-purple-600/40 
-                        rounded-lg border border-purple-300/30 text-white text-sm
-                        hover:from-purple-400/40 hover:to-purple-500/50 transition-all duration-300
-                        focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-opacity-60"
+              className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 translate-y-1/2
+                        w-16 h-16 rounded-full glass-card text-center
+                        hover:bg-glass-bg-hover hover:border-glass-border-hover hover:scale-110
+                        transition-all duration-300 focus:outline-none 
+                        focus:ring-2 focus:ring-accent-pink focus:ring-opacity-60
+                        ${currentFace === 'down' ? 'ring-2 ring-pink-400 scale-110' : ''}`}
               data-test="gc-face-down"
               aria-label="Open Music / Extras panel"
             >
-              <div className="text-center">
-                <div className="text-lg mb-1"></div>
-                <div className="text-xs">{cubeConfig.faces.down.label}</div>
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="text-2xl mb-1">
+                  <span role="img" aria-label="Music Extras">
+                    ME
+                  </span>
+                </div>
+                <div className="text-xs font-medium">{cubeConfig.faces.down.label}</div>
               </div>
             </button>
           </div>
@@ -354,16 +355,34 @@ export default function GameCubeHubV2() {
         <div className="w-80 p-6 border-l border-purple-400/20">
           <div className="space-y-4">
             <div className="text-center">
-              <h3 className="text-white font-semibold mb-2">Hub Status</h3>
+              <h3 className="text-primary font-semibold mb-2">Hub Status</h3>
               <div className="text-green-400 text-sm">All Systems Online</div>
             </div>
 
-            <div className="text-xs text-purple-300 space-y-1">
+            <div className="text-xs text-secondary space-y-1">
               <div>Current Face: {currentFace}</div>
               <div>Games Available: {allGames.length}</div>
               <div>Use WASD or Arrow Keys</div>
               <div>Press Enter to Select</div>
               <div>Press Esc to Close</div>
+              <div>Ctrl+S for Settings</div>
+            </div>
+
+            <div className="pt-4 border-t border-purple-400/20">
+              <button
+                onClick={() => setShowAccessibilitySettings(true)}
+                className="w-full p-3 glass-card hover:bg-glass-bg-hover 
+                         text-primary text-sm transition-all duration-300 
+                         focus:outline-none focus:ring-2 focus:ring-accent-pink focus:ring-opacity-50"
+                aria-label="Open accessibility settings"
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="text-lg" role="img" aria-label="Accessibility">
+                    ♿
+                  </span>
+                  <span>Accessibility Settings</span>
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -379,12 +398,10 @@ export default function GameCubeHubV2() {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-20"
             onClick={dismissOverlay}
           >
-            <div className="text-center text-white max-w-md p-8">
+            <div className="text-center text-primary max-w-md p-8">
               <h2 className="text-3xl font-bold mb-4">{cubeConfig.frontOverlay.title}</h2>
-              <p className="text-purple-200 mb-6">{cubeConfig.frontOverlay.subtitle}</p>
-              <div className="text-sm text-purple-300">
-                Click anywhere or press Escape to continue
-              </div>
+              <p className="text-secondary mb-6">{cubeConfig.frontOverlay.subtitle}</p>
+              <div className="text-sm text-muted">Click anywhere or press Escape to continue</div>
             </div>
           </motion.div>
         )}
@@ -399,14 +416,15 @@ export default function GameCubeHubV2() {
             exit={{ opacity: 0, y: 50 }}
             className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-end justify-center z-30 p-8"
           >
-            <div className="bg-gradient-to-br from-purple-900/90 to-black/90 rounded-2xl border border-purple-300/30 p-6 max-w-6xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="glass-card max-w-6xl w-full max-h-[80vh] overflow-y-auto p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Mini-Games</h2>
+                <h2 className="text-2xl font-bold text-primary">Mini-Games</h2>
                 <button
                   onClick={() => setActivePanel(null)}
-                  className="text-purple-300 hover:text-white transition-colors text-xl"
+                  className="text-muted hover:text-primary transition-colors text-xl"
+                  aria-label="Close games panel"
                 >
-                  
+                  ×
                 </button>
               </div>
 
@@ -416,8 +434,8 @@ export default function GameCubeHubV2() {
                     key={game.id}
                     onClick={() => handleGameSelect(game)}
                     disabled={loadingGame === game.id}
-                    className="p-4 bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-xl border border-purple-400/30 
-                              hover:from-purple-500/30 hover:to-purple-700/30 hover:border-purple-300/50 
+                    className="p-4 glass-card 
+                              hover:bg-glass-bg-hover hover:border-glass-border-hover 
                               disabled:opacity-50 disabled:cursor-not-allowed
                               transition-all duration-300 text-left group relative"
                   >
@@ -428,12 +446,24 @@ export default function GameCubeHubV2() {
                     )}
 
                     <div className="text-2xl mb-2">{game.icon}</div>
-                    <h3 className="text-white font-semibold text-sm mb-1 group-hover:text-pink-300 transition-colors">
+                    <h3 className="text-primary font-semibold text-sm mb-1 group-hover:text-accent-pink transition-colors">
                       {game.label}
                     </h3>
-                    <p className="text-purple-200 text-xs leading-relaxed opacity-80">
-                      {game.desc}
-                    </p>
+                    <p className="text-secondary text-xs leading-relaxed opacity-80">{game.desc}</p>
+
+                    {/* Age Rating Badge */}
+                    {game.ageRating && (
+                      <div className="absolute top-2 right-2 text-xs bg-glass-bg px-2 py-1 rounded">
+                        {game.ageRating}
+                      </div>
+                    )}
+
+                    {/* NSFW Indicator */}
+                    {game.nsfw && (
+                      <div className="absolute top-2 left-2 text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded">
+                        NSFW
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>
@@ -451,44 +481,45 @@ export default function GameCubeHubV2() {
             exit={{ opacity: 0, y: 50 }}
             className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-end justify-center z-30 p-8"
           >
-            <div className="bg-gradient-to-br from-purple-900/90 to-black/90 rounded-2xl border border-purple-300/30 p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="glass-card max-w-4xl w-full max-h-[80vh] overflow-y-auto p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Music & Extras</h2>
+                <h2 className="text-2xl font-bold text-primary">Music & Extras</h2>
                 <button
                   onClick={() => setActivePanel(null)}
-                  className="text-purple-300 hover:text-white transition-colors text-xl"
+                  className="text-muted hover:text-primary transition-colors text-xl"
+                  aria-label="Close music panel"
                 >
-                  
+                  ×
                 </button>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-pink-300">Sound Test</h3>
+                  <h3 className="text-lg font-semibold text-accent-pink">Sound Test</h3>
                   <div className="space-y-2">
-                    <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                       Main Theme
+                    <button className="w-full p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors">
+                      Main Theme
                     </button>
-                    <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                       Game Selection
+                    <button className="w-full p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors">
+                      Game Selection
                     </button>
-                    <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                       Battle Theme
+                    <button className="w-full p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors">
+                      Battle Theme
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-pink-300">Bonus Features</h3>
+                  <h3 className="text-lg font-semibold text-accent-pink">Bonus Features</h3>
                   <div className="space-y-2">
-                    <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                       Statistics
+                    <button className="w-full p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors">
+                      Statistics
                     </button>
-                    <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                       Achievements
+                    <button className="w-full p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors">
+                      Achievements
                     </button>
-                    <button className="w-full p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors">
-                       Gallery
+                    <button className="w-full p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors">
+                      Gallery
                     </button>
                   </div>
                 </div>
@@ -507,54 +538,65 @@ export default function GameCubeHubV2() {
             exit={{ opacity: 0, y: 50 }}
             className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-end justify-center z-30 p-8"
           >
-            <div className="bg-gradient-to-br from-purple-900/90 to-black/90 rounded-2xl border border-purple-300/30 p-6 max-w-6xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="glass-card max-w-6xl w-full max-h-[80vh] overflow-y-auto p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-white">Avatar & Community Hub</h2>
+                <h2 className="text-2xl font-bold text-primary">Avatar & Community Hub</h2>
                 <button
                   onClick={() => setActivePanel(null)}
-                  className="text-purple-300 hover:text-white transition-colors text-xl"
+                  className="text-muted hover:text-primary transition-colors text-xl"
+                  aria-label="Close community panel"
                 >
-                  
+                  ×
                 </button>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Avatar Section */}
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-pink-300">Character Creator</h3>
+                  <h3 className="text-xl font-semibold text-accent-pink">Character Creator</h3>
 
-                  <div className="bg-gradient-to-br from-pink-600/20 to-purple-600/20 rounded-xl border border-pink-400/30 p-6">
+                  <div className="glass-card p-6">
                     <div className="text-center mb-4">
                       <div className="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
-                        <span className="text-2xl"></span>
+                        <span className="text-2xl" role="img" aria-label="Character Avatar">
+                          AV
+                        </span>
                       </div>
-                      <h4 className="text-white font-medium">Ultra Detailed Character Creator</h4>
-                      <p className="text-zinc-300 text-sm mt-1">Code Vein-level customization</p>
+                      <h4 className="text-primary font-medium">Ultra Detailed Character Creator</h4>
+                      <p className="text-secondary text-sm mt-1">Code Vein-level customization</p>
                     </div>
 
                     <button
                       onClick={() => router.push('/adults/editor')}
-                      className="w-full p-3 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-lg transition-all duration-300 font-medium"
+                      className="w-full p-3 btn-primary"
                     >
                       Create Your Avatar
                     </button>
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="text-lg font-semibold text-white">Quick Actions</h4>
+                    <h4 className="text-lg font-semibold text-primary">Quick Actions</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => router.push('/profile')}
-                        className="p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors"
+                        className="p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors"
                       >
-                        <div className="text-lg mb-1"></div>
+                        <div className="text-lg mb-1">
+                          <span role="img" aria-label="Profile">
+                            PR
+                          </span>
+                        </div>
                         <div className="text-sm font-medium">View Profile</div>
                       </button>
                       <button
                         onClick={() => router.push('/community')}
-                        className="p-3 bg-purple-600/20 hover:bg-purple-500/30 rounded-lg text-white text-left transition-colors"
+                        className="p-3 glass-card hover:bg-glass-bg-hover text-primary text-left transition-colors"
                       >
-                        <div className="text-lg mb-1"></div>
+                        <div className="text-lg mb-1">
+                          <span role="img" aria-label="Community">
+                            💬
+                          </span>
+                        </div>
                         <div className="text-sm font-medium">Community</div>
                       </button>
                     </div>
@@ -563,35 +605,29 @@ export default function GameCubeHubV2() {
 
                 {/* Community Section */}
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-pink-300">Community Features</h3>
+                  <h3 className="text-xl font-semibold text-accent-pink">Community Features</h3>
 
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-xl border border-blue-400/30 p-4">
-                      <h4 className="text-white font-medium mb-2">Avatar Showcase</h4>
-                      <p className="text-zinc-300 text-sm mb-3">
+                    <div className="glass-card p-4">
+                      <h4 className="text-primary font-medium mb-2">Avatar Showcase</h4>
+                      <p className="text-secondary text-sm mb-3">
                         Share your creations with the community
                       </p>
-                      <button className="w-full p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-lg transition-colors text-sm">
-                        Browse Gallery
-                      </button>
+                      <button className="w-full p-2 btn-secondary text-sm">Browse Gallery</button>
                     </div>
 
-                    <div className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 rounded-xl border border-green-400/30 p-4">
-                      <h4 className="text-white font-medium mb-2">Gated Content</h4>
-                      <p className="text-zinc-300 text-sm mb-3">
+                    <div className="glass-card p-4">
+                      <h4 className="text-primary font-medium mb-2">Gated Content</h4>
+                      <p className="text-secondary text-sm mb-3">
                         Access adult-only avatar features
                       </p>
-                      <button className="w-full p-2 bg-green-500/20 hover:bg-green-500/30 text-green-200 rounded-lg transition-colors text-sm">
-                        Verify Age
-                      </button>
+                      <button className="w-full p-2 btn-secondary text-sm">Verify Age</button>
                     </div>
 
-                    <div className="bg-gradient-to-br from-yellow-600/20 to-orange-600/20 rounded-xl border border-yellow-400/30 p-4">
-                      <h4 className="text-white font-medium mb-2">Avatar Packs</h4>
-                      <p className="text-zinc-300 text-sm mb-3">Premium outfits and accessories</p>
-                      <button className="w-full p-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-lg transition-colors text-sm">
-                        Shop Packs
-                      </button>
+                    <div className="glass-card p-4">
+                      <h4 className="text-primary font-medium mb-2">Avatar Packs</h4>
+                      <p className="text-secondary text-sm mb-3">Premium outfits and accessories</p>
+                      <button className="w-full p-2 btn-secondary text-sm">Shop Packs</button>
                     </div>
                   </div>
                 </div>
@@ -600,6 +636,14 @@ export default function GameCubeHubV2() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Accessibility Settings Modal */}
+      <AccessibilitySettings
+        isOpen={showAccessibilitySettings}
+        onClose={() => setShowAccessibilitySettings(false)}
+        onSettingsChange={handleAccessibilitySettingsChange}
+        initialSettings={accessibilitySettings}
+      />
 
       {/* Accessibility fallback navigation */}
       <div className="sr-only">
@@ -632,6 +676,14 @@ export default function GameCubeHubV2() {
             transform: scale(1.2);
           }
         }
+      @keyframes gamecubeRotate {
+        0% {
+          transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg);
+        }
+      }
       `}</style>
     </div>
   );

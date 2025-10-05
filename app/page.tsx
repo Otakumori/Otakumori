@@ -8,6 +8,8 @@ import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
 import BlogSection from '@/app/(site)/home/BlogSection';
 import FooterSection from '@/app/(site)/home/FooterSection';
 import InteractivePetals from '@/components/hero/InteractivePetals';
+import ParallaxBackground from '@/components/background/ParallaxBackground';
+import ThemePicker from '@/components/ui/ThemePicker';
 
 export const revalidate = 60;
 
@@ -22,7 +24,21 @@ export default async function HomePage() {
   } = env;
 
   return (
-    <main className="pt-14">
+    <main className="pt-14 relative min-h-screen">
+      {/* Parallax Background */}
+      <ParallaxBackground theme="cherry" className="fixed inset-0 z-0" />
+
+      {/* Theme Picker - Fixed position */}
+      <div className="fixed top-20 right-4 z-50">
+        <ThemePicker
+          currentTheme="cherry"
+          onThemeChange={(_theme) => {
+            // Theme change will be handled by client-side state
+            // console.log('Theme changed to:', theme);
+          }}
+        />
+      </div>
+
       {/* HERO */}
       {NEXT_PUBLIC_FEATURE_HERO === '1' && (
         <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">

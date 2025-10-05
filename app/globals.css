@@ -67,6 +67,65 @@
   box-shadow: 0 0 20px -8px rgba(200, 120, 255, 0.15);
 }
 
+/* Enhanced Glass Theme Utilities */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all var(--motion-normal) var(--motion-ease);
+}
+
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.glass-card:focus-within {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+}
+
+/* Enhanced Button Styles */
+.btn-primary {
+  @apply glass-button rounded-xl px-6 py-3 text-white font-ui;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all var(--motion-normal) var(--motion-ease);
+  @apply hover-scale focus-ring hover-glow;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+.btn-secondary {
+  @apply glass-card px-6 py-3 text-white font-ui;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  transition: all var(--motion-normal) var(--motion-ease);
+  @apply hover-scale focus-ring hover-glow;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+.btn-secondary:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+/* Text Color Utilities */
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
 /* Otaku-mori v0 Focus & Hover States */
 .focus-ring {
   outline: 2px solid var(--glow-pink-focus);
@@ -133,6 +192,81 @@
 .card-hover:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px -12px var(--glow-pink);
+}
+
+/* Enhanced Anime-Inspired Animations */
+@keyframes petal-float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+    opacity: 1;
+  }
+}
+
+@keyframes glass-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px var(--glow-pink);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--glow-pink-strong);
+  }
+}
+
+/* Animation Utility Classes */
+.animate-petal-float {
+  animation: petal-float 3s ease-in-out infinite;
+}
+
+.animate-glass-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200% 100%;
+  animation: glass-shimmer 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-petal-float,
+  .animate-glass-shimmer,
+  .animate-pulse-glow {
+    animation: none;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.1s ease-out;
+  }
 }
 
 /* Otaku-mori v0 Form Focus States */
@@ -1039,6 +1173,17 @@ footer::after {
   --space-to: #1a0f2b; /* deep indigo */
   --star: rgba(255, 255, 255, 0.9);
   --star-dim: rgba(255, 255, 255, 0.35);
+
+  /* Enhanced Glass Theme Colors */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-bg-hover: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-hover: rgba(255, 255, 255, 0.3);
+  --accent-pink: #ec4899;
+  --accent-purple: #8b5cf6;
+  --text-primary: #ffffff;
+  --text-secondary: #d4d4d8;
+  --text-muted: rgba(255, 255, 255, 0.6);
 
   /* Motion timing - 120-300ms, easeOut/easeInOut only */
   --motion-fast: 120ms;

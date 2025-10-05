@@ -1,13 +1,12 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/app/components/ui/card';
 import Link from 'next/link';
 import NSFWAffirmNote from '@/components/NSFWAffirmNote';
 import { t } from '@/lib/microcopy';
+import { paths } from '@/lib/paths';
 
 interface ProductVariant {
   id: string;
@@ -104,9 +103,14 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex min-h-[400px] items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
+      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex min-h-[400px] items-center justify-center">
+            <div className="glass-card p-8">
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent-pink border-t-transparent mx-auto"></div>
+              <p className="text-secondary mt-4">Loading product...</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -114,19 +118,20 @@ export default function ProductDetailPage() {
 
   if (error || !product) {
     return (
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4"></div>
-          <h3 className="text-xl font-semibold mb-2">Product not found</h3>
-          <p className="text-white/60 mb-4">
-            {error || 'The product you are looking for does not exist.'}
-          </p>
-          <Link
-            href="/shop"
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-          >
-            Back to Shop
-          </Link>
+      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="text-center py-12">
+            <div className="glass-card p-8 max-w-md mx-auto">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-xl font-semibold text-primary mb-2">Product not found</h3>
+              <p className="text-secondary mb-4">
+                {error || 'The product you are looking for does not exist.'}
+              </p>
+              <Link href={paths.shop()} className="btn-primary inline-block">
+                Back to Shop
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -137,128 +142,135 @@ export default function ProductDetailPage() {
   const currency = product.currency || 'USD';
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-      {/* Breadcrumb */}
-      <nav className="mb-8">
-        <ol className="flex items-center space-x-2 text-sm text-white/60">
-          <li>
-            <Link href="/shop" className="hover:text-white">
-              {t('nav', 'shop')}
-            </Link>
-          </li>
-          <li>/</li>
-          <li className="text-white">{product.title}</li>
-        </ol>
-      </nav>
+    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        {/* Breadcrumb */}
+        <nav className="mb-8">
+          <ol className="flex items-center space-x-2 text-sm text-muted">
+            <li>
+              <Link href={paths.shop()} className="hover:text-primary transition-colors">
+                {t('nav', 'shop')}
+              </Link>
+            </li>
+            <li>/</li>
+            <li className="text-primary">{product.title}</li>
+          </ol>
+        </nav>
 
-      {/* NSFW Affirmation Note */}
-      {product.isNSFW && <NSFWAffirmNote />}
+        {/* NSFW Affirmation Note */}
+        {product.isNSFW && <NSFWAffirmNote />}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Product Image */}
-        <div className="space-y-4">
-          <div className="relative aspect-square overflow-hidden rounded-lg border border-white/20">
-            <Image src={imageUrl} alt={product.title} fill className="object-cover" priority />
-          </div>
-
-          {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 bg-pink-500/20 text-sm text-pink-200 rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Product Image */}
+          <div className="space-y-4">
+            <div className="relative aspect-square overflow-hidden rounded-2xl glass-card">
+              <Image src={imageUrl} alt={product.title} fill className="object-cover" priority />
             </div>
-          )}
-        </div>
 
-        {/* Product Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">{product.title}</h1>
-            {product.category && <p className="text-pink-400 text-sm">{product.category}</p>}
-          </div>
-
-          {/* Price */}
-          <div className="text-3xl font-bold text-pink-400">
-            {currency} {currentPrice.toFixed(2)}
-          </div>
-
-          {/* Description */}
-          {product.description && (
-            <Card className="p-6 bg-white/5 border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-2">{t('shop', 'description')}</h3>
-              <p className="text-white/80 leading-relaxed">{product.description}</p>
-            </Card>
-          )}
-
-          {/* Variants */}
-          {product.variants && product.variants.length > 1 && (
-            <Card className="p-6 bg-white/5 border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-3">{t('shop', 'options')}</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {product.variants.map((variant) => (
-                  <button
-                    key={variant.id}
-                    onClick={() => setSelectedVariant(variant)}
-                    className={`p-3 rounded-lg border transition-colors ${
-                      selectedVariant?.id === variant.id
-                        ? 'border-pink-500 bg-pink-500/20 text-white'
-                        : 'border-white/20 bg-white/10 text-white/80 hover:border-white/40'
-                    }`}
-                    disabled={!variant.is_enabled}
+            {/* Tags */}
+            {product.tags && product.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {product.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-accent-pink/20 text-sm text-accent-pink rounded-full"
                   >
-                    <div className="text-sm font-medium">{variant.title}</div>
-                    <div className="text-xs opacity-60">
-                      {product.currency || 'USD'} {variant.price.toFixed(2)}
-                    </div>
-                    {!variant.is_enabled && (
-                      <div className="text-xs text-red-400">{t('shop', 'unavailable')}</div>
-                    )}
-                  </button>
+                    {tag}
+                  </span>
                 ))}
               </div>
-            </Card>
-          )}
-
-          {/* Quantity */}
-          <div>
-            <label className="block text-sm font-medium text-white mb-2">Quantity</label>
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors"
-              >
-                -
-              </button>
-              <span className="w-16 text-center text-white">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="w-10 h-10 rounded-lg border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors"
-              >
-                +
-              </button>
-            </div>
+            )}
           </div>
 
-          {/* Add to Cart */}
-          <Button
-            onClick={handleAddToCart}
-            disabled={!selectedVariant?.is_enabled}
-            className="w-full bg-pink-600 hover:bg-pink-700 text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {selectedVariant?.is_enabled ? 'Add to Cart' : 'Unavailable'}
-          </Button>
+          {/* Product Info */}
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-primary mb-2">{product.title}</h1>
+              {product.category && <p className="text-accent-pink text-sm">{product.category}</p>}
+            </div>
 
-          {/* Back to Shop */}
-          <div className="text-center">
-            <Link href="/shop" className="text-pink-400 hover:text-pink-300 transition-colors">
-              ← Back to Shop
-            </Link>
+            {/* Price */}
+            <div className="text-3xl font-bold text-accent-pink">
+              {currency} {currentPrice.toFixed(2)}
+            </div>
+
+            {/* Description */}
+            {product.description && (
+              <div className="glass-card p-6">
+                <h3 className="text-lg font-semibold text-primary mb-2">
+                  {t('shop', 'description')}
+                </h3>
+                <p className="text-secondary leading-relaxed">{product.description}</p>
+              </div>
+            )}
+
+            {/* Variants */}
+            {product.variants && product.variants.length > 1 && (
+              <div className="glass-card p-6">
+                <h3 className="text-lg font-semibold text-primary mb-3">{t('shop', 'options')}</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {product.variants.map((variant) => (
+                    <button
+                      key={variant.id}
+                      onClick={() => setSelectedVariant(variant)}
+                      className={`p-3 rounded-lg border transition-colors ${
+                        selectedVariant?.id === variant.id
+                          ? 'border-accent-pink bg-accent-pink/20 text-primary'
+                          : 'border-glass-border bg-glass-bg text-secondary hover:border-glass-border-hover'
+                      }`}
+                      disabled={!variant.is_enabled}
+                    >
+                      <div className="text-sm font-medium">{variant.title}</div>
+                      <div className="text-xs opacity-60">
+                        {product.currency || 'USD'} {variant.price.toFixed(2)}
+                      </div>
+                      {!variant.is_enabled && (
+                        <div className="text-xs text-red-400">{t('shop', 'unavailable')}</div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity */}
+            <div>
+              <label className="block text-sm font-medium text-primary mb-2">Quantity</label>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 rounded-lg border border-glass-border bg-glass-bg text-primary hover:bg-glass-bg-hover transition-colors"
+                >
+                  -
+                </button>
+                <span className="w-16 text-center text-primary">{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 rounded-lg border border-glass-border bg-glass-bg text-primary hover:bg-glass-bg-hover transition-colors"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Add to Cart */}
+            <Button
+              onClick={handleAddToCart}
+              disabled={!selectedVariant?.is_enabled}
+              className="w-full btn-primary text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {selectedVariant?.is_enabled ? 'Add to Cart' : 'Unavailable'}
+            </Button>
+
+            {/* Back to Shop */}
+            <div className="text-center">
+              <Link
+                href={paths.shop()}
+                className="text-accent-pink hover:text-accent-pink/80 transition-colors"
+              >
+                ← Back to Shop
+              </Link>
+            </div>
           </div>
         </div>
       </div>

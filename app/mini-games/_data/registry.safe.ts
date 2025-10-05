@@ -1,201 +1,256 @@
 import { z } from 'zod';
-import { env } from '@/env';
 
-const GameStatus = z.enum(['available', 'beta', 'offline']);
-
-export const GameSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  path: z.string(),
-  status: GameStatus,
-  howToHtml: z.string().optional(),
+// Zod schema for game definition validation
+const GameDefinitionSchema = z.object({
+  id: z.string().min(1),
+  slug: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  status: z.enum(['ready', 'beta', 'alpha', 'disabled']),
+  ageRating: z.enum(['E', 'T', 'M']).optional(),
+  howToHtml: z.string().min(1),
+  defaultMap: z.string().min(1),
+  supportsAvatar: z.boolean().default(false),
+  supportsController: z.boolean().default(true),
+  featureFlag: z.string().optional(),
+  maxRewardPerRun: z.number().min(0).default(100),
+  difficulty: z.enum(['easy', 'medium', 'hard']).default('medium'),
+  category: z.enum(['action', 'puzzle', 'strategy', 'rhythm', 'adventure']),
+  tags: z.array(z.string()).default([]),
+  thumbnail: z.string().optional(),
+  icon: z.string().optional(),
 });
 
-export type Game = z.infer<typeof GameSchema>;
+export type GameDefinition = z.infer<typeof GameDefinitionSchema>;
 
-export const games: Game[] = [
+// Centralized games registry - single source of truth
+export const GAMES: GameDefinition[] = [
   {
-    id: 'petal-run',
-    title: 'Petal Run',
-    path: '/mini-games/petal-run',
-    status: 'available',
+    id: 'petal-samurai',
+    slug: 'petal-samurai',
+    title: 'Petal Samurai',
+    description: "Draw the Tetsusaiga's arc…",
+    status: 'ready',
+    ageRating: 'E',
     howToHtml:
-      '<p>Run through the petal storm! Use arrow keys or WASD to move, spacebar to jump. Collect petals for points and avoid obstacles.</p>',
-  },
-  {
-    id: 'memory',
-    title: 'Memory Match',
-    path: '/mini-games/memory',
-    status: 'available',
-    howToHtml:
-      '<p>Find matching pairs! Click on cards to flip them. Match all pairs to win. Use your memory to remember card positions.</p>',
-  },
-  {
-    id: 'rhythm',
-    title: 'Rhythm Beat',
-    path: '/mini-games/rhythm',
-    status: 'available',
-    howToHtml:
-      '<p>Hit the beats! Press the corresponding keys (D, F, J, K) when the notes reach the bottom. Perfect timing earns more points!</p>',
-  },
-  {
-    id: 'samurai-petal-slice',
-    title: 'Samurai Petal Slice',
-    path: '/mini-games/samurai-petal-slice',
-    status: 'available',
-    howToHtml:
-      "<p>Draw the Tetsusaiga's arc… Slice through petals with perfect timing. Chain combos for bonus rewards!</p>",
-  },
-  {
-    id: 'anime-memory-match',
-    title: 'Anime Memory Match',
-    path: '/mini-games/anime-memory-match',
-    status: 'available',
-    howToHtml:
-      '<p>Recall the faces bound by fate. Find matching anime character pairs. Complete the grid to win!</p>',
-  },
-  {
-    id: 'bubble-pop-gacha',
-    title: 'Bubble-Pop Gacha',
-    path: '/mini-games/bubble-pop-gacha',
-    status: 'available',
-    howToHtml:
-      '<p>Pop for spy-craft secrets… Pop bubbles in sequence to unlock gacha rewards. Chain pops for rare items!</p>',
-  },
-  {
-    id: 'rhythm-beat-em-up',
-    title: 'Rhythm Beat-Em-Up',
-    path: '/mini-games/rhythm-beat-em-up',
-    status: 'available',
-    howToHtml:
-      "<p>Sync to the Moon Prism's pulse. Hit beats in four lanes to the rhythm. Perfect timing earns combos!</p>",
+      '<p>Swipe to slice petals with perfect timing. Chain combos for bonus rewards!</p><ul><li><strong>Controls:</strong> Swipe gestures or arrow keys</li><li><strong>Goal:</strong> Slice petals without missing</li><li><strong>Combo:</strong> Chain slices for multipliers</li></ul>',
+    defaultMap: 'dojo',
+    supportsAvatar: true,
+    supportsController: true,
+    featureFlag: 'petal_samurai_enabled',
+    maxRewardPerRun: 150,
+    difficulty: 'medium',
+    category: 'action',
+    tags: ['sword', 'timing', 'combo'],
+    thumbnail: '/games/thumbnails/petal-samurai.jpg',
+    icon: 'katana',
   },
   {
     id: 'memory-match',
+    slug: 'memory-match',
     title: 'Memory Match',
-    path: '/mini-games/memory-match',
-    status: 'available',
+    description: 'Recall the faces bound by fate.',
+    status: 'ready',
+    ageRating: 'E',
     howToHtml:
-      '<p>Simple pairs, endless fun. Find matching pairs in a simple grid. Perfect for quick sessions!</p>',
+      '<p>Find matching anime character pairs. Complete the grid to win!</p><ul><li><strong>Controls:</strong> Click cards to flip</li><li><strong>Goal:</strong> Match all pairs</li><li><strong>Time:</strong> Complete as fast as possible</li></ul>',
+    defaultMap: 'memory',
+    supportsAvatar: false,
+    supportsController: true,
+    featureFlag: 'memory_match_enabled',
+    maxRewardPerRun: 100,
+    difficulty: 'easy',
+    category: 'puzzle',
+    tags: ['memory', 'anime', 'cards'],
+    thumbnail: '/games/thumbnails/memory-match.jpg',
+    icon: 'cards',
   },
   {
-    id: 'petal-collection',
-    title: 'Petal Collection',
-    path: '/mini-games/petal-collection',
-    status: 'available',
+    id: 'otaku-beat-em-up',
+    slug: 'otaku-beat-em-up',
+    title: 'Otaku Beat-Em-Up',
+    description: "Sync to the Moon Prism's pulse.",
+    status: 'ready',
+    ageRating: 'E',
     howToHtml:
-      '<p>Economy pacing prototype. Collect falling petals. Simple but effective for economy pacing!</p>',
-  },
-  {
-    id: 'quick-math',
-    title: 'Quick Math',
-    path: '/mini-games/quick-math',
-    status: 'available',
-    howToHtml:
-      '<p>Answer fast. Pressure builds with each correct streak. Solve math problems as quickly as possible!</p>',
-  },
-  {
-    id: 'puzzle-reveal',
-    title: 'Puzzle Reveal',
-    path: '/mini-games/puzzle-reveal',
-    status: 'available',
-    howToHtml:
-      '<p>Clear the fog to reveal the art. Watch your energy. Use different brush types to uncover hidden images!</p>',
-  },
-  {
-    id: 'petal-samurai',
-    title: 'Petal Samurai',
-    path: '/mini-games/petal-samurai',
-    status: 'available',
-    howToHtml:
-      '<p>Slash petals with style. Master storm and endless modes. Use precise timing to slice through petals!</p>',
+      '<p>Four-lane rhythm game with anime music. Hit notes in time with the beat!</p><ul><li><strong>Controls:</strong> D/F/J/K keys or gamepad</li><li><strong>Goal:</strong> Hit notes in perfect time</li><li><strong>Combo:</strong> Chain hits for multipliers</li></ul>',
+    defaultMap: 'neon',
+    supportsAvatar: true,
+    supportsController: true,
+    featureFlag: 'otaku_beat_em_up_enabled',
+    maxRewardPerRun: 200,
+    difficulty: 'hard',
+    category: 'rhythm',
+    tags: ['rhythm', 'music', 'anime'],
+    thumbnail: '/games/thumbnails/otaku-beat-em-up.jpg',
+    icon: 'music',
   },
   {
     id: 'bubble-girl',
+    slug: 'bubble-girl',
     title: 'Bubble Girl',
-    path: '/mini-games/bubble-girl',
-    status: 'available',
+    description: 'Spawn bubbles, float and score. Sandbox or challenge mode.',
+    status: 'ready',
+    ageRating: 'E',
     howToHtml:
-      '<p>Spawn bubbles, float and score. Sandbox or challenge mode. Create and pop bubbles in various game modes!</p>',
+      '<p>Pop bubbles in this relaxing puzzle game. Create chain reactions for high scores!</p><ul><li><strong>Controls:</strong> Click bubbles to pop</li><li><strong>Goal:</strong> Clear the screen</li><li><strong>Strategy:</strong> Chain pops for bonuses</li></ul>',
+    defaultMap: 'bubble',
+    supportsAvatar: false,
+    supportsController: false,
+    featureFlag: 'bubble_girl_enabled',
+    maxRewardPerRun: 80,
+    difficulty: 'easy',
+    category: 'puzzle',
+    tags: ['bubble', 'puzzle', 'relaxing'],
+    thumbnail: '/games/thumbnails/bubble-girl.jpg',
+    icon: 'bubble',
   },
   {
-    id: 'bubble-ragdoll',
-    title: 'Bubble Ragdoll',
-    path: '/mini-games/bubble-ragdoll',
-    status: 'available',
+    id: 'petal-storm-rhythm',
+    slug: 'petal-storm-rhythm',
+    title: 'Petal Storm Rhythm',
+    description: 'Stormy rhythm playlist—precision timing for petals.',
+    status: 'ready',
+    ageRating: 'E',
     howToHtml:
-      '<p>Toss the ragdoll into bubbles. Survive the chaos. Physics-based fun with ragdoll characters!</p>',
+      '<p>Rhythm game with falling petals. Hit the notes as they reach the bottom!</p><ul><li><strong>Controls:</strong> Space bar or tap</li><li><strong>Goal:</strong> Hit petals in rhythm</li><li><strong>Timing:</strong> Perfect timing = higher score</li></ul>',
+    defaultMap: 'sakura',
+    supportsAvatar: true,
+    supportsController: true,
+    featureFlag: 'petal_storm_rhythm_enabled',
+    maxRewardPerRun: 120,
+    difficulty: 'medium',
+    category: 'rhythm',
+    tags: ['rhythm', 'petals', 'falling'],
+    thumbnail: '/games/thumbnails/petal-storm-rhythm.jpg',
+    icon: 'petals',
   },
   {
     id: 'blossomware',
-    title: 'Blossomware',
-    path: '/mini-games/blossomware',
-    status: 'available',
+    slug: 'blossomware',
+    title: 'Blossom-ware',
+    description: 'Chaotic micro-sessions—keep your petal streak alive.',
+    status: 'ready',
+    ageRating: 'E',
     howToHtml:
-      '<p>Chaotic micro-sessions—keep your petal streak alive. Quick, intense gameplay sessions!</p>',
+      "<p>Quick micro-games in rapid succession. Keep your streak alive!</p><ul><li><strong>Controls:</strong> Various per mini-game</li><li><strong>Goal:</strong> Complete as many as possible</li><li><strong>Streak:</strong> Don't break the chain!</li></ul>",
+    defaultMap: 'chaos',
+    supportsAvatar: true,
+    supportsController: true,
+    featureFlag: 'blossomware_enabled',
+    maxRewardPerRun: 300,
+    difficulty: 'hard',
+    category: 'action',
+    tags: ['micro-games', 'streak', 'chaos'],
+    thumbnail: '/games/thumbnails/blossomware.jpg',
+    icon: 'blossom',
   },
   {
     id: 'dungeon-of-desire',
+    slug: 'dungeon-of-desire',
     title: 'Dungeon of Desire',
-    path: '/mini-games/dungeon-of-desire',
-    status: 'available',
+    description: 'Descend into the dungeon. Survive rooms and claim rewards.',
+    status: 'beta',
+    ageRating: 'M',
     howToHtml:
-      '<p>Descend into the dungeon. Survive rooms and claim rewards. Navigate through challenging dungeon levels!</p>',
-  },
-  {
-    id: 'maid-cafe-manager',
-    title: 'Maid Cafe Manager',
-    path: '/mini-games/maid-cafe-manager',
-    status: 'available',
-    howToHtml:
-      '<p>Manage shifts and keep guests smiling. Run your own maid cafe with strategic management!</p>',
+      '<p>Roguelike dungeon crawler with anime aesthetics. Fight monsters and collect loot!</p><ul><li><strong>Controls:</strong> WASD + mouse</li><li><strong>Goal:</strong> Survive as long as possible</li><li><strong>Loot:</strong> Collect weapons and upgrades</li></ul>',
+    defaultMap: 'dungeon',
+    supportsAvatar: true,
+    supportsController: true,
+    featureFlag: 'dungeon_of_desire_enabled',
+    maxRewardPerRun: 250,
+    difficulty: 'hard',
+    category: 'adventure',
+    tags: ['roguelike', 'dungeon', 'anime', 'adult'],
+    thumbnail: '/games/thumbnails/dungeon-of-desire.jpg',
+    icon: 'dungeon',
   },
   {
     id: 'thigh-coliseum',
-    title: 'Thigh Coliseum',
-    path: '/mini-games/thigh-coliseum',
-    status: 'available',
+    slug: 'thigh-coliseum',
+    title: 'Thigh Colosseum',
+    description: 'Enter the arena. Win rounds and advance the bracket.',
+    status: 'beta',
+    ageRating: 'M',
     howToHtml:
-      '<p>Enter the arena. Win rounds and advance the bracket. Competitive arena-based gameplay!</p>',
+      '<p>Fighting game with anime characters. Battle opponents in tournament brackets!</p><ul><li><strong>Controls:</strong> Arrow keys + Z/X</li><li><strong>Goal:</strong> Win tournament rounds</li><li><strong>Combat:</strong> Learn combos and timing</li></ul>',
+    defaultMap: 'arena',
+    supportsAvatar: true,
+    supportsController: true,
+    featureFlag: 'thigh_coliseum_enabled',
+    maxRewardPerRun: 300,
+    difficulty: 'hard',
+    category: 'action',
+    tags: ['fighting', 'tournament', 'anime', 'adult'],
+    thumbnail: '/games/thumbnails/thigh-coliseum.jpg',
+    icon: 'arena',
+  },
+  {
+    id: 'puzzle-reveal',
+    slug: 'puzzle-reveal',
+    title: 'Puzzle Reveal',
+    description: 'Clear the fog to reveal the art. Watch your energy.',
+    status: 'ready',
+    ageRating: 'E',
+    howToHtml:
+      '<p>Reveal hidden artwork by clearing fog tiles. Manage your energy carefully!</p><ul><li><strong>Controls:</strong> Click tiles to clear</li><li><strong>Goal:</strong> Reveal the complete image</li><li><strong>Energy:</strong> Limited clears per level</li></ul>',
+    defaultMap: 'mystery',
+    supportsAvatar: false,
+    supportsController: false,
+    featureFlag: 'puzzle_reveal_enabled',
+    maxRewardPerRun: 90,
+    difficulty: 'medium',
+    category: 'puzzle',
+    tags: ['puzzle', 'reveal', 'art'],
+    thumbnail: '/games/thumbnails/puzzle-reveal.jpg',
+    icon: 'puzzle',
   },
 ];
 
-// Build-time duplicate guard (development only)
-// This will be evaluated at build time, not runtime
-if (typeof window === 'undefined' && env.NODE_ENV === 'development') {
-  const ids = new Set<string>();
-  const paths = new Set<string>();
+// Build-time duplicate detection
+const gameIds = new Set(GAMES.map((game) => game.id));
+const gameSlugs = new Set(GAMES.map((game) => game.slug));
 
-  for (const game of games) {
-    if (ids.has(game.id)) {
-      throw new Error(`Duplicate game id detected: ${game.id}`);
-    }
-    if (paths.has(game.path)) {
-      throw new Error(`Duplicate game path detected: ${game.path}`);
-    }
-    ids.add(game.id);
-    paths.add(game.path);
-  }
+if (gameIds.size !== GAMES.length) {
+  throw new Error('Duplicate game IDs found in registry');
 }
 
-// Validation function
-export function validateGame(game: unknown): Game {
-  return GameSchema.parse(game);
+if (gameSlugs.size !== GAMES.length) {
+  throw new Error('Duplicate game slugs found in registry');
 }
+
+// Export types for compile-time safety
+export type GameId = (typeof GAMES)[number]['id'];
+export type GameSlug = (typeof GAMES)[number]['slug'];
 
 // Helper functions
-export function getGameById(id: string): Game | undefined {
-  return games.find((game) => game.id === id);
+export function getGameById(id: GameId): GameDefinition | undefined {
+  return GAMES.find((game) => game.id === id);
 }
 
-export function getGameByPath(path: string): Game | undefined {
-  return games.find((game) => game.path === path);
+export function getGameBySlug(slug: GameSlug): GameDefinition | undefined {
+  return GAMES.find((game) => game.slug === slug);
 }
 
-export function getAvailableGames(): Game[] {
-  return games.filter((game) => game.status === 'available');
+export function getGamesByCategory(category: GameDefinition['category']): GameDefinition[] {
+  return GAMES.filter((game) => game.category === category);
 }
 
-export function getGamesByStatus(status: 'available' | 'beta' | 'offline'): Game[] {
-  return games.filter((game) => game.status === status);
+export function getEnabledGames(): GameDefinition[] {
+  return GAMES.filter((game) => game.status === 'ready' || game.status === 'beta');
 }
+
+export function getFeaturedGames(): GameDefinition[] {
+  return GAMES.filter((game) => game.status === 'ready').slice(0, 6);
+}
+
+// Validate all games at import time
+GAMES.forEach((game, index) => {
+  try {
+    GameDefinitionSchema.parse(game);
+  } catch (error) {
+    throw new Error(`Invalid game definition at index ${index}: ${error}`);
+  }
+});
+
+export default GAMES;

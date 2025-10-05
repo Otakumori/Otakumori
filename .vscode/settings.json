@@ -12,6 +12,7 @@
     "arrowdown",
     "arrowleft",
     "arrowright",
+    "coily",
     "configcat",
     "cooldown",
     "EASYPOST",
@@ -23,6 +24,7 @@
     "metalness",
     "MINIGAMES",
     "mori",
+    "Ndot",
     "NEXTAUTH",
     "nosniff",
     "octx",
@@ -33,7 +35,10 @@
     "sakura",
     "SAMEORIGIN",
     "Supabase",
+    "toon",
     "treosh",
+    "WASD",
     "whsec"
-  ]
+  ],
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }

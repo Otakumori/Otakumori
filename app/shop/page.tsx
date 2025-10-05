@@ -41,8 +41,8 @@ export default async function ShopPage({
           {/* Header Section */}
           <div className="container mx-auto px-4 py-8">
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">Otaku-mori Shop</h1>
-              <p className="text-xl text-zinc-300 max-w-2xl mx-auto">
+              <h1 className="text-4xl md:text-6xl font-bold text-primary mb-4">Otaku-mori Shop</h1>
+              <p className="text-xl text-secondary max-w-2xl mx-auto">
                 Curated treasures for fellow travelers
               </p>
             </div>
@@ -54,10 +54,7 @@ export default async function ShopPage({
               <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 h-96 animate-pulse"
-                    />
+                    <div key={i} className="glass-card h-96 animate-pulse" />
                   ))}
                 </div>
               </div>
@@ -79,10 +76,12 @@ export default async function ShopPage({
     return (
       <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Shop Temporarily Unavailable</h1>
-          <p className="text-zinc-300">
-            Please try again later or contact support if the issue persists.
-          </p>
+          <div className="glass-card p-8 max-w-md mx-auto">
+            <h1 className="text-2xl font-bold text-primary mb-4">Shop Temporarily Unavailable</h1>
+            <p className="text-secondary">
+              Please try again later or contact support if the issue persists.
+            </p>
+          </div>
         </div>
       </div>
     );

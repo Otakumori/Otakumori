@@ -1,4 +1,4 @@
-import { games } from './registry.safe';
+import { GAMES, type GameDefinition } from './registry.safe';
 
 // Map registry games to hub component props
 export interface HubGameCard {
@@ -28,11 +28,11 @@ export const HUB_LABELS: HubFaceLabels = {
 
 // Convert registry games to hub cards
 export function getHubGameCards(): HubGameCard[] {
-  return games.map((game) => ({
+  return GAMES.map((game: GameDefinition) => ({
     slug: game.id,
     title: game.title,
     description: getGameDescription(game.id),
-    available: game.status === 'available',
+    available: game.status === 'ready',
     howToHtml: game.howToHtml,
   }));
 }

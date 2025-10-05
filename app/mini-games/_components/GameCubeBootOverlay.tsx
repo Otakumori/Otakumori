@@ -12,6 +12,7 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
   const [isComplete, setIsComplete] = useState(false);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Check for reduced motion preference
   const prefersReducedMotion =
@@ -20,6 +21,15 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       : false;
 
   useEffect(() => {
+    // Initialize audio
+    if (typeof window !== 'undefined') {
+      audioRef.current = new Audio();
+      audioRef.current.volume = 0.3; // Subtle volume
+      // Use a simple beep sound or create a GameCube-like chime
+      audioRef.current.src =
+        'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEZBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU1jdTyz3krBSF0yO/eizEIHWq+8+OWT';
+    }
+
     // Allow skipping after 1.2s
     const skipTimer = setTimeout(() => {
       setIsSkippable(true);
@@ -38,6 +48,10 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       clearTimeout(skipTimer);
       if (animationRef.current) {
         clearTimeout(animationRef.current);
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
       }
     };
   }, [prefersReducedMotion]);
@@ -60,8 +74,8 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
   };
 
   const startAnimation = () => {
-    // Auto-tune total duration to ~5s
-    const TARGET_MS = 5000;
+    // Authentic GameCube timing: ~3.78s total
+    const TARGET_MS = 3780;
     const BOOT_MS = 280;
     const startWait = 250;
     const TOTAL_STEPS = 31;
@@ -72,6 +86,11 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
 
     // Start the main animation sequence
     animationRef.current = setTimeout(() => {
+      // Add will-change for performance during animation
+      const cubeElement = containerRef.current?.querySelector('#cube');
+      if (cubeElement) {
+        (cubeElement as HTMLElement).style.willChange = 'transform';
+      }
       animate();
     }, startWait);
   };
@@ -120,39 +139,37 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       const rect = root.getBoundingClientRect();
       const cx = rect.width / 2,
         cy = rect.height / 2;
-      const N = 96; // More petals for better effect
+      const N = 12; // Mild and elegant petal count
 
-      // Create multiple burst waves
-      for (let wave = 0; wave < 3; wave++) {
-        setTimeout(() => {
-          for (let i = 0; i < N / 3; i++) {
-            const p = document.createElement('div');
-            p.className = 'petal';
+      // Create single gentle burst wave
+      setTimeout(() => {
+        for (let i = 0; i < N; i++) {
+          const p = document.createElement('div');
+          p.className = 'petal';
 
-            // Enhanced petal variety
-            const size = Math.random() * 8 + 4;
-            p.style.width = size + 'px';
-            p.style.height = size * 0.7 + 'px';
+          // Enhanced petal variety
+          const size = Math.random() * 8 + 4;
+          p.style.width = size + 'px';
+          p.style.height = size * 0.7 + 'px';
 
-            // Color variation
-            const colors = ['#ec4899', '#8b5cf6', '#f59e0b', '#10b981'];
-            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+          // Color variation
+          const colors = ['#ec4899', '#8b5cf6', '#f59e0b', '#10b981'];
+          p.style.background = colors[Math.floor(Math.random() * colors.length)];
 
-            const ang = Math.PI * 2 * (i / (N / 3)) + Math.random() * 0.8;
-            const dist = 80 + Math.random() * 160 + wave * 40;
-            const speed = 0.8 + Math.random() * 0.4;
+          const ang = Math.PI * 2 * (i / N) + Math.random() * 0.4;
+          const dist = 60 + Math.random() * 80;
+          const speed = 1.2 + Math.random() * 0.3;
 
-            p.style.left = cx + 'px';
-            p.style.top = cy + 'px';
-            p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
-            p.style.setProperty('--dy', Math.sin(ang) * dist + (30 + Math.random() * 60) + 'px');
-            p.style.setProperty('--speed', speed.toString());
+          p.style.left = cx + 'px';
+          p.style.top = cy + 'px';
+          p.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
+          p.style.setProperty('--dy', Math.sin(ang) * dist + (30 + Math.random() * 60) + 'px');
+          p.style.setProperty('--speed', speed.toString());
 
-            root.appendChild(p);
-            setTimeout(() => p.remove(), 1800);
-          }
-        }, wave * 150);
-      }
+          root.appendChild(p);
+          setTimeout(() => p.remove(), 1800);
+        }
+      }, 0);
 
       // Add hollow center glow effect
       const hollowCenter = root.querySelector('.hollow-center');
@@ -207,7 +224,20 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
       if (label) label.style.opacity = '1';
       if (sub) sub.style.opacity = '1';
 
+      // Remove will-change after animation completes for performance
       setTimeout(() => {
+        if (cubeElement) {
+          (cubeElement as HTMLElement).style.willChange = 'auto';
+        }
+
+        // Play startup sound when cube locks in
+        if (audioRef.current && !prefersReducedMotion) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play().catch(() => {
+            // Ignore audio play errors (user might not have interacted with page yet)
+          });
+        }
+
         petals();
         setTimeout(() => {
           setIsComplete(true);
@@ -240,11 +270,13 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 bg-black flex items-center justify-center cursor-pointer"
+      className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
       onClick={handleClick}
       data-test="gc-boot-overlay"
       style={
         {
+          background:
+            'radial-gradient(ellipse at center, #8b2d69 0%, #6b1d4a 25%, #4a0033 50%, #2d0019 100%)',
           '--cubesize': '180px',
           '--c': 'calc(var(--cubesize) / 3)',
           '--step-ms': '75ms',
@@ -261,16 +293,25 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
         } as React.CSSProperties
       }
     >
-      {/* Skip button */}
+      {/* Skip button - more prominent */}
       {isSkippable && (
         <button
-          className="absolute bottom-8 right-8 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/80 text-sm transition-colors"
+          className="absolute bottom-8 right-8 px-6 py-3 bg-pink-600/80 hover:bg-pink-600 text-white font-bold text-base rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl border border-pink-400/30"
           onClick={onSkip}
           aria-label="Skip boot animation"
+          style={{
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 4px 20px rgba(236, 72, 153, 0.3)',
+          }}
         >
           Skip
         </button>
       )}
+
+      {/* Screen reader announcement */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        GameCube-style boot animation loading. Press Space, Enter, or Escape to skip.
+      </div>
 
       <div id="cvs" className="h-full w-full relative" style={{ perspective: '2200px' }}>
         <div
@@ -284,7 +325,8 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
             transformStyle: 'preserve-3d',
             transform:
               'translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1.0), 0) rotateX(55deg) rotateZ(45deg)',
-            animation: 'bootshake 280ms ease-out var(--start-wait-ms) both',
+            animation:
+              'bootshake 280ms cubic-bezier(0.55, 0.085, 0.68, 0.53) var(--start-wait-ms) both',
           }}
         >
           {/* Cube faces */}
@@ -297,14 +339,16 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
               transformStyle: 'preserve-3d',
             }}
           >
-            {/* O-shape formation - 8 squares arranged in a circle */}
+            {/* O-shape formation - 8 cube blocks arranged in blocky O-formation */}
             {Array.from({ length: 8 }).map((_, i) => {
               const angle = (i / 8) * Math.PI * 2;
-              const radius = 1.2; // Distance from center
+              const radius = 1.4; // Distance from center (more blocky)
               const centerX = 1.5; // Center of O-shape
               const centerY = 1.5;
-              const x = centerX + Math.cos(angle) * radius;
-              const y = centerY + Math.sin(angle) * radius;
+              // Add slight offset to make it more blocky/chunky
+              const offset = 0.1;
+              const x = centerX + Math.cos(angle) * radius + (Math.random() - 0.5) * offset;
+              const y = centerY + Math.sin(angle) * radius + (Math.random() - 0.5) * offset;
 
               return (
                 <div
@@ -314,14 +358,13 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
                     position: 'absolute',
                     width: 'var(--c)',
                     height: 'var(--c)',
-                    background: 'linear-gradient(160deg, var(--glassB), var(--glassA))',
-                    border: '1.5px solid var(--glassStroke)',
+                    background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                    border: '1px solid rgba(255,255,255,0.3)',
                     boxSizing: 'border-box',
                     opacity: 0,
                     transform: 'scale(.94)',
                     transition:
                       'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                    backdropFilter: 'blur(6px) saturate(160%)',
                     top: `calc(var(--c) * ${y})`,
                     left: `calc(var(--c) * ${x})`,
                   }}
@@ -367,14 +410,13 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
                   position: 'absolute',
                   width: 'var(--c)',
                   height: 'var(--c)',
-                  background: 'linear-gradient(160deg, var(--glassB), var(--glassA))',
-                  border: '1.5px solid var(--glassStroke)',
+                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                  border: '1px solid rgba(255,255,255,0.3)',
                   boxSizing: 'border-box',
                   opacity: 0,
                   transform: 'scale(.94)',
                   transition:
                     'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                  backdropFilter: 'blur(6px) saturate(160%)',
                   top: i < 3 ? `calc(var(--c) * ${i})` : 'calc(var(--c) * 2)',
                   left: i < 3 ? '0' : i === 3 ? 'var(--c)' : 'calc(var(--c) * 2)',
                 }}
@@ -402,14 +444,13 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
                   position: 'absolute',
                   width: 'var(--c)',
                   height: 'var(--c)',
-                  background: 'linear-gradient(160deg, var(--glassB), var(--glassA))',
-                  border: '1.5px solid var(--glassStroke)',
+                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                  border: '1px solid rgba(255,255,255,0.3)',
                   boxSizing: 'border-box',
                   opacity: 0,
                   transform: 'scale(.94)',
                   transition:
                     'opacity 160ms var(--easing), transform 160ms var(--easing), box-shadow 300ms ease',
-                  backdropFilter: 'blur(6px) saturate(160%)',
                   top:
                     i === 0
                       ? 'calc(var(--c) * 2)'
@@ -456,10 +497,9 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
                   position: 'absolute',
                   width: 'var(--c)',
                   height: 'var(--c)',
-                  background: 'linear-gradient(160deg, var(--glassB), var(--glassA))',
-                  border: '1px solid var(--glassStroke)',
+                  background: 'linear-gradient(135deg, #e8e8e8 0%, #a0a0a0 50%, #707070 100%)',
+                  border: '1px solid rgba(255,255,255,0.3)',
                   boxSizing: 'border-box',
-                  backdropFilter: 'blur(6px) saturate(160%)',
                   transform:
                     face === 'top'
                       ? 'translate3d(0,0,var(--c))'
@@ -495,17 +535,20 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
             left: '50%',
             top: 'calc(50% + var(--cubesize) * 0.90)',
             transform: 'translateX(-50%)',
-            color: 'var(--pink)',
-            fontWeight: 800,
+            fontFamily: 'Orbitron, monospace',
+            fontWeight: 900,
             fontSize: '18px',
             letterSpacing: '0.20em',
             textTransform: 'uppercase',
-            textShadow: '0 0 10px rgba(255,157,179,.25), 0 2px 0 #111',
+            background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)',
             opacity: 0,
             transition: 'opacity 220ms ease',
           }}
         >
-          OTAKU-MORI
+          OTAKU-MORI™
         </div>
 
         <div
@@ -515,22 +558,59 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
             left: '50%',
             top: 'calc(50% + var(--cubesize) * 1.06)',
             transform: 'translateX(-50%)',
+            fontFamily: 'Orbitron, monospace',
             color: 'rgba(255,157,179,.85)',
             fontWeight: 500,
             fontSize: '12px',
             letterSpacing: '0.08em',
             fontStyle: 'italic',
+            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
             opacity: 0,
             transition: 'opacity 220ms ease',
           }}
         >
-          <em>made with </em>
+          <em>2025</em>
         </div>
       </div>
 
       <style>{`
+        @font-face {
+          font-family: 'GameCube';
+          src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        }
+        
         .transition {
           transition: transform var(--step-ms) var(--easing);
+        }
+
+        /* Chrome lighting effects */
+        .square, .minicubeface {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .square::before, .minicubeface::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.2) 100%);
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .square::after, .minicubeface::after {
+          content: '';
+          position: absolute;
+          top: 2px;
+          left: 2px;
+          right: 2px;
+          height: 1px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
+          pointer-events: none;
+          z-index: 2;
         }
 
         #cube.click {
@@ -573,15 +653,23 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
         @keyframes bootshake {
           0% {
             transform: translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1), 0)
-              rotateX(55deg) rotateZ(45deg);
+              rotateX(55deg) rotateZ(45deg) scale(1);
           }
-          50% {
+          20% {
             transform: translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1), 0)
-              rotateX(47deg) rotateZ(45deg);
+              rotateX(52deg) rotateZ(45deg) scale(0.98);
+          }
+          40% {
+            transform: translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1), 0)
+              rotateX(58deg) rotateZ(45deg) scale(1.01);
+          }
+          60% {
+            transform: translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1), 0)
+              rotateX(54deg) rotateZ(45deg) scale(0.99);
           }
           100% {
             transform: translate3d(calc(var(--cubesize) * -0.5), calc(var(--cubesize) * -1), 0)
-              rotateX(55deg) rotateZ(45deg);
+              rotateX(55deg) rotateZ(45deg) scale(1);
           }
         }
 

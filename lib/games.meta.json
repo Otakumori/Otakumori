@@ -1,0 +1,204 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2024-12-19T00:00:00Z",
+  "games": [
+    {
+      "id": "petal-samurai",
+      "slug": "petal-samurai",
+      "title": "Petal Samurai",
+      "description": "Slash petals with style. Master storm and endless modes.",
+      "category": "action",
+      "difficulty": "medium",
+      "estimatedTime": "5-15 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Slice petals as they fall! Follow the tooltip hints for bonus points.",
+        "modifiers": "Unlock slow-mo, double petals, and special blade themes",
+        "scoring": "Perfect slices earn more petals. Build combos for massive scores!"
+      },
+      "image": "/games/petal-samurai/cover.jpg",
+      "icon": "><",
+      "enabled": true,
+      "featured": true,
+      "order": 1
+    },
+    {
+      "id": "memory-match",
+      "slug": "memory-match",
+      "title": "Memory Match",
+      "description": "Flip cards and match pairs. Perfect recall earns bonuses.",
+      "category": "puzzle",
+      "difficulty": "easy",
+      "estimatedTime": "3-10 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Remember card positions! Use modifiers like flipped board for extra challenge.",
+        "levels": "Progress through increasingly difficult layouts",
+        "scoring": "Petals earned on streaks. Perfect matches give bonus rewards!"
+      },
+      "image": "/games/memory-match/cover.jpg",
+      "icon": "[]",
+      "enabled": true,
+      "featured": true,
+      "order": 2
+    },
+    {
+      "id": "otaku-beat-em-up",
+      "slug": "otaku-beat-em-up",
+      "title": "Otaku Beat-Em-Up",
+      "description": "Side-scrolling brawler with JoJo's Bizarre Adventure style. Score multiplier if attacks sync with background beat.",
+      "category": "action",
+      "difficulty": "hard",
+      "estimatedTime": "10-30 min",
+      "ageRating": "T",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Time your attacks to the beat for massive score multipliers!",
+        "style": "JoJo's Bizarre Adventure inspired character designs and poses",
+        "combos": "Chain attacks together for devastating combo moves"
+      },
+      "image": "/games/otaku-beat-em-up/cover.jpg",
+      "icon": "⚔️",
+      "enabled": true,
+      "featured": true,
+      "order": 3
+    },
+    {
+      "id": "bubble-girl",
+      "slug": "bubble-girl",
+      "title": "Bubble Girl",
+      "description": "Spawn bubbles, float and score. Sandbox or challenge mode.",
+      "category": "physics",
+      "difficulty": "medium",
+      "estimatedTime": "5-20 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Bounce on bubbles! Physics-based ragdoll gameplay with airtime scoring.",
+        "chains": "Build combo chains for massive petal rewards",
+        "modes": "Sandbox for creativity or challenge mode for high scores"
+      },
+      "image": "/games/bubble-girl/cover.jpg",
+      "icon": "(.)",
+      "enabled": true,
+      "order": 4
+    },
+    {
+      "id": "petal-storm-rhythm",
+      "slug": "petal-storm-rhythm",
+      "title": "Petal Storm Rhythm",
+      "description": "Stormy rhythm playlist—precision timing for petals.",
+      "category": "rhythm",
+      "difficulty": "hard",
+      "estimatedTime": "5-15 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Slice petals as laser beams! Beat Saber-style rhythm gameplay.",
+        "weapons": "Unlock different weapons and slicing styles",
+        "precision": "Perfect timing earns more petals and higher scores"
+      },
+      "image": "/games/petal-storm-rhythm/cover.jpg",
+      "icon": "~",
+      "enabled": true,
+      "order": 5
+    },
+    {
+      "id": "blossomware",
+      "slug": "blossomware",
+      "title": "Blossom-ware",
+      "description": "Chaotic micro-sessions—keep your petal streak alive.",
+      "category": "microgames",
+      "difficulty": "medium",
+      "estimatedTime": "2-10 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "WarioWare-style microgames! Cute companion explains each challenge.",
+        "companion": "Unique tooltip sequences guide you through each microgame",
+        "currency": "Petals earned as currency for unlocks and upgrades"
+      },
+      "image": "/games/blossomware/cover.jpg",
+      "icon": "≡",
+      "enabled": true,
+      "order": 6
+    },
+    {
+      "id": "dungeon-of-desire",
+      "slug": "dungeon-of-desire",
+      "title": "Dungeon of Desire",
+      "description": "Descend into the dungeon. Survive rooms and claim rewards.",
+      "category": "adventure",
+      "difficulty": "medium",
+      "estimatedTime": "15-45 min",
+      "ageRating": "M",
+      "nsfw": true,
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Succubus side-scroller with funny anime/game references!",
+        "references": "Spot the anime and gaming easter eggs throughout",
+        "gating": "Adult content - age verification required"
+      },
+      "image": "/games/dungeon-of-desire/cover.jpg",
+      "icon": "x",
+      "enabled": true,
+      "order": 7
+    },
+    {
+      "id": "thigh-coliseum",
+      "slug": "thigh-coliseum",
+      "title": "Thigh Colosseum",
+      "description": "Enter the arena. Win rounds and advance the bracket.",
+      "category": "action",
+      "difficulty": "hard",
+      "estimatedTime": "10-30 min",
+      "ageRating": "M",
+      "nsfw": true,
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Chaotic side-scroller with physics-based crush hazards!",
+        "physics": "Survive against giant thigh-crushers with humor-driven gameplay",
+        "gating": "Adult content - age verification required"
+      },
+      "image": "/games/thigh-coliseum/cover.jpg",
+      "icon": "()",
+      "enabled": true,
+      "order": 8
+    },
+    {
+      "id": "puzzle-reveal",
+      "slug": "puzzle-reveal",
+      "title": "Puzzle Reveal",
+      "description": "Clear the fog to reveal the art. Watch your energy.",
+      "category": "puzzle",
+      "difficulty": "easy",
+      "estimatedTime": "5-15 min",
+      "ageRating": "E",
+      "features": ["scoreboard", "saves", "unlocks", "petals", "avatars", "achievements"],
+      "tooltips": {
+        "hint": "Image-reveal puzzle game with unlockable difficulty and image packs!",
+        "energy": "Manage your energy as you clear fog to reveal beautiful art",
+        "packs": "Unlock new image packs and difficulty levels with petals"
+      },
+      "image": "/games/puzzle-reveal/cover.jpg",
+      "icon": "+",
+      "enabled": true,
+      "order": 9
+    }
+  ],
+  "categories": {
+    "action": { "name": "Action", "color": "#ef4444", "icon": "⚔️" },
+    "puzzle": { "name": "Puzzle", "color": "#3b82f6", "icon": "🧩" },
+    "physics": { "name": "Physics", "color": "#10b981", "icon": "⚡" },
+    "rhythm": { "name": "Rhythm", "color": "#8b5cf6", "icon": "🎵" },
+    "microgames": { "name": "Microgames", "color": "#f59e0b", "icon": "🎮" },
+    "adventure": { "name": "Adventure", "color": "#ec4899", "icon": "🗡️" }
+  },
+  "ageRatings": {
+    "E": { "name": "Everyone", "description": "Suitable for all ages" },
+    "T": { "name": "Teen", "description": "Suitable for ages 13+" },
+    "M": { "name": "Mature", "description": "Suitable for ages 17+" }
+  }
+}
