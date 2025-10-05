@@ -23,7 +23,7 @@ export default async function HomePage() {
   } = env;
 
   return (
-    <main className="pt-14 relative min-h-screen">
+    <main className="relative min-h-screen">
       {/* Parallax Background */}
       <ParallaxBackground theme="cherry" className="fixed inset-0 z-0" />
 

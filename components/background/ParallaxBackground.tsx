@@ -133,6 +133,8 @@ export default function ParallaxBackground({
 
   // Check for reduced motion preference
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mediaQuery.matches);
 
