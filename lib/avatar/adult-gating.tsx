@@ -1,6 +1,5 @@
 'use client';
 
-import { auth } from '@clerk/nextjs/server';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 
