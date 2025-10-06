@@ -4,7 +4,7 @@ import { env } from '@/env.mjs';
 // import { redis } from '../../../lib/redis';
 // TODO: Replace with HTTP-based Redis client if needed
 
-const MAINTENANCE_KEY = 'site:maintenance';
+const _MAINTENANCE_KEY = 'site:maintenance';
 
 export async function GET(request: NextRequest) {
   try {

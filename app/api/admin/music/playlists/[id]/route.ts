@@ -9,6 +9,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.log(`Admin ${admin.id} updating playlist ${params.id}`);
   } catch (error) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
@@ -25,6 +26,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.log(`Admin ${admin.id} deleting playlist ${params.id}`);
   } catch (error) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }

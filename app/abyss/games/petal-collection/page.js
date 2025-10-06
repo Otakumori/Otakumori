@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 export default function PetalCollectionPage() {
   const { user, isLoaded } = useUser();
-  const [score, setScore] = useState(0);
+  const [score, _setScore] = useState(0);
 
   if (!isLoaded) {
     return (

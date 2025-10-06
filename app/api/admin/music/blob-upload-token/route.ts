@@ -10,6 +10,7 @@ export async function POST(req: Request) {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.log(`Admin ${admin.id} requested blob upload token`);
   } catch (error) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }

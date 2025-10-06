@@ -50,7 +50,7 @@ export async function sendChatMessage(userId, content) {
   }
 }
 
-export function subscribeToChatMessages(callback) {
+export function subscribeToChatMessages(_callback) {
   // TODO: Implement with WebSocket or Server-Sent Events
   // For now, return a no-op unsubscribe function
   // Chat subscription needs WebSocket implementation

@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 export default function GalleryPage() {
   const { user, isLoaded } = useUser();
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [_selectedImage, _setSelectedImage] = useState(null);
 
   if (!isLoaded) {
     return (
@@ -166,11 +166,11 @@ export default function GalleryPage() {
     // Add more images as needed
   ];
 
-  const handleImageSelect = (image) => {
+  const handleImageSelect = (_image) => {
     // Implement image selection logic here
   };
 
-  const handlePurchase = () => {
+  const _handlePurchase = () => {
     // Implement purchase logic here
   };
 

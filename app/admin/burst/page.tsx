@@ -183,10 +183,14 @@ export default function AdminBurstPage() {
               {config.enabled && (
                 <>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-neutral-300">
+                    <label
+                      htmlFor="min-cooldown"
+                      className="mb-2 block text-sm font-medium text-neutral-300"
+                    >
                       Minimum Cooldown (seconds)
                     </label>
                     <input
+                      id="min-cooldown"
                       type="number"
                       value={config.minCooldownSec}
                       onChange={(e) =>
@@ -203,10 +207,14 @@ export default function AdminBurstPage() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-neutral-300">
+                    <label
+                      htmlFor="max-bursts"
+                      className="mb-2 block text-sm font-medium text-neutral-300"
+                    >
                       Max Bursts per Minute
                     </label>
                     <input
+                      id="max-bursts"
                       type="number"
                       value={config.maxPerMinute}
                       onChange={(e) => updateConfig('maxPerMinute', parseInt(e.target.value) || 3)}
@@ -232,10 +240,14 @@ export default function AdminBurstPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="small-particles"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Small Burst Particles
                 </label>
                 <input
+                  id="small-particles"
                   type="number"
                   value={config.particleCount.small}
                   onChange={(e) =>
@@ -252,10 +264,14 @@ export default function AdminBurstPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="medium-particles"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Medium Burst Particles
                 </label>
                 <input
+                  id="medium-particles"
                   type="number"
                   value={config.particleCount.medium}
                   onChange={(e) =>
@@ -272,10 +288,14 @@ export default function AdminBurstPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="large-particles"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Large Burst Particles
                 </label>
                 <input
+                  id="large-particles"
                   type="number"
                   value={config.particleCount.large}
                   onChange={(e) =>
@@ -302,10 +322,14 @@ export default function AdminBurstPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="small-weight"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Small Burst Weight
                 </label>
                 <input
+                  id="small-weight"
                   type="number"
                   value={config.rarityWeights.small * 100}
                   onChange={(e) =>
@@ -322,10 +346,14 @@ export default function AdminBurstPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="medium-weight"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Medium Burst Weight
                 </label>
                 <input
+                  id="medium-weight"
                   type="number"
                   value={config.rarityWeights.medium * 100}
                   onChange={(e) =>
@@ -342,10 +370,14 @@ export default function AdminBurstPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="large-weight"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Large Burst Weight
                 </label>
                 <input
+                  id="large-weight"
                   type="number"
                   value={config.rarityWeights.large * 100}
                   onChange={(e) =>

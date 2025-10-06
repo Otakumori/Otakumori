@@ -9,7 +9,42 @@ import otmPlugin from './eslint-plugin-otm/index.js';
 
 export default [
   {
-    ignores: ['.next', 'node_modules', 'dist', 'coverage', 'public', 'docs', 'comfy'],
+    ignores: [
+      // build + deps
+      'node_modules/',
+      '.next/',
+      'out/',
+      'coverage/',
+      'dist/',
+      // assets & third-party stuff
+      'public/',
+      'public/**',
+      'docs/**',
+      'comfy/**',
+      'public/games/**',
+      'public/assets/**',
+      // styles (we're not ESLinting CSS)
+      '**/*.css',
+      '**/*.scss',
+      '**/*.sass',
+      // misc
+      '*.lock',
+      '*.log',
+      '*.md',
+      '*.json',
+      '*.yaml',
+      '*.yml',
+      '*.svg',
+      '*.png',
+      '*.jpg',
+      '*.jpeg',
+      '*.gif',
+      '*.ico',
+      '*.woff',
+      '*.woff2',
+      '*.ttf',
+      '*.eot',
+    ],
   },
   {
     files: ['**/*.{js,jsx,ts,tsx}'],

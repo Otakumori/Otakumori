@@ -10,6 +10,7 @@ export async function GET() {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.log(`Admin ${admin.id} requested playlists`);
   } catch (error) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.log(`Admin ${admin.id} creating playlist`);
   } catch (error) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }

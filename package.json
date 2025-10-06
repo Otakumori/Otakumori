@@ -2,6 +2,7 @@
   "name": "otakumori",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "browser": {
     "@opentelemetry/instrumentation": false,
     "require-in-the-middle": false,

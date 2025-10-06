@@ -58,23 +58,23 @@ function AnimeToonMaterial({
 // Soft Body Physics Component
 function SoftBodyPhysics({
   enabled,
-  mass = 1.0,
-  stiffness = 0.4,
-  damping = 0.2,
+  _mass = 1.0,
+  _stiffness = 0.4,
+  _damping = 0.2,
   maxDisplacement = 0.06,
   children,
 }: {
   enabled: boolean;
-  mass?: number;
-  stiffness?: number;
-  damping?: number;
+  _mass?: number;
+  _stiffness?: number;
+  _damping?: number;
   maxDisplacement?: number;
   children: React.ReactNode;
 }) {
   const meshRef = useRef<any>(undefined);
-  const [springPositions, setSpringPositions] = useState<Vector3[]>([]);
+  const [_springPositions, _setSpringPositions] = useState<Vector3[]>([]);
 
-  useFrame((state, delta) => {
+  useFrame((state, _delta) => {
     if (!enabled || !meshRef.current) return;
 
     // Simple spring-based soft body simulation
@@ -100,22 +100,22 @@ function SoftBodyPhysics({
 // Cloth Simulation Component
 function ClothSimulation({
   enabled,
-  bendStiffness = 0.5,
-  stretchStiffness = 0.6,
-  damping = 0.2,
+  _bendStiffness = 0.5,
+  _stretchStiffness = 0.6,
+  _damping = 0.2,
   wind = 0.0,
   children,
 }: {
   enabled: boolean;
-  bendStiffness?: number;
-  stretchStiffness?: number;
-  damping?: number;
+  _bendStiffness?: number;
+  _stretchStiffness?: number;
+  _damping?: number;
   wind?: number;
   children: React.ReactNode;
 }) {
   const meshRef = useRef<any>(undefined);
 
-  useFrame((state, delta) => {
+  useFrame((state, _delta) => {
     if (!enabled || !meshRef.current) return;
 
     // Simple cloth simulation
@@ -156,17 +156,17 @@ function AvatarModel({
       {/* Soft Body Physics */}
       <SoftBodyPhysics
         enabled={physicsConfig.softBody.enable}
-        mass={physicsConfig.softBody.mass}
-        stiffness={physicsConfig.softBody.stiffness}
-        damping={physicsConfig.softBody.damping}
+        _mass={physicsConfig.softBody.mass}
+        _stiffness={physicsConfig.softBody.stiffness}
+        _damping={physicsConfig.softBody.damping}
         maxDisplacement={physicsConfig.softBody.maxDisplacement}
       >
         {/* Cloth Simulation */}
         <ClothSimulation
           enabled={physicsConfig.clothSim.enable}
-          bendStiffness={physicsConfig.clothSim.bendStiffness}
-          stretchStiffness={physicsConfig.clothSim.stretchStiffness}
-          damping={physicsConfig.clothSim.damping}
+          _bendStiffness={physicsConfig.clothSim.bendStiffness}
+          _stretchStiffness={physicsConfig.clothSim.stretchStiffness}
+          _damping={physicsConfig.clothSim.damping}
           wind={physicsConfig.clothSim.wind}
         >
           {/* Avatar Mesh */}
