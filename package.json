@@ -19,9 +19,20 @@
     },
     "onlyBuiltDependencies": [
       "@clerk/shared",
+      "@prisma/client",
+      "@prisma/engines",
+      "@sentry/cli",
+      "@tsparticles/engine",
+      "core-js",
       "esbuild",
       "msw",
+      "prisma",
+      "protobufjs",
+      "puppeteer",
       "sharp"
+    ],
+    "ignoredBuiltDependencies": [
+      "unrs-resolver"
     ]
   },
   "scripts": {

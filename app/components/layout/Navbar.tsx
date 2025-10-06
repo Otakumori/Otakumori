@@ -21,23 +21,7 @@ const FEATURED_GAMES = gamesRegistry.games
     status: game.ageRating === 'M' ? 'beta' : 'ready',
   }));
 
-const SAMPLE_PRODUCTS = [
-  {
-    id: '1',
-    name: 'Sakura Cherry Blossom T-Shirt',
-    price: 2999,
-    image: '/placeholder-product.jpg',
-  },
-  { id: '2', name: 'Anime Gaming Controller', price: 4999, image: '/placeholder-product.jpg' },
-  { id: '3', name: 'Otaku-mori Sticker Pack', price: 1499, image: '/placeholder-product.jpg' },
-  { id: '4', name: 'Mini-Games Poster Collection', price: 1999, image: '/placeholder-product.jpg' },
-];
-
-const SAMPLE_POSTS = [
-  { id: '1', title: 'Welcome to Otaku-mori: Your New Digital Haven', date: '2024-09-20' },
-  { id: '2', title: 'Mini-Games Hub: Complete Guide for Beginners', date: '2024-09-18' },
-  { id: '3', title: 'Building a Positive Community Together', date: '2024-09-15' },
-];
+// Real data will be fetched from APIs
 
 // Search suggestions with easter eggs
 const SEARCH_SUGGESTIONS = [
@@ -73,8 +57,49 @@ export default function Navbar() {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // State for real data
+  const [realProducts, setRealProducts] = useState<any[]>([]);
+  const [realBlogPosts, setRealBlogPosts] = useState<any[]>([]);
+  const [productsLoaded, setProductsLoaded] = useState(false);
+  const [blogLoaded, setBlogLoaded] = useState(false);
+
   const searchRef = useRef<HTMLDivElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real data from APIs
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/v1/printify/products?per_page=4');
+      const data = await response.json();
+      if (data.ok && data.data?.products) {
+        setRealProducts(data.data.products);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setProductsLoaded(true);
+    }
+  };
+
+  const fetchBlogPosts = async () => {
+    try {
+      const response = await fetch('/api/v1/content/blog?limit=3');
+      const data = await response.json();
+      if (data.ok && data.data?.posts) {
+        setRealBlogPosts(data.data.posts);
+      }
+    } catch (error) {
+      console.error('Failed to fetch blog posts:', error);
+    } finally {
+      setBlogLoaded(true);
+    }
+  };
+
+  // Load data when component mounts
+  useEffect(() => {
+    fetchProducts();
+    fetchBlogPosts();
+  }, []);
 
   // Handle search input
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +159,10 @@ export default function Navbar() {
   };
 
   return (
-    <header className="relative z-50 w-full bg-black/50 backdrop-blur-lg font-ui">
+    <header
+      className="relative z-50 w-full backdrop-blur-lg font-ui"
+      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}
+    >
       {/* Skip to content for accessibility */}
       <a
         href="#main-content"
@@ -144,18 +172,15 @@ export default function Navbar() {
       </a>
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
-        <Link href={paths.home()} className="flex items-center space-x-2 group">
-          <div className="relative w-8 h-8">
+        <Link href={paths.home()} className="flex items-center group py-1">
+          <div className="relative w-20 h-20">
             <Image
               src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
               fill
-              className="object-contain group-hover:scale-110 transition-transform"
+              className="object-contain"
             />
           </div>
-          <span className="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">
-            Otaku-mori
-          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -163,7 +188,8 @@ export default function Navbar() {
           {/* Home */}
           <Link
             href={paths.home()}
-            className={`text-white hover:text-pink-400 transition-colors ${
+            style={{ color: '#835D75' }}
+            className={`hover:text-pink-400 transition-colors ${
               pathname === paths.home() ? 'text-pink-400 border-b-2 border-pink-400' : ''
             }`}
           >
@@ -174,7 +200,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onMouseEnter={() => setActiveDropdown('shop')}
-              className={`text-white hover:text-pink-400 transition-colors flex items-center ${
+              style={{ color: '#835D75' }}
+              className={`hover:text-pink-400 transition-colors flex items-center ${
                 pathname.startsWith('/shop') ? 'text-pink-400 border-b-2 border-pink-400' : ''
               }`}
             >
@@ -190,27 +217,37 @@ export default function Navbar() {
             </button>
 
             {/* Shop Mega Menu */}
-            {activeDropdown === 'shop' && (
+            {activeDropdown === 'shop' && productsLoaded && realProducts.length > 0 && (
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <h3 className="text-white font-semibold mb-4">Featured Products</h3>
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  {SAMPLE_PRODUCTS.slice(0, 4).map((product) => (
+                  {realProducts.slice(0, 4).map((product) => (
                     <Link
                       key={product.id}
-                      href={`/shop/${product.id}`}
+                      href={`/shop/product/${product.id}`}
                       className="flex items-center space-x-3 p-2 rounded hover:bg-white/10 transition-colors"
                     >
-                      <div className="w-12 h-12 bg-white/10 rounded flex items-center justify-center">
-                        <span className="text-xs text-white">IMG</span>
+                      <div className="w-12 h-12 bg-white/10 rounded flex items-center justify-center overflow-hidden">
+                        {product.image ? (
+                          <Image
+                            src={product.image}
+                            alt={product.title}
+                            width={48}
+                            height={48}
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs text-white">IMG</span>
+                        )}
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium line-clamp-2">
-                          {product.name}
+                          {product.title}
                         </p>
-                        <p className="text-pink-400 text-sm">${(product.price / 100).toFixed(2)}</p>
+                        <p className="text-pink-400 text-sm">${product.price.toFixed(2)}</p>
                       </div>
                     </Link>
                   ))}
@@ -229,7 +266,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onMouseEnter={() => setActiveDropdown('games')}
-              className={`text-white hover:text-pink-400 transition-colors flex items-center ${
+              style={{ color: '#835D75' }}
+              className={`hover:text-pink-400 transition-colors flex items-center ${
                 pathname.startsWith('/mini-games') ? 'text-pink-400 border-b-2 border-pink-400' : ''
               }`}
             >
@@ -291,7 +329,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onMouseEnter={() => setActiveDropdown('blog')}
-              className={`text-white hover:text-pink-400 transition-colors flex items-center ${
+              style={{ color: '#835D75' }}
+              className={`hover:text-pink-400 transition-colors flex items-center ${
                 pathname.startsWith('/blog') ? 'text-pink-400 border-b-2 border-pink-400' : ''
               }`}
             >
@@ -307,21 +346,27 @@ export default function Navbar() {
             </button>
 
             {/* Blog Mega Menu */}
-            {activeDropdown === 'blog' && (
+            {activeDropdown === 'blog' && blogLoaded && realBlogPosts.length > 0 && (
               <div
                 className="absolute top-full left-0 mt-2 w-80 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <h3 className="text-white font-semibold mb-4">Latest Posts</h3>
                 <div className="space-y-3 mb-4">
-                  {SAMPLE_POSTS.map((post) => (
+                  {realBlogPosts.slice(0, 3).map((post) => (
                     <Link
                       key={post.id}
-                      href={`/blog/${post.id}`}
+                      href={`/blog/${post.slug}`}
                       className="block p-2 rounded hover:bg-white/10 transition-colors"
                     >
                       <p className="text-white text-sm font-medium line-clamp-2">{post.title}</p>
-                      <p className="text-gray-400 text-xs mt-1">{post.date}</p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
                     </Link>
                   ))}
                 </div>
@@ -338,7 +383,8 @@ export default function Navbar() {
           {/* About */}
           <Link
             href="/about"
-            className={`text-white hover:text-pink-400 transition-colors ${
+            style={{ color: '#835D75' }}
+            className={`hover:text-pink-400 transition-colors ${
               pathname === '/about' ? 'text-pink-400 border-b-2 border-pink-400' : ''
             }`}
           >
@@ -405,7 +451,10 @@ export default function Navbar() {
             />
           ) : (
             <SignInButton mode="modal">
-              <button className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-300">
+              <button
+                style={{ color: '#835D75' }}
+                className="px-4 py-2 bg-transparent border border-current rounded-lg hover:text-pink-400 hover:border-pink-400 transition-all duration-300"
+              >
                 Sign In
               </button>
             </SignInButton>

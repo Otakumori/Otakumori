@@ -19,41 +19,52 @@ interface GamesData {
 }
 
 export default async function MiniGamesSection() {
-  // Try games API first, then fallback endpoints
-  const gamesResult = await safeFetch<GamesData>('/api/v1/games', { allowLive: true });
-
   let games: Game[] = [];
   let isBlockedData = true;
 
-  if (isSuccess(gamesResult)) {
-    games = gamesResult.data?.games || [];
-    isBlockedData = false;
-  } else {
-    // Fallback to other endpoints
-    const endpoints = ['/api/games', '/api/mini-games', '/api/games/featured'];
+  try {
+    // Try games API first, then fallback endpoints
+    const gamesResult = await safeFetch<GamesData>('/api/v1/games', { allowLive: true });
 
-    for (const endpoint of endpoints) {
-      const result = await safeFetch<GamesData>(endpoint, { allowLive: true });
+    if (isSuccess(gamesResult)) {
+      games = gamesResult.data?.games || [];
+      isBlockedData = false;
+    } else {
+      // Fallback to other endpoints
+      const endpoints = ['/api/games', '/api/mini-games', '/api/games/featured'];
 
-      if (isSuccess(result)) {
-        games = result.data?.games || result.data?.data || [];
-        isBlockedData = false;
-        break;
+      for (const endpoint of endpoints) {
+        const result = await safeFetch<GamesData>(endpoint, { allowLive: true });
+
+        if (isSuccess(result)) {
+          games = result.data?.games || result.data?.data || [];
+          isBlockedData = false;
+          break;
+        }
       }
     }
+  } catch (error) {
+    // Fallback to empty games if API calls fail during SSR
+    console.warn('MiniGamesSection: API calls failed during SSR:', error);
+    games = [];
+    isBlockedData = true;
   }
 
   // If all endpoints are blocked, show CTA
   if (isBlockedData) {
     return (
-      <div className="space-y-6">
+      <div className="rounded-2xl p-8">
         <header className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-primary">Mini-Games</h2>
-          <p className="text-secondary mt-2">Play fun anime-inspired games and earn rewards</p>
+          <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
+            Mini-Games
+          </h2>
+          <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
+            Play fun anime-inspired games and earn rewards
+          </p>
         </header>
 
         <div className="text-center py-12">
-          <div className="glass-card p-8 max-w-md mx-auto">
+          <div className="p-8 max-w-md mx-auto">
             <h3 className="text-xl font-semibold text-primary mb-4">Games Coming Soon</h3>
             <p className="text-secondary mb-6">
               We're preparing exciting mini-games for you. Stay tuned!
@@ -71,17 +82,21 @@ export default async function MiniGamesSection() {
   const enabledGames = games.filter((game) => game.enabled !== false).slice(0, 6);
 
   return (
-    <div className="space-y-6">
+    <div className="rounded-2xl p-8">
       <header className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-primary">Mini-Games</h2>
-        <p className="text-secondary mt-2">Play fun anime-inspired games and earn rewards</p>
+        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
+          Mini-Games
+        </h2>
+        <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
+          Play fun anime-inspired games and earn rewards
+        </p>
       </header>
 
       {enabledGames.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {enabledGames.map((game) => (
             <Link key={game.id} href={paths.game(game.slug)} className="group block">
-              <div className="glass-card overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up">
+              <div className="overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up">
                 <div className="aspect-video relative overflow-hidden">
                   <Image
                     src={game.image || '/assets/placeholder-game.jpg'}
@@ -113,7 +128,7 @@ export default async function MiniGamesSection() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="glass-card p-8 max-w-md mx-auto">
+          <div className="p-8 max-w-md mx-auto">
             <h3 className="text-xl font-semibold text-primary mb-4">No Games Available</h3>
             <p className="text-secondary mb-6">
               We're working on adding new games. Check back soon!

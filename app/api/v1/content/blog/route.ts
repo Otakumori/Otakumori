@@ -19,13 +19,14 @@ const QuerySchema = z.object({
 const mockBlogPosts = [
   {
     id: '1',
-    title: 'Welcome to Otaku-mori: A Journey Begins',
-    slug: 'welcome-to-otaku-mori',
+    title: 'Welcome Home, Traveler — The Otaku-mori Journey',
+    slug: 'welcome-home-traveler',
     excerpt:
-      'Discover the magic of our anime-inspired community hub where gaming meets creativity.',
-    content: 'Full blog post content here...',
+      'Where anime meets gaming, petals fall like memories, and every click echoes with nostalgia. Your sanctuary awaits.',
+    content:
+      'Welcome to Otaku-mori, where the boundaries between anime, gaming, and community blur into something magical. We built this space for those who understand that collecting petals is more than just a mechanic — it is a way to preserve moments, memories, and connections.',
     image: '/assets/blog/welcome.jpg',
-    publishedAt: '2024-01-15T10:00:00Z',
+    publishedAt: new Date().toISOString(),
     author: {
       name: 'Otaku-mori Team',
       avatar: '/assets/avatars/team.jpg',
@@ -34,33 +35,35 @@ const mockBlogPosts = [
   },
   {
     id: '2',
-    title: 'The Art of Petal Collection: A Guide',
-    slug: 'petal-collection-guide',
+    title: 'Petals, Runes, and the Currency of Memory',
+    slug: 'petals-runes-currency',
     excerpt:
-      'Learn the secrets of collecting petals and maximizing your rewards in our mini-games.',
-    content: 'Full blog post content here...',
-    image: '/assets/blog/petals.jpg',
-    publishedAt: '2024-01-10T14:30:00Z',
+      'Every petal collected is a moment preserved. Learn how our reward system channels the spirit of classic gaming.',
+    content:
+      'In the world of Otaku-mori, petals are not just points — they are fragments of experience. Each one represents a moment of skill, a brushstroke of attention, a beat perfectly timed. Our rune system builds on this foundation, allowing you to transform these ephemeral moments into lasting power.',
+    image: '/assets/blog/petals-system.jpg',
+    publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     author: {
-      name: 'Game Master',
-      avatar: '/assets/avatars/gamemaster.jpg',
+      name: 'The Curator',
+      avatar: '/assets/avatars/curator.jpg',
     },
-    tags: ['guide', 'gaming', 'tips'],
+    tags: ['game-mechanics', 'petals', 'rewards'],
   },
   {
     id: '3',
-    title: 'Community Spotlight: Featured Artists',
-    slug: 'community-spotlight-artists',
+    title: 'Dark Souls Meets Cherry Blossoms: Our Design Philosophy',
+    slug: 'design-philosophy',
     excerpt:
-      'Meet the talented artists who bring Otaku-mori to life with their incredible designs.',
-    content: 'Full blog post content here...',
-    image: '/assets/blog/artists.jpg',
-    publishedAt: '2024-01-05T09:15:00Z',
+      'How we blend the brutality of Souls-like messaging with the delicate beauty of anime aesthetics.',
+    content:
+      'Our design philosophy embraces contradiction: the harsh world of Dark Souls soapstone messages paired with the gentle fall of cherry blossoms. We believe in respecting the player intelligence while creating moments of wonder. Every interface element, every sound effect, every animation is crafted to evoke both nostalgia and discovery.',
+    image: '/assets/blog/design.jpg',
+    publishedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
     author: {
-      name: 'Community Manager',
-      avatar: '/assets/avatars/community.jpg',
+      name: 'The Architect',
+      avatar: '/assets/avatars/architect.jpg',
     },
-    tags: ['community', 'artists', 'spotlight'],
+    tags: ['design', 'philosophy', 'community'],
   },
 ];
 

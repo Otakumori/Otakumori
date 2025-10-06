@@ -22,39 +22,56 @@ interface ShopData {
 }
 
 export default async function ShopSection() {
-  // Try featured products API first, then fallback
-  const featuredResult = await safeFetch<ShopData>('/api/v1/products/featured', {
-    allowLive: true,
-  });
+  let products: Product[] = [];
+  let isBlockedData = false;
 
-  const fallbackResult = await safeFetch<{ products: Product[] }>('/api/products?limit=12', {
-    allowLive: true,
-  });
+  try {
+    // Try featured products API first, then fallback
+    const featuredResult = await safeFetch<ShopData>('/api/v1/products/featured', {
+      allowLive: true,
+    });
 
-  const data = isSuccess(featuredResult)
-    ? featuredResult.data
-    : isSuccess(fallbackResult)
-      ? fallbackResult.data
-      : null;
+    const fallbackResult = await safeFetch<{ products: Product[] }>('/api/products?limit=12', {
+      allowLive: true,
+    });
 
-  const products = data?.products || [];
-  const isBlockedData = isBlocked(featuredResult) && isBlocked(fallbackResult);
+    const data = isSuccess(featuredResult)
+      ? featuredResult.data
+      : isSuccess(fallbackResult)
+        ? fallbackResult.data
+        : null;
+
+    products = data?.products || [];
+    isBlockedData = isBlocked(featuredResult) && isBlocked(fallbackResult);
+  } catch (error) {
+    // Fallback to empty products if API calls fail during SSR
+    console.warn('ShopSection: API calls failed during SSR:', error);
+    products = [];
+    isBlockedData = true;
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="rounded-2xl p-8">
       <header className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-pink-200">Shop</h2>
-        <p className="text-pink-200/70 mt-2">Discover unique anime-inspired merchandise</p>
+        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
+          Shop
+        </h2>
+        <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
+          Discover unique anime-inspired merchandise
+        </p>
       </header>
 
       {isBlockedData ? (
         <div className="text-center py-12">
-          <div className="glass-card p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-primary mb-4">Shop Coming Soon</h3>
-            <p className="text-secondary mb-6">
+          <div className="p-8 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-white mb-4">Shop Coming Soon</h3>
+            <p className="text-gray-300 mb-6">
               We're preparing something special for you. Check back soon!
             </p>
-            <Link href={paths.shop()} className="btn-primary inline-block">
+            <Link
+              href={paths.shop()}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+            >
               Explore Shop
             </Link>
           </div>
@@ -63,7 +80,7 @@ export default async function ShopSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.slice(0, 6).map((product) => (
             <Link key={product.id} href={paths.product(product.id)} className="group block">
-              <div className="glass-card overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
                 <div className="aspect-square relative overflow-hidden">
                   <Image
                     src={product.image || '/assets/placeholder-product.jpg'}
@@ -74,16 +91,14 @@ export default async function ShopSection() {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-primary group-hover:text-accent-pink transition-colors">
+                  <h3 className="font-semibold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
                     {product.title}
                   </h3>
                   {product.description && (
-                    <p className="text-secondary text-sm mt-1 line-clamp-2">
-                      {product.description}
-                    </p>
+                    <p className="text-gray-300 text-sm mt-1 line-clamp-2">{product.description}</p>
                   )}
                   <div className="flex items-center justify-between mt-3">
-                    <span className="text-lg font-bold text-accent-pink">
+                    <span className="text-lg font-bold text-pink-400">
                       ${product.price.toFixed(2)}
                     </span>
                     <span
@@ -103,12 +118,15 @@ export default async function ShopSection() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="glass-card p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-primary mb-4">No Products Available</h3>
-            <p className="text-secondary mb-6">
+          <div className="p-8 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-white mb-4">No Products Available</h3>
+            <p className="text-gray-300 mb-6">
               We're working on adding new products. Check back soon!
             </p>
-            <Link href={paths.shop()} className="btn-primary inline-block">
+            <Link
+              href={paths.shop()}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+            >
               Explore Shop
             </Link>
           </div>
@@ -117,7 +135,10 @@ export default async function ShopSection() {
 
       {products.length > 0 && (
         <div className="text-center mt-8">
-          <Link href={paths.shop()} className="btn-secondary inline-block">
+          <Link
+            href={paths.shop()}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+          >
             View All Products
           </Link>
         </div>

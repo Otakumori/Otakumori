@@ -10,7 +10,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
-import Navbar from './components/layout/Navbar';
 import QuakeHUD from './components/hud/QuakeHUD';
 import GlobalBackground from './components/GlobalBackground';
 import PostHogProvider from './providers/PostHogProvider.safe';
@@ -29,8 +28,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               <GlobalMusicProvider>
                 {/* Site-wide background (fixed, behind everything) */}
                 {showTree && <GlobalBackground />}
-                {/* Navigation */}
-                <Navbar />
                 {children}
                 <GlobalMusicBar />
                 <SoapstoneDock />

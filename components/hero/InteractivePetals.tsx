@@ -67,7 +67,7 @@ export default function InteractivePetals({
       className={`absolute inset-0 overflow-hidden pointer-events-auto ${className}`}
       aria-hidden="true"
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-300/10 to-transparent animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-pink-300/10 to-transparent" />
     </div>
   );
 }

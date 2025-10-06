@@ -42,7 +42,7 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
   const isLiveDataEnabled = env.NEXT_PUBLIC_LIVE_DATA === '1';
 
   return (
-    <footer className="relative z-40 mt-16">
+    <footer className="relative z-40 mt-16" style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         {/* Soapstones Section */}
         {showSoapstones && (

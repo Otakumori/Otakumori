@@ -24,39 +24,56 @@ interface BlogData {
 }
 
 export default async function BlogSection() {
-  // Try blog content API first, then fallback
-  const blogResult = await safeFetch<BlogData>('/api/v1/content/blog?limit=3', {
-    allowLive: true,
-  });
+  let posts: BlogPost[] = [];
+  let isBlockedData = true;
 
-  const postsResult = await safeFetch<BlogData>('/api/blog/posts?limit=3', {
-    allowLive: true,
-  });
+  try {
+    // Try blog content API first, then fallback
+    const blogResult = await safeFetch<BlogData>('/api/v1/content/blog?limit=3', {
+      allowLive: true,
+    });
 
-  const data = isSuccess(blogResult)
-    ? blogResult.data
-    : isSuccess(postsResult)
-      ? postsResult.data
-      : null;
+    const postsResult = await safeFetch<BlogData>('/api/blog/posts?limit=3', {
+      allowLive: true,
+    });
 
-  const posts = data?.posts || data?.data || [];
-  const isBlockedData = isBlocked(blogResult) && isBlocked(postsResult);
+    const data = isSuccess(blogResult)
+      ? blogResult.data
+      : isSuccess(postsResult)
+        ? postsResult.data
+        : null;
+
+    posts = data?.posts || data?.data || [];
+    isBlockedData = isBlocked(blogResult) && isBlocked(postsResult);
+  } catch (error) {
+    // Fallback to empty posts if API calls fail during SSR
+    console.warn('BlogSection: API calls failed during SSR:', error);
+    posts = [];
+    isBlockedData = true;
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="rounded-2xl p-8">
       <header className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-pink-200">Blog</h2>
-        <p className="text-pink-200/70 mt-2">Latest news, updates, and anime culture insights</p>
+        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
+          Blog
+        </h2>
+        <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
+          Latest news, updates, and anime culture insights
+        </p>
       </header>
 
       {isBlockedData ? (
         <div className="text-center py-12">
-          <div className="glass-card p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-primary mb-4">Blog Coming Soon</h3>
-            <p className="text-secondary mb-6">
+          <div className="p-8 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-white mb-4">Blog Coming Soon</h3>
+            <p className="text-gray-300 mb-6">
               We're preparing engaging content for you. Stay tuned!
             </p>
-            <Link href={paths.blogIndex()} className="btn-primary inline-block">
+            <Link
+              href={paths.blogIndex()}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+            >
               Explore Blog
             </Link>
           </div>
@@ -65,7 +82,7 @@ export default async function BlogSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.slice(0, 3).map((post) => (
             <Link key={post.id} href={paths.blogPost(post.slug)} className="group block">
-              <div className="glass-card overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
                 {post.image && (
                   <div className="aspect-video relative overflow-hidden">
                     <Image
@@ -79,13 +96,13 @@ export default async function BlogSection() {
                   </div>
                 )}
                 <div className="p-6">
-                  <h3 className="font-semibold text-primary group-hover:text-accent-pink transition-colors mb-3">
+                  <h3 className="font-semibold text-white group-hover:text-pink-400 transition-colors mb-3">
                     {post.title}
                   </h3>
                   {post.excerpt && (
-                    <p className="text-secondary text-sm line-clamp-3 mb-4">{post.excerpt}</p>
+                    <p className="text-gray-300 text-sm line-clamp-3 mb-4">{post.excerpt}</p>
                   )}
-                  <div className="flex items-center justify-between text-xs text-muted">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
                     <span>
                       {new Date(post.publishedAt).toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -100,7 +117,7 @@ export default async function BlogSection() {
                       {post.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="text-xs text-accent-pink/70 bg-accent-pink/20 px-2 py-1 rounded-full"
+                          className="text-xs text-pink-400 bg-pink-400/20 px-2 py-1 rounded-full"
                         >
                           {tag}
                         </span>
@@ -114,12 +131,15 @@ export default async function BlogSection() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <div className="glass-card p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-primary mb-4">No Posts Available</h3>
-            <p className="text-secondary mb-6">
+          <div className="p-8 max-w-md mx-auto">
+            <h3 className="text-xl font-semibold text-white mb-4">No Posts Available</h3>
+            <p className="text-gray-300 mb-6">
               We're working on creating amazing content. Check back soon!
             </p>
-            <Link href={paths.blogIndex()} className="btn-primary inline-block">
+            <Link
+              href={paths.blogIndex()}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+            >
               Explore Blog
             </Link>
           </div>
@@ -128,7 +148,10 @@ export default async function BlogSection() {
 
       {posts.length > 0 && (
         <div className="text-center mt-8">
-          <Link href={paths.blogIndex()} className="btn-secondary inline-block">
+          <Link
+            href={paths.blogIndex()}
+            className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+          >
             View All Posts
           </Link>
         </div>
