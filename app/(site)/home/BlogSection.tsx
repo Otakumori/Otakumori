@@ -72,7 +72,7 @@ export default async function BlogSection() {
             </p>
             <Link
               href={paths.blogIndex()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
             >
               Explore Blog
             </Link>
@@ -82,7 +82,7 @@ export default async function BlogSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.slice(0, 3).map((post) => (
             <Link key={post.id} href={paths.blogPost(post.slug)} className="group block">
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(255,160,200,0.18)]">
                 {post.image && (
                   <div className="aspect-video relative overflow-hidden">
                     <Image
@@ -138,7 +138,7 @@ export default async function BlogSection() {
             </p>
             <Link
               href={paths.blogIndex()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
             >
               Explore Blog
             </Link>

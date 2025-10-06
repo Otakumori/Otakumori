@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useGust } from './fx/useGust';
 
 interface Petal {
   id: string;
@@ -33,6 +34,7 @@ export default function PetalLayer({
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const animationRef = useRef<number | undefined>(undefined);
   const lastSpawnTime = useRef<number>(0);
+  const gust = useGust();
 
   const intensityMultipliers = {
     low: { count: 0.5, speed: 0.7, spawnRate: 0.3 },
@@ -170,7 +172,7 @@ export default function PetalLayer({
               transform: `rotate(${petal.rotation}deg) scale(${petal.scale})`,
               opacity: petal.opacity,
               animation: isVisible
-                ? `petal-fall ${petal.animationDuration}s linear infinite`
+                ? `petal-fall ${petal.animationDuration / gust}s linear infinite`
                 : 'none',
               animationDelay: `${petal.delay}s`,
               willChange: isVisible ? 'transform, opacity' : 'auto',

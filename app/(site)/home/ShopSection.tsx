@@ -70,7 +70,7 @@ export default async function ShopSection() {
             </p>
             <Link
               href={paths.shop()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
             >
               Explore Shop
             </Link>
@@ -80,7 +80,7 @@ export default async function ShopSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.slice(0, 6).map((product) => (
             <Link key={product.id} href={paths.product(product.id)} className="group block">
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(255,160,200,0.18)]">
                 <div className="aspect-square relative overflow-hidden">
                   <Image
                     src={product.image || '/assets/placeholder-product.jpg'}
@@ -125,7 +125,7 @@ export default async function ShopSection() {
             </p>
             <Link
               href={paths.shop()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
             >
               Explore Shop
             </Link>

@@ -1486,3 +1486,31 @@ textarea,
     opacity: 0;
   }
 }
+
+/* Vignette overlay (toggle via .vignette on page root) */
+.vignette::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5; /* above bg, below UI */
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    rgba(0, 0, 0, 0.22) 75%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+/* One-shot glow pulse for CTAs */
+@keyframes shimmerPulse {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 160, 200, 0);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(255, 160, 200, 0.28);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 160, 200, 0);
+  }
+}
