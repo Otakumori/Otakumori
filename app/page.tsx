@@ -1,6 +1,6 @@
 // app/page.tsx
 import { Suspense } from 'react';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 
 // Server components - conditionally imported based on feature flags
 import ShopSection from '@/app/(site)/home/ShopSection';
@@ -64,27 +64,11 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* SPACER - breathing room for visible petals before content */}
-      {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
-        <section aria-hidden className="relative z-40 h-[28vh] sm:h-[24vh] lg:h-[32vh]">
-          <InteractivePetals variant="spacer" />
-        </section>
-      )}
-
       {/* SHOP */}
       {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
         <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading products…</div>}>
+          <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
             <ShopSection />
-          </Suspense>
-        </section>
-      )}
-
-      {/* MINI-GAMES */}
-      {NEXT_PUBLIC_FEATURE_MINIGAMES === 'on' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
-            <MiniGamesSection />
           </Suspense>
         </section>
       )}
@@ -92,14 +76,23 @@ export default async function HomePage() {
       {/* BLOG */}
       {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
         <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading posts…</div>}>
+          <Suspense fallback={<div className="text-pink-200/70">Loading blog…</div>}>
             <BlogSection />
           </Suspense>
         </section>
       )}
 
-      {/* FOOTER with Soapstones */}
-      <FooterSection showSoapstones={NEXT_PUBLIC_FEATURE_SOAPSTONES === '1'} />
+      {/* MINI-GAMES */}
+      {NEXT_PUBLIC_FEATURE_MINIGAMES === '1' && (
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
+            <MiniGamesSection />
+          </Suspense>
+        </section>
+      )}
+
+      {/* FOOTER */}
+      <FooterSection />
     </main>
   );
 }
