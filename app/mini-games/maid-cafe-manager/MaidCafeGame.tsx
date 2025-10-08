@@ -48,7 +48,7 @@ export default function MaidCafeGame() {
   const [money, setMoney] = useState(50);
   const [level, setLevel] = useState(1);
   const [gameTime, setGameTime] = useState(0);
-  const [gameSpeed, setGameSpeed] = useState(1);
+  const [_gameSpeed, _setGameSpeed] = useState(1);
 
   // Game objects
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -59,10 +59,10 @@ export default function MaidCafeGame() {
   // Player state
   const [playerX, setPlayerX] = useState(400);
   const [playerY, setPlayerY] = useState(300);
-  const [isMoving, setIsMoving] = useState(false);
+  const [isMoving, _setIsMoving] = useState(false);
 
   // Game timing
-  const [customerSpawnTimer, setCustomerSpawnTimer] = useState(0);
+  const [_customerSpawnTimer, _setCustomerSpawnTimer] = useState(0);
   const [nextCustomerId, setNextCustomerId] = useState(1);
 
   const { saveOnExit, autoSave } = useGameSave('maid-cafe-manager');
@@ -113,18 +113,20 @@ export default function MaidCafeGame() {
     setNextCustomerId(1);
     setPlayerX(400);
     setPlayerY(300);
-    
+
     // Reset tables
-    setTables(prev => prev.map(table => ({ 
-      ...table, 
-      occupied: false, 
-      needsCleaning: false 
-    })));
+    setTables((prev) =>
+      prev.map((table) => ({
+        ...table,
+        occupied: false,
+        needsCleaning: false,
+      })),
+    );
   }, []);
 
   // Spawn customer
   const spawnCustomer = useCallback(() => {
-    const availableTable = tables.find(table => !table.occupied && !table.needsCleaning);
+    const availableTable = tables.find((table) => !table.occupied && !table.needsCleaning);
     if (!availableTable) return;
 
     const randomItem = menuItems[Math.floor(Math.random() * Math.min(menuItems.length, 2 + level))];
@@ -142,11 +144,11 @@ export default function MaidCafeGame() {
       tips: Math.floor(randomItem.price * 0.2) + Math.floor(Math.random() * 5),
     };
 
-    setCustomers(prev => [...prev, newCustomer]);
-    setTables(prev => prev.map(table => 
-      table.id === availableTable.id ? { ...table, occupied: true } : table
-    ));
-    setNextCustomerId(prev => prev + 1);
+    setCustomers((prev) => [...prev, newCustomer]);
+    setTables((prev) =>
+      prev.map((table) => (table.id === availableTable.id ? { ...table, occupied: true } : table)),
+    );
+    setNextCustomerId((prev) => prev + 1);
   }, [tables, nextCustomerId, gameTime, level]);
 
   // Game loop
@@ -155,10 +157,10 @@ export default function MaidCafeGame() {
 
     const gameLoop = setInterval(() => {
       const deltaTime = 100;
-      setGameTime(prev => prev + deltaTime);
+      setGameTime((prev) => prev + deltaTime);
 
       // Update customer spawn timer
-      setCustomerSpawnTimer(prev => {
+      setCustomerSpawnTimer((prev) => {
         const spawnRate = Math.max(3000, 8000 - level * 500); // Faster spawning each level
         if (prev <= 0) {
           spawnCustomer();
@@ -168,35 +170,40 @@ export default function MaidCafeGame() {
       });
 
       // Update customer patience
-      setCustomers(prev => prev.map(customer => {
-        const newPatience = customer.patience - deltaTime;
-        if (newPatience <= 0 && customer.status !== 'leaving') {
-          // Customer leaves angry
-          setScore(s => Math.max(0, s - 50));
-          setTables(tables => tables.map(table => 
-            table.id === customer.tableId 
-              ? { ...table, occupied: false, needsCleaning: true }
-              : table
-          ));
-          return { ...customer, status: 'leaving' as const, patience: 0 };
-        }
-        return { ...customer, patience: newPatience };
-      }));
+      setCustomers((prev) =>
+        prev.map((customer) => {
+          const newPatience = customer.patience - deltaTime;
+          if (newPatience <= 0 && customer.status !== 'leaving') {
+            // Customer leaves angry
+            setScore((s) => Math.max(0, s - 50));
+            setTables((tables) =>
+              tables.map((table) =>
+                table.id === customer.tableId
+                  ? { ...table, occupied: false, needsCleaning: true }
+                  : table,
+              ),
+            );
+            return { ...customer, status: 'leaving' as const, patience: 0 };
+          }
+          return { ...customer, patience: newPatience };
+        }),
+      );
 
       // Update orders
-      setOrders(prev => prev.map(order => {
-        if (order.status === 'preparing' && gameTime >= order.readyTime) {
-          return { ...order, status: 'ready' };
-        }
-        return order;
-      }));
+      setOrders((prev) =>
+        prev.map((order) => {
+          if (order.status === 'preparing' && gameTime >= order.readyTime) {
+            return { ...order, status: 'ready' };
+          }
+          return order;
+        }),
+      );
 
       // Check level progression
       if (score >= level * 500) {
-        setLevel(l => l + 1);
-        setGameSpeed(s => Math.min(2, s + 0.1));
+        setLevel((l) => l + 1);
+        setGameSpeed((s) => Math.min(2, s + 0.1));
       }
-
     }, 100);
 
     return () => clearInterval(gameLoop);
@@ -215,74 +222,84 @@ export default function MaidCafeGame() {
   }, [score, level, money, gameTime, selectedAvatar, autoSave, gameState]);
 
   // Player actions
-  const takeOrder = useCallback((customerId: number) => {
-    const customer = customers.find(c => c.id === customerId);
-    if (!customer || customer.status !== 'waiting') return;
+  const takeOrder = useCallback(
+    (customerId: number) => {
+      const customer = customers.find((c) => c.id === customerId);
+      if (!customer || customer.status !== 'waiting') return;
 
-    const newOrder: Order = {
-      id: Date.now(),
-      customerId,
-      item: customer.order,
-      status: 'preparing',
-      startTime: gameTime,
-      readyTime: gameTime + (customer.order.prepTime * 1000),
-    };
+      const newOrder: Order = {
+        id: Date.now(),
+        customerId,
+        item: customer.order,
+        status: 'preparing',
+        startTime: gameTime,
+        readyTime: gameTime + customer.order.prepTime * 1000,
+      };
 
-    setOrders(prev => [...prev, newOrder]);
-    setCustomers(prev => prev.map(c => 
-      c.id === customerId ? { ...c, status: 'ordering', orderTime: gameTime } : c
-    ));
-  }, [customers, gameTime]);
+      setOrders((prev) => [...prev, newOrder]);
+      setCustomers((prev) =>
+        prev.map((c) =>
+          c.id === customerId ? { ...c, status: 'ordering', orderTime: gameTime } : c,
+        ),
+      );
+    },
+    [customers, gameTime],
+  );
 
-  const serveOrder = useCallback((orderId: number) => {
-    const order = orders.find(o => o.id === orderId);
-    if (!order || order.status !== 'ready') return;
+  const serveOrder = useCallback(
+    (orderId: number) => {
+      const order = orders.find((o) => o.id === orderId);
+      if (!order || order.status !== 'ready') return;
 
-    const customer = customers.find(c => c.id === order.customerId);
-    if (!customer) return;
+      const customer = customers.find((c) => c.id === order.customerId);
+      if (!customer) return;
 
-    // Calculate tips based on speed
-    const serviceTime = gameTime - customer.arrivalTime;
-    const speedBonus = Math.max(0, customer.maxPatience - serviceTime) / customer.maxPatience;
-    const finalTips = Math.floor(customer.tips * (0.5 + speedBonus * 0.5));
+      // Calculate tips based on speed
+      const serviceTime = gameTime - customer.arrivalTime;
+      const speedBonus = Math.max(0, customer.maxPatience - serviceTime) / customer.maxPatience;
+      const finalTips = Math.floor(customer.tips * (0.5 + speedBonus * 0.5));
 
-    setMoney(prev => prev + order.item.price + finalTips);
-    setScore(prev => prev + order.item.price + finalTips);
+      setMoney((prev) => prev + order.item.price + finalTips);
+      setScore((prev) => prev + order.item.price + finalTips);
 
-    setOrders(prev => prev.map(o => 
-      o.id === orderId ? { ...o, status: 'served' } : o
-    ));
-    
-    setCustomers(prev => prev.map(c => 
-      c.id === customer.id ? { ...c, status: 'eating', serveTime: gameTime } : c
-    ));
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: 'served' } : o)));
 
-    // Customer leaves after eating
-    setTimeout(() => {
-      setCustomers(prev => prev.filter(c => c.id !== customer.id));
-      setOrders(prev => prev.filter(o => o.customerId !== customer.id));
-      setTables(prev => prev.map(table => 
-        table.id === customer.tableId 
-          ? { ...table, occupied: false, needsCleaning: true }
-          : table
-      ));
-    }, 3000);
-  }, [orders, customers, gameTime]);
+      setCustomers((prev) =>
+        prev.map((c) =>
+          c.id === customer.id ? { ...c, status: 'eating', serveTime: gameTime } : c,
+        ),
+      );
+
+      // Customer leaves after eating
+      setTimeout(() => {
+        setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
+        setOrders((prev) => prev.filter((o) => o.customerId !== customer.id));
+        setTables((prev) =>
+          prev.map((table) =>
+            table.id === customer.tableId
+              ? { ...table, occupied: false, needsCleaning: true }
+              : table,
+          ),
+        );
+      }, 3000);
+    },
+    [orders, customers, gameTime],
+  );
 
   const cleanTable = useCallback((tableId: number) => {
-    setTables(prev => prev.map(table => 
-      table.id === tableId ? { ...table, needsCleaning: false } : table
-    ));
-    setScore(prev => prev + 10); // Small bonus for cleaning
+    setTables((prev) =>
+      prev.map((table) => (table.id === tableId ? { ...table, needsCleaning: false } : table)),
+    );
+    setScore((prev) => prev + 10); // Small bonus for cleaning
   }, []);
 
   // Remove leaving customers
   useEffect(() => {
-    const leavingCustomers = customers.filter(c => c.status === 'leaving');
-    leavingCustomers.forEach(customer => {
+    const leavingCustomers = customers.filter((c) => c.status === 'leaving');
+    leavingCustomers.forEach((customer) => {
       setTimeout(() => {
-        setCustomers(prev => prev.filter(c => c.id !== customer.id));
-        setOrders(prev => prev.filter(o => o.customerId !== customer.id));
+        setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
+        setOrders((prev) => prev.filter((o) => o.customerId !== customer.id));
       }, 1000);
     });
   }, [customers]);
@@ -317,9 +334,7 @@ export default function MaidCafeGame() {
         <div className="text-center text-white max-w-md">
           <div className="text-6xl mb-6"></div>
           <h2 className="text-3xl font-bold mb-4">Maid Café Manager</h2>
-          <p className="text-gray-300 mb-8">
-            Manage shifts and keep guests smiling.
-          </p>
+          <p className="text-gray-300 mb-8">Manage shifts and keep guests smiling.</p>
 
           {/* Avatar Selection */}
           <div className="mb-6">
@@ -435,18 +450,24 @@ export default function MaidCafeGame() {
         <div className="absolute top-24 right-4 bg-gray-800 text-white p-4 rounded-xl w-64">
           <h3 className="font-bold mb-2">Kitchen Orders</h3>
           <div className="space-y-2 max-h-40 overflow-y-auto">
-            {orders.map(order => (
+            {orders.map((order) => (
               <div
                 key={order.id}
                 className={`p-2 rounded cursor-pointer transition-colors ${
-                  order.status === 'ready' 
-                    ? 'bg-green-600 hover:bg-green-700' 
-                    : 'bg-yellow-600'
+                  order.status === 'ready' ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600'
                 }`}
                 onClick={() => order.status === 'ready' && serveOrder(order.id)}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' && order.status === 'ready' && serveOrder(order.id)
+                }
+                role="button"
+                tabIndex={0}
+                aria-label={`Serve order ${order.id}`}
               >
                 <div className="flex items-center justify-between">
-                  <span>{order.item.emoji} {order.item.name}</span>
+                  <span>
+                    {order.item.emoji} {order.item.name}
+                  </span>
                   <span className="text-xs">
                     {order.status === 'ready' ? ' Ready!' : '⏱️ Cooking...'}
                   </span>
@@ -457,62 +478,79 @@ export default function MaidCafeGame() {
         </div>
 
         {/* Tables */}
-        {tables.map(table => (
+        {tables.map((table) => (
           <div
             key={table.id}
             className={`absolute w-16 h-16 rounded-lg border-2 flex items-center justify-center text-2xl cursor-pointer transition-all ${
-              table.needsCleaning 
+              table.needsCleaning
                 ? 'bg-red-200 border-red-400 hover:bg-red-300'
                 : table.occupied
-                ? 'bg-blue-200 border-blue-400'
-                : 'bg-green-200 border-green-400'
+                  ? 'bg-blue-200 border-blue-400'
+                  : 'bg-green-200 border-green-400'
             }`}
             style={{ left: table.x, top: table.y }}
             onClick={() => table.needsCleaning && cleanTable(table.id)}
+            onKeyDown={(e) => e.key === 'Enter' && table.needsCleaning && cleanTable(table.id)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Clean table ${table.id}`}
           >
             {table.needsCleaning ? '' : table.occupied ? '' : ''}
           </div>
         ))}
 
         {/* Customers */}
-        {customers.map(customer => {
-          const table = tables.find(t => t.id === customer.tableId);
+        {customers.map((customer) => {
+          const table = tables.find((t) => t.id === customer.tableId);
           if (!table) return null;
-          
+
           return (
             <div
               key={customer.id}
               className="absolute cursor-pointer transition-all hover:scale-110"
-              style={{ 
-                left: table.x - 10, 
+              style={{
+                left: table.x - 10,
                 top: table.y - 30,
                 opacity: customer.status === 'leaving' ? 0.5 : 1,
               }}
               onClick={() => customer.status === 'waiting' && takeOrder(customer.id)}
+              onKeyDown={(e) =>
+                e.key === 'Enter' && customer.status === 'waiting' && takeOrder(customer.id)
+              }
+              role="button"
+              tabIndex={0}
+              aria-label={`Take order from customer ${customer.id}`}
             >
               {/* Customer */}
               <div className="text-2xl mb-1">
-                {customer.status === 'waiting' ? '‍️' : 
-                 customer.status === 'ordering' ? '' :
-                 customer.status === 'eating' ? '' : ''}
+                {customer.status === 'waiting'
+                  ? '‍️'
+                  : customer.status === 'ordering'
+                    ? ''
+                    : customer.status === 'eating'
+                      ? ''
+                      : ''}
               </div>
-              
+
               {/* Order bubble */}
               {customer.status === 'waiting' && (
                 <div className="absolute -top-8 -right-8 bg-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-gray-300">
                   <span className="text-sm">{customer.order.emoji}</span>
                 </div>
               )}
-              
+
               {/* Patience bar */}
               <div className="w-12 h-1 bg-gray-300 rounded">
-                <div 
+                <div
                   className={`h-full rounded transition-all ${
-                    customer.patience / customer.maxPatience > 0.6 ? 'bg-green-500' :
-                    customer.patience / customer.maxPatience > 0.3 ? 'bg-yellow-500' : 'bg-red-500'
+                    customer.patience / customer.maxPatience > 0.6
+                      ? 'bg-green-500'
+                      : customer.patience / customer.maxPatience > 0.3
+                        ? 'bg-yellow-500'
+                        : 'bg-red-500'
                   }`}
-                  style={{ 
-                    width: `${(customer.patience / customer.maxPatience) * 100}%` 
+                  style={{
+                    width: `${(customer.patience / customer.maxPatience) * 100}%`,
                   }}
                 />
               </div>
@@ -523,8 +561,8 @@ export default function MaidCafeGame() {
         {/* Player Avatar */}
         <div
           className="absolute text-3xl transition-all z-20"
-          style={{ 
-            left: playerX, 
+          style={{
+            left: playerX,
             top: playerY,
             transform: isMoving ? 'scale(1.1)' : 'scale(1)',
           }}

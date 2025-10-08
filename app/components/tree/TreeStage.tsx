@@ -65,7 +65,7 @@ export default function TreeStage() {
         {/* Subtle environment tone */}
         <color attach="background" args={['#0b0b0b']} />
         <Suspense fallback={null}>
-          {layers.map((layer, i) => (
+          {layers.map((layer, _i) => (
             <LayerPlane
               key={layer.name}
               src="/assets/images/CherryTree.png"

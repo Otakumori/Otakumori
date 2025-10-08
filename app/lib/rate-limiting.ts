@@ -77,7 +77,7 @@ export function withRateLimit<T extends any[]>(
   return async (req: NextRequest, ...args: T): Promise<Response> => {
     try {
       // Extract user ID from request if available (simplified)
-      const authHeader = req.headers.get('authorization');
+      const _authHeader = req.headers.get('authorization');
       let userId: string | undefined;
 
       // Note: This is a simplified user extraction
@@ -127,7 +127,7 @@ export function withRateLimit<T extends any[]>(
 
 // Utility to clear rate limit for a specific user/IP (admin function)
 export async function clearRateLimit(key: string, identifier: string): Promise<void> {
-  const pattern = `rate_limit:${key}:${identifier}:*`;
+  const _pattern = `rate_limit:${key}:${identifier}:*`;
   try {
     // Note: This is a simplified version. In production, you might want
     // to use a more efficient method to clear keys matching a pattern

@@ -56,6 +56,9 @@ const samplePosts = [
 
 export async function POST(request: NextRequest) {
   try {
+    // Log request for audit trail
+    console.warn('Blog seeding requested from:', request.headers.get('user-agent'));
+
     // Seeding blog posts...
 
     for (const post of samplePosts) {

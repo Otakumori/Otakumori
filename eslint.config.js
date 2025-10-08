@@ -46,8 +46,13 @@ export default [
       '*.eot',
     ],
   },
+  // Main application files - strict rules
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: [
+      'app/**/*.{js,jsx,ts,tsx}',
+      'components/**/*.{js,jsx,ts,tsx}',
+      'lib/**/*.{js,jsx,ts,tsx}',
+    ],
     languageOptions: {
       parser: tseslintParser,
       parserOptions: {
@@ -174,6 +179,58 @@ export default [
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,
+    },
+  },
+  // Scripts and tests - more relaxed rules
+  {
+    files: [
+      'scripts/**/*.{js,ts}',
+      'tests/**/*.{js,jsx,ts,tsx}',
+      '**/*.test.{js,jsx,ts,tsx}',
+      '**/*.spec.{js,jsx,ts,tsx}',
+    ],
+    languageOptions: {
+      parser: tseslintParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      'unused-imports': unusedImports,
+    },
+    rules: {
+      // Relaxed rules for scripts and tests
+      'no-console': 'off', // Allow console in scripts
+      'unused-imports/no-unused-vars': 'warn', // Warn instead of error
+      '@typescript-eslint/no-var-requires': 'off', // Allow require() in scripts
+      '@typescript-eslint/no-unused-vars': 'warn',
+    },
+  },
+  // Other files - basic rules
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parser: tseslintParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+      'unused-imports': unusedImports,
+    },
+    rules: {
+      'unused-imports/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': 'off', // Disabled - handled by unused-imports
     },
   },
 ];

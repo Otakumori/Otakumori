@@ -306,6 +306,10 @@ export default function GameCubeMemoryCard({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleCardClick}
+        onKeyDown={(e) => e.key === 'Enter' && handleCardClick()}
+        role="button"
+        tabIndex={0}
+        aria-label="Memory card"
       />
 
       {/* Card Info Overlay */}

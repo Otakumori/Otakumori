@@ -141,10 +141,14 @@ export default function ReportButton({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
+                  <label
+                    htmlFor="reportDescription"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
                     Additional details (optional)
                   </label>
                   <textarea
+                    id="reportDescription"
                     value={reportData.description}
                     onChange={(e) =>
                       setReportData((prev) => ({ ...prev, description: e.target.value }))

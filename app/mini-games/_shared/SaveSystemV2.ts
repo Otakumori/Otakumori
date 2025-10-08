@@ -62,7 +62,7 @@ const CURRENT_SAVE_VERSION = 2;
 const MAX_SLOTS = 5; // Increased for better backup rotation
 const COMPRESSION_THRESHOLD = 1024; // Compress saves larger than 1KB
 const SYNC_INTERVAL = 30000; // 30 seconds
-const MAX_RETRY_ATTEMPTS = 3;
+const _MAX_RETRY_ATTEMPTS = 3;
 
 /**
  * Enterprise save system with cloud backup and advanced features
@@ -590,7 +590,7 @@ export class GameSaveSystemV2 {
     return latestSlot;
   }
 
-  private getSyncStatus(slot: number): 'local' | 'syncing' | 'synced' | 'conflict' {
+  private getSyncStatus(_slot: number): 'local' | 'syncing' | 'synced' | 'conflict' {
     // Simplified sync status - in production, this would track actual sync state
     return this.userId ? 'synced' : 'local';
   }

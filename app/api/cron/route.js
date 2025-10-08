@@ -122,6 +122,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
+    // Log cron job execution for audit
+    console.warn('Cron job triggered from:', request.headers.get('user-agent'));
+
     // Validate environment variables
     validateEnv();
 

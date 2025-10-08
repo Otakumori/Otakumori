@@ -11,12 +11,12 @@ export default function LRoom404Page() {
   const [currentPhase, setCurrentPhase] = useState<
     'timeline' | 'herring' | 'name' | 'complete' | 'fallback'
   >('timeline');
-  const [timelineOrder, setTimelineOrder] = useState<number[]>([]);
+  const [_timelineOrder, _setTimelineOrder] = useState<number[]>([]);
   const [selectedTimestamps, setSelectedTimestamps] = useState<number[]>([]);
   const [herringSelections, setHerringSelections] = useState<number[]>([]);
   const [nameInput, setNameInput] = useState('');
   const [showFlash, setShowFlash] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [_timeoutId, _setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   // Timeline Anomaly data - 5 timestamps out of order
   const timestamps = [

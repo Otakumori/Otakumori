@@ -47,7 +47,7 @@ export default function HubClient() {
     setBootState('hub');
   };
 
-  const handleBootSkip = () => {
+  const _handleBootSkip = () => {
     try {
       const sessionKey = 'otm_gc_boot_seen';
       // Only mark session as seen, not the daily flag

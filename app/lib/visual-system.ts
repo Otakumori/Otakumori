@@ -475,7 +475,7 @@ export const CSS_VARS = {
 };
 
 // Runtime validation for development
-export const validateDesignToken = (category: string, token: string) => {
+export const validateDesignToken = (_category: string, _token: string) => {
   if (env.NODE_ENV === 'development') {
     // Add validation logic for design tokens
     console.warn('Design token validation not yet implemented');

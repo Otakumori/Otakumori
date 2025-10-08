@@ -220,7 +220,7 @@ export default function GameCubeBoot3D({ onComplete, onSkip }: GameCubeBoot3DPro
 
   // Update rolling cubes
   const updateRollingCubes = (deltaTime: number) => {
-    cubesRef.current.forEach((cube, index) => {
+    cubesRef.current.forEach((cube, _index) => {
       // Apply gravity
       cube.velocity.y -= 0.01 * deltaTime * 60;
 

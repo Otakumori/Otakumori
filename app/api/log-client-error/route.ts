@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    console.error(`Client error logged: ${body.error?.message || 'Unknown error'}`);
 
     // Log to console with structured format for easy parsing
     // Client error logged

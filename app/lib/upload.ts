@@ -172,7 +172,7 @@ export async function uploadToCloud(
 // Cleanup function for removing old files
 export async function cleanupOldFiles(
   directory: string,
-  maxAge: number = 24 * 60 * 60 * 1000, // 24 hours
+  _maxAge: number = 24 * 60 * 60 * 1000, // 24 hours
 ): Promise<void> {
   // This would clean up old temporary files
   // Implementation depends on your storage solution

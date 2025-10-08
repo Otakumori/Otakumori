@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
-import { useState, useEffect } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
+import { useEffect, useState } from 'react';
 
 type AssetDemo = {
   id: string;
@@ -87,7 +87,7 @@ export default function PlaygroundPage() {
         oscillator.start(ctx.currentTime);
         oscillator.stop(ctx.currentTime + 0.1);
       });
-    } catch (error) {
+    } catch {
       // Audio playback failed
     }
 

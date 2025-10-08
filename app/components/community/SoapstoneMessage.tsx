@@ -27,6 +27,10 @@ export default function SoapstoneMessage({ preview, full }: SoapstoneMessageProp
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setIsOpen(false)}
+            onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)}
+            role="button"
+            tabIndex={0}
+            aria-label="Close modal"
           />
           <div className="relative z-[61] w-[min(90vw,480px)] rounded-2xl border border-fuchsia-500/20 bg-zinc-950/90 p-6 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
@@ -34,9 +38,7 @@ export default function SoapstoneMessage({ preview, full }: SoapstoneMessageProp
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-zinc-400 hover:text-zinc-200"
-              >
-                
-              </button>
+              ></button>
             </div>
             <p className="text-sm leading-relaxed text-zinc-200">{full}</p>
             <div className="mt-6 flex justify-end">

@@ -33,6 +33,9 @@ function AnimeToonMaterial({
       const cameraDirection = new Vector3();
       camera.getWorldDirection(cameraDirection);
       materialRef.current.uniforms.cameraDirection.value = cameraDirection;
+
+      // Update WebGL state for better rendering
+      gl.toneMappingExposure = 1.2;
     }
   });
 

@@ -63,7 +63,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
   });
 
   const [runId, setRunId] = useState<string | null>(null);
-  const [seed, setSeed] = useState<number | null>(null);
+  const [_seed, _setSeed] = useState<number | null>(null);
   const [isGameOver, setIsGameOver] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
@@ -427,7 +427,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     petal.scale.set(scale);
   };
 
-  const updateGame = (deltaTime: number) => {
+  const updateGame = (_deltaTime: number) => {
     if (!gameStateRef.current.isPlaying) return;
 
     // Spawn petals
@@ -486,7 +486,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     }
   };
 
-  const renderGame = (alpha: number) => {
+  const renderGame = (_alpha: number) => {
     if (!appRef.current) return;
 
     // Render slice trails

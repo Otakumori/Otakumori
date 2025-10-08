@@ -75,8 +75,8 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
   const [isPhysicsEnabled, setIsPhysicsEnabled] = useState(false);
   const [isAdultMode, setIsAdultMode] = useState(false);
   const [characterMesh, setCharacterMesh] = useState<THREE.Group | null>(null);
-  const [hairStrands, setHairStrands] = useState<any[]>([]);
-  const [clothMeshes, setClothMeshes] = useState<any[]>([]);
+  const [_hairStrands, _setHairStrands] = useState<any[]>([]);
+  const [_clothMeshes, _setClothMeshes] = useState<any[]>([]);
 
   const generatorRef = useRef<ProceduralCharacterGenerator | null>(null);
   const physicsEngineRef = useRef<VerletPhysicsEngine | null>(null);
@@ -694,7 +694,7 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
     additionalSliders.forEach((slider) => {
       sliders.push({
         ...slider,
-        onChange: (value) => {
+        onChange: (_value) => {
           // For now, just log the change
           // TODO: Implement slider change handler
           // console.log(`${slider.id}: ${value}`);

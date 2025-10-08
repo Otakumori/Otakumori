@@ -228,6 +228,10 @@ export default function PetalCollector() {
                   animation: `float ${3 + Math.random() * 2}s ease-in-out infinite alternate`,
                 }}
                 onClick={() => collectPetal(petal.id)}
+                onKeyDown={(e) => e.key === 'Enter' && collectPetal(petal.id)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Collect ${petal.type} petal`}
               />
             ),
         )}

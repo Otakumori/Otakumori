@@ -93,7 +93,7 @@ export class DatabaseAccess {
   /**
    * Get user's cart items
    */
-  static async getUserCart(userId: string) {
+  static async getUserCart(_userId: string) {
     // For now, we'll use a simple cart implementation
     // In the future, this could be moved to a proper cart table
     return [];

@@ -8,12 +8,12 @@ import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 
 export default function CheckoutContent() {
-  const router = useRouter();
+  const _router = useRouter();
   const { items } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [couponInput, setCouponInput] = useState('');
+  const [_couponInput, _setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
-  const [preview, setPreview] = useState<any>(null);
+  const [_preview, _setPreview] = useState<any>(null);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',

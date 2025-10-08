@@ -11,7 +11,7 @@ export default function CookieSettings() {
       try {
         const prefs = JSON.parse(stored);
         setAnalytics(prefs.analytics || false);
-      } catch (e) {
+      } catch {
         console.warn('Failed to parse cookie preferences');
       }
     }

@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    console.warn('Games list requested from:', request.headers.get('user-agent'));
     // Get enabled games from the games registry
     const enabledGames = getEnabledGames();
 

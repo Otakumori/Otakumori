@@ -14,7 +14,7 @@ interface EditableRewardsConfig extends RewardsConfig {
 }
 
 export default function AdminRewardsPage() {
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user: _user, isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [config, setConfig] = useState<EditableRewardsConfig>({
     baseRateCents: 300,
@@ -187,10 +187,14 @@ export default function AdminRewardsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="baseRate"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Base Rate (cents per petal)
                 </label>
                 <input
+                  id="baseRate"
                   type="number"
                   value={config.baseRateCents}
                   onChange={(e) => updateConfig('baseRateCents', parseInt(e.target.value) || 300)}
@@ -206,10 +210,14 @@ export default function AdminRewardsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-neutral-300">
+                  <label
+                    htmlFor="minPerOrder"
+                    className="mb-2 block text-sm font-medium text-neutral-300"
+                  >
                     Min per Order
                   </label>
                   <input
+                    id="minPerOrder"
                     type="number"
                     value={config.minPerOrder}
                     onChange={(e) => updateConfig('minPerOrder', parseInt(e.target.value) || 5)}
@@ -220,10 +228,14 @@ export default function AdminRewardsPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-neutral-300">
+                  <label
+                    htmlFor="maxPerOrder"
+                    className="mb-2 block text-sm font-medium text-neutral-300"
+                  >
                     Max per Order
                   </label>
                   <input
+                    id="maxPerOrder"
                     type="number"
                     value={config.maxPerOrder}
                     onChange={(e) => updateConfig('maxPerOrder', parseInt(e.target.value) || 120)}
@@ -235,10 +247,14 @@ export default function AdminRewardsPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="firstPurchaseBonus"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   First Purchase Bonus
                 </label>
                 <input
+                  id="firstPurchaseBonus"
                   type="number"
                   value={config.firstPurchaseBonus}
                   onChange={(e) =>
@@ -276,10 +292,14 @@ export default function AdminRewardsPage() {
               {config.streak.enabled && (
                 <>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-neutral-300">
+                    <label
+                      htmlFor="dailyBonusPct"
+                      className="mb-2 block text-sm font-medium text-neutral-300"
+                    >
                       Daily Bonus Percentage
                     </label>
                     <input
+                      id="dailyBonusPct"
                       type="number"
                       value={config.streak.dailyBonusPct * 100}
                       onChange={(e) =>
@@ -299,10 +319,14 @@ export default function AdminRewardsPage() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-neutral-300">
+                    <label
+                      htmlFor="maxStreakBonus"
+                      className="mb-2 block text-sm font-medium text-neutral-300"
+                    >
                       Maximum Streak Bonus
                     </label>
                     <input
+                      id="maxStreakBonus"
                       type="number"
                       value={config.streak.maxPct * 100}
                       onChange={(e) =>
@@ -331,8 +355,14 @@ export default function AdminRewardsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">Soft Cap</label>
+                <label
+                  htmlFor="softCap"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
+                  Soft Cap
+                </label>
                 <input
+                  id="softCap"
                   type="number"
                   value={config.daily.softCap}
                   onChange={(e) => updateConfig('daily.softCap', parseInt(e.target.value) || 200)}
@@ -346,10 +376,14 @@ export default function AdminRewardsPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="postSoftRate"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Post-Soft Cap Rate (%)
                 </label>
                 <input
+                  id="postSoftRate"
                   type="number"
                   value={config.daily.postSoftRatePct * 100}
                   onChange={(e) =>
@@ -366,8 +400,14 @@ export default function AdminRewardsPage() {
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">Hard Cap</label>
+                <label
+                  htmlFor="hardCap"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
+                  Hard Cap
+                </label>
                 <input
+                  id="hardCap"
                   type="number"
                   value={config.daily.hardCap}
                   onChange={(e) => updateConfig('daily.hardCap', parseInt(e.target.value) || 400)}
@@ -391,10 +431,14 @@ export default function AdminRewardsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-300">
+                <label
+                  htmlFor="seasonalMultiplier"
+                  className="mb-2 block text-sm font-medium text-neutral-300"
+                >
                   Seasonal Multiplier
                 </label>
                 <input
+                  id="seasonalMultiplier"
                   type="number"
                   value={config.seasonal.multiplier}
                   onChange={(e) =>

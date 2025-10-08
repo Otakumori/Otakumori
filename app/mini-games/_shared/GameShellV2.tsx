@@ -59,16 +59,16 @@ export default function GameShellV2({
   children,
   enableBootAnimation = true,
   enableLeaderboards = true,
-  enableAchievements = true,
+  _enableAchievements = true,
   enableTelemetry = true,
   onGameStart,
   onGameEnd,
-  onError,
+  _onError,
   className = '',
-  maxPlayers = 1,
+  _maxPlayers = 1,
   difficulty = 'medium',
 }: GameShellV2Props) {
-  const { isSignedIn, userId } = useAuth();
+  const { isSignedIn: _isSignedIn, userId } = useAuth();
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({

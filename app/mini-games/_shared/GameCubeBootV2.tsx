@@ -45,7 +45,7 @@ interface CubeState {
 export default function GameCubeBootV2({
   onBootComplete,
   onSkip,
-  skipAfterSeconds = 8,
+  _skipAfterSeconds = 8,
   forceShow = false,
 }: GameCubeBootV2Props) {
   const [bootStage, setBootStage] = useState<BootStage>('starting');
@@ -234,7 +234,7 @@ export default function GameCubeBootV2({
         audio.play().catch(() => {
           // Fail silently if audio doesn't work
         });
-      } catch (error) {
+      } catch {
         // Fail silently
       }
     }
@@ -377,9 +377,7 @@ export default function GameCubeBootV2({
               initial={{ scale: 0, rotate: 0 }}
               animate={{ scale: 1, rotate: 360 }}
               transition={{ duration: 1.5 }}
-            >
-              
-            </motion.div>
+            ></motion.div>
           ))}
         </div>
 

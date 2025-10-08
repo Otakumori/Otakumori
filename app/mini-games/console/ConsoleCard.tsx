@@ -46,7 +46,7 @@ export default function ConsoleCard({
 }) {
   const [mode, setMode] = useState<Mode>('boot');
   const [face, setFace] = useQueryFace();
-  const [audioOn, setAudioOn] = useState(false);
+  const [_audioOn, _setAudioOn] = useState(false);
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [animMs, setAnimMs] = useState(160);
@@ -60,10 +60,10 @@ export default function ConsoleCard({
   }, []);
   useEffect(() => {
     // Only preload audio if not in reduced motion mode and audio is supported
-    const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+    const _audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
     if (
       !isReducedMotion &&
-      audioEnabled &&
+      _audioEnabled &&
       typeof window !== 'undefined' &&
       'AudioContext' in window
     ) {
@@ -213,7 +213,7 @@ export default function ConsoleCard({
         const gp = pads && pads[0];
         if (gp) {
           const buttons = gp.buttons.map((b: any) => (b && b.pressed ? 1 : 0));
-          const axes = gp.axes || [0, 0];
+          const _axes = gp.axes || [0, 0];
           // D-pad
           if (mode === 'cube') {
             if (press(buttons[14], 14)) {
@@ -567,7 +567,7 @@ export default function ConsoleCard({
   );
 
   const MusicFace = () => {
-    const [loading, setLoading] = useState(true);
+    const [_loading, _setLoading] = useState(true);
     const [err, setErr] = useState<string | null>(null);
     const [crt, setCrt] = useState(false);
     const [vhs, setVhs] = useState(false);

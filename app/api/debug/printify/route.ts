@@ -5,6 +5,9 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
+    // Log debug request for audit
+    console.warn('Printify debug requested from:', request.headers.get('user-agent'));
+
     // Check if environment variables are loaded
     const printifyApiKey = env.PRINTIFY_API_KEY;
     const printifyApiUrl = env.PRINTIFY_API_URL;

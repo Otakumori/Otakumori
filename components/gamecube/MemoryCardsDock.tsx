@@ -37,7 +37,7 @@ export default function MemoryCardsDock() {
               if (prevCards.length === 0) return newCards;
 
               // Check for new cards
-              const newCardIds = new Set(newCards.map((c: OrderCard) => c.id));
+              const _newCardIds = new Set(newCards.map((c: OrderCard) => c.id));
               const oldCardIds = new Set(prevCards.map((c: OrderCard) => c.id));
               const addedCards = newCards.filter((c: OrderCard) => !oldCardIds.has(c.id));
 

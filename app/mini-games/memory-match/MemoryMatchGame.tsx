@@ -257,6 +257,10 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
           <div
             key={card.id}
             onClick={() => handleCardClick(card.id)}
+            onKeyDown={(e) => e.key === 'Enter' && handleCardClick(card.id)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Flip card ${card.id}`}
             className={`
               w-16 h-20 rounded-lg border-2 cursor-pointer transition-all duration-300 flex items-center justify-center text-2xl
               ${

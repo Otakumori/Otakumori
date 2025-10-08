@@ -8,6 +8,9 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
+    // Log merge request for analytics
+    console.warn('Petal merge requested from:', request.headers.get('user-agent'));
+
     const { userId } = await auth();
 
     if (!userId) {

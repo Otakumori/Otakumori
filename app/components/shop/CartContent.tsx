@@ -172,9 +172,12 @@ export default function CartContent() {
             </div>
             {/* Coupons */}
             <div className="mt-2">
-              <label className="block text-sm text-zinc-300 mb-1">Coupon Code</label>
+              <label htmlFor="couponCode" className="block text-sm text-zinc-300 mb-1">
+                Coupon Code
+              </label>
               <div className="flex gap-2">
                 <input
+                  id="couponCode"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value)}
                   placeholder="Enter code"

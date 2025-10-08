@@ -62,8 +62,8 @@ export default function ThighChaseGame() {
 
   // Game timing
   const [gameTime, setGameTime] = useState(0);
-  const [obstacleSpawnTimer, setObstacleSpawnTimer] = useState(0);
-  const [powerupSpawnTimer, setPowerupSpawnTimer] = useState(0);
+  const [_obstacleSpawnTimer, _setObstacleSpawnTimer] = useState(0);
+  const [_powerupSpawnTimer, _setPowerupSpawnTimer] = useState(0);
   const [nextObstacleId, setNextObstacleId] = useState(1);
   const [nextPowerupId, setNextPowerupId] = useState(1);
 

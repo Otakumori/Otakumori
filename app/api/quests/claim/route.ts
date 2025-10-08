@@ -11,6 +11,7 @@ const ClaimRequestSchema = z.object({
 });
 
 const DAILY_CAP = 120;
+// TTL for Redis cap tracking (currently using database fallback)
 const CAP_TTL_SECONDS = 60 * 60 * 24 * 2;
 
 export async function POST(request: Request) {
@@ -58,7 +59,9 @@ export async function POST(request: Request) {
     }
 
     const day = assignment.day ?? userDayNY();
+    // Redis key for future cap tracking (currently using database fallback)
     const dailyCapKey = `petals:cap:${user.id}:${day}`;
+    console.warn(`Quest claim tracking key: ${dailyCapKey} (Redis disabled, using DB)`);
 
     let usedToday = 0;
     // Redis disabled due to config issues - using database fallback

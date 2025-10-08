@@ -48,7 +48,9 @@ export async function POST(req: Request) {
         affinity: [{ npcId: 'maiden', delta: 2, score: 3 }],
       },
     });
-  } catch (e) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    console.error('Quest completion failed:', error.message, error.stack);
     return NextResponse.json(
       { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
       { status: 500 },

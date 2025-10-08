@@ -64,7 +64,7 @@ export default function OrdersPage() {
       } else {
         setError(data.error || 'Failed to fetch orders');
       }
-    } catch (_err) {
+    } catch {
       setError('Failed to fetch orders');
     } finally {
       setLoading(false);
@@ -197,7 +197,6 @@ export default function OrdersPage() {
                     <div key={item.id} className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
                         {item.product?.primaryImageUrl ? (
-                           
                           <img
                             src={item.product.primaryImageUrl}
                             alt={item.product.name}

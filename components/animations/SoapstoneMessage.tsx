@@ -63,7 +63,14 @@ export default function SoapstoneMessage() {
             exit={{ opacity: 0 }}
             style={{ left: message.position.x }}
           >
-            <div className="group relative" onClick={() => handleMessageClick(message.id)}>
+            <div
+              className="group relative"
+              onClick={() => handleMessageClick(message.id)}
+              onKeyDown={(e) => e.key === 'Enter' && handleMessageClick(message.id)}
+              role="button"
+              tabIndex={0}
+              aria-label={`View message from ${message.author}`}
+            >
               {/* Runic Background */}
               <div className="absolute inset-0 -rotate-1 transform rounded-lg bg-pink-500/20 blur-md" />
 

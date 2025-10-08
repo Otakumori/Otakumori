@@ -13,9 +13,9 @@ interface LeaderboardEntry {
 export default function InteractiveCherryBlossom() {
   const [petals, setPetals] = useState<Petal[]>([]);
   const [collectedCount, setCollectedCount] = useState(0);
-  const [communityProgress, setCommunityProgress] = useState(0);
+  const [_communityProgress, _setCommunityProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([
+  const [_leaderboard, _setLeaderboard] = useState<LeaderboardEntry[]>([
     { username: 'SakuraMaster', petals: 1500, rank: 1 },
     { username: 'PetalWhisperer', petals: 1200, rank: 2 },
     { username: 'BlossomSeeker', petals: 900, rank: 3 },

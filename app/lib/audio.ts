@@ -67,12 +67,12 @@ class AudioMgr {
       return () => {
         try {
           src.stop();
-        } catch (e) {
+        } catch {
           // Ignore errors when stopping already stopped sources
         }
       };
-    } catch (error) {
-      console.warn(`Failed to play audio: ${name}`, error);
+    } catch {
+      console.warn(`Failed to play audio: ${name}`);
       return null;
     }
   }

@@ -10,8 +10,9 @@ export async function POST(req: Request) {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.log(`Admin ${admin.id} requested blob upload token`);
+    console.warn(`Admin ${admin.id} requested blob upload token`);
   } catch (error) {
+    console.error('Admin auth failed for blob upload token:', error);
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

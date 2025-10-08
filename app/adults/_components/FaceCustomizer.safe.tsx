@@ -125,8 +125,11 @@ export function FaceCustomizer({ config, onChange }: FaceCustomizerProps) {
         />
 
         <div className="space-y-2">
-          <label className="block text-white text-sm font-medium">Eye Color</label>
+          <label htmlFor="eyeColor" className="block text-white text-sm font-medium">
+            Eye Color
+          </label>
           <input
+            id="eyeColor"
             type="color"
             value={config.eyes.eyeColor}
             onChange={(e) => updateConfig('eyes.eyeColor', e.target.value)}
@@ -290,8 +293,11 @@ export function FaceCustomizer({ config, onChange }: FaceCustomizerProps) {
         <h4 className="text-pink-300 font-medium">Skin & Complexion</h4>
 
         <div className="space-y-2">
-          <label className="block text-white text-sm font-medium">Skin Tone</label>
+          <label htmlFor="skinTone" className="block text-white text-sm font-medium">
+            Skin Tone
+          </label>
           <input
+            id="skinTone"
             type="color"
             value={config.skin.tone}
             onChange={(e) => updateConfig('skin.tone', e.target.value)}

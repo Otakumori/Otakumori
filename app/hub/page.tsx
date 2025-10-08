@@ -16,7 +16,7 @@ export default function HubPage() {
 
   // ambience loop
   useEffect(() => {
-    let playing = true;
+    let _playing = true;
     (async () => {
       try {
         await play('/assets/music/hub_ambience.ogg', -18);

@@ -50,7 +50,7 @@ export default function PetalEmitterTree({
     let running = true;
     let last = performance.now();
     let spawnAcc = 0;
-    let pointerDown = false;
+    let _pointerDown = false;
     let px = 0,
       py = 0;
 
@@ -214,7 +214,7 @@ export default function PetalEmitterTree({
     window.addEventListener('pointerup', onPointerUp);
 
     async function collect(idx: number) {
-      const p = petals[idx];
+      const _p = petals[idx];
       // pop effect: mark settled quickly; remove after
       petals.splice(idx, 1);
       try {

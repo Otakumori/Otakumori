@@ -41,8 +41,8 @@ export default function AvatarSystem({
 }: AvatarSystemProps) {
   const [mode, setMode] = useState<'view' | 'edit' | 'import'>('view');
   const [character, setCharacter] = useState<THREE.Group | null>(null);
-  const [hairStrands, setHairStrands] = useState<any[]>([]);
-  const [clothMeshes, setClothMeshes] = useState<any[]>([]);
+  const [_hairStrands, _setHairStrands] = useState<any[]>([]);
+  const [_clothMeshes, _setClothMeshes] = useState<any[]>([]);
   const [config, setConfig] = useState<ProceduralCharacterConfig>(
     initialConfig || {
       gender: 'female',
@@ -88,8 +88,8 @@ export default function AvatarSystem({
     verifyAge,
     setContentLevel,
     setPhysicsLevel,
-    canAccessContent,
-    getAvailableContent,
+    canAccessContent: _canAccessContent,
+    getAvailableContent: _getAvailableContent,
   } = useAdultGating();
 
   // Refs for systems

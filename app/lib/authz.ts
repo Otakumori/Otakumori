@@ -23,7 +23,7 @@ export async function getUserRole(userId: string): Promise<UserRole> {
     }
 
     return 'user';
-  } catch (error) {
+  } catch {
     return 'user';
   }
 }

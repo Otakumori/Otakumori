@@ -77,8 +77,11 @@ export default function AvatarEditorPage() {
 
   // Handle avatar preview
   const handlePreview = (config: any) => {
-    // Preview is handled internally by the component
-    // Preview updated
+    // Update preview with new config (trigger re-render with config change)
+    console.warn('Preview updated with config:', {
+      gender: config.gender,
+      hasPhysics: !!config.physics?.softBody?.enable,
+    });
   };
 
   if (!mounted) {

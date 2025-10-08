@@ -66,7 +66,7 @@ export function WorldProvider({ children, debug = false }: WorldProviderProps) {
     debug,
   });
 
-  const dispatch = useCallback((event: WorldEvent) => {
+  const dispatch = useCallback((_event: WorldEvent) => {
     // Handle world events here
     // World Event
 

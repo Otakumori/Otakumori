@@ -63,18 +63,18 @@ export default function GameCubeHub() {
   // Initialize systems on mount
   useEffect(() => {
     // Set up achievement system callbacks
-    achievementSystem.setOnUnlock((achievement) => {
+    achievementSystem.setOnUnlock((_achievement) => {
       // Achievement unlocked (logging disabled for production)
       // Show achievement notification
     });
 
     // Set up leaderboard system callbacks
-    leaderboardSystem.setOnEntryAdded((entry) => {
+    leaderboardSystem.setOnEntryAdded((_entry) => {
       // New leaderboard entry (logging disabled for production)
     });
 
     // Set up save system callbacks
-    saveSystem.setOnSaveCreated((save) => {
+    saveSystem.setOnSaveCreated((_save) => {
       // Save created (logging disabled for production)
     });
 

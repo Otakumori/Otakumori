@@ -42,7 +42,7 @@ export function reportWebVitals(metric: ExtendedMetric) {
 
   // Log performance metrics
   if (env.NODE_ENV === 'development') {
-    const emoji = rating === 'good' ? '' : rating === 'needs-improvement' ? '' : '';
+    const _emoji = rating === 'good' ? '' : rating === 'needs-improvement' ? '' : '';
     // Web Vitals metric logged
   }
 
@@ -60,7 +60,7 @@ export function reportWebVitals(metric: ExtendedMetric) {
     }
 
     // Custom analytics endpoint
-    const data = {
+    const _data = {
       name: metric.name,
       value: metric.value,
       rating,

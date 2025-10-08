@@ -7,8 +7,8 @@ import type { PrintifyProduct } from '@/app/lib/printify/service';
 
 // Enterprise-grade Product Card for Real Printify Products
 function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0] || null);
-  const [selectedImage, setSelectedImage] = useState(product.images[0] || null);
+  const [selectedVariant, _setSelectedVariant] = useState(product.variants[0] || null);
+  const [_selectedImage, _setSelectedImage] = useState(product.images[0] || null);
 
   // Get available colors and sizes from product options
   const colorOptions = product.options?.find((opt) => opt.name.toLowerCase().includes('color'));

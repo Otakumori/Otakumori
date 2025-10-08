@@ -309,7 +309,7 @@ export class PsychologicalTriggersSystem {
     confidence: number;
   } {
     const insights = this.getUserInsights(userId);
-    const preferences = insights.preferences || {};
+    const _preferences = insights.preferences || {};
 
     // Simple recommendation logic based on user behavior
     const recommended = items[Math.floor(Math.random() * items.length)];

@@ -300,10 +300,10 @@ export class GDPRCompliance {
       contact: any;
     };
   } {
-    const siteName = 'Otaku-mori'; // env.NEXT_PUBLIC_SITE_NAME not available
-    const contactEmail = 'privacy@otaku-mori.com'; // env.NEXT_PUBLIC_CONTACT_EMAIL not available
-    const dpoEmail = 'dpo@otaku-mori.com'; // env.NEXT_PUBLIC_DPO_EMAIL not available
-    const companyAddress = 'Japan'; // env.NEXT_PUBLIC_COMPANY_ADDRESS not available
+    const _siteName = 'Otaku-mori'; // env.NEXT_PUBLIC_SITE_NAME not available
+    const _contactEmail = 'adi@otaku-mori.com'; // env.NEXT_PUBLIC_CONTACT_EMAIL not available
+    const _dpoEmail = 'adi@otaku-mori.com'; // env.NEXT_PUBLIC_DPO_EMAIL not available
+    const _companyAddress = 'USA'; // env.NEXT_PUBLIC_COMPANY_ADDRESS not available
 
     return {
       lastUpdated: new Date().toISOString().split('T')[0],

@@ -37,11 +37,13 @@ export default function DungeonGame() {
   const keysRef = useRef<Set<string>>(new Set());
 
   // Game state
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameOver' | 'victory'>('menu');
+  const [gameState, setGameState] = useState<
+    'menu' | 'playing' | 'paused' | 'gameOver' | 'victory'
+  >('menu');
   const [stage, setStage] = useState(1);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
-  
+
   // Player state
   const [player, setPlayer] = useState({
     x: 100,
@@ -60,8 +62,8 @@ export default function DungeonGame() {
 
   // Game timing
   const [gameTime, setGameTime] = useState(0);
-  const [enemySpawnTimer, setEnemySpawnTimer] = useState(0);
-  const [pickupSpawnTimer, setPickupSpawnTimer] = useState(0);
+  const [_enemySpawnTimer, _setEnemySpawnTimer] = useState(0);
+  const [_pickupSpawnTimer, _setPickupSpawnTimer] = useState(0);
 
   const { saveOnExit, autoSave } = useGameSave('dungeon-of-desire');
 
@@ -100,11 +102,11 @@ export default function DungeonGame() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       keysRef.current.add(e.key.toLowerCase());
-      
+
       if (e.key === 'Escape') {
-        setGameState(prev => prev === 'playing' ? 'paused' : prev);
+        setGameState((prev) => (prev === 'playing' ? 'paused' : prev));
       }
-      
+
       if (e.key === ' ' && gameState === 'playing') {
         castSpell();
       }
@@ -126,9 +128,9 @@ export default function DungeonGame() {
   // Spell casting
   const castSpell = useCallback(() => {
     if (player.mana < 10) return;
-    
-    setPlayer(prev => ({ ...prev, mana: Math.max(0, prev.mana - 10) }));
-    
+
+    setPlayer((prev) => ({ ...prev, mana: Math.max(0, prev.mana - 10) }));
+
     const newSpell: Spell = {
       id: Date.now(),
       x: player.x + 30,
@@ -137,8 +139,8 @@ export default function DungeonGame() {
       vy: 0,
       damage: 25,
     };
-    
-    setSpells(prev => [...prev, newSpell]);
+
+    setSpells((prev) => [...prev, newSpell]);
   }, [player.mana, player.x, player.y]);
 
   // Enemy spawning
@@ -147,12 +149,12 @@ export default function DungeonGame() {
       { type: 'minion' as const, health: 50, speed: 1.5, damage: 15 },
       { type: 'boss' as const, health: 150, speed: 1, damage: 25 },
     ];
-    
-    const enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+
+    const _enemyType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
     const bossChance = stage > 3 ? 0.2 : 0.1;
     const isBoss = Math.random() < bossChance;
     const template = isBoss ? enemyTypes[1] : enemyTypes[0];
-    
+
     const newEnemy: Enemy = {
       id: Date.now(),
       x: CANVAS_WIDTH + 50,
@@ -163,8 +165,8 @@ export default function DungeonGame() {
       speed: template.speed + (stage - 1) * 0.2,
       damage: template.damage + (stage - 1) * 2,
     };
-    
-    setEnemies(prev => [...prev, newEnemy]);
+
+    setEnemies((prev) => [...prev, newEnemy]);
   }, [stage]);
 
   // Pickup spawning
@@ -174,9 +176,9 @@ export default function DungeonGame() {
       { type: 'mana' as const, value: 20 },
       { type: 'treasure' as const, value: 100 },
     ];
-    
+
     const pickup = pickupTypes[Math.floor(Math.random() * pickupTypes.length)];
-    
+
     const newPickup: Pickup = {
       id: Date.now(),
       x: CANVAS_WIDTH + 30,
@@ -184,40 +186,40 @@ export default function DungeonGame() {
       type: pickup.type,
       value: pickup.value,
     };
-    
-    setPickups(prev => [...prev, newPickup]);
+
+    setPickups((prev) => [...prev, newPickup]);
   }, []);
 
   // Game loop
   useEffect(() => {
     if (gameState !== 'playing') return;
-    
+
     const gameLoop = () => {
       const deltaTime = 16; // ~60fps
-      setGameTime(prev => {
+      setGameTime((prev) => {
         const newTime = prev + deltaTime;
-        
+
         // Check for stage progression
         if (newTime > stage * STAGE_DURATION) {
-          setStage(s => s + 1);
+          setStage((s) => s + 1);
         }
-        
+
         // Time limit (1 hour cap)
         if (newTime > MAX_TIME * 1000) {
           setGameState('victory');
           return newTime;
         }
-        
+
         return newTime;
       });
 
       // Player movement
-      setPlayer(prev => {
+      setPlayer((prev) => {
         let newX = prev.x;
         let newY = prev.y;
         let newMana = Math.min(prev.maxMana, prev.mana + 0.1); // Slow mana regen
         let newInvulnerable = Math.max(0, prev.invulnerable - deltaTime);
-        
+
         if (keysRef.current.has('a') || keysRef.current.has('arrowleft')) {
           newX = Math.max(0, newX - PLAYER_SPEED);
         }
@@ -230,7 +232,7 @@ export default function DungeonGame() {
         if (keysRef.current.has('s') || keysRef.current.has('arrowdown')) {
           newY = Math.min(CANVAS_HEIGHT - 40, newY + PLAYER_SPEED);
         }
-        
+
         return {
           ...prev,
           x: newX,
@@ -241,7 +243,7 @@ export default function DungeonGame() {
       });
 
       // Enemy spawning
-      setEnemySpawnTimer(prev => {
+      setEnemySpawnTimer((prev) => {
         const spawnRate = Math.max(500, 2000 - stage * 100); // Faster spawning each stage
         if (prev <= 0) {
           spawnEnemy();
@@ -251,7 +253,7 @@ export default function DungeonGame() {
       });
 
       // Pickup spawning
-      setPickupSpawnTimer(prev => {
+      setPickupSpawnTimer((prev) => {
         if (prev <= 0) {
           if (Math.random() < 0.3) spawnPickup();
           return 5000; // Every 5 seconds chance
@@ -260,42 +262,47 @@ export default function DungeonGame() {
       });
 
       // Update spells
-      setSpells(prev => prev
-        .map(spell => ({ ...spell, x: spell.x + spell.vx, y: spell.y + spell.vy }))
-        .filter(spell => spell.x < CANVAS_WIDTH + 50)
+      setSpells((prev) =>
+        prev
+          .map((spell) => ({ ...spell, x: spell.x + spell.vx, y: spell.y + spell.vy }))
+          .filter((spell) => spell.x < CANVAS_WIDTH + 50),
       );
 
       // Update enemies
-      setEnemies(prev => prev
-        .map(enemy => ({ ...enemy, x: enemy.x - enemy.speed }))
-        .filter(enemy => enemy.x > -50 && enemy.health > 0)
+      setEnemies((prev) =>
+        prev
+          .map((enemy) => ({ ...enemy, x: enemy.x - enemy.speed }))
+          .filter((enemy) => enemy.x > -50 && enemy.health > 0),
       );
 
       // Update pickups
-      setPickups(prev => prev
-        .map(pickup => ({ ...pickup, x: pickup.x - 2 }))
-        .filter(pickup => pickup.x > -30)
+      setPickups((prev) =>
+        prev.map((pickup) => ({ ...pickup, x: pickup.x - 2 })).filter((pickup) => pickup.x > -30),
       );
 
       // Collision detection
       // Spells vs Enemies
-      setSpells(prevSpells => {
-        return prevSpells.filter(spell => {
+      setSpells((prevSpells) => {
+        return prevSpells.filter((spell) => {
           let hit = false;
-          setEnemies(prevEnemies => 
-            prevEnemies.map(enemy => {
-              if (!hit && 
-                  spell.x < enemy.x + 40 && spell.x + 10 > enemy.x &&
-                  spell.y < enemy.y + 40 && spell.y + 5 > enemy.y) {
+          setEnemies((prevEnemies) =>
+            prevEnemies.map((enemy) => {
+              if (
+                !hit &&
+                spell.x < enemy.x + 40 &&
+                spell.x + 10 > enemy.x &&
+                spell.y < enemy.y + 40 &&
+                spell.y + 5 > enemy.y
+              ) {
                 hit = true;
                 const newHealth = enemy.health - spell.damage;
                 if (newHealth <= 0) {
-                  setScore(prev => prev + (enemy.type === 'boss' ? 200 : 100));
+                  setScore((prev) => prev + (enemy.type === 'boss' ? 200 : 100));
                 }
                 return { ...enemy, health: newHealth };
               }
               return enemy;
-            })
+            }),
           );
           return !hit;
         });
@@ -303,17 +310,20 @@ export default function DungeonGame() {
 
       // Player vs Enemies
       if (player.invulnerable <= 0) {
-        setEnemies(prevEnemies => {
+        setEnemies((prevEnemies) => {
           let playerHit = false;
-          const result = prevEnemies.filter(enemy => {
-            const collision = enemy.x < player.x + 40 && enemy.x + 40 > player.x &&
-                            enemy.y < player.y + 40 && enemy.y + 40 > player.y;
+          const result = prevEnemies.filter((enemy) => {
+            const collision =
+              enemy.x < player.x + 40 &&
+              enemy.x + 40 > player.x &&
+              enemy.y < player.y + 40 &&
+              enemy.y + 40 > player.y;
             if (collision && !playerHit) {
               playerHit = true;
-              setPlayer(prev => {
+              setPlayer((prev) => {
                 const newHealth = prev.health - enemy.damage;
                 if (newHealth <= 0) {
-                  setLives(l => l - 1);
+                  setLives((l) => l - 1);
                   return {
                     ...prev,
                     health: prev.maxHealth,
@@ -335,19 +345,22 @@ export default function DungeonGame() {
       }
 
       // Player vs Pickups
-      setPickups(prevPickups => {
-        return prevPickups.filter(pickup => {
-          const collision = pickup.x < player.x + 40 && pickup.x + 20 > player.x &&
-                          pickup.y < player.y + 40 && pickup.y + 20 > player.y;
+      setPickups((prevPickups) => {
+        return prevPickups.filter((pickup) => {
+          const collision =
+            pickup.x < player.x + 40 &&
+            pickup.x + 20 > player.x &&
+            pickup.y < player.y + 40 &&
+            pickup.y + 20 > player.y;
           if (collision) {
-            setPlayer(prev => {
+            setPlayer((prev) => {
               switch (pickup.type) {
                 case 'health':
                   return { ...prev, health: Math.min(prev.maxHealth, prev.health + pickup.value) };
                 case 'mana':
                   return { ...prev, mana: Math.min(prev.maxMana, prev.mana + pickup.value) };
                 case 'treasure':
-                  setScore(s => s + pickup.value);
+                  setScore((s) => s + pickup.value);
                   return prev;
                 default:
                   return prev;
@@ -437,23 +450,23 @@ export default function DungeonGame() {
     ctx.fillText('', player.x + 12, player.y + 25);
 
     // Draw enemies
-    enemies.forEach(enemy => {
+    enemies.forEach((enemy) => {
       ctx.fillStyle = enemy.type === 'boss' ? '#8b0000' : '#4a4a4a';
       ctx.fillRect(enemy.x, enemy.y, 40, 40);
-      
+
       // Health bar
       ctx.fillStyle = '#ff0000';
       ctx.fillRect(enemy.x, enemy.y - 8, 40, 4);
       ctx.fillStyle = '#00ff00';
       ctx.fillRect(enemy.x, enemy.y - 8, (enemy.health / enemy.maxHealth) * 40, 4);
-      
+
       // Enemy symbol
       ctx.fillStyle = '#ffffff';
       ctx.fillText(enemy.type === 'boss' ? '' : '', enemy.x + 12, enemy.y + 25);
     });
 
     // Draw spells
-    spells.forEach(spell => {
+    spells.forEach((spell) => {
       ctx.fillStyle = '#ff69b4';
       ctx.fillRect(spell.x, spell.y, 10, 5);
       ctx.shadowColor = '#ff69b4';
@@ -463,7 +476,7 @@ export default function DungeonGame() {
     });
 
     // Draw pickups
-    pickups.forEach(pickup => {
+    pickups.forEach((pickup) => {
       const colors = {
         health: '#ff0000',
         mana: '#0066ff',
@@ -471,7 +484,7 @@ export default function DungeonGame() {
       };
       ctx.fillStyle = colors[pickup.type];
       ctx.fillRect(pickup.x, pickup.y, 20, 20);
-      
+
       const symbols = {
         health: '️',
         mana: '',
@@ -494,7 +507,7 @@ export default function DungeonGame() {
     ctx.fillRect(CANVAS_WIDTH - 200, 10, 190, 20);
     ctx.fillStyle = '#00ff00';
     ctx.fillRect(CANVAS_WIDTH - 200, 10, (player.health / player.maxHealth) * 190, 20);
-    
+
     ctx.fillStyle = '#0000ff';
     ctx.fillRect(CANVAS_WIDTH - 200, 35, 190, 20);
     ctx.fillStyle = '#00aaff';
@@ -531,7 +544,12 @@ export default function DungeonGame() {
               <p> WASD/Arrow Keys - Move</p>
               <p> Space - Cast Spell</p>
               <p> Collect pickups to survive longer</p>
-              <p>⏰ 1-hour time limit (optional)</p>
+              <p>
+                <span role="img" aria-label="Clock">
+                  ⏰
+                </span>{' '}
+                1-hour time limit (optional)
+              </p>
             </div>
           </div>
           <p className="text-sm text-gray-400 mt-6">
@@ -562,9 +580,7 @@ export default function DungeonGame() {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-900 via-purple-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-4">
-            {gameState === 'victory' ? '' : ''}
-          </div>
+          <div className="text-6xl mb-4">{gameState === 'victory' ? '' : ''}</div>
           <h2 className="text-3xl font-bold mb-4">
             {gameState === 'victory' ? 'Victory!' : 'Defeated'}
           </h2>

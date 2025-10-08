@@ -8,20 +8,20 @@ import { PETAL_TO_USD as RATE } from '@/app/lib/shop/types';
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
-  const { addPetals: earn, setPetals: spend } = usePetalContext()();
+  const { addPetals: _earn, setPetals: _spend } = usePetalContext()();
   const {
     id,
     title,
     image,
     priceUSD,
-    petalPrice,
-    petalBonus = Math.round(priceUSD * 0.1),
-    tag,
-    inStock = true,
+    petalPrice: _petalPrice,
+    petalBonus: _petalBonus = Math.round(priceUSD * 0.1),
+    tag: _tag,
+    inStock: _inStock = true,
   } = product;
 
-  const handleAdd = () => {
-    if (!inStock) return;
+  const _handleAdd = () => {
+    if (!_inStock) return;
     addItem({
       id,
       name: title,
@@ -88,20 +88,20 @@ export default function ProductCard({ product }: { product: Product }) {
             aria-label="Add to wishlist"
             title="Add to wishlist"
           >
-             Wish
+            Wish
           </button>
         </div>
         <button
-          disabled={!inStock}
-          onClick={handleAdd}
+          disabled={!_inStock}
+          onClick={_handleAdd}
           className={[
             'w-full rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors',
-            inStock
+            _inStock
               ? 'bg-pink-500/90 hover:bg-pink-400/90 text-black'
               : 'bg-white/10 text-white/50 cursor-not-allowed',
           ].join(' ')}
         >
-          {inStock ? 'Add to bottomless cart' : 'Out of stock'}
+          {_inStock ? 'Add to bottomless cart' : 'Out of stock'}
         </button>
       </div>
     </article>

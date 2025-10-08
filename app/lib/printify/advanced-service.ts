@@ -305,9 +305,9 @@ export class AdvancedPrintifyService {
   }> {
     const {
       autoFulfill = false,
-      notifyCustomer = true,
-      trackingEnabled = true,
-      expedited = false,
+      notifyCustomer: _notifyCustomer = true,
+      trackingEnabled: _trackingEnabled = true,
+      expedited: _expedited = false,
     } = options;
 
     try {
@@ -589,7 +589,7 @@ export class AdvancedPrintifyService {
         if (!variant || !variant.is_available || !variant.is_enabled) {
           unavailableItems.push(`${product.title} - Variant ${item.variantId}`);
         }
-      } catch (error) {
+      } catch {
         unavailableItems.push(`Product ${item.productId}`);
       }
     }

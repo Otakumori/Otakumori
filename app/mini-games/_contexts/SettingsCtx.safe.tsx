@@ -39,7 +39,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       if (savedTheme !== null && (savedTheme === 'dark' || savedTheme === 'light')) {
         setThemeState(savedTheme);
       }
-    } catch (error) {
+    } catch {
       // Failed to load settings from localStorage
     }
   }, []);
@@ -48,7 +48,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   useEffect(() => {
     try {
       localStorage.setItem('otm-master-volume', masterVolume.toString());
-    } catch (error) {
+    } catch {
       // Failed to save volume to localStorage
     }
   }, [masterVolume]);
@@ -56,7 +56,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   useEffect(() => {
     try {
       localStorage.setItem('otm-muted', isMuted.toString());
-    } catch (error) {
+    } catch {
       // Failed to save muted state to localStorage
     }
   }, [isMuted]);
@@ -64,7 +64,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   useEffect(() => {
     try {
       localStorage.setItem('otm-theme', theme);
-    } catch (error) {
+    } catch {
       // Failed to save theme to localStorage
     }
   }, [theme]);

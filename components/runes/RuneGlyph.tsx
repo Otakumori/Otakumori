@@ -24,31 +24,31 @@ export default function RuneGlyph({
   displayName,
   size = 'md',
   animated = false,
-  style = 'emoji',
+  style: _style = 'emoji',
   className = '',
 }: RuneGlyphProps) {
   // Use the first available ID
-  const id = canonicalId || runeId;
-  
+  const _id = canonicalId || runeId;
+
   // Use the first available glyph
   const glyphText = glyphOverride || glyph || '';
-  
+
   // Size classes
   const sizeClasses = {
     sm: 'text-lg',
     md: 'text-2xl',
     lg: 'text-4xl',
   };
-  
+
   // Animation variants
   const animationVariants = {
     initial: { scale: 1, rotate: 0 },
     hover: { scale: 1.1, rotate: 5 },
     tap: { scale: 0.95 },
   };
-  
+
   const content: ReactNode = (
-    <span 
+    <span
       className={`${sizeClasses[size]} ${className}`}
       title={displayName || id}
       role="img"
@@ -57,7 +57,7 @@ export default function RuneGlyph({
       {glyphText}
     </span>
   );
-  
+
   if (animated) {
     return (
       <motion.div
@@ -71,6 +71,6 @@ export default function RuneGlyph({
       </motion.div>
     );
   }
-  
+
   return content;
 }

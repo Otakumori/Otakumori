@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoaded = true;
   }
 
-  const router = useRouter();
+  const _router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [authModal, setAuthModal] = useState<AuthModalState>({
     isOpen: false,

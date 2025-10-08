@@ -22,11 +22,11 @@ interface Achievement {
 }
 
 export default function AchievementsPage() {
-  const [activeCategory, setActiveCategory] = useState<
+  const [_activeCategory, _setActiveCategory] = useState<
     'all' | 'daily' | 'weekly' | 'skill' | 'collector' | 'social'
   >('all');
-  const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [totalProgress, setTotalProgress] = useState({ completed: 0, total: 0 });
+  const [_achievements, _setAchievements] = useState<Achievement[]>([]);
+  const [_totalProgress, _setTotalProgress] = useState({ completed: 0, total: 0 });
   const params = useSearchParams();
   const router = useRouter();
 

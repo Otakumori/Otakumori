@@ -13,7 +13,7 @@ interface SafetySettingsProps {
 export default function SafetySettings({ className = '' }: SafetySettingsProps) {
   const [settings, setSettings] = useState<UserSafetySettings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [_saving, _setSaving] = useState(false);
   const [blockedUsers, setBlockedUsers] = useState<
     Array<{ id: string; username: string; display_name?: string }>
   >([]);

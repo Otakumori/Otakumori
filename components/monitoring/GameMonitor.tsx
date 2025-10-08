@@ -18,7 +18,7 @@ export function GameMonitor() {
       let activeGames = 0;
 
       // Calculate metrics from active sessions
-      activeSessions.forEach((session, gameId) => {
+      activeSessions.forEach((session, _gameId) => {
         if (!session.endTime) {
           activeGames++;
           totalSessionTime += now - session.startTime;

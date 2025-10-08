@@ -8,10 +8,12 @@ export async function GET() {
   try {
     // Get metrics from Redis
     const metrics = await monitor.getMetrics();
+    console.warn(`Metrics requested: ${Object.keys(metrics).length} metric types`);
 
     // Get historical metrics (last 24 hours)
     const now = Date.now();
     const oneDayAgo = now - 24 * 60 * 60 * 1000;
+    console.warn(`Historical metrics from: ${new Date(oneDayAgo).toISOString()}`);
 
     // TODO: Integrate HTTP-based Redis client to fetch historical metrics
     const historicalMetrics: any[] = [];

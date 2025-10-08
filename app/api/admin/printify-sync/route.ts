@@ -15,12 +15,14 @@ export async function POST() {
 async function syncPrintify() {
   try {
     const result = await printifyService.getProducts();
+    console.warn(`Sync retrieved ${result.data?.length || 0} products from Printify`);
 
     // Process the products and upsert to database
     const products = await printifyService.getProducts();
 
     for (const product of products) {
       const visible = product.variants?.some((v: any) => v.available) ?? false;
+      const subcategory = mapSubcategory(product);
 
       await db.product.upsert({
         where: { id: String(product.id) },
@@ -28,6 +30,7 @@ async function syncPrintify() {
           name: product.title,
           description: product.description ?? '',
           category: mapCategory(product),
+          subcategory: subcategory,
           primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
           printifyProductId: String(product.id),
@@ -37,6 +40,7 @@ async function syncPrintify() {
           name: product.title,
           description: product.description ?? '',
           category: mapCategory(product),
+          subcategory: subcategory,
           primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
           printifyProductId: String(product.id),

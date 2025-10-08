@@ -9,8 +9,9 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.log(`Admin ${admin.id} deleting track ${params.id}`);
+    console.warn(`Admin ${admin.id} deleting track ${params.id}`);
   } catch (error) {
+    console.error('Admin auth failed for track deletion:', error);
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
