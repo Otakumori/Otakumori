@@ -50,7 +50,7 @@ export default function PetalEmitterTree({
     let running = true;
     let last = performance.now();
     let spawnAcc = 0;
-    let _pointerDown = false;
+    let pointerDown = false;
     let px = 0,
       py = 0;
 

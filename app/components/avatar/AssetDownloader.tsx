@@ -13,6 +13,9 @@ export function AssetDownloader({ config, className = '' }: AssetDownloaderProps
   const [exportFormat, setExportFormat] = useState<string>('');
   const [exportQuality, setExportQuality] = useState<'low' | 'medium' | 'high'>('medium');
 
+  // Log config for debugging export process
+  console.warn('AssetDownloader initialized with config keys:', Object.keys(config));
+
   const formats = [
     {
       id: 'glb',

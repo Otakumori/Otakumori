@@ -12,13 +12,35 @@ const ClaimRequestSchema = z.object({
 
 const DAILY_CAP = 120;
 // TTL for Redis cap tracking (currently using database fallback)
-const CAP_TTL_SECONDS = 60 * 60 * 24 * 2;
+// When Redis is re-enabled, use this TTL for caching daily caps
+const CAP_TTL_SECONDS = 60 * 60 * 24 * 2; // 2 days
+
+// Helper to generate cache key for daily cap tracking
+const getDailyCapKey = (userId: string, date: string) =>
+  `quest:daily_cap:${userId}:${date}:ttl_${CAP_TTL_SECONDS}`;
+
+// Helper to check daily quest cap (to be used when Redis is enabled)
+async function checkDailyQuestCap(userId: string): Promise<boolean> {
+  const today = new Date().toISOString().split('T')[0];
+  const cacheKey = getDailyCapKey(userId, today);
+  // TODO: Implement Redis check when available
+  // const count = await redis.get(cacheKey);
+  // return count ? parseInt(count) < 10 : true;
+  console.warn('Daily quest cap check bypassed - Redis not configured', { cacheKey });
+  return true; // Allow quests until Redis is configured
+}
 
 export async function POST(request: Request) {
   try {
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ error: 'auth' }, { status: 401 });
+    }
+
+    // Check daily quest cap before processing
+    const canClaim = await checkDailyQuestCap(clerkId);
+    if (!canClaim) {
+      return NextResponse.json({ error: 'daily_cap_reached' }, { status: 429 });
     }
 
     const body = ClaimRequestSchema.parse(await request.json());

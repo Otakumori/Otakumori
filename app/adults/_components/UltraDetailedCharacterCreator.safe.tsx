@@ -663,8 +663,11 @@ export function UltraDetailedCharacterCreator({
                     <h3 className="text-white font-semibold">Basic Information</h3>
 
                     <div>
-                      <label className="block text-white text-sm mb-2">Gender</label>
+                      <label htmlFor="char-gender" className="block text-white text-sm mb-2">
+                        Gender
+                      </label>
                       <select
+                        id="char-gender"
                         value={characterConfig.gender}
                         onChange={(e) => updateConfig('gender', e.target.value)}
                         className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white"
@@ -675,8 +678,11 @@ export function UltraDetailedCharacterCreator({
                     </div>
 
                     <div>
-                      <label className="block text-white text-sm mb-2">Age</label>
+                      <label htmlFor="char-age" className="block text-white text-sm mb-2">
+                        Age
+                      </label>
                       <select
+                        id="char-age"
                         value={characterConfig.age}
                         onChange={(e) => updateConfig('age', e.target.value)}
                         className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white"

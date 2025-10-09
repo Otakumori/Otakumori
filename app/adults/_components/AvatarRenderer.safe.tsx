@@ -96,23 +96,42 @@ function CharacterMesh({ config }: { config: any }) {
       const morphTargets = meshRef.current.morphTargetDictionary;
       const morphInfluences = meshRef.current.morphTargetInfluences;
       if (morphTargets && morphInfluences) {
-        // Apply face morphs
+        // Use delta for smooth interpolation of morph targets (frame-rate independent)
+        const interpSpeed = Math.min(delta * 5, 1); // Smooth interpolation
+
+        // Apply face morphs with smooth transitions
         if (morphTargets.eyeSize) {
-          morphInfluences[morphTargets.eyeSize] = (config.face?.eyes?.size || 1.0) - 1.0;
+          const targetValue = (config.face?.eyes?.size || 1.0) - 1.0;
+          morphInfluences[morphTargets.eyeSize] +=
+            (targetValue - morphInfluences[morphTargets.eyeSize]) * interpSpeed;
         }
         if (morphTargets.jawStrength) {
-          morphInfluences[morphTargets.jawStrength] = config.face?.faceShape?.jawline || 0.5;
+          const targetValue = config.face?.faceShape?.jawline || 0.5;
+          morphInfluences[morphTargets.jawStrength] +=
+            (targetValue - morphInfluences[morphTargets.jawStrength]) * interpSpeed;
         }
         if (morphTargets.cheekbones) {
-          morphInfluences[morphTargets.cheekbones] = config.face?.faceShape?.cheekbones || 0.5;
+          const targetValue = config.face?.faceShape?.cheekbones || 0.5;
+          morphInfluences[morphTargets.cheekbones] +=
+            (targetValue - morphInfluences[morphTargets.cheekbones]) * interpSpeed;
         }
 
-        // Apply body morphs
+        // Apply body morphs with smooth transitions
         if (morphTargets.muscleMass) {
-          morphInfluences[morphTargets.muscleMass] = config.body?.muscleMass || 0.5;
+          const targetValue = config.body?.muscleMass || 0.5;
+          morphInfluences[morphTargets.muscleMass] +=
+            (targetValue - morphInfluences[morphTargets.muscleMass]) * interpSpeed;
         }
         if (morphTargets.bodyFat) {
-          morphInfluences[morphTargets.bodyFat] = config.body?.bodyFat || 0.5;
+          const targetValue = config.body?.bodyFat || 0.5;
+          morphInfluences[morphTargets.bodyFat] +=
+            (targetValue - morphInfluences[morphTargets.bodyFat]) * interpSpeed;
+        }
+
+        // Use state.clock for time-based animations (breathing effect)
+        const time = state.clock.getElapsedTime();
+        if (morphTargets.breathe) {
+          morphInfluences[morphTargets.breathe] = Math.sin(time * 2) * 0.1;
         }
       }
     }

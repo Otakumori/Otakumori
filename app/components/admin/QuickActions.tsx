@@ -18,7 +18,9 @@ const QuickActions: React.FC = () => {
         });
         const data = await res.json();
         setMaintenance(!!data.maintenance);
-      } catch (err) {
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        console.error('Failed to fetch maintenance status:', error);
         setError('Failed to fetch maintenance status');
       } finally {
         setLoading(false);
@@ -38,7 +40,9 @@ const QuickActions: React.FC = () => {
       });
       const data = await res.json();
       setMaintenance(!!data.maintenance);
-    } catch (err) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('Failed to update maintenance status:', error);
       setError('Failed to update maintenance status');
     } finally {
       setLoading(false);

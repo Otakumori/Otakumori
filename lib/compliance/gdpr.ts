@@ -504,7 +504,13 @@ export class GDPRCompliance {
     // Store consent record in database for audit trail
     try {
       // This would integrate with your database
-      // Storing consent record
+      console.warn('Storing GDPR consent record', {
+        userId: consent.userId,
+        level: consent.level,
+        timestamp: consent.timestamp,
+        purposes: consent.purposes.length,
+      });
+      // TODO: await prisma.consentRecord.create({ data: consent })
     } catch (error) {
       console.error('Failed to store consent record:', error);
     }
@@ -514,6 +520,8 @@ export class GDPRCompliance {
     // Retrieve consent history from database
     try {
       // This would integrate with your database
+      console.warn('Retrieving GDPR consent history', { userId });
+      // TODO: return await prisma.consentRecord.findMany({ where: { userId } })
       return [];
     } catch (error) {
       console.error('Failed to get consent history:', error);
@@ -530,8 +538,13 @@ export function useGDPRConsent() {
   // This would be implemented as a React hook
   return {
     consent: null as ConsentRecord | null,
-    updateConsent: (level: ConsentLevel) => {},
-    isAllowed: (purpose: string) => false,
+    updateConsent: (_level: ConsentLevel) => {
+      // Stub implementation for consent update
+    },
+    isAllowed: (_purpose: string) => {
+      // Stub implementation always denies until implemented
+      return false;
+    },
     showBanner: false,
   };
 }

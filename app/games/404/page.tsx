@@ -16,7 +16,7 @@ export default function LRoom404Page() {
   const [herringSelections, setHerringSelections] = useState<number[]>([]);
   const [nameInput, setNameInput] = useState('');
   const [showFlash, setShowFlash] = useState(false);
-  const [_timeoutId, _setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   // Timeline Anomaly data - 5 timestamps out of order
   const timestamps = [

@@ -83,6 +83,8 @@ export class BundleAnalyzer {
       return null;
     }
 
+    console.warn('Analyzing bundle stats from:', statsPath);
+
     try {
       // In a real implementation, this would parse webpack stats.json
       // For now, return mock data
@@ -237,7 +239,7 @@ export class BundleAnalyzer {
     if (budgetCheck.violations.length > 0) {
       // Budget violations logged
       budgetCheck.violations.forEach((violation) => {
-        // Budget violation logged
+        console.warn(`Budget violation: ${violation}`);
       });
     }
 
@@ -245,7 +247,7 @@ export class BundleAnalyzer {
     if (recommendations.length > 0) {
       // Recommendations logged
       recommendations.forEach((rec) => {
-        // Recommendation logged
+        console.info(`Performance recommendation: ${rec}`);
       });
     }
 
@@ -279,7 +281,10 @@ export class CoreWebVitalsMonitor {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
         this.observers.push(lcpObserver);
       } catch (error) {
-        console.warn('LCP observer not supported');
+        console.warn(
+          'LCP observer not supported:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
 
       // FID Observer
@@ -293,7 +298,10 @@ export class CoreWebVitalsMonitor {
         fidObserver.observe({ entryTypes: ['first-input'] });
         this.observers.push(fidObserver);
       } catch (error) {
-        console.warn('FID observer not supported');
+        console.warn(
+          'FID observer not supported:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
 
       // CLS Observer
@@ -311,7 +319,10 @@ export class CoreWebVitalsMonitor {
         clsObserver.observe({ entryTypes: ['layout-shift'] });
         this.observers.push(clsObserver);
       } catch (error) {
-        console.warn('CLS observer not supported');
+        console.warn(
+          'CLS observer not supported:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
     }
   }

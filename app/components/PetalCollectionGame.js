@@ -11,6 +11,7 @@ export default function PetalCollectionGame() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [clickFeedback, setClickFeedback] = useState({ x: 0, y: 0, show: false });
   const containerRef = useRef(null);
 
   const handlePetalClick = async (e) => {
@@ -21,9 +22,13 @@ export default function PetalCollectionGame() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    // Show visual feedback at click position
+    setClickFeedback({ x, y, show: true });
+    setTimeout(() => setClickFeedback((prev) => ({ ...prev, show: false })), 500);
+
     try {
       await collectPetal();
-      setNotificationMessage(' Petal collected!');
+      setNotificationMessage(` Petal collected! Total: ${collectedPetals + 1}`);
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 2000);
     } catch (error) {
@@ -50,6 +55,30 @@ export default function PetalCollectionGame() {
 
         {/* Cherry Blossom Effect */}
         <CherryBlossomEffect isActive={isGameActive} containerRef={containerRef} />
+
+        {/* Click Feedback */}
+        {clickFeedback.show && (
+          <motion.div
+            initial={{ scale: 0, opacity: 1 }}
+            animate={{ scale: 1.5, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute pointer-events-none"
+            style={{
+              left: clickFeedback.x,
+              top: clickFeedback.y,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <div className="text-4xl">🌸</div>
+          </motion.div>
+        )}
+
+        {/* Petal Counter */}
+        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg border border-pink-500/30">
+          <p className="text-pink-300 font-bold">
+            Petals: <span className="text-pink-400">{collectedPetals}</span>
+          </p>
+        </div>
 
         {/* Game Controls Overlay */}
         <div className="absolute bottom-4 right-4 flex space-x-2">

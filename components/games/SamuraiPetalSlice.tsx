@@ -63,7 +63,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
   });
 
   const [runId, setRunId] = useState<string | null>(null);
-  const [_seed, _setSeed] = useState<number | null>(null);
+  const [seed, setSeed] = useState<number | null>(null);
   const [isGameOver, setIsGameOver] = useState(false);
   const [showResults, setShowResults] = useState(false);
 

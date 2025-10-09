@@ -208,13 +208,18 @@ export default function AdminFlagsPage() {
                       <h3 className="font-medium text-white">{flag.name}</h3>
                       <p className="mt-1 text-sm text-neutral-400">{flag.description}</p>
                     </div>
-                    <label className="relative inline-flex cursor-pointer items-center">
+                    <label
+                      htmlFor={`flag-toggle-${flag.id}`}
+                      className="relative inline-flex cursor-pointer items-center"
+                    >
                       <input
+                        id={`flag-toggle-${flag.id}`}
                         type="checkbox"
                         checked={flag.enabled}
                         onChange={() => toggleFlag(flag.id)}
                         disabled={saving}
                         className="peer sr-only"
+                        aria-label={`Enable or disable ${flag.name}`}
                       />
                       <span className="after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer h-6 w-11 rounded-full bg-neutral-700 peer-checked:bg-pink-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-800 peer-checked:after:translate-x-full peer-checked:after:border-white" />
                     </label>

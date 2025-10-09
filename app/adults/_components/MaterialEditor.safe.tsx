@@ -105,8 +105,14 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
 
         <div className="space-y-3">
           <div className="space-y-2">
-            <label className="block text-white text-sm font-medium">Primary Color</label>
+            <label
+              htmlFor="material-primary-color"
+              className="block text-white text-sm font-medium"
+            >
+              Primary Color
+            </label>
             <input
+              id="material-primary-color"
               type="color"
               value={config.parameters?.colorA || '#FF6B9D'}
               onChange={(e) => updateConfig('parameters.colorA', e.target.value)}
@@ -115,8 +121,14 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-white text-sm font-medium">Secondary Color</label>
+            <label
+              htmlFor="material-secondary-color"
+              className="block text-white text-sm font-medium"
+            >
+              Secondary Color
+            </label>
             <input
+              id="material-secondary-color"
               type="color"
               value={config.parameters?.colorB || '#8B5CF6'}
               onChange={(e) => updateConfig('parameters.colorB', e.target.value)}
@@ -125,8 +137,11 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-white text-sm font-medium">Rim Color</label>
+            <label htmlFor="material-rim-color" className="block text-white text-sm font-medium">
+              Rim Color
+            </label>
             <input
+              id="material-rim-color"
               type="color"
               value={config.parameters?.rimColor || '#FFD700'}
               onChange={(e) => updateConfig('parameters.rimColor', e.target.value)}
@@ -142,8 +157,14 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
 
         <div className="space-y-3">
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Albedo Texture</label>
+            <label
+              htmlFor="material-albedo-texture"
+              className="block text-white text-sm font-medium mb-2"
+            >
+              Albedo Texture
+            </label>
             <input
+              id="material-albedo-texture"
               type="url"
               value={config.textures?.albedo || ''}
               onChange={(e) => updateConfig('textures.albedo', e.target.value)}
@@ -153,8 +174,14 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Normal Map</label>
+            <label
+              htmlFor="material-normal-map"
+              className="block text-white text-sm font-medium mb-2"
+            >
+              Normal Map
+            </label>
             <input
+              id="material-normal-map"
               type="url"
               value={config.textures?.normal || ''}
               onChange={(e) => updateConfig('textures.normal', e.target.value)}
@@ -164,8 +191,14 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">ORM Texture</label>
+            <label
+              htmlFor="material-orm-texture"
+              className="block text-white text-sm font-medium mb-2"
+            >
+              ORM Texture
+            </label>
             <input
+              id="material-orm-texture"
               type="url"
               value={config.textures?.orm || ''}
               onChange={(e) => updateConfig('textures.orm', e.target.value)}
@@ -175,8 +208,14 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Mask Texture</label>
+            <label
+              htmlFor="material-mask-texture"
+              className="block text-white text-sm font-medium mb-2"
+            >
+              Mask Texture
+            </label>
             <input
+              id="material-mask-texture"
               type="url"
               value={config.textures?.mask || ''}
               onChange={(e) => updateConfig('textures.mask', e.target.value)}
@@ -186,8 +225,11 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Decals</label>
+            <label htmlFor="material-decals" className="block text-white text-sm font-medium mb-2">
+              Decals
+            </label>
             <input
+              id="material-decals"
               type="url"
               value={config.textures?.decals || ''}
               onChange={(e) => updateConfig('textures.decals', e.target.value)}

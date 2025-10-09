@@ -11,7 +11,8 @@ export type WorldEvent =
   | { type: 'shake:start' }
   | { type: 'shake:impulse'; strength?: number }
   | { type: 'shake:reward'; drops: Drop[] }
-  | { type: 'shake:end' };
+  | { type: 'shake:end' }
+  | { type: 'PETAL_BURST'; payload?: { count: number } };
 
 export type Drop = {
   type: 'petals' | 'cosmetic' | 'lore';

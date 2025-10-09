@@ -62,8 +62,8 @@ export default function DungeonGame() {
 
   // Game timing
   const [gameTime, setGameTime] = useState(0);
-  const [_enemySpawnTimer, _setEnemySpawnTimer] = useState(0);
-  const [_pickupSpawnTimer, _setPickupSpawnTimer] = useState(0);
+  const [enemySpawnTimer, setEnemySpawnTimer] = useState(0);
+  const [pickupSpawnTimer, setPickupSpawnTimer] = useState(0);
 
   const { saveOnExit, autoSave } = useGameSave('dungeon-of-desire');
 

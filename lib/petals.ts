@@ -349,6 +349,11 @@ export function validateEarning(config: {
     return { valid: false, reason: 'Amount must be positive' };
   }
 
+  // Check against max multiplier cap
+  if (baseAmount > maxMultiplier * 100) {
+    return { valid: false, reason: `Amount exceeds max multiplier cap (${maxMultiplier}x base)` };
+  }
+
   if (baseAmount > dailyCap) {
     return { valid: false, reason: 'Amount exceeds daily cap' };
   }

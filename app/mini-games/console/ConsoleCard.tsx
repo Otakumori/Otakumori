@@ -46,7 +46,7 @@ export default function ConsoleCard({
 }) {
   const [mode, setMode] = useState<Mode>('boot');
   const [face, setFace] = useQueryFace();
-  const [_audioOn, _setAudioOn] = useState(false);
+  const [audioOn, setAudioOn] = useState(false);
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [animMs, setAnimMs] = useState(160);
@@ -60,10 +60,10 @@ export default function ConsoleCard({
   }, []);
   useEffect(() => {
     // Only preload audio if not in reduced motion mode and audio is supported
-    const _audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+    const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
     if (
       !isReducedMotion &&
-      _audioEnabled &&
+      audioEnabled &&
       typeof window !== 'undefined' &&
       'AudioContext' in window
     ) {
@@ -76,6 +76,7 @@ export default function ConsoleCard({
         .catch((error) => {
           console.warn('Failed to preload audio files:', error);
         });
+      setAudioOn(audioEnabled); // Track audio state
     }
   }, [isReducedMotion]);
 
@@ -213,7 +214,8 @@ export default function ConsoleCard({
         const gp = pads && pads[0];
         if (gp) {
           const buttons = gp.buttons.map((b: any) => (b && b.pressed ? 1 : 0));
-          const _axes = gp.axes || [0, 0];
+          const axes = gp.axes || [0, 0];
+          // TODO: Add analog stick support using axes for smooth cube rotation
           // D-pad
           if (mode === 'cube') {
             if (press(buttons[14], 14)) {
@@ -567,7 +569,7 @@ export default function ConsoleCard({
   );
 
   const MusicFace = () => {
-    const [_loading, _setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [err, setErr] = useState<string | null>(null);
     const [crt, setCrt] = useState(false);
     const [vhs, setVhs] = useState(false);
@@ -1158,7 +1160,7 @@ function CommunityFace() {
     // Sentry breadcrumb on face enter
     try {
       // @ts-ignore
-      const S = require('@sentry/nextjs');
+      const S = Sentry;
       S.addBreadcrumb({ category: 'minigames', message: 'face.enter:2', level: 'info' });
     } catch {}
     const reqId = `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -1186,7 +1188,7 @@ function CommunityFace() {
     const bc = (message: string, extra?: Record<string, any>) => {
       try {
         // @ts-ignore
-        const S = require('@sentry/nextjs');
+        const S = Sentry;
         S.addBreadcrumb({
           category: 'minigames',
           message,
@@ -1295,6 +1297,7 @@ function CommunityFace() {
         // Creating WebSocket connection
         ws = new WebSocket(url);
       } catch (e) {
+        console.error('WebSocket connection failed:', e);
         setWsFailures((n) => n + 1);
         setWsDegraded(true);
         bc('ws.disconnect');
@@ -1429,7 +1432,7 @@ function CommunityFace() {
         onAccept={() => {
           setPendingInteraction(null);
           try {
-            const S = require('@sentry/nextjs');
+            const S = Sentry;
             S.addBreadcrumb({
               category: 'minigames',
               message: 'interaction.accepted',
@@ -1441,7 +1444,7 @@ function CommunityFace() {
         onDecline={() => {
           setPendingInteraction(null);
           try {
-            const S = require('@sentry/nextjs');
+            const S = Sentry;
             S.addBreadcrumb({
               category: 'minigames',
               message: 'interaction.declined',
@@ -1457,7 +1460,7 @@ function CommunityFace() {
           if (j.ok) {
             setTrainingActive(false);
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'training.learn',
@@ -1478,7 +1481,7 @@ function CommunityFace() {
           if (j.ok) {
             setUnlockedEmotes((prev) => new Set([...prev, 'blush_burst']));
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'emote.unlock',
@@ -1509,7 +1512,7 @@ function CommunityFace() {
               },
             ]);
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'prefs.blocked',
@@ -1531,7 +1534,7 @@ function CommunityFace() {
               },
             ]);
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'rate_limited',
@@ -1542,7 +1545,7 @@ function CommunityFace() {
           } else {
             try {
               if (dirty && prefs.JIGGLE_VISIBLE) {
-                const S = require('@sentry/nextjs');
+                const S = Sentry;
                 S.addBreadcrumb({
                   category: 'minigames',
                   message: 'jiggle.play',
@@ -1579,7 +1582,7 @@ function CommunityFace() {
             }
             setPendingInteraction({ requestId: j?.data?.requestId || `req_local_${Date.now()}` });
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'interaction.request.sent',
@@ -1588,6 +1591,7 @@ function CommunityFace() {
               });
             } catch {}
           } catch (e) {
+            console.error('Failed to send interaction request:', e);
             setToasts((prev) => [
               ...prev,
               {

@@ -79,7 +79,7 @@ export default function PetalStormRhythm() {
   const [accuracy, setAccuracy] = useState({ perfect: 0, great: 0, good: 0, miss: 0 });
   const [health, setHealth] = useState(100);
   const [multiplier, setMultiplier] = useState(1);
-  const [_sessionId, _setSessionId] = useState<string>('');
+  const [sessionId, setSessionId] = useState<string>('');
 
   // Refs for game loop
   const gameLoopRef = useRef<number | undefined>(undefined);

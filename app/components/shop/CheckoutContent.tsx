@@ -13,7 +13,7 @@ export default function CheckoutContent() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [_couponInput, _setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
-  const [_preview, _setPreview] = useState<any>(null);
+  const [preview, setPreview] = useState<any>(null);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',

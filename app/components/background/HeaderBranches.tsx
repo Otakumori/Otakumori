@@ -67,7 +67,7 @@ export default function HeaderBranches() {
 
         newBranches.push({
           id: `nav-twig-${index}`,
-          x1: trunkX + 20,
+          x1: navX - 50 + Math.random() * 100,
           y1: headerHeight + 10,
           x2: trunkX + 20 + Math.cos(twigAngle) * twigLength,
           y2: headerHeight + 10 + Math.sin(twigAngle) * twigLength,

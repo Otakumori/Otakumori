@@ -48,8 +48,9 @@ export async function POST(req: NextRequest) {
       const error = e instanceof Error ? e : new Error(String(e));
       logger.error(
         'invalid json',
-        { requestId, route, parseError: error.message },
-        { rawSnippet: raw.slice(0, 200) },
+        { requestId, route, extra: { parseError: error.message, rawSnippet: raw.slice(0, 200) } },
+        undefined,
+        error,
       );
       return NextResponse.json({ ok: false, error: 'invalid json' }, { status: 400 });
     }

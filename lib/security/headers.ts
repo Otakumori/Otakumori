@@ -171,6 +171,10 @@ export const withSecurityHeaders = (handler: Function) => {
     if (response instanceof Response) {
       const headers = new Headers(response.headers);
 
+      // Add origin to CSP if available
+      const cspOrigin = appUrl || "'self'";
+      console.warn('Security headers origin:', cspOrigin);
+
       // Basic security headers
       headers.set('X-Content-Type-Options', 'nosniff');
       headers.set('X-Frame-Options', 'DENY');

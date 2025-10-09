@@ -62,7 +62,7 @@ export default function SamuraiSlice() {
 
     let W = 800,
       H = 480;
-    let _running = true;
+    let running = true;
 
     function resize() {
       const r = host.getBoundingClientRect();

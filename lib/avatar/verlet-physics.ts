@@ -4,6 +4,7 @@ import * as THREE from 'three';
 
 // Types for Verlet physics system
 export interface VerletParticle {
+  velocity: any;
   position: THREE.Vector3;
   previousPosition: THREE.Vector3;
   acceleration: THREE.Vector3;
@@ -107,6 +108,7 @@ export class VerletPhysicsEngine {
       const particle: VerletParticle = {
         position: position.clone(),
         previousPosition: position.clone(),
+        velocity: new THREE.Vector3(0, 0, 0),
         acceleration: new THREE.Vector3(0, 0, 0),
         mass: 1.0,
         radius: thickness * (1 - t * 0.5), // Taper towards end
@@ -183,6 +185,7 @@ export class VerletPhysicsEngine {
         const particle: VerletParticle = {
           position: position.clone(),
           previousPosition: position.clone(),
+          velocity: new THREE.Vector3(0, 0, 0),
           acceleration: new THREE.Vector3(0, 0, 0),
           mass: 1.0,
           radius: 0.05,
@@ -343,6 +346,19 @@ export class VerletPhysicsEngine {
 
     const difference = (distance - restLength) / distance;
     const correction = delta.multiplyScalar(difference * stiffness);
+
+    // Apply damping to relative velocity
+    if (damping > 0) {
+      const relativeVelocity = particleB.velocity.clone().sub(particleA.velocity);
+      const dampingForce = relativeVelocity.multiplyScalar(damping);
+
+      if (!particleA.fixed) {
+        particleA.velocity.add(dampingForce.clone().multiplyScalar(0.5));
+      }
+      if (!particleB.fixed) {
+        particleB.velocity.sub(dampingForce.clone().multiplyScalar(0.5));
+      }
+    }
 
     if (!particleA.fixed && !particleB.fixed) {
       const massRatio = particleB.mass / (particleA.mass + particleB.mass);

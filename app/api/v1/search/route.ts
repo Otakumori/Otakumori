@@ -203,6 +203,9 @@ async function searchContent(
 ): Promise<SearchResult[]> {
   const { query, filters } = searchRequest;
   const results: SearchResult[] = [];
+  
+  // Log search for analytics
+  console.warn('Search query:', { query, userId: currentUserId, filters: filters || {} });
 
   // Search comments
   const comments = await db.comment.findMany({

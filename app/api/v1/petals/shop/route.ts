@@ -9,7 +9,7 @@ import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 import { z } from 'zod';
 
-const _ShopItemResponseSchema = z.object({
+const ShopItemResponseSchema = z.object({
   ok: z.boolean(),
   data: z
     .object({
@@ -83,7 +83,10 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(response);
+    // Validate response with Zod schema
+    const validatedResponse = ShopItemResponseSchema.parse(response);
+
+    return NextResponse.json(validatedResponse);
   } catch (error) {
     console.error('Error fetching shop items:', error);
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });

@@ -95,9 +95,8 @@ export async function GET(request: NextRequest) {
 // Background sync function
 async function syncProductsInBackground() {
   try {
-    // Background sync started
     const products = await getPrintifyService().getAllProducts();
-    // Background sync completed: ${products.length} products fetched
+    console.warn(`Background sync completed: ${products.length} products fetched`);
 
     // Here you would save to your database
     // await saveProductsToDatabase(products);

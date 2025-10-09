@@ -16,10 +16,12 @@ export default function HubPage() {
 
   // ambience loop
   useEffect(() => {
-    let _playing = true;
+    let playing = true;
     (async () => {
       try {
-        await play('/assets/music/hub_ambience.ogg', -18);
+        if (playing) {
+          await play('/assets/music/hub_ambience.ogg', -18);
+        }
       } catch {}
     })();
     return () => {

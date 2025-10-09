@@ -62,7 +62,8 @@ export async function POST(req: NextRequest) {
         const failedPayment = parseWebhookEvent(event, StripePaymentIntentSchema);
         console.error('Payment failed:', {
           paymentIntentId: failedPayment.id,
-          lastPaymentError: failedPayment.last_payment_error,
+          status: failedPayment.status,
+          // last_payment_error is not in the type definition
         });
         // Update order status to failed
         break;

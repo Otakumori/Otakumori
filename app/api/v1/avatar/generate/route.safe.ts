@@ -52,6 +52,8 @@ interface GenerationOptions {
 function generateProceduralAvatar(options: GenerationOptions) {
   const { theme, gender, age, style } = options;
 
+  console.warn('Generating avatar with style:', style, 'theme:', theme);
+
   // Random generators
   const random = (min: number, max: number) => Math.random() * (max - min) + min;
   const randomInt = (min: number, max: number) => Math.floor(random(min, max + 1));

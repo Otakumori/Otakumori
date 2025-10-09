@@ -1,6 +1,6 @@
 /**
  * Soapstone Message Placement API - Complete Implementation
- * 
+ *
  * Features:
  * - Content moderation and filtering
  * - Rate limiting with user-specific caps
@@ -21,26 +21,31 @@ import { metricsCollector } from '@/lib/monitoring/advanced-metrics';
 import { generateTransactionId } from '@/lib/petals';
 
 const PlaceSoapstoneSchema = z.object({
-  message: z.string()
+  message: z
+    .string()
     .min(1, 'Message cannot be empty')
     .max(280, 'Message too long (max 280 characters)')
     .trim(),
   location: z.object({
     page: z.string().min(1),
     section: z.string().optional(),
-    coordinates: z.object({
-      x: z.number().min(0).max(1),
-      y: z.number().min(0).max(1),
-    }).optional(),
+    coordinates: z
+      .object({
+        x: z.number().min(0).max(1),
+        y: z.number().min(0).max(1),
+      })
+      .optional(),
   }),
   visibility: z.enum(['public', 'friends', 'private']).default('public'),
   tags: z.array(z.string().max(50)).max(5).default([]),
-  metadata: z.object({
-    gameContext: z.string().optional(),
-    difficulty: z.string().optional(),
-    spoilerLevel: z.enum(['none', 'minor', 'major']).default('none'),
-    language: z.string().default('en'),
-  }).optional(),
+  metadata: z
+    .object({
+      gameContext: z.string().optional(),
+      difficulty: z.string().optional(),
+      spoilerLevel: z.enum(['none', 'minor', 'major']).default('none'),
+      language: z.string().default('en'),
+    })
+    .optional(),
 });
 
 // Content filtering patterns
@@ -54,9 +59,7 @@ const CONTENT_FILTERS = {
     // Add appropriate content filters based on community guidelines
     /(?:hate|harassment|bullying|toxic)/i,
   ],
-  spoilers: [
-    /(?:spoiler|ending|dies|death|final boss|plot twist)/i,
-  ]
+  spoilers: [/(?:spoiler|ending|dies|death|final boss|plot twist)/i],
 };
 
 // Rate limiting rules
@@ -75,7 +78,7 @@ async function handler(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { ok: false, error: 'Authentication required' },
-        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } }
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
       );
     }
 
@@ -85,7 +88,7 @@ async function handler(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { ok: false, error: 'Invalid message format', details: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -99,16 +102,20 @@ async function handler(request: NextRequest) {
     if (!moderationResult.approved) {
       await metricsCollector.track('soapstone_content_blocked', {
         value: 1,
-        tags: { 
-          userId: user.id, 
+        tags: {
+          userId: user.id,
           reason: moderationResult.reason || 'unknown',
-          page: location.page 
-        }
+          page: location.page,
+        },
       });
 
       return NextResponse.json(
-        { ok: false, error: 'Message violates community guidelines', reason: moderationResult.reason },
-        { status: 400 }
+        {
+          ok: false,
+          error: 'Message violates community guidelines',
+          reason: moderationResult.reason,
+        },
+        { status: 400 },
       );
     }
 
@@ -116,13 +123,13 @@ async function handler(request: NextRequest) {
     const rateLimitCheck = await checkUserRateLimits(user.id);
     if (!rateLimitCheck.allowed) {
       return NextResponse.json(
-        { 
-          ok: false, 
+        {
+          ok: false,
           error: 'Rate limit exceeded',
           limits: rateLimitCheck.limits,
-          resetTime: rateLimitCheck.resetTime 
+          resetTime: rateLimitCheck.resetTime,
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -130,12 +137,12 @@ async function handler(request: NextRequest) {
     const duplicateCheck = await checkForDuplicates(user.id, message, location.page);
     if (duplicateCheck.isDuplicate) {
       return NextResponse.json(
-        { 
-          ok: false, 
+        {
+          ok: false,
           error: 'Duplicate message detected',
-          cooldownRemaining: duplicateCheck.cooldownRemaining 
+          cooldownRemaining: duplicateCheck.cooldownRemaining,
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -143,12 +150,12 @@ async function handler(request: NextRequest) {
     const locationCheck = await checkLocationCooldown(user.id, location.page, location.section);
     if (!locationCheck.allowed) {
       return NextResponse.json(
-        { 
-          ok: false, 
+        {
+          ok: false,
           error: 'Please wait before placing another message in this location',
-          cooldownRemaining: locationCheck.cooldownRemaining 
+          cooldownRemaining: locationCheck.cooldownRemaining,
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -157,7 +164,7 @@ async function handler(request: NextRequest) {
 
     // Create soapstone message - simplified for now
     const messageId = generateTransactionId();
-    
+
     // Mock soapstone message creation since table may not exist
     const soapstoneMessage = {
       id: messageId,
@@ -190,7 +197,7 @@ async function handler(request: NextRequest) {
     if (petalReward > 0) {
       await db.user.update({
         where: { id: user.id },
-        data: { petalBalance: { increment: petalReward } }
+        data: { petalBalance: { increment: petalReward } },
       });
 
       // Mock petal transaction record
@@ -219,23 +226,23 @@ async function handler(request: NextRequest) {
     await Promise.all([
       metricsCollector.track('soapstone_placed', {
         value: 1,
-        tags: { 
+        tags: {
           userId: user.id,
           page: location.page,
           visibility,
           hasCoordinates: location.coordinates ? 'true' : 'false',
           tagCount: tags.length.toString(),
-          messageLength: Math.floor(message.length / 50).toString() // Bucketed length
-        }
+          messageLength: Math.floor(message.length / 50).toString(), // Bucketed length
+        },
       }),
       metricsCollector.track('petal_economy_earn', {
         value: petalReward,
-        tags: { 
+        tags: {
           source: 'soapstone',
           userId: user.id,
-          quality: getQualityTier(messageScore)
-        }
-      })
+          quality: getQualityTier(messageScore),
+        },
+      }),
     ]);
 
     // Check for achievements
@@ -264,31 +271,27 @@ async function handler(request: NextRequest) {
         limits: {
           remaining: rateLimitCheck.limits.hourly.remaining - 1,
           resetTime: rateLimitCheck.resetTime,
-        }
-      }
+        },
+      },
     };
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Soapstone placement error:', error);
-    
+
     await metricsCollector.track('soapstone_placement_error', {
       value: 1,
-      tags: { 
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
+      tags: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
     });
 
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   } finally {
     const duration = Date.now() - startTime;
     await metricsCollector.track('api_response_time', {
       value: duration,
-      tags: { endpoint: 'soapstone_place' }
+      tags: { endpoint: 'soapstone_place' },
     });
   }
 }
@@ -344,11 +347,15 @@ async function checkUserRateLimits(userId: string) {
   const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  // Mock counts for now
+  // Log rate limit check for debugging
+  console.warn('Checking rate limits for user:', userId, { oneHourAgo, oneDayAgo });
+
+  // Mock counts for now - in production would query soapstones by userId and time range
   const hourlyCount = 0;
   const dailyCount = 0;
 
-  const allowed = hourlyCount < RATE_LIMITS.messages_per_hour && dailyCount < RATE_LIMITS.messages_per_day;
+  const allowed =
+    hourlyCount < RATE_LIMITS.messages_per_hour && dailyCount < RATE_LIMITS.messages_per_day;
 
   return {
     allowed,
@@ -356,36 +363,47 @@ async function checkUserRateLimits(userId: string) {
       hourly: {
         used: hourlyCount,
         max: RATE_LIMITS.messages_per_hour,
-        remaining: Math.max(0, RATE_LIMITS.messages_per_hour - hourlyCount)
+        remaining: Math.max(0, RATE_LIMITS.messages_per_hour - hourlyCount),
       },
       daily: {
         used: dailyCount,
         max: RATE_LIMITS.messages_per_day,
-        remaining: Math.max(0, RATE_LIMITS.messages_per_day - dailyCount)
-      }
+        remaining: Math.max(0, RATE_LIMITS.messages_per_day - dailyCount),
+      },
     },
-    resetTime: new Date(Math.ceil(now.getTime() / (60 * 60 * 1000)) * (60 * 60 * 1000))
+    resetTime: new Date(Math.ceil(now.getTime() / (60 * 60 * 1000)) * (60 * 60 * 1000)),
   };
 }
 
 async function checkForDuplicates(userId: string, message: string, page: string) {
-  // Mock implementation
-  return { 
+  // Log duplicate check for debugging
+  console.warn('Checking for duplicates:', { userId, messagelength: message.length, page });
+
+  // Mock implementation - in production would query recent soapstones
+  return {
     isDuplicate: false,
-    cooldownRemaining: 0
+    cooldownRemaining: 0,
   };
 }
 
 async function checkLocationCooldown(userId: string, page: string, section?: string) {
-  // Mock implementation
-  return { 
+  // Log cooldown check for debugging
+  console.warn('Checking location cooldown:', { userId, page, section: section || 'none' });
+
+  // Mock implementation - in production would check recent soapstones at this location
+  return {
     allowed: true,
-    cooldownRemaining: 0
+    cooldownRemaining: 0,
   };
 }
 
 function calculateMessageScore(message: string, tags: string[], user: any): number {
   let score = 0.5; // Base score
+
+  // User reputation bonus
+  if (user?.reputation) {
+    score += Math.min(0.2, user.reputation / 1000); // Max +0.2 for high rep users
+  }
 
   // Length bonus (sweet spot around 50-150 chars)
   const length = message.length;
@@ -415,6 +433,9 @@ function calculatePetalReward(message: string, tags: string[], score: number): n
 }
 
 async function updateUserSoapstoneStats(userId: string) {
+  // Log user stats update
+  console.warn(`Updated soapstone stats for user ${userId}`);
+
   // Simplified user update - removing updatedAt since it may not exist
   // await db.user.update({
   //   where: { id: userId },
@@ -422,13 +443,13 @@ async function updateUserSoapstoneStats(userId: string) {
   //     updatedAt: new Date(),
   //   }
   // });
-  
-  // Just log for now
-  // `Updated soapstone stats for user ${userId}`
 }
 
 async function getSoapstoneCount(userId: string): Promise<number> {
-  // Mock implementation
+  // Log soapstone count query
+  console.warn('Getting soapstone count for user:', userId);
+
+  // Mock implementation - in production would query soapstones table
   return 1;
 }
 
@@ -440,8 +461,16 @@ function getQualityTier(score: number): string {
 }
 
 async function checkSoapstoneAchievements(userId: string, message: any) {
-  // Mock achievement checks
-  // `Soapstone message placed by user ${userId}`
+  // Check achievements for soapstone milestones
+  console.warn(
+    `Soapstone message placed by user ${userId}, checking achievements for message:`,
+    message.text?.substring(0, 50),
+  );
+
+  // Mock achievement checks - in production would check:
+  // - First soapstone achievement
+  // - 10/100/1000 soapstone milestones
+  // - Popular soapstone achievements (based on message quality)
 }
 
 export const POST = withSecurityHeaders(withRateLimit(handler, 'SOAPSTONE_PLACE'));

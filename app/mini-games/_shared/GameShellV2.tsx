@@ -59,13 +59,13 @@ export default function GameShellV2({
   children,
   enableBootAnimation = true,
   enableLeaderboards = true,
-  _enableAchievements = true,
+  enableAchievements = true,
   enableTelemetry = true,
   onGameStart,
   onGameEnd,
-  _onError,
+  onError,
   className = '',
-  _maxPlayers = 1,
+  maxPlayers = 1,
   difficulty = 'medium',
 }: GameShellV2Props) {
   const { isSignedIn: _isSignedIn, userId } = useAuth();
@@ -91,15 +91,33 @@ export default function GameShellV2({
   const saveSystem = useGameSaveV2(gameKey);
   const telemetry = useGameTelemetry(gameKey);
 
+  // Error handler
+  const handleError = useCallback((error: Error) => {
+    console.error(`[GameShell:${gameKey}] Error:`, error);
+    setGameState((prev) => ({ ...prev, hasError: true, isPlaying: false }));
+    
+    if (onError) {
+      onError(error);
+    }
+    
+    if (enableTelemetry) {
+      telemetry.trackError(error, 'GameShell');
+    }
+  }, [gameKey, onError, enableTelemetry, telemetry]);
+
   // Boot animation completion
   const handleBootComplete = useCallback(() => {
-    setShowBootAnimation(false);
-    setGameState((prev) => ({ ...prev, isLoading: false }));
+    try {
+      setShowBootAnimation(false);
+      setGameState((prev) => ({ ...prev, isLoading: false }));
 
-    if (enableTelemetry) {
-      telemetry.startSession(userId || undefined);
+      if (enableTelemetry) {
+        telemetry.startSession(userId || undefined);
+      }
+    } catch (error) {
+      handleError(error instanceof Error ? error : new Error(String(error)));
     }
-  }, [userId, enableTelemetry, telemetry]);
+  }, [userId, enableTelemetry, telemetry, handleError]);
 
   // Game lifecycle methods
   const startGame = useCallback(() => {

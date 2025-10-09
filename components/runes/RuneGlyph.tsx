@@ -28,7 +28,7 @@ export default function RuneGlyph({
   className = '',
 }: RuneGlyphProps) {
   // Use the first available ID
-  const _id = canonicalId || runeId;
+  const id = canonicalId || runeId;
 
   // Use the first available glyph
   const glyphText = glyphOverride || glyph || '';

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 
 export default function ContactForm() {
@@ -12,6 +12,13 @@ export default function ContactForm() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
+
+  // Pre-fill email if user is signed in
+  useEffect(() => {
+    if (user?.emailAddresses?.[0]?.emailAddress) {
+      setFormData((prev) => ({ ...prev, email: user.emailAddresses[0].emailAddress }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     if (e.target.type === 'file') {

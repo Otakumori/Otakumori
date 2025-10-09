@@ -270,7 +270,11 @@ export default function AnalyticsDashboard() {
           <CardContent>
             <div className="flex h-64 items-end justify-between gap-1">
               {data.timeSeriesData.slice(-7).map((day, i) => (
-                <div key={day.date} className="flex flex-1 flex-col items-center">
+                <div 
+                  key={day.date} 
+                  className="flex flex-1 flex-col items-center"
+                  title={`Day ${i + 1}: $${day.revenue.toFixed(2)}`}
+                >
                   <div
                     className="w-full rounded-t bg-gradient-to-t from-pink-500 to-pink-300"
                     style={{ height: `${(day.revenue / 500) * 100}%` }}

@@ -28,7 +28,7 @@ type LeaderboardInterfaceProps = {
 
 export default function LeaderboardInterface({ leaderboardData }: LeaderboardInterfaceProps) {
   const [activeTab, setActiveTab] = useState<'weekly' | 'seasonal'>('weekly');
-  const [timeRange, setTimeRange] = useState<'weekly' | 'seasonal'>('weekly');
+  const timeRange = activeTab; // Map activeTab to timeRange for consistency
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -56,7 +56,7 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
     }
   };
 
-  const currentData = timeRange === 'weekly' ? leaderboardData.weekly : leaderboardData.seasonal;
+  const currentData = activeTab === 'weekly' ? leaderboardData.weekly : leaderboardData.seasonal;
 
   return (
     <div className="space-y-6">
@@ -69,9 +69,9 @@ export default function LeaderboardInterface({ leaderboardData }: LeaderboardInt
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setTimeRange(tab.id as 'weekly' | 'seasonal')}
+              onClick={() => setActiveTab(tab.id as 'weekly' | 'seasonal')}
               className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                timeRange === tab.id
+                activeTab === tab.id
                   ? 'bg-fuchsia-500/90 text-white'
                   : 'text-zinc-300 hover:text-white hover:bg-white/10'
               }`}

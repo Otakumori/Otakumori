@@ -48,7 +48,7 @@ export default function MaidCafeGame() {
   const [money, setMoney] = useState(50);
   const [level, setLevel] = useState(1);
   const [gameTime, setGameTime] = useState(0);
-  const [_gameSpeed, _setGameSpeed] = useState(1);
+  const [gameSpeed, setGameSpeed] = useState(1);
 
   // Game objects
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -62,7 +62,7 @@ export default function MaidCafeGame() {
   const [isMoving, _setIsMoving] = useState(false);
 
   // Game timing
-  const [_customerSpawnTimer, _setCustomerSpawnTimer] = useState(0);
+  const [customerSpawnTimer, setCustomerSpawnTimer] = useState(0);
   const [nextCustomerId, setNextCustomerId] = useState(1);
 
   const { saveOnExit, autoSave } = useGameSave('maid-cafe-manager');

@@ -55,13 +55,13 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
 
     const { count, speed, size } = config[density];
 
-    // Create initial petals
+    // Create initial petals with density-based sizing
     const createPetal = () => ({
       x: Math.random() * canvas.width,
       y: -20,
       vx: (Math.random() - 0.5) * 0.5,
       vy: Math.random() * speed + 0.2,
-      size: Math.random() * 8 + 4,
+      size: (Math.random() * 8 + 4) * size,
       opacity: Math.random() * 0.6 + 0.2,
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.1,

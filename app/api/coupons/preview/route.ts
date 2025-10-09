@@ -156,9 +156,9 @@ export async function POST(req: NextRequest) {
 
     const breakdown = await getApplicableCoupons({
       now: new Date(),
-      items: [],
-      shipping: { provider: 'stripe', fee: 0 },
-      coupons: [],
+      items: items || [],
+      shipping: shipping,
+      coupons: metas,
       codesOrder: codes,
     });
 

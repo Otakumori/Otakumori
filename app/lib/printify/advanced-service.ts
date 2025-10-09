@@ -218,6 +218,20 @@ export class AdvancedPrintifyService {
   }
 
   /**
+   * Get current inventory status
+   */
+  async getInventoryStatus() {
+    const inventoryStatuses = await this.syncInventory();
+    return {
+      lastSync: new Date().toISOString(),
+      totalProducts: inventoryStatuses.length,
+      inStockProducts: inventoryStatuses.filter((s) => s.isAvailable).length,
+      outOfStockProducts: inventoryStatuses.filter((s) => !s.isAvailable).length,
+      lowStockProducts: 0,
+    };
+  }
+
+  /**
    * AI-powered product recommendations
    */
   async getRecommendations(options: RecommendationOptions = {}): Promise<PrintifyProduct[]> {
@@ -602,24 +616,29 @@ export class AdvancedPrintifyService {
 
   private async handleOrderCreated(orderData: any): Promise<void> {
     // Handle new order webhook
-    // 'Order created:', orderData
+    console.warn('Order created:', { orderId: orderData?.id, status: orderData?.status });
+    // TODO: Update database with order status
   }
 
   private async handleOrderUpdated(orderData: any): Promise<void> {
     // Handle order update webhook
-    // 'Order updated:', orderData
+    console.warn('Order updated:', { orderId: orderData?.id, status: orderData?.status });
+    // TODO: Sync order status to database
   }
 
   private async handleProductUpdated(productData: any): Promise<void> {
     // Handle product update webhook
     this.clearCache(`product:${productData.id}`);
-    // 'Product updated:', productData
+    console.warn('Product updated:', { productId: productData?.id, title: productData?.title });
   }
 
   private async handleInventoryUpdated(inventoryData: any): Promise<void> {
     // Handle inventory update webhook
     this.clearCache('inventory:all');
-    // 'Inventory updated:', inventoryData
+    console.warn('Inventory updated:', {
+      productId: inventoryData?.product_id,
+      available: inventoryData?.available,
+    });
   }
 
   private clearRelatedCaches(eventType: string, eventData: any): void {

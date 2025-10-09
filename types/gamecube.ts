@@ -17,6 +17,7 @@ export interface CubeFace {
   type: FaceType;
   label: string;
   slug: string; // 'trade' | 'mini-games' | 'community' | 'music' | 'about'
+  route: string; // Navigation route for this face
   enabled: boolean;
   faceTooltip?: string;
 }

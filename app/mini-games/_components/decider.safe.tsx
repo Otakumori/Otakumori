@@ -10,12 +10,7 @@ interface DeciderProps {
 }
 
 export default function Decider({ selectedGame, children }: DeciderProps) {
-  const {
-    masterVolume: _masterVolume,
-    setMasterVolume: _setMasterVolume,
-    theme: _theme,
-    setTheme: _setTheme,
-  } = useSettings();
+  const { masterVolume, setMasterVolume, theme, setTheme } = useSettings();
 
   // If no game is selected, show settings console
   if (!selectedGame) {

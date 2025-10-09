@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoaded = true;
   }
 
-  const _router = useRouter();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [authModal, setAuthModal] = useState<AuthModalState>({
     isOpen: false,
@@ -153,7 +153,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (redirectUrl) {
       url.searchParams.set('redirect_url', redirectUrl);
     }
-    window.location.href = url.toString();
+    // Use Next.js router for client-side navigation
+    router.push(url.pathname + url.search);
   };
 
   const redirectToSignUp = (redirectUrl?: string) => {
@@ -161,7 +162,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (redirectUrl) {
       url.searchParams.set('redirect_url', redirectUrl);
     }
-    window.location.href = url.toString();
+    // Use Next.js router for client-side navigation
+    router.push(url.pathname + url.search);
   };
 
   // Specific gated action implementations

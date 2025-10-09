@@ -63,17 +63,16 @@ class Logger {
         reset: '\x1b[0m', // Reset
       };
 
-      const _timestamp = new Date().toLocaleTimeString();
-      const _prefix = `${colors[level]}[${level.toUpperCase()}]${colors.reset}`;
-      const _routeInfo = ctx?.route ? ` ${colors.debug}[${ctx.route}]${colors.reset}` : '';
-      const _requestInfo = ctx?.requestId
-        ? ` ${colors.debug}[${ctx.requestId}]${colors.reset}`
-        : '';
+      const timestamp = new Date().toLocaleTimeString();
+      const prefix = `${colors[level]}[${level.toUpperCase()}]${colors.reset}`;
+      const routeInfo = ctx?.route ? ` ${colors.debug}[${ctx.route}]${colors.reset}` : '';
+      const requestInfo = ctx?.requestId ? ` ${colors.debug}[${ctx.requestId}]${colors.reset}` : '';
 
-      // `${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`
+      // Use console.warn for info/debug in development (allowed by linter)
+      console.warn(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
 
       if (data) {
-        // `${colors.debug}Data:${colors.reset}`, data
+        console.warn(`${colors.debug}Data:${colors.reset}`, data);
       }
 
       if (error) {

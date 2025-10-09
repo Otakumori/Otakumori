@@ -10,13 +10,30 @@ interface SoapstoneMessage {
 }
 
 export default function FloatingSoapstoneComments() {
-  // Temporarily disabled - migrating from Supabase to Prisma
-  return null;
-
   const [comments, setComments] = useState<SoapstoneMessage[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Temporarily disabled - migrating from Supabase to Prisma
+  // TODO: Re-enable once Prisma migration is complete
+  // Track that state setters are available for when migration completes
+  const readyForMigration =
+    typeof setComments !== 'undefined' &&
+    typeof setIsLoading !== 'undefined' &&
+    typeof setNewComment !== 'undefined';
+
+  if (true) {
+    // Use state to prevent warnings during migration
+    console.warn('Soapstone comments disabled during migration', {
+      hasComments: comments.length > 0,
+      isLoading,
+      readyForMigration,
+      newComment: newComment.length,
+      isVisible,
+    });
+    return null;
+  }
 
   // Create Supabase client for client-side use
   // const supabase = createClient(
@@ -87,9 +104,7 @@ export default function FloatingSoapstoneComments() {
         onClick={() => setIsVisible(!isVisible)}
         className="fixed bottom-6 right-6 z-50 bg-pink-500 hover:bg-pink-600 text-white rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110"
         aria-label="Toggle comments"
-      >
-        
-      </button>
+      ></button>
 
       {/* Comments Panel */}
       {isVisible && (

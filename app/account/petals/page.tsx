@@ -63,7 +63,7 @@ export default function PetalStorePage() {
       setError(null);
 
       const response = await fetch(`/api/petal-shop/catalog`);
-      const data = await response.json();
+      const data: PetalStoreResponse = await response.json();
 
       if (data?.ok && data?.data?.items) {
         let list: ShopItem[] = data.data.items;

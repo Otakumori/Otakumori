@@ -76,6 +76,13 @@ export class ProceduralTextureGenerator {
   generateMatcapTexture(config: TextureConfig): THREE.Texture {
     const { width, height, colors, parameters = {} } = config;
 
+    // Log texture generation with parameters
+    console.warn('Generating matcap texture:', {
+      width,
+      height,
+      paramCount: Object.keys(parameters).length,
+    });
+
     this.canvas.width = width;
     this.canvas.height = height;
 
@@ -98,13 +105,14 @@ export class ProceduralTextureGenerator {
           const phi = Math.atan2(dy, dx);
           const theta = Math.acos(distance / radius);
 
-          // Create matcap lighting
+          // Create matcap lighting (spherical coordinates)
           const lightX = Math.sin(theta) * Math.cos(phi);
           const lightY = Math.sin(theta) * Math.sin(phi);
           const lightZ = Math.cos(theta);
 
-          // Calculate lighting intensity
-          const intensity = Math.max(0, lightZ * 0.5 + 0.5);
+          // Calculate lighting intensity with directional influence
+          const directional = lightX * 0.1 + lightY * 0.1; // Use X and Y for subtle directional lighting
+          const intensity = Math.max(0, lightZ * 0.5 + 0.5 + directional);
 
           // Interpolate colors based on lighting
           const r = this.interpolateColor(colors.primary, colors.secondary, intensity).r;

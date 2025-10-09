@@ -11,7 +11,9 @@ interface GameCubeBootProps {
 export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBootProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [canSkip, setCanSkip] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'rolling' | 'assembling' | 'reveal' | 'burst' | 'complete'>('rolling');
+  const [currentPhase, setCurrentPhase] = useState<
+    'rolling' | 'assembling' | 'reveal' | 'burst' | 'complete'
+  >('rolling');
   const [showPetals, setShowPetals] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -36,8 +38,9 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
     try {
       audioRef.current = new Audio('/audio/gamecube-boot.mp3'); // Optional boot sound
       audioRef.current.volume = 0.3;
-    } catch (error) {
-      // 'Boot audio not available'
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.warn('Boot audio not available:', err.message);
     }
 
     // Boot sequence timing
@@ -47,30 +50,31 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
       if (audioRef.current) {
         try {
           await audioRef.current.play();
-        } catch (error) {
-          // 'Audio autoplay blocked'
+        } catch (error: unknown) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          console.warn('Audio autoplay blocked:', err.message);
         }
       }
 
-      await new Promise(resolve => setTimeout(resolve, 900));
+      await new Promise((resolve) => setTimeout(resolve, 900));
 
       // Phase 2: Assembly (800ms)
       setCurrentPhase('assembling');
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Phase 3: Logo reveal (800ms)
       setCurrentPhase('reveal');
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Phase 4: Petal burst (1500ms)
       setCurrentPhase('burst');
       setShowPetals(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Phase 5: Complete
       setCurrentPhase('complete');
       localStorage.setItem(bootKey, 'true');
-      
+
       // Auto-complete after a brief pause
       setTimeout(() => {
         handleComplete();
@@ -101,11 +105,11 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
     const today = new Date().toISOString().split('T')[0];
     const bootKey = `otm-gamecube-boot-${today}`;
     localStorage.setItem(bootKey, 'true');
-    
+
     if (audioRef.current) {
       audioRef.current.pause();
     }
-    
+
     handleComplete();
   };
 
@@ -129,7 +133,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #1a0d2e 0%, #16051a 50%, #0c0911 100%)'
+        background: 'linear-gradient(135deg, #1a0d2e 0%, #16051a 50%, #0c0911 100%)',
       }}
       data-gamecube-boot="true"
       role="img"
@@ -153,7 +157,6 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
 
       {/* Main Boot Animation Container */}
       <div className="relative flex flex-col items-center justify-center">
-        
         {/* Phase 1: Rolling Cubes */}
         <AnimatePresence>
           {currentPhase === 'rolling' && (
@@ -167,19 +170,19 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                 <motion.div
                   key={index}
                   initial={{ x: -200, rotateY: 0 }}
-                  animate={{ 
-                    x: 0, 
+                  animate={{
+                    x: 0,
                     rotateY: 360,
-                    rotateX: [0, 180, 360]
+                    rotateX: [0, 180, 360],
                   }}
                   transition={{
                     duration: 0.9,
                     delay: index * 0.1,
-                    ease: "easeOut"
+                    ease: 'easeOut',
                   }}
                   className="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg shadow-lg"
                   style={{
-                    transform: 'perspective(1000px)'
+                    transform: 'perspective(1000px)',
                   }}
                 />
               ))}
@@ -199,15 +202,15 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
               <motion.div
                 animate={{
                   rotateY: [0, 180, 360],
-                  scale: [1, 1.1, 1]
+                  scale: [1, 1.1, 1],
                 }}
                 transition={{
                   duration: 0.8,
-                  ease: "easeInOut"
+                  ease: 'easeInOut',
                 }}
                 className="relative w-32 h-32 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-2xl"
                 style={{
-                  transform: 'perspective(1000px)'
+                  transform: 'perspective(1000px)',
                 }}
               >
                 {/* Hollow center for O shape */}
@@ -217,7 +220,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                   transition={{ delay: 0.4, duration: 0.4 }}
                   className="absolute inset-6 bg-black rounded-xl border-2 border-pink-300/30"
                 />
-                
+
                 {/* Glowing edges */}
                 <div className="absolute inset-0 rounded-2xl shadow-[0_0_30px_rgba(236,72,153,0.6)] animate-pulse" />
               </motion.div>
@@ -237,19 +240,19 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
               {/* The O logo */}
               <motion.div
                 initial={{ scale: 0.8, rotateY: 0 }}
-                animate={{ 
-                  scale: 1, 
+                animate={{
+                  scale: 1,
                   rotateY: 360,
                 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
                 className="relative w-32 h-32 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-2xl mx-auto mb-6"
                 style={{
-                  transform: 'perspective(1000px)'
+                  transform: 'perspective(1000px)',
                 }}
               >
                 {/* Hollow center for O */}
                 <div className="absolute inset-6 bg-black rounded-xl border-2 border-pink-300/30" />
-                
+
                 {/* Intense glow */}
                 <div className="absolute inset-0 rounded-2xl shadow-[0_0_50px_rgba(236,72,153,0.8)]" />
               </motion.div>
@@ -263,13 +266,13 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2 tracking-wider">
                   OTAKU-MORI
                 </h1>
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
                   className="text-pink-300/80 text-sm italic tracking-wide"
                 >
-                  made with 
+                  made with
                 </motion.p>
               </motion.div>
             </motion.div>
@@ -295,9 +298,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2 tracking-wider">
                 OTAKU-MORI
               </h1>
-              <p className="text-pink-300/80 text-sm italic tracking-wide">
-                made with 
-              </p>
+              <p className="text-pink-300/80 text-sm italic tracking-wide">made with</p>
 
               {/* Petal Explosion */}
               {showPetals && (
@@ -309,28 +310,28 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                         x: '50%',
                         y: '50%',
                         scale: 0,
-                        opacity: 1
+                        opacity: 1,
                       }}
                       animate={{
-                        x: `${50 + Math.cos((i * 30) * Math.PI / 180) * 200}%`,
-                        y: `${50 + Math.sin((i * 30) * Math.PI / 180) * 200}%`,
+                        x: `${50 + Math.cos((i * 30 * Math.PI) / 180) * 200}%`,
+                        y: `${50 + Math.sin((i * 30 * Math.PI) / 180) * 200}%`,
                         scale: [0, 1, 0.8, 0],
                         opacity: [1, 1, 0.8, 0],
-                        rotate: [0, 180, 360]
+                        rotate: [0, 180, 360],
                       }}
                       transition={{
                         duration: 1.5,
                         delay: i * 0.05,
-                        ease: "easeOut"
+                        ease: 'easeOut',
                       }}
                       className="absolute w-4 h-4 rounded-full"
                       style={{
                         background: `radial-gradient(circle, ${i % 2 === 0 ? '#ec4899' : '#f472b6'}, transparent)`,
-                        filter: 'blur(0.5px)'
+                        filter: 'blur(0.5px)',
                       }}
                     />
                   ))}
-                  
+
                   {/* Additional sparkle effects */}
                   {[...Array(8)].map((_, i) => (
                     <motion.div
@@ -338,18 +339,18 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
                       initial={{
                         x: '50%',
                         y: '50%',
-                        scale: 0
+                        scale: 0,
                       }}
                       animate={{
-                        x: `${50 + Math.cos((i * 45 + 22.5) * Math.PI / 180) * 150}%`,
-                        y: `${50 + Math.sin((i * 45 + 22.5) * Math.PI / 180) * 150}%`,
+                        x: `${50 + Math.cos(((i * 45 + 22.5) * Math.PI) / 180) * 150}%`,
+                        y: `${50 + Math.sin(((i * 45 + 22.5) * Math.PI) / 180) * 150}%`,
                         scale: [0, 1.5, 0],
-                        opacity: [0, 1, 0]
+                        opacity: [0, 1, 0],
                       }}
                       transition={{
                         duration: 1.2,
                         delay: 0.3 + i * 0.1,
-                        ease: "easeOut"
+                        ease: 'easeOut',
                       }}
                       className="absolute w-2 h-2 bg-pink-300 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.8)]"
                     />
@@ -375,9 +376,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2 tracking-wider">
                 OTAKU-MORI
               </h1>
-              <p className="text-pink-300/80 text-sm italic tracking-wide">
-                made with 
-              </p>
+              <p className="text-pink-300/80 text-sm italic tracking-wide">made with</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -391,17 +390,17 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
             initial={{
               x: Math.random() * window.innerWidth,
               y: window.innerHeight + 20,
-              opacity: 0
+              opacity: 0,
             }}
             animate={{
               y: -20,
-              opacity: [0, 0.6, 0]
+              opacity: [0, 0.6, 0],
             }}
             transition={{
               duration: Math.random() * 3 + 2,
               delay: Math.random() * 2,
               repeat: Infinity,
-              ease: "linear"
+              ease: 'linear',
             }}
             className="absolute w-1 h-1 bg-pink-300/30 rounded-full"
           />

@@ -45,7 +45,7 @@ interface CubeState {
 export default function GameCubeBootV2({
   onBootComplete,
   onSkip,
-  _skipAfterSeconds = 8,
+  skipAfterSeconds = 8,
   forceShow = false,
 }: GameCubeBootV2Props) {
   const [bootStage, setBootStage] = useState<BootStage>('starting');

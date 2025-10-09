@@ -45,7 +45,7 @@ export default function MemoryMatchGame() {
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'completed' | 'paused'>('menu');
   const [difficulty, setDifficulty] = useState<'easy' | 'normal' | 'hard'>('normal');
   const [streak, setStreak] = useState(0);
-  const [_sessionId, _setSessionId] = useState<string>('');
+  const [sessionId, setSessionId] = useState<string>('');
 
   // Difficulty settings
   const difficultySettings = {

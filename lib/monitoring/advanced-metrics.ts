@@ -308,16 +308,31 @@ export class AdvancedMetricsCollector {
 
   private async sendSlackAlert(alert: any): Promise<void> {
     // Slack integration placeholder
-    // Slack alert sent
+    console.warn('Slack alert triggered:', {
+      type: alert.type,
+      severity: alert.severity,
+      metric: alert.metricName,
+    });
+    // TODO: Implement Slack webhook integration
   }
 
   private async sendEmailAlert(alert: any): Promise<void> {
     // Email integration placeholder
-    // Email alert sent
+    console.warn('Email alert triggered:', {
+      type: alert.type,
+      severity: alert.severity,
+      metric: alert.metricName,
+    });
+    // TODO: Implement email notification via Resend
   }
 
   private async sendWebhookAlert(alert: any): Promise<void> {
     // Webhook integration placeholder
+    console.warn('Webhook alert triggered:', {
+      type: alert.type,
+      severity: alert.severity,
+      metric: alert.metricName,
+    });
     // Webhook alert sent
   }
 

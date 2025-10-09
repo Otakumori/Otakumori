@@ -264,10 +264,11 @@ export class FeatureFlagDebugger {
 
     this.getAllFlags().then((flags) => {
       // Feature Flags Status
+      console.warn('Feature Flags Status:');
       Object.entries(flags).forEach(([key, value]) => {
-        // Feature flag value logged
+        console.warn(`  ${key}: ${JSON.stringify(value)}`);
       });
-      // Group end
+      console.warn('--- End Feature Flags ---');
     });
   }
 }

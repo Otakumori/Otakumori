@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 
 export function HeroShrine() {
-  const [_petals, _setPetals] = useState<
-    Array<{ id: number; x: number; y: number; delay: number }>
-  >([]);
+  const [petals, setPetals] = useState<Array<{ id: number; x: number; y: number; delay: number }>>(
+    [],
+  );
 
   // Generate flowing petals
   useEffect(() => {

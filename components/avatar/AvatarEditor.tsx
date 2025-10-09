@@ -75,8 +75,8 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
   const [isPhysicsEnabled, setIsPhysicsEnabled] = useState(false);
   const [isAdultMode, setIsAdultMode] = useState(false);
   const [characterMesh, setCharacterMesh] = useState<THREE.Group | null>(null);
-  const [_hairStrands, _setHairStrands] = useState<any[]>([]);
-  const [_clothMeshes, _setClothMeshes] = useState<any[]>([]);
+  const [hairStrands, setHairStrands] = useState<any[]>([]);
+  const [clothMeshes, setClothMeshes] = useState<any[]>([]);
 
   const generatorRef = useRef<ProceduralCharacterGenerator | null>(null);
   const physicsEngineRef = useRef<VerletPhysicsEngine | null>(null);
