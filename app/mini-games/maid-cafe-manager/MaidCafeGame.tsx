@@ -435,6 +435,14 @@ export default function MaidCafeGame() {
           <div>Money: ${money}</div>
           <div>Level: {level}</div>
           <div>Time: {formatTime(gameTime)}</div>
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              <div className="text-gray-400">Speed: {gameSpeed.toFixed(1)}x</div>
+              <div className="text-gray-400">
+                Next: {Math.max(0, Math.floor(customerSpawnTimer / 100))}
+              </div>
+            </>
+          )}
         </div>
         <button
           onClick={() => setGameState('paused')}

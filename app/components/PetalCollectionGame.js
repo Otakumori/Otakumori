@@ -46,6 +46,15 @@ export default function PetalCollectionGame() {
         ref={containerRef}
         className="relative h-[600px] w-full cursor-pointer"
         onClick={handlePetalClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handlePetalClick(e);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Click to collect petals from the cherry blossom tree"
       >
         <img
           src="/images/cherry-blossom-tree.jpg"

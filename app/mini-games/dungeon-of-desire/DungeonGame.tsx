@@ -62,8 +62,8 @@ export default function DungeonGame() {
 
   // Game timing
   const [gameTime, setGameTime] = useState(0);
-  const [enemySpawnTimer, setEnemySpawnTimer] = useState(0);
-  const [pickupSpawnTimer, setPickupSpawnTimer] = useState(0);
+  const [enemySpawnTimer, setEnemySpawnTimer] = useState(0); // Used via functional state updates
+  const [pickupSpawnTimer, setPickupSpawnTimer] = useState(0); // Used via functional state updates
 
   const { saveOnExit, autoSave } = useGameSave('dungeon-of-desire');
 
@@ -501,6 +501,14 @@ export default function DungeonGame() {
     ctx.fillText(`Stage: ${stage}`, 10, 45);
     ctx.fillText(`Lives: ${lives}`, 10, 65);
     ctx.fillText(`Time: ${Math.floor(gameTime / 1000)}s`, 10, 85);
+
+    // Debug info: spawn timers (useful for balancing)
+    if (process.env.NODE_ENV === 'development') {
+      ctx.fillStyle = '#888888';
+      ctx.font = '12px monospace';
+      ctx.fillText(`Enemy spawn: ${Math.max(0, Math.floor(enemySpawnTimer / 100))}`, 10, 105);
+      ctx.fillText(`Pickup spawn: ${Math.max(0, Math.floor(pickupSpawnTimer / 100))}`, 10, 120);
+    }
 
     // Health and mana bars
     ctx.fillStyle = '#ff0000';

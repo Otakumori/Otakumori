@@ -184,6 +184,15 @@ export const FriendChat: React.FC = () => {
           <div
             key={friend.id}
             onClick={() => setSelectedFriend(friend)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedFriend(friend);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Chat with ${friend.name}`}
             style={{
               padding: '12px 16px',
               cursor: 'pointer',
