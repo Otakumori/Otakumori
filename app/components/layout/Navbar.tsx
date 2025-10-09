@@ -47,8 +47,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const { user } = useUser();
-  const { requireAuthForSoapstone, requireAuthForWishlist } = useAuthContext();
+  const { user: _user } = useUser(); // Reserved for future user menu features
+  const {
+    requireAuthForSoapstone: _requireAuthForSoapstone,
+    requireAuthForWishlist: _requireAuthForWishlist,
+  } = useAuthContext(); // Reserved for future protected nav links
 
   // State for mega-menu and search
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);

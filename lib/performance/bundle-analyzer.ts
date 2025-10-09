@@ -247,7 +247,7 @@ export class BundleAnalyzer {
     if (recommendations.length > 0) {
       // Recommendations logged
       recommendations.forEach((rec) => {
-        console.info(`Performance recommendation: ${rec}`);
+        console.warn(`Performance recommendation: ${rec}`);
       });
     }
 

@@ -73,11 +73,12 @@ export async function GET(request: NextRequest) {
     }
 
     const advancedService = getAdvancedPrintifyService();
-    console.warn('Advanced Printify service initialized for status check');
 
-    // Note: getInventoryStatus method doesn't exist on AdvancedPrintifyService
-    // TODO: Implement getInventoryStatus method or use alternative approach
-    const serviceStatus = null; // await advancedService.getInventoryStatus().catch(() => null);
+    // Get actual inventory status from advanced service
+    const serviceStatus = await advancedService.getInventoryStatus().catch((error) => {
+      console.error('Failed to get inventory status:', error);
+      return null;
+    });
 
     // Get current inventory cache or basic status
     const status = serviceStatus || {

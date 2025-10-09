@@ -283,15 +283,28 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
   const [backgroundMusic, setBackgroundMusic] = useState<(() => void) | null>(null);
 
   // Handle face activation - passed down to Cube component
-  const handleFaceActivation = (face: CubeFace) => {
-    if (onActivate) {
-      onActivate(face);
-    }
-    // Default behavior if no callback provided
-    if (face.route) {
-      router.push(face.route);
-    }
-  };
+  const handleFaceActivation = useCallback(
+    (face: CubeFace) => {
+      // Call parent callback if provided
+      if (onActivate) {
+        onActivate(face);
+      }
+
+      // Only navigate if face is enabled
+      if (face.enabled) {
+        // Stop background music before navigation
+        if (backgroundMusic) {
+          backgroundMusic();
+          setBackgroundMusic(null);
+        }
+
+        // Navigate to face route (use face.route or fallback to /panel/{slug})
+        const route = face.route || `/panel/${face.slug}`;
+        router.push(route);
+      }
+    },
+    [router, backgroundMusic, onActivate],
+  );
 
   // Start background menu music when component mounts
   useEffect(() => {
@@ -321,20 +334,6 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
       }
     };
   }, [backgroundMusic]);
-
-  const handleActivate = useCallback(
-    (face: CubeFace) => {
-      if (face.enabled) {
-        // Stop background music when navigating
-        if (backgroundMusic) {
-          backgroundMusic();
-          setBackgroundMusic(null);
-        }
-        router.push(`/panel/${face.slug}`);
-      }
-    },
-    [router, backgroundMusic],
-  );
 
   return (
     <div className="w-full h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-purple-900">
