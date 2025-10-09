@@ -88,14 +88,25 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       const response = await gameApi.start(gameDef.key, idempotencyKey);
 
       if (response.ok && response.data) {
-        setRunId((response.data as any).runId);
-        setSeed((response.data as any).seed);
+        const runData = response.data as any;
+        setRunId(runData.runId);
+        const gameSeed = runData.seed;
+        setSeed(gameSeed);
+        
+        // Use seed for deterministic random generation (for replay functionality)
+        if (gameSeed) {
+          // Store seed for use in procedural generation
+          // This could be used to initialize a seeded random number generator
+          // for deterministic replay functionality in the future
+          (window as any).__GAME_SEED__ = gameSeed;
+        }
       }
 
       // Initialize PIXI app using manager
+      // Note: Seed is stored in window.__GAME_SEED__ for use by game logic
       const { pixiManager } = await import('@/app/lib/pixi-application-manager');
       const app = pixiManager.getApplication({
-        id: `samurai-petal-slice-${Date.now()}`,
+        id: `samurai-petal-slice-${Date.now()}-${seed || 'random'}`,
         width: 800,
         height: 600,
         backgroundColor: 0xf8f9fa,

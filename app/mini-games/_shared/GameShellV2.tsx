@@ -91,19 +91,30 @@ export default function GameShellV2({
   const saveSystem = useGameSaveV2(gameKey);
   const telemetry = useGameTelemetry(gameKey);
 
+  // Log game configuration
+  console.debug(`[GameShell] ${gameKey} initialized:`, {
+    achievements: enableAchievements,
+    maxPlayers,
+    difficulty,
+    leaderboards: enableLeaderboards,
+  });
+
   // Error handler
-  const handleError = useCallback((error: Error) => {
-    console.error(`[GameShell:${gameKey}] Error:`, error);
-    setGameState((prev) => ({ ...prev, hasError: true, isPlaying: false }));
-    
-    if (onError) {
-      onError(error);
-    }
-    
-    if (enableTelemetry) {
-      telemetry.trackError(error, 'GameShell');
-    }
-  }, [gameKey, onError, enableTelemetry, telemetry]);
+  const handleError = useCallback(
+    (error: Error) => {
+      console.error(`[GameShell:${gameKey}] Error:`, error);
+      setGameState((prev) => ({ ...prev, hasError: true, isPlaying: false }));
+
+      if (onError) {
+        onError(error);
+      }
+
+      if (enableTelemetry) {
+        telemetry.trackError(error, 'GameShell');
+      }
+    },
+    [gameKey, onError, enableTelemetry, telemetry],
+  );
 
   // Boot animation completion
   const handleBootComplete = useCallback(() => {

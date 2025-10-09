@@ -216,6 +216,11 @@ export class AdvancedMetricsCollector {
       if (rule.metric === metricName) {
         const triggered = this.evaluateAlertCondition(rule, point);
         if (triggered) {
+          console.warn(`[Alert ${alertId}] Triggered for metric ${metricName}:`, {
+            threshold: rule.threshold,
+            actual: point.value,
+            condition: rule.condition,
+          });
           this.triggerAlert(rule, point);
         }
       }

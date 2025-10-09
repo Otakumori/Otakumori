@@ -314,6 +314,16 @@ export default function AvatarSystem({
           <Environment preset="studio" />
 
           {character && <primitive object={character} />}
+          
+          {/* Render hair strands with physics */}
+          {hairStrands.map((strand, idx) => (
+            <primitive key={`hair-${idx}`} object={strand} />
+          ))}
+          
+          {/* Render cloth meshes with physics */}
+          {clothMeshes.map((cloth, idx) => (
+            <primitive key={`cloth-${idx}`} object={cloth} />
+          ))}
 
           <ContactShadows position={[0, -1, 0]} opacity={0.25} scale={10} blur={1.5} />
           <OrbitControls enablePan={false} enableZoom={true} minDistance={1.5} maxDistance={5} />

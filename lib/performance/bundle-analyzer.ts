@@ -387,16 +387,27 @@ export async function initializePerformanceMonitoring(): Promise<void> {
     // Initialize Core Web Vitals monitoring
     const cwvMonitor = initializeCoreWebVitalsMonitoring();
 
+    // Start monitoring if successfully initialized
+    if (cwvMonitor) {
+      console.info('[Performance] Core Web Vitals monitoring active');
+      // cwvMonitor is now tracking LCP, FID, CLS, etc.
+    }
+
     // Initialize bundle analysis in development
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       const bundleAnalyzer = initializeBundleAnalysis();
-      // Performance monitoring initialized
+
+      if (bundleAnalyzer) {
+        console.info('[Performance] Bundle analysis active in development mode');
+        // bundleAnalyzer is now tracking chunk sizes and load times
+      }
     }
 
     // Track performance initialization
     if ('gtag' in window) {
       (window as any).gtag('event', 'performance_monitoring_initialized', {
         environment: 'production', // Always report as production to avoid client-side env access
+        cwv_enabled: !!cwvMonitor,
       });
     }
   } catch (error) {

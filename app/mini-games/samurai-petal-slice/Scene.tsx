@@ -325,6 +325,11 @@ export default function SamuraiSlice() {
     // loop
     let raf = 0;
     function loop(now: number) {
+      // Check if game should still be running (cleanup may have been called)
+      if (!running) {
+        return;
+      }
+
       const dt = Math.min(32, now - last);
       last = now;
       update(now, dt);

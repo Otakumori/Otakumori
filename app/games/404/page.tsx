@@ -51,8 +51,17 @@ export default function LRoom404Page() {
 
     return () => {
       if (timeout) clearTimeout(timeout);
+      setTimeoutId(null);
     };
   }, []);
+  
+  // Clear timeout when puzzle is completed or fallback is triggered
+  useEffect(() => {
+    if ((currentPhase === 'complete' || currentPhase === 'fallback') && timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+  }, [currentPhase, timeoutId]);
 
   // Phase 1: Timeline Anomaly
   const handleTimestampClick = (id: number) => {

@@ -81,6 +81,13 @@ export default function PetalStormRhythm() {
   const [multiplier, setMultiplier] = useState(1);
   const [sessionId, setSessionId] = useState<string>('');
 
+  // Initialize session ID on mount
+  useEffect(() => {
+    const newSessionId = `psr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    setSessionId(newSessionId);
+    console.info('[Petal Storm Rhythm] Session initialized:', newSessionId);
+  }, []);
+
   // Refs for game loop
   const gameLoopRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(0);
@@ -329,17 +336,19 @@ export default function PetalStormRhythm() {
     const healthBonus = health * 50;
     const finalScore = score + comboBonus + accuracyBonus + healthBonus;
 
-    // Update game engine
+    // Update game engine with session tracking
     gameEngine.updateScore(finalScore, {
       accuracy: finalAccuracy,
       maxCombo,
       perfectHits: accuracy.perfect,
       track: selectedTrack.id,
       difficulty: selectedTrack.difficulty,
+      sessionId,
     });
 
-    // Submit to leaderboard
+    // Submit to leaderboard with session tracking
     await gameEngine.submitScore('score', finalScore, {
+      sessionId,
       accuracy: finalAccuracy,
       maxCombo,
       track: selectedTrack.id,

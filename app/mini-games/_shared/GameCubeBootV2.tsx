@@ -67,6 +67,18 @@ export default function GameCubeBootV2({
   const audioEnabled = useFeatureFlag('GAMECUBE_AUDIO_ENABLED') ?? true;
   const reducedMotionSupport = useFeatureFlag('GAMECUBE_REDUCED_MOTION') ?? true;
 
+  // Auto-skip after specified seconds
+  useEffect(() => {
+    if (bootStage === 'starting' && skipAfterSeconds > 0 && onSkip) {
+      const autoSkipTimer = setTimeout(() => {
+        console.info(`[GameCube Boot] Auto-skipping after ${skipAfterSeconds} seconds`);
+        onSkip();
+      }, skipAfterSeconds * 1000);
+
+      return () => clearTimeout(autoSkipTimer);
+    }
+  }, [bootStage, skipAfterSeconds, onSkip]);
+
   // Check if boot should be shown
   useEffect(() => {
     if (!bootEnabled) {

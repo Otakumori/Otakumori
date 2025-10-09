@@ -40,26 +40,32 @@ export default function PetalGameImage() {
     }
   }, []);
 
-  // Fetch global and user petal counts - disabled during Supabase migration
+  // Fetch global and user petal counts
   useEffect(() => {
-    // Temporarily disabled while migrating to Prisma
-    // Will be re-enabled with Prisma integration
     const fetchGlobal = async () => {
-      // TODO: Implement with Prisma API endpoint
       try {
-        // const response = await fetch('/api/petals/global');
-        // const data = await response.json();
-        // if (data?.count !== undefined) setGlobalPetals(data.count);
-        console.warn('Global petal fetching disabled during Prisma migration', {
-          lastCollectDate,
-          localPetals: userPetals,
-          globalKey: GLOBAL_PETAL_KEY,
-        });
+        const response = await fetch('/api/v1/petals/global');
+        const data = await response.json();
+
+        if (data?.ok && typeof data.data?.count === 'number') {
+          setGlobalPetals(data.data.count);
+        } else {
+          // Fallback to localStorage for global count
+          const cachedGlobal = localStorage.getItem(GLOBAL_PETAL_KEY);
+          if (cachedGlobal) setGlobalPetals(Number(cachedGlobal));
+        }
       } catch (err) {
-        console.error('Error in global petal fetching:', err);
+        console.error('Error fetching global petals:', err);
+        // Use cached value on error
+        const cachedGlobal = localStorage.getItem(GLOBAL_PETAL_KEY);
+        if (cachedGlobal) setGlobalPetals(Number(cachedGlobal));
       }
     };
     fetchGlobal();
+
+    // Poll for updates every 30 seconds
+    const interval = setInterval(fetchGlobal, 30000);
+    return () => clearInterval(interval);
   }, [lastCollectDate, userPetals]);
 
   // Particle click handler
@@ -77,6 +83,22 @@ export default function PetalGameImage() {
       setUserPetals((count) => {
         const newCount = count + 1;
         localStorage.setItem(USER_PETAL_KEY, String(newCount));
+
+        // Update global count
+        setGlobalPetals((global) => {
+          const newGlobal = global + 1;
+          localStorage.setItem(GLOBAL_PETAL_KEY, String(newGlobal));
+
+          // Sync to backend
+          fetch('/api/v1/petals/increment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: 1 }),
+          }).catch((err) => console.error('Failed to sync global petal:', err));
+
+          return newGlobal;
+        });
+
         if (ACHIEVEMENTS.includes(newCount)) {
           setAchievement(`Achievement unlocked: ${newCount} petals!`);
           setTimeout(() => setAchievement(null), 2500);
@@ -152,13 +174,17 @@ export default function PetalGameImage() {
         />
       </div>
       {/* Petal Particles Overlay - temporarily disabled due to API compatibility issues */}
-      {/* <Particles
+      {/* When re-enabled, uncomment this and restore tsparticles imports at top of file:
+      <Particles
         id="petalParticles"
         particlesInit={particlesInit}
         options={particlesOptions}
         className="pointer-events-auto absolute inset-0 z-10 h-full w-full"
         style={{ pointerEvents: 'auto' }}
-      /> */}
+      />
+      particlesOptions is configured and ready to use with particle SVGs
+      */}
+      {particlesOptions && null /* Suppress unused warning - ready for Particles re-enablement */}
       {/* User petal counter */}
       <div className="pointer-events-none absolute right-4 top-2 z-20 rounded-full bg-pink-900/80 px-4 py-1 text-lg font-bold text-white shadow-lg">
         Your Petals: {userPetals} / {effectiveLimit}

@@ -602,9 +602,35 @@ export class DataRetentionManager {
 
     for (const [category, retentionDays] of Object.entries(this.config.dataRetention)) {
       const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-      // Cleaning up old data
 
-      // Database cleanup would happen here
+      // Log cleanup operation for audit trail
+      console.info(
+        `[GDPR Cleanup] Processing category: ${category}, retention: ${retentionDays} days, cutoff: ${cutoffDate.toISOString()}`,
+      );
+
+      // Database cleanup for different categories
+      try {
+        switch (category) {
+          case 'analytics':
+            // await db.analyticsEvent.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
+            console.info(
+              `[GDPR Cleanup] Would delete analytics data before ${cutoffDate.toISOString()}`,
+            );
+            break;
+          case 'logs':
+            // await db.log.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
+            console.info(`[GDPR Cleanup] Would delete logs before ${cutoffDate.toISOString()}`);
+            break;
+          case 'sessions':
+            // await db.session.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
+            console.info(`[GDPR Cleanup] Would delete sessions before ${cutoffDate.toISOString()}`);
+            break;
+          default:
+            console.warn(`[GDPR Cleanup] Unknown category: ${category}`);
+        }
+      } catch (error) {
+        console.error(`[GDPR Cleanup] Error cleaning ${category}:`, error);
+      }
     }
   }
 }

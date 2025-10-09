@@ -334,6 +334,12 @@ export default function CheckoutContent() {
                 ).toFixed(2)}
               </span>
             </div>
+            {preview && preview.discount > 0 && (
+              <div className="flex justify-between text-green-400">
+                <span>Coupon Discount ({codes.join(', ')})</span>
+                <span>-${preview.discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-zinc-300">
               <span>Tax</span>
               <span>
@@ -355,6 +361,9 @@ export default function CheckoutContent() {
                   : `$${useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]).toFixed(2)}`}
               </span>
             </div>
+            {preview && preview.freeShipping && (
+              <div className="text-sm text-green-400">✓ Free shipping applied from coupon</div>
+            )}
             <div className="border-t border-white/10 pt-2">
               <div className="flex justify-between text-lg font-semibold text-white">
                 <span>Total</span>

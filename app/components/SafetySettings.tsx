@@ -143,6 +143,12 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
         <div className="flex items-center gap-3 mb-6">
           <Shield className="w-6 h-6 text-pink-400" />
           <h2 className="text-2xl font-bold text-white">Safety & Privacy</h2>
+          {saving && (
+            <div className="ml-auto flex items-center gap-2 text-sm text-blue-400">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
+              <span>Saving...</span>
+            </div>
+          )}
         </div>
 
         {/* Communication Settings */}

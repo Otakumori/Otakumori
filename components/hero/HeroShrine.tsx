@@ -25,7 +25,20 @@ export function HeroShrine() {
     >
       {/* Use the universal space background - no additional background needed */}
 
-      {/* Petals are handled by PetalLayer component */}
+      {/* Floating petals animation */}
+      {petals.map((petal) => (
+        <div
+          key={petal.id}
+          className="pointer-events-none absolute text-pink-300 opacity-60"
+          style={{
+            left: `${petal.x}%`,
+            top: `${petal.y}%`,
+            animation: `float ${5 + petal.delay}s ease-in-out ${petal.delay}s infinite`,
+          }}
+        >
+          🌸
+        </div>
+      ))}
 
       {/* Main content */}
       <div className="relative z-10 mx-auto max-w-6xl px-4 text-center">

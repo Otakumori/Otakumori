@@ -99,7 +99,7 @@ export const ADULT_CONTENT_DESCRIPTORS: AdultContentDescriptor[] = [
     requiresVerification: true,
     regionBlocked: ['CN', 'RU', 'SA', 'AE'],
   },
-  
+
   // Clothing content
   {
     id: 'revealing-clothing',
@@ -128,7 +128,7 @@ export const ADULT_CONTENT_DESCRIPTORS: AdultContentDescriptor[] = [
     requiresVerification: true,
     regionBlocked: ['CN', 'RU', 'SA', 'AE'],
   },
-  
+
   // Pose content
   {
     id: 'suggestive-poses',
@@ -157,7 +157,7 @@ export const ADULT_CONTENT_DESCRIPTORS: AdultContentDescriptor[] = [
     requiresVerification: true,
     regionBlocked: ['CN', 'RU', 'SA', 'AE'],
   },
-  
+
   // Interaction content
   {
     id: 'touch-interactions',
@@ -191,16 +191,16 @@ export const ADULT_CONTENT_DESCRIPTORS: AdultContentDescriptor[] = [
 // Adult gating service
 export class AdultGatingService {
   private config: AdultGatingConfig;
-  
+
   constructor(config: AdultGatingConfig = ADULT_GATING_CONFIG) {
     this.config = config;
   }
-  
+
   // Check if adult content is enabled
   isAdultContentEnabled(): boolean {
     return this.config.enabled;
   }
-  
+
   // Get user's adult status
   async getUserAdultStatus(userId: string): Promise<UserAdultStatus> {
     try {
@@ -214,7 +214,7 @@ export class AdultGatingService {
           consentDate: parsed.consentDate ? new Date(parsed.consentDate) : null,
         };
       }
-      
+
       return {
         isVerified: false,
         age: null,
@@ -237,125 +237,125 @@ export class AdultGatingService {
       };
     }
   }
-  
+
   // Update user's adult status
   async updateUserAdultStatus(userId: string, status: Partial<UserAdultStatus>): Promise<void> {
     try {
       const currentStatus = await this.getUserAdultStatus(userId);
       const updatedStatus = { ...currentStatus, ...status };
-      
+
       // Store in localStorage (in production, this would be stored in database)
-      localStorage.setItem(
-        `otakumori_adult_status_${userId}`,
-        JSON.stringify(updatedStatus)
-      );
+      localStorage.setItem(`otakumori_adult_status_${userId}`, JSON.stringify(updatedStatus));
     } catch (error) {
       console.error('Error updating user adult status:', error);
     }
   }
-  
+
   // Check if user can access content
   async canAccessContent(
     userId: string,
-    contentId: string
+    contentId: string,
   ): Promise<{ allowed: boolean; reason?: string }> {
     if (!this.config.enabled) {
       return { allowed: true };
     }
-    
+
     const userStatus = await this.getUserAdultStatus(userId);
-    const content = ADULT_CONTENT_DESCRIPTORS.find(c => c.id === contentId);
-    
+    const content = ADULT_CONTENT_DESCRIPTORS.find((c) => c.id === contentId);
+
     if (!content) {
       return { allowed: false, reason: 'Content not found' };
     }
-    
+
     // Check region restrictions
     if (userStatus.region && content.regionBlocked.includes(userStatus.region)) {
       return { allowed: false, reason: 'Content blocked in your region' };
     }
-    
+
     // Check age verification
     if (content.requiresVerification && !userStatus.isVerified) {
       return { allowed: false, reason: 'Age verification required' };
     }
-    
+
     // Check content level
     if (userStatus.contentLevel) {
       const levelOrder = { mild: 1, moderate: 2, explicit: 3 };
       const userLevel = levelOrder[userStatus.contentLevel];
       const contentLevel = levelOrder[content.level];
-      
+
       if (userLevel < contentLevel) {
         return { allowed: false, reason: 'Content level too high for your settings' };
       }
     }
-    
+
     return { allowed: true };
   }
-  
+
   // Verify user age
   async verifyUserAge(userId: string, age: number): Promise<boolean> {
     if (age < 18) {
       return false;
     }
-    
+
     await this.updateUserAdultStatus(userId, {
       isVerified: true,
       age,
       consentGiven: true,
       consentDate: new Date(),
     });
-    
+
     return true;
   }
-  
+
   // Set user content level
   async setUserContentLevel(
     userId: string,
-    level: 'mild' | 'moderate' | 'explicit'
+    level: 'mild' | 'moderate' | 'explicit',
   ): Promise<void> {
     await this.updateUserAdultStatus(userId, { contentLevel: level });
   }
-  
+
   // Set user physics level
   async setUserPhysicsLevel(
     userId: string,
-    level: 'basic' | 'enhanced' | 'realistic'
+    level: 'basic' | 'enhanced' | 'realistic',
   ): Promise<void> {
     await this.updateUserAdultStatus(userId, { physicsLevel: level });
   }
-  
+
   // Get available content for user
   async getAvailableContent(userId: string): Promise<AdultContentDescriptor[]> {
     const userStatus = await this.getUserAdultStatus(userId);
     const availableContent: AdultContentDescriptor[] = [];
-    
+
+    // Filter based on user verification status and age
+    if (!userStatus.isVerified && this.config.ageVerification) {
+      // Return only non-adult content for unverified users
+      return availableContent;
+    }
+
     for (const content of ADULT_CONTENT_DESCRIPTORS) {
       const access = await this.canAccessContent(userId, content.id);
       if (access.allowed) {
         availableContent.push(content);
       }
     }
-    
+
     return availableContent;
   }
-  
+
   // Get content by category
-  async getContentByCategory(
-    userId: string,
-    category: string
-  ): Promise<AdultContentDescriptor[]> {
+  async getContentByCategory(userId: string, category: string): Promise<AdultContentDescriptor[]> {
     const availableContent = await this.getAvailableContent(userId);
-    return availableContent.filter(content => content.category === category);
+    return availableContent.filter((content) => content.category === category);
   }
-  
+
   // Check if user needs age verification
   async needsAgeVerification(userId: string): Promise<boolean> {
     const userStatus = await this.getUserAdultStatus(userId);
     return !userStatus.isVerified && this.config.ageVerification;
   }
-  
+
   // Get user's region (simplified)
   async getUserRegion(): Promise<string | null> {
     try {
@@ -367,7 +367,7 @@ export class AdultGatingService {
       return null;
     }
   }
-  
+
   // Reset user adult status
   async resetUserAdultStatus(userId: string): Promise<void> {
     try {
@@ -383,9 +383,9 @@ export function useAdultGating() {
   const { user } = useUser();
   const [adultStatus, setAdultStatus] = useState<UserAdultStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const service = new AdultGatingService();
-  
+
   useEffect(() => {
     if (user) {
       loadAdultStatus();
@@ -393,10 +393,10 @@ export function useAdultGating() {
       setLoading(false);
     }
   }, [user]);
-  
+
   const loadAdultStatus = async () => {
     if (!user) return;
-    
+
     try {
       const status = await service.getUserAdultStatus(user.id);
       setAdultStatus(status);
@@ -406,44 +406,44 @@ export function useAdultGating() {
       setLoading(false);
     }
   };
-  
+
   const verifyAge = async (age: number) => {
     if (!user) return false;
-    
+
     const success = await service.verifyUserAge(user.id, age);
     if (success) {
       await loadAdultStatus();
     }
     return success;
   };
-  
+
   const setContentLevel = async (level: 'mild' | 'moderate' | 'explicit') => {
     if (!user) return;
-    
+
     await service.setUserContentLevel(user.id, level);
     await loadAdultStatus();
   };
-  
+
   const setPhysicsLevel = async (level: 'basic' | 'enhanced' | 'realistic') => {
     if (!user) return;
-    
+
     await service.setUserPhysicsLevel(user.id, level);
     await loadAdultStatus();
   };
-  
+
   const canAccessContent = async (contentId: string) => {
     if (!user) return false;
-    
+
     const result = await service.canAccessContent(user.id, contentId);
     return result.allowed;
   };
-  
+
   const getAvailableContent = async () => {
     if (!user) return [];
-    
+
     return await service.getAvailableContent(user.id);
   };
-  
+
   return {
     adultStatus,
     loading,
@@ -468,21 +468,21 @@ export function AgeVerificationModal({
 }) {
   const [age, setAge] = useState('');
   const [error, setError] = useState('');
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const ageNum = parseInt(age);
     if (isNaN(ageNum) || ageNum < 18) {
       setError('You must be 18 or older to access adult content');
       return;
     }
-    
+
     onVerify(ageNum);
   };
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
@@ -490,7 +490,7 @@ export function AgeVerificationModal({
         <p className="text-gray-600 mb-4">
           You must be 18 or older to access adult content. Please verify your age to continue.
         </p>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
@@ -507,11 +507,9 @@ export function AgeVerificationModal({
               required
             />
           </div>
-          
-          {error && (
-            <div className="text-red-600 text-sm">{error}</div>
-          )}
-          
+
+          {error && <div className="text-red-600 text-sm">{error}</div>}
+
           <div className="flex gap-2">
             <button
               type="button"
@@ -546,13 +544,11 @@ export function ContentLevelSelector({
     { id: 'moderate', label: 'Moderate', description: 'Some suggestive content' },
     { id: 'explicit', label: 'Explicit', description: 'Adult content only' },
   ];
-  
+
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        Content Level
-      </label>
-      {levels.map(level => (
+      <label className="block text-sm font-medium text-gray-700">Content Level</label>
+      {levels.map((level) => (
         <label key={level.id} className="flex items-center space-x-2">
           <input
             type="radio"

@@ -140,13 +140,12 @@ export default function ConsoleCard({
         else if (face === 2) setFace(0);
         else if (face === 1) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'ArrowRight') {
@@ -155,13 +154,12 @@ export default function ConsoleCard({
         else if (face === 1) setFace(0);
         else if (face === 2) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       // Vertical rotation between front/top/bottom
@@ -171,13 +169,12 @@ export default function ConsoleCard({
         else if (face === 3) setFace(0);
         else if (face === 4) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'ArrowDown') {
@@ -186,13 +183,12 @@ export default function ConsoleCard({
         else if (face === 4) setFace(0);
         else if (face === 3) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'Enter') {
@@ -215,7 +211,21 @@ export default function ConsoleCard({
         if (gp) {
           const buttons = gp.buttons.map((b: any) => (b && b.pressed ? 1 : 0));
           const axes = gp.axes || [0, 0];
-          // TODO: Add analog stick support using axes for smooth cube rotation
+
+          // Analog stick support for smooth cube rotation
+          if (mode === 'cube' && Math.abs(axes[0]) > 0.5) {
+            // Horizontal analog stick for left/right face navigation
+            const direction = axes[0] > 0 ? 'right' : 'left';
+            if (direction === 'right' && face === 0) setFace(2);
+            else if (direction === 'left' && face === 0) setFace(1);
+          }
+          if (mode === 'cube' && Math.abs(axes[1]) > 0.5) {
+            // Vertical analog stick for up/down face navigation
+            const direction = axes[1] > 0 ? 'down' : 'up';
+            if (direction === 'up' && face === 0) setFace(4);
+            else if (direction === 'down' && face === 0) setFace(3);
+          }
+
           // D-pad
           if (mode === 'cube') {
             if (press(buttons[14], 14)) {
@@ -484,11 +494,13 @@ export default function ConsoleCard({
                 try {
                   const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                   if (audioEnabled) {
-                    audio.unlock();
-                    // Small delay to ensure audio context is unlocked
-                    setTimeout(() => {
-                      audio.play('samus_jingle', { gain: 0.35 });
-                    }, 10);
+                    if (audioOn) {
+                      audio.unlock();
+                      // Small delay to ensure audio context is unlocked
+                      setTimeout(() => {
+                        audio.play('samus_jingle', { gain: 0.35 });
+                      }, 10);
+                    }
                   }
                 } catch (error) {
                   console.warn('Failed to play audio:', error);
@@ -599,6 +611,17 @@ export default function ConsoleCard({
         body: JSON.stringify({ prefs: { CRT: crt, VHS: vhs, AUDIO: audio, AUDIO_LEVEL: vol } }),
       });
     };
+
+    if (loading) {
+      return (
+        <div className="p-4 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+            <div className="text-xs text-zinc-400">Loading preferences...</div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="p-4 space-y-3">

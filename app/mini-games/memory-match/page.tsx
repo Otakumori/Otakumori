@@ -79,12 +79,16 @@ export default function MemoryMatchGame() {
     setTimeElapsed(0);
     setStreak(0);
 
-    // Start new game session
+    // Start new game session and track session ID
     const newSessionId = gameEngine.startSession();
     setSessionId(newSessionId);
 
-    // Record game start
-    gameEngine.recordAction('game_start', { difficulty, totalPairs: settings.pairs });
+    // Record game start with session ID for analytics tracking
+    gameEngine.recordAction('game_start', { 
+      difficulty, 
+      totalPairs: settings.pairs,
+      sessionId: newSessionId 
+    });
 
     setGameState('playing');
   }, [difficulty, settings.pairs, gameEngine]);
@@ -221,7 +225,7 @@ export default function MemoryMatchGame() {
     // Calculate accuracy
     const accuracy = matches / Math.max(moves, 1);
 
-    // Update game engine
+    // Update game engine with session tracking
     gameEngine.updateScore(finalScore, {
       timeElapsed,
       moves,
@@ -229,14 +233,16 @@ export default function MemoryMatchGame() {
       accuracy,
       difficulty,
       streakBonus,
+      sessionId,
     });
 
-    // Submit to leaderboard
+    // Submit to leaderboard with session tracking
     await gameEngine.submitScore('score', finalScore, {
       timeElapsed,
       moves,
       accuracy,
       difficulty,
+      sessionId,
     });
 
     // Check achievements
