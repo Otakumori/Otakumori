@@ -314,12 +314,12 @@ export default function AvatarSystem({
           <Environment preset="studio" />
 
           {character && <primitive object={character} />}
-          
+
           {/* Render hair strands with physics */}
           {hairStrands.map((strand, idx) => (
             <primitive key={`hair-${idx}`} object={strand} />
           ))}
-          
+
           {/* Render cloth meshes with physics */}
           {clothMeshes.map((cloth, idx) => (
             <primitive key={`cloth-${idx}`} object={cloth} />

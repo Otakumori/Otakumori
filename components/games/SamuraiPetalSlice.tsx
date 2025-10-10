@@ -92,7 +92,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
         setRunId(runData.runId);
         const gameSeed = runData.seed;
         setSeed(gameSeed);
-        
+
         // Use seed for deterministic random generation (for replay functionality)
         if (gameSeed) {
           // Store seed for use in procedural generation

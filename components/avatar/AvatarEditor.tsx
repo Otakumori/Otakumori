@@ -738,12 +738,12 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
           <Environment preset="studio" />
 
           {characterMesh && <primitive object={characterMesh} />}
-          
+
           {/* Render hair strands with physics */}
           {hairStrands.map((strand, idx) => (
             <primitive key={`hair-${idx}`} object={strand} />
           ))}
-          
+
           {/* Render cloth meshes with physics */}
           {clothMeshes.map((cloth, idx) => (
             <primitive key={`cloth-${idx}`} object={cloth} />

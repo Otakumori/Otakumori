@@ -54,7 +54,7 @@ export default function LRoom404Page() {
       setTimeoutId(null);
     };
   }, []);
-  
+
   // Clear timeout when puzzle is completed or fallback is triggered
   useEffect(() => {
     if ((currentPhase === 'complete' || currentPhase === 'fallback') && timeoutId) {

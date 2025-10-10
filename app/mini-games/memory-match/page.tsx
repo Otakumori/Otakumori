@@ -84,10 +84,10 @@ export default function MemoryMatchGame() {
     setSessionId(newSessionId);
 
     // Record game start with session ID for analytics tracking
-    gameEngine.recordAction('game_start', { 
-      difficulty, 
+    gameEngine.recordAction('game_start', {
+      difficulty,
       totalPairs: settings.pairs,
-      sessionId: newSessionId 
+      sessionId: newSessionId,
     });
 
     setGameState('playing');
