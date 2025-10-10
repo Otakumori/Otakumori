@@ -8,54 +8,12 @@ export default function HubClient() {
   const [bootState, setBootState] = useState<'loading' | 'boot' | 'hub'>('loading');
 
   useEffect(() => {
-    // Check if boot should be shown (once per day)
-    try {
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const bootKey = `otm_gc_boot_${today}`;
-      const sessionKey = 'otm_gc_boot_seen';
-
-      // Check localStorage for today's boot
-      const hasBootedToday = localStorage.getItem(bootKey) === 'true';
-
-      // Check sessionStorage for this session
-      const hasBootedThisSession = sessionStorage.getItem(sessionKey) === 'true';
-
-      if (hasBootedToday || hasBootedThisSession) {
-        setBootState('hub');
-      } else {
-        setBootState('boot');
-      }
-    } catch {
-      // If localStorage/sessionStorage fails, skip boot
-      setBootState('hub');
-    }
+    // Always show boot sequence (no localStorage gating)
+    setBootState('boot');
   }, []);
 
   const handleBootComplete = () => {
-    try {
-      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      const bootKey = `otm_gc_boot_${today}`;
-      const sessionKey = 'otm_gc_boot_seen';
-
-      // Mark as booted for today and this session
-      localStorage.setItem(bootKey, 'true');
-      sessionStorage.setItem(sessionKey, 'true');
-    } catch {
-      // Ignore storage errors
-    }
-
-    setBootState('hub');
-  };
-
-  const _handleBootSkip = () => {
-    try {
-      const sessionKey = 'otm_gc_boot_seen';
-      // Only mark session as seen, not the daily flag
-      sessionStorage.setItem(sessionKey, 'true');
-    } catch {
-      // Ignore storage errors
-    }
-
+    // No localStorage - always show boot on next visit
     setBootState('hub');
   };
 

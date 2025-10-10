@@ -12,18 +12,14 @@ export default function GameCubeBootSequence({
   onComplete,
   skipable = true,
 }: GameCubeBootSequenceProps) {
-  const [phase, setPhase] = useState<'spin' | 'logo' | 'complete'>('spin');
+  const [phase, setPhase] = useState<'spin' | 'logo' | 'burst' | 'complete'>('spin');
   const [showSkip, setShowSkip] = useState(false);
-  const [bootSeen, setBootSeen] = useState(false);
+  const [showPetals, setShowPetals] = useState(false);
 
-  // Check if boot sequence was seen today
+  // Boot sequence always shows (no localStorage gating)
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const bootKey = `otm-gamecube-boot-${today}`;
-    const seen = localStorage.getItem(bootKey);
-    setBootSeen(!!seen);
-
-    if (seen) {
+    // Respect reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       onComplete();
       return;
     }
@@ -33,13 +29,15 @@ export default function GameCubeBootSequence({
 
     // Phase transitions (authentic GameCube timing)
     const timers = [
-      setTimeout(() => setPhase('logo'), 1500), // Cube spin
+      setTimeout(() => setPhase('logo'), 1000), // O-cube arrival
+      setTimeout(() => {
+        setPhase('burst');
+        setShowPetals(true);
+      }, 2000), // Petal burst
       setTimeout(() => {
         setPhase('complete');
-        setBootSeen(true);
-        localStorage.setItem(bootKey, 'true');
-        setTimeout(onComplete, 1000); // Logo display
-      }, 3000),
+        setTimeout(onComplete, 600); // Wordmark display
+      }, 2600), // Complete
     ];
 
     return () => {
@@ -49,20 +47,21 @@ export default function GameCubeBootSequence({
   }, [onComplete]);
 
   const skipBoot = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const bootKey = `otm-gamecube-boot-${today}`;
-    localStorage.setItem(bootKey, 'true');
     onComplete();
   };
 
-  // Respect reduced motion preference
+  // Skip button keyboard handler
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      onComplete();
-    }
-  }, [onComplete]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (showSkip && (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        skipBoot();
+      }
+    };
 
-  if (bootSeen) return null;
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showSkip]);
 
   return (
     <div
@@ -86,10 +85,10 @@ export default function GameCubeBootSequence({
         )}
       </AnimatePresence>
 
-      {/* Spinning cube phase (authentic GameCube style) */}
+      {/* Spinning O-cube phase */}
       {phase === 'spin' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-          {/* 3D CSS Cube */}
+          {/* 3D CSS O-Cube */}
           <div className="relative w-48 h-48 mx-auto mb-8" style={{ perspective: '800px' }}>
             <motion.div
               className="absolute inset-0 transform-gpu"
@@ -99,18 +98,18 @@ export default function GameCubeBootSequence({
                 rotateY: [0, 720], // 2 full rotations
               }}
               transition={{
-                duration: 1.5,
+                duration: 1.0,
                 ease: [0.45, 0, 0.15, 1], // Ease out cubic
               }}
             >
-              {/* Cube faces */}
+              {/* O-Cube faces with hollow center */}
               {['front', 'back', 'right', 'left', 'top', 'bottom'].map((face) => (
                 <div
                   key={face}
                   className="absolute w-full h-full"
                   style={{
-                    background: 'linear-gradient(135deg, #a855f7 0%, #8b5cf6 50%, #6b21a8 100%)',
-                    border: '2px solid rgba(255,255,255,0.2)',
+                    background: 'linear-gradient(135deg, #C7D0FF 0%, #9FB0FF 50%, #8b5cf6 100%)',
+                    border: '2px solid #9FB0FF',
                     transform:
                       face === 'front'
                         ? 'translateZ(96px)'
@@ -125,6 +124,14 @@ export default function GameCubeBootSequence({
                                 : 'rotateX(-90deg) translateZ(96px)',
                   }}
                 >
+                  {/* Hollow O-shaped center */}
+                  <div
+                    className="absolute inset-8 bg-black rounded-full border-2 border-white/20"
+                    style={{
+                      clipPath: 'polygon(20% 20%, 80% 20%, 80% 80%, 20% 80%)',
+                    }}
+                  />
+
                   {/* Subtle shine */}
                   <div
                     className="absolute inset-0 pointer-events-none"
@@ -140,56 +147,165 @@ export default function GameCubeBootSequence({
         </motion.div>
       )}
 
-      {/* Logo reveal phase */}
+      {/* Logo reveal phase - O-cube settles */}
       {phase === 'logo' && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <motion.h1
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="text-5xl font-bold tracking-[0.3em] mb-2"
-            style={{
-              fontFamily: 'Arial, sans-serif',
-              background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textShadow: '0 0 20px rgba(168, 85, 247, 0.5)',
-            }}
-          >
-            OTAKU-MORI
-          </motion.h1>
+          {/* Settled O-Cube */}
           <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="h-0.5 w-40 mx-auto bg-gradient-to-r from-transparent via-purple-400 to-transparent"
-          />
+            initial={{ scale: 1.08, rotateY: 0 }}
+            animate={{ scale: 1, rotateY: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="relative w-48 h-48 mx-auto mb-8"
+            style={{ perspective: '800px' }}
+          >
+            <div
+              className="absolute inset-0 transform-gpu"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Front face of O-Cube */}
+              <div
+                className="absolute w-full h-full"
+                style={{
+                  background: 'linear-gradient(135deg, #C7D0FF 0%, #9FB0FF 50%, #8b5cf6 100%)',
+                  border: '2px solid #9FB0FF',
+                  transform: 'translateZ(96px)',
+                }}
+              >
+                {/* Hollow O-shaped center */}
+                <div
+                  className="absolute inset-8 bg-black rounded-full border-2 border-white/20"
+                  style={{
+                    clipPath: 'polygon(20% 20%, 80% 20%, 80% 80%, 20% 80%)',
+                  }}
+                />
+
+                {/* Glow effect */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.3) 100%)',
+                    boxShadow: '0 0 30px rgba(199, 208, 255, 0.6)',
+                  }}
+                />
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
       )}
 
-      {/* Complete phase */}
+      {/* Petal burst phase */}
+      {phase === 'burst' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center relative"
+        >
+          {/* O-Cube with intense glow */}
+          <div className="relative w-48 h-48 mx-auto mb-8" style={{ perspective: '800px' }}>
+            <div
+              className="absolute inset-0 transform-gpu"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              <div
+                className="absolute w-full h-full"
+                style={{
+                  background: 'linear-gradient(135deg, #C7D0FF 0%, #9FB0FF 50%, #8b5cf6 100%)',
+                  border: '2px solid #9FB0FF',
+                  transform: 'translateZ(96px)',
+                  boxShadow: '0 0 60px rgba(199, 208, 255, 1)',
+                }}
+              >
+                <div
+                  className="absolute inset-8 bg-black rounded-full border-2 border-white/20"
+                  style={{
+                    clipPath: 'polygon(20% 20%, 80% 20%, 80% 80%, 20% 80%)',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Cherry blossom petal burst */}
+          {showPetals && (
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(60)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{
+                    x: '50%',
+                    y: '50%',
+                    scale: 0,
+                    opacity: 1,
+                  }}
+                  animate={{
+                    x: `${50 + Math.cos((i * 6 * Math.PI) / 180) * (240 + Math.random() * 140)}%`,
+                    y: `${50 + Math.sin((i * 6 * Math.PI) / 180) * (240 + Math.random() * 140)}%`,
+                    scale: [0, 1.2, 0.8, 0],
+                    opacity: [1, 1, 0.8, 0],
+                    rotate: [0, Math.random() * 45, Math.random() * 90],
+                  }}
+                  transition={{
+                    duration: 0.9 + Math.random() * 0.2,
+                    delay: i * 0.02,
+                    ease: 'easeOut',
+                  }}
+                  className="absolute w-3 h-3 rounded-full"
+                  style={{
+                    background: `radial-gradient(circle, ${
+                      i % 3 === 0 ? '#FFC7D9' : i % 3 === 1 ? '#FF9FBE' : '#FF6A9C'
+                    }, transparent)`,
+                    filter: 'blur(0.5px)',
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Complete phase - Wordmark */}
       {phase === 'complete' && (
         <motion.div
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
           className="text-center"
         >
-          <h1
-            className="text-5xl font-bold tracking-[0.3em]"
-            style={{
-              fontFamily: 'Arial, sans-serif',
-              background: 'linear-gradient(180deg, #fff 0%, #c0c0c0 50%, #808080 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
           >
-            OTAKU-MORI
-          </h1>
+            <h1
+              className="text-5xl font-bold tracking-[0.3em] mb-2"
+              style={{
+                fontFamily: 'Arial, sans-serif',
+                color: '#E8ECFF',
+                textShadow: '0 0 20px rgba(232, 236, 255, 0.8), 0 0 40px rgba(232, 236, 255, 0.4)',
+              }}
+            >
+              OTAKU-MORI
+            </h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-2xl font-medium tracking-wide"
+              style={{
+                fontFamily: 'Arial, sans-serif',
+                color: '#E8ECFF',
+                fontSize: '0.6em',
+                marginTop: '0.5rem',
+              }}
+            >
+              ™ 2025
+            </motion.p>
+          </motion.div>
         </motion.div>
       )}
     </div>
