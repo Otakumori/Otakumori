@@ -3,27 +3,19 @@
 ## Color Palette Implementation
 
 ### Primary Colors
+
 ```css
 /* Deep Indigo Background */
---otm-ink: #0D0F1C
---otm-ink-2: #11152A
-
-/* O-Cube Metallic */
---otm-silver: #C7D0FF
---otm-silver-border: #9FB0FF
-
-/* Cherry Blossom Sakura */
---otm-sakura: #FFC7D9    /* Light */
---otm-sakura-mid: #FF9FBE /* Medium */
---otm-rose: #FF6A9C       /* Deep */
-
-/* Wordmark */
---otm-ice: #E8ECFF
+--otm-ink: #0d0f1c --otm-ink-2: #11152a /* O-Cube Metallic */ --otm-silver: #c7d0ff
+  --otm-silver-border: #9fb0ff /* Cherry Blossom Sakura */ --otm-sakura: #ffc7d9 /* Light */
+  --otm-sakura-mid: #ff9fbe /* Medium */ --otm-rose: #ff6a9c /* Deep */ /* Wordmark */
+  --otm-ice: #e8ecff;
 ```
 
 ## Visual Phases
 
 ### Phase 1: O-Cube Spinning (0-1000ms)
+
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
@@ -40,6 +32,7 @@
 ```
 
 ### Phase 2: Petal Burst (1000-2000ms)
+
 ```
 ┌─────────────────────────────────────────┐
 │    🌸               🌸                 │
@@ -53,6 +46,7 @@
 ```
 
 ### Phase 3: Wordmark (2000-2600ms)
+
 ```
 ┌─────────────────────────────────────────┐
 │                                         │
@@ -67,6 +61,7 @@
 ## Animation Timing
 
 ### Ease Curves
+
 ```javascript
 // Primary rotation
 ease: [0.45, 0, 0.15, 1] // Ease out cubic
@@ -86,6 +81,7 @@ transition: {
 ```
 
 ### Particle System
+
 ```javascript
 // Petal configuration
 const petalCount = 60;
@@ -97,6 +93,7 @@ const rotation = Math.random() * 45;
 ## Accessibility Features
 
 ### Reduced Motion Support
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   /* Skip animations, show final state */
@@ -108,6 +105,7 @@ const rotation = Math.random() * 45;
 ```
 
 ### Keyboard Navigation
+
 - **Space/Enter/Escape:** Skip boot sequence
 - **Tab:** Navigate to skip button
 - **Screen reader:** Proper ARIA labels
@@ -115,11 +113,13 @@ const rotation = Math.random() * 45;
 ## Performance Targets
 
 ### Frame Rate
+
 - **Target:** 60fps on modern devices
 - **Minimum:** 30fps on older devices
 - **Optimization:** Hardware-accelerated transforms
 
 ### Layout Stability
+
 - **CLS Target:** <0.02
 - **No layout shifts** during animation
 - **Stable dimensions** throughout sequence
@@ -127,12 +127,14 @@ const rotation = Math.random() * 45;
 ## Brand Consistency
 
 ### Typography
+
 - **Font:** Arial (GameCube-inspired)
 - **Tracking:** 0.3em for main title
 - **Scale:** Responsive sizing
 - **Glow:** Subtle text-shadow effects
 
 ### Visual Hierarchy
+
 1. **O-Cube:** Primary focus (spinning)
 2. **Petal Burst:** Secondary animation (explosion)
 3. **Wordmark:** Final reveal (branding)
@@ -140,4 +142,4 @@ const rotation = Math.random() * 45;
 
 ---
 
-*This guide provides the complete visual specification for implementing the O-cube boot sequence with proper color usage, timing, and accessibility considerations.*
+_This guide provides the complete visual specification for implementing the O-cube boot sequence with proper color usage, timing, and accessibility considerations._
