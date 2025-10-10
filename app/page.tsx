@@ -13,7 +13,7 @@ import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
 import ShopSection from '@/app/(site)/home/ShopSection';
 import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
 import BlogSection from '@/app/(site)/home/BlogSection';
-import FooterSection from '@/app/(site)/home/FooterSection';
+import SoapstoneComposer from '@/components/soapstone/SoapstoneComposer';
 import InteractivePetals from '@/components/hero/InteractivePetals';
 import StarfieldBackground from '@/components/background/StarfieldBackground';
 import CursorGlow from './components/fx/CursorGlow';
@@ -140,8 +140,20 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* FOOTER */}
-      <FooterSection showSoapstones={NEXT_PUBLIC_FEATURE_SOAPSTONES === '1'} />
+      {/* Soapstones on Home Page (footer content is handled by global Footer) */}
+      {NEXT_PUBLIC_FEATURE_SOAPSTONES === '1' && (
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="glass-panel rounded-2xl p-8">
+            <h3 className="text-2xl font-bold text-pink-200 mb-6">
+              Leave a sign for fellow travelers
+            </h3>
+            <SoapstoneComposer 
+              disabled={false}
+              disabledMessage={undefined}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Existing drift animation layer */}
       <SoapstoneHomeDrift />

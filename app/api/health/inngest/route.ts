@@ -43,4 +43,3 @@ export async function GET() {
 
   return NextResponse.json({ healthy, results }, { status: healthy ? 200 : 503 });
 }
-

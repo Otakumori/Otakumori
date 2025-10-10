@@ -5,9 +5,7 @@ export async function bootCheckInngest() {
   started = true;
 
   const serveUrl = process.env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
-  const missing = ['INNGEST_EVENT_KEY', 'INNGEST_SIGNING_KEY'].filter(
-    (k) => !process.env[k],
-  );
+  const missing = ['INNGEST_EVENT_KEY', 'INNGEST_SIGNING_KEY'].filter((k) => !process.env[k]);
   if (missing.length) {
     console.warn('[Inngest] Missing env:', missing.join(', '));
   }
@@ -35,9 +33,7 @@ export async function bootCheckInngest() {
       }),
     });
     if (!res.ok) {
-      console.error(
-        `[Inngest] POST ${serveUrl} failed: ${res.status} – check keys/serve URL`,
-      );
+      console.error(`[Inngest] POST ${serveUrl} failed: ${res.status} – check keys/serve URL`);
     } else {
       console.info(`[Inngest] POST ${serveUrl} succeeded: ${res.status}`);
     }
@@ -45,4 +41,3 @@ export async function bootCheckInngest() {
     console.error(`[Inngest] POST ${serveUrl} error:`, e?.message || e);
   }
 }
-

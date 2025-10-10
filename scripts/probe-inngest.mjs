@@ -26,4 +26,3 @@ if (!postRes.ok) {
   process.exit(1);
 }
 console.log('✅ Inngest OK');
-

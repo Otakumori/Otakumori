@@ -72,10 +72,10 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-white/10">
           <div className="text-gray-300 text-sm text-center space-y-2">
-            <p>
-              © {new Date().getFullYear()} Otaku-mori. All petals accounted for. Don't go hollow.
+            <p>Otakumori ™ made with ♡</p>
+            <p className="text-xs">
+              © {new Date().getFullYear()} Otaku-mori. All rights reserved.
             </p>
-            <p>Otakumori ™ made with </p>
             <p>
               <a href="/#leave-a-sign" className="hover:text-white transition-colors">
                 Leave a sign
