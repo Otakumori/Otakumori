@@ -85,6 +85,7 @@ try {
       INNGEST_EVENT_KEY: z.string().optional(),
       INNGEST_SIGNING_KEY: z.string().optional(),
       INNGEST_SERVE_URL: z.string().url().optional(),
+      INNGEST_PROBE: z.string().optional(),
       BASE_URL: z.string().url().optional(),
       SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
       OTEL_SDK_DISABLED: z.string().optional(),
@@ -138,6 +139,8 @@ try {
       NEXT_PUBLIC_SITE_URL: z.string().url(),
       NEXT_PUBLIC_CANONICAL_ORIGIN: z.string().url().optional(),
       NEXT_PUBLIC_VERCEL_ENVIRONMENT: z.string().optional(),
+      NEXT_PUBLIC_APP_ENV: z.string().optional(),
+      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: z.string().optional(),
       // Supabase
       NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
       NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
@@ -295,6 +298,7 @@ try {
       INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
       INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
       INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
+      INNGEST_PROBE: process.env.INNGEST_PROBE,
       BASE_URL: process.env.BASE_URL,
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
       // Google OAuth
@@ -332,6 +336,8 @@ try {
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
       NEXT_PUBLIC_CANONICAL_ORIGIN: process.env.NEXT_PUBLIC_CANONICAL_ORIGIN,
       NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
+      NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
       // Supabase
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

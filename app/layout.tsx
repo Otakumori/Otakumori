@@ -16,9 +16,13 @@ import PetalProgressBar from './components/progress/PetalProgressBar';
 import GoogleAnalytics from './components/analytics/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import { bootCheckInngest } from '@/lib/inngestHealth';
+import { enforceNoMocks } from '@/lib/no-mocks';
 
 // Boot-time Inngest health check (fire-and-forget)
 bootCheckInngest();
+
+// Enforce no mock data in production
+enforceNoMocks();
 
 export function generateMetadata(): Metadata {
   return {
