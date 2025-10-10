@@ -88,9 +88,11 @@ const nextConfig = {
       // Enhanced style-src for Google Fonts and inline styles
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Enhanced script-src for GTM and Clerk
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://*.clerk.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://otaku-mori.com https://www.otaku-mori.com https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://*.clerk.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live",
       // Enhanced worker-src for service workers and blob workers
       "worker-src 'self' blob:",
+      // Enhanced frame-src for Vercel Live and Clerk
+      "frame-src 'self' https://vercel.live https://*.clerk.com https://*.clerk.accounts.dev",
       "frame-ancestors 'self'",
     ];
 
