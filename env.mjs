@@ -82,6 +82,8 @@ try {
       // Anti-bot (Cloudflare Turnstile) – optional
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
       TURNSTILE_SECRET_KEY: z.string().optional(),
+      INNGEST_EVENT_KEY: z.string().optional(),
+      INNGEST_SIGNING_KEY: z.string().optional(),
       INNGEST_SERVE_URL: z.string().url().optional(),
       BASE_URL: z.string().url().optional(),
       SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
@@ -290,6 +292,8 @@ try {
       // Anti-bot (Cloudflare Turnstile) – optional
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
       TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+      INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+      INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
       INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
       BASE_URL: process.env.BASE_URL,
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -479,6 +483,9 @@ try {
     // Anti-bot (Cloudflare Turnstile) – optional
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
     TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY || '',
+    INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY || '',
+    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY || '',
+    INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL || '',
     FEATURE_EASYPOST: process.env.FEATURE_EASYPOST || '',
 
     // Supabase

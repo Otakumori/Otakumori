@@ -43,6 +43,7 @@ const isPublic = createRouteMatcher([
   '/assets(.*)',
 
   // API routes (handled separately)
+  '/api/inngest(.*)', // Inngest platform access (auth via signing keys)
   '/api/health',
   '/api/printify(.*)',
   '/api/v1/printify(.*)',
@@ -115,7 +116,6 @@ const isProtected = createRouteMatcher([
   '/api/ds-messages(.*)',
   '/api/checkout(.*)',
   '/api/contact(.*)',
-  '/api/inngest(.*)',
   '/api/notifications(.*)',
   '/api/parties(.*)',
   '/api/safety(.*)',
