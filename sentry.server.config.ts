@@ -48,6 +48,7 @@ if (env.SENTRY_SKIP_AUTO_RELEASE !== 'true' && env.NEXT_PUBLIC_SENTRY_DSN) {
     environment: env.NODE_ENV,
     tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 0, // 10% in production
     profilesSampleRate: 0,
+    skipOpenTelemetrySetup: true, // Prevent OTEL conflicts in bundling
 
     integrations: [
       Sentry.httpIntegration(),

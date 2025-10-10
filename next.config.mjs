@@ -183,6 +183,7 @@ const nextConfig = {
         '@sentry/node': false,
         '@prisma/instrumentation': false,
         ioredis: false,
+        '@opentelemetry/instrumentation': false,
       };
     }
     return config;

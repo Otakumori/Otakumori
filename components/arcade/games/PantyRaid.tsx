@@ -114,9 +114,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
             {/* Panty details */}
             <div className="w-full h-full bg-pink-200 rounded-md flex items-center justify-center">
               <div className="text-xs">
-                <span role="img" aria-label="Underwear">
-                  
-                </span>
+                <span role="img" aria-label="Underwear"></span>
               </div>
             </div>
           </motion.div>
@@ -132,14 +130,10 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
             className="absolute top-4 right-4 flex space-x-2"
           >
             <div className="text-2xl">
-              <span role="img" aria-label="Crow">
-                
-              </span>
+              <span role="img" aria-label="Crow"></span>
             </div>
             <div className="text-2xl">
-              <span role="img" aria-label="Crow">
-                
-              </span>
+              <span role="img" aria-label="Crow"></span>
             </div>
           </motion.div>
         )}
