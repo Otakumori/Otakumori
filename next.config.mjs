@@ -174,14 +174,26 @@ const nextConfig = {
       }),
     );
 
+    // Suppress OpenTelemetry dynamic require warnings
+    config.plugins.push(
+      new webpack.ContextReplacementPlugin(
+        /@opentelemetry\/instrumentation/,
+        (data) => {
+          delete data.dependencies[0].critical;
+          return data;
+        },
+      ),
+    );
+
     // Reduce polyfills and giant blobs entering the cache
     config.resolve.fallback = { ...config.resolve.fallback, buffer: false };
 
-    // Keep cache but avoid extra compression overhead
+    // Optimize cache settings to avoid large string serialization warnings
     config.cache = {
       type: 'filesystem',
       compression: false,
       store: 'pack',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     };
 
     if (!isServer) {
