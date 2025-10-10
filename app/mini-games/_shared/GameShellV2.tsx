@@ -91,13 +91,16 @@ export default function GameShellV2({
   const saveSystem = useGameSaveV2(gameKey);
   const telemetry = useGameTelemetry(gameKey);
 
-  // Log game configuration
-  console.debug(`[GameShell] ${gameKey} initialized:`, {
-    achievements: enableAchievements,
-    maxPlayers,
-    difficulty,
-    leaderboards: enableLeaderboards,
-  });
+  // Log game configuration (development only)
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.log(`[GameShell] ${gameKey} initialized:`, {
+      achievements: enableAchievements,
+      maxPlayers,
+      difficulty,
+      leaderboards: enableLeaderboards,
+    });
+  }
 
   // Error handler
   const handleError = useCallback(
@@ -288,7 +291,9 @@ export default function GameShellV2({
                     className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
                     aria-label="Pause game"
                   >
-                    ⏸️
+                    <span role="img" aria-label="Pause">
+                      ⏸
+                    </span>
                   </button>
                 )}
 

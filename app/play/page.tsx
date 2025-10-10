@@ -136,8 +136,14 @@ export default function PlaygroundPage() {
                 ${selectedAsset?.id === asset.id ? 'ring-2 ring-sakura-400 ring-opacity-50' : ''}
               `}
               onClick={() => handleAssetClick(asset)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') handleAssetClick(asset);
+              }}
               onMouseEnter={() => handleAssetHover(asset.id, asset.sfxId)}
               onMouseLeave={() => setHoveredAsset(null)}
+              role="button"
+              tabIndex={0}
+              aria-label={`${asset.name} - ${asset.type}`}
             >
               {/* Asset Preview */}
               <div className="aspect-square bg-slate-700 rounded-xl mb-4 flex items-center justify-center overflow-hidden">

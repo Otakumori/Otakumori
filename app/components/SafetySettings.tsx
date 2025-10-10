@@ -166,7 +166,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
                   Let other users send you friend requests
                 </div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label
+                className="relative inline-flex items-center cursor-pointer"
+                aria-label="Allow friend requests"
+              >
+                <span className="sr-only">Allow friend requests</span>
                 <input
                   type="checkbox"
                   checked={settings.allowFriendRequests}
@@ -182,7 +186,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
                 <div className="text-white font-medium">Allow Party Invites</div>
                 <div className="text-white/60 text-sm">Let other users invite you to parties</div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label
+                className="relative inline-flex items-center cursor-pointer"
+                aria-label="Allow party invites"
+              >
+                <span className="sr-only">Allow party invites</span>
                 <input
                   type="checkbox"
                   checked={settings.allowPartyInvites}
@@ -200,7 +208,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
                   Let other users send you direct messages
                 </div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label
+                className="relative inline-flex items-center cursor-pointer"
+                aria-label="Allow messages"
+              >
+                <span className="sr-only">Allow messages</span>
                 <input
                   type="checkbox"
                   checked={settings.allowMessages}
@@ -260,7 +272,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
                   Get notified when your reports are reviewed
                 </div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label
+                className="relative inline-flex items-center cursor-pointer"
+                aria-label="Report notifications"
+              >
+                <span className="sr-only">Report notifications</span>
                 <input
                   type="checkbox"
                   checked={settings.reportNotifications}
@@ -276,7 +292,11 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
                 <div className="text-white font-medium">Moderation Notifications</div>
                 <div className="text-white/60 text-sm">Get notified about moderation actions</div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label
+                className="relative inline-flex items-center cursor-pointer"
+                aria-label="Moderation notifications"
+              >
+                <span className="sr-only">Moderation notifications</span>
                 <input
                   type="checkbox"
                   checked={settings.moderationNotifications}

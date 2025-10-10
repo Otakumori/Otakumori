@@ -36,7 +36,7 @@ export function HeroShrine() {
             animation: `float ${5 + petal.delay}s ease-in-out ${petal.delay}s infinite`,
           }}
         >
-          🌸
+          <span role="img" aria-label="Cherry blossom petal">🌸</span>
         </div>
       ))}
 

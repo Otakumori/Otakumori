@@ -114,10 +114,14 @@ export default function ReportButton({
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
+                  <div className="block text-sm font-medium text-white/80 mb-2">
                     Reason for reporting
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  </div>
+                  <div
+                    className="grid grid-cols-2 gap-2"
+                    role="group"
+                    aria-label="Reason for reporting"
+                  >
                     {reasons.map((reason) => {
                       const Icon = reason.icon;
                       return (

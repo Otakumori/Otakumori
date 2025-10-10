@@ -78,7 +78,11 @@ export default function PetalCollectionGame() {
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <div className="text-4xl">🌸</div>
+            <div className="text-4xl">
+              <span role="img" aria-label="Cherry blossom petal">
+                🌸
+              </span>
+            </div>
           </motion.div>
         )}
 

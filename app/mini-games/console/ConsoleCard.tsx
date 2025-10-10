@@ -553,6 +553,7 @@ export default function ConsoleCard({
               </button>
 
               {/* Hover or toggled description overlay */}
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
               <div
                 className={[
                   'pointer-events-none absolute inset-0 rounded-lg bg-black/70 p-3 opacity-0 transition-opacity',
@@ -560,6 +561,13 @@ export default function ConsoleCard({
                   infoOpen === g.slug ? 'opacity-100 pointer-events-auto' : '',
                 ].join(' ')}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.stopPropagation();
+                  }
+                }}
+                role="article"
+                aria-label={`${g.name} game description`}
               >
                 <div className="mb-1 text-sm font-semibold text-zinc-100">{g.name}</div>
                 <p className="text-xs text-zinc-300">{g.desc}</p>
@@ -692,7 +700,6 @@ export default function ConsoleCard({
             <div key={src} className="rounded-lg border border-white/15 bg-white/10 p-3">
               <div className="text-xs text-zinc-300">{src}</div>
               {audio && (
-                // eslint-disable-next-line jsx-a11y/media-has-caption
                 <audio
                   src={`/${src}`}
                   loop
@@ -700,7 +707,10 @@ export default function ConsoleCard({
                   controls
                   className="mt-2 w-full"
                   preload="none"
-                />
+                  aria-label={`Background music: ${src}`}
+                >
+                  <track kind="captions" label="Background music" />
+                </audio>
               )}
             </div>
           ))}
@@ -901,7 +911,6 @@ export default function ConsoleCard({
   return (
     <section
       ref={containerRef}
-      tabIndex={0}
       className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none"
       aria-label="Mini-Games Console"
     >

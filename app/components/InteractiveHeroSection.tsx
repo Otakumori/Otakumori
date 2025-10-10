@@ -512,7 +512,10 @@ const InteractiveHeroSection: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
         >
-          🔥 {clickStreak} streak
+          <span role="img" aria-label="Fire">
+            🔥
+          </span>{' '}
+          {clickStreak} streak
         </motion.div>
       )}
 
@@ -535,7 +538,14 @@ const InteractiveHeroSection: React.FC = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          {trailCount > 0 && <div>🌸 Trails: {trailCount}</div>}
+          {trailCount > 0 && (
+            <div>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>{' '}
+              Trails: {trailCount}
+            </div>
+          )}
           {recentClicks.length > 1 && <div>⚡ Recent: {recentClicks.length}/10</div>}
         </motion.div>
       )}

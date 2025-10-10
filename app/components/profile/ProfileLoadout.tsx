@@ -50,6 +50,12 @@ export default function ProfileLoadout() {
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setOpen(false);
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label="Close loadout modal"
           />
           <div className="relative z-[71] w-[min(94vw,640px)] rounded-2xl border border-fuchsia-500/20 bg-zinc-950/80 p-4 shadow-2xl">
             <div className="mb-3 text-sm font-semibold text-fuchsia-200">Memory Card — Loadout</div>

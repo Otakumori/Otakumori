@@ -547,23 +547,28 @@ export function ContentLevelSelector({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">Content Level</label>
-      {levels.map((level) => (
-        <label key={level.id} className="flex items-center space-x-2">
-          <input
-            type="radio"
-            name="contentLevel"
-            value={level.id}
-            checked={currentLevel === level.id}
-            onChange={() => onLevelChange(level.id as 'mild' | 'moderate' | 'explicit')}
-            className="text-pink-500 focus:ring-pink-500"
-          />
-          <div>
-            <div className="text-sm font-medium">{level.label}</div>
-            <div className="text-xs text-gray-500">{level.description}</div>
-          </div>
-        </label>
-      ))}
+      <div className="block text-sm font-medium text-gray-700" id="content-level-label">
+        Content Level
+      </div>
+      <div role="radiogroup" aria-labelledby="content-level-label">
+        {levels.map((level) => (
+          <label key={level.id} className="flex items-center space-x-2">
+            <input
+              type="radio"
+              name="contentLevel"
+              value={level.id}
+              checked={currentLevel === level.id}
+              onChange={() => onLevelChange(level.id as 'mild' | 'moderate' | 'explicit')}
+              className="text-pink-500 focus:ring-pink-500"
+              aria-label={`${level.label}: ${level.description}`}
+            />
+            <div>
+              <div className="text-sm font-medium">{level.label}</div>
+              <div className="text-xs text-gray-500">{level.description}</div>
+            </div>
+          </label>
+        ))}
+      </div>
     </div>
   );
 }

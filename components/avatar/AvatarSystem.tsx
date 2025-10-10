@@ -411,8 +411,9 @@ export default function AvatarSystem({
                   />
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-white">Physics Level</label>
+                    <label htmlFor="physics-level-select" className="block text-sm font-medium text-white">Physics Level</label>
                     <select
+                      id="physics-level-select"
                       value={adultStatus.physicsLevel || 'basic'}
                       onChange={(e) => handlePhysicsLevelChange(e.target.value as any)}
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
@@ -443,8 +444,9 @@ export default function AvatarSystem({
               <h3 className="text-lg font-semibold text-white">Import Character</h3>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-white">GLB File</label>
+                <label htmlFor="glb-file-input" className="block text-sm font-medium text-white">GLB File</label>
                 <input
+                  id="glb-file-input"
                   type="file"
                   accept=".glb"
                   onChange={(e) => {
@@ -456,8 +458,9 @@ export default function AvatarSystem({
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-white">VRoid File</label>
+                <label htmlFor="vroid-file-input" className="block text-sm font-medium text-white">VRoid File</label>
                 <input
+                  id="vroid-file-input"
                   type="file"
                   accept=".glb"
                   onChange={(e) => {

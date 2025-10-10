@@ -36,16 +36,29 @@ export const Unicode: React.FC<UnicodeProps> = ({
     }
   };
 
+  // Use button element for interactive unicode, span for static
+  if (interactive) {
+    return (
+      <button
+        type="button"
+        aria-label={ariaLabel || title || unicode.replace(/_/g, ' ').toLowerCase()}
+        className={`unicode inline-flex items-center justify-center bg-transparent border-0 p-0 ${className}`.trim()}
+        title={title}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        style={{ cursor: 'pointer' }}
+      >
+        {UNICODE[unicode]}
+      </button>
+    );
+  }
+
   return (
     <span
       aria-label={ariaLabel || title || unicode.replace(/_/g, ' ').toLowerCase()}
       role="img"
       className={`unicode ${className}`.trim()}
       title={title}
-      onClick={interactive ? onClick : undefined}
-      onKeyDown={interactive ? handleKeyDown : undefined}
-      tabIndex={interactive ? 0 : undefined}
-      style={interactive ? { cursor: 'pointer' } : undefined}
     >
       {UNICODE[unicode]}
     </span>

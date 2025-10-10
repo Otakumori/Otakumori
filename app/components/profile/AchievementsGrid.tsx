@@ -156,6 +156,13 @@ export default function AchievementsGrid({ achievements }: AchievementsGridProps
               handleMouseEnter(achievement.id, e)
             }
             onMouseLeave={handleMouseLeave}
+            onFocus={(e: React.FocusEvent<HTMLDivElement>) =>
+              handleMouseEnter(achievement.id, e as any)
+            }
+            onBlur={handleMouseLeave}
+            role="button"
+            tabIndex={0}
+            aria-label={`${achievement.name} achievement${achievement.unlocked ? ' - unlocked' : ' - locked'}`}
           >
             <div className="text-center">
               <div

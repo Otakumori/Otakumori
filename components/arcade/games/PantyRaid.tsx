@@ -58,6 +58,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
   }, [crowsApproaching, isCaught, onFail]);
 
   return (
+    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <div
       ref={gameRef}
       className="w-full h-full relative bg-gradient-to-br from-blue-400 to-pink-400 cursor-grab"

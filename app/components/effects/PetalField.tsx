@@ -163,7 +163,6 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
         opacity: 0.6,
       }}
       aria-hidden="true"
-      role="presentation"
     />
   );
 }

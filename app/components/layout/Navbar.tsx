@@ -224,6 +224,11 @@ export default function Navbar() {
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setActiveDropdown(null);
+                }}
+                role="menu"
+                aria-label="Shop menu"
               >
                 <h3 className="text-white font-semibold mb-4">Featured Products</h3>
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -290,6 +295,11 @@ export default function Navbar() {
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setActiveDropdown(null);
+                }}
+                role="menu"
+                aria-label="Mini-games menu"
               >
                 <h3 className="text-white font-semibold mb-4">Featured Games</h3>
                 <div className="space-y-3 mb-4">
@@ -353,6 +363,11 @@ export default function Navbar() {
               <div
                 className="absolute top-full left-0 mt-2 w-80 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setActiveDropdown(null);
+                }}
+                role="menu"
+                aria-label="Blog menu"
               >
                 <h3 className="text-white font-semibold mb-4">Latest Posts</h3>
                 <div className="space-y-3 mb-4">

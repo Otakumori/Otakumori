@@ -47,7 +47,11 @@ export default function CookieSettings() {
                   <h3 className="text-lg font-semibold text-white">Analytics Cookies</h3>
                   <p className="text-zinc-300 text-sm">Help us understand site usage</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label
+                  className="relative inline-flex items-center cursor-pointer"
+                  aria-label="Analytics cookies"
+                >
+                  <span className="sr-only">Analytics cookies</span>
                   <input
                     type="checkbox"
                     className="sr-only peer"

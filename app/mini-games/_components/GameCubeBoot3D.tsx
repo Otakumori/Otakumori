@@ -380,7 +380,17 @@ export default function GameCubeBoot3D({ onComplete, onSkip }: GameCubeBoot3DPro
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
       {/* 3D Canvas Container */}
-      <div ref={mountRef} className="w-full h-full cursor-pointer" onClick={handleSkip} />
+      <div
+        ref={mountRef}
+        className="w-full h-full cursor-pointer"
+        onClick={handleSkip}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') handleSkip();
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="GameCube boot animation - press any key to skip"
+      />
 
       {/* Skip Button */}
       {showSkip && (

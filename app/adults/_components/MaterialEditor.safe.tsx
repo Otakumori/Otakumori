@@ -246,6 +246,7 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
           <h5 className="text-white text-sm font-medium">Texture Preview</h5>
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-black/20 rounded-lg p-2">
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
               <img
                 src={config.textures.albedo}
                 alt="Albedo texture"
@@ -258,6 +259,7 @@ export function MaterialEditor({ config, onChange }: MaterialEditorProps) {
             </div>
             {config.textures.normal && (
               <div className="bg-black/20 rounded-lg p-2">
+                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
                 <img
                   src={config.textures.normal}
                   alt="Normal map"

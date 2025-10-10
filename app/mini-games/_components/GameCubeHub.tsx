@@ -326,7 +326,11 @@ export default function GameCubeHub() {
             title="Memory Card Slot"
           >
             <div className="text-center">
-              <div className="text-lg mb-1 group-hover:scale-110 transition-transform">💾</div>
+              <div className="text-lg mb-1 group-hover:scale-110 transition-transform">
+                <span role="img" aria-label="Memory card">
+                  💾
+                </span>
+              </div>
               <div className="text-xs opacity-75">MC</div>
             </div>
           </button>
