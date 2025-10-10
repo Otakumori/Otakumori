@@ -1,6 +1,5 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
-import webpack from 'webpack';
 import { env } from './env.mjs';
 
 const withBundleAnalyzer = bundleAnalyzer({
@@ -165,7 +164,7 @@ const nextConfig = {
   // Note: Babel configuration moved to babel.config.js for Next.js 15 compatibility
 
   // Webpack configuration to handle client/server module splitting and build performance
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, webpack }) => {
     // Remove Sentry tracing code paths from bundles
     config.plugins.push(
       new webpack.DefinePlugin({
