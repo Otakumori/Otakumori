@@ -134,7 +134,9 @@ export default function SoapstoneWall({ messages, maxDisplay = 10 }: SoapstoneWa
                           <p className="text-sm font-medium text-pink-200">
                             {message.user?.name || 'Anonymous Traveler'}
                           </p>
-                          <p className="text-xs text-pink-200/50">{formatDate(message.createdAt)}</p>
+                          <p className="text-xs text-pink-200/50">
+                            {formatDate(message.createdAt)}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -147,7 +149,7 @@ export default function SoapstoneWall({ messages, maxDisplay = 10 }: SoapstoneWa
                     </div>
 
                     <p className="text-pink-200/90 leading-relaxed">{message.text}</p>
-                    
+
                     <p className="text-xs text-pink-200/50 text-center mt-2">Tap to hide</p>
                   </div>
                 )}

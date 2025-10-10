@@ -793,14 +793,23 @@ export default function GameCubeHubV2() {
             transform: scale(1.2);
           }
         }
-      @keyframes gamecubeRotate {
-        0% {
-          transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+        @keyframes gamecubeRotate {
+          0% {
+            transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+          }
+          25% {
+            transform: translate(-50%, -50%) rotateX(2deg) rotateY(3deg);
+          }
+          50% {
+            transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+          }
+          75% {
+            transform: translate(-50%, -50%) rotateX(-2deg) rotateY(-3deg);
+          }
+          100% {
+            transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg);
+          }
         }
-        100% {
-          transform: translate(-50%, -50%) rotateX(360deg) rotateY(360deg);
-        }
-      }
       `}</style>
     </div>
   );
