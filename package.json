@@ -138,6 +138,7 @@
     "inngest:dev": "npx inngest-cli@latest dev",
     "inngest:deploy": "npx inngest-cli@latest deploy",
     "inngest:logs": "npx inngest-cli@latest logs",
+    "probe:inngest": "node scripts/probe-inngest.mjs",
     "test:webhooks": "curl -X GET http://localhost:3000/api/webhooks/inngest",
     "test:inngest": "curl -X POST http://localhost:8288/api/inngest -H 'Content-Type: application/json' -d '{\"name\": \"test/function\", \"data\": {\"test\": true}}'",
     "test:admin": "node scripts/test-admin-setup.js",

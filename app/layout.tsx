@@ -15,6 +15,10 @@ import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import GoogleAnalytics from './components/analytics/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import { bootCheckInngest } from '@/lib/inngestHealth';
+
+// Boot-time Inngest health check (fire-and-forget)
+bootCheckInngest();
 
 export function generateMetadata(): Metadata {
   return {
