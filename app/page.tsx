@@ -147,10 +147,7 @@ export default async function HomePage() {
             <h3 className="text-2xl font-bold text-pink-200 mb-6">
               Leave a sign for fellow travelers
             </h3>
-            <SoapstoneComposer 
-              disabled={false}
-              disabledMessage={undefined}
-            />
+            <SoapstoneComposer disabled={false} disabledMessage={undefined} />
           </div>
         </section>
       )}
