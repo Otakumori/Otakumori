@@ -122,7 +122,9 @@ export async function getBalance(userId: string): Promise<number> {
 export async function getTransactionHistory(
   userId: string,
   limit: number = 20,
-): Promise<Array<{ id: string; amount: number; source: string; description: string | null; createdAt: Date }>> {
+): Promise<
+  Array<{ id: string; amount: number; source: string; description: string | null; createdAt: Date }>
+> {
   const transactions = await db.petalTransaction.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
@@ -135,7 +137,9 @@ export async function getTransactionHistory(
 /**
  * Check and update daily streak
  */
-export async function updateStreak(userId: string): Promise<{ currentStreak: number; streakBonus: number }> {
+export async function updateStreak(
+  userId: string,
+): Promise<{ currentStreak: number; streakBonus: number }> {
   const wallet = await getPetalWallet(userId);
 
   const yesterday = new Date();
@@ -172,4 +176,3 @@ export async function updateStreak(userId: string): Promise<{ currentStreak: num
 
   return { currentStreak, streakBonus };
 }
-

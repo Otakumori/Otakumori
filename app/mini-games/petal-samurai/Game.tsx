@@ -106,23 +106,48 @@ export default function Game({ mode }: Props) {
     };
   }, [mode]);
 
-  // Handle petal clicks
-  const handleCanvasClick = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!gameRef.current || gameState.isStunned) return;
+  // Handle mouse/touch slash mechanics
+  const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
+  const isSlashing = useRef(false);
 
-      const canvas = canvasRef.current!;
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+  const handleMouseDown = useCallback((_event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (gameState.isStunned) return;
+    isSlashing.current = true;
+    slashPoints.current = [];
+  }, [gameState.isStunned]);
 
-      const clickedPetal = gameRef.current.getPetalAt(x, y);
-      if (clickedPetal) {
-        gameRef.current.clickPetal(clickedPetal);
-      }
-    },
-    [gameState.isStunned],
-  );
+  const handleMouseMove = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isSlashing.current || !canvasRef.current || !gameRef.current) return;
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    slashPoints.current.push({ x, y, time: Date.now() });
+
+    // Keep only last 10 points
+    if (slashPoints.current.length > 10) {
+      slashPoints.current.shift();
+    }
+
+    // Check if slash hits any petals
+    const hitPetals = gameRef.current.getPetalsAlongPath(slashPoints.current);
+    hitPetals.forEach((petal) => {
+      gameRef.current!.slashPetal(petal);
+    });
+
+    // Draw slash trail
+    gameRef.current.setSlashTrail(slashPoints.current);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    isSlashing.current = false;
+    slashPoints.current = [];
+    if (gameRef.current) {
+      gameRef.current.clearSlashTrail();
+    }
+  }, []);
 
   // Handle power-up activation
   const handlePowerUpClick = useCallback((powerUpType: string) => {
@@ -131,26 +156,47 @@ export default function Game({ mode }: Props) {
     }
   }, []);
 
-  // Submit score when game ends
+  // Submit score and award petals when game ends
   useEffect(() => {
     if (gameState.isGameOver) {
       const submitScore = async () => {
         try {
-          const _payload = {
-            score: gameState.score,
-            combo: gameState.combo,
-            mode: mode,
-            meta: { game: 'petal-samurai' },
-          };
-          // TODO: Implement score submission API
-          // Score to submit
+          // Calculate petal reward (score / 10)
+          const petalReward = Math.floor(gameState.score / 10);
+
+          // Submit score to leaderboard
+          await fetch('/api/v1/leaderboards/petal-samurai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              score: gameState.score,
+              combo: gameState.combo,
+              mode: mode,
+              metadata: {
+                multiplier: gameState.multiplier,
+                misses: gameState.misses,
+              },
+            }),
+          });
+
+          // Award petals
+          if (petalReward > 0) {
+            await fetch('/api/v1/petals/collect', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: petalReward,
+                source: 'game_reward',
+              }),
+            });
+          }
         } catch (error) {
           console.error('Failed to submit score:', error);
         }
       };
       submitScore();
     }
-  }, [gameState.isGameOver, gameState.score, gameState.combo, mode]);
+  }, [gameState.isGameOver, gameState.score, gameState.combo, gameState.multiplier, gameState.misses, mode]);
 
   return (
     <div className="relative">
@@ -160,8 +206,11 @@ export default function Game({ mode }: Props) {
         width={800}
         height={600}
         className="w-full h-auto cursor-crosshair"
-        onClick={handleCanvasClick}
-        aria-label="Petal Samurai game area"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        aria-label="Petal Samurai game area - slash through petals to score"
       />
 
       {/* HUD Overlay */}
@@ -264,6 +313,8 @@ class GameEngine {
   private animationId: number | null = null;
   private lastPetalSpawn: number = 0;
   private lastPowerUpSpawn: number = 0;
+  private slashTrail: { x: number; y: number; time: number }[] = [];
+  private slashedPetals: Set<string> = new Set();
 
   constructor(canvas: HTMLCanvasElement, mode: string) {
     this.canvas = canvas;
@@ -395,7 +446,11 @@ class GameEngine {
     this.powerUps.push(powerUp);
   }
 
-  clickPetal(petal: Petal) {
+  slashPetal(petal: Petal) {
+    // Prevent double-slashing the same petal
+    if (this.slashedPetals.has(petal.id)) return;
+    this.slashedPetals.add(petal.id);
+
     if (petal.type === 'cursed') {
       this.score = Math.max(0, this.score - 2);
       this.combo = 0;
@@ -412,8 +467,58 @@ class GameEngine {
       }
     }
 
-    // Remove clicked petal
+    // Remove slashed petal
     this.petals = this.petals.filter((p) => p.id !== petal.id);
+  }
+
+  getPetalsAlongPath(path: { x: number; y: number }[]): Petal[] {
+    if (path.length < 2) return [];
+
+    const hitPetals: Petal[] = [];
+
+    for (let i = 0; i < path.length - 1; i++) {
+      const p1 = path[i];
+      const p2 = path[i + 1];
+
+      this.petals.forEach((petal) => {
+        if (this.slashedPetals.has(petal.id)) return;
+
+        // Check if petal intersects with line segment
+        const distance = this.distanceToLineSegment(petal.x, petal.y, p1.x, p1.y, p2.x, p2.y);
+        if (distance < petal.size + 5) {
+          hitPetals.push(petal);
+        }
+      });
+    }
+
+    return hitPetals;
+  }
+
+  private distanceToLineSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const lengthSquared = dx * dx + dy * dy;
+
+    if (lengthSquared === 0) {
+      return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
+    }
+
+    let t = ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
+    t = Math.max(0, Math.min(1, t));
+
+    const closestX = x1 + t * dx;
+    const closestY = y1 + t * dy;
+
+    return Math.sqrt((px - closestX) * (px - closestX) + (py - closestY) * (py - closestY));
+  }
+
+  setSlashTrail(trail: { x: number; y: number; time: number }[]) {
+    this.slashTrail = trail;
+  }
+
+  clearSlashTrail() {
+    this.slashTrail = [];
+    this.slashedPetals.clear();
   }
 
   activatePowerUp(type: string) {
@@ -512,16 +617,45 @@ class GameEngine {
       this.ctx.restore();
     });
 
-    // Draw blade trail effect
+    // Draw slash trail effect
+    if (this.slashTrail.length > 1) {
+      this.ctx.save();
+      
+      // Create gradient trail
+      const gradient = this.ctx.createLinearGradient(
+        this.slashTrail[0].x,
+        this.slashTrail[0].y,
+        this.slashTrail[this.slashTrail.length - 1].x,
+        this.slashTrail[this.slashTrail.length - 1].y
+      );
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+      gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(135, 206, 250, 0.9)');
+
+      this.ctx.strokeStyle = gradient;
+      this.ctx.lineWidth = 4;
+      this.ctx.lineCap = 'round';
+      this.ctx.lineJoin = 'round';
+      this.ctx.shadowBlur = 15;
+      this.ctx.shadowColor = 'rgba(135, 206, 250, 0.8)';
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.slashTrail[0].x, this.slashTrail[0].y);
+      
+      for (let i = 1; i < this.slashTrail.length; i++) {
+        this.ctx.lineTo(this.slashTrail[i].x, this.slashTrail[i].y);
+      }
+      
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
+    // Draw combo streak effect
     if (this.combo > 5) {
       this.ctx.save();
-      this.ctx.globalAlpha = Math.min(0.8, (this.combo - 5) * 0.1);
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      this.ctx.lineWidth = 3;
-      this.ctx.beginPath();
-      this.ctx.moveTo(0, this.canvas.height);
-      this.ctx.lineTo(this.canvas.width, this.canvas.height);
-      this.ctx.stroke();
+      this.ctx.globalAlpha = Math.min(0.3, (this.combo - 5) * 0.02);
+      this.ctx.fillStyle = 'rgba(255, 215, 0, 0.5)';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.restore();
     }
   }

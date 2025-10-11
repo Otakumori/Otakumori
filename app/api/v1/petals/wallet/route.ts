@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { generateRequestId } from '@/lib/requestId';
 
@@ -76,4 +76,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
