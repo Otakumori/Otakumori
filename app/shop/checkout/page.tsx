@@ -37,8 +37,8 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const { items: cart, clearCart, total } = useCart();
-  const { isSignedIn, userId } = useAuth();
+  const { items: cart, clearCart: _clearCart, total } = useCart();
+  const { isSignedIn, userId: _userId } = useAuth();
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     firstName: '',
     lastName: '',
@@ -163,8 +163,11 @@ export default function CheckoutPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-2 block text-sm text-pink-200">First Name</label>
+                    <label htmlFor="firstName" className="mb-2 block text-sm text-pink-200">
+                      First Name
+                    </label>
                     <Input
+                      id="firstName"
                       name="firstName"
                       value={shippingInfo.firstName}
                       onChange={handleInputChange}
@@ -174,8 +177,11 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm text-pink-200">Last Name</label>
+                    <label htmlFor="lastName" className="mb-2 block text-sm text-pink-200">
+                      Last Name
+                    </label>
                     <Input
+                      id="lastName"
                       name="lastName"
                       value={shippingInfo.lastName}
                       onChange={handleInputChange}
@@ -187,8 +193,11 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm text-pink-200">Email</label>
+                  <label htmlFor="email" className="mb-2 block text-sm text-pink-200">
+                    Email
+                  </label>
                   <Input
+                    id="email"
                     name="email"
                     type="email"
                     value={shippingInfo.email}
@@ -200,8 +209,11 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm text-pink-200">Address</label>
+                  <label htmlFor="address" className="mb-2 block text-sm text-pink-200">
+                    Address
+                  </label>
                   <Input
+                    id="address"
                     name="address"
                     value={shippingInfo.address}
                     onChange={handleInputChange}
@@ -213,8 +225,11 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="mb-2 block text-sm text-pink-200">City</label>
+                    <label htmlFor="city" className="mb-2 block text-sm text-pink-200">
+                      City
+                    </label>
                     <Input
+                      id="city"
                       name="city"
                       value={shippingInfo.city}
                       onChange={handleInputChange}
@@ -224,8 +239,11 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm text-pink-200">State</label>
+                    <label htmlFor="state" className="mb-2 block text-sm text-pink-200">
+                      State
+                    </label>
                     <Input
+                      id="state"
                       name="state"
                       value={shippingInfo.state}
                       onChange={handleInputChange}
@@ -235,8 +253,11 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm text-pink-200">ZIP Code</label>
+                    <label htmlFor="zipCode" className="mb-2 block text-sm text-pink-200">
+                      ZIP Code
+                    </label>
                     <Input
+                      id="zipCode"
                       name="zipCode"
                       value={shippingInfo.zipCode}
                       onChange={handleInputChange}
@@ -248,8 +269,11 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm text-pink-200">Country</label>
+                  <label htmlFor="country" className="mb-2 block text-sm text-pink-200">
+                    Country
+                  </label>
                   <Input
+                    id="country"
                     name="country"
                     value={shippingInfo.country}
                     onChange={handleInputChange}

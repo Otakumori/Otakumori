@@ -242,6 +242,7 @@ export async function GET(request: NextRequest) {
         userSliders = JSON.parse(slidersParam);
       } catch (error) {
         // Invalid JSON, use empty object
+        console.error('Failed to parse sliders JSON:', error);
       }
     }
 

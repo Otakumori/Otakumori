@@ -34,7 +34,7 @@ export default function GameCubePage() {
   }, []);
 
   // Save game progress to localStorage
-  const saveGameProgress = (gameId: string, progress: any) => {
+  const _saveGameProgress = (gameId: string, progress: any) => {
     const newProgress = { ...gameProgress, [gameId]: progress };
     setGameProgress(newProgress);
     localStorage.setItem('gamecube-progress', JSON.stringify(newProgress));

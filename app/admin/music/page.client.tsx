@@ -112,7 +112,9 @@ export default function AdminMusicClient() {
                   <div className="text-xs text-zinc-500">{t.artist}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <audio src={t.url} controls preload="none" />
+                  <audio src={t.url} controls preload="none">
+                    <track kind="captions" src="" label="No captions available" />
+                  </audio>
                   <button
                     onClick={() => deleteTrack(t.id)}
                     className="rounded-md bg-red-600 px-2 py-1 text-xs hover:bg-red-500"

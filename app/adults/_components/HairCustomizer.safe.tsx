@@ -100,8 +100,9 @@ export function HairCustomizer({ config, onChange }: HairCustomizerProps) {
         <h4 className="text-pink-300 font-medium">Hair Color</h4>
 
         <div className="space-y-2">
-          <label className="block text-white text-sm font-medium">Primary Color</label>
+          <label htmlFor="primaryColor" className="block text-white text-sm font-medium">Primary Color</label>
           <input
+            id="primaryColor"
             type="color"
             value={config.color?.primary || '#8B4513'}
             onChange={(e) => updateConfig('color.primary', e.target.value)}
@@ -125,8 +126,9 @@ export function HairCustomizer({ config, onChange }: HairCustomizerProps) {
         {config.highlights?.enabled && (
           <div className="space-y-3 ml-6">
             <div className="space-y-2">
-              <label className="block text-white text-sm font-medium">Highlight Color</label>
+              <label htmlFor="highlightColor" className="block text-white text-sm font-medium">Highlight Color</label>
               <input
+                id="highlightColor"
                 type="color"
                 value={config.highlights?.color || '#FFD700'}
                 onChange={(e) => updateConfig('highlights.color', e.target.value)}
@@ -145,8 +147,9 @@ export function HairCustomizer({ config, onChange }: HairCustomizerProps) {
             />
 
             <div>
-              <label className="block text-white text-sm font-medium mb-2">Highlight Pattern</label>
+              <label htmlFor="highlightPattern" className="block text-white text-sm font-medium mb-2">Highlight Pattern</label>
               <select
+                id="highlightPattern"
                 value={config.highlights?.pattern || 'streaks'}
                 onChange={(e) => updateConfig('highlights.pattern', e.target.value)}
                 className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white"

@@ -17,7 +17,9 @@ export async function GET() {
     const card = prefs.card ?? {};
     const emotes: string[] = Array.isArray(card.emotes) ? card.emotes : [];
     return NextResponse.json({ ok: true, data: { items: emotes } });
-  } catch (e) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    console.error('Failed to fetch user emotes:', error.message, error.stack);
     return NextResponse.json(
       { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
       { status: 500 },

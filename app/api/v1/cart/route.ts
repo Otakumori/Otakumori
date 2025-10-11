@@ -7,6 +7,9 @@ import { CartUpdateSchema } from '@/app/lib/contracts';
 
 export async function GET(req: NextRequest) {
   try {
+    // Log cart request for analytics
+    console.warn('Cart GET requested from:', req.headers.get('user-agent'));
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });

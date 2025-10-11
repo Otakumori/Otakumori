@@ -68,7 +68,7 @@ export default function GameShellV2({
   maxPlayers = 1,
   difficulty = 'medium',
 }: GameShellV2Props) {
-  const { isSignedIn, userId } = useAuth();
+  const { isSignedIn: _isSignedIn, userId } = useAuth();
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({
@@ -91,15 +91,47 @@ export default function GameShellV2({
   const saveSystem = useGameSaveV2(gameKey);
   const telemetry = useGameTelemetry(gameKey);
 
+  // Log game configuration (development only)
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.log(`[GameShell] ${gameKey} initialized:`, {
+      achievements: enableAchievements,
+      maxPlayers,
+      difficulty,
+      leaderboards: enableLeaderboards,
+    });
+  }
+
+  // Error handler
+  const handleError = useCallback(
+    (error: Error) => {
+      console.error(`[GameShell:${gameKey}] Error:`, error);
+      setGameState((prev) => ({ ...prev, hasError: true, isPlaying: false }));
+
+      if (onError) {
+        onError(error);
+      }
+
+      if (enableTelemetry) {
+        telemetry.trackError(error, 'GameShell');
+      }
+    },
+    [gameKey, onError, enableTelemetry, telemetry],
+  );
+
   // Boot animation completion
   const handleBootComplete = useCallback(() => {
-    setShowBootAnimation(false);
-    setGameState((prev) => ({ ...prev, isLoading: false }));
+    try {
+      setShowBootAnimation(false);
+      setGameState((prev) => ({ ...prev, isLoading: false }));
 
-    if (enableTelemetry) {
-      telemetry.startSession(userId || undefined);
+      if (enableTelemetry) {
+        telemetry.startSession(userId || undefined);
+      }
+    } catch (error) {
+      handleError(error instanceof Error ? error : new Error(String(error)));
     }
-  }, [userId, enableTelemetry, telemetry]);
+  }, [userId, enableTelemetry, telemetry, handleError]);
 
   // Game lifecycle methods
   const startGame = useCallback(() => {
@@ -259,7 +291,9 @@ export default function GameShellV2({
                     className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
                     aria-label="Pause game"
                   >
-                    ⏸️
+                    <span role="img" aria-label="Pause">
+                      ⏸
+                    </span>
                   </button>
                 )}
 

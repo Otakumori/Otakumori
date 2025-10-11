@@ -44,6 +44,9 @@ export function AvatarCard({
   const eyeColor = config?.face?.eyes?.color || '#4A90E2';
   const outfitColor = config?.outfit?.primary?.color || '#FF6B9D';
 
+  // Log avatar characteristics for debugging
+  console.warn('AvatarCard rendering:', { gender, age, hairColor });
+
   // Convert skin tone to hex
   const getSkinToneHex = (tone: number) => {
     const tones = [

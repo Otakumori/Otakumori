@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -47,8 +45,11 @@ export default function LedgerClient() {
       <div className="flex items-center justify-between p-4 border-b border-neutral-200">
         <div className="font-medium">History</div>
         <div className="flex items-center gap-2">
-          <label className="text-sm text-neutral-600">Filter</label>
+          <label htmlFor="filter-select" className="text-sm text-neutral-600">
+            Filter
+          </label>
           <select
+            id="filter-select"
             value={type}
             onChange={(e) => setType(e.target.value as any)}
             className="text-sm rounded-lg border border-neutral-300 px-2 py-1"

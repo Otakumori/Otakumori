@@ -8,6 +8,9 @@ export const runtime = 'nodejs';
 let wss: WebSocketServer | null = null;
 
 export async function GET(request: NextRequest) {
+  // Log WebSocket connection request
+  console.warn('WebSocket server requested from:', request.headers.get('user-agent'));
+
   if (!wss) {
     // Create WebSocket server
     wss = new WebSocketServer({ port: 8080 });

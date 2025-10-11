@@ -24,7 +24,7 @@ interface ReviewsProps {
   productId: string;
 }
 
-export default function Reviews({ reviews, productId }: ReviewsProps) {
+export default function Reviews({ reviews, productId: _productId }: ReviewsProps) {
   if (reviews.length === 0) {
     return (
       <section className="mt-8" aria-labelledby="reviews-heading">

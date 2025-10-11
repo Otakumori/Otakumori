@@ -112,7 +112,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
         setError('WebSocket connection error');
         onError?.(event);
       };
-    } catch (error) {
+    } catch {
       setError('Failed to create WebSocket connection');
       setIsConnecting(false);
     }

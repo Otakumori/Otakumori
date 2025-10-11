@@ -13,7 +13,11 @@ export default function Hero() {
   useEffect(() => {
     if (isLoaded && user) {
       setUserId(user.id);
-      fetchPetalData();
+      console.warn('Hero component initialized for user:', user.id);
+      // Only fetch if we have a userId
+      if (user.id) {
+        fetchPetalData();
+      }
     }
   }, [user, isLoaded]);
 
@@ -32,6 +36,12 @@ export default function Hero() {
   const handlePetalClick = async () => {
     if (loading) return;
 
+    // Require user to be signed in
+    if (!userId) {
+      console.warn('User must be signed in to collect petals');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch('/api/petals', {
@@ -42,6 +52,7 @@ export default function Hero() {
         body: JSON.stringify({
           amount: 1,
           reason: 'cherry_blossom_click',
+          userId: userId, // Include userId for server validation
         }),
       });
 
@@ -304,13 +315,8 @@ export default function Hero() {
             'Collecting...'
           ) : (
             <>
-              <span role="img" aria-label="Cherry blossom">
-                
-              </span>{' '}
-              Click to Collect{' '}
-              <span role="img" aria-label="Cherry blossom">
-                
-              </span>
+              <span role="img" aria-label="Cherry blossom"></span> Click to Collect{' '}
+              <span role="img" aria-label="Cherry blossom"></span>
             </>
           )}
         </button>

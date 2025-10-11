@@ -39,7 +39,7 @@ function imageFromSku(sku: string) {
     const manifestAny = manifest as any;
     if (manifestAny.cosmetics?.titles?.[sku]) return manifestAny.cosmetics.titles[sku];
     if (manifestAny.ui?.titles?.[sku]) return manifestAny.ui.titles[sku];
-  } catch (_e) {
+  } catch {
     // Fallback to placeholder
   }
 

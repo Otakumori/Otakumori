@@ -92,6 +92,8 @@ export async function POST(request: Request) {
       },
     });
 
+    console.warn('Rune unlocked:', { userId, slug, unlockId: unlock.id });
+
     // Log the unlock for telemetry
     // Rune unlocked
 

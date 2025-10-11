@@ -94,11 +94,11 @@ export default function StarfieldBackground({ className = '' }: StarfieldBackgro
     };
 
     // Animation loop
-    let time = 0;
+    let _time = 0;
     const animate = () => {
       if (!ctx || !canvas) return;
 
-      time += 0.01;
+      _time += 0.01;
 
       // Clear canvas
       ctx.fillStyle = '#000000';

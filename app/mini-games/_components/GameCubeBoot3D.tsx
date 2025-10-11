@@ -8,307 +8,156 @@ interface GameCubeBoot3DProps {
   onSkip: () => void;
 }
 
-interface GameCube {
-  mesh: THREE.Mesh;
-  velocity: THREE.Vector3;
-  angularVelocity: THREE.Vector3;
-  position: THREE.Vector3;
-  rotation: THREE.Euler;
-  scale: number;
-  targetPosition: THREE.Vector3;
-  targetRotation: THREE.Euler;
-  targetScale: number;
-  isAssembled: boolean;
-  faceIndex: number;
-}
-
 export default function GameCubeBoot3D({ onComplete, onSkip }: GameCubeBoot3DProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const cubesRef = useRef<GameCube[]>([]);
+  const cubeRef = useRef<THREE.Mesh | null>(null);
   const animationIdRef = useRef<number | null>(null);
   const [isSkippable, setIsSkippable] = useState(false);
-  const [phase, setPhase] = useState<'rolling' | 'assembling' | 'complete'>('rolling');
+  const [phase, setPhase] = useState<'spin' | 'logo' | 'complete'>('spin');
   const [showSkip, setShowSkip] = useState(false);
-
-  // GameCube colors and materials
-  const createGameCubeMaterial = (color: string) => {
-    return new THREE.MeshPhongMaterial({
-      color: new THREE.Color(color),
-      shininess: 100,
-      specular: new THREE.Color(0x222222),
-      transparent: true,
-      opacity: 0.9,
-    });
-  };
-
-  const materials = {
-    purple: createGameCubeMaterial('#8b5cf6'),
-    pink: createGameCubeMaterial('#ec4899'),
-    indigo: createGameCubeMaterial('#6366f1'),
-    violet: createGameCubeMaterial('#a855f7'),
-  };
-
-  // Create individual GameCube
-  const createGameCube = (
-    position: THREE.Vector3,
-    material: THREE.Material,
-    faceIndex: number,
-  ): GameCube => {
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const mesh = new THREE.Mesh(geometry, material);
-
-    // Add GameCube logo texture to one face
-    const logoGeometry = new THREE.PlaneGeometry(0.8, 0.8);
-    const logoMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.8,
-    });
-    const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-    logo.position.z = 0.51;
-    mesh.add(logo);
-
-    // Add subtle glow effect
-    const glowGeometry = new THREE.BoxGeometry(1.1, 1.1, 1.1);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff69b4,
-      transparent: true,
-      opacity: 0.1,
-      side: THREE.BackSide,
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-    mesh.add(glow);
-
-    mesh.position.copy(position);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-
-    return {
-      mesh,
-      velocity: new THREE.Vector3(
-        (Math.random() - 0.5) * 0.02,
-        (Math.random() - 0.5) * 0.02,
-        (Math.random() - 0.5) * 0.02,
-      ),
-      angularVelocity: new THREE.Vector3(
-        (Math.random() - 0.5) * 0.02,
-        (Math.random() - 0.5) * 0.02,
-        (Math.random() - 0.5) * 0.02,
-      ),
-      position: position.clone(),
-      rotation: new THREE.Euler(0, 0, 0),
-      scale: 1,
-      targetPosition: position.clone(),
-      targetRotation: new THREE.Euler(0, 0, 0),
-      targetScale: 1,
-      isAssembled: false,
-      faceIndex,
-    };
-  };
+  const startTimeRef = useRef<number>(0);
 
   // Initialize 3D scene
   const initScene = useCallback(() => {
     if (!mountRef.current) return;
 
-    // Scene
+    // Scene with dark purple gradient background (like GameCube)
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x080611);
+    scene.background = new THREE.Color(0x0a0520); // Deep purple-black
     sceneRef.current = scene;
 
     // Camera
     const camera = new THREE.PerspectiveCamera(
-      75,
+      50,
       mountRef.current.clientWidth / mountRef.current.clientHeight,
       0.1,
       1000,
     );
-    camera.position.set(0, 5, 10);
+    camera.position.set(0, 0, 5);
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.enabled = false;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1;
     rendererRef.current = renderer;
 
     mountRef.current.appendChild(renderer.domElement);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+    // Lighting (simple, like GameCube)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(10, 10, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 50;
-    directionalLight.shadow.camera.left = -10;
-    directionalLight.shadow.camera.right = 10;
-    directionalLight.shadow.camera.top = 10;
-    directionalLight.shadow.camera.bottom = -10;
-    scene.add(directionalLight);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    keyLight.position.set(2, 2, 3);
+    scene.add(keyLight);
 
-    // Point lights for dramatic effect
-    const pointLight1 = new THREE.PointLight(0xec4899, 1, 20);
-    pointLight1.position.set(-5, 5, 5);
-    scene.add(pointLight1);
+    const fillLight = new THREE.DirectionalLight(0x8b5cf6, 0.3);
+    fillLight.position.set(-2, -1, -1);
+    scene.add(fillLight);
 
-    const pointLight2 = new THREE.PointLight(0x8b5cf6, 1, 20);
-    pointLight2.position.set(5, 5, -5);
-    scene.add(pointLight2);
+    // Create the cube (simple, like GameCube)
+    const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
 
-    // Ground plane
-    const groundGeometry = new THREE.PlaneGeometry(50, 50);
-    const groundMaterial = new THREE.MeshLambertMaterial({
-      color: 0x1a1a2e,
+    // Create gradient material for the cube
+    const material = new THREE.MeshPhongMaterial({
+      color: 0xa855f7, // Purple
+      shininess: 80,
+      specular: 0x444444,
+    });
+
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    cubeRef.current = cube;
+
+    // Add edge highlights (like GameCube)
+    const edges = new THREE.EdgesGeometry(geometry);
+    const lineMaterial = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      opacity: 0.3,
       transparent: true,
-      opacity: 0.8,
     });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -2;
-    ground.receiveShadow = true;
-    scene.add(ground);
-
-    // Create 4 GameCubes
-    const cubePositions = [
-      new THREE.Vector3(-8, 2, -5),
-      new THREE.Vector3(-3, 3, -8),
-      new THREE.Vector3(3, 2, -6),
-      new THREE.Vector3(8, 3, -4),
-    ];
-
-    const cubeMaterials = [materials.purple, materials.pink, materials.indigo, materials.violet];
-
-    cubesRef.current = cubePositions.map((pos, i) => createGameCube(pos, cubeMaterials[i], i));
-
-    cubesRef.current.forEach((cube) => {
-      scene.add(cube.mesh);
-    });
+    const wireframe = new THREE.LineSegments(edges, lineMaterial);
+    cube.add(wireframe);
 
     // Start animation
+    startTimeRef.current = Date.now();
     animate();
   }, []);
 
-  // Animation loop
+  // Animation loop (authentic GameCube style)
   const animate = useCallback(() => {
-    if (!sceneRef.current || !rendererRef.current || !cameraRef.current) return;
+    if (!sceneRef.current || !rendererRef.current || !cameraRef.current || !cubeRef.current) return;
 
-    const deltaTime = 0.016; // ~60fps
+    const elapsedTime = (Date.now() - startTimeRef.current) / 1000; // seconds
 
-    // Update cubes based on current phase
-    if (phase === 'rolling') {
-      updateRollingCubes(deltaTime);
-    } else if (phase === 'assembling') {
-      updateAssemblingCubes(deltaTime);
+    if (phase === 'spin') {
+      // Phase 1: Spinning cube (1.5s) - authentic GameCube rotation
+      // The cube spins fast initially, then slows down
+      const spinDuration = 1.5;
+      const t = Math.min(elapsedTime / spinDuration, 1);
+
+      // Ease out cubic for deceleration
+      const eased = 1 - Math.pow(1 - t, 3);
+
+      // Multiple rotations that slow down
+      cubeRef.current.rotation.y = eased * Math.PI * 4; // 2 full rotations
+      cubeRef.current.rotation.x = eased * Math.PI * 2; // 1 full rotation
+
+      // Slight scale pulse
+      const scale = 1 + Math.sin(elapsedTime * 3) * 0.05;
+      cubeRef.current.scale.setScalar(scale);
+
+      if (elapsedTime > spinDuration) {
+        setPhase('logo');
+        startTimeRef.current = Date.now(); // Reset for next phase
+      }
+    } else if (phase === 'logo') {
+      // Phase 2: Logo reveal (1.5s) - cube settles into final position
+      const logoDuration = 1.5;
+      const t = Math.min(elapsedTime / logoDuration, 1);
+
+      // Ease out for settling
+      const eased = 1 - Math.pow(1 - t, 2);
+
+      // Target rotation: front face showing
+      const targetRotX = 0;
+      const targetRotY = 0;
+
+      // Lerp from current rotation to target
+      cubeRef.current.rotation.x = THREE.MathUtils.lerp(
+        cubeRef.current.rotation.x,
+        targetRotX,
+        eased,
+      );
+      cubeRef.current.rotation.y = THREE.MathUtils.lerp(
+        cubeRef.current.rotation.y,
+        targetRotY,
+        eased,
+      );
+
+      // Scale to final size
+      cubeRef.current.scale.setScalar(1);
+
+      if (elapsedTime > logoDuration) {
+        setPhase('complete');
+        setTimeout(() => {
+          onComplete();
+        }, 800);
+      }
     }
 
     // Render
     rendererRef.current.render(sceneRef.current, cameraRef.current);
     animationIdRef.current = requestAnimationFrame(animate);
-  }, [phase]);
-
-  // Update rolling cubes
-  const updateRollingCubes = (deltaTime: number) => {
-    cubesRef.current.forEach((cube, index) => {
-      // Apply gravity
-      cube.velocity.y -= 0.01 * deltaTime * 60;
-
-      // Update position
-      cube.position.add(cube.velocity.clone().multiplyScalar(deltaTime * 60));
-      cube.mesh.position.copy(cube.position);
-
-      // Update rotation
-      cube.rotation.x += cube.angularVelocity.x * deltaTime * 60;
-      cube.rotation.y += cube.angularVelocity.y * deltaTime * 60;
-      cube.rotation.z += cube.angularVelocity.z * deltaTime * 60;
-      cube.mesh.rotation.copy(cube.rotation);
-
-      // Ground collision
-      if (cube.position.y <= 0.5) {
-        cube.position.y = 0.5;
-        cube.velocity.y *= -0.6; // Bounce with energy loss
-        cube.velocity.x *= 0.9; // Friction
-        cube.velocity.z *= 0.9;
-      }
-
-      // Wall collisions
-      if (Math.abs(cube.position.x) > 8) {
-        cube.velocity.x *= -0.8;
-        cube.position.x = Math.sign(cube.position.x) * 8;
-      }
-      if (Math.abs(cube.position.z) > 8) {
-        cube.velocity.z *= -0.8;
-        cube.position.z = Math.sign(cube.position.z) * 8;
-      }
-
-      // Add some random movement
-      cube.velocity.add(
-        new THREE.Vector3((Math.random() - 0.5) * 0.001, 0, (Math.random() - 0.5) * 0.001),
-      );
-    });
-  };
-
-  // Update assembling cubes
-  const updateAssemblingCubes = (deltaTime: number) => {
-    const centerPosition = new THREE.Vector3(0, 1, 0);
-    const assemblyRadius = 2;
-
-    cubesRef.current.forEach((cube, index) => {
-      // Calculate target position in O-shape
-      const angle = (index / 4) * Math.PI * 2;
-      const targetPos = new THREE.Vector3(
-        centerPosition.x + Math.cos(angle) * assemblyRadius,
-        centerPosition.y,
-        centerPosition.z + Math.sin(angle) * assemblyRadius,
-      );
-
-      // Smooth movement to target
-      cube.position.lerp(targetPos, deltaTime * 2);
-      cube.mesh.position.copy(cube.position);
-
-      // Smooth rotation to face center
-      const targetRotation = new THREE.Euler(0, angle, 0);
-      cube.rotation.x = THREE.MathUtils.lerp(cube.rotation.x, targetRotation.x, deltaTime * 2);
-      cube.rotation.y = THREE.MathUtils.lerp(cube.rotation.y, targetRotation.y, deltaTime * 2);
-      cube.rotation.z = THREE.MathUtils.lerp(cube.rotation.z, targetRotation.z, deltaTime * 2);
-      cube.mesh.rotation.copy(cube.rotation);
-
-      // Scale animation
-      cube.scale = THREE.MathUtils.lerp(cube.scale, 0.8, deltaTime * 2);
-      cube.mesh.scale.setScalar(cube.scale);
-
-      // Check if assembled
-      if (cube.position.distanceTo(targetPos) < 0.1 && !cube.isAssembled) {
-        cube.isAssembled = true;
-      }
-    });
-
-    // Check if all cubes are assembled
-    if (cubesRef.current.every((cube) => cube.isAssembled)) {
-      setTimeout(() => {
-        setPhase('complete');
-        setTimeout(() => {
-          onComplete();
-        }, 2000);
-      }, 1000);
-    }
-  };
-
-  // Start assembly phase
-  const startAssembly = useCallback(() => {
-    setPhase('assembling');
-  }, []);
+  }, [phase, onComplete]);
 
   // Handle skip
   const handleSkip = useCallback(() => {
@@ -344,16 +193,11 @@ export default function GameCubeBoot3D({ onComplete, onSkip }: GameCubeBoot3DPro
   useEffect(() => {
     initScene();
 
-    // Allow skipping after 2 seconds
+    // Allow skipping after 1 second
     const skipTimer = setTimeout(() => {
       setIsSkippable(true);
       setShowSkip(true);
-    }, 2000);
-
-    // Start assembly after 3 seconds
-    const assemblyTimer = setTimeout(() => {
-      startAssembly();
-    }, 3000);
+    }, 1000);
 
     // Add event listeners
     window.addEventListener('keydown', handleKeyPress);
@@ -362,7 +206,6 @@ export default function GameCubeBoot3D({ onComplete, onSkip }: GameCubeBoot3DPro
     // Cleanup
     return () => {
       clearTimeout(skipTimer);
-      clearTimeout(assemblyTimer);
       window.removeEventListener('keydown', handleKeyPress);
       window.removeEventListener('resize', handleResize);
 
@@ -375,46 +218,77 @@ export default function GameCubeBoot3D({ onComplete, onSkip }: GameCubeBoot3DPro
         rendererRef.current.dispose();
       }
     };
-  }, [initScene, startAssembly, handleKeyPress, handleResize]);
+  }, [initScene, handleKeyPress, handleResize]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{
+        background: 'radial-gradient(ellipse at center, #1a0b2e 0%, #0a0520 100%)',
+      }}
+    >
       {/* 3D Canvas Container */}
-      <div ref={mountRef} className="w-full h-full cursor-pointer" onClick={handleSkip} />
+      <div
+        ref={mountRef}
+        className="w-full h-full cursor-pointer"
+        onClick={handleSkip}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') handleSkip();
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="GameCube boot animation - press any key to skip"
+      />
 
       {/* Skip Button */}
       {showSkip && (
         <button
-          className="absolute bottom-8 right-8 px-6 py-3 bg-white/10 hover:bg-white/20 rounded-lg text-white/80 text-sm transition-colors backdrop-blur-sm border border-white/20"
+          className="absolute bottom-8 right-8 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/70 text-xs transition-colors backdrop-blur-sm border border-white/10"
           onClick={handleSkip}
           aria-label="Skip boot animation"
         >
-          Skip
+          Press any key to skip
         </button>
       )}
 
-      {/* Loading Text */}
-      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-center">
-        <div className="text-white/60 text-sm mb-2">
-          {phase === 'rolling' && 'Rolling cubes...'}
-          {phase === 'assembling' && 'Assembling GameCube...'}
-          {phase === 'complete' && 'Loading OTAKU-MORI...'}
-        </div>
-        <div className="w-32 h-1 bg-white/20 rounded-full overflow-hidden">
+      {/* Brand Text (appears in logo phase) */}
+      {phase !== 'spin' && (
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ marginTop: '120px' }}
+        >
           <div
-            className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all duration-1000"
-            style={{
-              width: phase === 'rolling' ? '33%' : phase === 'assembling' ? '66%' : '100%',
-            }}
-          />
+            className="text-center opacity-0 animate-fadeIn"
+            style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
+          >
+            <h1
+              className="text-3xl font-bold text-white tracking-[0.3em] mb-1"
+              style={{
+                fontFamily: 'Arial, sans-serif',
+                textShadow: '0 0 20px rgba(168, 85, 247, 0.5)',
+              }}
+            >
+              OTAKU-MORI
+            </h1>
+            <div className="h-0.5 w-32 mx-auto bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Brand Text */}
-      <div className="absolute top-20 left-1/2 transform -translate-x-1/2 text-center">
-        <h1 className="text-4xl font-bold text-white tracking-wider mb-2">OTAKU-MORI™</h1>
-        <p className="text-white/60 text-sm">Select a face to navigate</p>
-      </div>
+      {/* Add fadeIn animation */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out;
+          }
+        `,
+        }}
+      />
     </div>
   );
 }

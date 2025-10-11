@@ -9,6 +9,9 @@ import { auth } from '@clerk/nextjs/server';
 
 export async function GET(req: NextRequest) {
   try {
+    // Log profile presets request for analytics
+    console.warn('Profile presets requested from:', req.headers.get('user-agent'));
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });

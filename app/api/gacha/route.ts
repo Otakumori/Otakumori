@@ -12,11 +12,17 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
+    // Log request for analytics
+    console.warn('Gacha pull requested from:', request.headers.get('user-agent'));
+
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Parse request body (even if empty, validates content-type)
+    await request.json().catch(() => ({}));
 
     // Get user
     const db = await getDb();

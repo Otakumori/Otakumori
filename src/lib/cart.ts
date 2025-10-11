@@ -6,11 +6,10 @@ export async function addToCart(productId: string, qty = 1) {
   const { userId } = await auth();
   if (!userId) throw new Error('UNAUTHENTICATED');
 
-  // For now, just log the cart addition
-  // You can implement actual cart storage later
-  // Adding to cart
+  // Log the cart addition for analytics
+  console.warn('Adding to cart', { userId, productId, qty });
 
-  // TODO: Implement actual cart storage
+  // TODO: Implement actual cart storage when Prisma migration is complete
   // await prisma.cartItem.upsert({
   //   where: { userId_productId: { userId, productId } },
   //   create: { userId, productId, qty },
@@ -38,8 +37,13 @@ export async function removeFromCart(productId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error('UNAUTHENTICATED');
 
-  // TODO: Implement actual cart removal
-  // Removing from cart
+  // Log removal for analytics
+  console.warn('Removing from cart', { userId, productId });
+
+  // TODO: Implement actual cart removal when Prisma migration is complete
+  // await prisma.cartItem.delete({
+  //   where: { userId_productId: { userId, productId } }
+  // });
 
   revalidatePath('/cart');
   return { ok: true } as const;

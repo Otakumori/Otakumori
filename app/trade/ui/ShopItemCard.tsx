@@ -8,7 +8,7 @@ interface ShopItemCardProps {
 }
 
 export default function ShopItemCard({ item, onPurchase }: ShopItemCardProps) {
-  const [open, setOpen] = useState(false);
+  const [_open, _setOpen] = useState(false);
 
   // Handle nullable price fields safely - preserve petal economy logic
   const priceRunes = item.priceRunes ?? 0;

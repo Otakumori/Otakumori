@@ -41,6 +41,9 @@ export class PetalShopHandler {
   collectPetal(petalId: string): PetalReward | null {
     if (!this.state.isActive) return null;
 
+    // Log petal collection for debugging
+    console.warn('Petal collected:', petalId);
+
     this.state.collected++;
 
     // Generate reward based on probabilities

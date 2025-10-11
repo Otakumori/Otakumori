@@ -88,8 +88,8 @@ export default function AvatarSystem({
     verifyAge,
     setContentLevel,
     setPhysicsLevel,
-    canAccessContent,
-    getAvailableContent,
+    canAccessContent: _canAccessContent,
+    getAvailableContent: _getAvailableContent,
   } = useAdultGating();
 
   // Refs for systems
@@ -315,6 +315,16 @@ export default function AvatarSystem({
 
           {character && <primitive object={character} />}
 
+          {/* Render hair strands with physics */}
+          {hairStrands.map((strand, idx) => (
+            <primitive key={`hair-${idx}`} object={strand} />
+          ))}
+
+          {/* Render cloth meshes with physics */}
+          {clothMeshes.map((cloth, idx) => (
+            <primitive key={`cloth-${idx}`} object={cloth} />
+          ))}
+
           <ContactShadows position={[0, -1, 0]} opacity={0.25} scale={10} blur={1.5} />
           <OrbitControls enablePan={false} enableZoom={true} minDistance={1.5} maxDistance={5} />
         </Canvas>
@@ -401,8 +411,9 @@ export default function AvatarSystem({
                   />
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-white">Physics Level</label>
+                    <label htmlFor="physics-level-select" className="block text-sm font-medium text-white">Physics Level</label>
                     <select
+                      id="physics-level-select"
                       value={adultStatus.physicsLevel || 'basic'}
                       onChange={(e) => handlePhysicsLevelChange(e.target.value as any)}
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
@@ -433,8 +444,9 @@ export default function AvatarSystem({
               <h3 className="text-lg font-semibold text-white">Import Character</h3>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-white">GLB File</label>
+                <label htmlFor="glb-file-input" className="block text-sm font-medium text-white">GLB File</label>
                 <input
+                  id="glb-file-input"
                   type="file"
                   accept=".glb"
                   onChange={(e) => {
@@ -446,8 +458,9 @@ export default function AvatarSystem({
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-white">VRoid File</label>
+                <label htmlFor="vroid-file-input" className="block text-sm font-medium text-white">VRoid File</label>
                 <input
+                  id="vroid-file-input"
                   type="file"
                   accept=".glb"
                   onChange={(e) => {

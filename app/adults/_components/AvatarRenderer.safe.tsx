@@ -3,12 +3,7 @@
 import { Suspense, useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
-import {
-  ACESFilmicToneMapping,
-  Color,
-  type Group,
-  type Mesh,
-} from 'three';
+import { ACESFilmicToneMapping, Color, type Group, type Mesh } from 'three';
 
 interface AvatarRendererProps {
   config: any;
@@ -60,14 +55,25 @@ function SimplePhysics({ config, children }: { config: any; children: React.Reac
       const damping = config.physics.softBody.damping || 0.2;
       const maxDisplacement = config.physics.softBody.maxDisplacement || 0.06;
 
-      // Apply subtle breathing motion
+      // Apply subtle breathing motion with damping
       const breathScale = 1 + Math.sin(time * 2) * springIntensity * 0.02;
       const swayX = Math.sin(time * 0.5) * springIntensity * 0.01;
       const swayY = Math.cos(time * 0.3) * springIntensity * 0.005;
 
-      groupRef.current.scale.setScalar(breathScale);
-      groupRef.current.rotation.x = swayY;
-      groupRef.current.rotation.z = swayX;
+      // Apply damping to smooth out movement (frame-rate independent)
+      const dampingFactor = Math.pow(1 - damping, delta * 60);
+
+      // Clamp displacement to maxDisplacement
+      const clampedSwayX = Math.max(-maxDisplacement, Math.min(maxDisplacement, swayX));
+      const clampedSwayY = Math.max(-maxDisplacement, Math.min(maxDisplacement, swayY));
+
+      // Apply with damping for smooth motion
+      groupRef.current.scale.lerp(
+        { x: breathScale, y: breathScale, z: breathScale } as any,
+        dampingFactor,
+      );
+      groupRef.current.rotation.x += (clampedSwayY - groupRef.current.rotation.x) * dampingFactor;
+      groupRef.current.rotation.z += (clampedSwayX - groupRef.current.rotation.z) * dampingFactor;
 
       // Clamp displacement
       groupRef.current.position.y = Math.min(
@@ -84,29 +90,48 @@ function SimplePhysics({ config, children }: { config: any; children: React.Reac
 function CharacterMesh({ config }: { config: any }) {
   const meshRef = useRef<Mesh>(null);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (meshRef.current) {
       // Apply morph targets based on configuration
       const morphTargets = meshRef.current.morphTargetDictionary;
       const morphInfluences = meshRef.current.morphTargetInfluences;
       if (morphTargets && morphInfluences) {
-        // Apply face morphs
+        // Use delta for smooth interpolation of morph targets (frame-rate independent)
+        const interpSpeed = Math.min(delta * 5, 1); // Smooth interpolation
+
+        // Apply face morphs with smooth transitions
         if (morphTargets.eyeSize) {
-          morphInfluences[morphTargets.eyeSize] = (config.face?.eyes?.size || 1.0) - 1.0;
+          const targetValue = (config.face?.eyes?.size || 1.0) - 1.0;
+          morphInfluences[morphTargets.eyeSize] +=
+            (targetValue - morphInfluences[morphTargets.eyeSize]) * interpSpeed;
         }
         if (morphTargets.jawStrength) {
-          morphInfluences[morphTargets.jawStrength] = config.face?.faceShape?.jawline || 0.5;
+          const targetValue = config.face?.faceShape?.jawline || 0.5;
+          morphInfluences[morphTargets.jawStrength] +=
+            (targetValue - morphInfluences[morphTargets.jawStrength]) * interpSpeed;
         }
         if (morphTargets.cheekbones) {
-          morphInfluences[morphTargets.cheekbones] = config.face?.faceShape?.cheekbones || 0.5;
+          const targetValue = config.face?.faceShape?.cheekbones || 0.5;
+          morphInfluences[morphTargets.cheekbones] +=
+            (targetValue - morphInfluences[morphTargets.cheekbones]) * interpSpeed;
         }
 
-        // Apply body morphs
+        // Apply body morphs with smooth transitions
         if (morphTargets.muscleMass) {
-          morphInfluences[morphTargets.muscleMass] = config.body?.muscleMass || 0.5;
+          const targetValue = config.body?.muscleMass || 0.5;
+          morphInfluences[morphTargets.muscleMass] +=
+            (targetValue - morphInfluences[morphTargets.muscleMass]) * interpSpeed;
         }
         if (morphTargets.bodyFat) {
-          morphInfluences[morphTargets.bodyFat] = config.body?.bodyFat || 0.5;
+          const targetValue = config.body?.bodyFat || 0.5;
+          morphInfluences[morphTargets.bodyFat] +=
+            (targetValue - morphInfluences[morphTargets.bodyFat]) * interpSpeed;
+        }
+
+        // Use state.clock for time-based animations (breathing effect)
+        const time = state.clock.getElapsedTime();
+        if (morphTargets.breathe) {
+          morphInfluences[morphTargets.breathe] = Math.sin(time * 2) * 0.1;
         }
       }
     }
@@ -160,7 +185,7 @@ function OutfitComponent({ config }: { config: any }) {
 }
 
 // Scene Component
-function AvatarScene({ config, physicsEnabled }: { config: any; physicsEnabled?: boolean }) {
+function AvatarScene({ config, physicsEnabled = true }: { config: any; physicsEnabled?: boolean }) {
   const { camera } = useThree();
 
   useEffect(() => {
@@ -180,11 +205,19 @@ function AvatarScene({ config, physicsEnabled }: { config: any; physicsEnabled?:
       <Environment preset="studio" />
 
       {/* Character */}
-      <SimplePhysics config={config}>
-        <CharacterMesh config={config} />
-        <HairComponent config={config} />
-        <OutfitComponent config={config} />
-      </SimplePhysics>
+      {physicsEnabled ? (
+        <SimplePhysics config={config}>
+          <CharacterMesh config={config} />
+          <HairComponent config={config} />
+          <OutfitComponent config={config} />
+        </SimplePhysics>
+      ) : (
+        <>
+          <CharacterMesh config={config} />
+          <HairComponent config={config} />
+          <OutfitComponent config={config} />
+        </>
+      )}
 
       {/* Ground shadow */}
       <ContactShadows position={[0, -1, 0]} opacity={0.25} scale={10} blur={1.5} far={4.5} />

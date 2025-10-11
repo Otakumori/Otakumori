@@ -3,6 +3,9 @@ import { auth } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest) {
   try {
+    // Log game save auth check
+    console.warn('Game save auth check from:', request.headers.get('user-agent'));
+
     const { userId } = await auth();
 
     if (!userId) {

@@ -69,8 +69,11 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
         <h2 className="font-cormorant-garamond mb-6 text-2xl text-pink-200">Avatar Settings</h2>
         {/* Pose Selection */}
         <div className="mb-4">
-          <label className="font-cormorant-garamond mb-2 block text-pink-200">Pose</label>
+          <label htmlFor="pose" className="font-cormorant-garamond mb-2 block text-pink-200">
+            Pose
+          </label>
           <select
+            id="pose"
             value={pose}
             onChange={(e) => setPose(e.target.value)}
             className="w-full rounded bg-pink-400/10 p-2 text-pink-100"
@@ -85,8 +88,11 @@ export const AvatarSettingsModal: React.FC<AvatarSettingsModalProps> = ({ isOpen
         </div>
         {/* Outfit Selection */}
         <div className="mb-4">
-          <label className="font-cormorant-garamond mb-2 block text-pink-200">Outfit</label>
+          <label htmlFor="outfit" className="font-cormorant-garamond mb-2 block text-pink-200">
+            Outfit
+          </label>
           <select
+            id="outfit"
             value={outfit}
             onChange={(e) => setOutfit(e.target.value)}
             className="w-full rounded bg-pink-400/10 p-2 text-pink-100"

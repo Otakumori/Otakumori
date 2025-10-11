@@ -6,6 +6,7 @@ import Navbar from './components/layout/Navbar';
 import Providers from './Providers';
 import * as Sentry from '@sentry/nextjs';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
+import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 import { headers } from 'next/headers';
 import CursorGlow from './components/effects/CursorGlow';
 import { isCursorGlowEnabled } from './flags';
@@ -14,6 +15,14 @@ import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import GoogleAnalytics from './components/analytics/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import { bootCheckInngest } from '@/lib/inngestHealth';
+import { enforceNoMocks } from '@/lib/no-mocks';
+
+// Boot-time Inngest health check (fire-and-forget)
+bootCheckInngest();
+
+// Enforce no mock data in production
+enforceNoMocks();
 
 export function generateMetadata(): Metadata {
   return {
@@ -56,19 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <PetalHUD />
           <Konami />
           <PetalProgressBar />
-          <Sentry.ErrorBoundary
-            fallback={
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center p-8">
-                  <h1 className="text-2xl font-bold text-pink-400 mb-4">Something went wrong</h1>
-                  <p className="text-zinc-300">
-                    We&apos;re sorry, but something unexpected happened. Please try refreshing the
-                    page.
-                  </p>
-                </div>
-              </div>
-            }
-          >
+          <ClientErrorBoundary>
             <Providers>
               <div className="flex min-h-screen flex-col">
                 <Navbar />
@@ -78,7 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Footer />
               </div>
             </Providers>
-          </Sentry.ErrorBoundary>
+          </ClientErrorBoundary>
         </body>
       </html>
     </ClerkProviderWrapper>

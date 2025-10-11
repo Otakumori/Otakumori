@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import GlassPanel from '../GlassPanel';
 
@@ -27,6 +27,15 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
   const [characterCount, setCharacterCount] = useState(0);
   const maxCharacters = 280;
   const glowTimeoutRef = useRef<any>(undefined);
+
+  // Cleanup glow timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (glowTimeoutRef.current) {
+        clearTimeout(glowTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

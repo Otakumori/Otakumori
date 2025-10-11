@@ -15,6 +15,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     const soapstoneId = params.id;
 
+    // Log reply for debugging
+    console.warn('Soapstone reply requested for ID:', soapstoneId);
+
     // In production, this would:
     // 1. Find the soapstone by ID
     // 2. Create a reply record

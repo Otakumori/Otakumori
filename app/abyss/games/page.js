@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export default function GamesPage() {
   const { user, isLoaded } = useUser();
-  const [selectedGame, setSelectedGame] = useState(null);
+  const [_selectedGame, _setSelectedGame] = useState(null);
 
   if (!isLoaded) {
     return (

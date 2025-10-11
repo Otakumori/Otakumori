@@ -321,6 +321,8 @@ export class RateLimiter {
       if (authHeader) {
         // Extract from JWT if present
         const token = authHeader.replace('Bearer ', '');
+        // Log token presence for debugging (not the token itself for security)
+        console.warn('Auth token present for rate limiting, length:', token.length);
         // This would need to be implemented based on your auth system
         // For now, return null to fall back to IP-based limiting
       }
@@ -443,8 +445,11 @@ export class RateLimiter {
 
   /**
    * API route wrapper for rate limiting
+   * @template _T - Response data type for type safety (reserved for future use)
    */
-  protect<T = any>(handler: (request: NextRequest, context?: any) => Promise<Response> | Response) {
+  protect<_T = any>(
+    handler: (request: NextRequest, context?: any) => Promise<Response> | Response,
+  ): (request: NextRequest, context?: any) => Promise<Response> {
     return async (request: NextRequest, context?: any): Promise<Response> => {
       const result = await this.checkLimit(request);
 
@@ -493,6 +498,9 @@ export const rateLimiter = new RateLimiter();
 // Export wrapper functions for API routes
 export function withRateLimit(handler: Function, ruleKey: string) {
   return async (req: any, context?: any) => {
+    // Log rate limit rule being applied
+    console.warn('Applying rate limit rule:', ruleKey);
+
     // Create a mock NextRequest for rate limiting
     const mockRequest = {
       nextUrl: { pathname: req.url || '/api/unknown' },

@@ -50,15 +50,21 @@ export async function POST(req: NextRequest) {
 
       case 'payment_intent.succeeded':
         const paymentIntent = parseWebhookEvent(event, StripePaymentIntentSchema);
-        // Payment succeeded
-
+        console.warn('Payment succeeded:', {
+          paymentIntentId: paymentIntent.id,
+          amount: paymentIntent.amount,
+          status: paymentIntent.status,
+        });
         // Update order status if needed
         break;
 
       case 'payment_intent.payment_failed':
         const failedPayment = parseWebhookEvent(event, StripePaymentIntentSchema);
-        // Payment failed
-
+        console.error('Payment failed:', {
+          paymentIntentId: failedPayment.id,
+          status: failedPayment.status,
+          // last_payment_error is not in the type definition
+        });
         // Update order status to failed
         break;
 

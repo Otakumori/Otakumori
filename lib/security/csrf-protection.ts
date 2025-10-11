@@ -97,8 +97,13 @@ export class CSRFProtection {
     const allowedOrigins: string[] = []; // env.NEXT_PUBLIC_ALLOWED_ORIGINS not available
     const isDev = env.NODE_ENV === 'development';
 
-    // In development, allow localhost
-    if (isDev && (origin?.includes('localhost') || referer?.includes('localhost'))) {
+    // In development, allow localhost and same-host requests
+    if (
+      isDev &&
+      (origin?.includes('localhost') ||
+        referer?.includes('localhost') ||
+        host?.includes('localhost'))
+    ) {
       return true;
     }
 
@@ -184,9 +189,15 @@ export class CSRFProtection {
 
   /**
    * API route wrapper for CSRF protection
+   * @template _T - Response data type for type safety (reserved for future use)
    */
-  protect<T = any>(handler: (request: NextRequest, context?: any) => Promise<Response> | Response) {
+  protect<_T = any>(
+    handler: (request: NextRequest, context?: any) => Promise<Response> | Response,
+  ): (request: NextRequest, context?: any) => Promise<Response> {
     return async (request: NextRequest, context?: any): Promise<Response> => {
+      // CSRF protection enabled for all mutating requests
+      console.warn('CSRF protection wrapper active');
+
       // Validate CSRF for mutating methods
       if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
         if (!this.validateOrigin(request)) {

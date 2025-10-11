@@ -11,6 +11,9 @@ export async function POST(req: Request) {
     const userId = await requireUserId();
     const { amount, reason, metadata } = await req.json();
 
+    // Log spend with metadata for analytics/debugging
+    console.warn('Petal spend request:', { userId, amount, reason, metadata: metadata || {} });
+
     const result = await petalService.spendPetals(
       userId,
       Number(amount),

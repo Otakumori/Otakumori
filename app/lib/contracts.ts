@@ -330,7 +330,7 @@ export const validateRequest = <T>(schema: z.ZodSchema<T>, data: unknown): T => 
   }
 };
 
-export const validatePartial = <T>(schema: z.ZodObject<any>, data: unknown): any => {
+export const validatePartial = <_T>(schema: z.ZodObject<any>, data: unknown): any => {
   try {
     return schema.partial().parse(data);
   } catch (error) {

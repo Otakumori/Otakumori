@@ -67,6 +67,18 @@ export default function GameCubeBootV2({
   const audioEnabled = useFeatureFlag('GAMECUBE_AUDIO_ENABLED') ?? true;
   const reducedMotionSupport = useFeatureFlag('GAMECUBE_REDUCED_MOTION') ?? true;
 
+  // Auto-skip after specified seconds
+  useEffect(() => {
+    if (bootStage === 'starting' && skipAfterSeconds > 0 && onSkip) {
+      const autoSkipTimer = setTimeout(() => {
+        console.info(`[GameCube Boot] Auto-skipping after ${skipAfterSeconds} seconds`);
+        onSkip();
+      }, skipAfterSeconds * 1000);
+
+      return () => clearTimeout(autoSkipTimer);
+    }
+  }, [bootStage, skipAfterSeconds, onSkip]);
+
   // Check if boot should be shown
   useEffect(() => {
     if (!bootEnabled) {
@@ -234,7 +246,7 @@ export default function GameCubeBootV2({
         audio.play().catch(() => {
           // Fail silently if audio doesn't work
         });
-      } catch (error) {
+      } catch {
         // Fail silently
       }
     }
@@ -377,9 +389,7 @@ export default function GameCubeBootV2({
               initial={{ scale: 0, rotate: 0 }}
               animate={{ scale: 1, rotate: 360 }}
               transition={{ duration: 1.5 }}
-            >
-              
-            </motion.div>
+            ></motion.div>
           ))}
         </div>
 

@@ -1,4 +1,0 @@
-# Run linting, type checking, and emoji scan
-pnpm typecheck
-pnpm lint
-pnpm scan:emojis

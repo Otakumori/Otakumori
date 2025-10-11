@@ -18,7 +18,7 @@ export type TierFrameProps = {
 export default function TierFrame({
   tier,
   size = 96,
-  hueBase = 325,
+  hueBase: _hueBase = 325,
   children,
   animate = true,
   className,
@@ -31,7 +31,7 @@ export default function TierFrame({
   // Respect reduced motion preference
   const shouldAnimate = animate && preset.motion !== 'none';
 
-  const frameId = `tier-frame-${tier}`;
+  const _frameId = `tier-frame-${tier}`;
   const gradientId = `tier-gradient-${tier}`;
   const patternId = `tier-pattern-${tier}`;
 

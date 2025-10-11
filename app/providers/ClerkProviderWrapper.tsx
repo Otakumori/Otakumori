@@ -19,7 +19,7 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   // Environment-specific configuration - use the actual env var that's set
   const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
-  const isDevelopment =
+  const _isDevelopment =
     typeof window !== 'undefined'
       ? window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       : !isProduction;

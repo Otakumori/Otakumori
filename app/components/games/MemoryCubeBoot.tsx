@@ -27,6 +27,14 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
   const router = useRouter();
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Easter egg: Track secret phrase
+  useEffect(() => {
+    if (secretPhrase === 'konami') {
+      console.warn('Secret phrase activated!');
+      router.push('/mini-games?unlock=true');
+    }
+  }, [secretPhrase, router]);
 
   // Audio elements
   const [ambientAudio, setAmbientAudio] = useState<HTMLAudioElement | null>(null);

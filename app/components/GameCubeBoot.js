@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -33,6 +31,9 @@ export default function GameCubeBoot({ onBootComplete }) {
   const [showFaces, setShowFaces] = useState(false);
   const [bootProgress, setBootProgress] = useState(0);
   const audioRef = useRef(null);
+
+  // Log boot state for debugging
+  console.warn('GameCube boot initialized:', { isLoaded, stage, bootProgress });
 
   // Determine current season
   useEffect(() => {
@@ -109,19 +110,29 @@ export default function GameCubeBoot({ onBootComplete }) {
       }
 
       // Black screen
+      setBootProgress(10);
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Show cube
       setStage('cube');
       setShowCube(true);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setBootProgress(40);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Show cursor
+      setShowCursor(true);
+      setBootProgress(60);
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Show interface
       setStage('interface');
       setShowInterface(true);
+      setShowFaces(true);
+      setBootProgress(90);
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Complete boot sequence
+      setBootProgress(100);
       onBootComplete?.();
     };
 
@@ -134,7 +145,67 @@ export default function GameCubeBoot({ onBootComplete }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-      <audio ref={audioRef} src="/assets/gamecube-boot.mp3" preload="auto" />
+      <audio ref={audioRef} src="/assets/gamecube-boot.mp3" preload="auto">
+        <track kind="captions" label="Boot sequence audio" />
+      </audio>
+
+      {/* Floating petals */}
+      {petals.map((petal) => (
+        <motion.div
+          key={petal.id}
+          className="absolute text-pink-300 text-2xl pointer-events-none"
+          style={{
+            left: `${petal.x}%`,
+            top: `${petal.y}%`,
+            transform: `rotate(${petal.rotation}deg) scale(${petal.scale})`,
+          }}
+          animate={{
+            y: ['0%', '110%'],
+            x: [`${petal.x}%`, `${petal.x + petal.sway}%`],
+          }}
+          transition={{ duration: petal.speed, repeat: Infinity }}
+        >
+          <span role="img" aria-label="Cherry blossom petal">🌸</span>
+        </motion.div>
+      ))}
+
+      {/* Abyss particles */}
+      {abyssParticles.map((particle) => (
+        <div
+          key={particle.id}
+          className="absolute bg-purple-500 rounded-full pointer-events-none"
+          style={{
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            transform: `rotate(${particle.rotation}deg)`,
+            opacity: particle.opacity,
+          }}
+        />
+      ))}
+
+      {/* Boot progress indicator */}
+      {bootProgress > 0 && bootProgress < 100 && (
+        <div className="absolute bottom-10 left-0 right-0 px-20">
+          <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-pink-500 transition-all duration-300"
+              style={{ width: `${bootProgress}%` }}
+            />
+          </div>
+          <div className="text-center text-white/60 text-sm mt-2">{bootProgress}%</div>
+        </div>
+      )}
+
+      {/* Custom cursor */}
+      {showCursor && (
+        <div
+          className="absolute pointer-events-none w-4 h-4 bg-pink-500 rounded-full animate-pulse"
+          style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+        />
+      )}
+
       <AnimatePresence mode="wait">
         {stage === 'black' && (
           <motion.div
@@ -163,6 +234,10 @@ export default function GameCubeBoot({ onBootComplete }) {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
+            {/* Show GameCube faces if enabled */}
+            {showFaces && (
+              <div className="mb-6 text-purple-400 text-sm">Loading GameCube interface...</div>
+            )}
             <h1 className="mb-4 text-4xl font-bold text-pink-500">
               {
                 <>

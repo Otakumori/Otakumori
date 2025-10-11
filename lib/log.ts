@@ -2,8 +2,14 @@ export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 export function log(level: LogLevel, message: string, meta?: Record<string, unknown>) {
   const ts = new Date().toISOString();
+  const formattedMessage = `[${ts}] ${level.toUpperCase()}: ${message}`;
 
-  // Log: [${ts}] ${message} with meta: ${JSON.stringify(meta ?? {})}
+  // Use appropriate console method based on log level
+  if (level === 'error') {
+    console.error(formattedMessage, meta ?? {});
+  } else {
+    console.warn(formattedMessage, meta ?? {});
+  }
 }
 
 export function reqId(headers: Headers): string | undefined {

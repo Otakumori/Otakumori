@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -156,6 +154,10 @@ function CubeFacePanel({
                 ${disabled ? 'pointer-events-none opacity-50' : ''}`}
       style={{ transformStyle: 'preserve-3d' }}
       onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
+      role="button"
+      tabIndex={0}
+      aria-label={`Game cube ${slot}`}
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">

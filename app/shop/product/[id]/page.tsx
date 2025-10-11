@@ -122,7 +122,11 @@ export default function ProductDetailPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="text-center py-12">
             <div className="glass-card p-8 max-w-md mx-auto">
-              <div className="text-6xl mb-4">🔍</div>
+              <div className="text-6xl mb-4">
+                <span role="img" aria-label="Search">
+                  🔍︎
+                </span>
+              </div>
               <h3 className="text-xl font-semibold text-primary mb-2">Product not found</h3>
               <p className="text-secondary mb-4">
                 {error || 'The product you are looking for does not exist.'}
@@ -235,18 +239,26 @@ export default function ProductDetailPage() {
 
             {/* Quantity */}
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">Quantity</label>
-              <div className="flex items-center space-x-3">
+              <div className="block text-sm font-medium text-primary mb-2">Quantity</div>
+              <div
+                className="flex items-center space-x-3"
+                role="group"
+                aria-label="Quantity selector"
+              >
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-10 h-10 rounded-lg border border-glass-border bg-glass-bg text-primary hover:bg-glass-bg-hover transition-colors"
+                  aria-label="Decrease quantity"
                 >
                   -
                 </button>
-                <span className="w-16 text-center text-primary">{quantity}</span>
+                <span className="w-16 text-center text-primary" aria-live="polite">
+                  {quantity}
+                </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-10 h-10 rounded-lg border border-glass-border bg-glass-bg text-primary hover:bg-glass-bg-hover transition-colors"
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>

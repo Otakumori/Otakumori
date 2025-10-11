@@ -33,7 +33,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
   const programRef = useRef<WebGLProgram | null>(null);
   const petalsRef = useRef<Petal[]>([]);
   const collectedCountRef = useRef(0);
-  const lastCollectTimeRef = useRef(0);
+  const _lastCollectTimeRef = useRef(0);
   const walletPositionRef = useRef({ x: 0, y: 0 });
 
   const [isInitialized, setIsInitialized] = useState(false);
@@ -153,7 +153,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
     try {
       const texture = await createTextureFromUrl(gl, '/assets/petals-atlas.png');
       textureRef.current = texture;
-    } catch (err) {
+    } catch {
       console.warn('Failed to load petal texture, using fallback');
       // Create a simple colored texture as fallback
       textureRef.current = createFallbackTexture(gl);

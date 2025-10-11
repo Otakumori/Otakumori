@@ -193,7 +193,7 @@ export default function EquipTray() {
           >
             <span className="text-sm font-medium text-neutral-300">Badges</span>
             <div className="grid grid-cols-2 gap-2">
-              {equippedState.badges.map((badge, index) => (
+              {equippedState.badges.map((badge, _index) => (
                 <div
                   key={badge.id}
                   className="flex items-center gap-2 p-2 bg-neutral-800/30 rounded border border-neutral-700"

@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await requireAdmin();
     const body = (await request.json()) as unknown;
-    const config = BurstConfigSchema.parse(body);
+    const config: BurstConfigPayload = BurstConfigSchema.parse(body);
 
     const siteConfig = await db.siteConfig.upsert({
       where: { id: 'singleton' },

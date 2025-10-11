@@ -62,7 +62,7 @@ const PetalWallet: React.FC = () => {
             <ul className="max-h-48 overflow-y-auto pr-1">
               {log.map((entry, idx) => (
                 <li
-                  key={entry.timestamp}
+                  key={`${entry.timestamp}-${idx}`}
                   className="flex justify-between py-1 border-b border-pink-800/40 last:border-0"
                 >
                   <span>{entry.amount > 0 ? `+${entry.amount}` : entry.amount} petals</span>

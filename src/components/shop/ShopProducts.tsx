@@ -63,6 +63,8 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
   const handleAddToCart = async (productId: string, variantId: string) => {
     try {
       await addToCart(productId, 1);
+      // Log variant selection for analytics
+      console.warn('Product added to cart', { productId, variantId });
       // You could add a toast notification here
     } catch (error) {
       console.error('Failed to add to cart:', error);
@@ -98,9 +100,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">
-          <span role="img" aria-label="Disappointed face">
-            
-          </span>
+          <span role="img" aria-label="Disappointed face"></span>
         </div>
         <h3 className="text-xl font-semibold mb-2">Something went wrong</h3>
         <p className="text-white/60 mb-4">{error}</p>
@@ -118,9 +118,7 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">
-          <span role="img" aria-label="Cherry blossom">
-            
-          </span>
+          <span role="img" aria-label="Cherry blossom"></span>
         </div>
         <h3 className="text-xl font-semibold mb-2">No products found</h3>
         <p className="text-white/60">

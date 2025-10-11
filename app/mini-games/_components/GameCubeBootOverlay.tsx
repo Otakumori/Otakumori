@@ -85,10 +85,15 @@ export default function GameCubeBootOverlay({ onComplete, onSkip }: GameCubeBoot
   if (isComplete) return null;
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className="fixed inset-0 z-50 flex items-center justify-center cursor-pointer"
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') handleClick();
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label="GameCube boot animation overlay - press any key to continue"
       data-test="gc-boot-overlay"
       style={{
         background:

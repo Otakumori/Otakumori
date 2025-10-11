@@ -63,18 +63,18 @@ export default function GameCubeHub() {
   // Initialize systems on mount
   useEffect(() => {
     // Set up achievement system callbacks
-    achievementSystem.setOnUnlock((achievement) => {
+    achievementSystem.setOnUnlock((_achievement) => {
       // Achievement unlocked (logging disabled for production)
       // Show achievement notification
     });
 
     // Set up leaderboard system callbacks
-    leaderboardSystem.setOnEntryAdded((entry) => {
+    leaderboardSystem.setOnEntryAdded((_entry) => {
       // New leaderboard entry (logging disabled for production)
     });
 
     // Set up save system callbacks
-    saveSystem.setOnSaveCreated((save) => {
+    saveSystem.setOnSaveCreated((_save) => {
       // Save created (logging disabled for production)
     });
 
@@ -326,7 +326,11 @@ export default function GameCubeHub() {
             title="Memory Card Slot"
           >
             <div className="text-center">
-              <div className="text-lg mb-1 group-hover:scale-110 transition-transform">💾</div>
+              <div className="text-lg mb-1 group-hover:scale-110 transition-transform">
+                <span role="img" aria-label="Memory card">
+                  💾
+                </span>
+              </div>
               <div className="text-xs opacity-75">MC</div>
             </div>
           </button>

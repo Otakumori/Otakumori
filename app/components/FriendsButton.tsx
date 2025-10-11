@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import FriendsOverlay from './FriendsOverlay';
@@ -12,7 +12,30 @@ interface FriendsButtonProps {
 export default function FriendsButton({ className = '' }: FriendsButtonProps) {
   const { user } = useUser();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  const [onlineCount, setOnlineCount] = useState(3); // Mock data
+  const [onlineCount, setOnlineCount] = useState(0);
+
+  // Fetch online friends count
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchOnlineCount = async () => {
+      try {
+        const response = await fetch('/api/v1/presence/friends');
+        const data = await response.json();
+        if (data.ok) {
+          const online = data.data.friends.filter((f: any) => f.status === 'online').length;
+          setOnlineCount(online);
+        }
+      } catch (error) {
+        console.error('Failed to fetch online friends:', error);
+      }
+    };
+
+    fetchOnlineCount();
+    // Update every 30 seconds
+    const interval = setInterval(fetchOnlineCount, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   if (!user) return null;
 

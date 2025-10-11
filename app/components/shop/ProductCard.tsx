@@ -88,7 +88,7 @@ export default function ProductCard({ product }: { product: Product }) {
             aria-label="Add to wishlist"
             title="Add to wishlist"
           >
-             Wish
+            Wish
           </button>
         </div>
         <button

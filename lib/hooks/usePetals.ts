@@ -36,7 +36,9 @@ export const usePetals = () => {
 
   const claimReward = (code: string) => {
     // Here you would typically make an API call to validate and apply the discount
-    // Claiming reward
+    console.warn('Claiming petal reward', { code, totalPetals });
+    // TODO: Implement API call to validate reward code
+    // await fetch('/api/petals/claim-reward', { method: 'POST', body: JSON.stringify({ code }) })
     setShowReward(null);
   };
 

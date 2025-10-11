@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { type InstancedMesh } from 'three';
 import { useWorldEvent } from '@/app/world/WorldProvider';
@@ -8,6 +8,11 @@ import { useWorldEvent } from '@/app/world/WorldProvider';
 export default function PetalBurst() {
   const meshRef = useRef<InstancedMesh>(null);
   const dispatch = useWorldEvent();
+
+  // Dispatch petal burst event on mount
+  useEffect(() => {
+    dispatch({ type: 'PETAL_BURST', payload: { count: 12 } });
+  }, [dispatch]);
 
   useFrame((state, delta) => {
     if (meshRef.current) {

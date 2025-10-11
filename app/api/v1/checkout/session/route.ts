@@ -171,8 +171,7 @@ export async function POST(req: NextRequest) {
     // Adjust for penny drift: ensure totals align
     const original = subtotalCents;
     const discountedSum = lineItems.reduce(
-      (s: number, li: any, idx: number) =>
-        s + (li.price_data.unit_amount as number) * (li.quantity as number),
+      (s: number, li: any) => s + (li.price_data.unit_amount as number) * (li.quantity as number),
       0,
     );
     const nonShipDiscountCents = discountTotalCents - shippingDiscountCents;

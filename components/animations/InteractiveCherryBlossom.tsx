@@ -67,16 +67,48 @@ export default function InteractiveCherryBlossom() {
   }, []);
 
   const handlePetalClick = (id: number) => {
+    const clickedPetal = petals.find((p) => p.id === id);
+    const points = clickedPetal?.isSpecial ? 5 : 1;
+
     setPetals((prev) =>
       prev.map((petal) => (petal.id === id ? { ...petal, collected: true } : petal)),
     );
-    setCollectedCount((prev) => prev + 1);
+    setCollectedCount((prev) => {
+      const newCount = prev + points;
+
+      // Update community progress (simulate global contribution)
+      setCommunityProgress((prevProgress) => {
+        const increment = (points / 1000) * 100; // Each petal contributes to community goal
+        return Math.min(prevProgress + increment, 100);
+      });
+
+      // Update leaderboard when milestones are reached
+      if (newCount % 10 === 0) {
+        updateLeaderboard(newCount);
+      }
+
+      return newCount;
+    });
     setShowProgress(true);
 
     // Play petal collect sound
     const audio = new Audio('/assets/sounds/petal-collect.mp3');
     audio.volume = 0.3;
-    audio.play();
+    audio.play().catch(() => {
+      // Silently fail if audio doesn't exist yet
+    });
+  };
+
+  const updateLeaderboard = (userPetals: number) => {
+    setLeaderboard((prev) => {
+      // Add/update current user's position
+      const currentUser = { username: 'You', petals: userPetals, rank: 0 };
+      const withoutUser = prev.filter((e) => e.username !== 'You');
+      const combined = [...withoutUser, currentUser].sort((a, b) => b.petals - a.petals);
+
+      // Update ranks
+      return combined.map((entry, index) => ({ ...entry, rank: index + 1 })).slice(0, 5);
+    });
   };
 
   return (

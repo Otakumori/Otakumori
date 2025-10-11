@@ -15,7 +15,7 @@ interface EngineProps {
   autoplay?: boolean;
 }
 
-export default function Engine({ playlist, mode = 'short', autoplay = true }: EngineProps) {
+export default function Engine({ playlist, mode: _mode = 'short', autoplay = true }: EngineProps) {
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -24,7 +24,7 @@ export default function Engine({ playlist, mode = 'short', autoplay = true }: En
   const [showPetals, setShowPetals] = useState(false);
 
   const { updateBestScore, updateDailyStreak, addPetalsEarned, getBestScore } = useProgress();
-  const { attemptReward, isSignedIn } = useRewards();
+  const { attemptReward, isSignedIn: _isSignedIn } = useRewards();
 
   const currentGame = playlist[currentGameIndex];
   const progress = timeRemaining / (currentGame?.durationSec || 1);

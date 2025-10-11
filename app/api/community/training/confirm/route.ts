@@ -25,7 +25,9 @@ export async function POST() {
       create: { userId: user.id, notificationPreferences: next },
     });
     return NextResponse.json({ ok: true });
-  } catch (e) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    console.error('Training confirmation failed:', error.message, error.stack);
     return NextResponse.json({ ok: false, code: 'SERVER_ERROR' }, { status: 500 });
   }
 }

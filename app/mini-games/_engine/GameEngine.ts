@@ -220,7 +220,7 @@ export class GameEngine {
     });
 
     // Gamepad input
-    window.addEventListener('gamepadconnected', (e) => {
+    window.addEventListener('gamepadconnected', (_e) => {
       this.input.gamepad.connected = true;
       // Gamepad connected (logging disabled for production)
     });

@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
   // Get the body
   const payload = await req.text();
   const body = JSON.parse(payload);
+  console.warn(`Clerk webhook received: ${body.type}`);
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET!);
@@ -59,6 +60,7 @@ export async function POST(req: NextRequest) {
 
   if (eventType === 'user.created') {
     const { id, email_addresses, public_metadata } = evt.data;
+    console.warn(`Creating user ${id} with ${email_addresses?.length || 0} email addresses`);
 
     // New user created
 
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
 
   if (eventType === 'user.updated') {
     const { id, public_metadata } = evt.data;
+    console.warn(`Updating user ${id} metadata`);
     // User updated
 
     // Log avatar preset changes for debugging

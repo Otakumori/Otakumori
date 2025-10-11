@@ -26,7 +26,7 @@ interface EditableComboDef extends Omit<RuneComboDef, 'createdAt' | 'updatedAt'>
 }
 
 export default function AdminRunesPage() {
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user: _user, isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [runes, setRunes] = useState<EditableRuneDef[]>([]);
   const [combos, setCombos] = useState<EditableComboDef[]>([]);
@@ -586,8 +586,11 @@ function ComboForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">Combo ID</label>
+        <label htmlFor="comboId" className="mb-2 block text-sm font-medium text-neutral-300">
+          Combo ID
+        </label>
         <input
+          id="comboId"
           type="text"
           value={formData.comboId}
           onChange={(e) => setFormData({ ...formData, comboId: e.target.value })}
@@ -598,7 +601,9 @@ function ComboForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">Required Runes</label>
+        <label htmlFor="requiredRunes" className="mb-2 block text-sm font-medium text-neutral-300">
+          Required Runes
+        </label>
         <div className="max-h-32 space-y-2 overflow-y-auto">
           {availableRunes.map((runeId) => (
             <label key={runeId} className="flex items-center space-x-2">
@@ -628,10 +633,11 @@ function ComboForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">
+        <label htmlFor="revealCopy" className="mb-2 block text-sm font-medium text-neutral-300">
           Reveal Copy (optional)
         </label>
         <textarea
+          id="revealCopy"
           value={formData.revealCopy || ''}
           onChange={(e) => setFormData({ ...formData, revealCopy: e.target.value })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"
@@ -641,8 +647,11 @@ function ComboForm({
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-neutral-300">Cosmetic Burst</label>
+        <label htmlFor="cosmeticBurst" className="mb-2 block text-sm font-medium text-neutral-300">
+          Cosmetic Burst
+        </label>
         <select
+          id="cosmeticBurst"
           value={formData.cosmeticBurst}
           onChange={(e) => setFormData({ ...formData, cosmeticBurst: e.target.value as any })}
           className="w-full rounded-lg border border-neutral-600 bg-neutral-800 px-3 py-2 text-white"

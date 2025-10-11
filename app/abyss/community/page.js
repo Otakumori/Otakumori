@@ -176,7 +176,7 @@ export default function CommunityPage() {
     setPosts(posts.map((post) => (post.id === postId ? { ...post, likes: post.likes + 1 } : post)));
   };
 
-  const handleComment = (postId) => {
+  const handleComment = (_postId) => {
     // Implement comment functionality
   };
 
@@ -278,7 +278,7 @@ export default function CommunityPage() {
                 onClick={() => handleComment(post.id)}
                 className="text-gray-600 hover:text-blue-500"
               >
-                 {post.comments}
+                {post.comments}
               </button>
             </div>
           </div>

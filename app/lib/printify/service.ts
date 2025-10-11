@@ -427,7 +427,7 @@ export class PrintifyService {
   async testConnection(): Promise<{ success: boolean; error?: string; shopId?: string }> {
     try {
       // Test with a simple endpoint that doesn't require shop ID
-      const result = await this.makeRequest<{ id: string; title: string }>('/shops.json');
+      const _result = await this.makeRequest<{ id: string; title: string }>('/shops.json');
       return {
         success: true,
         shopId: this.shopId,

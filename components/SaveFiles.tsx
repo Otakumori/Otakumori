@@ -49,6 +49,35 @@ export default function SaveFiles() {
     }).format(date);
   };
 
+  const handleDeleteSave = (id: string) => {
+    if (confirm('Are you sure you want to delete this save file?')) {
+      setSaveFiles((prev) => prev.filter((file) => file.id !== id));
+    }
+  };
+
+  const handleDownloadSave = (saveFile: SaveFile) => {
+    // Create and download save file as JSON
+    const dataStr = JSON.stringify(saveFile, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${saveFile.name.replace(/\s+/g, '_')}_${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCreateNewSave = () => {
+    const newSave: SaveFile = {
+      id: Date.now().toString(),
+      name: `Save File ${saveFiles.length + 1}`,
+      lastModified: new Date(),
+      playTime: 0,
+      progress: 0,
+    };
+    setSaveFiles((prev) => [...prev, newSave]);
+  };
+
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {saveFiles.map((saveFile) => (
@@ -71,14 +100,18 @@ export default function SaveFiles() {
             </div>
             <div className="flex space-x-2">
               <button
+                onClick={() => handleDownloadSave(saveFile)}
                 className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
                 title="Download Save"
+                aria-label={`Download ${saveFile.name}`}
               >
                 <Download className="h-5 w-5" />
               </button>
               <button
-                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
+                onClick={() => handleDeleteSave(saveFile.id)}
+                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-red-500"
                 title="Delete Save"
+                aria-label={`Delete ${saveFile.name}`}
               >
                 <Trash2 className="h-5 w-5" />
               </button>
@@ -99,10 +132,12 @@ export default function SaveFiles() {
         </motion.div>
       ))}
       <motion.button
+        onClick={handleCreateNewSave}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileHover={{ scale: 1.02 }}
         className="flex h-full min-h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-pink-200 bg-white p-6 text-pink-500 hover:border-pink-300 hover:bg-pink-50"
+        aria-label="Create new save file"
       >
         <div className="flex flex-col items-center space-y-2">
           <Plus className="h-8 w-8" />

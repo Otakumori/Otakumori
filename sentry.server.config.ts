@@ -46,8 +46,9 @@ if (env.SENTRY_SKIP_AUTO_RELEASE !== 'true' && env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
     dsn: dsn || undefined,
     environment: env.NODE_ENV,
-    tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 0, // 10% in production
-    profilesSampleRate: 0,
+    // Tracing disabled: omit tracesSampleRate entirely so it doesn't initialize
+    // (we also tree-shake tracing via __SENTRY_TRACING__ = false in next.config)
+    skipOpenTelemetrySetup: true, // Prevent OTEL conflicts in bundling
 
     integrations: [
       Sentry.httpIntegration(),

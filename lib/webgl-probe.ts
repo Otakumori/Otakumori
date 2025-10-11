@@ -10,7 +10,9 @@ export function probeWebGL(): boolean {
       (gl as WebGLRenderingContext).ALIASED_LINE_WIDTH_RANGE,
     );
     return true;
-  } catch (e) {
+  } catch (e: unknown) {
+    const error = e instanceof Error ? e : new Error(String(e));
+    console.error('WebGL probe failed:', error.message);
     return false;
   }
 }

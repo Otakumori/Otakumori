@@ -42,6 +42,9 @@ export async function POST(req: NextRequest) {
     // Handle coupons vs inventory
     if (shopItem.kind?.toUpperCase() === 'COUPON' || (shopItem.metadata as any)?.coupon) {
       const res = await debitPetals(userId, price, 'petal-shop-purchase');
+      if (!res.success) {
+        return NextResponse.json(problem(400, res.error || 'Debit failed'), { status: 400 });
+      }
       const meta = (shopItem.metadata as any) || {};
       const coupon = meta.coupon || {};
       const type = coupon.type === 'OFF_AMOUNT' ? 'OFF_AMOUNT' : 'PERCENT';
@@ -75,6 +78,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true, data: { alreadyOwned: true }, requestId: rid });
       }
       const res = await debitPetals(userId, price, 'petal-shop-purchase');
+      if (!res.success) {
+        return NextResponse.json(problem(400, res.error || 'Debit failed'), { status: 400 });
+      }
       const kind = (() => {
         const k = (shopItem.kind || '').toUpperCase();
         if (k in InventoryKind) return k as keyof typeof InventoryKind as any;

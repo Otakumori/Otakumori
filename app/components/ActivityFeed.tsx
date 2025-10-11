@@ -15,11 +15,12 @@ interface ActivityFeedProps {
 
 export default function ActivityFeed({
   className = '',
-  scope = 'friends',
+  scope: initialScope = 'friends',
   type,
   limit = 20,
 }: ActivityFeedProps) {
   const { user } = useUser();
+  const [scope, setScope] = useState<'global' | 'friends' | 'user'>(initialScope);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -136,6 +137,7 @@ export default function ActivityFeed({
               value={scope}
               onChange={(e) => {
                 const newScope = e.target.value as 'global' | 'friends' | 'user';
+                setScope(newScope);
                 setActivities([]);
                 setNextCursor(undefined);
                 loadActivities();

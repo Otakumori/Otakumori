@@ -6,8 +6,8 @@ import { useUser } from '@clerk/nextjs';
 // This hook now delegates to the main AuthContext to avoid conflicts
 export function useAuth() {
   const authContext = useAuthContext();
-  const { user } = useUser();
-  
+  const { user: _user } = useUser();
+
   // Use AuthContext values for consistent modal behavior
   return {
     user: authContext.user,

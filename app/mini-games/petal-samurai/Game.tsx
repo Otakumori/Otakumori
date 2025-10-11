@@ -136,7 +136,7 @@ export default function Game({ mode }: Props) {
     if (gameState.isGameOver) {
       const submitScore = async () => {
         try {
-          const payload = {
+          const _payload = {
             score: gameState.score,
             combo: gameState.combo,
             mode: mode,

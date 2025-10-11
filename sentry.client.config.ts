@@ -27,8 +27,7 @@ if (env.SENTRY_SKIP_AUTO_RELEASE !== 'true' && env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
     dsn: env.NEXT_PUBLIC_SENTRY_DSN,
     environment: env.NODE_ENV,
-    tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 0, // 10% in production
-    profilesSampleRate: 0, // Disable profiling
+    // no tracing on the client either
     integrations: (defaults) =>
       defaults.filter(
         (i) => !('addPerformanceEntries' in i || i?.name?.includes('browserTracing')),

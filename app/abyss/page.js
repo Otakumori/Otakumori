@@ -60,9 +60,9 @@ const sampleQuests = [
 
 export default function AbyssPage() {
   const { user, isLoaded } = useUser();
-  const [currentSection, setCurrentSection] = useState('main');
+  const [_currentSection, _setCurrentSection] = useState('main');
   const [isLoading, setIsLoading] = useState(true);
-  const { petals, addPetals } = usePetalContext();
+  const { petals: _petals, addPetals } = usePetalContext();
   const { quests, addQuest } = useOverlordContext();
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export default function AbyssPage() {
     setTimeout(() => {
       addPetals(quest.reward);
       // Remove quest from list
-      const updatedQuests = quests.filter((q) => q.id !== quest.id);
+      const _updatedQuests = quests.filter((q) => q.id !== quest.id);
       // Update quests in store - this would need to be handled differently
       // For now, we'll just remove the quest from the local state
     }, 2000);

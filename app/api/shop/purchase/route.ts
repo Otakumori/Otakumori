@@ -36,7 +36,8 @@ export async function POST(req: Request) {
   if (item.visibleTo && item.visibleTo < new Date())
     return NextResponse.json({ ok: false, error: 'expired' }, { status: 403 });
 
-  const res = await prisma.$transaction(async (tx) => {
+  // Execute purchase transaction
+  await prisma.$transaction(async (tx) => {
     if (needRunes)
       await tx.user.update({ where: { id: user.id }, data: { runes: { decrement: needRunes } } });
     if (needPetals)
@@ -52,5 +53,11 @@ export async function POST(req: Request) {
     // optional: create CouponGrant if the item issues a coupon (not in this batch)
   });
 
+  console.warn('Shop purchase completed:', {
+    userId: user.id,
+    sku: item.sku,
+    needRunes,
+    needPetals,
+  });
   return NextResponse.json({ ok: true });
 }

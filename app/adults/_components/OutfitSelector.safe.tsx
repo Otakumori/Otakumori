@@ -9,6 +9,9 @@ interface OutfitSelectorProps {
 }
 
 export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps) {
+  // Log gender context for outfit recommendations
+  console.warn('OutfitSelector initialized for gender:', gender);
+  
   const updateConfig = (path: string, value: any) => {
     const newConfig = { ...config };
     const keys = path.split('.');
@@ -98,8 +101,11 @@ export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps
         <h4 className="text-pink-300 font-medium">Outfit Colors</h4>
 
         <div className="space-y-2">
-          <label className="block text-white text-sm font-medium">Primary Color</label>
+          <label htmlFor="outfit-primary-color" className="block text-white text-sm font-medium">
+            Primary Color
+          </label>
           <input
+            id="outfit-primary-color"
             type="color"
             value={config.primary?.color || '#FF6B9D'}
             onChange={(e) => updateConfig('primary.color', e.target.value)}
@@ -131,8 +137,11 @@ export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps
         {config.secondary?.type && (
           <div className="space-y-3 ml-6">
             <div className="space-y-2">
-              <label className="block text-white text-sm font-medium">Secondary Color</label>
+              <label htmlFor="outfit-secondary-color" className="block text-white text-sm font-medium">
+                Secondary Color
+              </label>
               <input
+                id="outfit-secondary-color"
                 type="color"
                 value={config.secondary?.color || '#FFFFFF'}
                 onChange={(e) => updateConfig('secondary.color', e.target.value)}
@@ -178,8 +187,11 @@ export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps
         />
 
         <div>
-          <label className="block text-white text-sm font-medium mb-2">Style Level</label>
+          <label htmlFor="outfit-style-level" className="block text-white text-sm font-medium mb-2">
+            Style Level
+          </label>
           <select
+            id="outfit-style-level"
             value={config.fit?.style || 'moderate'}
             onChange={(e) => updateConfig('fit.style', e.target.value)}
             className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white"

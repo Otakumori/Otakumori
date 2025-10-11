@@ -12,6 +12,9 @@ interface DeciderProps {
 export default function Decider({ selectedGame, children }: DeciderProps) {
   const { masterVolume, setMasterVolume, theme, setTheme } = useSettings();
 
+  // Log settings for debugging when switching modes
+  console.debug('[Decider] Current settings:', { masterVolume, theme, hasGame: !!selectedGame });
+
   // If no game is selected, show settings console
   if (!selectedGame) {
     return <SettingsConsole onVolumeChange={setMasterVolume} onThemeChange={setTheme} />;

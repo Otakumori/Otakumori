@@ -1,6 +1,6 @@
 /**
  * Authentication Modal - Complete Implementation
- * 
+ *
  * Features:
  * - Modal intercept for gated actions
  * - Beautiful glass UI design
@@ -40,8 +40,8 @@ const DEFAULT_CONTEXT = {
     'Earn and spend Petals',
     'Join community discussions',
     'Track achievements',
-    'Access exclusive content'
-  ]
+    'Access exclusive content',
+  ],
 };
 
 const CONTEXT_CONFIGS = {
@@ -54,8 +54,8 @@ const CONTEXT_CONFIGS = {
       'Leave meaningful messages',
       'Build your reputation',
       'Connect with travelers',
-      'Share discoveries'
-    ]
+      'Share discoveries',
+    ],
   },
   praise: {
     action: 'Sign in to send praise to other travelers',
@@ -66,8 +66,8 @@ const CONTEXT_CONFIGS = {
       'Appreciate great content',
       'Build community bonds',
       'Earn karma points',
-      'Unlock praise badges'
-    ]
+      'Unlock praise badges',
+    ],
   },
   wishlist: {
     action: 'Sign in to add items to your wishlist',
@@ -78,8 +78,8 @@ const CONTEXT_CONFIGS = {
       'Save favorite items',
       'Track price changes',
       'Get restock alerts',
-      'Share collections'
-    ]
+      'Share collections',
+    ],
   },
   trade: {
     action: 'Sign in to present offers in the Scarlet Bazaar',
@@ -90,8 +90,8 @@ const CONTEXT_CONFIGS = {
       'Trade rare items',
       'Build trust reputation',
       'Access exclusive deals',
-      'Connect with collectors'
-    ]
+      'Connect with collectors',
+    ],
   },
   community: {
     action: 'Sign in to participate in community discussions',
@@ -102,30 +102,32 @@ const CONTEXT_CONFIGS = {
       'Join discussions',
       'Share your thoughts',
       'Get recommendations',
-      'Build friendships'
-    ]
-  }
+      'Build friendships',
+    ],
+  },
 };
 
-export default function AuthModal({ 
-  isOpen, 
-  onClose, 
+export default function AuthModal({
+  isOpen,
+  onClose,
   mode = 'signin',
   context,
   redirectUrl,
-  onSuccess 
+  onSuccess,
 }: AuthModalProps) {
   const [currentMode, setCurrentMode] = useState<'signin' | 'signup'>(mode);
   const [isLoading, setIsLoading] = useState(false);
   const { isSignedIn } = useAuth();
 
-  const modalContext = context ? {
-    ...context,
-    ...(CONTEXT_CONFIGS[context.iconType] || CONTEXT_CONFIGS.community)
-  } : {
-    ...DEFAULT_CONTEXT,
-    ...CONTEXT_CONFIGS.community
-  };
+  const modalContext = context
+    ? {
+        ...context,
+        ...(CONTEXT_CONFIGS[context.iconType] || CONTEXT_CONFIGS.community),
+      }
+    : {
+        ...DEFAULT_CONTEXT,
+        ...CONTEXT_CONFIGS.community,
+      };
 
   // Close modal when user signs in
   useEffect(() => {
@@ -144,7 +146,7 @@ export default function AuthModal({
   };
 
   // Handle sign in success
-  const handleSignInSuccess = () => {
+  const _handleSignInSuccess = () => {
     setIsLoading(true);
     // Clerk will handle the redirect and update isSignedIn
   };
@@ -162,13 +164,13 @@ export default function AuthModal({
       >
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-        
+
         {/* Modal Content */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="relative w-full max-w-md bg-slate-900/95 backdrop-blur-lg rounded-2xl border border-slate-700/50 shadow-2xl overflow-hidden"
         >
           {/* Close Button */}
@@ -187,17 +189,17 @@ export default function AuthModal({
               <div className="absolute top-0 left-0 w-20 h-20 bg-white/10 rounded-full -translate-x-10 -translate-y-10" />
               <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-16 translate-y-16" />
             </div>
-            
+
             <div className="relative text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", damping: 20 }}
+                transition={{ delay: 0.2, type: 'spring', damping: 20 }}
                 className="inline-flex items-center justify-center w-16 h-16 mb-4 text-3xl bg-white/20 backdrop-blur-sm rounded-full border border-white/30"
               >
                 {modalContext.icon}
               </motion.div>
-              
+
               <motion.h2
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -206,7 +208,7 @@ export default function AuthModal({
               >
                 {modalContext.action}
               </motion.h2>
-              
+
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -277,7 +279,7 @@ export default function AuthModal({
                 <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full"
                   />
                 </div>
@@ -297,24 +299,26 @@ export default function AuthModal({
                       redirectUrl={redirectUrl}
                       appearance={{
                         elements: {
-                          rootBox: "w-full",
-                          card: "bg-transparent shadow-none",
-                          headerTitle: "hidden",
-                          headerSubtitle: "hidden",
-                          socialButtonsBlockButton: "bg-slate-800 border-slate-600 text-white hover:bg-slate-700",
-                          formButtonPrimary: "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500",
-                          formFieldInput: "bg-slate-800 border-slate-600 text-white",
-                          formFieldLabel: "text-slate-300",
-                          dividerLine: "bg-slate-600",
-                          dividerText: "text-slate-400",
-                          footerActionLink: "text-pink-400 hover:text-pink-300",
-                          identityPreviewText: "text-slate-300",
-                          identityPreviewEditButton: "text-pink-400",
+                          rootBox: 'w-full',
+                          card: 'bg-transparent shadow-none',
+                          headerTitle: 'hidden',
+                          headerSubtitle: 'hidden',
+                          socialButtonsBlockButton:
+                            'bg-slate-800 border-slate-600 text-white hover:bg-slate-700',
+                          formButtonPrimary:
+                            'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500',
+                          formFieldInput: 'bg-slate-800 border-slate-600 text-white',
+                          formFieldLabel: 'text-slate-300',
+                          dividerLine: 'bg-slate-600',
+                          dividerText: 'text-slate-400',
+                          footerActionLink: 'text-pink-400 hover:text-pink-300',
+                          identityPreviewText: 'text-slate-300',
+                          identityPreviewEditButton: 'text-pink-400',
                         },
                         layout: {
-                          socialButtonsPlacement: "top",
-                          socialButtonsVariant: "blockButton"
-                        }
+                          socialButtonsPlacement: 'top',
+                          socialButtonsVariant: 'blockButton',
+                        },
                       }}
                     />
                   </motion.div>
@@ -331,24 +335,26 @@ export default function AuthModal({
                       redirectUrl={redirectUrl}
                       appearance={{
                         elements: {
-                          rootBox: "w-full",
-                          card: "bg-transparent shadow-none",
-                          headerTitle: "hidden",
-                          headerSubtitle: "hidden",
-                          socialButtonsBlockButton: "bg-slate-800 border-slate-600 text-white hover:bg-slate-700",
-                          formButtonPrimary: "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500",
-                          formFieldInput: "bg-slate-800 border-slate-600 text-white",
-                          formFieldLabel: "text-slate-300",
-                          dividerLine: "bg-slate-600",
-                          dividerText: "text-slate-400",
-                          footerActionLink: "text-pink-400 hover:text-pink-300",
-                          identityPreviewText: "text-slate-300",
-                          identityPreviewEditButton: "text-pink-400",
+                          rootBox: 'w-full',
+                          card: 'bg-transparent shadow-none',
+                          headerTitle: 'hidden',
+                          headerSubtitle: 'hidden',
+                          socialButtonsBlockButton:
+                            'bg-slate-800 border-slate-600 text-white hover:bg-slate-700',
+                          formButtonPrimary:
+                            'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500',
+                          formFieldInput: 'bg-slate-800 border-slate-600 text-white',
+                          formFieldLabel: 'text-slate-300',
+                          dividerLine: 'bg-slate-600',
+                          dividerText: 'text-slate-400',
+                          footerActionLink: 'text-pink-400 hover:text-pink-300',
+                          identityPreviewText: 'text-slate-300',
+                          identityPreviewEditButton: 'text-pink-400',
                         },
                         layout: {
-                          socialButtonsPlacement: "top",
-                          socialButtonsVariant: "blockButton"
-                        }
+                          socialButtonsPlacement: 'top',
+                          socialButtonsVariant: 'blockButton',
+                        },
                       }}
                     />
                   </motion.div>

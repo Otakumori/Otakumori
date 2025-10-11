@@ -12,6 +12,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Log inventory sync request
+    console.warn('Printify inventory sync requested from:', request.headers.get('user-agent'));
+
     // Verify authentication and admin role
     const { userId } = await auth();
     if (!userId) {
@@ -25,6 +28,7 @@ export async function POST(request: NextRequest) {
     // For now, allow any authenticated user to trigger sync
 
     const advancedService = getAdvancedPrintifyService();
+    console.warn('Advanced Printify service initialized for sync');
     const inventoryStatuses = await advancedService.syncInventory();
 
     return NextResponse.json({
@@ -57,6 +61,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    // Log inventory status request
+    console.warn('Printify inventory status requested from:', request.headers.get('user-agent'));
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json(
@@ -67,8 +74,14 @@ export async function GET(request: NextRequest) {
 
     const advancedService = getAdvancedPrintifyService();
 
+    // Get actual inventory status from advanced service
+    const serviceStatus = await advancedService.getInventoryStatus().catch((error) => {
+      console.error('Failed to get inventory status:', error);
+      return null;
+    });
+
     // Get current inventory cache or basic status
-    const status = {
+    const status = serviceStatus || {
       lastSync: new Date().toISOString(),
       totalProducts: 0,
       availableProducts: 0,

@@ -56,6 +56,12 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
     const { userId: paramUserId } = params;
     const { userId: currentUserId } = await auth();
 
+    // Log request timing
+    const logTiming = () => {
+      const duration = Date.now() - startTime;
+      console.warn(`Achievement request completed in ${duration}ms`);
+    };
+
     if (request.method === 'POST') {
       // Unlock achievement
       if (!currentUserId) {
@@ -98,6 +104,7 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
             progress,
             unlocked: isFullyUnlocked,
             unlockedAt: isFullyUnlocked ? new Date() : null,
+            metadata, // Include any extra unlock metadata
           },
           rewards: {
             points: pointsAwarded,
@@ -219,9 +226,11 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
       });
     }
 
+    logTiming();
     return NextResponse.json({ ok: false, error: 'Method not allowed' }, { status: 405 });
   } catch (error) {
-    console.error('Achievement error:', error);
+    const duration = Date.now() - startTime;
+    console.error('Achievement error after', duration, 'ms:', error);
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

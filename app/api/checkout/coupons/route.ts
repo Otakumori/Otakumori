@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { couponCode } = await req.json();
+    console.warn(`Coupon validation requested for: ${couponCode}`);
 
     // TODO: Implement coupon validation logic
     return NextResponse.json({

@@ -1,25 +1,37 @@
-* text=auto eol=lf
+# Merge conflict prevention
+*.lock merge=union
+package-lock.json merge=union
+pnpm-lock.yaml merge=union
+yarn.lock merge=union
 
-# Force LF in repo; Git converts on checkout if needed
-* text=auto eol=lf
-*.ps1 text eol=crlf
-*.bat text eol=crlf
-*.cmd text eol=crlf
-*.exe binary
-*.dll binary
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.gif binary
-*.ico binary
-*.svg binary
-*.woff binary
-*.woff2 binary
-*.ttf binary
-*.eot binary
-*.pdf binary
-*.zip binary
-*.tar binary
-*.gz binary
-*.rar binary
-*.7z binary 
+# Generated files
+*.generated.* linguist-generated=true
+.next/** linguist-generated=true
+dist/** linguist-generated=true
+coverage/** linguist-generated=true
+
+# Binary files
+*.png linguist-detectable=true
+*.jpg linguist-detectable=true
+*.jpeg linguist-detectable=true
+*.gif linguist-detectable=true
+*.ico linguist-detectable=true
+*.woff linguist-detectable=true
+*.woff2 linguist-detectable=true
+*.ttf linguist-detectable=true
+*.eot linguist-detectable=true
+
+# Text files
+*.md text
+*.txt text
+*.json text
+*.yml text
+*.yaml text
+*.js text
+*.ts text
+*.tsx text
+*.jsx text
+*.css text
+*.scss text
+*.html text
+*.xml text

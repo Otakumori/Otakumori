@@ -68,10 +68,11 @@ class Logger {
       const routeInfo = ctx?.route ? ` ${colors.debug}[${ctx.route}]${colors.reset}` : '';
       const requestInfo = ctx?.requestId ? ` ${colors.debug}[${ctx.requestId}]${colors.reset}` : '';
 
-      // `${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`
+      // Use console.warn for info/debug in development (allowed by linter)
+      console.warn(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
 
       if (data) {
-        // `${colors.debug}Data:${colors.reset}`, data
+        console.warn(`${colors.debug}Data:${colors.reset}`, data);
       }
 
       if (error) {

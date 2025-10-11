@@ -26,8 +26,16 @@ interface GameCube3DProps {
 function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: CubeFace) => void }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const [currentFace, setCurrentFace] = useState(0);
+
+  // Enable proper rendering settings
+  useEffect(() => {
+    if (gl) {
+      gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      gl.setClearColor('#080611', 1);
+    }
+  }, [gl]);
   const [isRotating, setIsRotating] = useState(false);
   const [gestureState, setGestureState] = useState<GestureState>({
     startX: 0,
@@ -35,6 +43,15 @@ function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: Cu
     isDragging: false,
     threshold: 30,
   });
+
+  // Use camera for dynamic field of view adjustments
+  useEffect(() => {
+    if (camera && 'fov' in camera) {
+      // TypeScript guard for PerspectiveCamera
+      (camera as any).fov = 75;
+      camera.updateProjectionMatrix();
+    }
+  }, [camera]);
 
   // Face mapping: 0=front, 1=right, 2=back, 3=left, 4=top, 5=down
 
@@ -240,7 +257,7 @@ function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: Cu
       </mesh>
 
       {/* Face labels */}
-      {faces.map((face, index) => {
+      {faces.map((face) => {
         const position = getFacePosition(face.slot);
         const angle = getFaceAngle(face.slot);
         return (
@@ -264,6 +281,30 @@ function Cube({ faces, onActivate }: { faces: CubeFace[]; onActivate?: (face: Cu
 export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
   const router = useRouter();
   const [backgroundMusic, setBackgroundMusic] = useState<(() => void) | null>(null);
+
+  // Handle face activation - passed down to Cube component
+  const handleFaceActivation = useCallback(
+    (face: CubeFace) => {
+      // Call parent callback if provided
+      if (onActivate) {
+        onActivate(face);
+      }
+
+      // Only navigate if face is enabled
+      if (face.enabled) {
+        // Stop background music before navigation
+        if (backgroundMusic) {
+          backgroundMusic();
+          setBackgroundMusic(null);
+        }
+
+        // Navigate to face route (use face.route or fallback to /panel/{slug})
+        const route = face.route || `/panel/${face.slug}`;
+        router.push(route);
+      }
+    },
+    [router, backgroundMusic, onActivate],
+  );
 
   // Start background menu music when component mounts
   useEffect(() => {
@@ -294,20 +335,6 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
     };
   }, [backgroundMusic]);
 
-  const handleActivate = useCallback(
-    (face: CubeFace) => {
-      if (face.enabled) {
-        // Stop background music when navigating
-        if (backgroundMusic) {
-          backgroundMusic();
-          setBackgroundMusic(null);
-        }
-        router.push(`/panel/${face.slug}`);
-      }
-    },
-    [router, backgroundMusic],
-  );
-
   return (
     <div className="w-full h-screen bg-gradient-to-br from-purple-900 via-pink-900 to-purple-900">
       <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
@@ -315,7 +342,7 @@ export default function GameCube3D({ faces, onActivate }: GameCube3DProps) {
         <directionalLight position={[5, 5, 5]} intensity={0.8} />
         <pointLight position={[-5, -5, -5]} intensity={0.3} />
 
-        <Cube faces={faces} onActivate={handleActivate} />
+        <Cube faces={faces} onActivate={handleFaceActivation} />
 
         <OrbitControls
           enableZoom={false}

@@ -1,6 +1,11 @@
+import { env } from '@/env.mjs';
+
 export const monitor = {
   log: (...args: any[]) => {
-    /* Log disabled */
+    // Development logging with args
+    if (env.NODE_ENV === 'development') {
+      console.warn('[Monitor]', ...args);
+    }
   },
   error: (error: any) => console.error(error),
   checkHealth: async () => ({

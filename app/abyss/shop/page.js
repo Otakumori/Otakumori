@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 export default function ShopPage() {
   const { user, isLoaded } = useUser();
-  const [items] = useState([
+  const [_items] = useState([
     { id: 1, name: 'Petal Boost', price: 100, description: 'Collect 2x petals for 1 hour' },
     { id: 2, name: 'Rare Petal', price: 500, description: 'Unlock rare petal types' },
     { id: 3, name: 'Custom Avatar', price: 1000, description: 'Create your own avatar' },

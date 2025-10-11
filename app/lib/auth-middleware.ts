@@ -61,7 +61,7 @@ export async function withAuth<T>(
   handler: (userId: string, requestId: string) => Promise<NextResponse | AuthResponse<T>>,
   requiredRole?: UserRole,
 ) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  return async (_request: NextRequest): Promise<NextResponse> => {
     const requestId = generateRequestId();
 
     try {
@@ -182,7 +182,7 @@ export async function withPermission<T>(
   permission: Permission,
   handler: (userId: string, requestId: string) => Promise<NextResponse | AuthResponse<T>>,
 ) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  return async (_request: NextRequest): Promise<NextResponse> => {
     const requestId = generateRequestId();
 
     try {

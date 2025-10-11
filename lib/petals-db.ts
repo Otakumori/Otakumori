@@ -21,41 +21,55 @@ export async function ensureUserByClerkId(clerkId: string) {
 }
 
 export async function creditPetals(clerkId: string, amount: number, reason: string) {
-  if (amount <= 0) return { balance: 0 };
-  const user = await ensureUserByClerkId(clerkId);
-  const updated = await db.$transaction(async (tx) => {
-    await tx.petalLedger.create({
-      data: { userId: user.id, type: 'earn', amount, reason },
+  try {
+    if (amount <= 0) return { success: false, balance: 0, error: 'Amount must be positive' };
+
+    const user = await ensureUserByClerkId(clerkId);
+    const updated = await db.$transaction(async (tx) => {
+      await tx.petalLedger.create({
+        data: { userId: user.id, type: 'earn', amount, reason },
+      });
+      const updatedUser = await tx.user.update({
+        where: { id: user.id },
+        data: { petalBalance: { increment: amount } },
+        select: { petalBalance: true },
+      });
+      return updatedUser;
     });
-    const updatedUser = await tx.user.update({
-      where: { id: user.id },
-      data: { petalBalance: { increment: amount } },
-      select: { petalBalance: true },
-    });
-    return updatedUser;
-  });
-  return { balance: updated.petalBalance };
+
+    return { success: true, balance: updated.petalBalance };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Credit failed';
+    return { success: false, balance: 0, error: message };
+  }
 }
 
 export async function debitPetals(clerkId: string, amount: number, reason: string) {
-  if (amount <= 0) return { balance: 0 };
-  const user = await ensureUserByClerkId(clerkId);
-  const updated = await db.$transaction(async (tx) => {
-    const current = await tx.user.findUnique({
-      where: { id: user.id },
-      select: { petalBalance: true },
+  try {
+    if (amount <= 0) return { success: false, balance: 0, error: 'Amount must be positive' };
+
+    const user = await ensureUserByClerkId(clerkId);
+    const updated = await db.$transaction(async (tx) => {
+      const current = await tx.user.findUnique({
+        where: { id: user.id },
+        select: { petalBalance: true },
+      });
+      const balance = current?.petalBalance ?? 0;
+      if (balance < amount) {
+        throw Object.assign(new Error('INSUFFICIENT_FUNDS'), { code: 'INSUFFICIENT_FUNDS' });
+      }
+      await tx.petalLedger.create({ data: { userId: user.id, type: 'spend', amount, reason } });
+      const updatedUser = await tx.user.update({
+        where: { id: user.id },
+        data: { petalBalance: { decrement: amount } },
+        select: { petalBalance: true },
+      });
+      return updatedUser;
     });
-    const balance = current?.petalBalance ?? 0;
-    if (balance < amount) {
-      throw Object.assign(new Error('INSUFFICIENT_FUNDS'), { code: 'INSUFFICIENT_FUNDS' });
-    }
-    await tx.petalLedger.create({ data: { userId: user.id, type: 'spend', amount, reason } });
-    const updatedUser = await tx.user.update({
-      where: { id: user.id },
-      data: { petalBalance: { decrement: amount } },
-      select: { petalBalance: true },
-    });
-    return updatedUser;
-  });
-  return { balance: updated.petalBalance };
+
+    return { success: true, balance: updated.petalBalance };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Debit failed';
+    return { success: false, balance: 0, error: message };
+  }
 }

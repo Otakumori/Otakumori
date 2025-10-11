@@ -1,0 +1,69 @@
+﻿
+20:24  Warning: 'setGlobalPetals' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+92:9  Warning: 'particlesOptions' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+16:10  Warning: 'saving' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+16:10  Warning: 'preview' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+19:10  Warning: 'timeoutId' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+49:10  Warning: 'audioOn' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+217:17  Warning: 'axes' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+572:12  Warning: 'loading' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+48:10  Warning: 'sessionId' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+82:10  Warning: 'sessionId' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+65:9  Warning: 'running' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+13:11  Warning: 'masterVolume' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+13:42  Warning: 'theme' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+48:3  Warning: 'skipAfterSeconds' is assigned a value but never used. Allowed unused args must match /^_/u.  
+unused-imports/no-unused-vars
+62:3  Warning: 'enableAchievements' is assigned a value but never used. Allowed unused args must match /^_/u.  
+unused-imports/no-unused-vars
+68:3  Warning: 'maxPlayers' is assigned a value but never used. Allowed unused args must match /^_/u.  
+unused-imports/no-unused-vars
+16:29  Warning: 'setCommunityProgress' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+18:23  Warning: 'setLeaderboard' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+78:10  Warning: 'hairStrands' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+79:10  Warning: 'clothMeshes' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+44:10  Warning: 'hairStrands' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+45:10  Warning: 'clothMeshes' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+66:10  Warning: 'seed' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+6:10  Warning: 'petals' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+53:9  Warning: 'pointerDown' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+34:21  Warning: 'setSaveFiles' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+331:11  Warning: 'userStatus' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+603:17  Warning: 'category' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+604:13  Warning: 'cutoffDate' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+3:9  Warning: 'entry' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+215:17  Warning: 'alertId' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+388:11  Warning: 'cwvMonitor' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+392:13  Warning: 'bundleAnalyzer' is assigned a value but never used. Allowed unused vars must match /^_/u.  
+unused-imports/no-unused-vars
+
+

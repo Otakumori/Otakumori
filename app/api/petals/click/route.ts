@@ -139,8 +139,9 @@ export async function POST(req: Request) {
           });
           achievements.push(achievement);
         }
-      } catch (error) {
-        // Achievement might not exist yet, continue
+      } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        console.warn('Achievement creation failed (may not exist yet):', err.message);
       }
     }
 
@@ -162,8 +163,9 @@ export async function POST(req: Request) {
             });
             achievements.push(achievement);
           }
-        } catch (error) {
-          // Achievement might not exist yet, continue
+        } catch (error: unknown) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          console.warn('Milestone achievement creation failed (may not exist yet):', err.message);
         }
       }
     }

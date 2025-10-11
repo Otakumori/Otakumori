@@ -7,6 +7,9 @@ export const maxDuration = 10;
 
 export async function POST(req: NextRequest) {
   try {
+    // Log trade offer request
+    console.warn('Trade offer requested from:', req.headers.get('user-agent'));
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });

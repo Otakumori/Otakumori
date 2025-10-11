@@ -9,8 +9,8 @@ export default function Avatar() {
 
   useFrame((state, delta) => {
     if (meshRef.current) {
-      // Subtle idle animation
-      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+      // Frame-rate independent idle animation
+      meshRef.current.rotation.y += Math.sin(state.clock.elapsedTime * 0.5) * delta * 0.1;
     }
   });
 

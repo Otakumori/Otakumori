@@ -81,7 +81,6 @@ export async function POST(req: NextRequest) {
       });
 
       let isInWishlist: boolean;
-      let wishlistItem;
 
       if (existingItem) {
         // Remove from wishlist
@@ -96,13 +95,14 @@ export async function POST(req: NextRequest) {
         isInWishlist = false;
       } else {
         // Add to wishlist
-        wishlistItem = await db.wishlist.create({
+        const wishlistItem = await db.wishlist.create({
           data: {
             userId,
             productId,
           },
         });
         isInWishlist = true;
+        console.warn('Added to wishlist:', { itemId: wishlistItem.id, productId });
       }
 
       const response = createApiSuccess(

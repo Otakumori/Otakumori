@@ -1,0 +1,205 @@
+﻿
+> otakumori@0.1.0 lint
+> next lint --no-inline-config
+
+npm : `next lint` is deprecated and will be removed in Next.js 16.
+At C:\Users\ap190\AppData\Local\Temp\ps-script-333a1412-a234-4dd9-ab48-e5e5f0ded5f6.ps1:87 char:1
++ npm run lint 2>&1 | Out-File -FilePath unused-vars-audit.txt -Encodin ...
++ ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (`next lint` is ... in Next.js 16.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+For new projects, use create-next-app to choose your preferred linter.
+For existing projects, migrate to the ESLint CLI:
+npx @next/codemod@canary next-lint-to-eslint-cli .
+
+(node:22136) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ignores" 
+property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ ΓÜá The Next.js plugin was not detected in your ESLint configuration. See 
+https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+./app/adults/_components/MaterialEditor.safe.tsx
+249:15  Warning: Non-interactive elements should not be assigned mouse or keyboard event listeners.  jsx-a11y/no-noninteractive-element-interactions
+261:17  Warning: Non-interactive elements should not be assigned mouse or keyboard event listeners.  jsx-a11y/no-noninteractive-element-interactions
+
+./app/components/effects/PetalField.tsx
+166:7  Warning: Interactive elements should not be assigned non-interactive roles.  jsx-a11y/no-interactive-element-to-noninteractive-role
+
+./app/components/GameCubeBoot.js
+154:9  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+
+./app/components/InteractiveHeroSection.tsx
+509:9  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+538:30  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+
+./app/components/layout/Navbar.tsx
+224:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+290:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+353:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/components/PetalCollectionGame.js
+81:13  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+
+./app/components/PetalGameImage.tsx
+20:24  Warning: 'setGlobalPetals' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+92:9  Warning: 'particlesOptions' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/components/profile/AchievementsGrid.tsx
+144:11  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/components/profile/ProfileLoadout.tsx
+50:11  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+50:11  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/components/ReportButton.tsx
+117:19  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./app/components/SafetySettings.tsx
+16:10  Warning: 'saving' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+163:15  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+179:15  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+197:15  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+257:15  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+273:15  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+
+./app/components/shop/AdvancedShopCatalog.tsx
+489:15  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./app/components/shop/CheckoutContent.tsx
+16:10  Warning: 'preview' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/components/shop/ProductDetail.tsx
+148:11  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./app/components/ui/card.tsx
+26:5  Warning: Headings must have content and the content must be accessible by a screen reader.  jsx-a11y/heading-has-content
+
+./app/components/ui/Tooltip.tsx
+15:5  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/cookies/page.tsx
+50:17  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+
+./app/games/404/page.tsx
+19:10  Warning: 'timeoutId' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/mini-games/console/ConsoleCard.tsx
+49:10  Warning: 'audioOn' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+217:17  Warning: 'axes' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+544:15  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+544:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+572:12  Warning: 'loading' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+673:17  Warning: Media elements such as <audio> and <video> must have a <track> for captions.  jsx-a11y/media-has-caption
+881:7  Warning: `tabIndex` should only be declared on interactive elements.  jsx-a11y/no-noninteractive-tabindex
+
+./app/mini-games/memory-match/page.tsx
+48:10  Warning: 'sessionId' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/mini-games/petal-storm-rhythm/page.tsx
+82:10  Warning: 'sessionId' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/mini-games/samurai-petal-slice/Scene.tsx
+65:9  Warning: 'running' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/mini-games/trade-hall/page.tsx
+283:19  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./app/mini-games/_components/decider.safe.tsx
+13:11  Warning: 'masterVolume' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+13:42  Warning: 'theme' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./app/mini-games/_components/GameCubeBoot3D.tsx
+383:7  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+383:7  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/mini-games/_components/GameCubeBootOverlay.tsx
+89:5  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+89:5  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/mini-games/_components/GameCubeHub.tsx
+329:15  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+
+./app/mini-games/_components/MemoryCardDock.tsx
+210:17  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+216:19  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+222:19  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+229:19  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./app/mini-games/_components/SettingsConsole.safe.tsx
+157:13  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+198:13  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+213:13  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+237:13  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./app/mini-games/_shared/GameCubeBootV2.tsx
+48:3  Warning: 'skipAfterSeconds' is assigned a value but never used. Allowed unused args must match /^_/u.  unused-imports/no-unused-vars
+
+./app/mini-games/_shared/GameShellV2.tsx
+62:3  Warning: 'enableAchievements' is assigned a value but never used. Allowed unused args must match /^_/u.  unused-imports/no-unused-vars
+68:3  Warning: 'maxPlayers' is assigned a value but never used. Allowed unused args must match /^_/u.  unused-imports/no-unused-vars
+275:19  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+
+./app/play/page.tsx
+130:13  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+130:13  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+
+./app/shop/product/[id]/page.tsx
+125:15  Warning: Emojis should be wrapped in <span>, have role="img", and have an accessible description with aria-label or aria-labelledby.  jsx-a11y/accessible-emoji
+238:15  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./components/animations/InteractiveCherryBlossom.tsx
+16:29  Warning: 'setCommunityProgress' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+18:23  Warning: 'setLeaderboard' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./components/arcade/games/PantyRaid.tsx
+61:5  Warning: Non-interactive elements should not be assigned mouse or keyboard event listeners.  jsx-a11y/no-noninteractive-element-interactions
+
+./components/avatar/AvatarEditor.tsx
+78:10  Warning: 'hairStrands' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+79:10  Warning: 'clothMeshes' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./components/avatar/AvatarSystem.tsx
+44:10  Warning: 'hairStrands' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+45:10  Warning: 'clothMeshes' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+404:21  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+436:17  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+449:17  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+./components/games/SamuraiPetalSlice.tsx
+66:10  Warning: 'seed' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./components/hero/HeroShrine.tsx
+6:10  Warning: 'petals' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./components/PetalEmitterTree.tsx
+53:9  Warning: 'pointerDown' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./components/SaveFiles.tsx
+34:21  Warning: 'setSaveFiles' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./components/Unicode.tsx
+40:5  Warning: Non-interactive elements should not be assigned mouse or keyboard event listeners.  jsx-a11y/no-noninteractive-element-interactions
+47:7  Warning: `tabIndex` should only be declared on interactive elements.  jsx-a11y/no-noninteractive-tabindex
+
+./lib/avatar/adult-gating.tsx
+331:11  Warning: 'userStatus' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+552:7  Warning: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+556:9  Warning: A form label must have accessible text.  jsx-a11y/label-has-associated-control
+
+./lib/compliance/gdpr.ts
+603:17  Warning: 'category' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+604:13  Warning: 'cutoffDate' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./lib/logger.ts
+3:9  Warning: 'entry' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./lib/monitoring/advanced-metrics.ts
+215:17  Warning: 'alertId' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+./lib/performance/bundle-analyzer.ts
+388:11  Warning: 'cwvMonitor' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+392:13  Warning: 'bundleAnalyzer' is assigned a value but never used. Allowed unused vars must match /^_/u.  unused-imports/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

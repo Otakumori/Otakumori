@@ -2,7 +2,10 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="bg-black/20 backdrop-blur-md border-t border-white/10">
+    <footer
+      className="backdrop-blur-lg border-t border-white/10"
+      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}
+    >
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -72,10 +75,10 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-white/10">
           <div className="text-gray-300 text-sm text-center space-y-2">
-            <p>
-              © {new Date().getFullYear()} Otaku-mori. All petals accounted for. Don't go hollow.
+            <p>Otakumori ™ made with ♡</p>
+            <p className="text-xs">
+              © {new Date().getFullYear()} Otaku-mori. All rights reserved.
             </p>
-            <p>Otakumori ™ made with </p>
             <p>
               <a href="/#leave-a-sign" className="hover:text-white transition-colors">
                 Leave a sign

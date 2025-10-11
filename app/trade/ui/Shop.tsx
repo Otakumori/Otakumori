@@ -10,10 +10,10 @@ const fetcher = (u: string) => fetch(u).then((r) => r.json());
 export default function Shop() {
   const { data, mutate } = useSWR('/api/shop', fetcher);
   const items = data?.items ?? [];
-  const inv = data?.inventory ?? [];
-  const balances = data?.balances ?? { petals: 0, runes: 0 };
+  const _inv = data?.inventory ?? [];
+  const _balances = data?.balances ?? { petals: 0, runes: 0 };
 
-  const handlePurchase = async (sku: string) => {
+  const handlePurchase = async (_sku: string) => {
     // TODO: Implement purchase logic
     // Purchasing item
     // Refresh data after purchase

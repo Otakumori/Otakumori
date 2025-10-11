@@ -45,7 +45,7 @@ export class GamepadManager {
   }
 
   private setupEventListeners() {
-    window.addEventListener('gamepadconnected', (e) => {
+    window.addEventListener('gamepadconnected', (_e) => {
       // Gamepad connected
       this.startPolling();
     });

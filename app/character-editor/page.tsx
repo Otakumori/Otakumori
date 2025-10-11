@@ -239,7 +239,7 @@ export default function CharacterEditorPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Created</label>
+                <div className="block text-sm font-medium text-gray-300 mb-2">Created</div>
                 <div className="p-2 rounded-lg bg-white/5 text-gray-300">
                   {characterConfig.createdAt
                     ? new Date(characterConfig.createdAt).toLocaleDateString()
@@ -247,7 +247,7 @@ export default function CharacterEditorPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+                <div className="block text-sm font-medium text-gray-300 mb-2">Status</div>
                 <div className="p-2 rounded-lg bg-white/5 text-gray-300">
                   {characterConfig.isActive ? 'Active' : 'Inactive'}
                 </div>

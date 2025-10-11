@@ -544,6 +544,14 @@ export default function ThighChaseGame() {
     ctx.fillText(`Distance: ${Math.floor(distance)}m`, 10, 80);
     ctx.fillText(`Lives: ${lives}`, 10, 105);
 
+    // Debug info: spawn timers (development mode only)
+    if (process.env.NODE_ENV === 'development') {
+      ctx.fillStyle = '#888888';
+      ctx.font = '12px monospace';
+      ctx.fillText(`Obstacle: ${Math.max(0, Math.floor(obstacleSpawnTimer / 100))}`, 10, 125);
+      ctx.fillText(`Powerup: ${Math.max(0, Math.floor(powerupSpawnTimer / 100))}`, 10, 140);
+    }
+
     // Status effects
     if (player.speedBoost > 0) {
       ctx.fillStyle = '#ffff00';

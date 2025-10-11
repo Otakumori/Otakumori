@@ -100,7 +100,14 @@ export default function HowTo({ children, className = '' }: HowToProps) {
           aria-labelledby="howto-title"
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={closeModal}
+            onKeyDown={(e) => e.key === 'Escape' && closeModal()}
+            role="button"
+            tabIndex={0}
+            aria-label="Close modal"
+          />
 
           {/* Modal */}
           <div

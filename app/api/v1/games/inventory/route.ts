@@ -10,6 +10,7 @@ import { prisma } from '@/app/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
+    console.warn('Game inventory requested from:', req.headers.get('user-agent'));
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {

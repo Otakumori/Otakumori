@@ -42,7 +42,9 @@ export function AvatarRenderer({
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
         return !!gl;
-      } catch (e) {
+      } catch (e: unknown) {
+        const error = e instanceof Error ? e : new Error(String(e));
+        console.error('WebGL support check failed:', error);
         return false;
       }
     };
@@ -88,7 +90,7 @@ export function AvatarRenderer({
 
   // Handle 3D rendering errors
   const handle3DError = (error: Error) => {
-    console.warn('3D rendering failed, falling back to 2D:', error);
+    console.error('3D rendering failed, falling back to 2D:', error);
     setHasError(true);
 
     if (fallbackTo2D) {
@@ -100,10 +102,20 @@ export function AvatarRenderer({
 
   // Handle successful 3D loading
   const handle3DLoad = () => {
+    console.warn('3D avatar loaded successfully');
     setIsLoading(false);
     setHasError(false);
     onLoad?.();
   };
+
+  // Initialize 3D handlers on mount
+  useEffect(() => {
+    if (renderMode === '3d' && !is3DSupported) {
+      handle3DError(new Error('WebGL not supported'));
+    } else if (renderMode === '3d') {
+      handle3DLoad();
+    }
+  }, [renderMode, is3DSupported]);
 
   // Render 2D Avatar
   const render2D = () => (

@@ -31,6 +31,21 @@ export const FriendChat: React.FC = () => {
     { id: '4', name: 'CosplayQueen', avatar: '', status: 'online' },
   ]);
 
+  // Refresh friends list periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulate friend status updates
+      setFriends((prev) =>
+        prev.map((f) => ({
+          ...f,
+          status: Math.random() > 0.7 ? 'online' : f.status,
+        })),
+      );
+    }, 30000); // Every 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -169,6 +184,15 @@ export const FriendChat: React.FC = () => {
           <div
             key={friend.id}
             onClick={() => setSelectedFriend(friend)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedFriend(friend);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`Chat with ${friend.name}`}
             style={{
               padding: '12px 16px',
               cursor: 'pointer',
@@ -275,7 +299,7 @@ export const FriendChat: React.FC = () => {
                     fontSize: '14px',
                   }}
                 >
-                  Start a conversation with {selectedFriend.name}! 
+                  Start a conversation with {selectedFriend.name}!
                 </div>
               )}
 
@@ -393,7 +417,7 @@ export const FriendChat: React.FC = () => {
               fontSize: '16px',
             }}
           >
-            Select a friend to start chatting! 
+            Select a friend to start chatting!
           </div>
         )}
       </div>

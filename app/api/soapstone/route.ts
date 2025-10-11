@@ -32,7 +32,18 @@ export async function GET(req: Request) {
 export async function POST(req: NextRequest) {
   const logger = await getLogger();
   logger.request(req, 'POST /api/soapstone');
-  const userId = await requireUserId();
+
+  // Allow anonymous soapstone posting - get userId if available, otherwise use 'anonymous'
+  let userId: string;
+  try {
+    userId = await requireUserId();
+  } catch {
+    // Anonymous user - use IP-based identifier for rate limiting
+    userId =
+      'anonymous_' +
+      (req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown');
+  }
+
   const rl = await rateLimit(
     req,
     { windowMs: 30_000, maxRequests: 6, keyPrefix: 'soapstone:post' },

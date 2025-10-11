@@ -206,15 +206,26 @@ export default function PetalEmitterTree({
       if (idx !== null) collect(idx);
     };
 
+    const onPointerMove = (e: PointerEvent) => {
+      if (!pointerDown) return; // Only collect during drag if pointer is down
+
+      const rect = c.getBoundingClientRect();
+      px = e.clientX - rect.left;
+      py = e.clientY - rect.top;
+      const idx = hitPetal(px, py);
+      if (idx !== null) collect(idx);
+    };
+
     const onPointerUp = () => {
       pointerDown = false;
     };
 
     c.addEventListener('pointerdown', onPointerDown);
+    c.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
 
     async function collect(idx: number) {
-      const p = petals[idx];
+      const _p = petals[idx];
       // pop effect: mark settled quickly; remove after
       petals.splice(idx, 1);
       try {
@@ -316,6 +327,7 @@ export default function PetalEmitterTree({
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
+      c.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
 
       // Clean up ResizeObserver

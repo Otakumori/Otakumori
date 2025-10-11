@@ -199,34 +199,32 @@ export default function MemoryCardDock({ className = '' }: MemoryCardDockProps) 
                 onClick={() => setSelectedCard(null)}
                 className="text-purple-300 hover:text-white transition-colors text-xl"
                 aria-label="Close detail view"
-              >
-                
-              </button>
+              ></button>
             </div>
 
             {/* Order Details */}
             <div className="space-y-4">
               <div>
-                <label className="block text-purple-200 text-sm mb-1">Item</label>
+                <div className="block text-purple-200 text-sm mb-1">Item</div>
                 <div className="text-white font-medium">{getItemName(selectedCard)}</div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-purple-200 text-sm mb-1">Total</label>
+                  <div className="block text-purple-200 text-sm mb-1">Total</div>
                   <div className="text-white font-medium">
                     {formatPrice(selectedCard.totalAmount, selectedCard.currency)}
                   </div>
                 </div>
                 <div>
-                  <label className="block text-purple-200 text-sm mb-1">Date</label>
+                  <div className="block text-purple-200 text-sm mb-1">Date</div>
                   <div className="text-white">{formatDate(selectedCard.createdAt)}</div>
                 </div>
               </div>
 
               {selectedCard.paidAt && (
                 <div>
-                  <label className="block text-purple-200 text-sm mb-1">Paid</label>
+                  <div className="block text-purple-200 text-sm mb-1">Paid</div>
                   <div className="text-green-400">{formatDate(selectedCard.paidAt)}</div>
                 </div>
               )}

@@ -549,7 +549,7 @@ export class GameTelemetryV2 {
     }
   }
 
-  private updateSessionMetrics(eventType: string, gameData: Partial<GameEvent['gameData']>): void {
+  private updateSessionMetrics(eventType: string, _gameData: Partial<GameEvent['gameData']>): void {
     if (!this.currentSession) return;
 
     switch (eventType) {

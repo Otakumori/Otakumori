@@ -9,6 +9,7 @@ import { useLocalStorage } from './app/hooks/hooks/useLocalStorage';
 // import { useUserStore } from './lib/store/userStore';
 import mitt from 'mitt';
 import { CartProvider } from './app/components/cart/CartProvider';
+import { initFlags } from '@/lib/flags';
 
 interface PetalState {
   petals: number;
@@ -181,6 +182,10 @@ export const useOverlordContext = () => {
 };
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    initFlags();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>

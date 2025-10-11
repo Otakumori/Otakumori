@@ -224,6 +224,13 @@ export class FeatureFlagProvider {
     }
 
     // In a real implementation, you would use the ConfigCat SDK here
+    // Log context for debugging integration
+    console.warn('ConfigCat evaluation', {
+      key,
+      userId: context.userId,
+      environment: context.environment,
+    });
+
     // For now, return the default value
     return FEATURE_FLAG_CONFIG[key].defaultValue;
   }
@@ -240,6 +247,13 @@ export class FeatureFlagProvider {
     }
 
     // In a real implementation, you would use the Flagsmith SDK here
+    // Log context for debugging integration
+    console.warn('Flagsmith evaluation', {
+      key,
+      userId: context.userId,
+      environment: context.environment,
+    });
+
     // For now, return the default value
     return FEATURE_FLAG_CONFIG[key].defaultValue;
   }
@@ -301,6 +315,12 @@ export function getFeatureFlagProvider(): FeatureFlagProvider {
       pollingInterval: 60000, // 1 minute
       cacheTTL: 5 * 60 * 1000, // 5 minutes
     };
+
+    // Log configuration for debugging
+    console.warn('Initializing feature flag provider', {
+      provider: config.provider,
+      cacheTTL: config.cacheTTL,
+    });
 
     providerInstance = new FeatureFlagProvider();
   }

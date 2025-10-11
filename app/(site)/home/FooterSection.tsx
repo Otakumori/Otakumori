@@ -218,11 +218,11 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
 
         {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-pink-200/20">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-pink-200/50 text-sm">
-              © 2024 Otaku-mori. All petals accounted for. Don't go hollow.
+          <div className="text-center">
+            <p className="text-pink-200/50 text-sm">Otakumori ™ made with ♡</p>
+            <p className="text-pink-200/50 text-xs mt-2">
+              © {new Date().getFullYear()} Otaku-mori. All rights reserved.
             </p>
-            <p className="text-pink-200/50 text-sm mt-2 md:mt-0">Otakumori ™ made with ♡</p>
           </div>
         </div>
       </div>

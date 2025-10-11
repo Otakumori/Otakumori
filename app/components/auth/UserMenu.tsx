@@ -16,6 +16,9 @@ export default function UserMenu() {
     } catch {}
   }, []);
 
+  // Log sign-in state for debugging
+  console.warn('UserMenu rendered, isSignedIn:', isSignedIn);
+
   const signInUrl = useMemo(() => {
     const base = env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in';
     return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;

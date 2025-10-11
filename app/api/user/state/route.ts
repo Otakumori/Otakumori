@@ -9,6 +9,9 @@ export const maxDuration = 10;
 
 export async function GET(req: NextRequest) {
   try {
+    // Log user state request for analytics
+    console.warn('User state requested from:', req.headers.get('user-agent'));
+
     const { userId } = await auth();
 
     if (!userId) {

@@ -34,6 +34,7 @@ export const useLeaderboardStore = create<LeaderboardStore>((set, get) => ({
       ];
       set({ entries: mockEntries, isLoading: false });
     } catch (error) {
+      console.error('Leaderboard fetch error:', error);
       set({ error: 'Failed to fetch leaderboard entries', isLoading: false });
     }
   },
