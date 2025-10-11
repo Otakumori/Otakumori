@@ -123,16 +123,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Soapstones */}
-      {NEXT_PUBLIC_FEATURE_SOAPSTONES === '1' && (
-        <section className="bg-gradient-to-b from-black/40 to-black/60 py-24">
-          <div className="mx-auto w-full max-w-7xl px-4">
-            <StickySoapstones />
-          </div>
-        </section>
-      )}
-
-      {/* Soapstones on Home Page (footer content is handled by global Footer) */}
+      {/* Soapstones - Single composer section */}
       {NEXT_PUBLIC_FEATURE_SOAPSTONES === '1' && (
         <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="glass-panel rounded-2xl p-8">

@@ -18,8 +18,8 @@ import { enforceNoMocks } from '@/lib/no-mocks';
 import StarfieldBackground from '@/components/background/StarfieldBackground';
 import PetalField from './components/effects/PetalField';
 
-// Boot-time Inngest health check (fire-and-forget)
-bootCheckInngest();
+// Boot-time Inngest health check (disabled - run Inngest dev server separately)
+// bootCheckInngest();
 
 // Enforce no mock data in production
 enforceNoMocks();

@@ -14,18 +14,20 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
   ({ className, variant = 'primary', size = 'md', href, ...props }, ref) => {
     const baseClasses = cn(
       // Base styles
-      'relative inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200',
-      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background',
+      'relative inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200',
+      'focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:ring-offset-2 focus:ring-offset-background',
       'disabled:pointer-events-none disabled:opacity-50',
-      // Glass effect
-      'backdrop-blur-sm bg-white/10 border border-white/20',
-      'hover:bg-white/20 hover:border-white/30',
+      // Glass effect - darker pink theme
+      'backdrop-blur-lg',
       'active:scale-95',
       // Variants
       {
-        'text-white shadow-lg': variant === 'primary',
-        'text-white/80 shadow-md': variant === 'secondary',
-        'text-white/60 shadow-sm hover:text-white/80': variant === 'ghost',
+        // Primary: darker pink with glass
+        'bg-pink-500/20 border border-pink-400/30 text-pink-100 hover:bg-pink-500/30 hover:border-pink-400/50 shadow-lg shadow-pink-500/10': variant === 'primary',
+        // Secondary: darker glass
+        'bg-white/10 border border-white/20 text-pink-200/80 hover:bg-white/15 hover:border-white/30 shadow-md': variant === 'secondary',
+        // Ghost: minimal
+        'bg-transparent border-0 text-pink-200/60 hover:text-pink-200/90 hover:bg-white/5': variant === 'ghost',
       },
       // Sizes
       {
