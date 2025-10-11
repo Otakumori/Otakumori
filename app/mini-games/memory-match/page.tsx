@@ -6,7 +6,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useGameEngine } from '@/hooks/useGameEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Card {
@@ -30,13 +29,6 @@ const CHARACTERS = [
 ];
 
 export default function MemoryMatchGame() {
-  const gameEngine = useGameEngine({
-    gameId: 'memory-match',
-    enableAchievements: true,
-    enableLeaderboards: true,
-    enablePetals: true,
-  });
-
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -45,7 +37,7 @@ export default function MemoryMatchGame() {
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'completed' | 'paused'>('menu');
   const [difficulty, setDifficulty] = useState<'easy' | 'normal' | 'hard'>('normal');
   const [streak, setStreak] = useState(0);
-  const [sessionId, setSessionId] = useState<string>('');
+  const [finalScore, setFinalScore] = useState(0);
 
   // Difficulty settings
   const difficultySettings = {
@@ -78,36 +70,12 @@ export default function MemoryMatchGame() {
     setMatches(0);
     setTimeElapsed(0);
     setStreak(0);
-
-    // Start new game session and track session ID
-    const newSessionId = gameEngine.startSession();
-    setSessionId(newSessionId);
-
-    // Record game start with session ID for analytics tracking
-    gameEngine.recordAction('game_start', {
-      difficulty,
-      totalPairs: settings.pairs,
-      sessionId: newSessionId,
-    });
+    setFinalScore(0);
 
     setGameState('playing');
-  }, [difficulty, settings.pairs, gameEngine]);
+  }, [difficulty, settings.pairs]);
 
-  // Load saved game
-  useEffect(() => {
-    if (gameEngine.gameState) {
-      const saved = gameEngine.gameState;
-      if (saved.progress.cards) {
-        setCards(saved.progress.cards);
-        setMoves(saved.progress.moves || 0);
-        setMatches(saved.progress.matches || 0);
-        setTimeElapsed(saved.progress.timeElapsed || 0);
-        setStreak(saved.progress.streak || 0);
-        setDifficulty(saved.progress.difficulty || 'normal');
-        setGameState(saved.progress.gameState || 'menu');
-      }
-    }
-  }, [gameEngine.gameState]);
+  // No saved game loading for now - simplified implementation
 
   // Timer
   useEffect(() => {
@@ -120,22 +88,7 @@ export default function MemoryMatchGame() {
     return () => clearInterval(interval);
   }, [gameState]);
 
-  // Auto-save progress
-  useEffect(() => {
-    if (gameState === 'playing' || gameState === 'paused') {
-      gameEngine.updateProgress({
-        progress: {
-          cards,
-          moves,
-          matches,
-          timeElapsed,
-          streak,
-          difficulty,
-          gameState,
-        },
-      });
-    }
-  }, [cards, moves, matches, timeElapsed, streak, difficulty, gameState, gameEngine]);
+  // Auto-save removed for simplified implementation
 
   // Handle card flip
   const handleCardFlip = useCallback(
@@ -152,9 +105,6 @@ export default function MemoryMatchGame() {
       setCards((prev) =>
         prev.map((card) => (card.id === cardId ? { ...card, isFlipped: true } : card)),
       );
-
-      // Record action
-      gameEngine.recordAction('card_flip', { cardId, character: cards[cardId].character });
 
       // Check for match when two cards are flipped
       if (newFlippedCards.length === 2) {
@@ -176,17 +126,6 @@ export default function MemoryMatchGame() {
             setStreak((prev) => prev + 1);
             setFlippedCards([]);
 
-            // Record match
-            gameEngine.recordAction('match_found', {
-              character: firstCard.character,
-              streak,
-              moves: moves + 1,
-            });
-
-            // Award petals for match
-            const petalReward = (streak + 1) * 10;
-            gameEngine.awardPetals(petalReward, `Memory match: ${firstCard.character}`);
-
             // Check for completion
             if (matches + 1 === settings.pairs) {
               completeGame();
@@ -202,14 +141,11 @@ export default function MemoryMatchGame() {
             );
             setFlippedCards([]);
             setStreak(0);
-
-            // Record miss
-            gameEngine.recordAction('match_miss', { moves: moves + 1 });
           }, 1500);
         }
       }
     },
-    [gameState, flippedCards, cards, moves, matches, streak, settings.pairs, gameEngine],
+    [gameState, flippedCards, cards, moves, matches, streak, settings.pairs],
   );
 
   // Complete game
@@ -220,59 +156,47 @@ export default function MemoryMatchGame() {
     const timeBonus = Math.max(0, 300 - timeElapsed) * settings.timeBonus;
     const moveBonus = Math.max(0, settings.pairs * 2 - moves) * 50;
     const streakBonus = streak * 25;
-    const finalScore = Math.round(1000 + timeBonus + moveBonus + streakBonus);
+    const calculatedScore = Math.round(1000 + timeBonus + moveBonus + streakBonus);
+    setFinalScore(calculatedScore);
 
     // Calculate accuracy
     const accuracy = matches / Math.max(moves, 1);
 
-    // Update game engine with session tracking
-    gameEngine.updateScore(finalScore, {
-      timeElapsed,
-      moves,
-      matches,
-      accuracy,
-      difficulty,
-      streakBonus,
-      sessionId,
-    });
+    // Calculate petal reward
+    const petalReward = Math.floor(calculatedScore / 10);
 
-    // Submit to leaderboard with session tracking
-    await gameEngine.submitScore('score', finalScore, {
-      timeElapsed,
-      moves,
-      accuracy,
-      difficulty,
-      sessionId,
-    });
+    try {
+      // Award petals
+      if (petalReward > 0) {
+        await fetch('/api/v1/petals/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: petalReward,
+            source: 'game_reward',
+          }),
+        });
+      }
 
-    // Check achievements
-    await gameEngine.checkAchievements(gameEngine.gameState!);
-
-    // Specific achievements
-    if (accuracy === 1.0) {
-      await gameEngine.unlockAchievement('memory-master', 1, { difficulty, finalScore });
+      // Submit to leaderboard
+      await fetch('/api/v1/leaderboards/memory-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: calculatedScore,
+          metadata: {
+            timeElapsed,
+            moves,
+            accuracy,
+            difficulty,
+            streakBonus,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
     }
-
-    if (moves <= settings.pairs * 1.5) {
-      await gameEngine.unlockAchievement('efficient-memory', 1, { moves, pairs: settings.pairs });
-    }
-
-    // Award completion petals
-    const completionPetals = finalScore / 10;
-    await gameEngine.awardPetals(completionPetals, 'Memory match completion');
-
-    // End session
-    await gameEngine.endSession();
-
-    // Record completion
-    gameEngine.recordAction('game_complete', {
-      finalScore,
-      timeElapsed,
-      moves,
-      accuracy,
-      difficulty,
-    });
-  }, [timeElapsed, moves, matches, streak, settings, difficulty, gameEngine]);
+  }, [timeElapsed, moves, matches, streak, settings, difficulty]);
 
   // Format time
   const formatTime = (seconds: number) => {
@@ -285,10 +209,8 @@ export default function MemoryMatchGame() {
   const togglePause = () => {
     if (gameState === 'playing') {
       setGameState('paused');
-      gameEngine.recordAction('game_pause', { timeElapsed, moves });
     } else if (gameState === 'paused') {
       setGameState('playing');
-      gameEngine.recordAction('game_resume', { timeElapsed, moves });
     }
   };
 
@@ -334,15 +256,6 @@ export default function MemoryMatchGame() {
               >
                 Start Game
               </button>
-
-              {gameEngine.gameState?.progress?.gameState === 'paused' && (
-                <button
-                  onClick={() => setGameState('paused')}
-                  className="ml-4 bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-600 transition-all"
-                >
-                  Resume Game
-                </button>
-              )}
             </div>
           </motion.div>
         )}
@@ -491,9 +404,7 @@ export default function MemoryMatchGame() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Final Score</div>
-                <div className="text-white font-bold text-xl">
-                  {gameEngine.gameState?.score || 0}
-                </div>
+                <div className="text-white font-bold text-xl">{finalScore}</div>
               </div>
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Time</div>
@@ -510,6 +421,10 @@ export default function MemoryMatchGame() {
                 </div>
               </div>
             </div>
+            
+            <p className="text-pink-200 text-lg mb-6">
+              <span role="img" aria-label="Cherry blossom petal">🌸</span> Petals Earned: <span className="font-bold">{Math.floor(finalScore / 10)}</span>
+            </p>
 
             <div className="space-x-4">
               <button

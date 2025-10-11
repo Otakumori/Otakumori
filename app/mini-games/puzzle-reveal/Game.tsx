@@ -131,14 +131,28 @@ export default function Game({ mode }: Props) {
   useEffect(() => {
     if (gameState.isGameOver) {
       const submitScore = async () => {
+        const petalReward = Math.floor(gameState.score / 15);
+        
         try {
-          await fetch('/api/v1/leaderboard/submit', {
+          // Award petals
+          if (petalReward > 0) {
+            await fetch('/api/v1/petals/collect', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: petalReward,
+                source: 'game_reward',
+              }),
+            });
+          }
+          
+          // Submit to leaderboard
+          await fetch('/api/v1/leaderboards/puzzle-reveal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              gameCode: 'puzzle-reveal',
               score: Math.max(0, Math.round(gameState.score)),
-              meta: { revealedPercent: gameState.revealedPercent, mode },
+              metadata: { revealedPercent: gameState.revealedPercent, mode },
             }),
           });
         } catch (error) {
@@ -164,16 +178,16 @@ export default function Game({ mode }: Props) {
 
       {/* HUD Overlay */}
       <div className="absolute top-4 left-4 flex gap-4">
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
+        <div className="bg-black/80 backdrop-blur-lg px-3 py-2 rounded-lg border border-pink-500/30 text-pink-200 text-sm">
           Score: {gameState.score}
         </div>
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
+        <div className="bg-black/80 backdrop-blur-lg px-3 py-2 rounded-lg border border-pink-500/30 text-pink-200 text-sm">
           Time: {Math.ceil(gameState.timeLeft)}s
         </div>
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
+        <div className="bg-black/80 backdrop-blur-lg px-3 py-2 rounded-lg border border-pink-500/30 text-pink-200 text-sm">
           Revealed: {Math.round(gameState.revealedPercent)}%
         </div>
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
+        <div className="bg-black/80 backdrop-blur-lg px-3 py-2 rounded-lg border border-pink-500/30 text-pink-200 text-sm">
           Energy: {Math.round(gameState.energy)}%
         </div>
       </div>
@@ -181,7 +195,7 @@ export default function Game({ mode }: Props) {
       {/* Brush Controls */}
       <div className="absolute top-4 right-4 flex gap-2">
         <motion.button
-          className="px-3 py-1 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded text-blue-200 text-xs hover:bg-blue-500/30 transition-colors"
+          className="px-3 py-1 bg-pink-500/20 backdrop-blur-lg border border-pink-400/30 rounded text-pink-200 text-xs hover:bg-pink-500/30 transition-colors"
           onClick={() => handleBrushUpgrade('size')}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -189,7 +203,7 @@ export default function Game({ mode }: Props) {
           Bigger Brush
         </motion.button>
         <motion.button
-          className="px-3 py-1 bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded text-green-200 text-xs hover:bg-green-500/30 transition-colors"
+          className="px-3 py-1 bg-pink-500/20 backdrop-blur-lg border border-pink-400/30 rounded text-pink-200 text-xs hover:bg-pink-500/30 transition-colors"
           onClick={() => handleBrushUpgrade('wind')}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -197,7 +211,7 @@ export default function Game({ mode }: Props) {
           Wind Brush
         </motion.button>
         <motion.button
-          className="px-3 py-1 bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded text-purple-200 text-xs hover:bg-purple-500/30 transition-colors"
+          className="px-3 py-1 bg-pink-500/20 backdrop-blur-lg border border-pink-400/30 rounded text-pink-200 text-xs hover:bg-pink-500/30 transition-colors"
           onClick={() => handleBrushUpgrade('precision')}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -208,7 +222,7 @@ export default function Game({ mode }: Props) {
 
       {/* Energy Warning */}
       {gameState.energy <= 20 && (
-        <div className="absolute bottom-4 left-4 bg-red-500/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm animate-pulse">
+        <div className="absolute bottom-4 left-4 bg-red-500/40 backdrop-blur-lg px-3 py-2 rounded-lg border border-red-400/30 text-red-200 text-sm animate-pulse">
           Low Energy! Wait for recharge...
         </div>
       )}
@@ -216,21 +230,24 @@ export default function Game({ mode }: Props) {
       {/* Game Over Screen */}
       {gameState.isGameOver && (
         <motion.div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+          className="absolute inset-0 bg-black/70 backdrop-blur-lg flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <div className="bg-white/95 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center max-w-md mx-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {gameState.revealedPercent >= 100 ? 'Puzzle Complete!' : "Time's Up!"}
+          <div className="bg-black/80 backdrop-blur-xl border border-pink-500/30 rounded-2xl p-8 text-center max-w-md mx-4">
+            <h2 className="text-3xl font-bold text-pink-200 mb-4 drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]">
+              {gameState.revealedPercent >= 100 ? 'FOG CLEARED! ✓' : 'TIME EXPIRED'}
             </h2>
             <div className="space-y-2 mb-6">
-              <p className="text-gray-600">Final Score: {gameState.score}</p>
-              <p className="text-gray-600">Revealed: {Math.round(gameState.revealedPercent)}%</p>
-              <p className="text-gray-600">Mode: {mode}</p>
+              <p className="text-pink-100">Final Score: <span className="font-bold">{gameState.score}</span></p>
+              <p className="text-pink-100">Revealed: <span className="font-bold">{Math.round(gameState.revealedPercent)}%</span></p>
+              <p className="text-pink-100">Mode: <span className="font-bold capitalize">{mode}</span></p>
+              <p className="text-pink-200 text-lg mt-4">
+                <span role="img" aria-label="Cherry blossom petal">🌸</span> Petals Earned: <span className="font-bold">{Math.floor(gameState.score / 15)}</span>
+              </p>
             </div>
             <motion.button
-              className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="px-6 py-3 bg-pink-500/20 border border-pink-400/30 backdrop-blur-lg hover:bg-pink-500/30 text-pink-100 font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
               onClick={() => window.location.reload()}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

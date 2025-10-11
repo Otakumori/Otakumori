@@ -1,5 +1,4 @@
 // Quick Math Game - Answer fast. Pressure builds with each correct streak.
- 
 
 'use client';
 
@@ -239,10 +238,10 @@ export default function QuickMath() {
     if (ended) return;
     setEnded(true);
     const duration = Math.round(Math.min(now - roundStart.current, ROUND_MS));
-    
+
     // Calculate petal reward (score / 20)
     const petalReward = Math.floor(score / 20);
-    
+
     try {
       // Award petals
       if (petalReward > 0) {
@@ -255,7 +254,7 @@ export default function QuickMath() {
           }),
         });
       }
-      
+
       // Submit to leaderboard
       await fetch('/api/v1/leaderboards/quick-math', {
         method: 'POST',
@@ -268,7 +267,7 @@ export default function QuickMath() {
     } catch (error) {
       console.error('Failed to submit score:', error);
     }
-    
+
     (window as any).__gameEnd?.({
       score,
       durationMs: duration,
