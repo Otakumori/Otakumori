@@ -1956,14 +1956,14 @@ enum ResponseType {
 }
 
 model PetalWallet {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  balance         Int      @default(0)
-  lifetimeEarned  Int      @default(0)
-  currentStreak   Int      @default(0)
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  balance         Int       @default(0)
+  lifetimeEarned  Int       @default(0)
+  currentStreak   Int       @default(0)
   lastCollectedAt DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   user User @relation("PetalWallet", fields: [userId], references: [id], onDelete: Cascade)
 

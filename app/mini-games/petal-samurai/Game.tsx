@@ -121,13 +121,17 @@ export default function Game({ mode }: Props) {
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    
+    // Calculate proper canvas-relative coordinates accounting for canvas scaling
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
 
     slashPoints.current.push({ x, y, time: Date.now() });
 
-    // Keep only last 10 points
-    if (slashPoints.current.length > 10) {
+    // Keep only last 15 points for smoother trail
+    if (slashPoints.current.length > 15) {
       slashPoints.current.shift();
     }
 
@@ -564,16 +568,16 @@ class GameEngine {
       this.ctx.translate(petal.x, petal.y);
       this.ctx.rotate(petal.rotation);
 
-      // Petal colors based on type
+      // Petal colors based on type - all pink themed
       switch (petal.type) {
         case 'normal':
-          this.ctx.fillStyle = 'rgba(255, 182, 193, 0.8)';
+          this.ctx.fillStyle = 'rgba(255, 182, 193, 0.9)'; // Light pink
           break;
         case 'gold':
-          this.ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+          this.ctx.fillStyle = 'rgba(255, 105, 180, 1.0)'; // Hot pink for gold
           break;
         case 'cursed':
-          this.ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+          this.ctx.fillStyle = 'rgba(139, 0, 139, 0.9)'; // Dark magenta for cursed
           break;
       }
 
@@ -582,9 +586,9 @@ class GameEngine {
       this.ctx.ellipse(0, 0, petal.size, petal.size * 0.6, 0, 0, Math.PI * 2);
       this.ctx.fill();
 
-      // Add outline
+      // Add outline - pink themed
       this.ctx.strokeStyle =
-        petal.type === 'gold' ? 'rgba(255, 215, 0, 1)' : 'rgba(255, 255, 255, 0.6)';
+        petal.type === 'gold' ? 'rgba(255, 20, 147, 1)' : 'rgba(255, 182, 193, 0.8)';
       this.ctx.lineWidth = 2;
       this.ctx.stroke();
 
@@ -617,44 +621,60 @@ class GameEngine {
       this.ctx.restore();
     });
 
-    // Draw slash trail effect
+    // Draw slash trail effect - enhanced pink themed
     if (this.slashTrail.length > 1) {
       this.ctx.save();
       
-      // Create gradient trail
-      const gradient = this.ctx.createLinearGradient(
-        this.slashTrail[0].x,
-        this.slashTrail[0].y,
-        this.slashTrail[this.slashTrail.length - 1].x,
-        this.slashTrail[this.slashTrail.length - 1].y
-      );
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-      gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.8)');
-      gradient.addColorStop(1, 'rgba(135, 206, 250, 0.9)');
+      // Draw multiple layers for better effect
+      for (let layer = 0; layer < 3; layer++) {
+        const opacity = (3 - layer) / 3;
+        const width = 8 - layer * 2;
+        
+        // Create gradient trail
+        const gradient = this.ctx.createLinearGradient(
+          this.slashTrail[0].x,
+          this.slashTrail[0].y,
+          this.slashTrail[this.slashTrail.length - 1].x,
+          this.slashTrail[this.slashTrail.length - 1].y
+        );
+        gradient.addColorStop(0, `rgba(255, 20, 147, ${0.1 * opacity})`);
+        gradient.addColorStop(0.5, `rgba(255, 105, 180, ${0.9 * opacity})`);
+        gradient.addColorStop(1, `rgba(255, 182, 193, ${0.7 * opacity})`);
 
-      this.ctx.strokeStyle = gradient;
-      this.ctx.lineWidth = 4;
-      this.ctx.lineCap = 'round';
-      this.ctx.lineJoin = 'round';
-      this.ctx.shadowBlur = 15;
-      this.ctx.shadowColor = 'rgba(135, 206, 250, 0.8)';
+        this.ctx.strokeStyle = gradient;
+        this.ctx.lineWidth = width;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.shadowBlur = 20 + layer * 10;
+        this.ctx.shadowColor = `rgba(255, 105, 180, ${0.6 * opacity})`;
 
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.slashTrail[0].x, this.slashTrail[0].y);
-      
-      for (let i = 1; i < this.slashTrail.length; i++) {
-        this.ctx.lineTo(this.slashTrail[i].x, this.slashTrail[i].y);
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.slashTrail[0].x, this.slashTrail[0].y);
+        
+        // Use quadratic curves for smoother trail
+        for (let i = 1; i < this.slashTrail.length - 1; i++) {
+          const xc = (this.slashTrail[i].x + this.slashTrail[i + 1].x) / 2;
+          const yc = (this.slashTrail[i].y + this.slashTrail[i + 1].y) / 2;
+          this.ctx.quadraticCurveTo(this.slashTrail[i].x, this.slashTrail[i].y, xc, yc);
+        }
+        
+        // Last segment
+        if (this.slashTrail.length > 1) {
+          const last = this.slashTrail[this.slashTrail.length - 1];
+          this.ctx.lineTo(last.x, last.y);
+        }
+        
+        this.ctx.stroke();
       }
       
-      this.ctx.stroke();
       this.ctx.restore();
     }
 
-    // Draw combo streak effect
+    // Draw combo streak effect - pink glow
     if (this.combo > 5) {
       this.ctx.save();
-      this.ctx.globalAlpha = Math.min(0.3, (this.combo - 5) * 0.02);
-      this.ctx.fillStyle = 'rgba(255, 215, 0, 0.5)';
+      this.ctx.globalAlpha = Math.min(0.2, (this.combo - 5) * 0.015);
+      this.ctx.fillStyle = 'rgba(255, 105, 180, 0.3)';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.restore();
     }
