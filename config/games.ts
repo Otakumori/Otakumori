@@ -15,7 +15,7 @@ export const GAME_FLAGS = {
   'dungeon-of-desire': { enabled: true, practice: false },
   'thigh-coliseum': { enabled: true, practice: false },
   'maid-cafe-manager': { enabled: true, practice: false },
-  'blossomware': { enabled: true, practice: false },
+  blossomware: { enabled: true, practice: false },
   'bubble-girl': { enabled: true, practice: false },
   'otaku-beat-em-up': { enabled: true, practice: false },
 } as const;

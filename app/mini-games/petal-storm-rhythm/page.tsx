@@ -142,24 +142,68 @@ export default function PetalStormRhythm() {
     }
   };
 
-  // Initialize game
-  const startGame = useCallback(() => {
-    const trackNotes = generateNotes(selectedTrack);
-    setNotes(trackNotes);
-    setCurrentTime(0);
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
-    setAccuracy({ perfect: 0, great: 0, good: 0, miss: 0 });
-    setHealth(100);
-    setMultiplier(1);
+  // End game (game over)
+  const endGame = useCallback(() => {
+    setGameState('completed');
 
-    setGameState('playing');
-    startTimeRef.current = Date.now();
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+    }
+  }, []);
 
-    // Start game loop
-    gameLoop();
-  }, [selectedTrack, gameLoop]);
+  // Complete game
+  const completeGame = useCallback(async () => {
+    setGameState('completed');
+
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+    }
+
+    const totalNotes = accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss;
+    const finalAccuracy =
+      totalNotes > 0 ? (accuracy.perfect + accuracy.great + accuracy.good) / totalNotes : 0;
+
+    // Calculate final score with bonuses
+    const comboBonus = maxCombo * 100;
+    const accuracyBonus = Math.round(finalAccuracy * 10000);
+    const healthBonus = health * 50;
+    const finalScore = score + comboBonus + accuracyBonus + healthBonus;
+    setFinalScore(finalScore);
+
+    // Award completion petals
+    const petalReward = Math.round(finalScore / 100);
+    try {
+      await fetch('/api/v1/petals/collect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: petalReward,
+          source: 'petal-storm-rhythm',
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to award petals:', error);
+    }
+
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/petal-storm-rhythm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScore,
+          metadata: {
+            accuracy: finalAccuracy,
+            maxCombo,
+            track: selectedTrack.id,
+            difficulty: selectedTrack.difficulty,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [score, accuracy, maxCombo, health, selectedTrack]);
 
   // Game loop
   const gameLoop = useCallback(() => {
@@ -198,7 +242,26 @@ export default function PetalStormRhythm() {
     }
 
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState, health, selectedTrack.duration]);
+  }, [gameState, health, selectedTrack.duration, endGame, completeGame]);
+
+  // Initialize game
+  const startGame = useCallback(() => {
+    const trackNotes = generateNotes(selectedTrack);
+    setNotes(trackNotes);
+    setCurrentTime(0);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setAccuracy({ perfect: 0, great: 0, good: 0, miss: 0 });
+    setHealth(100);
+    setMultiplier(1);
+
+    setGameState('playing');
+    startTimeRef.current = Date.now();
+
+    // Start game loop
+    gameLoop();
+  }, [selectedTrack, gameLoop]);
 
   // Handle note hit
   const hitNote = useCallback(
@@ -258,7 +321,6 @@ export default function PetalStormRhythm() {
         else if (combo >= 25) setMultiplier(3);
         else if (combo >= 10) setMultiplier(2);
         else setMultiplier(1);
-
       } else {
         setCombo(0);
         setMultiplier(1);
@@ -270,69 +332,6 @@ export default function PetalStormRhythm() {
     },
     [gameState, currentTime, notes, combo, multiplier, score],
   );
-
-  // Complete game
-  const completeGame = useCallback(async () => {
-    setGameState('completed');
-
-    if (gameLoopRef.current) {
-      cancelAnimationFrame(gameLoopRef.current);
-    }
-
-    const totalNotes = accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss;
-    const finalAccuracy =
-      totalNotes > 0 ? (accuracy.perfect + accuracy.great + accuracy.good) / totalNotes : 0;
-
-    // Calculate final score with bonuses
-    const comboBonus = maxCombo * 100;
-    const accuracyBonus = Math.round(finalAccuracy * 10000);
-    const healthBonus = health * 50;
-    const finalScore = score + comboBonus + accuracyBonus + healthBonus;
-    setFinalScore(finalScore);
-
-    // Award completion petals
-    const petalReward = Math.round(finalScore / 100);
-    try {
-      await fetch('/api/v1/petals/collect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: petalReward,
-          source: 'petal-storm-rhythm',
-        }),
-      });
-    } catch (error) {
-      console.error('Failed to award petals:', error);
-    }
-
-    // Submit to leaderboard
-    try {
-      await fetch('/api/v1/leaderboards/petal-storm-rhythm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          score: finalScore,
-          metadata: {
-            accuracy: finalAccuracy,
-            maxCombo,
-            track: selectedTrack.id,
-            difficulty: selectedTrack.difficulty,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error('Failed to submit score:', error);
-    }
-  }, [score, accuracy, maxCombo, health, selectedTrack]);
-
-  // End game (game over)
-  const endGame = useCallback(() => {
-    setGameState('completed');
-
-    if (gameLoopRef.current) {
-      cancelAnimationFrame(gameLoopRef.current);
-    }
-  }, []);
 
   // Keyboard controls
   useEffect(() => {
