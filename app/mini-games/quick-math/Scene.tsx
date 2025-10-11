@@ -239,32 +239,41 @@ export default function QuickMath() {
     if (ended) return;
     setEnded(true);
     const duration = Math.round(Math.min(now - roundStart.current, ROUND_MS));
+    
+    // Calculate petal reward (score / 20)
+    const petalReward = Math.floor(score / 20);
+    
     try {
-      await fetch('/api/games/finish', {
+      // Award petals
+      if (petalReward > 0) {
+        await fetch('/api/v1/petals/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: petalReward,
+            source: 'game_reward',
+          }),
+        });
+      }
+      
+      // Submit to leaderboard
+      await fetch('/api/v1/leaderboards/quick-math', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          game: 'quick-math',
           score,
-          durationMs: duration,
-          stats: { correct, wrong, maxStreak, diff },
+          metadata: { durationMs: duration, correct, wrong, maxStreak, diff },
         }),
       });
-      // Also submit to leaderboard
-      await fetch('/api/v1/leaderboard/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          gameCode: 'quick-math',
-          score,
-          meta: { durationMs: duration, correct, wrong, maxStreak, diff },
-        }),
-      });
-    } catch {}
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+    
     (window as any).__gameEnd?.({
       score,
       durationMs: duration,
       stats: { correct, wrong, maxStreak, diff },
+      petalsEarned: petalReward,
     });
   }
 
@@ -275,21 +284,21 @@ export default function QuickMath() {
       {/* Top: question + HUD */}
       <div className="relative flex flex-col items-center justify-center p-4">
         {/* HUD */}
-        <div className="absolute left-4 top-3 rounded-lg border border-amber-300/30 bg-black/30 px-3 py-1 text-sm text-amber-100">
+        <div className="absolute left-4 top-3 rounded-lg border border-pink-500/30 bg-black/80 backdrop-blur-lg px-3 py-1 text-sm text-pink-200">
           Score {score} • Streak {streak} • {diff.toUpperCase()}
         </div>
-        <div className="absolute right-4 top-3 rounded-lg border border-amber-300/30 bg-black/30 px-3 py-1 text-sm text-amber-100">
+        <div className="absolute right-4 top-3 rounded-lg border border-pink-500/30 bg-black/80 backdrop-blur-lg px-3 py-1 text-sm text-pink-200">
           Time {Math.ceil(remainMs / 1000)}s
         </div>
 
         {/* Question */}
         <div className="mt-6 text-center">
-          <div className="text-4xl font-bold tracking-wide text-amber-200 drop-shadow">
+          <div className="text-4xl font-bold tracking-wide text-pink-200 drop-shadow-[0_0_20px_rgba(236,72,153,0.5)]">
             {question || 'Tap a key to start'}
           </div>
-          <div className="mt-3 text-3xl font-semibold text-white/90">
+          <div className="mt-3 text-3xl font-semibold text-pink-100">
             ={' '}
-            <span className="inline-block min-w-[6ch] rounded-lg border border-white/15 bg-white/5 px-3 py-1 text-white">
+            <span className="inline-block min-w-[6ch] rounded-lg border border-pink-500/30 bg-black/60 backdrop-blur-sm px-3 py-1 text-white">
               {input || '\u00A0'}
             </span>
           </div>
@@ -297,7 +306,7 @@ export default function QuickMath() {
           {/* Submit on desktop */}
           <div className="mt-3 hidden gap-2 sm:flex">
             <button
-              className="rounded-lg border border-amber-300/40 px-3 py-1 text-amber-200 hover:bg-amber-300/10"
+              className="rounded-lg border border-pink-500/40 bg-pink-500/20 backdrop-blur-sm px-3 py-1 text-pink-200 hover:bg-pink-500/30"
               onClick={() => {
                 startIfNeeded();
                 submit();
@@ -306,7 +315,7 @@ export default function QuickMath() {
               Submit
             </button>
             <button
-              className="rounded-lg border border-amber-300/20 px-3 py-1 text-amber-100 hover:bg-amber-300/10"
+              className="rounded-lg border border-pink-500/20 bg-black/60 backdrop-blur-sm px-3 py-1 text-pink-100 hover:bg-black/80"
               onClick={() => push('C')}
             >
               Clear
@@ -316,7 +325,7 @@ export default function QuickMath() {
       </div>
 
       {/* Bottom: mobile keypad (thumb-reachable) */}
-      <div className="select-none border-t border-white/10 bg-black/30 p-3 backdrop-blur-sm">
+      <div className="select-none border-t border-pink-500/20 bg-black/80 p-3 backdrop-blur-lg">
         <div className="mx-auto grid max-w-xl grid-cols-4 gap-2">
           {['7', '8', '9', '←', '4', '5', '6', '±', '1', '2', '3', 'C', '0', '', '', 'OK'].map(
             (k, i) => {
@@ -326,10 +335,10 @@ export default function QuickMath() {
                 <button
                   key={i}
                   onClick={() => push(k)}
-                  className={`h-12 rounded-xl border text-lg ${
+                  className={`h-12 rounded-xl border text-lg transition-colors ${
                     primary
-                      ? 'border-amber-300/40 text-amber-200 hover:bg-amber-300/10'
-                      : 'border-white/15 text-white hover:bg-white/5'
+                      ? 'border-pink-500/40 bg-pink-500/20 backdrop-blur-sm text-pink-200 hover:bg-pink-500/30'
+                      : 'border-pink-500/20 bg-black/60 backdrop-blur-sm text-pink-100 hover:bg-black/80'
                   }`}
                   aria-label={`key ${k}`}
                 >
