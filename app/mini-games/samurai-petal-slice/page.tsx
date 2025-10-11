@@ -3,7 +3,7 @@ import GameShell from '../_shared/GameShell';
 import SamuraiSlice from './Scene';
 
 export const metadata: Metadata = {
-  title: 'Samurai Petal Slice | Otakumori',
+  title: 'Samurai Petal Slice | Otaku-mori',
   description: "Draw the Tetsusaiga's arc…",
 };
 

@@ -23,7 +23,7 @@ interface SEOProps {
 }
 
 export function SEO({
-  title = 'Otakumori - Small-batch anime-inspired apparel, accessories & home decor',
+  title = 'Otaku-mori - Small-batch anime-inspired apparel, accessories & home decor',
   description = 'Discover unique anime-inspired merchandise crafted with passion. From apparel to accessories and home decor, join our vibrant otaku community.',
   image = '/assets/images/og-default.jpg',
   url = appUrl(),
@@ -35,7 +35,7 @@ export function SEO({
   tags = [],
   product,
 }: SEOProps) {
-  const fullTitle = title === 'Otakumori' ? title : `${title} | Otakumori`;
+  const fullTitle = title === 'Otaku-mori' ? title : `${title} | Otaku-mori`;
 
   return (
     <Head>
@@ -44,7 +44,7 @@ export function SEO({
       <meta name="description" content={description} />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="robots" content="index, follow" />
-      <meta name="author" content="Otakumori" />
+      <meta name="author" content="Otaku-mori" />
       <meta name="theme-color" content="#ec4899" />
 
       {/* Canonical URL */}
@@ -56,7 +56,7 @@ export function SEO({
       <meta property="og:image" content={image} />
       <meta property="og:url" content={url} />
       <meta property="og:type" content={type} />
-      <meta property="og:site_name" content="Otakumori" />
+      <meta property="og:site_name" content="Otaku-mori" />
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter Card */}
@@ -120,7 +120,7 @@ export function SEO({
                 availability: `https://schema.org/${product.availability.replace(' ', '')}`,
                 seller: {
                   '@type': 'Organization',
-                  name: 'Otakumori',
+                  name: 'Otaku-mori',
                 },
               },
             }),
@@ -135,7 +135,7 @@ export function SEO({
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'Organization',
-            name: 'Otakumori',
+            name: 'Otaku-mori',
             url: appUrl(),
             logo: `${appUrl()}/assets/circlelogo.png`,
             description: 'Small-batch anime-inspired apparel, accessories & home decor',

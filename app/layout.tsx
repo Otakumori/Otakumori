@@ -13,7 +13,6 @@ import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import GoogleAnalytics from './components/analytics/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
-import { bootCheckInngest } from '@/lib/inngestHealth';
 import { enforceNoMocks } from '@/lib/no-mocks';
 import StarfieldBackground from '@/components/background/StarfieldBackground';
 import PetalField from './components/effects/PetalField';

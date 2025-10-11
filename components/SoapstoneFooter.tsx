@@ -301,7 +301,7 @@ export function SoapstoneFooter() {
 
           <div className="mt-8 text-center">
             <p className="text-neutral-500 text-sm">
-              © 2024 Otakumori. Made with{' '}
+              © 2024 Otaku-mori. Made with{' '}
               <span role="img" aria-label="Red heart">
                 ️
               </span>{' '}

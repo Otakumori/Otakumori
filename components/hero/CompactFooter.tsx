@@ -41,7 +41,7 @@ export function CompactFooter() {
               <Link href="/terms" className="transition-colors hover:text-gray-400">
                 Terms
               </Link>
-              <span>© 2024 Otakumori</span>
+              <span>© 2024 Otaku-mori</span>
             </div>
           </div>
         </div>

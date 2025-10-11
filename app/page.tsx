@@ -6,7 +6,6 @@ import { env } from '@/env.mjs';
 import ShopTeaser from './components/ShopTeaser';
 import BlogTeaser from './components/BlogTeaser';
 import MiniGameTeaser from './components/MiniGameTeaser';
-import StickySoapstones from './components/StickySoapstones';
 import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
 
 // Server components - conditionally imported based on feature flags
@@ -30,24 +29,30 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen vignette">
-      {/* Cherry Blossom Tree (z-[49]) - positioned behind header but above content */}
-      <div className="fixed top-0 left-0 w-full h-screen z-[49] pointer-events-none">
+      {/* Cherry Blossom Tree - Fixed background, visible through semi-transparent header */}
+      <div
+        className="fixed top-0 left-0 w-full pointer-events-none"
+        style={{
+          zIndex: 0, // Behind everything, including header
+          height: '200vh', // Tall enough to reveal as user scrolls
+        }}
+      >
         <div
-          className="absolute top-0 left-0 opacity-95"
+          className="absolute opacity-95"
           style={{
+            top: '-10vh',
+            left: '-20%',
             width: '140vw',
-            height: '140vh',
-            transform: 'translateX(-40%) translateY(-10%)',
+            height: '150vh',
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
             backgroundSize: 'contain',
-            backgroundPosition: 'left center',
+            backgroundPosition: 'left top',
             backgroundRepeat: 'no-repeat',
           }}
         />
-        {/* Left feather */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-black/40 to-transparent" />
-        {/* Bottom feather */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 to-transparent" />
+        {/* Subtle gradient overlays */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/30 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
 
       {/* HERO */}

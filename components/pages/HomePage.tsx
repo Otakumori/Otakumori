@@ -11,7 +11,7 @@ import Header from '@/app/components/layout/Navbar';
 const socialLinks: SocialLink[] = [
   {
     name: 'Facebook',
-    url: 'https://www.facebook.com/Otakumorii',
+    url: 'https://www.facebook.com/Otaku-morii',
     icon: (
       <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.129 11.854v-8.385H7.37V12.073h2.769V9.03c0-2.758 1.67-4.256 4.107-4.256 1.195 0 2.37.214 2.37.214v2.604h-1.324c-1.304 0-1.71.805-1.71 1.647v1.916h2.93l-.466 2.891h-2.464V23.927C19.612 23.027 24 18.063 24 12.073z" />

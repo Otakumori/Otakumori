@@ -136,7 +136,7 @@ export default function SiteLayout({
               </span>
             </div>
             <a href="/" className="text-lg font-semibold tracking-wide hover:text-pink-200">
-              Otakumori
+              Otaku-mori
             </a>
           </div>
 
@@ -247,7 +247,7 @@ export default function SiteLayout({
                   
                 </span>
               </div>
-              <span className="font-semibold">Otakumori</span>
+              <span className="font-semibold">Otaku-mori</span>
             </div>
             <p className="mt-3 text-neutral-400 text-sm max-w-xs">
               Dark‑cute commerce. Minimal on fabric, maximal in lore. Built for fans, by a fan.
@@ -273,7 +273,7 @@ export default function SiteLayout({
               </li>
               <li>
                 <a className="hover:text-pink-200" href="/about">
-                  Otakumori Insiders
+                  Otaku-mori Insiders
                 </a>
               </li>
             </ul>
@@ -298,7 +298,7 @@ export default function SiteLayout({
           </div>
         </div>
         <div className="border-t border-white/10 py-4 text-center text-xs text-neutral-500">
-          © {new Date().getFullYear()} Otakumori
+          © {new Date().getFullYear()} Otaku-mori
         </div>
       </footer>
 

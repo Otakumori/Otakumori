@@ -13,7 +13,7 @@ export async function GET() {
     const result = await inngest.send({
       name: 'test/function',
       data: {
-        message: 'Hello from Otakumori!',
+        message: 'Hello from Otaku-mori!',
         timestamp: new Date().toISOString(),
         test: true,
         environment: env.NODE_ENV || 'unknown',

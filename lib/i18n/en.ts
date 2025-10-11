@@ -313,7 +313,7 @@ export const en = {
       help: 'Help Center',
     },
     sections: {
-      otakumori: 'Otakumori',
+      otakumori: 'Otaku-mori',
       support: 'Support', 
       legal: 'Legal',
       connect: 'Connect',

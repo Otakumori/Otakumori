@@ -1,6 +1,6 @@
 import MemoryWrapper from './memory-wrapper';
 
-export const metadata = { title: 'Memory | Otakumori' };
+export const metadata = { title: 'Memory | Otaku-mori' };
 
 export default function Page() {
   return (

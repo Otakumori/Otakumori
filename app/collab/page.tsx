@@ -2,13 +2,13 @@
 import { type Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Creator Collaboration - Otakumori',
+  title: 'Creator Collaboration - Otaku-mori',
   description:
-    'Join our creator collaboration program. Get custom assets, build your audience, and be part of the Otakumori community.',
+    'Join our creator collaboration program. Get custom assets, build your audience, and be part of the Otaku-mori community.',
   openGraph: {
-    title: 'Creator Collaboration - Otakumori',
+    title: 'Creator Collaboration - Otaku-mori',
     description:
-      'Join our creator collaboration program. Get custom assets, build your audience, and be part of the Otakumori community.',
+      'Join our creator collaboration program. Get custom assets, build your audience, and be part of the Otaku-mori community.',
     type: 'website',
   },
 };
@@ -138,7 +138,7 @@ export default function CollabPage() {
                 </div>
               </div>
               <p className="text-slatey-300 italic">
-                "The custom UI elements Otakumori created for my game completely transformed the
+                "The custom UI elements Otaku-mori created for my game completely transformed the
                 player experience. Sales increased 40% after the visual upgrade!"
               </p>
             </div>
@@ -154,7 +154,7 @@ export default function CollabPage() {
                 </div>
               </div>
               <p className="text-slatey-300 italic">
-                "Using Otakumori assets in my thumbnails and videos gave them that authentic retro
+                "Using Otaku-mori assets in my thumbnails and videos gave them that authentic retro
                 feel. My channel grew from 1K to 50K subscribers in 6 months!"
               </p>
             </div>

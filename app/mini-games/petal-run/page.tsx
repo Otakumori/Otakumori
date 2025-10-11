@@ -1,6 +1,6 @@
 import PetalRunWrapper from './petal-run-wrapper';
 
-export const metadata = { title: 'Petal Run | Otakumori' };
+export const metadata = { title: 'Petal Run | Otaku-mori' };
 
 export default function Page() {
   return (

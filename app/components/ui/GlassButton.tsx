@@ -23,11 +23,14 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
       // Variants
       {
         // Primary: darker pink with glass
-        'bg-pink-500/20 border border-pink-400/30 text-pink-100 hover:bg-pink-500/30 hover:border-pink-400/50 shadow-lg shadow-pink-500/10': variant === 'primary',
+        'bg-pink-500/20 border border-pink-400/30 text-pink-100 hover:bg-pink-500/30 hover:border-pink-400/50 shadow-lg shadow-pink-500/10':
+          variant === 'primary',
         // Secondary: darker glass
-        'bg-white/10 border border-white/20 text-pink-200/80 hover:bg-white/15 hover:border-white/30 shadow-md': variant === 'secondary',
+        'bg-white/10 border border-white/20 text-pink-200/80 hover:bg-white/15 hover:border-white/30 shadow-md':
+          variant === 'secondary',
         // Ghost: minimal
-        'bg-transparent border-0 text-pink-200/60 hover:text-pink-200/90 hover:bg-white/5': variant === 'ghost',
+        'bg-transparent border-0 text-pink-200/60 hover:text-pink-200/90 hover:bg-white/5':
+          variant === 'ghost',
       },
       // Sizes
       {

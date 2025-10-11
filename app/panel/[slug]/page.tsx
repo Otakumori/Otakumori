@@ -85,7 +85,7 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
   },
   about: {
     title: 'About',
-    description: 'Learn more about Otakumori',
+    description: 'Learn more about Otaku-mori',
     icon: <Info className="h-12 w-12 text-yellow-400" />,
     routes: [
       { name: 'About Us', href: '/about', description: 'Our story and mission' },
