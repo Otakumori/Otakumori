@@ -36,7 +36,7 @@ export default function InteractivePetals({
   const [showComboText, setShowComboText] = useState(false);
   const [dailyLimit, setDailyLimit] = useState(100);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
   const petalIdCounter = useRef(0);
 
   // Check for reduced motion preference

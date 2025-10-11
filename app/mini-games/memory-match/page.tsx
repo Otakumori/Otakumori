@@ -90,6 +90,56 @@ export default function MemoryMatchGame() {
 
   // Auto-save removed for simplified implementation
 
+  // Complete game
+  const completeGame = useCallback(async () => {
+    setGameState('completed');
+
+    // Calculate score
+    const timeBonus = Math.max(0, 300 - timeElapsed) * settings.timeBonus;
+    const moveBonus = Math.max(0, settings.pairs * 2 - moves) * 50;
+    const streakBonus = streak * 25;
+    const calculatedScore = Math.round(1000 + timeBonus + moveBonus + streakBonus);
+    setFinalScore(calculatedScore);
+
+    // Calculate accuracy
+    const accuracy = matches / Math.max(moves, 1);
+
+    // Calculate petal reward
+    const petalReward = Math.floor(calculatedScore / 10);
+
+    try {
+      // Award petals
+      if (petalReward > 0) {
+        await fetch('/api/v1/petals/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: petalReward,
+            source: 'game_reward',
+          }),
+        });
+      }
+
+      // Submit to leaderboard
+      await fetch('/api/v1/leaderboards/memory-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: calculatedScore,
+          metadata: {
+            timeElapsed,
+            moves,
+            accuracy,
+            difficulty,
+            streakBonus,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [timeElapsed, moves, matches, streak, settings, difficulty]);
+
   // Handle card flip
   const handleCardFlip = useCallback(
     (cardId: number) => {
@@ -152,56 +202,6 @@ export default function MemoryMatchGame() {
     },
     [gameState, flippedCards, cards, settings.pairs, completeGame],
   );
-
-  // Complete game
-  const completeGame = useCallback(async () => {
-    setGameState('completed');
-
-    // Calculate score
-    const timeBonus = Math.max(0, 300 - timeElapsed) * settings.timeBonus;
-    const moveBonus = Math.max(0, settings.pairs * 2 - moves) * 50;
-    const streakBonus = streak * 25;
-    const calculatedScore = Math.round(1000 + timeBonus + moveBonus + streakBonus);
-    setFinalScore(calculatedScore);
-
-    // Calculate accuracy
-    const accuracy = matches / Math.max(moves, 1);
-
-    // Calculate petal reward
-    const petalReward = Math.floor(calculatedScore / 10);
-
-    try {
-      // Award petals
-      if (petalReward > 0) {
-        await fetch('/api/v1/petals/collect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: petalReward,
-            source: 'game_reward',
-          }),
-        });
-      }
-
-      // Submit to leaderboard
-      await fetch('/api/v1/leaderboards/memory-match', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          score: calculatedScore,
-          metadata: {
-            timeElapsed,
-            moves,
-            accuracy,
-            difficulty,
-            streakBonus,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error('Failed to submit score:', error);
-    }
-  }, [timeElapsed, moves, matches, streak, settings, difficulty]);
 
   // Format time
   const formatTime = (seconds: number) => {

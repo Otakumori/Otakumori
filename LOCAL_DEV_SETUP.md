@@ -97,10 +97,10 @@ npm run dev
 
 ### Key Differences Between Dev and Production
 
-| Environment | Clerk Keys Start With | Domain |
-|-------------|----------------------|--------|
-| Development | `pk_test_`, `sk_test_` | `localhost` |
-| Production | `pk_live_`, `sk_live_` | `otaku-mori.com` |
+| Environment | Clerk Keys Start With  | Domain           |
+| ----------- | ---------------------- | ---------------- |
+| Development | `pk_test_`, `sk_test_` | `localhost`      |
+| Production  | `pk_live_`, `sk_live_` | `otaku-mori.com` |
 
 ### Database Considerations
 
@@ -119,6 +119,7 @@ You have two options for local development:
 ### Environment Variables Priority
 
 Next.js loads environment variables in this order:
+
 1. `.env.local` (highest priority, not committed to git)
 2. `.env.development` or `.env.production`
 3. `.env`
@@ -136,16 +137,19 @@ After setting up your development keys, you should:
 ## Troubleshooting
 
 ### Still seeing domain errors?
+
 - Make sure you copied the **test** keys (`pk_test_`, `sk_test_`)
 - Check that `.env.local` is in your project root
 - Restart your dev server after creating `.env.local`
 
 ### Can't sign in?
+
 - Verify the Clerk development instance is set to "Development" mode
 - Check that paths are configured correctly (`/sign-in`, `/sign-up`)
 - Make sure `localhost` is in allowed domains
 
 ### Database connection errors?
+
 - Update `DATABASE_URL` with your development database URL
 - Run `npx prisma generate` to regenerate Prisma client
 - Run `npx prisma db push` to sync schema to dev database
@@ -165,4 +169,3 @@ Once you have local development working:
 **Create `.env.local` with development keys → Restart dev server → Test**
 
 That's it! Your local environment should now work properly with Clerk authentication.
-
