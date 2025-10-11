@@ -2,6 +2,7 @@ import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
 import { paths } from '@/lib/paths';
+import GlassButton from '@/app/components/ui/GlassButton';
 
 interface Product {
   id: string;
@@ -68,12 +69,9 @@ export default async function ShopSection() {
             <p className="text-gray-300 mb-6">
               We're preparing something special for you. Check back soon!
             </p>
-            <Link
-              href={paths.shop()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
-            >
+            <GlassButton href={paths.shop()} size="lg" variant="primary">
               Explore Shop
-            </Link>
+            </GlassButton>
           </div>
         </div>
       ) : products.length > 0 ? (
@@ -123,24 +121,18 @@ export default async function ShopSection() {
             <p className="text-gray-300 mb-6">
               We're working on adding new products. Check back soon!
             </p>
-            <Link
-              href={paths.shop()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
-            >
+            <GlassButton href={paths.shop()} size="lg" variant="primary">
               Explore Shop
-            </Link>
+            </GlassButton>
           </div>
         </div>
       )}
 
       {products.length > 0 && (
         <div className="text-center mt-8">
-          <Link
-            href={paths.shop()}
-            className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg inline-block transition-colors"
-          >
+          <GlassButton href={paths.shop()} size="md" variant="secondary">
             View All Products
-          </Link>
+          </GlassButton>
         </div>
       )}
     </div>

@@ -1,0 +1,557 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Generate Game Thumbnails</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #1a1a1a;
+        color: white;
+      }
+      .thumbnail {
+        margin: 20px 0;
+        padding: 10px;
+        background: #2a2a2a;
+        border-radius: 8px;
+      }
+      svg {
+        border: 2px solid #444;
+        display: block;
+        margin: 10px 0;
+      }
+      button {
+        background: #ec4899;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #db2777;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Game Thumbnail Generator</h1>
+    <p>Right-click each SVG and "Save image as..." to save as PNG, or click "Download SVG"</p>
+
+    <div class="thumbnail">
+      <h3>Samurai Petal Slice</h3>
+      <svg
+        id="samurai-thumb"
+        width="800"
+        height="450"
+        viewBox="0 0 800 450"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- Dark dojo background -->
+        <rect width="800" height="450" fill="#1a0a0f" />
+        <rect width="800" height="450" fill="url(#dojo-gradient)" />
+
+        <!-- Gradients -->
+        <defs>
+          <linearGradient id="dojo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: #4a1942; stop-opacity: 0.3" />
+            <stop offset="100%" style="stop-color: #1a0a0f; stop-opacity: 1" />
+          </linearGradient>
+          <radialGradient id="petal-glow">
+            <stop offset="0%" style="stop-color: #ff69b4; stop-opacity: 0.8" />
+            <stop offset="100%" style="stop-color: #ff1493; stop-opacity: 0" />
+          </radialGradient>
+        </defs>
+
+        <!-- Katana slash arc -->
+        <path
+          d="M 100 350 Q 250 150 500 100 T 700 150"
+          stroke="#ff69b4"
+          stroke-width="8"
+          fill="none"
+          opacity="0.6"
+          stroke-linecap="round"
+        />
+        <path
+          d="M 100 350 Q 250 150 500 100 T 700 150"
+          stroke="#ffffff"
+          stroke-width="3"
+          fill="none"
+          opacity="0.9"
+          stroke-linecap="round"
+        />
+
+        <!-- Falling petals -->
+        <ellipse
+          cx="300"
+          cy="120"
+          rx="15"
+          ry="20"
+          fill="#ffb6c1"
+          opacity="0.9"
+          transform="rotate(-30 300 120)"
+        />
+        <ellipse
+          cx="450"
+          cy="80"
+          rx="12"
+          ry="18"
+          fill="#ff69b4"
+          opacity="0.9"
+          transform="rotate(20 450 80)"
+        />
+        <ellipse
+          cx="550"
+          cy="180"
+          rx="14"
+          ry="19"
+          fill="#ff1493"
+          opacity="0.9"
+          transform="rotate(-15 550 180)"
+        />
+        <ellipse
+          cx="350"
+          cy="200"
+          rx="13"
+          ry="17"
+          fill="#ffc0cb"
+          opacity="0.9"
+          transform="rotate(40 350 200)"
+        />
+        <ellipse
+          cx="620"
+          cy="140"
+          rx="15"
+          ry="20"
+          fill="#ffb6c1"
+          opacity="0.9"
+          transform="rotate(-25 620 140)"
+        />
+
+        <!-- Katana blade (iconic) -->
+        <line x1="650" y1="320" x2="720" y2="380" stroke="#c0c0c0" stroke-width="6" />
+        <line x1="650" y1="320" x2="720" y2="380" stroke="#ffffff" stroke-width="2" />
+        <rect x="645" y="380" width="12" height="35" fill="#8b4513" rx="2" />
+
+        <!-- Title -->
+        <text
+          x="400"
+          y="420"
+          font-family="Arial, sans-serif"
+          font-size="32"
+          font-weight="bold"
+          fill="#ff69b4"
+          text-anchor="middle"
+        >
+          SAMURAI PETAL SLICE
+        </text>
+      </svg>
+      <button onclick="downloadSVG('samurai-thumb')">Download SVG</button>
+    </div>
+
+    <div class="thumbnail">
+      <h3>Memory Match</h3>
+      <svg
+        id="memory-thumb"
+        width="800"
+        height="450"
+        viewBox="0 0 800 450"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- Background -->
+        <rect width="800" height="450" fill="#0f0520" />
+        <rect width="800" height="450" fill="url(#memory-gradient)" />
+
+        <defs>
+          <linearGradient id="memory-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: #2d1b4e; stop-opacity: 0.5" />
+            <stop offset="100%" style="stop-color: #0f0520; stop-opacity: 1" />
+          </linearGradient>
+        </defs>
+
+        <!-- Card grid (4x2) -->
+        <!-- Back cards -->
+        <rect x="150" y="120" width="100" height="140" rx="8" fill="#8b5cf6" opacity="0.9" />
+        <rect
+          x="150"
+          y="120"
+          width="100"
+          height="140"
+          rx="8"
+          fill="none"
+          stroke="#a78bfa"
+          stroke-width="3"
+        />
+        <text x="200" y="200" font-size="60" text-anchor="middle" fill="#ffffff">🌸</text>
+
+        <rect x="270" y="120" width="100" height="140" rx="8" fill="#ec4899" opacity="0.9" />
+        <rect
+          x="270"
+          y="120"
+          width="100"
+          height="140"
+          rx="8"
+          fill="none"
+          stroke="#f472b6"
+          stroke-width="3"
+        />
+        <circle cx="320" cy="190" r="40" fill="#ffffff" opacity="0.2" />
+
+        <!-- Flipped cards (faces) -->
+        <rect x="390" y="120" width="100" height="140" rx="8" fill="#ffffff" />
+        <circle cx="440" cy="160" r="15" fill="#ff69b4" />
+        <circle cx="425" cy="170" r="5" fill="#000" />
+        <circle cx="455" cy="170" r="5" fill="#000" />
+        <path d="M 425 190 Q 440 200 455 190" stroke="#000" stroke-width="2" fill="none" />
+
+        <rect x="510" y="120" width="100" height="140" rx="8" fill="#8b5cf6" opacity="0.9" />
+        <rect
+          x="510"
+          y="120"
+          width="100"
+          height="140"
+          rx="8"
+          fill="none"
+          stroke="#a78bfa"
+          stroke-width="3"
+        />
+        <text x="560" y="200" font-size="60" text-anchor="middle" fill="#ffffff">🌸</text>
+
+        <!-- Bottom row -->
+        <rect x="150" y="280" width="100" height="140" rx="8" fill="#ec4899" opacity="0.9" />
+        <rect
+          x="150"
+          y="280"
+          width="100"
+          height="140"
+          rx="8"
+          fill="none"
+          stroke="#f472b6"
+          stroke-width="3"
+        />
+        <circle cx="200" cy="350" r="40" fill="#ffffff" opacity="0.2" />
+
+        <rect x="270" y="280" width="100" height="140" rx="8" fill="#ffffff" />
+        <circle cx="320" cy="320" r="15" fill="#ff69b4" />
+        <circle cx="305" cy="330" r="5" fill="#000" />
+        <circle cx="335" cy="330" r="5" fill="#000" />
+        <path d="M 305 350 Q 320 360 335 350" stroke="#000" stroke-width="2" fill="none" />
+
+        <rect x="390" y="280" width="100" height="140" rx="8" fill="#8b5cf6" opacity="0.9" />
+        <rect
+          x="390"
+          y="280"
+          width="100"
+          height="140"
+          rx="8"
+          fill="none"
+          stroke="#a78bfa"
+          stroke-width="3"
+        />
+        <text x="440" y="360" font-size="60" text-anchor="middle" fill="#ffffff">🌸</text>
+
+        <rect x="510" y="280" width="100" height="140" rx="8" fill="#ec4899" opacity="0.9" />
+        <rect
+          x="510"
+          y="280"
+          width="100"
+          height="140"
+          rx="8"
+          fill="none"
+          stroke="#f472b6"
+          stroke-width="3"
+        />
+        <circle cx="560" cy="350" r="40" fill="#ffffff" opacity="0.2" />
+
+        <!-- Match sparkles -->
+        <text x="440" y="110" font-size="40" fill="#ffff00">✨</text>
+        <text x="560" y="110" font-size="40" fill="#ffff00">✨</text>
+        <text x="320" y="270" font-size="40" fill="#ffff00">✨</text>
+
+        <!-- Title -->
+        <text
+          x="400"
+          y="35"
+          font-family="Arial, sans-serif"
+          font-size="28"
+          font-weight="bold"
+          fill="#a78bfa"
+          text-anchor="middle"
+        >
+          MEMORY MATCH
+        </text>
+      </svg>
+      <button onclick="downloadSVG('memory-thumb')">Download SVG</button>
+    </div>
+
+    <div class="thumbnail">
+      <h3>Puzzle Reveal</h3>
+      <svg
+        id="puzzle-thumb"
+        width="800"
+        height="450"
+        viewBox="0 0 800 450"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- Background -->
+        <rect width="800" height="450" fill="#0a0a0a" />
+
+        <!-- Hidden image (pixelated art behind fog) -->
+        <rect x="150" y="80" width="500" height="290" fill="#4a1942" />
+
+        <!-- Fog of war (partially cleared) -->
+        <rect x="150" y="80" width="180" height="290" fill="#1a1a1a" opacity="0.95" />
+        <rect x="470" y="80" width="180" height="290" fill="#1a1a1a" opacity="0.95" />
+
+        <!-- Revealed area (anime character silhouette) -->
+        <ellipse cx="400" cy="180" rx="60" ry="70" fill="#ffb6c1" />
+        <circle cx="380" cy="170" r="8" fill="#000" />
+        <circle cx="420" cy="170" r="8" fill="#000" />
+        <path d="M 380 190 Q 400 200 420 190" stroke="#000" stroke-width="3" fill="none" />
+        <path
+          d="M 370 140 Q 400 120 430 140"
+          stroke="#ff69b4"
+          stroke-width="8"
+          fill="none"
+          stroke-linecap="round"
+        />
+
+        <!-- Brush strokes clearing fog -->
+        <path
+          d="M 330 100 L 320 120 L 310 150"
+          stroke="#ff69b4"
+          stroke-width="12"
+          fill="none"
+          stroke-linecap="round"
+          opacity="0.6"
+        />
+        <circle cx="310" cy="150" r="25" fill="#ff69b4" opacity="0.3" />
+
+        <!-- Progress bar -->
+        <rect
+          x="150"
+          y="390"
+          width="500"
+          height="30"
+          rx="15"
+          fill="#2a2a2a"
+          stroke="#ff69b4"
+          stroke-width="2"
+        />
+        <rect x="155" y="395" width="250" height="20" rx="10" fill="#ff69b4" />
+        <text
+          x="400"
+          y="412"
+          font-family="Arial, sans-serif"
+          font-size="16"
+          fill="#ffffff"
+          text-anchor="middle"
+        >
+          50% Revealed
+        </text>
+
+        <!-- Title -->
+        <text
+          x="400"
+          y="50"
+          font-family="Arial, sans-serif"
+          font-size="32"
+          font-weight="bold"
+          fill="#ff69b4"
+          text-anchor="middle"
+        >
+          PUZZLE REVEAL
+        </text>
+      </svg>
+      <button onclick="downloadSVG('puzzle-thumb')">Download SVG</button>
+    </div>
+
+    <div class="thumbnail">
+      <h3>Quick Math</h3>
+      <svg
+        id="quick-math-thumb"
+        width="800"
+        height="450"
+        viewBox="0 0 800 450"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <!-- Background -->
+        <rect width="800" height="450" fill="#0f0520" />
+        <rect width="800" height="450" fill="url(#math-gradient)" />
+
+        <defs>
+          <linearGradient id="math-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: #ec4899; stop-opacity: 0.1" />
+            <stop offset="100%" style="stop-color: #0f0520; stop-opacity: 1" />
+          </linearGradient>
+        </defs>
+
+        <!-- Math equation display -->
+        <rect
+          x="200"
+          y="120"
+          width="400"
+          height="100"
+          rx="12"
+          fill="#1a1a1a"
+          stroke="#ec4899"
+          stroke-width="4"
+        />
+        <text
+          x="400"
+          y="185"
+          font-family="monospace"
+          font-size="56"
+          font-weight="bold"
+          fill="#ff69b4"
+          text-anchor="middle"
+        >
+          48 + 37 = ?
+        </text>
+
+        <!-- Timer/streak indicator -->
+        <circle
+          cx="700"
+          cy="170"
+          r="40"
+          fill="#ec4899"
+          opacity="0.2"
+          stroke="#ec4899"
+          stroke-width="3"
+        />
+        <text
+          x="700"
+          y="180"
+          font-family="Arial, sans-serif"
+          font-size="28"
+          font-weight="bold"
+          fill="#ffffff"
+          text-anchor="middle"
+        >
+          12s
+        </text>
+
+        <!-- Answer input -->
+        <rect
+          x="250"
+          y="260"
+          width="300"
+          height="80"
+          rx="8"
+          fill="#2a2a2a"
+          stroke="#a78bfa"
+          stroke-width="3"
+        />
+        <text
+          x="400"
+          y="315"
+          font-family="monospace"
+          font-size="48"
+          font-weight="bold"
+          fill="#a78bfa"
+          text-anchor="middle"
+        >
+          85
+        </text>
+
+        <!-- Number pad preview -->
+        <rect
+          x="250"
+          y="360"
+          width="70"
+          height="60"
+          rx="8"
+          fill="#4a1942"
+          stroke="#ec4899"
+          stroke-width="2"
+        />
+        <text
+          x="285"
+          y="400"
+          font-family="Arial, sans-serif"
+          font-size="32"
+          font-weight="bold"
+          fill="#ffffff"
+          text-anchor="middle"
+        >
+          7
+        </text>
+
+        <rect
+          x="340"
+          y="360"
+          width="70"
+          height="60"
+          rx="8"
+          fill="#4a1942"
+          stroke="#ec4899"
+          stroke-width="2"
+        />
+        <text
+          x="375"
+          y="400"
+          font-family="Arial, sans-serif"
+          font-size="32"
+          font-weight="bold"
+          fill="#ffffff"
+          text-anchor="middle"
+        >
+          8
+        </text>
+
+        <rect
+          x="430"
+          y="360"
+          width="70"
+          height="60"
+          rx="8"
+          fill="#4a1942"
+          stroke="#ec4899"
+          stroke-width="2"
+        />
+        <text
+          x="465"
+          y="400"
+          font-family="Arial, sans-serif"
+          font-size="32"
+          font-weight="bold"
+          fill="#ffffff"
+          text-anchor="middle"
+        >
+          9
+        </text>
+
+        <!-- Title -->
+        <text
+          x="400"
+          y="70"
+          font-family="Arial, sans-serif"
+          font-size="36"
+          font-weight="bold"
+          fill="#ec4899"
+          text-anchor="middle"
+        >
+          QUICK MATH
+        </text>
+      </svg>
+      <button onclick="downloadSVG('quick-math-thumb')">Download SVG</button>
+    </div>
+
+    <script>
+      function downloadSVG(id) {
+        const svg = document.getElementById(id);
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svg);
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = id + '.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    </script>
+  </body>
+</html>

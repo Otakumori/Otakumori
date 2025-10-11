@@ -68,32 +68,54 @@
   }
 }
 
-/* Glass Recipe */
+/* Global Theme Colors - Matching Header/Footer */
+:root {
+  --theme-glass-bg: rgba(57, 5, 40, 0.7); /* Purple-pink glass background */
+  --theme-glass-border: rgba(236, 72, 153, 0.3); /* Pink border */
+  --theme-text-primary: rgb(252, 231, 243); /* pink-100 */
+  --theme-text-secondary: rgba(252, 231, 243, 0.7); /* pink-100/70 */
+  --theme-accent: rgb(236, 72, 153); /* pink-500 */
+}
+
+/* Glass Recipe - Updated with theme colors */
 .glass-panel {
-  @apply bg-white/5 border border-white/10 backdrop-blur-xl;
-  box-shadow: 0 0 60px -15px rgba(200, 120, 255, 0.25);
+  background: var(--theme-glass-bg);
+  border: 1px solid var(--theme-glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 0 60px -15px rgba(236, 72, 153, 0.25);
+}
+
+.glass-panel:hover {
+  background: rgba(57, 5, 40, 0.85);
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 0 80px -10px rgba(236, 72, 153, 0.35);
 }
 
 .glass-button {
-  @apply bg-white/5 border border-white/10 backdrop-blur-xl;
-  box-shadow: 0 0 20px -8px rgba(200, 120, 255, 0.15);
+  background: var(--theme-glass-bg);
+  border: 1px solid var(--theme-glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 0 20px -8px rgba(236, 72, 153, 0.15);
 }
 
 /* Enhanced Glass Theme Utilities */
 .glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: var(--theme-glass-bg);
+  border: 1px solid var(--theme-glass-border);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all var(--motion-normal) var(--motion-ease);
+  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.15);
+  transition: all 0.3s ease;
 }
 
 .glass-card:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
+  background: rgba(57, 5, 40, 0.85);
+  border-color: rgba(236, 72, 153, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(236, 72, 153, 0.25);
 }
 
 .glass-card:focus-within {

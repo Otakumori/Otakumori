@@ -12,16 +12,15 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
     return (
       <div
         className={cn(
-          // Base styles
+          // Base styles - using theme colors
           'relative rounded-xl border transition-all duration-200',
-          // Glass effect
-          'backdrop-blur-sm bg-white/5 border-white/10',
-          'hover:bg-white/10 hover:border-white/20',
+          // Glass effect with purple-pink theme
+          'backdrop-blur-lg',
           // Variants
           {
-            'shadow-lg': variant === 'default',
-            'shadow-xl bg-white/10 border-white/20': variant === 'elevated',
-            'shadow-sm bg-white/2 border-white/5': variant === 'subtle',
+            'glass-panel': variant === 'default',
+            'glass-panel shadow-xl': variant === 'elevated',
+            'glass-panel opacity-80': variant === 'subtle',
           },
           className,
         )}

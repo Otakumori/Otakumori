@@ -12,7 +12,6 @@ import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
 import ShopSection from '@/app/(site)/home/ShopSection';
 import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
 import BlogSection from '@/app/(site)/home/BlogSection';
-import SoapstoneComposer from '@/components/soapstone/SoapstoneComposer';
 import InteractivePetals from '@/components/hero/InteractivePetals';
 
 export const revalidate = 60;
@@ -32,10 +31,10 @@ export default async function HomePage() {
       className="relative min-h-screen"
       style={{
         backgroundImage: 'url(/assets/images/cherry-tree.png)',
-        backgroundPosition: 'left center',
+        backgroundPosition: '-15% -50px', // Push left to cut trunk, extend above viewport
         backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundAttachment: 'fixed',
+        backgroundSize: '60% auto', // Wider tree that extends in height
+        backgroundAttachment: 'scroll', // Tree scrolls with content
       }}
     >
       {/* HERO */}
@@ -111,19 +110,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Soapstones - Single composer section */}
-      {NEXT_PUBLIC_FEATURE_SOAPSTONES === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <div className="glass-panel rounded-2xl p-8">
-            <h3 className="text-2xl font-bold text-pink-200 mb-6">
-              Leave a sign for fellow travelers
-            </h3>
-            <SoapstoneComposer disabled={false} disabledMessage={undefined} />
-          </div>
-        </section>
-      )}
-
-      {/* Existing drift animation layer */}
+      {/* Existing drift animation layer - soapstone now only in footer */}
       <SoapstoneHomeDrift />
     </main>
   );
