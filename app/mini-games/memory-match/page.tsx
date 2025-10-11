@@ -122,14 +122,19 @@ export default function MemoryMatchGame() {
                 card.id === firstId || card.id === secondId ? { ...card, isMatched: true } : card,
               ),
             );
-            setMatches((prev) => prev + 1);
+            setMatches((prev) => {
+              const newMatches = prev + 1;
+              console.log(`Match count: ${newMatches} / ${settings.pairs}`);
+              
+              // Check for completion with new value
+              if (newMatches === settings.pairs) {
+                setTimeout(() => completeGame(), 100);
+              }
+              
+              return newMatches;
+            });
             setStreak((prev) => prev + 1);
             setFlippedCards([]);
-
-            // Check for completion
-            if (matches + 1 === settings.pairs) {
-              completeGame();
-            }
           }, 1000);
         } else {
           // No match
@@ -145,7 +150,7 @@ export default function MemoryMatchGame() {
         }
       }
     },
-    [gameState, flippedCards, cards, moves, matches, streak, settings.pairs],
+    [gameState, flippedCards, cards, settings.pairs, completeGame],
   );
 
   // Complete game

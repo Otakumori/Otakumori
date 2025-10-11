@@ -25,8 +25,7 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
       // Variants
       {
         // Primary: enhanced glassmorphic with iridescent hint
-        'glass-button-primary':
-          variant === 'primary',
+        'glass-button-primary': variant === 'primary',
         // Secondary: darker glass
         'bg-white/10 border border-white/20 text-pink-200/80 hover:bg-white/15 hover:border-white/30 shadow-md':
           variant === 'secondary',

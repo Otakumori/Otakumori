@@ -6,7 +6,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useGameEngine } from '@/hooks/useGameEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Note {
@@ -62,13 +61,6 @@ const SAMPLE_TRACKS: Track[] = [
 ];
 
 export default function PetalStormRhythm() {
-  const gameEngine = useGameEngine({
-    gameId: 'petal-storm-rhythm',
-    enableAchievements: true,
-    enableLeaderboards: true,
-    enablePetals: true,
-  });
-
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'completed' | 'paused'>('menu');
   const [selectedTrack, setSelectedTrack] = useState<Track>(SAMPLE_TRACKS[0]);
   const [currentTime, setCurrentTime] = useState(0);
@@ -79,14 +71,7 @@ export default function PetalStormRhythm() {
   const [accuracy, setAccuracy] = useState({ perfect: 0, great: 0, good: 0, miss: 0 });
   const [health, setHealth] = useState(100);
   const [multiplier, setMultiplier] = useState(1);
-  const [sessionId, setSessionId] = useState<string>('');
-
-  // Initialize session ID on mount
-  useEffect(() => {
-    const newSessionId = `psr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    setSessionId(newSessionId);
-    console.info('[Petal Storm Rhythm] Session initialized:', newSessionId);
-  }, []);
+  const [finalScore, setFinalScore] = useState(0);
 
   // Refs for game loop
   const gameLoopRef = useRef<number | undefined>(undefined);
@@ -169,23 +154,12 @@ export default function PetalStormRhythm() {
     setHealth(100);
     setMultiplier(1);
 
-    // Start game session
-    const newSessionId = gameEngine.startSession();
-    setSessionId(newSessionId);
-
-    // Record game start
-    gameEngine.recordAction('game_start', {
-      track: selectedTrack.id,
-      difficulty: selectedTrack.difficulty,
-      noteCount: trackNotes.length,
-    });
-
     setGameState('playing');
     startTimeRef.current = Date.now();
 
     // Start game loop
     gameLoop();
-  }, [selectedTrack, gameEngine]);
+  }, [selectedTrack, gameLoop]);
 
   // Game loop
   const gameLoop = useCallback(() => {
@@ -204,12 +178,6 @@ export default function PetalStormRhythm() {
           setMultiplier(1);
           setHealth((h) => Math.max(0, h - 10));
           setAccuracy((acc) => ({ ...acc, miss: acc.miss + 1 }));
-
-          gameEngine.recordAction('note_miss', {
-            noteId: note.id,
-            time: elapsed,
-            lane: note.lane,
-          });
 
           return { ...note, hit: true, accuracy: 'miss' };
         }
@@ -291,12 +259,6 @@ export default function PetalStormRhythm() {
         else if (combo >= 10) setMultiplier(2);
         else setMultiplier(1);
 
-        // Award petals for good hits
-        if (accuracy === 'perfect') {
-          gameEngine.awardPetals(5, 'Perfect hit');
-        } else if (accuracy === 'great') {
-          gameEngine.awardPetals(3, 'Great hit');
-        }
       } else {
         setCombo(0);
         setMultiplier(1);
@@ -305,17 +267,8 @@ export default function PetalStormRhythm() {
 
       // Update max combo
       setMaxCombo((prev) => Math.max(prev, combo));
-
-      // Record action
-      gameEngine.recordAction('note_hit', {
-        noteId: closestNote.id,
-        accuracy,
-        timeDiff,
-        combo,
-        score: score + points * multiplier,
-      });
     },
-    [gameState, currentTime, notes, combo, multiplier, score, gameEngine],
+    [gameState, currentTime, notes, combo, multiplier, score],
   );
 
   // Complete game
@@ -335,62 +288,42 @@ export default function PetalStormRhythm() {
     const accuracyBonus = Math.round(finalAccuracy * 10000);
     const healthBonus = health * 50;
     const finalScore = score + comboBonus + accuracyBonus + healthBonus;
-
-    // Update game engine with session tracking
-    gameEngine.updateScore(finalScore, {
-      accuracy: finalAccuracy,
-      maxCombo,
-      perfectHits: accuracy.perfect,
-      track: selectedTrack.id,
-      difficulty: selectedTrack.difficulty,
-      sessionId,
-    });
-
-    // Submit to leaderboard with session tracking
-    await gameEngine.submitScore('score', finalScore, {
-      sessionId,
-      accuracy: finalAccuracy,
-      maxCombo,
-      track: selectedTrack.id,
-      difficulty: selectedTrack.difficulty,
-    });
-
-    // Check achievements
-    await gameEngine.checkAchievements(gameEngine.gameState!);
-
-    // Specific achievements
-    if (finalAccuracy >= 0.95) {
-      await gameEngine.unlockAchievement('rhythm-master', 1, {
-        accuracy: finalAccuracy,
-        track: selectedTrack.id,
-      });
-    }
-
-    if (maxCombo >= 100) {
-      await gameEngine.unlockAchievement('combo-god', 1, { maxCombo });
-    }
-
-    if (accuracy.perfect >= totalNotes * 0.8) {
-      await gameEngine.unlockAchievement('perfect-storm', 1, {
-        perfectRatio: accuracy.perfect / totalNotes,
-      });
-    }
+    setFinalScore(finalScore);
 
     // Award completion petals
-    const completionPetals = Math.round(finalScore / 100);
-    await gameEngine.awardPetals(completionPetals, 'Rhythm game completion');
+    const petalReward = Math.round(finalScore / 100);
+    try {
+      await fetch('/api/v1/petals/collect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: petalReward,
+          source: 'petal-storm-rhythm',
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to award petals:', error);
+    }
 
-    // End session
-    await gameEngine.endSession();
-
-    // Record completion
-    gameEngine.recordAction('game_complete', {
-      finalScore,
-      accuracy: finalAccuracy,
-      maxCombo,
-      track: selectedTrack.id,
-    });
-  }, [score, accuracy, maxCombo, health, selectedTrack, gameEngine]);
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/petal-storm-rhythm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScore,
+          metadata: {
+            accuracy: finalAccuracy,
+            maxCombo,
+            track: selectedTrack.id,
+            difficulty: selectedTrack.difficulty,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [score, accuracy, maxCombo, health, selectedTrack]);
 
   // End game (game over)
   const endGame = useCallback(() => {
@@ -399,13 +332,7 @@ export default function PetalStormRhythm() {
     if (gameLoopRef.current) {
       cancelAnimationFrame(gameLoopRef.current);
     }
-
-    gameEngine.recordAction('game_over', {
-      finalScore: score,
-      reason: 'health_depleted',
-      time: currentTime,
-    });
-  }, [score, currentTime, gameEngine]);
+  }, []);
 
   // Keyboard controls
   useEffect(() => {
@@ -690,7 +617,7 @@ export default function PetalStormRhythm() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Final Score</div>
-                <div className="text-white font-bold text-xl">{formatScore(score)}</div>
+                <div className="text-white font-bold text-xl">{formatScore(finalScore)}</div>
               </div>
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Max Combo</div>

@@ -62,7 +62,9 @@ export default function Footer() {
               </button>
             </div>
             {message && (
-              <p className={`text-center mt-2 text-sm ${message.includes('✓') ? 'text-green-400' : 'text-red-400'}`}>
+              <p
+                className={`text-center mt-2 text-sm ${message.includes('✓') ? 'text-green-400' : 'text-red-400'}`}
+              >
                 {message}
               </p>
             )}
@@ -78,17 +80,26 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Explore</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/shop" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/shop"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Shop
                 </a>
               </li>
               <li>
-                <a href="/mini-games" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/mini-games"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Mini-Games
                 </a>
               </li>
               <li>
-                <a href="/blog" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/blog"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Blog: Read the lore
                 </a>
               </li>
@@ -98,17 +109,26 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/help" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/help"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Help Center
                 </a>
               </li>
               <li>
-                <a href="/privacy" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/privacy"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="/terms" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/terms"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Terms of Service
                 </a>
               </li>
@@ -118,17 +138,26 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Connect</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/community" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/community"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Community
                 </a>
               </li>
               <li>
-                <a href="/community/soapstones" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/community/soapstones"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   View All Signs
                 </a>
               </li>
               <li>
-                <a href="/cookies" className="text-gray-300 hover:text-white text-sm transition-colors">
+                <a
+                  href="/cookies"
+                  className="text-gray-300 hover:text-white text-sm transition-colors"
+                >
                   Cookie Settings
                 </a>
               </li>
