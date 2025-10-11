@@ -16,15 +16,20 @@ type BlogPost = {
 
 async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    const response = await fetch(
-      `${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`,
-      {
-        next: { revalidate: 300 },
-      },
-    );
+    const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`, {
+      next: { revalidate: 300 },
+    });
 
     if (!response.ok) return [];
-    return response.json();
+
+    const json = await response.json();
+
+    // Handle API envelope format: { ok: true, data: { posts: [...] } }
+    if (json.ok && json.data?.posts && Array.isArray(json.data.posts)) {
+      return json.data.posts;
+    }
+
+    return [];
   } catch {
     return [];
   }
