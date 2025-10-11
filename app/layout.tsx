@@ -1,5 +1,6 @@
 import 'server-only';
 import './globals.css';
+import './styles/glassmorphic-effects.css';
 import type { Metadata } from 'next';
 import Footer from './components/Footer';
 import Navbar from './components/layout/Navbar';

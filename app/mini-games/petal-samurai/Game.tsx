@@ -110,18 +110,21 @@ export default function Game({ mode }: Props) {
   const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
   const isSlashing = useRef(false);
 
-  const handleMouseDown = useCallback((_event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (gameState.isStunned) return;
-    isSlashing.current = true;
-    slashPoints.current = [];
-  }, [gameState.isStunned]);
+  const handleMouseDown = useCallback(
+    (_event: React.MouseEvent<HTMLCanvasElement>) => {
+      if (gameState.isStunned) return;
+      isSlashing.current = true;
+      slashPoints.current = [];
+    },
+    [gameState.isStunned],
+  );
 
   const handleMouseMove = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isSlashing.current || !canvasRef.current || !gameRef.current) return;
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    
+
     // Calculate proper canvas-relative coordinates accounting for canvas scaling
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -200,7 +203,14 @@ export default function Game({ mode }: Props) {
       };
       submitScore();
     }
-  }, [gameState.isGameOver, gameState.score, gameState.combo, gameState.multiplier, gameState.misses, mode]);
+  }, [
+    gameState.isGameOver,
+    gameState.score,
+    gameState.combo,
+    gameState.multiplier,
+    gameState.misses,
+    mode,
+  ]);
 
   return (
     <div className="relative">
@@ -505,7 +515,14 @@ class GameEngine {
     return hitPetals;
   }
 
-  private distanceToLineSegment(px: number, py: number, x1: number, y1: number, x2: number, y2: number): number {
+  private distanceToLineSegment(
+    px: number,
+    py: number,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+  ): number {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const lengthSquared = dx * dx + dy * dy;
@@ -631,33 +648,33 @@ class GameEngine {
     // Draw slash trail effect - dynamic fading based on age
     if (this.slashTrail.length > 1) {
       this.ctx.save();
-      
+
       const now = this.gameTime;
-      
+
       // Draw multiple layers for better effect
       for (let layer = 0; layer < 3; layer++) {
         this.ctx.beginPath();
-        
+
         for (let i = 0; i < this.slashTrail.length - 1; i++) {
           const point = this.slashTrail[i];
           const nextPoint = this.slashTrail[i + 1];
-          
+
           // Calculate age-based opacity (newer = more visible)
           const age = now - point.time;
           const fadeProgress = Math.max(0, 1 - age / 0.3); // Fade over 300ms
           const layerOpacity = ((3 - layer) / 3) * fadeProgress;
-          
+
           // Dynamic width based on age and layer
           const baseWidth = 12 - layer * 3;
           const width = baseWidth * fadeProgress;
-          
+
           if (width > 0.5 && layerOpacity > 0.01) {
             // Create gradient for this segment
             const gradient = this.ctx.createLinearGradient(
               point.x,
               point.y,
               nextPoint.x,
-              nextPoint.y
+              nextPoint.y,
             );
             gradient.addColorStop(0, `rgba(255, 20, 147, ${0.8 * layerOpacity})`);
             gradient.addColorStop(0.5, `rgba(255, 105, 180, ${0.95 * layerOpacity})`);
@@ -673,7 +690,7 @@ class GameEngine {
             // Draw smooth curved segment
             this.ctx.beginPath();
             this.ctx.moveTo(point.x, point.y);
-            
+
             const midX = (point.x + nextPoint.x) / 2;
             const midY = (point.y + nextPoint.y) / 2;
             this.ctx.quadraticCurveTo(point.x, point.y, midX, midY);
