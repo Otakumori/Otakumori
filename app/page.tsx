@@ -28,119 +28,140 @@ export default async function HomePage() {
   } = env;
 
   return (
-    <main className="relative min-h-screen vignette">
-      {/* Cherry Blossom Tree - Fixed background, reveals more as you scroll */}
+    <>
+      {/* Parallax Cherry Blossom Tree Background */}
       <div
-        className="fixed top-0 left-0 w-full h-screen pointer-events-none overflow-hidden"
+        className="parallax-tree"
         style={{
-          zIndex: 0, // Behind everything, including header
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100vh',
+          zIndex: 0,
+          backgroundImage: 'url(/assets/images/cherry-tree.png)',
+          backgroundPosition: 'left center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          backgroundAttachment: 'fixed', // Key for parallax effect
+          pointerEvents: 'none',
+          opacity: 0.95,
         }}
       >
+        {/* Gradient overlays */}
         <div
-          className="absolute opacity-95"
           style={{
-            top: '-50vh', // Start with upper portion hidden
-            left: '-15%',
-            width: '130vw',
-            height: '200vh', // Tree is 2x viewport height
-            backgroundImage: 'url(/assets/images/cherry-tree.png)',
-            backgroundSize: 'cover', // Fill the entire space
-            backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat',
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to right, rgba(8, 6, 17, 0.4) 0%, transparent 10%)',
+            pointerEvents: 'none',
           }}
         />
-        {/* Subtle gradient overlays for depth */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#080611]/40 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#080611]/40 to-transparent" />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(8, 6, 17, 0.4) 0%, transparent 15%)',
+            pointerEvents: 'none',
+          }}
+        />
       </div>
 
-      {/* HERO */}
-      {NEXT_PUBLIC_FEATURE_HERO === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="text-center">
-            <h1
-              className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight"
-              style={{ color: '#835D75' }}
-            >
-              Welcome Home, Traveler
-            </h1>
+      <main
+        className="relative min-h-screen vignette"
+        style={{
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        {/* HERO */}
+        {NEXT_PUBLIC_FEATURE_HERO === '1' && (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+            <div className="text-center">
+              <h1
+                className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight"
+                style={{ color: '#835D75' }}
+              >
+                Welcome Home, Traveler
+              </h1>
 
-            {/* Interactive petals in hero only */}
-            {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
-              <div className="relative mt-8 h-48">
-                <InteractivePetals variant="hero" />
-              </div>
-            )}
-          </div>
-        </section>
-      )}
+              {/* Interactive petals in hero only */}
+              {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
+                <div className="relative mt-8 h-48">
+                  <InteractivePetals variant="hero" />
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
-      {/* SHOP */}
-      {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
-            <ShopSection />
-          </Suspense>
-        </section>
-      )}
+        {/* SHOP */}
+        {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
+              <ShopSection />
+            </Suspense>
+          </section>
+        )}
 
-      {/* BLOG */}
-      {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading blog…</div>}>
-            <BlogSection />
-          </Suspense>
-        </section>
-      )}
+        {/* BLOG */}
+        {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <Suspense fallback={<div className="text-pink-200/70">Loading blog…</div>}>
+              <BlogSection />
+            </Suspense>
+          </section>
+        )}
 
-      {/* MINI-GAMES */}
-      {NEXT_PUBLIC_FEATURE_MINIGAMES === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
-            <MiniGamesSection />
-          </Suspense>
-        </section>
-      )}
+        {/* MINI-GAMES */}
+        {NEXT_PUBLIC_FEATURE_MINIGAMES === '1' && (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
+              <MiniGamesSection />
+            </Suspense>
+          </section>
+        )}
 
-      {/* Fallback sections when feature flags are off */}
-      {NEXT_PUBLIC_FEATURE_SHOP !== '1' && (
-        <section className="bg-gradient-to-b from-transparent via-black/10 to-black/30 py-24">
-          <div className="mx-auto w-full max-w-7xl px-4">
-            <ShopTeaser />
-          </div>
-        </section>
-      )}
+        {/* Fallback sections when feature flags are off */}
+        {NEXT_PUBLIC_FEATURE_SHOP !== '1' && (
+          <section className="bg-gradient-to-b from-transparent via-black/10 to-black/30 py-24">
+            <div className="mx-auto w-full max-w-7xl px-4">
+              <ShopTeaser />
+            </div>
+          </section>
+        )}
 
-      {NEXT_PUBLIC_FEATURE_BLOG !== '1' && (
-        <section className="bg-gradient-to-b from-black/30 via-black/20 to-transparent py-24">
-          <div className="mx-auto w-full max-w-7xl px-4">
-            <BlogTeaser />
-          </div>
-        </section>
-      )}
+        {NEXT_PUBLIC_FEATURE_BLOG !== '1' && (
+          <section className="bg-gradient-to-b from-black/30 via-black/20 to-transparent py-24">
+            <div className="mx-auto w-full max-w-7xl px-4">
+              <BlogTeaser />
+            </div>
+          </section>
+        )}
 
-      {NEXT_PUBLIC_FEATURE_MINIGAMES !== '1' && (
-        <section className="bg-gradient-to-b from-transparent via-black/20 to-black/40 py-24">
-          <div className="mx-auto w-full max-w-7xl px-4">
-            <MiniGameTeaser />
-          </div>
-        </section>
-      )}
+        {NEXT_PUBLIC_FEATURE_MINIGAMES !== '1' && (
+          <section className="bg-gradient-to-b from-transparent via-black/20 to-black/40 py-24">
+            <div className="mx-auto w-full max-w-7xl px-4">
+              <MiniGameTeaser />
+            </div>
+          </section>
+        )}
 
-      {/* Soapstones - Single composer section */}
-      {NEXT_PUBLIC_FEATURE_SOAPSTONES === '1' && (
-        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-          <div className="glass-panel rounded-2xl p-8">
-            <h3 className="text-2xl font-bold text-pink-200 mb-6">
-              Leave a sign for fellow travelers
-            </h3>
-            <SoapstoneComposer disabled={false} disabledMessage={undefined} />
-          </div>
-        </section>
-      )}
+        {/* Soapstones - Single composer section */}
+        {NEXT_PUBLIC_FEATURE_SOAPSTONES === '1' && (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <div className="glass-panel rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-pink-200 mb-6">
+                Leave a sign for fellow travelers
+              </h3>
+              <SoapstoneComposer disabled={false} disabledMessage={undefined} />
+            </div>
+          </section>
+        )}
 
-      {/* Existing drift animation layer */}
-      <SoapstoneHomeDrift />
-    </main>
+        {/* Existing drift animation layer */}
+        <SoapstoneHomeDrift />
+      </main>
+    </>
   );
 }

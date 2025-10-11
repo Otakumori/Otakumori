@@ -3,6 +3,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Parallax Tree Effect */
+.parallax-tree {
+  background-attachment: fixed;
+}
+
+/* Mobile compatibility - disable fixed attachment on mobile */
+@media only screen and (max-device-width: 1366px) {
+  .parallax-tree {
+    background-attachment: scroll;
+  }
+}
+
 /* Global Motion & Styling Rules */
 
 /* Reduced Motion Support */
