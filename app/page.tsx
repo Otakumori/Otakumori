@@ -29,30 +29,29 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen vignette">
-      {/* Cherry Blossom Tree - Fixed background, visible through semi-transparent header */}
+      {/* Cherry Blossom Tree - Fixed background, reveals more as you scroll */}
       <div
-        className="fixed top-0 left-0 w-full pointer-events-none"
+        className="fixed top-0 left-0 w-full h-screen pointer-events-none overflow-hidden"
         style={{
           zIndex: 0, // Behind everything, including header
-          height: '200vh', // Tall enough to reveal as user scrolls
         }}
       >
         <div
           className="absolute opacity-95"
           style={{
-            top: '-10vh',
-            left: '-20%',
-            width: '140vw',
-            height: '150vh',
+            top: '-50vh', // Start with upper portion hidden
+            left: '-15%',
+            width: '130vw',
+            height: '200vh', // Tree is 2x viewport height
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
-            backgroundSize: 'contain',
-            backgroundPosition: 'left top',
+            backgroundSize: 'cover', // Fill the entire space
+            backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',
           }}
         />
-        {/* Subtle gradient overlays */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/30 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 to-transparent" />
+        {/* Subtle gradient overlays for depth */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#080611]/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#080611]/40 to-transparent" />
       </div>
 
       {/* HERO */}
