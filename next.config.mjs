@@ -176,13 +176,10 @@ const nextConfig = {
 
     // Suppress OpenTelemetry dynamic require warnings
     config.plugins.push(
-      new webpack.ContextReplacementPlugin(
-        /@opentelemetry\/instrumentation/,
-        (data) => {
-          delete data.dependencies[0].critical;
-          return data;
-        },
-      ),
+      new webpack.ContextReplacementPlugin(/@opentelemetry\/instrumentation/, (data) => {
+        delete data.dependencies[0].critical;
+        return data;
+      }),
     );
 
     // Reduce polyfills and giant blobs entering the cache

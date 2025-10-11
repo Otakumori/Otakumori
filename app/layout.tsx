@@ -8,8 +8,6 @@ import * as Sentry from '@sentry/nextjs';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
 import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 import { headers } from 'next/headers';
-import CursorGlow from './components/effects/CursorGlow';
-import { isCursorGlowEnabled } from './flags';
 import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
@@ -17,6 +15,8 @@ import GoogleAnalytics from './components/analytics/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import { bootCheckInngest } from '@/lib/inngestHealth';
 import { enforceNoMocks } from '@/lib/no-mocks';
+import StarfieldBackground from '@/components/background/StarfieldBackground';
+import PetalField from './components/effects/PetalField';
 
 // Boot-time Inngest health check (fire-and-forget)
 bootCheckInngest();
@@ -60,14 +60,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50 font-body">
           <GoogleAnalytics />
           <PerformanceMonitor />
-          {/* CherryBlossomEffect moved to Home page only for v0 spec compliance */}
-          {isCursorGlowEnabled() && <CursorGlow />}
+
+          {/* Global Background Effects (z-0) */}
+          <StarfieldBackground className="fixed inset-0 z-0" />
+          <PetalField density="site" />
+
+          {/* Cursor Glow disabled per user preference */}
+          {/* {isCursorGlowEnabled() && <CursorGlow />} */}
+
           <PetalHUD />
           <Konami />
           <PetalProgressBar />
           <ClientErrorBoundary>
             <Providers>
-              <div className="flex min-h-screen flex-col">
+              <div className="flex min-h-screen flex-col relative z-10">
                 <Navbar />
                 <main id="main-content" className="flex-1">
                   {children}

@@ -57,7 +57,7 @@ export async function GET() {
       cache: 'no-store',
     });
     diagnostics.printify.status = res.ok ? 'reachable' : `error: ${res.status} ${res.statusText}`;
-    
+
     if (!res.ok) {
       diagnostics.printify.error = await res.text().catch(() => 'no error body');
     } else {
@@ -112,4 +112,3 @@ export async function GET() {
     },
   });
 }
-

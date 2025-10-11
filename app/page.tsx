@@ -15,8 +15,6 @@ import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
 import BlogSection from '@/app/(site)/home/BlogSection';
 import SoapstoneComposer from '@/components/soapstone/SoapstoneComposer';
 import InteractivePetals from '@/components/hero/InteractivePetals';
-import StarfieldBackground from '@/components/background/StarfieldBackground';
-import CursorGlow from './components/fx/CursorGlow';
 
 export const revalidate = 60;
 
@@ -32,13 +30,7 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen vignette">
-      {/* Layer 1: Animated Starfield Background (z-0) */}
-      <StarfieldBackground className="fixed inset-0 z-0" />
-
-      {/* Cursor Glow Effect (z-4) */}
-      <CursorGlow />
-
-      {/* Layer 2: Cherry Blossom Tree (z-[49]) - positioned behind header but above content */}
+      {/* Cherry Blossom Tree (z-[49]) - positioned behind header but above content */}
       <div className="fixed top-0 left-0 w-full h-screen z-[49] pointer-events-none">
         <div
           className="absolute top-0 left-0 opacity-95"
