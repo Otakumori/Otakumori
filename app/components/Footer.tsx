@@ -72,44 +72,44 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-white text-lg font-semibold mb-4">Otaku-mori</h3>
-            <p className="text-gray-300 text-sm">Discover treasures from the digital abyss</p>
+            <p className="text-gray-300 text-sm">Anime x gaming — curated treasures</p>
           </div>
           <div>
-            <h4 className="text-white text-sm font-semibold mb-4">Support</h4>
+            <h4 className="text-white text-sm font-semibold mb-4">Explore</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/help" className="text-gray-300 hover:text-white text-sm">
-                  Help Center
+                <a href="/shop" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Shop
                 </a>
               </li>
               <li>
-                <a href="/contact" className="text-gray-300 hover:text-white text-sm">
-                  Contact Us
+                <a href="/mini-games" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Mini-Games
                 </a>
               </li>
               <li>
-                <a href="/privacy" className="text-gray-300 hover:text-white text-sm">
-                  Privacy Policy
+                <a href="/blog" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Blog: Read the lore
                 </a>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white text-sm font-semibold mb-4">Legal</h4>
+            <h4 className="text-white text-sm font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/terms" className="text-gray-300 hover:text-white text-sm">
+                <a href="/help" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="/privacy" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Terms of Service
-                </a>
-              </li>
-              <li>
-                <a href="/returns" className="text-gray-300 hover:text-white text-sm">
-                  Returns
-                </a>
-              </li>
-              <li>
-                <a href="/cookies" className="text-gray-300 hover:text-white text-sm">
-                  Cookie Settings
                 </a>
               </li>
             </ul>
@@ -118,18 +118,18 @@ export default function Footer() {
             <h4 className="text-white text-sm font-semibold mb-4">Connect</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/community" className="text-gray-300 hover:text-white text-sm">
+                <a href="/community" className="text-gray-300 hover:text-white text-sm transition-colors">
                   Community
                 </a>
               </li>
               <li>
-                <a href="/glossary" className="text-gray-300 hover:text-white text-sm">
-                  Glossary
+                <a href="/community/soapstones" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  View All Signs
                 </a>
               </li>
               <li>
-                <a href="/community/soapstones" className="text-gray-300 hover:text-white text-sm">
-                  View All Signs
+                <a href="/cookies" className="text-gray-300 hover:text-white text-sm transition-colors">
+                  Cookie Settings
                 </a>
               </li>
             </ul>

@@ -209,7 +209,7 @@ export default function Game({ mode }: Props) {
         ref={canvasRef}
         width={800}
         height={600}
-        className="w-full h-auto cursor-crosshair"
+        className="w-full h-auto cursor-crosshair bg-gradient-to-br from-black via-purple-950/30 to-black"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -402,6 +402,13 @@ class GameEngine {
       } else {
         this.activePowerUps.set(type, newTime);
       }
+    });
+
+    // Fade slash trail dynamically over time
+    const now = this.gameTime;
+    this.slashTrail = this.slashTrail.filter((point) => {
+      const age = now - point.time;
+      return age < 0.3; // Trail fades after 300ms
     });
   }
 
@@ -621,52 +628,61 @@ class GameEngine {
       this.ctx.restore();
     });
 
-    // Draw slash trail effect - enhanced pink themed
+    // Draw slash trail effect - dynamic fading based on age
     if (this.slashTrail.length > 1) {
       this.ctx.save();
       
+      const now = this.gameTime;
+      
       // Draw multiple layers for better effect
       for (let layer = 0; layer < 3; layer++) {
-        const opacity = (3 - layer) / 3;
-        const width = 8 - layer * 2;
-        
-        // Create gradient trail
-        const gradient = this.ctx.createLinearGradient(
-          this.slashTrail[0].x,
-          this.slashTrail[0].y,
-          this.slashTrail[this.slashTrail.length - 1].x,
-          this.slashTrail[this.slashTrail.length - 1].y
-        );
-        gradient.addColorStop(0, `rgba(255, 20, 147, ${0.1 * opacity})`);
-        gradient.addColorStop(0.5, `rgba(255, 105, 180, ${0.9 * opacity})`);
-        gradient.addColorStop(1, `rgba(255, 182, 193, ${0.7 * opacity})`);
-
-        this.ctx.strokeStyle = gradient;
-        this.ctx.lineWidth = width;
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        this.ctx.shadowBlur = 20 + layer * 10;
-        this.ctx.shadowColor = `rgba(255, 105, 180, ${0.6 * opacity})`;
-
         this.ctx.beginPath();
-        this.ctx.moveTo(this.slashTrail[0].x, this.slashTrail[0].y);
         
-        // Use quadratic curves for smoother trail
-        for (let i = 1; i < this.slashTrail.length - 1; i++) {
-          const xc = (this.slashTrail[i].x + this.slashTrail[i + 1].x) / 2;
-          const yc = (this.slashTrail[i].y + this.slashTrail[i + 1].y) / 2;
-          this.ctx.quadraticCurveTo(this.slashTrail[i].x, this.slashTrail[i].y, xc, yc);
+        for (let i = 0; i < this.slashTrail.length - 1; i++) {
+          const point = this.slashTrail[i];
+          const nextPoint = this.slashTrail[i + 1];
+          
+          // Calculate age-based opacity (newer = more visible)
+          const age = now - point.time;
+          const fadeProgress = Math.max(0, 1 - age / 0.3); // Fade over 300ms
+          const layerOpacity = ((3 - layer) / 3) * fadeProgress;
+          
+          // Dynamic width based on age and layer
+          const baseWidth = 12 - layer * 3;
+          const width = baseWidth * fadeProgress;
+          
+          if (width > 0.5 && layerOpacity > 0.01) {
+            // Create gradient for this segment
+            const gradient = this.ctx.createLinearGradient(
+              point.x,
+              point.y,
+              nextPoint.x,
+              nextPoint.y
+            );
+            gradient.addColorStop(0, `rgba(255, 20, 147, ${0.8 * layerOpacity})`);
+            gradient.addColorStop(0.5, `rgba(255, 105, 180, ${0.95 * layerOpacity})`);
+            gradient.addColorStop(1, `rgba(255, 182, 193, ${0.7 * layerOpacity})`);
+
+            this.ctx.strokeStyle = gradient;
+            this.ctx.lineWidth = width;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+            this.ctx.shadowBlur = (25 + layer * 15) * fadeProgress;
+            this.ctx.shadowColor = `rgba(255, 105, 180, ${0.7 * layerOpacity})`;
+
+            // Draw smooth curved segment
+            this.ctx.beginPath();
+            this.ctx.moveTo(point.x, point.y);
+            
+            const midX = (point.x + nextPoint.x) / 2;
+            const midY = (point.y + nextPoint.y) / 2;
+            this.ctx.quadraticCurveTo(point.x, point.y, midX, midY);
+            this.ctx.lineTo(nextPoint.x, nextPoint.y);
+            this.ctx.stroke();
+          }
         }
-        
-        // Last segment
-        if (this.slashTrail.length > 1) {
-          const last = this.slashTrail[this.slashTrail.length - 1];
-          this.ctx.lineTo(last.x, last.y);
-        }
-        
-        this.ctx.stroke();
       }
-      
+
       this.ctx.restore();
     }
 

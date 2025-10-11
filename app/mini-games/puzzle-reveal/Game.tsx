@@ -132,7 +132,7 @@ export default function Game({ mode }: Props) {
     if (gameState.isGameOver) {
       const submitScore = async () => {
         const petalReward = Math.floor(gameState.score / 15);
-        
+
         try {
           // Award petals
           if (petalReward > 0) {
@@ -145,7 +145,7 @@ export default function Game({ mode }: Props) {
               }),
             });
           }
-          
+
           // Submit to leaderboard
           await fetch('/api/v1/leaderboards/puzzle-reveal', {
             method: 'POST',
@@ -239,11 +239,21 @@ export default function Game({ mode }: Props) {
               {gameState.revealedPercent >= 100 ? 'FOG CLEARED! ✓' : 'TIME EXPIRED'}
             </h2>
             <div className="space-y-2 mb-6">
-              <p className="text-pink-100">Final Score: <span className="font-bold">{gameState.score}</span></p>
-              <p className="text-pink-100">Revealed: <span className="font-bold">{Math.round(gameState.revealedPercent)}%</span></p>
-              <p className="text-pink-100">Mode: <span className="font-bold capitalize">{mode}</span></p>
+              <p className="text-pink-100">
+                Final Score: <span className="font-bold">{gameState.score}</span>
+              </p>
+              <p className="text-pink-100">
+                Revealed:{' '}
+                <span className="font-bold">{Math.round(gameState.revealedPercent)}%</span>
+              </p>
+              <p className="text-pink-100">
+                Mode: <span className="font-bold capitalize">{mode}</span>
+              </p>
               <p className="text-pink-200 text-lg mt-4">
-                <span role="img" aria-label="Cherry blossom petal">🌸</span> Petals Earned: <span className="font-bold">{Math.floor(gameState.score / 15)}</span>
+                <span role="img" aria-label="Cherry blossom petal">
+                  🌸
+                </span>{' '}
+                Petals Earned: <span className="font-bold">{Math.floor(gameState.score / 15)}</span>
               </p>
             </div>
             <motion.button
