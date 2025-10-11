@@ -23,7 +23,7 @@ export async function GET() {
 
   // Test Inngest endpoint
   try {
-    const inngestUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/api/inngest`;
+    const inngestUrl = `${env.VERCEL_URL ? `https://${env.VERCEL_URL}` : 'http://localhost:3000'}/api/inngest`;
     const res = await fetch(inngestUrl, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },

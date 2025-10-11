@@ -1,0 +1,57 @@
+<svg width="160" height="240" viewBox="0 0 160 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="card-bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="border-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="sakura-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="3" fill="#ec4899" opacity="0.3"/>
+      <circle cx="20" cy="20" r="6" fill="none" stroke="#8b5cf6" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+  </defs>
+  
+  <!-- Card background -->
+  <rect width="160" height="240" rx="12" ry="12" fill="url(#card-bg)" stroke="url(#border-gradient)" stroke-width="2"/>
+  
+  <!-- Sakura pattern overlay -->
+  <rect x="4" y="4" width="152" height="232" rx="8" ry="8" fill="url(#sakura-pattern)" opacity="0.6"/>
+  
+  <!-- Central logo area -->
+  <circle cx="80" cy="120" r="35" fill="#1a1a2e" stroke="#ec4899" stroke-width="2" filter="url(#glow)"/>
+  
+  <!-- Cherry blossom icon -->
+  <g transform="translate(80, 120)">
+    <!-- Petals -->
+    <g fill="#ec4899" opacity="0.8">
+      <ellipse cx="0" cy="-15" rx="8" ry="12" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-15" rx="8" ry="12" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-15" rx="8" ry="12" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-15" rx="8" ry="12" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-15" rx="8" ry="12" transform="rotate(288)"/>
+    </g>
+    <!-- Center -->
+    <circle cx="0" cy="0" r="4" fill="#8b5cf6"/>
+  </g>
+  
+  <!-- Brand text -->
+  <text x="80" y="210" font-size="12" font-weight="bold" text-anchor="middle" fill="#ec4899" filter="url(#glow)">OTAKU</text>
+  <text x="80" y="225" font-size="12" font-weight="bold" text-anchor="middle" fill="#8b5cf6" filter="url(#glow)">MORI</text>
+  
+  <!-- Corner decorations -->
+  <circle cx="20" cy="20" r="3" fill="#ec4899" opacity="0.6"/>
+  <circle cx="140" cy="20" r="3" fill="#8b5cf6" opacity="0.6"/>
+  <circle cx="20" cy="220" r="3" fill="#8b5cf6" opacity="0.6"/>
+  <circle cx="140" cy="220" r="3" fill="#ec4899" opacity="0.6"/>
+</svg>

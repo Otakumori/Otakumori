@@ -1,0 +1,477 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="trunk-fall" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </radialGradient>
+    <filter id="shadow-fall">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <filter id="glow-fall">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="900" fill="transparent"/>
+  
+  <!-- Main trunk -->
+  <ellipse cx="350" cy="600" rx="40" ry="300" fill="url(#trunk-fall)" filter="url(#shadow-fall)"/>
+  
+  <!-- Branches -->
+  
+    <line x1="394.59951714869254" y1="653.1588064713043" x2="433.9090227327164" y2="311.05761726452397" 
+          stroke="#A0522D" stroke-width="3.8251340716251274" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="340.3160837597989" y1="661.8912684959186" x2="547.2032261045226" y2="234.76348359937785" 
+          stroke="#A0522D" stroke-width="10.175109079347449" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="381.3130752905578" y1="601.8344616795866" x2="414.343784234429" y2="522.8424034161935" 
+          stroke="#A0522D" stroke-width="3.0438187377112254" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="334.4722222433756" y1="659.6663541351079" x2="208.96260740074055" y2="337.9533053162876" 
+          stroke="#A0522D" stroke-width="8.256032905649533" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="362.5714697099286" y1="670.9175563221465" x2="519.3673870329969" y2="419.9492766635332" 
+          stroke="#A0522D" stroke-width="4.315507332704838" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="333.7835781568935" y1="402.2224601599104" x2="430.2557358087749" y2="228.87189402431156" 
+          stroke="#A0522D" stroke-width="8.714851587182604" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="330.90366029775345" y1="667.9053705253311" x2="543.8888295722704" y2="483.71756321155806" 
+          stroke="#A0522D" stroke-width="4.388280430173085" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="388.6163306827903" y1="592.4043446679681" x2="299.7700440105923" y2="577.9640872154317" 
+          stroke="#A0522D" stroke-width="6.860774717131813" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="387.3620550051841" y1="698.0344541116963" x2="396.591775892416" y2="285.41368044201" 
+          stroke="#A0522D" stroke-width="7.461933872483877" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="351.92634149210176" y1="682.631086611178" x2="366.7029916217115" y2="510.4705030434065" 
+          stroke="#A0522D" stroke-width="5.0383071200119165" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="340.4216990311763" y1="697.8520814906983" x2="476.9836977279132" y2="272.2293558224371" 
+          stroke="#A0522D" stroke-width="4.575674701783013" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="390.98356909727295" y1="642.6544815632011" x2="422.78950986189255" y2="437.68924951608074" 
+          stroke="#A0522D" stroke-width="4.198799315233366" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="348.56676767075885" y1="626.9813516720428" x2="462.8851931273867" y2="494.992772725801" 
+          stroke="#A0522D" stroke-width="8.433081363084433" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="395.5918895850585" y1="437.09860836642787" x2="533.4910509060611" y2="274.7477958107663" 
+          stroke="#A0522D" stroke-width="3.001307467744997" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+    <line x1="304.9382226294935" y1="479.0318719857967" x2="489.2615301448438" y2="256.4552721462001" 
+          stroke="#A0522D" stroke-width="6.964613809707378" 
+          stroke-linecap="round" filter="url(#shadow-fall)"/>
+  
+  
+  <!-- Leaf/Blossom clusters -->
+  
+    <circle cx="159.23337747160824" cy="497.1351797675352" r="18.519066934226306" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="156.08922378331044" cy="496.36760018063455" r="30.992741032594854" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="390.48291919766274" cy="255.2810104256256" r="18.589293551404488" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="636.0028144008404" cy="268.1271352064452" r="15.302039620421862" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="297.9332787934443" cy="335.3724786055027" r="39.636020691586126" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="331.05067739365165" cy="342.6535976515713" r="34.43321496294931" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="215.83301182128156" cy="292.1395969680257" r="27.434387911384412" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="183.59694837030668" cy="249.94093448311418" r="35.19177250573344" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="293.49485185534525" cy="353.9317801387575" r="25.03461086339505" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="592.7240638759831" cy="115.85676186448559" r="16.79491332764571" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="197.23390926520244" cy="475.5506681400275" r="37.83737419336478" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="598.2793450545507" cy="454.7083275023717" r="24.48460457184143" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="252.54263288787624" cy="487.4539290098665" r="35.6456158489083" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="490.2440929743529" cy="188.30394540954256" r="28.436269883298092" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="376.5947764858378" cy="528.6273607435155" r="22.260647103623597" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="358.82377988238466" cy="235.8768136562869" r="33.356497824570646" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="322.26580690295793" cy="164.9038693200792" r="27.8513544165394" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="456.75302516422573" cy="419.5574216110899" r="21.430362156762797" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="547.7355513104377" cy="421.9025517731634" r="35.10740231007608" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="349.2951483930965" cy="231.1246339148714" r="29.39805541046847" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="482.98699903491814" cy="253.30994589769986" r="29.678560037891458" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="546.3753807498315" cy="573.2779872985684" r="23.243448808633588" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="279.83418573541235" cy="225.11975733910052" r="37.85635741984655" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="354.133286965814" cy="245.86351047297686" r="37.93087775930435" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="257.2057523469213" cy="522.5046119762862" r="27.625331990139763" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="503.7824925845544" cy="369.95493493753406" r="30.234633198531526" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="304.2572342243021" cy="102.66649887582315" r="24.455830411232334" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="607.5047532899323" cy="529.7554898060778" r="15.587323869206136" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="301.171052060802" cy="581.2904942917031" r="34.423080956486174" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="502.53995123151526" cy="151.54521520561138" r="29.02862706760795" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="510.7413294607278" cy="272.8849940648136" r="21.38739654528615" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="358.24773811457266" cy="520.1238674225149" r="20.655165068218224" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="202.38117575053815" cy="262.18430692164975" r="33.465658892040395" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="220.32460230736825" cy="592.167014141321" r="20.207946648123247" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="412.9341148673151" cy="115.69499378706053" r="39.053542232686766" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="490.72670706704645" cy="354.8343528882541" r="18.92329101626472" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="571.7141464789293" cy="301.61003537081615" r="15.344072879951002" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="587.8860693236595" cy="363.4188342537347" r="22.774213439182283" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="490.3756175073507" cy="595.3339460677355" r="30.599637622856825" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="542.3673560385221" cy="125.05883233720307" r="31.3267296171039" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="440.07393563279305" cy="231.21968297461018" r="27.805197627122066" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="304.72796469952164" cy="391.5279516696051" r="27.930364511880924" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="606.178856498015" cy="439.3893307996129" r="15.085789765077642" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="342.7316526762613" cy="184.51716474067462" r="15.277555864877893" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="620.6768124295429" cy="457.82535228446733" r="30.410130773896757" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="609.645686803259" cy="472.86405910508904" r="37.7091483446269" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="629.4680457725824" cy="175.69344117116304" r="36.86761214767691" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="258.24522801240977" cy="101.2603581517836" r="24.457240522594102" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="433.5179009986725" cy="352.00563327200865" r="31.126259288907114" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="589.9103648318747" cy="105.21567873358552" r="26.540003373890013" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="359.53356111591984" cy="236.75402856435483" r="29.02441452807387" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="367.883170021715" cy="425.2523635862342" r="25.319732509649477" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="413.81219674733836" cy="527.5819971373205" r="30.207710190058087" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="632.3859634294965" cy="190.02710630789912" r="24.02998005715895" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="597.4312928875706" cy="343.48782908203134" r="16.784981926570055" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="634.2967271274351" cy="262.9270645190649" r="23.259761147688" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="323.7163031610217" cy="379.1457871531351" r="22.946272278952115" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="300.6122629987838" cy="458.98539829087593" r="22.613535867492494" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="190.51432159907398" cy="358.06130832597063" r="31.51379831052707" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="202.98744402073407" cy="203.76163364289158" r="28.041593641299333" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="535.0273725208974" cy="587.8974019780658" r="33.951004730526805" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="321.4708000245806" cy="256.7849042145647" r="34.98304365175787" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="529.5505268413791" cy="202.27351334102184" r="18.873466905643735" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="526.1885874018425" cy="248.89123187998877" r="27.843409356937933" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="551.9768426208742" cy="137.17927640844132" r="38.789570263591045" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="455.2158862157538" cy="447.60794693226774" r="20.60728037780122" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="374.78142569698923" cy="268.84749546241164" r="29.168511941549344" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="480.9762964101156" cy="255.27636144606006" r="27.964738558724786" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="533.9119171003833" cy="337.9187246403618" r="30.079668620196614" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="264.5918000762103" cy="291.7224288815771" r="18.798408787763087" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="397.93223410544" cy="279.8449842719431" r="31.47790831482706" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="202.45948264947464" cy="424.58180859624883" r="20.33305269675412" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="467.43041462812226" cy="310.94232682098493" r="37.93471140287757" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="300.8912574550313" cy="336.23935369730873" r="26.311764344317048" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="616.9705290312547" cy="308.4250727215857" r="39.51514451135104" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="226.74606773649506" cy="207.81100933471677" r="15.8752170083482" 
+            fill="#FFA500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="498.1586183607701" cy="368.2262561401569" r="22.616986228563547" 
+            fill="#FFD700" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="303.9069158564573" cy="241.7290920695653" r="15.339987934016012" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="192.20003474823707" cy="136.43691749190305" r="27.510825776576105" 
+            fill="#FF6347" opacity="0.8" filter="url(#glow-fall)"/>
+  
+    <circle cx="416.63448877278296" cy="436.22349926264826" r="26.724473124843122" 
+            fill="#FF4500" opacity="0.8" filter="url(#glow-fall)"/>
+  
+  
+  <!-- Floating petals -->
+  
+    <g transform="translate(1040.4788949207139, 438.2514561260183) rotate(44.63857767018563)">
+      <ellipse rx="12.34850882131763" ry="7.409105292790578" fill="#FF4500" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="8s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(675.2508408877923, 428.70786336840416) rotate(206.42613028420925)">
+      <ellipse rx="15.329356373992091" ry="9.197613824395255" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="9s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(450.23636845411784, 17.180274605002776) rotate(16.1822584965517)">
+      <ellipse rx="19.840823548615596" ry="11.904494129169358" fill="#B8860B" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="10s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(491.05705093850116, 734.6297233055396) rotate(214.10344844839193)">
+      <ellipse rx="16.749631896309687" ry="10.049779137785812" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="11s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(147.9882883744863, 851.6590262368444) rotate(159.94308239627847)">
+      <ellipse rx="18.89320901301393" ry="11.335925407808357" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="8s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(76.12821115136059, 433.23649497338374) rotate(80.23515676197658)">
+      <ellipse rx="19.021151781624315" ry="11.412691068974588" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="9s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(1140.8076289947762, 462.84283892749505) rotate(302.25622983049277)">
+      <ellipse rx="19.463387275810657" ry="11.678032365486393" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="10s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(341.2857124768065, 395.62150218188253) rotate(142.39165540455468)">
+      <ellipse rx="9.134354295912305" ry="5.480612577547382" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="11s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(508.94116411161406, 554.4638206609505) rotate(241.69093004296448)">
+      <ellipse rx="19.13415304927197" ry="11.480491829563181" fill="#B8860B" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="8s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(1025.8516408760088, 727.1252826422526) rotate(111.03956627364664)">
+      <ellipse rx="19.12675424663215" ry="11.47605254797929" fill="#FF4500" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="9s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(820.6572315258709, 281.24601359568555) rotate(326.2433511449295)">
+      <ellipse rx="16.7205572439005" ry="10.032334346340301" fill="#FF4500" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="10s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(81.86914000008576, 537.3101664476573) rotate(64.8254571786992)">
+      <ellipse rx="8.95739357437917" ry="5.374436144627501" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="11s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(166.0056377962886, 442.1839186017454) rotate(242.0140044721489)">
+      <ellipse rx="18.132011688546545" ry="10.879207013127926" fill="#FF4500" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="8s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(456.32940994020635, 55.28541557724229) rotate(340.88936984084995)">
+      <ellipse rx="19.59918298707717" ry="11.759509792246302" fill="#FF4500" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="9s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(392.9886137904156, 655.9685262050176) rotate(19.53882602481017)">
+      <ellipse rx="8.856162520212642" ry="5.313697512127585" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="10s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(436.6553036107574, 623.0509168204561) rotate(351.2201752258888)">
+      <ellipse rx="8.461186739343693" ry="5.076712043606216" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="11s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(1040.6761619509123, 485.9267774447553) rotate(191.41908322208187)">
+      <ellipse rx="19.183333486283885" ry="11.510000091770332" fill="#DC143C" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="8s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(745.3599393339406, 776.1247294144423) rotate(198.3092721755854)">
+      <ellipse rx="18.35526746705795" ry="11.013160480234768" fill="#B8860B" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="9s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(3.839673027402579, 37.24137460415267) rotate(230.0762156047471)">
+      <ellipse rx="17.590716519549087" ry="10.554429911729452" fill="#FF4500" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="10s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+    <g transform="translate(324.64183981468693, 479.48572233213883) rotate(300.5316145568868)">
+      <ellipse rx="13.381987213791511" ry="8.029192328274906" fill="#B8860B" opacity="0.7">
+        <animateTransform attributeName="transform" type="rotate" 
+                         values="0;360" dur="11s" repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  
+  
+  <!-- Tree title -->
+  <text x="600" y="50" font-size="32" font-weight="bold" text-anchor="middle" 
+        fill="#333" filter="url(#shadow-fall)">Autumn Cherry Tree</text>
+</svg>

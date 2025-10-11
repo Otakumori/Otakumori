@@ -7,11 +7,5 @@ export default function GlassPanel({
   children: ReactNode;
   className?: string;
 }) {
-  return (
-    <div
-      className={`glass-panel rounded-2xl ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`glass-panel rounded-2xl ${className}`}>{children}</div>;
 }
