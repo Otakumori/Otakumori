@@ -60,6 +60,10 @@ export default function Navbar() {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Scroll state for navbar effects
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
   // State for real data
   const [realProducts, setRealProducts] = useState<any[]>([]);
   const [realBlogPosts, setRealBlogPosts] = useState<any[]>([]);
@@ -102,6 +106,26 @@ export default function Navbar() {
   useEffect(() => {
     fetchProducts();
     fetchBlogPosts();
+  }, []);
+
+  // Handle scroll effects
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollTop = window.scrollY;
+          setScrollY(scrollTop);
+          setIsScrolled(scrollTop > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Handle search input
@@ -163,8 +187,12 @@ export default function Navbar() {
 
   return (
     <header
-      className="relative z-50 w-full backdrop-blur-lg font-ui"
-      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}
+      className={`navbar-scroll relative z-50 w-full backdrop-blur-lg font-ui transition-all duration-300 ${
+        isScrolled ? 'scrolled bg-black/95 shadow-lg' : 'bg-[rgba(57,5,40,0.8)]'
+      }`}
+      style={{
+        transform: `translateY(${Math.min(scrollY * 0.05, 10)}px)`, // Subtle parallax
+      }}
     >
       {/* Skip to content for accessibility */}
       <a

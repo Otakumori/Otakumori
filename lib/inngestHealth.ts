@@ -1,3 +1,5 @@
+import { env } from '@/env';
+
 let started = false;
 
 function isBuildPhase() {
@@ -7,7 +9,7 @@ function isBuildPhase() {
 
 function isEdgeRuntime() {
   // Next 14/15: 'edge' | 'nodejs' (undefined in some build contexts)
-  return process.env.NEXT_RUNTIME === 'edge';
+  return env.NEXT_RUNTIME === 'edge';
 }
 
 export async function bootCheckInngest() {
@@ -25,13 +27,18 @@ export async function bootCheckInngest() {
   if (isEdgeRuntime()) return;
 
   const serveUrl = process.env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
-  const missing = ['INNGEST_EVENT_KEY', 'INNGEST_SIGNING_KEY'].filter((k) => !process.env[k]);
-  if (missing.length) {
+  const hasEventKey = !!process.env.INNGEST_EVENT_KEY;
+  const hasSigningKey = !!process.env.INNGEST_SIGNING_KEY;
+
+  if (!hasEventKey || !hasSigningKey) {
+    const missing = [];
+    if (!hasEventKey) missing.push('INNGEST_EVENT_KEY');
+    if (!hasSigningKey) missing.push('INNGEST_SIGNING_KEY');
     console.warn('[Inngest] Missing env:', missing.join(', '));
   }
 
   // If we're in production but serveUrl points to localhost, skip
-  if (process.env.NODE_ENV === 'production' && serveUrl.startsWith('http://localhost')) {
+  if (env.NODE_ENV === 'production' && serveUrl.startsWith('http://localhost')) {
     return;
   }
 
@@ -41,8 +48,6 @@ export async function bootCheckInngest() {
       console.error(
         `[Inngest] GET ${serveUrl} failed: ${res.status} – check middleware/public routes`,
       );
-    } else {
-      console.info(`[Inngest] GET ${serveUrl} succeeded: ${res.status}`);
     }
   } catch (e: any) {
     console.error(`[Inngest] GET ${serveUrl} error:`, e?.message || e);
@@ -59,8 +64,6 @@ export async function bootCheckInngest() {
     });
     if (!res.ok) {
       console.error(`[Inngest] POST ${serveUrl} failed: ${res.status} – check keys/serve URL`);
-    } else {
-      console.info(`[Inngest] POST ${serveUrl} succeeded: ${res.status}`);
     }
   } catch (e: any) {
     console.error(`[Inngest] POST ${serveUrl} error:`, e?.message || e);

@@ -9,12 +9,9 @@ import {
   type ProceduralCharacterConfig,
 } from '@/lib/avatar/procedural-generator';
 import { GLBCharacterImporter, VRoidImporter } from '@/lib/avatar/glb-importer';
-import { createCharacterPartMaterial } from '@/lib/avatar/anime-toon-material';
-import {
-  VerletPhysicsEngine,
-  HairPhysicsSystem,
-  ClothPhysicsSystem,
-} from '@/lib/avatar/verlet-physics';
+import { VerletPhysicsEngine } from '@/lib/avatar/verlet-physics';
+import { HairPhysicsSystem, HairStrand } from '@/lib/physics/hair-physics';
+import { ClothPhysicsSystem, ClothMesh } from '@/lib/physics/cloth-physics';
 import {
   useAdultGating,
   AgeVerificationModal,
@@ -41,8 +38,8 @@ export default function AvatarSystem({
 }: AvatarSystemProps) {
   const [mode, setMode] = useState<'view' | 'edit' | 'import'>('view');
   const [character, setCharacter] = useState<THREE.Group | null>(null);
-  const [hairStrands, setHairStrands] = useState<any[]>([]);
-  const [clothMeshes, setClothMeshes] = useState<any[]>([]);
+  const [hairStrands, setHairStrands] = useState<HairStrand[]>([]);
+  const [clothMeshes, setClothMeshes] = useState<ClothMesh[]>([]);
   const [config, setConfig] = useState<ProceduralCharacterConfig>(
     initialConfig || {
       gender: 'female',
@@ -106,8 +103,8 @@ export default function AvatarSystem({
     importerRef.current = new GLBCharacterImporter();
     vroidImporterRef.current = new VRoidImporter();
     physicsEngineRef.current = new VerletPhysicsEngine();
-    hairSystemRef.current = new HairPhysicsSystem(physicsEngineRef.current);
-    clothSystemRef.current = new ClothPhysicsSystem(physicsEngineRef.current);
+    hairSystemRef.current = new HairPhysicsSystem();
+    clothSystemRef.current = new ClothPhysicsSystem();
 
     generateCharacter();
   }, []);
@@ -161,14 +158,16 @@ export default function AvatarSystem({
         const length =
           config.hair.style === 'very-long' ? 0.8 : config.hair.style === 'long' ? 0.6 : 0.4;
 
-        const strand = hairSystemRef.current.addHairStrand(
-          rootPosition,
-          direction,
-          length,
-          8,
-          0.01,
+        // Create and add strand manually
+        const strand = new HairStrand(
+          rootPosition.x,
+          rootPosition.y,
+          8, // segmentCount
+          length / 8, // segmentLength
           config.hair.color,
+          2, // thickness
         );
+        hairSystemRef.current.addStrand(strand);
 
         strands.push(strand);
       }
@@ -184,13 +183,18 @@ export default function AvatarSystem({
     if (!clothSystemRef.current) return;
 
     try {
-      const cloth = clothSystemRef.current.addClothMesh(
-        0.8,
-        1.2,
-        16,
-        20,
-        createCharacterPartMaterial('clothing', '#FF6B9D'),
+      // Create cloth mesh manually
+      const cloth = new ClothMesh(
+        0, // startX
+        0, // startY
+        0.8, // width
+        1.2, // height
+        16, // cols
+        20, // rows
+        '#FF6B9D', // color
+        0.8, // opacity
       );
+      clothSystemRef.current.addMesh(cloth);
 
       setClothMeshes([cloth]);
     } catch (error) {
@@ -411,7 +415,12 @@ export default function AvatarSystem({
                   />
 
                   <div className="space-y-2">
-                    <label htmlFor="physics-level-select" className="block text-sm font-medium text-white">Physics Level</label>
+                    <label
+                      htmlFor="physics-level-select"
+                      className="block text-sm font-medium text-white"
+                    >
+                      Physics Level
+                    </label>
                     <select
                       id="physics-level-select"
                       value={adultStatus.physicsLevel || 'basic'}
@@ -444,7 +453,9 @@ export default function AvatarSystem({
               <h3 className="text-lg font-semibold text-white">Import Character</h3>
 
               <div className="space-y-2">
-                <label htmlFor="glb-file-input" className="block text-sm font-medium text-white">GLB File</label>
+                <label htmlFor="glb-file-input" className="block text-sm font-medium text-white">
+                  GLB File
+                </label>
                 <input
                   id="glb-file-input"
                   type="file"
@@ -458,7 +469,9 @@ export default function AvatarSystem({
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="vroid-file-input" className="block text-sm font-medium text-white">VRoid File</label>
+                <label htmlFor="vroid-file-input" className="block text-sm font-medium text-white">
+                  VRoid File
+                </label>
                 <input
                   id="vroid-file-input"
                   type="file"

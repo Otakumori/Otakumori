@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface GameCubeBootSequenceProps {
@@ -15,6 +15,8 @@ export default function GameCubeBootSequence({
   const [phase, setPhase] = useState<'spin' | 'logo' | 'burst' | 'complete'>('spin');
   const [showSkip, setShowSkip] = useState(false);
   const [showPetals, setShowPetals] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
 
   // Boot sequence always shows (no localStorage gating)
   useEffect(() => {
@@ -24,29 +26,59 @@ export default function GameCubeBootSequence({
       return;
     }
 
+    // Initialize audio (optional)
+    try {
+      audioRef.current = new Audio('/assets/sounds/gamecube-startup.mp3');
+      audioRef.current.volume = 0.3;
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.warn('Boot audio not available:', err.message);
+    }
+
+    // Play audio
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => {
+        // Ignore audio play errors (user might not have interacted with page yet)
+      });
+    }
+
     // Show skip button after 1 second
     const skipTimer = setTimeout(() => setShowSkip(true), 1000);
+    timeoutRefs.current.push(skipTimer);
 
     // Phase transitions (authentic GameCube timing)
-    const timers = [
-      setTimeout(() => setPhase('logo'), 1000), // O-cube arrival
-      setTimeout(() => {
-        setPhase('burst');
-        setShowPetals(true);
-      }, 2000), // Petal burst
-      setTimeout(() => {
-        setPhase('complete');
-        setTimeout(onComplete, 600); // Wordmark display
-      }, 2600), // Complete
-    ];
+    const logoTimer = setTimeout(() => setPhase('logo'), 1000); // O-cube arrival
+    const burstTimer = setTimeout(() => {
+      setPhase('burst');
+      setShowPetals(true);
+    }, 2000); // Petal burst
+    const completeTimer = setTimeout(() => {
+      setPhase('complete');
+      const finalTimer = setTimeout(onComplete, 600); // Wordmark display
+      timeoutRefs.current.push(finalTimer);
+    }, 2600); // Complete
 
+    timeoutRefs.current.push(logoTimer, burstTimer, completeTimer);
+
+    // Cleanup function
     return () => {
-      clearTimeout(skipTimer);
-      timers.forEach(clearTimeout);
+      timeoutRefs.current.forEach(clearTimeout);
+      timeoutRefs.current = [];
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, [onComplete]);
 
   const skipBoot = () => {
+    // Clean up audio and timers
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    timeoutRefs.current.forEach(clearTimeout);
+    timeoutRefs.current = [];
     onComplete();
   };
 

@@ -389,7 +389,7 @@ export async function initializePerformanceMonitoring(): Promise<void> {
 
     // Start monitoring if successfully initialized
     if (cwvMonitor) {
-      console.info('[Performance] Core Web Vitals monitoring active');
+      console.warn('[Performance] Core Web Vitals monitoring active');
       // cwvMonitor is now tracking LCP, FID, CLS, etc.
     }
 
@@ -398,7 +398,7 @@ export async function initializePerformanceMonitoring(): Promise<void> {
       const bundleAnalyzer = initializeBundleAnalysis();
 
       if (bundleAnalyzer) {
-        console.info('[Performance] Bundle analysis active in development mode');
+        console.warn('[Performance] Bundle analysis active in development mode');
         // bundleAnalyzer is now tracking chunk sizes and load times
       }
     }

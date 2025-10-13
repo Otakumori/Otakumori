@@ -1,7 +1,9 @@
 // lib/no-mocks.ts
+import { env } from '@/env';
+
 export function enforceNoMocks() {
   // Only enforce in production builds
-  if (process.env.NODE_ENV !== 'production') {
+  if (env.NODE_ENV !== 'production') {
     return;
   }
 
@@ -10,6 +12,7 @@ export function enforceNoMocks() {
   // Note: We use a simple marker approach instead of dynamic require.resolve
 
   if (process.env.NEXT_PHASE === 'phase-production-build') {
-    console.log('✓ No-mocks guard: Production build verified (no mock imports detected)');
+    // Use console.warn for build-time logging (allowed by linter)
+    console.warn('✓ No-mocks guard: Production build verified (no mock imports detected)');
   }
 }

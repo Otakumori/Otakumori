@@ -911,9 +911,25 @@ export default function ConsoleCard({
   return (
     <section
       ref={containerRef}
-      className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none"
+      className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none relative"
       aria-label="Mini-Games Console"
     >
+      {/* Audio Status Indicator */}
+      <div className="absolute top-4 right-4 z-10">
+        <div
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
+            audioOn
+              ? 'bg-green-500/20 border border-green-500/40'
+              : 'bg-zinc-500/20 border border-zinc-500/40'
+          }`}
+        >
+          <span className="text-sm">{audioOn ? '🔊' : '🔇'}</span>
+          <span className={`text-xs font-medium ${audioOn ? 'text-green-300' : 'text-zinc-400'}`}>
+            {audioOn ? 'Audio On' : 'Audio Off'}
+          </span>
+        </div>
+      </div>
+
       {mode === 'boot' && (
         <>
           <Boot />

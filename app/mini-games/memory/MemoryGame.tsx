@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -10,7 +11,9 @@ interface Card {
   value: string;
   isFlipped: boolean;
   isMatched: boolean;
-  emoji: string;
+  characterName: string;
+  characterSet: 'kill-la-kill' | 'studio-ghibli';
+  imagePath: string;
 }
 
 interface GameState {
@@ -23,28 +26,58 @@ interface GameState {
   difficulty: Difficulty;
 }
 
-// Kill la Kill themed card emojis with high contrast
-const CARD_EMOJIS = {
-  easy: ['⚔️', '🔥', '💀', '⭐', '🌟', '💥'],
-  medium: ['⚔️', '🔥', '💀', '⭐', '🌟', '💥', '🎭', '🎪', '🎯', '🎨'],
-  hard: [
-    '⚔️',
-    '🔥',
-    '💀',
-    '⭐',
-    '🌟',
-    '💥',
-    '🎭',
-    '🎪',
-    '🎯',
-    '🎨',
-    '🏆',
-    '⚡',
-    '🎌',
-    '🎏',
-    '🎐',
-    '🎑',
-  ],
+// Character sets for different difficulties
+const CHARACTER_SETS = {
+  easy: {
+    'kill-la-kill': [
+      { name: 'ryuko', path: '/assets/memory/kill-la-kill/ryuko.svg' },
+      { name: 'satsuki', path: '/assets/memory/kill-la-kill/satsuki.svg' },
+      { name: 'mako', path: '/assets/memory/kill-la-kill/mako.svg' },
+    ],
+    'studio-ghibli': [
+      { name: 'totoro', path: '/assets/memory/studio-ghibli/totoro.svg' },
+      { name: 'chihiro', path: '/assets/memory/studio-ghibli/chihiro.svg' },
+      { name: 'howl', path: '/assets/memory/studio-ghibli/howl.svg' },
+    ],
+  },
+  medium: {
+    'kill-la-kill': [
+      { name: 'ryuko', path: '/assets/memory/kill-la-kill/ryuko.svg' },
+      { name: 'satsuki', path: '/assets/memory/kill-la-kill/satsuki.svg' },
+      { name: 'mako', path: '/assets/memory/kill-la-kill/mako.svg' },
+      { name: 'senketsu', path: '/assets/memory/kill-la-kill/senketsu.svg' },
+      { name: 'nonon', path: '/assets/memory/kill-la-kill/nonon.svg' },
+    ],
+    'studio-ghibli': [
+      { name: 'totoro', path: '/assets/memory/studio-ghibli/totoro.svg' },
+      { name: 'chihiro', path: '/assets/memory/studio-ghibli/chihiro.svg' },
+      { name: 'howl', path: '/assets/memory/studio-ghibli/howl.svg' },
+      { name: 'sophie', path: '/assets/memory/studio-ghibli/sophie.svg' },
+      { name: 'kiki', path: '/assets/memory/studio-ghibli/kiki.svg' },
+    ],
+  },
+  hard: {
+    'kill-la-kill': [
+      { name: 'ryuko', path: '/assets/memory/kill-la-kill/ryuko.svg' },
+      { name: 'satsuki', path: '/assets/memory/kill-la-kill/satsuki.svg' },
+      { name: 'mako', path: '/assets/memory/kill-la-kill/mako.svg' },
+      { name: 'senketsu', path: '/assets/memory/kill-la-kill/senketsu.svg' },
+      { name: 'nonon', path: '/assets/memory/kill-la-kill/nonon.svg' },
+      { name: 'gamagoori', path: '/assets/memory/kill-la-kill/gamagoori.svg' },
+      { name: 'sanageyama', path: '/assets/memory/kill-la-kill/sanageyama.svg' },
+      { name: 'inumuta', path: '/assets/memory/kill-la-kill/inumuta.svg' },
+    ],
+    'studio-ghibli': [
+      { name: 'totoro', path: '/assets/memory/studio-ghibli/totoro.svg' },
+      { name: 'chihiro', path: '/assets/memory/studio-ghibli/chihiro.svg' },
+      { name: 'howl', path: '/assets/memory/studio-ghibli/howl.svg' },
+      { name: 'sophie', path: '/assets/memory/studio-ghibli/sophie.svg' },
+      { name: 'kiki', path: '/assets/memory/studio-ghibli/kiki.svg' },
+      { name: 'ashitaka', path: '/assets/memory/studio-ghibli/ashitaka.svg' },
+      { name: 'san', path: '/assets/memory/studio-ghibli/san.svg' },
+      { name: 'calcifer', path: '/assets/memory/studio-ghibli/calcifer.svg' },
+    ],
+  },
 };
 
 const GRID_SIZES = {
@@ -73,24 +106,43 @@ export default function MemoryGame({ onGameComplete }: MemoryGameProps) {
   // Initialize game
   const initializeGame = useCallback((difficulty: Difficulty) => {
     const { pairs } = GRID_SIZES[difficulty];
-    const emojis = CARD_EMOJIS[difficulty].slice(0, pairs);
+    const characterSet = Math.random() > 0.5 ? 'kill-la-kill' : 'studio-ghibli';
+    const availableCharacters = CHARACTER_SETS[difficulty][characterSet];
 
-    // Create pairs
-    const cardPairs = [...emojis, ...emojis];
+    // Select characters for this game (ensuring we have enough)
+    const selectedCharacters = availableCharacters.slice(0, pairs);
 
-    // Shuffle
-    const shuffled = cardPairs
-      .map((emoji, index) => ({
-        id: `card-${index}`,
-        value: emoji,
+    // Create pairs of cards
+    const cardPairs: Card[] = [];
+    selectedCharacters.forEach((character) => {
+      // First card of the pair
+      cardPairs.push({
+        id: `${character.name}-1`,
+        value: character.name,
         isFlipped: false,
         isMatched: false,
-        emoji,
-      }))
-      .sort(() => Math.random() - 0.5);
+        characterName: character.name,
+        characterSet,
+        imagePath: character.path,
+      });
+
+      // Second card of the pair
+      cardPairs.push({
+        id: `${character.name}-2`,
+        value: character.name,
+        isFlipped: false,
+        isMatched: false,
+        characterName: character.name,
+        characterSet,
+        imagePath: character.path,
+      });
+    });
+
+    // Shuffle the cards
+    const shuffledCards = [...cardPairs].sort(() => Math.random() - 0.5);
 
     setGameState({
-      cards: shuffled,
+      cards: shuffledCards,
       flippedCards: [],
       moves: 0,
       matches: 0,
@@ -287,46 +339,48 @@ export default function MemoryGame({ onGameComplete }: MemoryGameProps) {
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
                 disabled={card.isMatched || card.isFlipped}
-                className={`aspect-square rounded-xl border-2 flex items-center justify-center text-5xl font-bold transition-all relative overflow-hidden ${
+                className={`memory-card aspect-square rounded-xl border-2 flex items-center justify-center transition-all relative overflow-hidden ${
                   card.isMatched
                     ? 'bg-pink-900/40 backdrop-blur-sm border-pink-500 cursor-default'
                     : card.isFlipped
                       ? 'bg-pink-600/30 backdrop-blur-lg border-pink-400'
                       : 'bg-black/80 backdrop-blur-sm border-pink-900/50 hover:border-pink-500/50 hover:bg-black/90 cursor-pointer'
-                }`}
-                initial={{ scale: 0, rotateY: 180 }}
-                animate={{
-                  scale: 1,
-                  rotateY: card.isFlipped || card.isMatched ? 0 : 180,
-                }}
+                } ${card.isFlipped ? 'flipped' : ''}`}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
                 exit={{ scale: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
                 whileHover={!card.isMatched && !card.isFlipped ? { scale: 1.05 } : {}}
                 whileTap={!card.isMatched && !card.isFlipped ? { scale: 0.95 } : {}}
               >
-                {/* Card Back (🌸 logo) */}
-                {!card.isFlipped && !card.isMatched && (
-                  <div className="absolute inset-0 flex items-center justify-center text-pink-400/30">
-                    🌸
+                <div className="memory-card-inner w-full h-full relative">
+                  {/* Card Back (Otaku-mori branded) */}
+                  <div className="memory-card-back absolute inset-0 flex items-center justify-center">
+                    <Image
+                      src="/assets/memory/otm-card-back.svg"
+                      alt="Otaku-mori Card Back"
+                      width={120}
+                      height={180}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                )}
 
-                {/* Card Front (emoji) */}
-                {(card.isFlipped || card.isMatched) && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.15 }}
-                    className="drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]"
-                  >
-                    {card.emoji}
-                  </motion.div>
-                )}
+                  {/* Card Front (Character) */}
+                  <div className="memory-card-front absolute inset-0 flex items-center justify-center">
+                    <Image
+                      src={card.imagePath}
+                      alt={card.characterName}
+                      width={120}
+                      height={180}
+                      className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]"
+                    />
+                  </div>
+                </div>
 
                 {/* Match effect */}
                 {card.isMatched && (
                   <motion.div
-                    className="absolute inset-0 bg-pink-500/20"
+                    className="absolute inset-0 bg-pink-500/20 rounded-xl"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: [0, 1, 0] }}
                     transition={{ duration: 0.5 }}

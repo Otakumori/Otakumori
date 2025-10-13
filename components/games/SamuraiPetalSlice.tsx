@@ -728,6 +728,25 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
           <p>Click and drag to slice • R to reset • L for left-handed mode</p>
         </div>
       )}
+
+      {/* Seed Sharing */}
+      {seed && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-sm">
+          <span className="text-gray-600">Run Seed:</span>
+          <code className="px-3 py-1 bg-gray-100 rounded border border-gray-300 font-mono text-xs">
+            {seed}
+          </code>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(seed.toString());
+              alert('Seed copied! Share it to let others play the same run.');
+            }}
+            className="px-3 py-1 bg-pink-500 hover:bg-pink-600 text-white rounded text-xs transition-colors"
+          >
+            Share Seed
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,13 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CherryBlossom from '@/components/animations/CherryBlossom';
 import { usePetalContext } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';
+import PetalCollectionToast from '@/app/components/ui/PetalCollectionToast';
+import dynamic from 'next/dynamic';
+
+// Dynamically import wallet indicator to avoid SSR issues
+const PetalWalletIndicator = dynamic(() => import('@/app/components/ui/PetalWalletIndicator'), {
+  ssr: false,
+});
 const MAX_PETALS = 30;
 const CLICK_THROTTLE = 300; // ms
 const MODAL_TRIGGER = 10;
@@ -194,6 +201,15 @@ const InteractiveHeroSection: React.FC = () => {
   const [bloomBonus, setBloomBonus] = useState(0);
   const [bloomStreak, setBloomStreak] = useState(0);
 
+  // Progressive disclosure state
+  const [showCollectionToast, setShowCollectionToast] = useState(false);
+  const [lastCollectedPetal, setLastCollectedPetal] = useState<{
+    type: PetalTypeKey;
+    amount: number;
+    position: { x: number; y: number };
+  } | null>(null);
+  const [totalPetalsCollected, setTotalPetalsCollected] = useState(0);
+
   // Late night mode state
   const [lateNight, setLateNight] = useState(false);
   const [lateNightEnabled, setLateNightEnabled] = useState(() => {
@@ -336,6 +352,15 @@ const InteractiveHeroSection: React.FC = () => {
       if (burstMode) reward = getRandomInt(3, 5);
       addPetals(reward);
       setClickCount((c) => c + 1);
+
+      // Progressive disclosure - show toast
+      setTotalPetalsCollected((prev) => prev + 1);
+      setLastCollectedPetal({
+        type: (petal.type as PetalTypeKey) || 'normal',
+        amount: reward,
+        position: { x: petal.x, y: petal.y },
+      });
+      setShowCollectionToast(true);
 
       // Track trail count for effects
       setTrailCount((prev) => prev + 1);
@@ -645,6 +670,30 @@ const InteractiveHeroSection: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Progressive Disclosure Toast */}
+      {lastCollectedPetal && (
+        <PetalCollectionToast
+          show={showCollectionToast}
+          amount={lastCollectedPetal.amount}
+          totalCollected={totalPetalsCollected}
+          petalType={lastCollectedPetal.type}
+          position={lastCollectedPetal.position}
+          onComplete={() => setShowCollectionToast(false)}
+        />
+      )}
+
+      {/* Floating Petal Wallet Indicator */}
+      <div className="fixed top-20 right-4 z-[100]">
+        <PetalWalletIndicator
+          showAfterCollections={3}
+          position="floating"
+          onClick={() => {
+            // Navigate to petal wallet or show petal details
+            // TODO: Implement petal wallet modal or navigation
+          }}
+        />
+      </div>
+
       {/* Tooltip for burst mode */}
       {showTooltip && (
         <div className="absolute top-24 right-1/2 z-50 rounded-lg bg-pink-700/90 px-6 py-3 text-lg font-bold text-white shadow-xl animate-pulse pointer-events-none">

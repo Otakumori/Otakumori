@@ -166,7 +166,7 @@ function generateTreeSVG(season) {
 }
 
 // Generate all seasonal trees
-console.log('🌸 Generating seasonal tree variations...\n');
+console.log('Generating seasonal tree variations...\n');
 
 seasons.forEach((season) => {
   const svg = generateTreeSVG(season);
@@ -174,7 +174,7 @@ seasons.forEach((season) => {
   const filepath = path.join(OUTPUT_DIR, filename);
 
   fs.writeFileSync(filepath, svg, 'utf8');
-  console.log(`✅ Generated: ${filename} - ${season.description}`);
+  console.log(`Generated: ${filename} - ${season.description}`);
 });
 
 console.log(

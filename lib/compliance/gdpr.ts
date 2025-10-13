@@ -603,8 +603,8 @@ export class DataRetentionManager {
     for (const [category, retentionDays] of Object.entries(this.config.dataRetention)) {
       const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
 
-      // Log cleanup operation for audit trail
-      console.info(
+      // Log cleanup operation for audit trail (using console.warn for visibility in production logs)
+      console.warn(
         `[GDPR Cleanup] Processing category: ${category}, retention: ${retentionDays} days, cutoff: ${cutoffDate.toISOString()}`,
       );
 
@@ -613,17 +613,18 @@ export class DataRetentionManager {
         switch (category) {
           case 'analytics':
             // await db.analyticsEvent.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
-            console.info(
+            // Using console.warn for operational logs
+            console.warn(
               `[GDPR Cleanup] Would delete analytics data before ${cutoffDate.toISOString()}`,
             );
             break;
           case 'logs':
             // await db.log.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
-            console.info(`[GDPR Cleanup] Would delete logs before ${cutoffDate.toISOString()}`);
+            console.warn(`[GDPR Cleanup] Would delete logs before ${cutoffDate.toISOString()}`);
             break;
           case 'sessions':
             // await db.session.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
-            console.info(`[GDPR Cleanup] Would delete sessions before ${cutoffDate.toISOString()}`);
+            console.warn(`[GDPR Cleanup] Would delete sessions before ${cutoffDate.toISOString()}`);
             break;
           default:
             console.warn(`[GDPR Cleanup] Unknown category: ${category}`);

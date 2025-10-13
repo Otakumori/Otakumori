@@ -1,4 +1,6 @@
 // lib/flags.ts
+import { env } from '@/env';
+
 export function initFlags() {
   // Only run in production
   if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') return;
@@ -6,7 +8,7 @@ export function initFlags() {
   // Use a BROWSER/PUBLIC key only
   const publicKey = process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY;
   if (!publicKey) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (env.NODE_ENV !== 'production') {
       console.warn('[Flags] Missing NEXT_PUBLIC_FLAGS_PUBLIC_KEY; skipping init');
     }
     return;

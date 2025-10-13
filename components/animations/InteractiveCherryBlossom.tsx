@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type Petal } from '../../app/types/index';
+import { communityWS } from '@/lib/websocket/client';
 
 interface LeaderboardEntry {
   username: string;
@@ -20,6 +21,36 @@ export default function InteractiveCherryBlossom() {
     { username: 'PetalWhisperer', petals: 1200, rank: 2 },
     { username: 'BlossomSeeker', petals: 900, rank: 3 },
   ]);
+
+  // WebSocket integration for live updates
+  useEffect(() => {
+    // Listen for community progress updates
+    const handleProgressUpdate = (message: any) => {
+      if (message.type === 'community-progress' && typeof message.progress === 'number') {
+        setCommunityProgress(message.progress);
+      }
+    };
+
+    // Listen for leaderboard updates
+    const handleLeaderboardUpdate = (message: any) => {
+      if (message.type === 'leaderboard' && Array.isArray(message.data)) {
+        const formatted = message.data.map((entry: any, index: number) => ({
+          username: entry.username || entry.name,
+          petals: entry.score || entry.petals,
+          rank: index + 1,
+        }));
+        setLeaderboard(formatted.slice(0, 5));
+      }
+    };
+
+    communityWS.on('community-progress', handleProgressUpdate);
+    communityWS.on('leaderboard', handleLeaderboardUpdate);
+
+    return () => {
+      communityWS.removeListener('community-progress', handleProgressUpdate);
+      communityWS.removeListener('leaderboard', handleLeaderboardUpdate);
+    };
+  }, []);
 
   // Get current season based on date
   const getCurrentSeason = () => {

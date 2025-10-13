@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import NextImage from 'next/image';
 import cubeConfig from '../cube.map.json';
 import MemoryCardDock from './MemoryCardDock';
 import AccessibilitySettings, {
@@ -31,7 +32,26 @@ const allGames = gamesRegistry.games
     nsfw: game.nsfw || false,
     tooltips: game.tooltips,
     features: game.features,
+    slug: game.slug,
   }));
+
+// Function to get thumbnail path for a game
+const getGameThumbnail = (gameSlug: string): string => {
+  // Map game slugs to their thumbnail files
+  const thumbnailMap: Record<string, string> = {
+    'petal-samurai': '/assets/games/petal-samurai.svg',
+    'memory-match': '/assets/games/memory-match.svg',
+    'puzzle-reveal': '/assets/games/puzzle-reveal.svg',
+    'bubble-girl': '/assets/games/bubble-girl.svg',
+    'petal-storm-rhythm': '/assets/games/petal-storm-rhythm.svg',
+    blossomware: '/assets/games/blossomware.svg',
+    'dungeon-of-desire': '/assets/games/dungeon-of-desire.svg',
+    'thigh-coliseum': '/assets/games/thigh-coliseum.svg',
+    'otaku-beat-em-up': '/assets/games/otaku-beat-em-up.svg',
+  };
+
+  return thumbnailMap[gameSlug] || '/assets/games/memory-match.svg'; // Fallback
+};
 
 type FacePosition = 'front' | 'up' | 'left' | 'right' | 'down';
 type ActivePanel = 'games' | 'extras' | 'avatar-community' | null;
@@ -562,7 +582,26 @@ export default function GameCubeHubV2() {
                       </div>
                     )}
 
-                    <div className="text-2xl mb-2">{game.icon}</div>
+                    {/* Game Thumbnail */}
+                    <div className="w-full h-20 mb-3 flex items-center justify-center">
+                      <NextImage
+                        src={getGameThumbnail(game.slug)}
+                        alt={`${game.label} thumbnail`}
+                        width={80}
+                        height={80}
+                        className="w-16 h-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                          // Fallback to emoji if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<div class="text-2xl">${game.icon}</div>`;
+                          }
+                        }}
+                      />
+                    </div>
+
                     <h3 className="text-primary font-semibold text-sm mb-1 group-hover:text-accent-pink transition-colors">
                       {game.label}
                     </h3>

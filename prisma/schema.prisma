@@ -205,6 +205,7 @@ model User {
   following                 Follow[]                 @relation("UserFollowing")
   gameRuns                  GameRun[]
   gameSaves                 GameSave[]
+  gameSessions              GameSession[]
   gameSettings              GameSettings[]
   inventory                 InventoryItem[]
   leaderboardScores         LeaderboardScore[]
@@ -395,6 +396,23 @@ model GameSave {
   @@unique([userId, gameId, slot])
   @@index([userId, gameId])
   @@index([updatedAt])
+}
+
+model GameSession {
+  id        String    @id
+  gameId    String
+  userId    String?
+  startTime DateTime
+  endTime   DateTime?
+  score     Int       @default(0)
+  highScore Int       @default(0)
+  actions   Json      @default("[]")
+  metadata  Json      @default("{}")
+  createdAt DateTime  @default(now())
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([gameId, userId])
+  @@index([startTime])
 }
 
 model Achievement {

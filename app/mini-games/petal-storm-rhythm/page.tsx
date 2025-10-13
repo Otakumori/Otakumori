@@ -77,6 +77,7 @@ export default function PetalStormRhythm() {
   const gameLoopRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(0);
   const _audioRef = useRef<HTMLAudioElement | null>(null);
+  const sessionId = useRef<string | null>(null);
 
   // Lane positions (4 lanes)
   const LANE_COUNT = 4;

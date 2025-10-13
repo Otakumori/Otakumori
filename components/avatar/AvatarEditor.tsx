@@ -9,12 +9,9 @@ import {
   ProceduralCharacterGenerator,
   type ProceduralCharacterConfig,
 } from '@/lib/avatar/procedural-generator';
-import { createCharacterPartMaterial } from '@/lib/avatar/anime-toon-material';
-import {
-  VerletPhysicsEngine,
-  HairPhysicsSystem,
-  ClothPhysicsSystem,
-} from '@/lib/avatar/verlet-physics';
+import { VerletPhysicsEngine } from '@/lib/avatar/verlet-physics';
+import { HairPhysicsSystem, HairStrand } from '@/lib/physics/hair-physics';
+import { ClothPhysicsSystem, ClothMesh } from '@/lib/physics/cloth-physics';
 
 // Types for avatar editor
 interface AvatarEditorProps {
@@ -75,8 +72,8 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
   const [isPhysicsEnabled, setIsPhysicsEnabled] = useState(false);
   const [isAdultMode, setIsAdultMode] = useState(false);
   const [characterMesh, setCharacterMesh] = useState<THREE.Group | null>(null);
-  const [hairStrands, setHairStrands] = useState<any[]>([]);
-  const [clothMeshes, setClothMeshes] = useState<any[]>([]);
+  const [hairStrands, setHairStrands] = useState<HairStrand[]>([]);
+  const [clothMeshes, setClothMeshes] = useState<ClothMesh[]>([]);
 
   const generatorRef = useRef<ProceduralCharacterGenerator | null>(null);
   const physicsEngineRef = useRef<VerletPhysicsEngine | null>(null);
@@ -87,8 +84,8 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
   useEffect(() => {
     generatorRef.current = new ProceduralCharacterGenerator();
     physicsEngineRef.current = new VerletPhysicsEngine();
-    hairSystemRef.current = new HairPhysicsSystem(physicsEngineRef.current);
-    clothSystemRef.current = new ClothPhysicsSystem(physicsEngineRef.current);
+    hairSystemRef.current = new HairPhysicsSystem();
+    clothSystemRef.current = new ClothPhysicsSystem();
 
     generateCharacter();
   }, []);
@@ -135,14 +132,16 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
       const length =
         config.hair.style === 'very-long' ? 0.8 : config.hair.style === 'long' ? 0.6 : 0.4;
 
-      const strand = hairSystemRef.current.addHairStrand(
-        rootPosition,
-        direction,
-        length,
-        8,
-        0.01,
+      // Create and add strand manually
+      const strand = new HairStrand(
+        rootPosition.x,
+        rootPosition.y,
+        8, // segmentCount
+        length / 8, // segmentLength
         config.hair.color,
+        2, // thickness
       );
+      hairSystemRef.current.addStrand(strand);
 
       strands.push(strand);
     }
@@ -154,13 +153,18 @@ export default function AvatarEditor({ onClose, onSave, initialConfig }: AvatarE
   const generateClothing = useCallback(() => {
     if (!clothSystemRef.current) return;
 
-    const cloth = clothSystemRef.current.addClothMesh(
-      0.8,
-      1.2,
-      16,
-      20,
-      createCharacterPartMaterial('clothing', '#FF6B9D'),
+    // Create cloth mesh manually
+    const cloth = new ClothMesh(
+      0, // startX
+      0, // startY
+      0.8, // width
+      1.2, // height
+      16, // cols
+      20, // rows
+      '#FF6B9D', // color
+      0.8, // opacity
     );
+    clothSystemRef.current.addMesh(cloth);
 
     setClothMeshes([cloth]);
   }, []);

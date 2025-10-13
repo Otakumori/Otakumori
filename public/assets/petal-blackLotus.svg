@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80" height="80" viewBox="0 0 80 80" 
+     xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     aria-label="Black Lotus">
+  <title>Black Lotus</title>
+  <desc>Procedurally generated ethereal cherry blossom petal for Otaku-mori</desc>
+  
+  <defs>
+    <!-- Gradients for each petal -->
+    
+      <radialGradient id="petal-gradient-0" cx="50%" cy="30%">
+        <stop offset="0%" style="stop-color:#16213E;stop-opacity:1" />
+        <stop offset="60%" style="stop-color:#1A1A2E;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#6A0DAD;stop-opacity:0.9" />
+      </radialGradient>
+    
+      <radialGradient id="petal-gradient-1" cx="50%" cy="30%">
+        <stop offset="0%" style="stop-color:#16213E;stop-opacity:1" />
+        <stop offset="60%" style="stop-color:#1A1A2E;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#6A0DAD;stop-opacity:0.9" />
+      </radialGradient>
+    
+      <radialGradient id="petal-gradient-2" cx="50%" cy="30%">
+        <stop offset="0%" style="stop-color:#16213E;stop-opacity:1" />
+        <stop offset="60%" style="stop-color:#1A1A2E;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#6A0DAD;stop-opacity:0.9" />
+      </radialGradient>
+    
+      <radialGradient id="petal-gradient-3" cx="50%" cy="30%">
+        <stop offset="0%" style="stop-color:#16213E;stop-opacity:1" />
+        <stop offset="60%" style="stop-color:#1A1A2E;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#6A0DAD;stop-opacity:0.9" />
+      </radialGradient>
+    
+      <radialGradient id="petal-gradient-4" cx="50%" cy="30%">
+        <stop offset="0%" style="stop-color:#16213E;stop-opacity:1" />
+        <stop offset="60%" style="stop-color:#1A1A2E;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#6A0DAD;stop-opacity:0.9" />
+      </radialGradient>
+    
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Center gradient -->
+    <radialGradient id="center-gradient">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6A0DAD;stop-opacity:0" />
+    </radialGradient>
+    
+    
+          <filter id="ethereal-effect">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+            <feColorMatrix in="blur" type="matrix" values="
+              1 0 0 0 0
+              0 1 0 0 0
+              0 0 1 0 0
+              0 0 0 0.8 0
+            "/>
+          </filter>
+        
+  </defs>
+  
+  <!-- Outer glow -->
+  <circle cx="40" cy="40" r="36" 
+          fill="#9D4EDD" opacity="0.3" filter="url(#glow)" />
+  
+  <!-- Petals -->
+  <g filter="url(#ethereal-effect)">
+    
+      <path d="
+      M 40,40
+      Q 36.453757520063924,28.535962130492727 40,12
+      Q 43.546242479936076,28.535962130492727 40,40
+      Z
+    " 
+            fill="url(#petal-gradient-0)" 
+            stroke="#6A0DAD" 
+            stroke-width="0.5"
+            opacity="0.95"
+             />
+    
+      <path d="
+      M 40,40
+      Q 49.80709872637469,33.0847404552584 66.6295824562643,31.347524157501475
+      Q 51.99879711132391,39.83009449307018 40,40
+      Z
+    " 
+            fill="url(#petal-gradient-1)" 
+            stroke="#6A0DAD" 
+            stroke-width="0.5"
+            opacity="0.95"
+             />
+    
+      <path d="
+      M 40,40
+      Q 49.60736282386144,47.190172429829836 56.45798706418925,62.65247584249853
+      Q 43.869421958976154,51.35903049134886 40,40
+      Z
+    " 
+            fill="url(#petal-gradient-2)" 
+            stroke="#6A0DAD" 
+            stroke-width="0.5"
+            opacity="0.95"
+             />
+    
+      <path d="
+      M 40,40
+      Q 36.130578041023846,51.35903049134886 23.542012935810757,62.65247584249853
+      Q 30.39263717613856,47.19017242982984 40,40
+      Z
+    " 
+            fill="url(#petal-gradient-3)" 
+            stroke="#6A0DAD" 
+            stroke-width="0.5"
+            opacity="0.95"
+             />
+    
+      <path d="
+      M 40,40
+      Q 28.001202888676094,39.83009449307018 13.370417543735698,31.347524157501475
+      Q 30.192901273625303,33.0847404552584 40,40
+      Z
+    " 
+            fill="url(#petal-gradient-4)" 
+            stroke="#6A0DAD" 
+            stroke-width="0.5"
+            opacity="0.95"
+             />
+    
+  </g>
+  
+  <!-- Center circle -->
+  <circle cx="40" cy="40" r="6.4" 
+          fill="url(#center-gradient)" 
+          stroke="#FFA500" 
+          stroke-width="1" />
+  
+  <!-- Highlight -->
+  <ellipse cx="36" cy="36" 
+           rx="9.6" ry="14.399999999999999" 
+           fill="white" 
+           opacity="0.3" 
+           transform="rotate(-45 40 40)" />
+</svg>

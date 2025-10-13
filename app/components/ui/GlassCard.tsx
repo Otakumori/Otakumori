@@ -13,14 +13,14 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       <div
         className={cn(
           // Base styles - using theme colors
-          'relative rounded-xl border transition-all duration-200',
-          // Glass effect with purple-pink theme
+          'relative rounded-xl border transition-all duration-300',
+          // Enhanced glass effect with our premium glassmorphic system
           'backdrop-blur-lg',
-          // Variants
+          // Variants with enhanced effects
           {
-            'glass-panel': variant === 'default',
-            'glass-panel shadow-xl': variant === 'elevated',
-            'glass-panel opacity-80': variant === 'subtle',
+            'glass-iridescent hover-lift': variant === 'default',
+            'glass-iridescent shadow-xl hover-lift': variant === 'elevated',
+            'glass-reflection opacity-80': variant === 'subtle',
           },
           className,
         )}

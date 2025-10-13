@@ -5,8 +5,9 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sessionTracker } from '@/lib/analytics/session-tracker';
 
 interface Card {
   id: number;
@@ -38,6 +39,7 @@ export default function MemoryMatchGame() {
   const [difficulty, setDifficulty] = useState<'easy' | 'normal' | 'hard'>('normal');
   const [streak, setStreak] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
+  const sessionId = useRef<string | null>(null);
 
   // Difficulty settings
   const difficultySettings = {
@@ -71,6 +73,16 @@ export default function MemoryMatchGame() {
     setTimeElapsed(0);
     setStreak(0);
     setFinalScore(0);
+
+    // Start session tracking
+    sessionTracker
+      .startSession('memory-match', undefined, {
+        difficulty,
+        pairs: settings.pairs,
+      })
+      .then((id) => {
+        sessionId.current = id;
+      });
 
     setGameState('playing');
   }, [difficulty, settings.pairs]);
@@ -106,6 +118,11 @@ export default function MemoryMatchGame() {
 
     // Calculate petal reward
     const petalReward = Math.floor(calculatedScore / 10);
+
+    // End session tracking
+    if (sessionId.current) {
+      await sessionTracker.endSession(calculatedScore);
+    }
 
     try {
       // Award petals
@@ -174,13 +191,13 @@ export default function MemoryMatchGame() {
             );
             setMatches((prev) => {
               const newMatches = prev + 1;
-              console.log(`Match count: ${newMatches} / ${settings.pairs}`);
-              
+              // Match count tracked: ${newMatches} / ${settings.pairs}
+
               // Check for completion with new value
               if (newMatches === settings.pairs) {
                 setTimeout(() => completeGame(), 100);
               }
-              
+
               return newMatches;
             });
             setStreak((prev) => prev + 1);
@@ -426,9 +443,12 @@ export default function MemoryMatchGame() {
                 </div>
               </div>
             </div>
-            
+
             <p className="text-pink-200 text-lg mb-6">
-              <span role="img" aria-label="Cherry blossom petal">🌸</span> Petals Earned: <span className="font-bold">{Math.floor(finalScore / 10)}</span>
+              <span role="img" aria-label="Cherry blossom petal">
+                🌸
+              </span>{' '}
+              Petals Earned: <span className="font-bold">{Math.floor(finalScore / 10)}</span>
             </p>
 
             <div className="space-x-4">
