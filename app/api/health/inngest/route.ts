@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { env } from '@/env';
 
-const SERVE_URL = process.env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
+const SERVE_URL = env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
 
 export async function GET() {
   const results: Record<string, any> = {

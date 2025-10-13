@@ -1,11 +1,20 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+/**
+ * Generic Webhook to Inngest Bridge
+ *
+ * Receives webhooks from external services (Clerk, Stripe, Printify, etc.)
+ * and forwards them to Inngest for background processing.
+ *
+ * Note: This is separate from /api/inngest which serves Inngest functions.
+ * This route acts as a webhook receiver that triggers Inngest events.
+ */
 import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '../../../../inngest/client';
 import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-// Handle Clerk webhooks and trigger Inngest functions
+// Handle webhooks from external services and trigger Inngest functions
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -68,7 +77,7 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        // `Unhandled webhook type: ${eventType}`
+      // `Unhandled webhook type: ${eventType}`
     }
 
     return NextResponse.json({
