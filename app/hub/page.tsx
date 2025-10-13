@@ -19,7 +19,9 @@ export default function HubPage() {
     let playing = true;
     (async () => {
       try {
-        await play('/assets/music/hub_ambience.ogg', -18);
+        if (playing) {
+          await play('/assets/music/hub_ambience.ogg', -18);
+        }
       } catch {}
     })();
     return () => {

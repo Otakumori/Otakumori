@@ -70,6 +70,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     });
 
+    console.warn('Invitation updated:', {
+      id: updatedInvitation.id,
+      status: updatedInvitation.status,
+    });
+
     // If accepted, add user to party
     if (validatedData.status === 'accepted') {
       await db.partyMember.create({

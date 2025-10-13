@@ -1,5 +1,4 @@
 // DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-ragdoll\Scene.tsx instead.
- 
 
 'use client';
 
@@ -175,7 +174,7 @@ export default function PetalCollection() {
       }
     }
 
-    function draw(now: number) {
+    function draw(_now: number) {
       // bg
       if (bgImg && bgImg.complete && bgImg.naturalWidth) {
         const s = Math.max(W / bgImg.naturalWidth, H / bgImg.naturalHeight);

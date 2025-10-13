@@ -72,7 +72,7 @@ export const UNICODE = {
   SMILE: '',
   FROWN: '',
 
-  // Special for Otakumori
+  // Special for Otaku-mori
   PETAL: '',
   GAME: '',
   MAGIC: '',

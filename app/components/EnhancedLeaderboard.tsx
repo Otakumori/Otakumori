@@ -21,6 +21,9 @@ export default function EnhancedLeaderboard({
   const [scope, setScope] = useState<'global' | 'friends'>('global');
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'all'>('daily');
 
+  // Log current user for highlighting in leaderboard
+  console.warn('EnhancedLeaderboard current user:', user?.id || 'anonymous');
+
   useEffect(() => {
     loadLeaderboard();
   }, [gameCode, scope, period]);

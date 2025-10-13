@@ -153,7 +153,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (redirectUrl) {
       url.searchParams.set('redirect_url', redirectUrl);
     }
-    window.location.href = url.toString();
+    // Use Next.js router for client-side navigation
+    router.push(url.pathname + url.search);
   };
 
   const redirectToSignUp = (redirectUrl?: string) => {
@@ -161,7 +162,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (redirectUrl) {
       url.searchParams.set('redirect_url', redirectUrl);
     }
-    window.location.href = url.toString();
+    // Use Next.js router for client-side navigation
+    router.push(url.pathname + url.search);
   };
 
   // Specific gated action implementations

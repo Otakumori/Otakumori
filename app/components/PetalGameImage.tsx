@@ -1,24 +1,24 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-// import { supabase } from '@/utils/supabase/client';
-// Temporarily disabled tsparticles due to API compatibility issues
-// import Particles from '@tsparticles/react';
-// import { loadFull } from 'tsparticles';
-// import { Engine } from '@tsparticles/engine';
+import { communityWS } from '@/lib/websocket/client';
+import PetalParticleBurst from '@/app/components/effects/PetalParticleBurst';
 
 const GLOBAL_PETAL_KEY = 'global_petals';
 const USER_PETAL_KEY = 'user_petals';
 const USER_PETAL_DATE_KEY = 'user_petals_date';
 const GUEST_LIMIT = 50;
-const USER_LIMIT = 2500;
+const USER_LIMIT = 2500; // For authenticated users (to be implemented with auth)
 const ACHIEVEMENTS = [10, 50, 100, 500, 1000, 2500];
-
-const petalSvg = `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 2C18.5 7 27 10 27 18C27 24 21 30 16 30C11 30 5 24 5 18C5 10 13.5 7 16 2Z" fill="#FFB6C1" stroke="#E75480" stroke-width="2"/></svg>`;
 
 export default function PetalGameImage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [userPetals, setUserPetals] = useState(0);
   const [globalPetals, setGlobalPetals] = useState(0);
+  const [dailyCollectors, setDailyCollectors] = useState(0);
   const [lastCollectDate, setLastCollectDate] = useState('');
+  const [particleTrigger, setParticleTrigger] = useState(0);
+
+  // Calculate user limit based on auth status (guest vs authenticated)
+  const effectiveLimit = userPetals > GUEST_LIMIT ? USER_LIMIT : GUEST_LIMIT;
   const [limitReached, setLimitReached] = useState(false);
   const [achievement, setAchievement] = useState<string | null>(null);
 
@@ -37,35 +37,84 @@ export default function PetalGameImage() {
     }
   }, []);
 
-  // Fetch global and user petal counts - disabled during Supabase migration
+  // WebSocket integration for real-time global petals
   useEffect(() => {
-    // Temporarily disabled while migrating to Prisma
-    // 'Petal fetching disabled during migration'
-    // const fetchGlobal = async () => {
-    //   if (!supabase) {
-    //     console.warn('Supabase client not available');
-    //     return;
-    //   }
-    //   const { data } = await supabase
-    //     .from('petal_counters')
-    //     .select('count')
-    //     .eq('id', GLOBAL_PETAL_KEY)
-    //     .single();
-    //   if (data && data.count !== undefined) setGlobalPetals(data.count);
-    // };
-    // fetchGlobal();
+    // Connect to WebSocket
+    communityWS.connect();
+
+    // Subscribe to global petal updates
+    const unsubscribe = communityWS.on('global-petals', (message) => {
+      if (message.type === 'global-petals') {
+        setGlobalPetals(message.count);
+        setDailyCollectors(message.dailyCollectors);
+        // Cache for fallback
+        localStorage.setItem(GLOBAL_PETAL_KEY, String(message.count));
+      }
+    });
+
+    // Initial fetch from API as fallback
+    const fetchGlobal = async () => {
+      try {
+        const response = await fetch('/api/v1/petals/global');
+        const data = await response.json();
+
+        if (data?.ok && typeof data.data?.count === 'number') {
+          setGlobalPetals(data.data.count);
+        } else {
+          // Fallback to localStorage for global count
+          const cachedGlobal = localStorage.getItem(GLOBAL_PETAL_KEY);
+          if (cachedGlobal) setGlobalPetals(Number(cachedGlobal));
+        }
+      } catch (err) {
+        console.error('Error fetching global petals:', err);
+        // Use cached value on error
+        const cachedGlobal = localStorage.getItem(GLOBAL_PETAL_KEY);
+        if (cachedGlobal) setGlobalPetals(Number(cachedGlobal));
+      }
+    };
+    fetchGlobal();
+
+    return () => {
+      unsubscribe();
+      communityWS.disconnect();
+    };
   }, []);
 
   // Particle click handler
   const handlePetalClick = useCallback(
-    (event: any) => {
-      if (userPetals >= GUEST_LIMIT) {
+    (event: React.MouseEvent | React.KeyboardEvent) => {
+      // Prevent default for keyboard events
+      if ('key' in event && event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+
+      if (userPetals >= effectiveLimit) {
         setLimitReached(true);
         return;
       }
+
+      // Trigger particle burst animation
+      setParticleTrigger((prev) => prev + 1);
+
       setUserPetals((count) => {
         const newCount = count + 1;
         localStorage.setItem(USER_PETAL_KEY, String(newCount));
+
+        // Update global count
+        setGlobalPetals((global) => {
+          const newGlobal = global + 1;
+          localStorage.setItem(GLOBAL_PETAL_KEY, String(newGlobal));
+
+          // Sync to backend
+          fetch('/api/v1/petals/increment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: 1 }),
+          }).catch((err) => console.error('Failed to sync global petal:', err));
+
+          return newGlobal;
+        });
+
         if (ACHIEVEMENTS.includes(newCount)) {
           setAchievement(`Achievement unlocked: ${newCount} petals!`);
           setTimeout(() => setAchievement(null), 2500);
@@ -73,54 +122,8 @@ export default function PetalGameImage() {
         return newCount;
       });
     },
-    [userPetals],
+    [userPetals, effectiveLimit],
   );
-
-  // Particle options - temporarily disabled due to API compatibility issues
-  // const particlesInit = useCallback(async (engine: Engine) => {
-  //   await loadFull(engine);
-  // }, []);
-
-  // const particlesOptions = {
-  //   fullScreen: false,
-  //   background: { color: 'transparent' },
-  //   particles: {
-  //     number: { value: 24, density: { enable: true, area: 800 } },
-  //     color: { value: '#FFB6C1' },
-  //     shape: {
-  //       type: 'image',
-  //       image: [
-  //         {
-  //           src: 'data:image/svg+xml;base64,' + btoa(petalSvg),
-  //       width: 32,
-  //       height: 32,
-  //         },
-  //       ],
-  //     },
-  //     opacity: { value: 0.85 },
-  //       size: { value: 24, random: { enable: true, minimumValue: 16 } },
-  //       move: {
-  //         enable: true,
-  //         speed: 1.5,
-  //         direction: 'bottom' as const,
-  //         random: true,
-  //         straight: false,
-  //         outModes: { default: 'out' as const },
-  //       },
-  //     },
-  //     detectRetina: true,
-  //     interactivity: {
-  //       events: {
-  //         onClick: { enable: true, mode: 'repulse' },
-  //         onHover: { enable: true, mode: 'bubble' },
-  //       },
-  //       modes: {
-  //         repulse: { distance: 80, duration: 0.4 },
-  //         bubble: { distance: 60, duration: 0.3, size: 32, opacity: 1 },
-  //       },
-  //     },
-  //     emitters: [],
-  //   };
 
   return (
     <div
@@ -128,27 +131,40 @@ export default function PetalGameImage() {
       className="relative aspect-[2/1] w-full overflow-hidden rounded-none shadow-xl md:rounded-3xl"
       style={{ minHeight: '320px', background: '#1a1a1a' }}
     >
-      <img
-        src="/assets/cherry.jpg"
-        alt="Cherry Blossom Animated Tree"
-        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-center"
-        draggable={false}
-      />
-      {/* Petal Particles Overlay - temporarily disabled due to API compatibility issues */}
-      {/* <Particles
-        id="petalParticles"
-        particlesInit={particlesInit}
-        options={particlesOptions}
-        className="pointer-events-auto absolute inset-0 z-10 h-full w-full"
-        style={{ pointerEvents: 'auto' }}
-      /> */}
-      {/* User petal counter */}
-      <div className="absolute right-4 top-2 z-20 rounded-full bg-pink-900/80 px-4 py-1 text-lg font-bold text-white shadow-lg">
-        Your Petals: {userPetals} / {GUEST_LIMIT}
+      <div
+        role="button"
+        tabIndex={0}
+        className="absolute inset-0 h-full w-full cursor-pointer"
+        onClick={handlePetalClick}
+        onKeyDown={handlePetalClick}
+        aria-label="Click to collect petals"
+      >
+        <img
+          src="/assets/cherry.jpg"
+          alt="Cherry Blossom Animated Tree"
+          className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-center"
+          draggable={false}
+        />
       </div>
-      {/* Global petal counter */}
-      <div className="absolute left-4 top-2 z-20 rounded-full bg-pink-700/80 px-4 py-1 text-lg font-bold text-white shadow-lg">
-        Community Petals: {globalPetals}
+
+      {/* Particle burst animation */}
+      <PetalParticleBurst trigger={particleTrigger} className="z-10" />
+
+      {/* User petal counter */}
+      <div className="pointer-events-none absolute right-4 top-2 z-20 rounded-full bg-pink-900/80 px-4 py-1 text-lg font-bold text-white shadow-lg">
+        Your Petals: {userPetals} / {effectiveLimit}
+      </div>
+
+      {/* Global petal counter with daily collectors */}
+      <div className="pointer-events-none absolute left-4 top-2 z-20 flex flex-col gap-1">
+        <div className="rounded-full bg-pink-700/80 px-4 py-1 text-lg font-bold text-white shadow-lg">
+          Community Petals: {globalPetals.toLocaleString()}
+        </div>
+        {dailyCollectors > 0 && (
+          <div className="animate-pulse rounded-full bg-pink-600/70 px-3 py-0.5 text-sm text-white shadow-md">
+            {dailyCollectors.toLocaleString()} travelers collected today
+          </div>
+        )}
       </div>
       {/* Limit reached error */}
       {limitReached && (

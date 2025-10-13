@@ -266,6 +266,12 @@ class ExternalAPIHealthCheck extends HealthCheck {
       const clerkSecretKey = env.CLERK_SECRET_KEY;
       const isDev = env.NODE_ENV === 'development';
 
+      // Log service check for debugging
+      console.warn(`Health check for external service: ${serviceName} at ${url}`, {
+        hasClerkKey: !!clerkSecretKey,
+        environment: isDev ? 'development' : 'production',
+      });
+
       // Mock service check
       const latency = Math.random() * 100;
 
@@ -276,6 +282,7 @@ class ExternalAPIHealthCheck extends HealthCheck {
         timestamp: new Date(),
       };
     } catch (error) {
+      console.error('External service check failed:', error);
       return {
         service: this.name,
         status: 'unhealthy',
@@ -546,6 +553,9 @@ export class HealthMonitor {
    */
   createHealthEndpoint() {
     return async (request: NextRequest): Promise<NextResponse> => {
+      // Log health check request for monitoring
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+      console.warn('Health check requested', { userAgent });
       try {
         const health = await this.checkHealth();
 
@@ -599,6 +609,7 @@ export class HealthMonitor {
           },
         });
       } catch (error) {
+        console.error('Error fetching health metrics:', error);
         return new NextResponse(JSON.stringify({ error: 'Failed to fetch metrics' }), {
           status: 500,
         });

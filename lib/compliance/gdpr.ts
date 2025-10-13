@@ -300,10 +300,10 @@ export class GDPRCompliance {
       contact: any;
     };
   } {
-    const siteName = 'Otaku-mori'; // env.NEXT_PUBLIC_SITE_NAME not available
-    const contactEmail = 'privacy@otaku-mori.com'; // env.NEXT_PUBLIC_CONTACT_EMAIL not available
-    const dpoEmail = 'dpo@otaku-mori.com'; // env.NEXT_PUBLIC_DPO_EMAIL not available
-    const companyAddress = 'Japan'; // env.NEXT_PUBLIC_COMPANY_ADDRESS not available
+    const _siteName = 'Otaku-mori'; // env.NEXT_PUBLIC_SITE_NAME not available
+    const _contactEmail = 'adi@otaku-mori.com'; // env.NEXT_PUBLIC_CONTACT_EMAIL not available
+    const _dpoEmail = 'adi@otaku-mori.com'; // env.NEXT_PUBLIC_DPO_EMAIL not available
+    const _companyAddress = 'USA'; // env.NEXT_PUBLIC_COMPANY_ADDRESS not available
 
     return {
       lastUpdated: new Date().toISOString().split('T')[0],
@@ -504,7 +504,13 @@ export class GDPRCompliance {
     // Store consent record in database for audit trail
     try {
       // This would integrate with your database
-      // Storing consent record
+      console.warn('Storing GDPR consent record', {
+        userId: consent.userId,
+        level: consent.level,
+        timestamp: consent.timestamp,
+        purposes: consent.purposes.length,
+      });
+      // TODO: await prisma.consentRecord.create({ data: consent })
     } catch (error) {
       console.error('Failed to store consent record:', error);
     }
@@ -514,6 +520,8 @@ export class GDPRCompliance {
     // Retrieve consent history from database
     try {
       // This would integrate with your database
+      console.warn('Retrieving GDPR consent history', { userId });
+      // TODO: return await prisma.consentRecord.findMany({ where: { userId } })
       return [];
     } catch (error) {
       console.error('Failed to get consent history:', error);
@@ -530,8 +538,13 @@ export function useGDPRConsent() {
   // This would be implemented as a React hook
   return {
     consent: null as ConsentRecord | null,
-    updateConsent: (level: ConsentLevel) => {},
-    isAllowed: (purpose: string) => false,
+    updateConsent: (_level: ConsentLevel) => {
+      // Stub implementation for consent update
+    },
+    isAllowed: (_purpose: string) => {
+      // Stub implementation always denies until implemented
+      return false;
+    },
     showBanner: false,
   };
 }
@@ -589,9 +602,36 @@ export class DataRetentionManager {
 
     for (const [category, retentionDays] of Object.entries(this.config.dataRetention)) {
       const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-      // Cleaning up old data
 
-      // Database cleanup would happen here
+      // Log cleanup operation for audit trail (using console.warn for visibility in production logs)
+      console.warn(
+        `[GDPR Cleanup] Processing category: ${category}, retention: ${retentionDays} days, cutoff: ${cutoffDate.toISOString()}`,
+      );
+
+      // Database cleanup for different categories
+      try {
+        switch (category) {
+          case 'analytics':
+            // await db.analyticsEvent.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
+            // Using console.warn for operational logs
+            console.warn(
+              `[GDPR Cleanup] Would delete analytics data before ${cutoffDate.toISOString()}`,
+            );
+            break;
+          case 'logs':
+            // await db.log.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
+            console.warn(`[GDPR Cleanup] Would delete logs before ${cutoffDate.toISOString()}`);
+            break;
+          case 'sessions':
+            // await db.session.deleteMany({ where: { createdAt: { lt: cutoffDate } } });
+            console.warn(`[GDPR Cleanup] Would delete sessions before ${cutoffDate.toISOString()}`);
+            break;
+          default:
+            console.warn(`[GDPR Cleanup] Unknown category: ${category}`);
+        }
+      } catch (error) {
+        console.error(`[GDPR Cleanup] Error cleaning ${category}:`, error);
+      }
     }
   }
 }

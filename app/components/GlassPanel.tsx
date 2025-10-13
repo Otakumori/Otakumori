@@ -7,11 +7,5 @@ export default function GlassPanel({
   children: ReactNode;
   className?: string;
 }) {
-  return (
-    <div
-      className={`rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_0_60px_-15px_rgba(200,120,255,0.25)] ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`glass-panel rounded-2xl ${className}`}>{children}</div>;
 }

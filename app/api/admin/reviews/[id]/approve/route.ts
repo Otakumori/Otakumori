@@ -9,7 +9,9 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.warn(`Admin ${admin.id} approving review ${params.id}`);
   } catch (error) {
+    console.error('Admin auth failed for review approval:', error);
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

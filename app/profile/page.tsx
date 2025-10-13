@@ -7,7 +7,13 @@ import { AvatarDisplay } from '../components/profile/AvatarDisplay';
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
-  const { user, achievements, ownedCodes, gamertag, canRenameAt } = await getProfileData();
+  const {
+    user: _user,
+    achievements: _achievements,
+    ownedCodes: _ownedCodes,
+    gamertag,
+    canRenameAt: _canRenameAt,
+  } = await getProfileData();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-10">

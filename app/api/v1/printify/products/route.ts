@@ -21,6 +21,9 @@ const QuerySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const requestId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  const startTime = Date.now();
+
   try {
     const { searchParams } = new URL(request.url);
     const query = QuerySchema.parse(Object.fromEntries(searchParams));
@@ -39,7 +42,7 @@ export async function GET(request: NextRequest) {
     const products = result.data.map((product: any) => ({
       id: product.id,
       title: product.title,
-      description: product.description,
+      description: stripHtml(product.description || ''),
       price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0, // Convert cents to dollars
       image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
       tags: product.tags || [],
@@ -56,27 +59,70 @@ export async function GET(request: NextRequest) {
       updatedAt: product.updated_at,
     }));
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        products,
-        pagination: {
-          currentPage: query.page,
-          totalPages: result.last_page,
-          total: result.total,
-          perPage: query.per_page,
+    // Success with cache headers
+    const duration = Date.now() - startTime;
+    return NextResponse.json(
+      {
+        ok: true,
+        data: {
+          products,
+          pagination: {
+            currentPage: query.page,
+            totalPages: result.last_page,
+            total: result.total,
+            perPage: query.per_page,
+          },
         },
+        source: 'live-api',
+        timestamp: new Date().toISOString(),
+        requestId,
+        duration,
       },
-      source: 'live-api',
-      timestamp: new Date().toISOString(),
-    });
+      {
+        status: 200,
+        headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+      },
+    );
   } catch (error) {
     console.error('Printify products API error:', error);
 
+    // Check if it's a known upstream failure (Printify API issues)
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
+    const isUpstreamFailure =
+      errorMessage.includes('fetch') ||
+      errorMessage.includes('network') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('ECONNREFUSED') ||
+      errorMessage.includes('ENOTFOUND');
+
+    if (isUpstreamFailure) {
+      // Upstream known failure -> handled 502 (matches repo direction)
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Failed to fetch products from Printify',
+          detail: errorMessage,
+          requestId,
+          data: {
+            products: [],
+            pagination: {
+              currentPage: 1,
+              totalPages: 0,
+              total: 0,
+              perPage: 100,
+            },
+          },
+        },
+        { status: 502 },
+      );
+    }
+
+    // Only truly unexpected errors fall here -> 500
     return NextResponse.json(
       {
         ok: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch products',
+        error: 'Internal server error',
+        requestId,
         data: {
           products: [],
           pagination: {
@@ -92,12 +138,25 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Helper function to strip HTML tags from descriptions
+function stripHtml(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<[^>]*>/g, '') // Remove all HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+    .replace(/&amp;/g, '&')  // Replace &amp; with &
+    .replace(/&lt;/g, '<')   // Replace &lt; with <
+    .replace(/&gt;/g, '>')   // Replace &gt; with >
+    .replace(/&quot;/g, '"') // Replace &quot; with "
+    .replace(/&#039;/g, "'") // Replace &#039; with '
+    .trim();
+}
+
 // Background sync function
 async function syncProductsInBackground() {
   try {
-    // Background sync started
     const products = await getPrintifyService().getAllProducts();
-    // Background sync completed: ${products.length} products fetched
+    console.warn(`Background sync completed: ${products.length} products fetched`);
 
     // Here you would save to your database
     // await saveProductsToDatabase(products);

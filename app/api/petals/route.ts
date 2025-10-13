@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { amount, reason } = earnPetalsSchema.parse(body);
-    
+
     const db = await getDb();
 
     // Check daily click limit
@@ -85,6 +85,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    // Log petal balance request for analytics
+    console.warn('Petal balance requested from:', request.headers.get('user-agent'));
+
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

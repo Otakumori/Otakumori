@@ -88,9 +88,11 @@ const nextConfig = {
       // Enhanced style-src for Google Fonts and inline styles
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Enhanced script-src for GTM and Clerk
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.otaku-mori.com https://www.googletagmanager.com https://www.google-analytics.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://otaku-mori.com https://www.otaku-mori.com https://clerk.otaku-mori.com https://*.clerk.accounts.dev https://*.clerk.com https://www.googletagmanager.com https://www.google-analytics.com https://vercel.live",
       // Enhanced worker-src for service workers and blob workers
       "worker-src 'self' blob:",
+      // Enhanced frame-src for Vercel Live and Clerk
+      "frame-src 'self' https://vercel.live https://*.clerk.com https://*.clerk.accounts.dev",
       "frame-ancestors 'self'",
     ];
 
@@ -165,14 +167,30 @@ const nextConfig = {
 
   // Webpack configuration to handle client/server module splitting and build performance
   webpack: (config, { isServer, webpack }) => {
+    // Remove Sentry tracing code paths from bundles
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        __SENTRY_TRACING__: JSON.stringify(false),
+      }),
+    );
+
+    // Suppress OpenTelemetry dynamic require warnings
+    config.plugins.push(
+      new webpack.ContextReplacementPlugin(/@opentelemetry\/instrumentation/, (data) => {
+        delete data.dependencies[0].critical;
+        return data;
+      }),
+    );
+
     // Reduce polyfills and giant blobs entering the cache
     config.resolve.fallback = { ...config.resolve.fallback, buffer: false };
 
-    // Keep cache but avoid extra compression overhead
+    // Optimize cache settings to avoid large string serialization warnings
     config.cache = {
       type: 'filesystem',
       compression: false,
       store: 'pack',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     };
 
     if (!isServer) {
@@ -183,6 +201,7 @@ const nextConfig = {
         '@sentry/node': false,
         '@prisma/instrumentation': false,
         ioredis: false,
+        '@opentelemetry/instrumentation': false,
       };
     }
     return config;

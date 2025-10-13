@@ -7,8 +7,8 @@ import type { PrintifyProduct } from '@/app/lib/printify/service';
 
 // Enterprise-grade Product Card for Real Printify Products
 function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0] || null);
-  const [selectedImage, setSelectedImage] = useState(product.images[0] || null);
+  const [selectedVariant, _setSelectedVariant] = useState(product.variants[0] || null);
+  const [_selectedImage, _setSelectedImage] = useState(product.images[0] || null);
 
   // Get available colors and sizes from product options
   const colorOptions = product.options?.find((opt) => opt.name.toLowerCase().includes('color'));
@@ -486,11 +486,12 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
 
             {/* Price Range */}
             <div className="mb-6">
-              <label className="block text-white text-sm mb-2">Price Range</label>
+              <div className="block text-white text-sm mb-2">Price Range</div>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
                   placeholder="Min"
+                  aria-label="Minimum price"
                   value={filters.minPrice || ''}
                   onChange={(e) =>
                     updateFilters({ minPrice: e.target.value ? Number(e.target.value) : undefined })
@@ -505,6 +506,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                     updateFilters({ maxPrice: e.target.value ? Number(e.target.value) : undefined })
                   }
                   className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400 text-sm"
+                  aria-label="Maximum price"
                 />
               </div>
             </div>

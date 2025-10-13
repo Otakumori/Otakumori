@@ -14,20 +14,22 @@ export async function POST() {
 
 async function syncPrintify() {
   try {
-    const result = await printifyService.getProducts();
-
-    // Process the products and upsert to database
+    // Get products from Printify (returns array directly)
     const products = await printifyService.getProducts();
+    console.warn(`Sync retrieved ${products.length || 0} products from Printify`);
 
     for (const product of products) {
       const visible = product.variants?.some((v: any) => v.available) ?? false;
+      const subcategory = mapSubcategory(product);
 
+      // Note: subcategory field doesn't exist in Product schema
+      // Store it in category or add to schema if needed
       await db.product.upsert({
         where: { id: String(product.id) },
         update: {
           name: product.title,
           description: product.description ?? '',
-          category: mapCategory(product),
+          category: `${mapCategory(product)}:${subcategory}`, // Combine category and subcategory
           primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
           printifyProductId: String(product.id),
@@ -36,7 +38,7 @@ async function syncPrintify() {
           id: String(product.id),
           name: product.title,
           description: product.description ?? '',
-          category: mapCategory(product),
+          category: `${mapCategory(product)}:${subcategory}`, // Combine category and subcategory
           primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
           printifyProductId: String(product.id),

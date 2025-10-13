@@ -9,10 +9,10 @@ interface SettingsConsoleProps {
   className?: string;
 }
 
-export default function SettingsConsole({ 
-  onVolumeChange, 
-  onThemeChange, 
-  className = '' 
+export default function SettingsConsole({
+  onVolumeChange,
+  onThemeChange,
+  className = '',
 }: SettingsConsoleProps) {
   const [masterVolume, setMasterVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
@@ -20,7 +20,7 @@ export default function SettingsConsole({
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [controllerConnected, setControllerConnected] = useState(false);
   const [controllerIndex, setControllerIndex] = useState(-1);
-  
+
   const volumeRef = useRef<HTMLInputElement>(null);
   const timeIntervalRef = useRef<any>(undefined);
 
@@ -28,7 +28,7 @@ export default function SettingsConsole({
   useEffect(() => {
     const updateTime = () => setCurrentTime(new Date());
     updateTime();
-    
+
     timeIntervalRef.current = setInterval(updateTime, 1000);
     return () => {
       if (timeIntervalRef.current) {
@@ -112,7 +112,7 @@ export default function SettingsConsole({
       hour12: false,
       hour: '2-digit',
       minute: '2-digit',
-      second: '2-digit'
+      second: '2-digit',
     });
   };
 
@@ -122,43 +122,46 @@ export default function SettingsConsole({
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
   return (
-    <div className={`
+    <div
+      className={`
       w-full max-w-4xl mx-auto p-8
       bg-gray-900/95 backdrop-blur-lg
       border border-white/20 rounded-2xl
       shadow-2xl
       ${className}
-    `}>
+    `}
+    >
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Otakumori™ 2025
-        </h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Otakumori™ 2025</h1>
         <p className="text-gray-400">System Settings</p>
       </div>
 
       {/* Settings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
         {/* Audio Settings */}
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-white flex items-center gap-2">
             <Volume2 className="w-5 h-5" />
             Audio Settings
           </h2>
-          
+
           {/* Master Volume */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
+            <label
+              htmlFor="master-volume-slider"
+              className="block text-sm font-medium text-gray-300"
+            >
               Master Volume
             </label>
             <div className="flex items-center gap-4">
               <input
+                id="master-volume-slider"
                 ref={volumeRef}
                 type="range"
                 min="0"
@@ -177,7 +180,11 @@ export default function SettingsConsole({
                          focus:outline-none focus:ring-2 focus:ring-pink-500"
                 aria-label={isMuted ? 'Unmute' : 'Mute'}
               >
-                {isMuted ? <VolumeX className="w-5 h-5 text-gray-400" /> : <Volume2 className="w-5 h-5 text-pink-400" />}
+                {isMuted ? (
+                  <VolumeX className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <Volume2 className="w-5 h-5 text-pink-400" />
+                )}
               </button>
               <span className="text-sm text-gray-400 w-12 text-right">
                 {Math.round((isMuted ? 0 : masterVolume) * 100)}%
@@ -192,34 +199,29 @@ export default function SettingsConsole({
             <Clock className="w-5 h-5" />
             System Information
           </h2>
-          
+
           {/* Date & Time */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Current Time
-            </label>
+            <div className="block text-sm font-medium text-gray-300">Current Time</div>
             <div className="p-4 bg-gray-800 rounded-lg">
-              <div className="text-2xl font-mono text-white">
-                {formatTime(currentTime)}
-              </div>
-              <div className="text-sm text-gray-400 mt-1">
-                {formatDate(currentTime)}
-              </div>
+              <div className="text-2xl font-mono text-white">{formatTime(currentTime)}</div>
+              <div className="text-sm text-gray-400 mt-1">{formatDate(currentTime)}</div>
             </div>
           </div>
 
           {/* Controller Status */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Controller Status
-            </label>
+            <div className="block text-sm font-medium text-gray-300">Controller Status</div>
             <div className="flex items-center gap-2 p-4 bg-gray-800 rounded-lg">
-              <Gamepad2 className={`w-5 h-5 ${controllerConnected ? 'text-green-400' : 'text-gray-500'}`} />
-              <span className={`text-sm ${controllerConnected ? 'text-green-400' : 'text-gray-500'}`}>
-                {controllerConnected 
-                  ? `Controller ${controllerIndex + 1} Connected` 
-                  : 'No Controller Detected'
-                }
+              <Gamepad2
+                className={`w-5 h-5 ${controllerConnected ? 'text-green-400' : 'text-gray-500'}`}
+              />
+              <span
+                className={`text-sm ${controllerConnected ? 'text-green-400' : 'text-gray-500'}`}
+              >
+                {controllerConnected
+                  ? `Controller ${controllerIndex + 1} Connected`
+                  : 'No Controller Detected'}
               </span>
             </div>
           </div>
@@ -231,19 +233,18 @@ export default function SettingsConsole({
             <Palette className="w-5 h-5" />
             Display Settings
           </h2>
-          
+
           {/* Theme Selection */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">
-              Theme
-            </label>
-            <div className="flex gap-2">
+            <div className="block text-sm font-medium text-gray-300">Theme</div>
+            <div className="flex gap-2" role="group" aria-label="Theme selection">
               <button
                 onClick={() => handleThemeChange('dark')}
                 className={`px-4 py-2 rounded-lg transition-colors
-                  ${theme === 'dark' 
-                    ? 'bg-pink-500 text-white' 
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ${
+                    theme === 'dark'
+                      ? 'bg-pink-500 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
               >
                 Dark
@@ -251,9 +252,10 @@ export default function SettingsConsole({
               <button
                 onClick={() => handleThemeChange('light')}
                 className={`px-4 py-2 rounded-lg transition-colors
-                  ${theme === 'light' 
-                    ? 'bg-pink-500 text-white' 
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ${
+                    theme === 'light'
+                      ? 'bg-pink-500 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
               >
                 Light
@@ -268,7 +270,7 @@ export default function SettingsConsole({
             <RotateCcw className="w-5 h-5" />
             System Actions
           </h2>
-          
+
           {/* Reset Settings */}
           <div className="space-y-2">
             <button
@@ -284,9 +286,7 @@ export default function SettingsConsole({
 
       {/* Footer */}
       <div className="mt-8 pt-6 border-t border-white/10 text-center">
-        <p className="text-sm text-gray-400">
-          Select a face to navigate • Press ESC to return
-        </p>
+        <p className="text-sm text-gray-400">Select a face to navigate • Press ESC to return</p>
       </div>
     </div>
   );

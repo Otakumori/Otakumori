@@ -1,6 +1,20 @@
-import { env } from '@/env.mjs';
+// lib/flags.ts
+import { env } from '@/env';
 
-export const _FLAGS = {
-  CUBE_HUB: env.NEXT_PUBLIC_FEATURE_CUBE_HUB === 'true',
-  PETALS_ABOUT: env.NEXT_PUBLIC_FEATURE_PETALS_ABOUT !== 'false',
-};
+export function initFlags() {
+  // Only run in production
+  if (process.env.NEXT_PUBLIC_APP_ENV !== 'production') return;
+
+  // Use a BROWSER/PUBLIC key only
+  const publicKey = process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY;
+  if (!publicKey) {
+    if (env.NODE_ENV !== 'production') {
+      console.warn('[Flags] Missing NEXT_PUBLIC_FLAGS_PUBLIC_KEY; skipping init');
+    }
+    return;
+  }
+
+  // TODO: Replace with your provider's client init
+  // Example:
+  // flagsClient.init({ clientKey: publicKey, /* domain: 'www.otaku-mori.com', */ });
+}

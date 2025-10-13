@@ -9,7 +9,9 @@ export async function GET(req: Request) {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
+    console.warn(`Admin ${admin.id} requested reviews`);
   } catch (error) {
+    console.error('Admin auth failed for reviews GET:', error);
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

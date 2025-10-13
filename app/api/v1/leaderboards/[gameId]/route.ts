@@ -187,8 +187,9 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
             //   where: { userId: user.id, status: 'accepted' },
             //   select: { friendId: true },
             // });
-          } catch (error) {
-            console.warn('Friend table not available, using user-only scope');
+          } catch (error: unknown) {
+            const err = error instanceof Error ? error : new Error(String(error));
+            console.warn('Friend table not available, using user-only scope:', err.message);
           }
           scopeFilter = {
             userId: { in: [user.id, ...friends.map((f: any) => f.friendId)] },
@@ -276,7 +277,10 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
 
     await metricsCollector.track('leaderboard_error', {
       value: 1,
-              tags: { gameId: params.gameId, error: error instanceof Error ? error.message : 'Unknown error' },
+      tags: {
+        gameId: params.gameId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
     });
 
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
@@ -368,8 +372,16 @@ async function updateAchievements(
   category: string,
   metadata: any,
 ) {
+  // Log achievement check for debugging
+  console.warn('Checking achievements for:', { userId, gameId, score, category, metadata });
+
   // Achievement logic would go here
   // This is a placeholder for the achievement system
+
+  // Example: Check for high score achievements
+  if (score > 1000) {
+    console.warn(`High score achievement candidate: ${score} in ${gameId}`);
+  }
 }
 
 function buildDateFilter(period: string) {

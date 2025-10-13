@@ -19,6 +19,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { format, quality, includeAssets } = body;
 
+    // Log export request for analytics
+    console.warn('Avatar export requested:', {
+      format,
+      quality,
+      includeAssets: includeAssets || false,
+    });
+
     // Validate format
     const validFormats = ['glb', 'fbx', 'obj', 'png', 'jpg', 'svg'];
     if (!validFormats.includes(format)) {
@@ -95,62 +102,72 @@ export async function POST(request: NextRequest) {
 // Asset generation functions (these would integrate with actual 3D rendering)
 async function generateGLBExport(config: any, quality: string) {
   // This would integrate with Three.js GLTFExporter or similar
-  // For now, return mock data
+  console.warn('Generating GLB export with quality:', quality, 'config keys:', Object.keys(config));
+  const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
-    buffer: Buffer.from('mock-glb-data'),
-    size: 1024 * 1024, // 1MB
+    buffer: Buffer.from(`mock-glb-data-${JSON.stringify(config).substring(0, 50)}`),
+    size: Math.floor(1024 * 1024 * qualityMultiplier),
     mimeType: 'model/gltf-binary',
   };
 }
 
 async function generateFBXExport(config: any, quality: string) {
   // This would integrate with FBX exporter
+  console.warn('Generating FBX export with quality:', quality);
+  const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
-    buffer: Buffer.from('mock-fbx-data'),
-    size: 2 * 1024 * 1024, // 2MB
+    buffer: Buffer.from(`mock-fbx-data-${config.gender || 'female'}`),
+    size: Math.floor(2 * 1024 * 1024 * qualityMultiplier),
     mimeType: 'application/octet-stream',
   };
 }
 
 async function generateOBJExport(config: any, quality: string) {
   // This would generate OBJ file with MTL
+  console.warn('Generating OBJ export with quality:', quality);
+  const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
-    buffer: Buffer.from('mock-obj-data'),
-    size: 512 * 1024, // 512KB
+    buffer: Buffer.from(`mock-obj-data-${config.outfit?.type || 'casual'}`),
+    size: Math.floor(512 * 1024 * qualityMultiplier),
     mimeType: 'text/plain',
   };
 }
 
 async function generatePNGExport(config: any, quality: string) {
   // This would render avatar to PNG using Three.js or Canvas
+  console.warn('Generating PNG export with quality:', quality);
+  const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
-    buffer: Buffer.from('mock-png-data'),
-    size: 256 * 1024, // 256KB
+    buffer: Buffer.from(`mock-png-data-${config.hair?.color || 'pink'}`),
+    size: Math.floor(256 * 1024 * qualityMultiplier),
     mimeType: 'image/png',
   };
 }
 
 async function generateJPGExport(config: any, quality: string) {
   // This would render avatar to JPG
+  console.warn('Generating JPG export with quality:', quality);
+  const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
-    buffer: Buffer.from('mock-jpg-data'),
-    size: 128 * 1024, // 128KB
+    buffer: Buffer.from(`mock-jpg-data-${config.face?.eyes?.color || 'blue'}`),
+    size: Math.floor(128 * 1024 * qualityMultiplier),
     mimeType: 'image/jpeg',
   };
 }
 
 async function generateSVGExport(config: any) {
   // This would generate SVG representation
+  console.warn('Generating SVG export, config gender:', config.gender || 'female');
   return {
-    buffer: Buffer.from('mock-svg-data'),
-    size: 64 * 1024, // 64KB
+    buffer: Buffer.from(`<svg><!-- Avatar SVG for ${config.gender || 'female'} --></svg>`),
+    size: 64 * 1024,
     mimeType: 'image/svg+xml',
   };
 }
 
 async function createDownloadUrl(exportData: any, format: string, username: string) {
   // In a real implementation, this would upload to cloud storage
-  // For now, create a data URL
+  console.warn(`Creating download URL for ${username}, format: ${format}`);
   const base64 = exportData.buffer.toString('base64');
   const dataUrl = `data:${exportData.mimeType};base64,${base64}`;
 

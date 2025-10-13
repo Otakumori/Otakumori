@@ -4,6 +4,9 @@ import * as Sentry from '@sentry/nextjs';
 
 export async function GET(request: NextRequest) {
   try {
+    // Log test error request
+    console.warn('Sentry test error triggered from:', request.headers.get('user-agent'));
+
     // This will trigger a server-side error that Sentry will capture
     throw new Error('Test server-side error for Sentry!');
   } catch (error) {

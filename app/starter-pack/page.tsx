@@ -90,7 +90,7 @@ export default function StarterPackPage() {
           <div className="mb-4 text-6xl"></div>
           <h1 className="text-3xl font-bold text-slatey-200 mb-4">Free Starter Pack</h1>
           <p className="text-lg text-slatey-400">
-            Get your first taste of Otakumori's retro gaming assets. No strings attached, just pure
+            Get your first taste of Otaku-mori's retro gaming assets. No strings attached, just pure
             pixel goodness.
           </p>
         </div>

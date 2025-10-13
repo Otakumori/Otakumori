@@ -56,6 +56,7 @@ export default function GameCubeBootV2({
   const [showSkipButton, setShowSkipButton] = useState(false);
   const [bootSeen, setBootSeen] = useState(!forceShow);
   const [animationFrameId, setAnimationFrameId] = useState<number | null>(null);
+  const [autoSkipCountdown, setAutoSkipCountdown] = useState<number>(skipAfterSeconds);
 
   const prefersReducedMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,6 +67,35 @@ export default function GameCubeBootV2({
   const bootFrequency = useFeatureFlag('GAMECUBE_BOOT_FREQUENCY') ?? 'once_per_day';
   const audioEnabled = useFeatureFlag('GAMECUBE_AUDIO_ENABLED') ?? true;
   const reducedMotionSupport = useFeatureFlag('GAMECUBE_REDUCED_MOTION') ?? true;
+
+  // Countdown timer for auto-skip
+  useEffect(() => {
+    if (bootStage === 'starting' && skipAfterSeconds > 0) {
+      const interval = setInterval(() => {
+        setAutoSkipCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [bootStage, skipAfterSeconds]);
+
+  // Auto-skip after specified seconds
+  useEffect(() => {
+    if (bootStage === 'starting' && skipAfterSeconds > 0 && onSkip) {
+      const autoSkipTimer = setTimeout(() => {
+        // GameCube Boot: Auto-skipping after timeout
+        onSkip();
+      }, skipAfterSeconds * 1000);
+
+      return () => clearTimeout(autoSkipTimer);
+    }
+  }, [bootStage, skipAfterSeconds, onSkip]);
 
   // Check if boot should be shown
   useEffect(() => {
@@ -234,7 +264,7 @@ export default function GameCubeBootV2({
         audio.play().catch(() => {
           // Fail silently if audio doesn't work
         });
-      } catch (error) {
+      } catch {
         // Fail silently
       }
     }
@@ -377,13 +407,11 @@ export default function GameCubeBootV2({
               initial={{ scale: 0, rotate: 0 }}
               animate={{ scale: 1, rotate: 360 }}
               transition={{ duration: 1.5 }}
-            >
-              
-            </motion.div>
+            ></motion.div>
           ))}
         </div>
 
-        {/* Skip Button */}
+        {/* Skip Button with Auto-Skip Countdown */}
         <AnimatePresence>
           {showSkipButton && (
             <motion.button
@@ -392,9 +420,18 @@ export default function GameCubeBootV2({
               exit={{ opacity: 0 }}
               onClick={handleSkip}
               className="absolute bottom-8 right-8 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-400"
-              aria-label="Skip boot animation"
+              aria-label={
+                autoSkipCountdown > 0
+                  ? `Skip boot animation (auto-skipping in ${autoSkipCountdown}s)`
+                  : 'Skip boot animation'
+              }
             >
-              Skip (Space/Enter)
+              <span className="flex items-center gap-2">
+                Skip (Space/Enter)
+                {autoSkipCountdown > 0 && (
+                  <span className="text-xs opacity-75">Auto-skip in {autoSkipCountdown}s</span>
+                )}
+              </span>
             </motion.button>
           )}
         </AnimatePresence>

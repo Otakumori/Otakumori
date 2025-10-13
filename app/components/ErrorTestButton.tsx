@@ -18,8 +18,8 @@ export default function ErrorTestButton() {
       // Simulate an error that might not be caught by React's error boundary
       // or is a non-fatal issue we still want to track.
       const data = null;
-      // @ts-ignore
-      // data.property // This will throw a TypeError
+      // @ts-ignore - intentionally triggering error for testing
+      data.property; // This will throw a TypeError
     } catch (error) {
       Sentry.captureException(error);
       console.error('Custom error captured by Sentry:', error);

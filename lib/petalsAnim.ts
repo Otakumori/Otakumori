@@ -56,8 +56,10 @@ export class WindController {
     const gustMultiplier = 1 + wind.gustStrength;
     const windAngle = wind.direction + wind.gustStrength * (wind.gustDirection - wind.direction);
 
-    const windX = Math.cos((windAngle * Math.PI) / 180) * wind.speed * gustMultiplier;
-    const windY = Math.sin((windAngle * Math.PI) / 180) * wind.speed * gustMultiplier;
+    // Frame-rate independent wind calculations
+    const timeFactor = deltaTime / 16.67; // Normalize to 60fps
+    const windX = Math.cos((windAngle * Math.PI) / 180) * wind.speed * gustMultiplier * timeFactor;
+    const windY = Math.sin((windAngle * Math.PI) / 180) * wind.speed * gustMultiplier * timeFactor;
 
     return {
       ...physics,

@@ -142,6 +142,9 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const status = searchParams.get('status'); // Filter by order status
 
+    // Log order query params
+    console.warn('Orders requested with filters:', { limit, offset, status: status || 'all' });
+
     // TODO: Implement order history retrieval
     // const orders = await prisma.order.findMany({
     //   where: {

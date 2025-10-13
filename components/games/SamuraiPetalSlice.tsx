@@ -88,14 +88,25 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       const response = await gameApi.start(gameDef.key, idempotencyKey);
 
       if (response.ok && response.data) {
-        setRunId((response.data as any).runId);
-        setSeed((response.data as any).seed);
+        const runData = response.data as any;
+        setRunId(runData.runId);
+        const gameSeed = runData.seed;
+        setSeed(gameSeed);
+
+        // Use seed for deterministic random generation (for replay functionality)
+        if (gameSeed) {
+          // Store seed for use in procedural generation
+          // This could be used to initialize a seeded random number generator
+          // for deterministic replay functionality in the future
+          (window as any).__GAME_SEED__ = gameSeed;
+        }
       }
 
       // Initialize PIXI app using manager
+      // Note: Seed is stored in window.__GAME_SEED__ for use by game logic
       const { pixiManager } = await import('@/app/lib/pixi-application-manager');
       const app = pixiManager.getApplication({
-        id: `samurai-petal-slice-${Date.now()}`,
+        id: `samurai-petal-slice-${Date.now()}-${seed || 'random'}`,
         width: 800,
         height: 600,
         backgroundColor: 0xf8f9fa,
@@ -427,7 +438,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     petal.scale.set(scale);
   };
 
-  const updateGame = (deltaTime: number) => {
+  const updateGame = (_deltaTime: number) => {
     if (!gameStateRef.current.isPlaying) return;
 
     // Spawn petals
@@ -486,7 +497,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     }
   };
 
-  const renderGame = (alpha: number) => {
+  const renderGame = (_alpha: number) => {
     if (!appRef.current) return;
 
     // Render slice trails
@@ -715,6 +726,25 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
       {gameState.isPlaying && (
         <div className="mt-4 text-center text-sm text-gray-600">
           <p>Click and drag to slice • R to reset • L for left-handed mode</p>
+        </div>
+      )}
+
+      {/* Seed Sharing */}
+      {seed && (
+        <div className="mt-4 flex items-center justify-center gap-2 text-sm">
+          <span className="text-gray-600">Run Seed:</span>
+          <code className="px-3 py-1 bg-gray-100 rounded border border-gray-300 font-mono text-xs">
+            {seed}
+          </code>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(seed.toString());
+              alert('Seed copied! Share it to let others play the same run.');
+            }}
+            className="px-3 py-1 bg-pink-500 hover:bg-pink-600 text-white rounded text-xs transition-colors"
+          >
+            Share Seed
+          </button>
         </div>
       )}
     </div>

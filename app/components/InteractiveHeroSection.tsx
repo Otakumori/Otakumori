@@ -1,11 +1,16 @@
- 
-
 'use client';
 import Image from 'next/image';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import CherryBlossom from '@/components/animations/CherryBlossom';
 import { usePetalContext } from '@/providers';
 import { motion, AnimatePresence } from 'framer-motion';
+import PetalCollectionToast from '@/app/components/ui/PetalCollectionToast';
+import dynamic from 'next/dynamic';
+
+// Dynamically import wallet indicator to avoid SSR issues
+const PetalWalletIndicator = dynamic(() => import('@/app/components/ui/PetalWalletIndicator'), {
+  ssr: false,
+});
 const MAX_PETALS = 30;
 const CLICK_THROTTLE = 300; // ms
 const MODAL_TRIGGER = 10;
@@ -16,6 +21,9 @@ const SEASON_VARIANTS: Record<string, PetalTypeKey[]> = {
   autumn: ['normal', 'glitch'],
   winter: ['normal', 'blackLotus'],
 };
+
+// Log season variants for debugging
+console.warn('Season variants loaded:', Object.keys(SEASON_VARIANTS));
 
 const PETAL_TYPE_PROPS: Record<PetalTypeKey, { img: string; min: number; max: number }> = {
   normal: { img: '/assets/petal.svg', min: 1, max: 3 },
@@ -163,8 +171,17 @@ const InteractiveHeroSection: React.FC = () => {
   const [burstMode, setBurstMode] = useState(false);
   const [burstTimer, setBurstTimer] = useState(0);
   const [recentClicks, setRecentClicks] = useState<number[]>([]);
+  const [clickStreak, setClickStreak] = useState(0);
   const [showTooltip, setShowTooltip] = useState(false);
   const [cooldownLine, setCooldownLine] = useState('');
+
+  // Update season periodically
+  useEffect(() => {
+    const seasonInterval = setInterval(() => {
+      setSeason(getSeason());
+    }, 60000); // Check every minute
+    return () => clearInterval(seasonInterval);
+  }, []);
   const [trails, setTrails] = useState<
     {
       id: string;
@@ -178,10 +195,20 @@ const InteractiveHeroSection: React.FC = () => {
   const idleTimeout = useRef<NodeJS.Timeout | null>(null);
   const idleLastAward = useRef(Date.now());
   const [trailCount, setTrailCount] = useState(0);
+  const [showTrailBonus, setShowTrailBonus] = useState(false);
   const [senpaiTrailTip, setSenpaiTrailTip] = useState('');
   const [showBloomModal, setShowBloomModal] = useState(false);
   const [bloomBonus, setBloomBonus] = useState(0);
   const [bloomStreak, setBloomStreak] = useState(0);
+
+  // Progressive disclosure state
+  const [showCollectionToast, setShowCollectionToast] = useState(false);
+  const [lastCollectedPetal, setLastCollectedPetal] = useState<{
+    type: PetalTypeKey;
+    amount: number;
+    position: { x: number; y: number };
+  } | null>(null);
+  const [totalPetalsCollected, setTotalPetalsCollected] = useState(0);
 
   // Late night mode state
   const [lateNight, setLateNight] = useState(false);
@@ -263,6 +290,7 @@ const InteractiveHeroSection: React.FC = () => {
   const resetIdle = useCallback(() => {
     setIdlePetals(0);
     if (idleTimeout.current) clearTimeout(idleTimeout.current);
+    idleLastAward.current = Date.now(); // Track last interaction
     scheduleIdleAward();
   }, []);
 
@@ -314,6 +342,8 @@ const InteractiveHeroSection: React.FC = () => {
       setRecentClicks((clicks) => {
         const updated = [...clicks.filter((ts) => now - ts < 10000), now];
         if (!burstMode && updated.length >= 10) activateBurstMode();
+        // Update click streak based on recent clicks
+        setClickStreak(updated.length);
         return updated;
       });
 
@@ -322,6 +352,18 @@ const InteractiveHeroSection: React.FC = () => {
       if (burstMode) reward = getRandomInt(3, 5);
       addPetals(reward);
       setClickCount((c) => c + 1);
+
+      // Progressive disclosure - show toast
+      setTotalPetalsCollected((prev) => prev + 1);
+      setLastCollectedPetal({
+        type: (petal.type as PetalTypeKey) || 'normal',
+        amount: reward,
+        position: { x: petal.x, y: petal.y },
+      });
+      setShowCollectionToast(true);
+
+      // Track trail count for effects
+      setTrailCount((prev) => prev + 1);
 
       // Send to API for persistence
       try {
@@ -357,6 +399,12 @@ const InteractiveHeroSection: React.FC = () => {
       }
       setTrailCount((c) => {
         const next = c + 1;
+        // Show trail bonus every 25 trails
+        if (next % 25 === 0) {
+          setShowTrailBonus(true);
+          addPetals(5); // Bonus petals for trail milestone
+          setTimeout(() => setShowTrailBonus(false), 2000);
+        }
         if (next % 10 === 0) {
           const line = senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)];
           setSenpaiTrailTip(line);
@@ -480,6 +528,52 @@ const InteractiveHeroSection: React.FC = () => {
         <Image src="/assets/petal.svg" alt="Petal" width={24} height={24} />
         <span className="tabular-nums">{petalCount}</span>
       </motion.div>
+
+      {/* Click Streak Indicator */}
+      {clickStreak > 3 && (
+        <motion.div
+          className="absolute top-16 right-6 z-40 rounded-lg bg-orange-500/90 px-3 py-1 text-white text-sm font-semibold shadow-lg"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+        >
+          <span role="img" aria-label="Fire">
+            🔥
+          </span>{' '}
+          {clickStreak} streak
+        </motion.div>
+      )}
+
+      {/* Trail Bonus Notification */}
+      {showTrailBonus && (
+        <motion.div
+          className="absolute top-28 right-6 z-40 rounded-lg bg-purple-500/90 px-4 py-2 text-white font-bold shadow-lg"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+        >
+          ✨ Trail Milestone! +5 Petals
+        </motion.div>
+      )}
+
+      {/* Stats Display (trails & recent clicks) */}
+      {(trailCount > 0 || recentClicks.length > 0) && (
+        <motion.div
+          className="absolute top-4 left-6 z-40 rounded-lg bg-black/60 backdrop-blur-sm px-4 py-2 text-white text-sm space-y-1"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          {trailCount > 0 && (
+            <div>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>{' '}
+              Trails: {trailCount}
+            </div>
+          )}
+          {recentClicks.length > 1 && <div>⚡ Recent: {recentClicks.length}/10</div>}
+        </motion.div>
+      )}
       {/* Clickable Petals */}
       {petals.map((petal) => {
         const { img } = PETAL_TYPE_PROPS[petal.type || 'normal'];
@@ -576,6 +670,30 @@ const InteractiveHeroSection: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Progressive Disclosure Toast */}
+      {lastCollectedPetal && (
+        <PetalCollectionToast
+          show={showCollectionToast}
+          amount={lastCollectedPetal.amount}
+          totalCollected={totalPetalsCollected}
+          petalType={lastCollectedPetal.type}
+          position={lastCollectedPetal.position}
+          onComplete={() => setShowCollectionToast(false)}
+        />
+      )}
+
+      {/* Floating Petal Wallet Indicator */}
+      <div className="fixed top-20 right-4 z-[100]">
+        <PetalWalletIndicator
+          showAfterCollections={3}
+          position="floating"
+          onClick={() => {
+            // Navigate to petal wallet or show petal details
+            // TODO: Implement petal wallet modal or navigation
+          }}
+        />
+      </div>
+
       {/* Tooltip for burst mode */}
       {showTooltip && (
         <div className="absolute top-24 right-1/2 z-50 rounded-lg bg-pink-700/90 px-6 py-3 text-lg font-bold text-white shadow-xl animate-pulse pointer-events-none">

@@ -1,4 +1,18 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+/**
+ * Inngest API Route
+ *
+ * This is the official Inngest integration endpoint for background job processing.
+ * Handles all Inngest functions including:
+ * - User management (Clerk sync)
+ * - Order processing
+ * - Product/inventory sync
+ * - Scheduled jobs (daily, weekly)
+ * - Payment webhooks
+ *
+ * Required environment variables:
+ * - INNGEST_EVENT_KEY: For sending events to Inngest
+ * - INNGEST_SIGNING_KEY: For webhook signature verification
+ */
 import { serve } from 'inngest/next';
 import { inngest } from '../../../inngest/client';
 import {
@@ -14,8 +28,11 @@ import {
   cleanupOldData,
 } from '../../../inngest/functions';
 
+export const runtime = 'nodejs';
+
 // Create an API route that serves the Inngest functions
 // Next.js App Router requires GET, POST, and PUT methods
+
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions: [
@@ -30,4 +47,6 @@ export const { GET, POST, PUT } = serve({
     retryFailedOperation,
     cleanupOldData,
   ],
+  // eslint-disable-next-line no-restricted-syntax -- Inngest serve() requires direct process.env access
+  signingKey: process.env.INNGEST_SIGNING_KEY,
 });

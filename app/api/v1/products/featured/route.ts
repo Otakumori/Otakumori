@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       .map((product: any) => ({
         id: product.id,
         title: product.title,
-        description: product.description,
+        description: stripHtml(product.description || ''),
         price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0, // Convert cents to dollars
         image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
         images: product.images?.map((img: any) => img.src) || [],
@@ -64,4 +64,18 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   }
+}
+
+// Helper function to strip HTML tags from descriptions
+function stripHtml(html: string): string {
+  if (!html) return '';
+  return html
+    .replace(/<[^>]*>/g, '') // Remove all HTML tags
+    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
+    .replace(/&amp;/g, '&') // Replace &amp; with &
+    .replace(/&lt;/g, '<') // Replace &lt; with <
+    .replace(/&gt;/g, '>') // Replace &gt; with >
+    .replace(/&quot;/g, '"') // Replace &quot; with "
+    .replace(/&#039;/g, "'") // Replace &#039; with '
+    .trim();
 }

@@ -1,19 +1,28 @@
 import 'server-only';
 import './globals.css';
+import './styles/glassmorphic-effects.css';
 import type { Metadata } from 'next';
 import Footer from './components/Footer';
 import Navbar from './components/layout/Navbar';
 import Providers from './Providers';
 import * as Sentry from '@sentry/nextjs';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
+import ClientErrorBoundary from '@/components/ClientErrorBoundary';
 import { headers } from 'next/headers';
-import CursorGlow from './components/effects/CursorGlow';
-import { isCursorGlowEnabled } from './flags';
 import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import GoogleAnalytics from './components/analytics/GoogleAnalytics';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import { enforceNoMocks } from '@/lib/no-mocks';
+import StarfieldBackground from '@/components/background/StarfieldBackground';
+import PetalField from './components/effects/PetalField';
+
+// Boot-time Inngest health check (disabled - run Inngest dev server separately)
+// bootCheckInngest();
+
+// Enforce no mock data in production
+enforceNoMocks();
 
 export function generateMetadata(): Metadata {
   return {
@@ -51,26 +60,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50 font-body">
           <GoogleAnalytics />
           <PerformanceMonitor />
-          {/* CherryBlossomEffect moved to Home page only for v0 spec compliance */}
-          {isCursorGlowEnabled() && <CursorGlow />}
+
+          {/* Global Background Effects (z-0) */}
+          <StarfieldBackground className="fixed inset-0 z-0" />
+          <PetalField density="site" />
+
+          {/* Cursor Glow disabled per user preference */}
+          {/* {isCursorGlowEnabled() && <CursorGlow />} */}
+
           <PetalHUD />
           <Konami />
           <PetalProgressBar />
-          <Sentry.ErrorBoundary
-            fallback={
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center p-8">
-                  <h1 className="text-2xl font-bold text-pink-400 mb-4">Something went wrong</h1>
-                  <p className="text-zinc-300">
-                    We&apos;re sorry, but something unexpected happened. Please try refreshing the
-                    page.
-                  </p>
-                </div>
-              </div>
-            }
-          >
+          <ClientErrorBoundary>
             <Providers>
-              <div className="flex min-h-screen flex-col">
+              <div className="flex min-h-screen flex-col relative z-10">
                 <Navbar />
                 <main id="main-content" className="flex-1">
                   {children}
@@ -78,7 +81,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <Footer />
               </div>
             </Providers>
-          </Sentry.ErrorBoundary>
+          </ClientErrorBoundary>
         </body>
       </html>
     </ClerkProviderWrapper>

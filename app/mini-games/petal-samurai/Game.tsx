@@ -106,23 +106,55 @@ export default function Game({ mode }: Props) {
     };
   }, [mode]);
 
-  // Handle petal clicks
-  const handleCanvasClick = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!gameRef.current || gameState.isStunned) return;
+  // Handle mouse/touch slash mechanics
+  const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
+  const isSlashing = useRef(false);
 
-      const canvas = canvasRef.current!;
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-
-      const clickedPetal = gameRef.current.getPetalAt(x, y);
-      if (clickedPetal) {
-        gameRef.current.clickPetal(clickedPetal);
-      }
+  const handleMouseDown = useCallback(
+    (_event: React.MouseEvent<HTMLCanvasElement>) => {
+      if (gameState.isStunned) return;
+      isSlashing.current = true;
+      slashPoints.current = [];
     },
     [gameState.isStunned],
   );
+
+  const handleMouseMove = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isSlashing.current || !canvasRef.current || !gameRef.current) return;
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+
+    // Calculate proper canvas-relative coordinates accounting for canvas scaling
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    slashPoints.current.push({ x, y, time: Date.now() });
+
+    // Keep only last 15 points for smoother trail
+    if (slashPoints.current.length > 15) {
+      slashPoints.current.shift();
+    }
+
+    // Check if slash hits any petals
+    const hitPetals = gameRef.current.getPetalsAlongPath(slashPoints.current);
+    hitPetals.forEach((petal) => {
+      gameRef.current!.slashPetal(petal);
+    });
+
+    // Draw slash trail
+    gameRef.current.setSlashTrail(slashPoints.current);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    isSlashing.current = false;
+    slashPoints.current = [];
+    if (gameRef.current) {
+      gameRef.current.clearSlashTrail();
+    }
+  }, []);
 
   // Handle power-up activation
   const handlePowerUpClick = useCallback((powerUpType: string) => {
@@ -131,26 +163,54 @@ export default function Game({ mode }: Props) {
     }
   }, []);
 
-  // Submit score when game ends
+  // Submit score and award petals when game ends
   useEffect(() => {
     if (gameState.isGameOver) {
       const submitScore = async () => {
         try {
-          const payload = {
-            score: gameState.score,
-            combo: gameState.combo,
-            mode: mode,
-            meta: { game: 'petal-samurai' },
-          };
-          // TODO: Implement score submission API
-          // Score to submit
+          // Calculate petal reward (score / 10)
+          const petalReward = Math.floor(gameState.score / 10);
+
+          // Submit score to leaderboard
+          await fetch('/api/v1/leaderboards/petal-samurai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              score: gameState.score,
+              combo: gameState.combo,
+              mode: mode,
+              metadata: {
+                multiplier: gameState.multiplier,
+                misses: gameState.misses,
+              },
+            }),
+          });
+
+          // Award petals
+          if (petalReward > 0) {
+            await fetch('/api/v1/petals/collect', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: petalReward,
+                source: 'game_reward',
+              }),
+            });
+          }
         } catch (error) {
           console.error('Failed to submit score:', error);
         }
       };
       submitScore();
     }
-  }, [gameState.isGameOver, gameState.score, gameState.combo, mode]);
+  }, [
+    gameState.isGameOver,
+    gameState.score,
+    gameState.combo,
+    gameState.multiplier,
+    gameState.misses,
+    mode,
+  ]);
 
   return (
     <div className="relative">
@@ -159,9 +219,12 @@ export default function Game({ mode }: Props) {
         ref={canvasRef}
         width={800}
         height={600}
-        className="w-full h-auto cursor-crosshair"
-        onClick={handleCanvasClick}
-        aria-label="Petal Samurai game area"
+        className="w-full h-auto cursor-crosshair bg-gradient-to-br from-black via-purple-950/30 to-black"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        aria-label="Petal Samurai game area - slash through petals to score"
       />
 
       {/* HUD Overlay */}
@@ -264,6 +327,8 @@ class GameEngine {
   private animationId: number | null = null;
   private lastPetalSpawn: number = 0;
   private lastPowerUpSpawn: number = 0;
+  private slashTrail: { x: number; y: number; time: number }[] = [];
+  private slashedPetals: Set<string> = new Set();
 
   constructor(canvas: HTMLCanvasElement, mode: string) {
     this.canvas = canvas;
@@ -348,6 +413,13 @@ class GameEngine {
         this.activePowerUps.set(type, newTime);
       }
     });
+
+    // Fade slash trail dynamically over time
+    const now = this.gameTime;
+    this.slashTrail = this.slashTrail.filter((point) => {
+      const age = now - point.time;
+      return age < 0.3; // Trail fades after 300ms
+    });
   }
 
   private spawnPetal() {
@@ -395,7 +467,11 @@ class GameEngine {
     this.powerUps.push(powerUp);
   }
 
-  clickPetal(petal: Petal) {
+  slashPetal(petal: Petal) {
+    // Prevent double-slashing the same petal
+    if (this.slashedPetals.has(petal.id)) return;
+    this.slashedPetals.add(petal.id);
+
     if (petal.type === 'cursed') {
       this.score = Math.max(0, this.score - 2);
       this.combo = 0;
@@ -412,8 +488,65 @@ class GameEngine {
       }
     }
 
-    // Remove clicked petal
+    // Remove slashed petal
     this.petals = this.petals.filter((p) => p.id !== petal.id);
+  }
+
+  getPetalsAlongPath(path: { x: number; y: number }[]): Petal[] {
+    if (path.length < 2) return [];
+
+    const hitPetals: Petal[] = [];
+
+    for (let i = 0; i < path.length - 1; i++) {
+      const p1 = path[i];
+      const p2 = path[i + 1];
+
+      this.petals.forEach((petal) => {
+        if (this.slashedPetals.has(petal.id)) return;
+
+        // Check if petal intersects with line segment
+        const distance = this.distanceToLineSegment(petal.x, petal.y, p1.x, p1.y, p2.x, p2.y);
+        if (distance < petal.size + 5) {
+          hitPetals.push(petal);
+        }
+      });
+    }
+
+    return hitPetals;
+  }
+
+  private distanceToLineSegment(
+    px: number,
+    py: number,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+  ): number {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const lengthSquared = dx * dx + dy * dy;
+
+    if (lengthSquared === 0) {
+      return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
+    }
+
+    let t = ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
+    t = Math.max(0, Math.min(1, t));
+
+    const closestX = x1 + t * dx;
+    const closestY = y1 + t * dy;
+
+    return Math.sqrt((px - closestX) * (px - closestX) + (py - closestY) * (py - closestY));
+  }
+
+  setSlashTrail(trail: { x: number; y: number; time: number }[]) {
+    this.slashTrail = trail;
+  }
+
+  clearSlashTrail() {
+    this.slashTrail = [];
+    this.slashedPetals.clear();
   }
 
   activatePowerUp(type: string) {
@@ -459,16 +592,16 @@ class GameEngine {
       this.ctx.translate(petal.x, petal.y);
       this.ctx.rotate(petal.rotation);
 
-      // Petal colors based on type
+      // Petal colors based on type - all pink themed
       switch (petal.type) {
         case 'normal':
-          this.ctx.fillStyle = 'rgba(255, 182, 193, 0.8)';
+          this.ctx.fillStyle = 'rgba(255, 182, 193, 0.9)'; // Light pink
           break;
         case 'gold':
-          this.ctx.fillStyle = 'rgba(255, 215, 0, 0.9)';
+          this.ctx.fillStyle = 'rgba(255, 105, 180, 1.0)'; // Hot pink for gold
           break;
         case 'cursed':
-          this.ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+          this.ctx.fillStyle = 'rgba(139, 0, 139, 0.9)'; // Dark magenta for cursed
           break;
       }
 
@@ -477,9 +610,9 @@ class GameEngine {
       this.ctx.ellipse(0, 0, petal.size, petal.size * 0.6, 0, 0, Math.PI * 2);
       this.ctx.fill();
 
-      // Add outline
+      // Add outline - pink themed
       this.ctx.strokeStyle =
-        petal.type === 'gold' ? 'rgba(255, 215, 0, 1)' : 'rgba(255, 255, 255, 0.6)';
+        petal.type === 'gold' ? 'rgba(255, 20, 147, 1)' : 'rgba(255, 182, 193, 0.8)';
       this.ctx.lineWidth = 2;
       this.ctx.stroke();
 
@@ -512,16 +645,70 @@ class GameEngine {
       this.ctx.restore();
     });
 
-    // Draw blade trail effect
+    // Draw slash trail effect - dynamic fading based on age
+    if (this.slashTrail.length > 1) {
+      this.ctx.save();
+
+      const now = this.gameTime;
+
+      // Draw multiple layers for better effect
+      for (let layer = 0; layer < 3; layer++) {
+        this.ctx.beginPath();
+
+        for (let i = 0; i < this.slashTrail.length - 1; i++) {
+          const point = this.slashTrail[i];
+          const nextPoint = this.slashTrail[i + 1];
+
+          // Calculate age-based opacity (newer = more visible)
+          const age = now - point.time;
+          const fadeProgress = Math.max(0, 1 - age / 0.3); // Fade over 300ms
+          const layerOpacity = ((3 - layer) / 3) * fadeProgress;
+
+          // Dynamic width based on age and layer
+          const baseWidth = 12 - layer * 3;
+          const width = baseWidth * fadeProgress;
+
+          if (width > 0.5 && layerOpacity > 0.01) {
+            // Create gradient for this segment
+            const gradient = this.ctx.createLinearGradient(
+              point.x,
+              point.y,
+              nextPoint.x,
+              nextPoint.y,
+            );
+            gradient.addColorStop(0, `rgba(255, 20, 147, ${0.8 * layerOpacity})`);
+            gradient.addColorStop(0.5, `rgba(255, 105, 180, ${0.95 * layerOpacity})`);
+            gradient.addColorStop(1, `rgba(255, 182, 193, ${0.7 * layerOpacity})`);
+
+            this.ctx.strokeStyle = gradient;
+            this.ctx.lineWidth = width;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+            this.ctx.shadowBlur = (25 + layer * 15) * fadeProgress;
+            this.ctx.shadowColor = `rgba(255, 105, 180, ${0.7 * layerOpacity})`;
+
+            // Draw smooth curved segment
+            this.ctx.beginPath();
+            this.ctx.moveTo(point.x, point.y);
+
+            const midX = (point.x + nextPoint.x) / 2;
+            const midY = (point.y + nextPoint.y) / 2;
+            this.ctx.quadraticCurveTo(point.x, point.y, midX, midY);
+            this.ctx.lineTo(nextPoint.x, nextPoint.y);
+            this.ctx.stroke();
+          }
+        }
+      }
+
+      this.ctx.restore();
+    }
+
+    // Draw combo streak effect - pink glow
     if (this.combo > 5) {
       this.ctx.save();
-      this.ctx.globalAlpha = Math.min(0.8, (this.combo - 5) * 0.1);
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      this.ctx.lineWidth = 3;
-      this.ctx.beginPath();
-      this.ctx.moveTo(0, this.canvas.height);
-      this.ctx.lineTo(this.canvas.width, this.canvas.height);
-      this.ctx.stroke();
+      this.ctx.globalAlpha = Math.min(0.2, (this.combo - 5) * 0.015);
+      this.ctx.fillStyle = 'rgba(255, 105, 180, 0.3)';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.restore();
     }
   }

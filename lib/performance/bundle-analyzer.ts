@@ -83,6 +83,8 @@ export class BundleAnalyzer {
       return null;
     }
 
+    console.warn('Analyzing bundle stats from:', statsPath);
+
     try {
       // In a real implementation, this would parse webpack stats.json
       // For now, return mock data
@@ -237,7 +239,7 @@ export class BundleAnalyzer {
     if (budgetCheck.violations.length > 0) {
       // Budget violations logged
       budgetCheck.violations.forEach((violation) => {
-        // Budget violation logged
+        console.warn(`Budget violation: ${violation}`);
       });
     }
 
@@ -245,7 +247,7 @@ export class BundleAnalyzer {
     if (recommendations.length > 0) {
       // Recommendations logged
       recommendations.forEach((rec) => {
-        // Recommendation logged
+        console.warn(`Performance recommendation: ${rec}`);
       });
     }
 
@@ -279,7 +281,10 @@ export class CoreWebVitalsMonitor {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
         this.observers.push(lcpObserver);
       } catch (error) {
-        console.warn('LCP observer not supported');
+        console.warn(
+          'LCP observer not supported:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
 
       // FID Observer
@@ -293,7 +298,10 @@ export class CoreWebVitalsMonitor {
         fidObserver.observe({ entryTypes: ['first-input'] });
         this.observers.push(fidObserver);
       } catch (error) {
-        console.warn('FID observer not supported');
+        console.warn(
+          'FID observer not supported:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
 
       // CLS Observer
@@ -311,7 +319,10 @@ export class CoreWebVitalsMonitor {
         clsObserver.observe({ entryTypes: ['layout-shift'] });
         this.observers.push(clsObserver);
       } catch (error) {
-        console.warn('CLS observer not supported');
+        console.warn(
+          'CLS observer not supported:',
+          error instanceof Error ? error.message : String(error),
+        );
       }
     }
   }
@@ -376,16 +387,27 @@ export async function initializePerformanceMonitoring(): Promise<void> {
     // Initialize Core Web Vitals monitoring
     const cwvMonitor = initializeCoreWebVitalsMonitoring();
 
+    // Start monitoring if successfully initialized
+    if (cwvMonitor) {
+      console.warn('[Performance] Core Web Vitals monitoring active');
+      // cwvMonitor is now tracking LCP, FID, CLS, etc.
+    }
+
     // Initialize bundle analysis in development
     if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
       const bundleAnalyzer = initializeBundleAnalysis();
-      // Performance monitoring initialized
+
+      if (bundleAnalyzer) {
+        console.warn('[Performance] Bundle analysis active in development mode');
+        // bundleAnalyzer is now tracking chunk sizes and load times
+      }
     }
 
     // Track performance initialization
     if ('gtag' in window) {
       (window as any).gtag('event', 'performance_monitoring_initialized', {
         environment: 'production', // Always report as production to avoid client-side env access
+        cwv_enabled: !!cwvMonitor,
       });
     }
   } catch (error) {

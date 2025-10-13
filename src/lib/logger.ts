@@ -19,7 +19,7 @@ class Logger {
     const timestamp = new Date().toISOString();
     const requestId = context?.requestId || this.generateRequestId();
 
-    const contextStr = context ? ` ${JSON.stringify(context)}` : '';
+    const contextStr = context ? ` ${JSON.stringify({ ...context, requestId })}` : '';
     return `[${timestamp}] ${level.toUpperCase()}: ${message}${contextStr}`;
   }
 
@@ -28,10 +28,10 @@ class Logger {
 
     if (env.NODE_ENV === 'production') {
       // In production, use structured logging
-      // Production logging disabled
+      console.warn(formattedMessage);
     } else {
       // In development, use human-readable format
-      // Development logging disabled
+      console.warn(formattedMessage);
     }
   }
 
@@ -55,8 +55,10 @@ class Logger {
 
   // API-specific logging helpers
   apiRequest(method: string, path: string, context?: LogContext): void {
+    const requestId = context?.requestId || this.generateRequestId();
     this.info(`API Request: ${method} ${path}`, {
       ...context,
+      requestId,
       service: 'api',
       operation: 'request',
     });
@@ -90,5 +92,28 @@ export { Logger };
 // Helper function to create a request-scoped logger
 export function createRequestLogger(requestId: string): Logger {
   const requestLogger = new Logger();
+
+  // Wrap logger methods to automatically inject requestId
+  const originalInfo = requestLogger.info.bind(requestLogger);
+  const originalWarn = requestLogger.warn.bind(requestLogger);
+  const originalError = requestLogger.error.bind(requestLogger);
+  const originalDebug = requestLogger.debug.bind(requestLogger);
+
+  requestLogger.info = (message: string, context?: LogContext) => {
+    originalInfo(message, { ...context, requestId });
+  };
+
+  requestLogger.warn = (message: string, context?: LogContext) => {
+    originalWarn(message, { ...context, requestId });
+  };
+
+  requestLogger.error = (message: string, context?: LogContext) => {
+    originalError(message, { ...context, requestId });
+  };
+
+  requestLogger.debug = (message: string, context?: LogContext) => {
+    originalDebug(message, { ...context, requestId });
+  };
+
   return requestLogger;
 }

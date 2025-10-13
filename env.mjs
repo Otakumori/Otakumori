@@ -1,16 +1,9 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
-// Load environment variables from .env.local when running outside Next.js context
-if (typeof window === 'undefined' && !process.env.NEXT_RUNTIME) {
-  try {
-    const dotenv = await import('dotenv');
-    dotenv.config({ path: '.env.local' });
-  } catch (error) {
-    // dotenv not available or .env.local not found, continue without it
-    console.warn('Could not load .env.local:', error.message);
-  }
-}
+// Note: dotenv loading removed to eliminate import trace warnings
+// Next.js automatically loads .env.local in development
+// For scripts, manually source .env.local before running
 
 let safeEnv;
 try {
@@ -82,8 +75,14 @@ try {
       // Anti-bot (Cloudflare Turnstile) – optional
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
       TURNSTILE_SECRET_KEY: z.string().optional(),
+      INNGEST_EVENT_KEY: z.string().optional(),
+      INNGEST_SIGNING_KEY: z.string().optional(),
       INNGEST_SERVE_URL: z.string().url().optional(),
+      INNGEST_PROBE: z.string().optional(),
       BASE_URL: z.string().url().optional(),
+      // Next.js runtime detection
+      NEXT_PHASE: z.string().optional(),
+      NEXT_RUNTIME: z.string().optional(),
       SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
       OTEL_SDK_DISABLED: z.string().optional(),
       // Google OAuth
@@ -136,6 +135,8 @@ try {
       NEXT_PUBLIC_SITE_URL: z.string().url(),
       NEXT_PUBLIC_CANONICAL_ORIGIN: z.string().url().optional(),
       NEXT_PUBLIC_VERCEL_ENVIRONMENT: z.string().optional(),
+      NEXT_PUBLIC_APP_ENV: z.string().optional(),
+      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: z.string().optional(),
       // Supabase
       NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
       NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
@@ -290,8 +291,14 @@ try {
       // Anti-bot (Cloudflare Turnstile) – optional
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
       TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
+      INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+      INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
       INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
+      INNGEST_PROBE: process.env.INNGEST_PROBE,
       BASE_URL: process.env.BASE_URL,
+      // Next.js runtime detection
+      NEXT_PHASE: process.env.NEXT_PHASE,
+      NEXT_RUNTIME: process.env.NEXT_RUNTIME,
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
       // Google OAuth
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
@@ -328,6 +335,8 @@ try {
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
       NEXT_PUBLIC_CANONICAL_ORIGIN: process.env.NEXT_PUBLIC_CANONICAL_ORIGIN,
       NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
+      NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
       // Supabase
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -479,7 +488,14 @@ try {
     // Anti-bot (Cloudflare Turnstile) – optional
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
     TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY || '',
+    INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY || '',
+    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY || '',
+    INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL || '',
+    INNGEST_PROBE: process.env.INNGEST_PROBE || 'on',
     FEATURE_EASYPOST: process.env.FEATURE_EASYPOST || '',
+    // Next.js runtime detection
+    NEXT_PHASE: process.env.NEXT_PHASE || '',
+    NEXT_RUNTIME: process.env.NEXT_RUNTIME || '',
 
     // Supabase
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
@@ -500,6 +516,8 @@ try {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || '',
     NEXT_PUBLIC_CANONICAL_ORIGIN: process.env.NEXT_PUBLIC_CANONICAL_ORIGIN || '',
     NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT || 'development',
+    NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV || 'development',
+    NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY || '',
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
@@ -514,6 +532,11 @@ try {
     NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE || '',
     NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
     NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+    // WebSocket
+    NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS:
+      process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS || 'true',
+    NEXT_PUBLIC_COMMUNITY_WS_URL:
+      process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/ws',
 
     // Feature flags
     NEXT_PUBLIC_FEATURE_MINIGAMES: process.env.NEXT_PUBLIC_FEATURE_MINIGAMES || 'on',

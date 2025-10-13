@@ -1,7 +1,5 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import StarfieldPurple from '../components/StarfieldPurple';
-import FooterDark from '../components/FooterDark';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
 
 async function getLogger() {
@@ -34,27 +32,25 @@ export default async function ShopPage({
     });
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
-        <StarfieldPurple />
-
-        <main className="relative z-10">
-          {/* Header Section */}
-          <div className="container mx-auto px-4 py-8">
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-6xl font-bold text-primary mb-4">Otaku-mori Shop</h1>
-              <p className="text-xl text-secondary max-w-2xl mx-auto">
-                Curated treasures for fellow travelers
-              </p>
-            </div>
+      <main className="relative min-h-screen vignette">
+        {/* Header Section */}
+        <div className="relative z-40 container mx-auto px-4 py-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-6xl font-bold text-pink-200 mb-4">Otaku-mori Shop</h1>
+            <p className="text-xl text-pink-200/70 max-w-2xl mx-auto">
+              Curated treasures for fellow travelers
+            </p>
           </div>
+        </div>
 
-          {/* Advanced Shop Catalog with Search and Filters */}
+        {/* Advanced Shop Catalog with Search and Filters */}
+        <div className="relative z-40">
           <Suspense
             fallback={
               <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="glass-card h-96 animate-pulse" />
+                    <div key={i} className="glass-panel h-96 animate-pulse rounded-2xl" />
                   ))}
                 </div>
               </div>
@@ -62,10 +58,8 @@ export default async function ShopPage({
           >
             <AdvancedShopCatalog searchParams={searchParams} />
           </Suspense>
-        </main>
-
-        <FooterDark />
-      </div>
+        </div>
+      </main>
     );
   } catch (error) {
     logger.error('shop_page_error', undefined, {
@@ -74,16 +68,16 @@ export default async function ShopPage({
     });
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="glass-card p-8 max-w-md mx-auto">
-            <h1 className="text-2xl font-bold text-primary mb-4">Shop Temporarily Unavailable</h1>
-            <p className="text-secondary">
+      <main className="relative min-h-screen vignette flex items-center justify-center">
+        <div className="relative z-40 text-center">
+          <div className="glass-panel rounded-2xl p-8 max-w-md mx-auto">
+            <h1 className="text-2xl font-bold text-pink-200 mb-4">Shop Temporarily Unavailable</h1>
+            <p className="text-pink-200/70">
               Please try again later or contact support if the issue persists.
             </p>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 }

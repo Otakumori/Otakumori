@@ -1,4 +1,12 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+/**
+ * Inngest Test Route
+ *
+ * Development utility endpoint for testing Inngest event sending.
+ * GET: Send a test event
+ * POST: Send a custom event with payload
+ *
+ * Not meant for production use.
+ */
 import { NextResponse } from 'next/server';
 import { inngest } from '../../../inngest/client';
 import { env } from '@/env';
@@ -13,7 +21,7 @@ export async function GET() {
     const result = await inngest.send({
       name: 'test/function',
       data: {
-        message: 'Hello from Otakumori!',
+        message: 'Hello from Otaku-mori!',
         timestamp: new Date().toISOString(),
         test: true,
         environment: env.NODE_ENV || 'unknown',

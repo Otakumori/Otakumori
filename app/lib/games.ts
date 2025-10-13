@@ -1,4 +1,5 @@
 import { env } from '@/env.mjs';
+import { isEnabled as isGameEnabledFromConfig } from '@/config/games';
 
 export interface GameDefinition {
   key: string;
@@ -216,8 +217,7 @@ export function isGameEnabled(key: string): boolean {
 
   // Check game flags from config
   try {
-    const { isEnabled } = require('@/config/games');
-    return isEnabled(key);
+    return isGameEnabledFromConfig(key as any); // Allow any string to support dynamic games
   } catch {
     // Fallback to environment variables if config not available
     const flagKey = game.featureFlagKey;

@@ -111,8 +111,11 @@ export function NSFWCustomizer({ config, onChange, gender }: NSFWCustomizerProps
             </div>
 
             <div>
-              <label className="block text-white text-sm font-medium mb-2">Interaction Level</label>
+              <label htmlFor="nsfw-interaction-level" className="block text-white text-sm font-medium mb-2">
+                Interaction Level
+              </label>
               <select
+                id="nsfw-interaction-level"
                 value={config.features?.interactionLevel || 'none'}
                 onChange={(e) => updateConfig('features.interactionLevel', e.target.value)}
                 className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white"
@@ -224,8 +227,11 @@ export function NSFWCustomizer({ config, onChange, gender }: NSFWCustomizerProps
               {config.customization?.pubicHair && (
                 <div className="ml-6 space-y-3">
                   <div>
-                    <label className="block text-white text-sm font-medium mb-2">Hair Style</label>
+                    <label htmlFor="nsfw-hair-style" className="block text-white text-sm font-medium mb-2">
+                      Hair Style
+                    </label>
                     <select
+                      id="nsfw-hair-style"
                       value={config.customization.pubicHair.style || 'natural'}
                       onChange={(e) =>
                         updateConfig('customization.pubicHair.style', e.target.value)
@@ -254,8 +260,11 @@ export function NSFWCustomizer({ config, onChange, gender }: NSFWCustomizerProps
                   />
 
                   <div className="space-y-2">
-                    <label className="block text-white text-sm font-medium">Hair Color</label>
+                    <label htmlFor="nsfw-hair-color" className="block text-white text-sm font-medium">
+                      Hair Color
+                    </label>
                     <input
+                      id="nsfw-hair-color"
                       type="color"
                       value={config.customization.pubicHair.color || '#8B4513'}
                       onChange={(e) =>

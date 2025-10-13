@@ -1,6 +1,6 @@
 import RhythmWrapper from './rhythm-wrapper';
 
-export const metadata = { title: 'Rhythm | Otakumori' };
+export const metadata = { title: 'Rhythm | Otaku-mori' };
 
 export default function Page() {
   return (

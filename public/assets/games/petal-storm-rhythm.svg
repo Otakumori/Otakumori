@@ -1,0 +1,43 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-petal-storm-rhythm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow-petal-storm-rhythm">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#bg-petal-storm-rhythm)"/>
+  
+  <!-- Overlay pattern -->
+  <rect width="400" height="300" fill="black" opacity="0.2"/>
+  
+  <!-- Grid pattern -->
+  <pattern id="grid-petal-storm-rhythm" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/>
+  </pattern>
+  <rect width="400" height="300" fill="url(#grid-petal-storm-rhythm)"/>
+  
+  <!-- Icon circle -->
+  <circle cx="200" cy="120" r="50" fill="#ec4899" opacity="0.3" filter="url(#glow-petal-storm-rhythm)"/>
+  <circle cx="200" cy="120" r="45" fill="#ec4899" opacity="0.8"/>
+  
+  <!-- Icon text (emoji) -->
+  <text x="200" y="140" font-size="48" text-anchor="middle" fill="white">🌸🎵</text>
+  
+  <!-- Title -->
+  <text x="200" y="220" font-size="28" font-weight="bold" text-anchor="middle" fill="white" filter="url(#glow-petal-storm-rhythm)">Petal Storm Rhythm</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="50" cy="50" r="20" fill="white" opacity="0.1"/>
+  <circle cx="350" cy="50" r="15" fill="white" opacity="0.1"/>
+  <circle cx="50" cy="250" r="15" fill="white" opacity="0.1"/>
+  <circle cx="350" cy="250" r="20" fill="white" opacity="0.1"/>
+</svg>

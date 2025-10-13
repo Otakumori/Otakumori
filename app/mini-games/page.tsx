@@ -1,4 +1,4 @@
-export const metadata = { title: 'Mini-Games | Otakumori' };
+export const metadata = { title: 'Mini-Games | Otaku-mori' };
 
 import HubClient from './HubClient';
 

@@ -14,7 +14,7 @@ interface EditableBurstConfig extends BurstConfig {
 }
 
 export default function AdminBurstPage() {
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user: _user, isSignedIn, isLoaded } = useUser();
   const router = useRouter();
   const [config, setConfig] = useState<EditableBurstConfig>({
     enabled: true,

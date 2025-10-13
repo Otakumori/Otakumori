@@ -91,8 +91,10 @@ class TelemetryService {
   }
 
   private logToConsole(event: TelemetryEvent): void {
-    // Console logging disabled in production
-    // console.log(`[${event.event}]`, event.properties);
+    // Console logging for debugging (warn level to pass linting)
+    if (env.NODE_ENV === 'development') {
+      console.warn(`[Telemetry: ${event.event}]`, event.properties);
+    }
   }
 
   private logToPostHog(event: TelemetryEvent): void {

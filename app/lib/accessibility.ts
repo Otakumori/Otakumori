@@ -73,7 +73,7 @@ export function createSkipLink(targetId: string, text: string = 'Skip to main co
 }
 
 // Color contrast utilities
-export function getContrastRatio(color1: string, color2: string): number {
+export function getContrastRatio(_color1: string, _color2: string): number {
   // Simplified contrast ratio calculation
   // In production, use a proper color contrast library
   return 4.5; // Placeholder - always passes AA

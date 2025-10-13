@@ -76,6 +76,7 @@ export default function ConsoleCard({
         .catch((error) => {
           console.warn('Failed to preload audio files:', error);
         });
+      setAudioOn(audioEnabled); // Track audio state
     }
   }, [isReducedMotion]);
 
@@ -139,13 +140,12 @@ export default function ConsoleCard({
         else if (face === 2) setFace(0);
         else if (face === 1) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'ArrowRight') {
@@ -154,13 +154,12 @@ export default function ConsoleCard({
         else if (face === 1) setFace(0);
         else if (face === 2) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       // Vertical rotation between front/top/bottom
@@ -170,13 +169,12 @@ export default function ConsoleCard({
         else if (face === 3) setFace(0);
         else if (face === 4) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'ArrowDown') {
@@ -185,13 +183,12 @@ export default function ConsoleCard({
         else if (face === 4) setFace(0);
         else if (face === 3) setFace(0);
         audio.unlock();
-        try {
-          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
-          if (audioEnabled) {
+        if (audioOn) {
+          try {
             audio.play('gamecube_menu', { gain: 0.25 });
+          } catch (error) {
+            console.warn('Failed to play audio:', error);
           }
-        } catch (error) {
-          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'Enter') {
@@ -214,6 +211,21 @@ export default function ConsoleCard({
         if (gp) {
           const buttons = gp.buttons.map((b: any) => (b && b.pressed ? 1 : 0));
           const axes = gp.axes || [0, 0];
+
+          // Analog stick support for smooth cube rotation
+          if (mode === 'cube' && Math.abs(axes[0]) > 0.5) {
+            // Horizontal analog stick for left/right face navigation
+            const direction = axes[0] > 0 ? 'right' : 'left';
+            if (direction === 'right' && face === 0) setFace(2);
+            else if (direction === 'left' && face === 0) setFace(1);
+          }
+          if (mode === 'cube' && Math.abs(axes[1]) > 0.5) {
+            // Vertical analog stick for up/down face navigation
+            const direction = axes[1] > 0 ? 'down' : 'up';
+            if (direction === 'up' && face === 0) setFace(4);
+            else if (direction === 'down' && face === 0) setFace(3);
+          }
+
           // D-pad
           if (mode === 'cube') {
             if (press(buttons[14], 14)) {
@@ -482,11 +494,13 @@ export default function ConsoleCard({
                 try {
                   const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                   if (audioEnabled) {
-                    audio.unlock();
-                    // Small delay to ensure audio context is unlocked
-                    setTimeout(() => {
-                      audio.play('samus_jingle', { gain: 0.35 });
-                    }, 10);
+                    if (audioOn) {
+                      audio.unlock();
+                      // Small delay to ensure audio context is unlocked
+                      setTimeout(() => {
+                        audio.play('samus_jingle', { gain: 0.35 });
+                      }, 10);
+                    }
                   }
                 } catch (error) {
                   console.warn('Failed to play audio:', error);
@@ -539,6 +553,7 @@ export default function ConsoleCard({
               </button>
 
               {/* Hover or toggled description overlay */}
+              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
               <div
                 className={[
                   'pointer-events-none absolute inset-0 rounded-lg bg-black/70 p-3 opacity-0 transition-opacity',
@@ -546,6 +561,13 @@ export default function ConsoleCard({
                   infoOpen === g.slug ? 'opacity-100 pointer-events-auto' : '',
                 ].join(' ')}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.stopPropagation();
+                  }
+                }}
+                role="article"
+                aria-label={`${g.name} game description`}
               >
                 <div className="mb-1 text-sm font-semibold text-zinc-100">{g.name}</div>
                 <p className="text-xs text-zinc-300">{g.desc}</p>
@@ -597,6 +619,17 @@ export default function ConsoleCard({
         body: JSON.stringify({ prefs: { CRT: crt, VHS: vhs, AUDIO: audio, AUDIO_LEVEL: vol } }),
       });
     };
+
+    if (loading) {
+      return (
+        <div className="p-4 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+            <div className="text-xs text-zinc-400">Loading preferences...</div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="p-4 space-y-3">
@@ -667,7 +700,6 @@ export default function ConsoleCard({
             <div key={src} className="rounded-lg border border-white/15 bg-white/10 p-3">
               <div className="text-xs text-zinc-300">{src}</div>
               {audio && (
-                // eslint-disable-next-line jsx-a11y/media-has-caption
                 <audio
                   src={`/${src}`}
                   loop
@@ -675,7 +707,10 @@ export default function ConsoleCard({
                   controls
                   className="mt-2 w-full"
                   preload="none"
-                />
+                  aria-label={`Background music: ${src}`}
+                >
+                  <track kind="captions" label="Background music" />
+                </audio>
               )}
             </div>
           ))}
@@ -876,10 +911,25 @@ export default function ConsoleCard({
   return (
     <section
       ref={containerRef}
-      tabIndex={0}
-      className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none"
+      className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none relative"
       aria-label="Mini-Games Console"
     >
+      {/* Audio Status Indicator */}
+      <div className="absolute top-4 right-4 z-10">
+        <div
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
+            audioOn
+              ? 'bg-green-500/20 border border-green-500/40'
+              : 'bg-zinc-500/20 border border-zinc-500/40'
+          }`}
+        >
+          <span className="text-sm">{audioOn ? '🔊' : '🔇'}</span>
+          <span className={`text-xs font-medium ${audioOn ? 'text-green-300' : 'text-zinc-400'}`}>
+            {audioOn ? 'Audio On' : 'Audio Off'}
+          </span>
+        </div>
+      </div>
+
       {mode === 'boot' && (
         <>
           <Boot />
@@ -1158,7 +1208,7 @@ function CommunityFace() {
     // Sentry breadcrumb on face enter
     try {
       // @ts-ignore
-      const S = require('@sentry/nextjs');
+      const S = Sentry;
       S.addBreadcrumb({ category: 'minigames', message: 'face.enter:2', level: 'info' });
     } catch {}
     const reqId = `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -1186,7 +1236,7 @@ function CommunityFace() {
     const bc = (message: string, extra?: Record<string, any>) => {
       try {
         // @ts-ignore
-        const S = require('@sentry/nextjs');
+        const S = Sentry;
         S.addBreadcrumb({
           category: 'minigames',
           message,
@@ -1295,6 +1345,7 @@ function CommunityFace() {
         // Creating WebSocket connection
         ws = new WebSocket(url);
       } catch (e) {
+        console.error('WebSocket connection failed:', e);
         setWsFailures((n) => n + 1);
         setWsDegraded(true);
         bc('ws.disconnect');
@@ -1429,7 +1480,7 @@ function CommunityFace() {
         onAccept={() => {
           setPendingInteraction(null);
           try {
-            const S = require('@sentry/nextjs');
+            const S = Sentry;
             S.addBreadcrumb({
               category: 'minigames',
               message: 'interaction.accepted',
@@ -1441,7 +1492,7 @@ function CommunityFace() {
         onDecline={() => {
           setPendingInteraction(null);
           try {
-            const S = require('@sentry/nextjs');
+            const S = Sentry;
             S.addBreadcrumb({
               category: 'minigames',
               message: 'interaction.declined',
@@ -1457,7 +1508,7 @@ function CommunityFace() {
           if (j.ok) {
             setTrainingActive(false);
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'training.learn',
@@ -1478,7 +1529,7 @@ function CommunityFace() {
           if (j.ok) {
             setUnlockedEmotes((prev) => new Set([...prev, 'blush_burst']));
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'emote.unlock',
@@ -1509,7 +1560,7 @@ function CommunityFace() {
               },
             ]);
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'prefs.blocked',
@@ -1531,7 +1582,7 @@ function CommunityFace() {
               },
             ]);
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'rate_limited',
@@ -1542,7 +1593,7 @@ function CommunityFace() {
           } else {
             try {
               if (dirty && prefs.JIGGLE_VISIBLE) {
-                const S = require('@sentry/nextjs');
+                const S = Sentry;
                 S.addBreadcrumb({
                   category: 'minigames',
                   message: 'jiggle.play',
@@ -1579,7 +1630,7 @@ function CommunityFace() {
             }
             setPendingInteraction({ requestId: j?.data?.requestId || `req_local_${Date.now()}` });
             try {
-              const S = require('@sentry/nextjs');
+              const S = Sentry;
               S.addBreadcrumb({
                 category: 'minigames',
                 message: 'interaction.request.sent',
@@ -1588,6 +1639,7 @@ function CommunityFace() {
               });
             } catch {}
           } catch (e) {
+            console.error('Failed to send interaction request:', e);
             setToasts((prev) => [
               ...prev,
               {

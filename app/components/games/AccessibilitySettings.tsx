@@ -125,7 +125,7 @@ export default function AccessibilitySettings({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-primary font-medium">Reduced Motion</label>
+                      <div className="text-primary font-medium">Reduced Motion</div>
                       <p className="text-secondary text-sm">Minimize animations and transitions</p>
                     </div>
                     <button
@@ -145,7 +145,7 @@ export default function AccessibilitySettings({
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-primary font-medium">High Contrast</label>
+                      <div className="text-primary font-medium">High Contrast</div>
                       <p className="text-secondary text-sm">
                         Increase contrast for better visibility
                       </p>
@@ -167,7 +167,7 @@ export default function AccessibilitySettings({
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-primary font-medium">Color Blind Support</label>
+                      <div className="text-primary font-medium">Color Blind Support</div>
                       <p className="text-secondary text-sm">Use color-blind friendly palettes</p>
                     </div>
                     <button
@@ -188,7 +188,7 @@ export default function AccessibilitySettings({
                   </div>
 
                   <div>
-                    <label className="text-primary font-medium mb-2 block">Font Size</label>
+                    <div className="text-primary font-medium mb-2 block">Font Size</div>
                     <div className="flex space-x-2">
                       {(['small', 'medium', 'large'] as const).map((size) => (
                         <button
@@ -229,7 +229,7 @@ export default function AccessibilitySettings({
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-primary font-medium">Captions</label>
+                      <div className="text-primary font-medium">Captions</div>
                       <p className="text-secondary text-sm">Show text for dialogue and sounds</p>
                     </div>
                     <button
@@ -249,7 +249,7 @@ export default function AccessibilitySettings({
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-primary font-medium">Audio Descriptions</label>
+                      <div className="text-primary font-medium">Audio Descriptions</div>
                       <p className="text-secondary text-sm">Describe visual elements with audio</p>
                     </div>
                     <button
@@ -275,9 +275,7 @@ export default function AccessibilitySettings({
               <section>
                 <h3 className="text-lg font-semibold text-primary mb-4">Input Settings</h3>
                 <div>
-                  <label className="text-primary font-medium mb-2 block">
-                    Preferred Input Method
-                  </label>
+                  <div className="text-primary font-medium mb-2 block">Preferred Input Method</div>
                   <div className="grid grid-cols-3 gap-2">
                     {(['keyboard', 'gamepad', 'touch'] as const).map((method) => (
                       <button

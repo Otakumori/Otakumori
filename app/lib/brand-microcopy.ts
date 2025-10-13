@@ -1,4 +1,4 @@
-// Brand microcopy placeholders for Otakumori
+// Brand microcopy placeholders for Otaku-mori
 // These are seed texts that can be iterated on later
 
 export const BRAND_MICROCOPY = {
@@ -21,7 +21,7 @@ export const BRAND_MICROCOPY = {
 
   // Blog & Content
   blog: {
-    signup: 'Join Otakumori Insiders… if you even care',
+    signup: 'Join Otaku-mori Insiders… if you even care',
     readMore: 'Continue reading...',
     share: 'Share this wisdom',
     bookmark: 'Save for later',

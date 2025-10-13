@@ -14,7 +14,13 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 export const useToast = () => {
   // Placeholder hook
   return {
-    toast: ({ title, description }: { title: string; description?: string }) => {
+    toast: ({
+      title: _title,
+      description: _description,
+    }: {
+      title: string;
+      description?: string;
+    }) => {
       // 'Toast:', title, description
     },
   };

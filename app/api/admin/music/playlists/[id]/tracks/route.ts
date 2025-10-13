@@ -9,8 +9,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.log(`Admin ${admin.id} adding track to playlist ${params.id}`);
+    console.warn(`Admin ${admin.id} adding track to playlist ${params.id}`);
   } catch (error) {
+    console.error('Admin auth failed for track addition:', error);
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
@@ -39,8 +40,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.log(`Admin ${admin.id} reordering tracks in playlist ${params.id}`);
+    console.warn(`Admin ${admin.id} reordering tracks in playlist ${params.id}`);
   } catch (error) {
+    console.error('Admin auth failed for track reordering:', error);
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

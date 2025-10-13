@@ -8,11 +8,23 @@ interface GameCubeBootProps {
   skipable?: boolean;
 }
 
+interface Petal {
+  id: number;
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+  color: string;
+}
+
 export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBootProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [canSkip, setCanSkip] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'rolling' | 'assembling' | 'reveal' | 'burst' | 'complete'>('rolling');
+  const [currentPhase, setCurrentPhase] = useState<
+    'rolling' | 'assembling' | 'reveal' | 'burst' | 'complete'
+  >('rolling');
   const [showPetals, setShowPetals] = useState(false);
+  const [petals, setPetals] = useState<Petal[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -34,10 +46,11 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
 
     // Initialize audio (optional)
     try {
-      audioRef.current = new Audio('/audio/gamecube-boot.mp3'); // Optional boot sound
+      audioRef.current = new Audio('/assets/sounds/gamecube-startup.mp3');
       audioRef.current.volume = 0.3;
-    } catch (error) {
-      // 'Boot audio not available'
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.warn('Boot audio not available:', err.message);
     }
 
     // Boot sequence timing
@@ -47,30 +60,32 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
       if (audioRef.current) {
         try {
           await audioRef.current.play();
-        } catch (error) {
-          // 'Audio autoplay blocked'
+        } catch (error: unknown) {
+          const err = error instanceof Error ? error : new Error(String(error));
+          console.warn('Audio play failed:', err.message);
         }
       }
 
-      await new Promise(resolve => setTimeout(resolve, 900));
+      await new Promise((resolve) => setTimeout(resolve, 900));
 
       // Phase 2: Assembly (800ms)
       setCurrentPhase('assembling');
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Phase 3: Logo reveal (800ms)
       setCurrentPhase('reveal');
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       // Phase 4: Petal burst (1500ms)
       setCurrentPhase('burst');
       setShowPetals(true);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      generatePetals();
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Phase 5: Complete
       setCurrentPhase('complete');
       localStorage.setItem(bootKey, 'true');
-      
+
       // Auto-complete after a brief pause
       setTimeout(() => {
         handleComplete();
@@ -89,7 +104,24 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
         audioRef.current = null;
       }
     };
-  }, []);
+  }, [onComplete, skipable]);
+
+  const generatePetals = () => {
+    const newPetals: Petal[] = [];
+    const colors = ['#FFB7C5', '#FF69B4', '#FFC0CB', '#FF1493'];
+
+    for (let i = 0; i < 12; i++) {
+      newPetals.push({
+        id: i,
+        x: 50 + Math.random() * 40, // Center around the O
+        y: 50 + Math.random() * 40,
+        rotation: Math.random() * 360,
+        scale: 0.8 + Math.random() * 0.4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
+    setPetals(newPetals);
+  };
 
   const handleComplete = () => {
     setIsVisible(false);
@@ -101,312 +133,170 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
     const today = new Date().toISOString().split('T')[0];
     const bootKey = `otm-gamecube-boot-${today}`;
     localStorage.setItem(bootKey, 'true');
-    
+
     if (audioRef.current) {
       audioRef.current.pause();
     }
-    
+
     handleComplete();
   };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') && canSkip) {
-        e.preventDefault();
-        handleSkip();
-      }
-    };
-
-    if (skipable) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [skipable, canSkip]);
 
   if (!isVisible) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #1a0d2e 0%, #16051a 50%, #0c0911 100%)'
-      }}
-      data-gamecube-boot="true"
-      role="img"
-      aria-label="Otaku-mori GameCube boot animation loading"
-    >
-      {/* Skip Button */}
-      <AnimatePresence>
-        {skipable && canSkip && (
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-black"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Skip button */}
+        {canSkip && skipable && (
           <motion.button
+            className="absolute bottom-4 right-4 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors"
+            onClick={handleSkip}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleSkip}
-            className="absolute bottom-6 right-6 z-10 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
-            aria-label="Skip GameCube boot animation"
+            transition={{ delay: 1.5 }}
           >
-            Skip (Space/Enter)
+            Skip
           </motion.button>
         )}
-      </AnimatePresence>
 
-      {/* Main Boot Animation Container */}
-      <div className="relative flex flex-col items-center justify-center">
-        
-        {/* Phase 1: Rolling Cubes */}
-        <AnimatePresence>
+        {/* Main animation container */}
+        <div className="relative w-96 h-96 flex items-center justify-center">
+          {/* Phase 1: Rolling cubes */}
           {currentPhase === 'rolling' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex space-x-8"
-            >
-              {[0, 1, 2, 3].map((index) => (
+            <div className="flex space-x-4">
+              {[0, 1, 2, 3].map((i) => (
                 <motion.div
-                  key={index}
-                  initial={{ x: -200, rotateY: 0 }}
-                  animate={{ 
-                    x: 0, 
-                    rotateY: 360,
-                    rotateX: [0, 180, 360]
-                  }}
+                  key={i}
+                  className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg"
+                  initial={{ x: -200, rotate: 0 }}
+                  animate={{ x: 0, rotate: 360 }}
                   transition={{
                     duration: 0.9,
-                    delay: index * 0.1,
-                    ease: "easeOut"
-                  }}
-                  className="w-12 h-12 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg shadow-lg"
-                  style={{
-                    transform: 'perspective(1000px)'
+                    delay: i * 0.1,
+                    ease: 'easeOut',
                   }}
                 />
               ))}
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
 
-        {/* Phase 2: Assembly into O */}
-        <AnimatePresence>
+          {/* Phase 2: Assembly */}
           {currentPhase === 'assembling' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              className="relative"
-            >
-              <motion.div
-                animate={{
-                  rotateY: [0, 180, 360],
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 0.8,
-                  ease: "easeInOut"
-                }}
-                className="relative w-32 h-32 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-2xl"
-                style={{
-                  transform: 'perspective(1000px)'
-                }}
-              >
-                {/* Hollow center for O shape */}
+            <div className="grid grid-cols-2 gap-2">
+              {[0, 1, 2, 3].map((i) => (
                 <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.4, duration: 0.4 }}
-                  className="absolute inset-6 bg-black rounded-xl border-2 border-pink-300/30"
+                  key={i}
+                  className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg"
+                  initial={{ scale: 0, rotate: 180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: i * 0.1,
+                    ease: 'backOut',
+                  }}
                 />
-                
-                {/* Glowing edges */}
-                <div className="absolute inset-0 rounded-2xl shadow-[0_0_30px_rgba(236,72,153,0.6)] animate-pulse" />
-              </motion.div>
-            </motion.div>
+              ))}
+            </div>
           )}
-        </AnimatePresence>
 
-        {/* Phase 3: Logo Reveal */}
-        <AnimatePresence>
+          {/* Phase 3: Logo reveal */}
           {currentPhase === 'reveal' && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center"
+              className="relative"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
             >
-              {/* The O logo */}
-              <motion.div
-                initial={{ scale: 0.8, rotateY: 0 }}
-                animate={{ 
-                  scale: 1, 
-                  rotateY: 360,
-                }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="relative w-32 h-32 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-2xl mx-auto mb-6"
-                style={{
-                  transform: 'perspective(1000px)'
-                }}
-              >
-                {/* Hollow center for O */}
-                <div className="absolute inset-6 bg-black rounded-xl border-2 border-pink-300/30" />
-                
-                {/* Intense glow */}
-                <div className="absolute inset-0 rounded-2xl shadow-[0_0_50px_rgba(236,72,153,0.8)]" />
-              </motion.div>
-
-              {/* Brand Text */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2 tracking-wider">
-                  OTAKU-MORI
-                </h1>
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-pink-300/80 text-sm italic tracking-wide"
-                >
-                  made with 
-                </motion.p>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Phase 4: Petal Burst */}
-        <AnimatePresence>
-          {currentPhase === 'burst' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-center"
-            >
-              {/* The O logo (static during burst) */}
-              <div className="relative w-32 h-32 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-2xl mx-auto mb-6">
-                <div className="absolute inset-6 bg-black rounded-xl border-2 border-pink-300/30" />
-                <div className="absolute inset-0 rounded-2xl shadow-[0_0_60px_rgba(236,72,153,1)]" />
+              {/* O-shaped cube formation */}
+              <div className="relative w-32 h-32">
+                <div className="absolute inset-0 border-8 border-pink-500 rounded-lg bg-gradient-to-br from-pink-500/20 to-purple-600/20 backdrop-blur-sm" />
+                <div className="absolute inset-4 bg-transparent rounded-lg border-4 border-pink-400" />
               </div>
 
-              {/* Brand Text */}
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2 tracking-wider">
-                OTAKU-MORI
-              </h1>
-              <p className="text-pink-300/80 text-sm italic tracking-wide">
-                made with 
-              </p>
-
-              {/* Petal Explosion */}
-              {showPetals && (
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                  {[...Array(12)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{
-                        x: '50%',
-                        y: '50%',
-                        scale: 0,
-                        opacity: 1
-                      }}
-                      animate={{
-                        x: `${50 + Math.cos((i * 30) * Math.PI / 180) * 200}%`,
-                        y: `${50 + Math.sin((i * 30) * Math.PI / 180) * 200}%`,
-                        scale: [0, 1, 0.8, 0],
-                        opacity: [1, 1, 0.8, 0],
-                        rotate: [0, 180, 360]
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        delay: i * 0.05,
-                        ease: "easeOut"
-                      }}
-                      className="absolute w-4 h-4 rounded-full"
-                      style={{
-                        background: `radial-gradient(circle, ${i % 2 === 0 ? '#ec4899' : '#f472b6'}, transparent)`,
-                        filter: 'blur(0.5px)'
-                      }}
-                    />
-                  ))}
-                  
-                  {/* Additional sparkle effects */}
-                  {[...Array(8)].map((_, i) => (
-                    <motion.div
-                      key={`sparkle-${i}`}
-                      initial={{
-                        x: '50%',
-                        y: '50%',
-                        scale: 0
-                      }}
-                      animate={{
-                        x: `${50 + Math.cos((i * 45 + 22.5) * Math.PI / 180) * 150}%`,
-                        y: `${50 + Math.sin((i * 45 + 22.5) * Math.PI / 180) * 150}%`,
-                        scale: [0, 1.5, 0],
-                        opacity: [0, 1, 0]
-                      }}
-                      transition={{
-                        duration: 1.2,
-                        delay: 0.3 + i * 0.1,
-                        ease: "easeOut"
-                      }}
-                      className="absolute w-2 h-2 bg-pink-300 rounded-full shadow-[0_0_10px_rgba(236,72,153,0.8)]"
-                    />
-                  ))}
-                </div>
-              )}
+              {/* OTAKU-MORI text */}
+              <motion.div
+                className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
+                <h1 className="text-2xl font-bold text-white tracking-wider">OTAKU-MORI</h1>
+              </motion.div>
             </motion.div>
           )}
-        </AnimatePresence>
 
-        {/* Phase 5: Completion fade */}
-        <AnimatePresence>
+          {/* Phase 4: Petal burst */}
+          {currentPhase === 'burst' && (
+            <>
+              {/* O-shaped cube (static) */}
+              <div className="relative w-32 h-32">
+                <div className="absolute inset-0 border-8 border-pink-500 rounded-lg bg-gradient-to-br from-pink-500/20 to-purple-600/20 backdrop-blur-sm" />
+                <div className="absolute inset-4 bg-transparent rounded-lg border-4 border-pink-400" />
+              </div>
+
+              {/* OTAKU-MORI text */}
+              <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center">
+                <h1 className="text-2xl font-bold text-white tracking-wider">OTAKU-MORI</h1>
+              </div>
+
+              {/* Petal burst animation */}
+              {showPetals &&
+                petals.map((petal) => (
+                  <motion.div
+                    key={petal.id}
+                    className="absolute w-4 h-4 rounded-full"
+                    style={{
+                      backgroundColor: petal.color,
+                      left: `${petal.x}%`,
+                      top: `${petal.y}%`,
+                    }}
+                    initial={{
+                      scale: 0,
+                      rotate: 0,
+                      x: 0,
+                      y: 0,
+                    }}
+                    animate={{
+                      scale: petal.scale,
+                      rotate: petal.rotation,
+                      x: (Math.random() - 0.5) * 400,
+                      y: (Math.random() - 0.5) * 400,
+                      opacity: [1, 1, 0],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      ease: 'easeOut',
+                      times: [0, 0.8, 1],
+                    }}
+                  />
+                ))}
+            </>
+          )}
+
+          {/* Phase 5: Complete */}
           {currentPhase === 'complete' && (
             <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
               className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
             >
-              <div className="relative w-32 h-32 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl shadow-2xl mx-auto mb-6">
-                <div className="absolute inset-6 bg-black rounded-xl border-2 border-pink-300/30" />
+              <div className="relative w-32 h-32 mb-4">
+                <div className="absolute inset-0 border-8 border-pink-500 rounded-lg bg-gradient-to-br from-pink-500/20 to-purple-600/20 backdrop-blur-sm" />
+                <div className="absolute inset-4 bg-transparent rounded-lg border-4 border-pink-400" />
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2 tracking-wider">
-                OTAKU-MORI
-              </h1>
-              <p className="text-pink-300/80 text-sm italic tracking-wide">
-                made with 
-              </p>
+              <h1 className="text-2xl font-bold text-white tracking-wider mb-2">OTAKU-MORI</h1>
+              <p className="text-pink-300 text-sm">Ready to play</p>
             </motion.div>
           )}
-        </AnimatePresence>
-      </div>
-
-      {/* Ambient particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={`ambient-${i}`}
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: window.innerHeight + 20,
-              opacity: 0
-            }}
-            animate={{
-              y: -20,
-              opacity: [0, 0.6, 0]
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              delay: Math.random() * 2,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute w-1 h-1 bg-pink-300/30 rounded-full"
-          />
-        ))}
-      </div>
-    </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }

@@ -47,8 +47,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const { user } = useUser();
-  const { requireAuthForSoapstone, requireAuthForWishlist } = useAuthContext();
+  const { user: _user } = useUser(); // Reserved for future user menu features
+  const {
+    requireAuthForSoapstone: _requireAuthForSoapstone,
+    requireAuthForWishlist: _requireAuthForWishlist,
+  } = useAuthContext(); // Reserved for future protected nav links
 
   // State for mega-menu and search
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -56,6 +59,10 @@ export default function Navbar() {
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Scroll state for navbar effects
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   // State for real data
   const [realProducts, setRealProducts] = useState<any[]>([]);
@@ -99,6 +106,26 @@ export default function Navbar() {
   useEffect(() => {
     fetchProducts();
     fetchBlogPosts();
+  }, []);
+
+  // Handle scroll effects
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollTop = window.scrollY;
+          setScrollY(scrollTop);
+          setIsScrolled(scrollTop > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Handle search input
@@ -160,8 +187,12 @@ export default function Navbar() {
 
   return (
     <header
-      className="relative z-50 w-full backdrop-blur-lg font-ui"
-      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}
+      className={`navbar-scroll relative z-50 w-full backdrop-blur-lg font-ui transition-all duration-300 ${
+        isScrolled ? 'scrolled bg-black/95 shadow-lg' : 'bg-[rgba(57,5,40,0.8)]'
+      }`}
+      style={{
+        transform: `translateY(${Math.min(scrollY * 0.05, 10)}px)`, // Subtle parallax
+      }}
     >
       {/* Skip to content for accessibility */}
       <a
@@ -173,7 +204,7 @@ export default function Navbar() {
       <nav className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <Link href={paths.home()} className="flex items-center group py-1">
-          <div className="relative w-20 h-20">
+          <div className="relative w-32 h-32 md:w-36 md:h-36">
             <Image
               src="/assets/images/circlelogo.png"
               alt="Otaku-mori"
@@ -221,6 +252,11 @@ export default function Navbar() {
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setActiveDropdown(null);
+                }}
+                role="menu"
+                aria-label="Shop menu"
               >
                 <h3 className="text-white font-semibold mb-4">Featured Products</h3>
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -287,6 +323,11 @@ export default function Navbar() {
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setActiveDropdown(null);
+                }}
+                role="menu"
+                aria-label="Mini-games menu"
               >
                 <h3 className="text-white font-semibold mb-4">Featured Games</h3>
                 <div className="space-y-3 mb-4">
@@ -350,6 +391,11 @@ export default function Navbar() {
               <div
                 className="absolute top-full left-0 mt-2 w-80 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setActiveDropdown(null);
+                }}
+                role="menu"
+                aria-label="Blog menu"
               >
                 <h3 className="text-white font-semibold mb-4">Latest Posts</h3>
                 <div className="space-y-3 mb-4">

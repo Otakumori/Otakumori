@@ -663,7 +663,7 @@ class RagdollSegment {
     this.baseY = y;
   }
 
-  update(deltaTime: number) {
+  update(_deltaTime: number) {
     // Simple gravity
     this.vy += 0.001;
 

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type Petal } from '../../app/types/index';
+import { communityWS } from '@/lib/websocket/client';
 
 interface LeaderboardEntry {
   username: string;
@@ -20,6 +21,36 @@ export default function InteractiveCherryBlossom() {
     { username: 'PetalWhisperer', petals: 1200, rank: 2 },
     { username: 'BlossomSeeker', petals: 900, rank: 3 },
   ]);
+
+  // WebSocket integration for live updates
+  useEffect(() => {
+    // Listen for community progress updates
+    const handleProgressUpdate = (message: any) => {
+      if (message.type === 'community-progress' && typeof message.progress === 'number') {
+        setCommunityProgress(message.progress);
+      }
+    };
+
+    // Listen for leaderboard updates
+    const handleLeaderboardUpdate = (message: any) => {
+      if (message.type === 'leaderboard' && Array.isArray(message.data)) {
+        const formatted = message.data.map((entry: any, index: number) => ({
+          username: entry.username || entry.name,
+          petals: entry.score || entry.petals,
+          rank: index + 1,
+        }));
+        setLeaderboard(formatted.slice(0, 5));
+      }
+    };
+
+    communityWS.on('community-progress', handleProgressUpdate);
+    communityWS.on('leaderboard', handleLeaderboardUpdate);
+
+    return () => {
+      communityWS.removeListener('community-progress', handleProgressUpdate);
+      communityWS.removeListener('leaderboard', handleLeaderboardUpdate);
+    };
+  }, []);
 
   // Get current season based on date
   const getCurrentSeason = () => {
@@ -67,16 +98,48 @@ export default function InteractiveCherryBlossom() {
   }, []);
 
   const handlePetalClick = (id: number) => {
+    const clickedPetal = petals.find((p) => p.id === id);
+    const points = clickedPetal?.isSpecial ? 5 : 1;
+
     setPetals((prev) =>
       prev.map((petal) => (petal.id === id ? { ...petal, collected: true } : petal)),
     );
-    setCollectedCount((prev) => prev + 1);
+    setCollectedCount((prev) => {
+      const newCount = prev + points;
+
+      // Update community progress (simulate global contribution)
+      setCommunityProgress((prevProgress) => {
+        const increment = (points / 1000) * 100; // Each petal contributes to community goal
+        return Math.min(prevProgress + increment, 100);
+      });
+
+      // Update leaderboard when milestones are reached
+      if (newCount % 10 === 0) {
+        updateLeaderboard(newCount);
+      }
+
+      return newCount;
+    });
     setShowProgress(true);
 
     // Play petal collect sound
     const audio = new Audio('/assets/sounds/petal-collect.mp3');
     audio.volume = 0.3;
-    audio.play();
+    audio.play().catch(() => {
+      // Silently fail if audio doesn't exist yet
+    });
+  };
+
+  const updateLeaderboard = (userPetals: number) => {
+    setLeaderboard((prev) => {
+      // Add/update current user's position
+      const currentUser = { username: 'You', petals: userPetals, rank: 0 };
+      const withoutUser = prev.filter((e) => e.username !== 'You');
+      const combined = [...withoutUser, currentUser].sort((a, b) => b.petals - a.petals);
+
+      // Update ranks
+      return combined.map((entry, index) => ({ ...entry, rank: index + 1 })).slice(0, 5);
+    });
   };
 
   return (

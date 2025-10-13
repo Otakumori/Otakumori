@@ -10,6 +10,7 @@ import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
+    console.warn('Game coupons requested from:', request.headers.get('user-agent'));
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {

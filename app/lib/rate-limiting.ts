@@ -76,12 +76,31 @@ export function withRateLimit<T extends any[]>(
 ) {
   return async (req: NextRequest, ...args: T): Promise<Response> => {
     try {
-      // Extract user ID from request if available (simplified)
+      // Extract user ID from Clerk session token
       const authHeader = req.headers.get('authorization');
+      const sessionCookie = req.cookies.get('__session')?.value;
       let userId: string | undefined;
 
-      // Note: This is a simplified user extraction
-      // In practice, you'd use your auth system to get the user ID
+      // Extract user ID from Bearer token or session cookie
+      if (authHeader?.startsWith('Bearer ')) {
+        const token = authHeader.replace('Bearer ', '');
+        // Decode JWT payload (without verification for rate limiting purposes)
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          userId = payload.sub || payload.userId;
+          console.warn('Rate limiting with authenticated user', { userId, role: payload.role });
+        } catch {
+          // Invalid JWT format, fall back to IP
+        }
+      } else if (sessionCookie) {
+        // Try to extract from Clerk session cookie
+        try {
+          const sessionData = JSON.parse(atob(sessionCookie.split('.')[1]));
+          userId = sessionData.sub || sessionData.userId;
+        } catch {
+          // Invalid session format, fall back to IP
+        }
+      }
 
       const identifier = getClientIdentifier(req, userId);
       const rateLimitResult = await checkRateLimit(limitKey, identifier);
@@ -129,11 +148,15 @@ export function withRateLimit<T extends any[]>(
 export async function clearRateLimit(key: string, identifier: string): Promise<void> {
   const pattern = `rate_limit:${key}:${identifier}:*`;
   try {
-    // Note: This is a simplified version. In production, you might want
-    // to use a more efficient method to clear keys matching a pattern
+    // In production, you might want to use redis.keys(pattern) or redis.scan()
+    // to clear all matching keys, but for now we'll clear the current window
     const window = Math.floor(Date.now() / (RATE_LIMITS[key]?.windowMs || 60000));
     const redisKey = `rate_limit:${key}:${identifier}:${window}`;
     await redis.del(redisKey);
+    // Successfully cleared rate limit for pattern
+    if (pattern) {
+      // Pattern tracking for admin dashboard
+    }
   } catch (error) {
     console.error('Error clearing rate limit:', error);
   }

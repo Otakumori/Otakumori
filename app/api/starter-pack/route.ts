@@ -26,9 +26,9 @@ export async function POST(req: Request) {
         VALUES (${email}, NOW()) 
         ON CONFLICT ("email") DO NOTHING
       `;
-    } catch (dbError) {
-      // If Subscriber table doesn't exist yet, that's okay for now
-      // Subscriber table not found, skipping database storage
+    } catch (dbError: unknown) {
+      const error = dbError instanceof Error ? dbError : new Error(String(dbError));
+      console.warn('Subscriber table operation failed (table may not exist):', error.message);
     }
 
     // Return the starter pack download URL

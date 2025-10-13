@@ -141,8 +141,11 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
             <h3 className="text-lg font-semibold text-white mb-4">Create New Party</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Party Name</label>
+                <label htmlFor="partyName" className="block text-sm font-medium text-white/80 mb-2">
+                  Party Name
+                </label>
                 <input
+                  id="partyName"
                   type="text"
                   value={newParty.name}
                   onChange={(e) => setNewParty((prev) => ({ ...prev, name: e.target.value }))}
@@ -152,8 +155,14 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">Description</label>
+                <label
+                  htmlFor="partyDescription"
+                  className="block text-sm font-medium text-white/80 mb-2"
+                >
+                  Description
+                </label>
                 <textarea
+                  id="partyDescription"
                   value={newParty.description}
                   onChange={(e) =>
                     setNewParty((prev) => ({ ...prev, description: e.target.value }))
@@ -166,10 +175,14 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">
+                  <label
+                    htmlFor="maxMembers"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
                     Max Members
                   </label>
                   <select
+                    id="maxMembers"
                     value={newParty.maxMembers}
                     onChange={(e) =>
                       setNewParty((prev) => ({ ...prev, maxMembers: parseInt(e.target.value) }))
@@ -186,8 +199,14 @@ export default function PartyHub({ className = '' }: PartyHubProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-white/80 mb-2">Game Mode</label>
+                  <label
+                    htmlFor="gameMode"
+                    className="block text-sm font-medium text-white/80 mb-2"
+                  >
+                    Game Mode
+                  </label>
                   <select
+                    id="gameMode"
                     value={newParty.gameMode}
                     onChange={(e) =>
                       setNewParty((prev) => ({ ...prev, gameMode: e.target.value as any }))

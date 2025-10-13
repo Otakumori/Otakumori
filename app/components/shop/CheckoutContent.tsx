@@ -8,10 +8,10 @@ import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 
 export default function CheckoutContent() {
-  const router = useRouter();
+  const _router = useRouter();
   const { items } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [couponInput, setCouponInput] = useState('');
+  const [_couponInput, _setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
   const [preview, setPreview] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -149,6 +149,21 @@ export default function CheckoutContent() {
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      {/* Preview Mode Banner */}
+      {preview && (
+        <div className="lg:col-span-2 bg-amber-500/20 border border-amber-500/40 rounded-xl p-4 flex items-center gap-3">
+          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/30 flex items-center justify-center">
+            <span className="text-amber-400 text-sm">👁️</span>
+          </div>
+          <div className="flex-1">
+            <p className="text-amber-200 font-medium">Preview Mode</p>
+            <p className="text-amber-300/80 text-sm">
+              Viewing coupon discount preview - changes not yet applied
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Checkout Form */}
       <div className="space-y-6">
         <GlassPanel className="p-6">
@@ -334,6 +349,12 @@ export default function CheckoutContent() {
                 ).toFixed(2)}
               </span>
             </div>
+            {preview && preview.discount > 0 && (
+              <div className="flex justify-between text-green-400">
+                <span>Coupon Discount ({codes.join(', ')})</span>
+                <span>-${preview.discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-zinc-300">
               <span>Tax</span>
               <span>
@@ -355,6 +376,9 @@ export default function CheckoutContent() {
                   : `$${useMemo(() => (items.reduce((s, i) => s + i.price * i.quantity, 0) > 50 ? 0 : 9.99), [items]).toFixed(2)}`}
               </span>
             </div>
+            {preview && preview.freeShipping && (
+              <div className="text-sm text-green-400">✓ Free shipping applied from coupon</div>
+            )}
             <div className="border-t border-white/10 pt-2">
               <div className="flex justify-between text-lg font-semibold text-white">
                 <span>Total</span>

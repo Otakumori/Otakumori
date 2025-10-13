@@ -21,7 +21,7 @@ export default function Home() {
             transition={{ duration: 1.2 }}
             className="text-6xl font-bold text-pink-300"
           >
-            Welcome to Otakumori
+            Welcome to Otaku-mori
           </motion.h1>
           <motion.p
             className="my-4 max-w-xl text-center text-gray-200"

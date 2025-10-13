@@ -19,6 +19,9 @@ export async function GET(req: NextRequest) {
   // const rateLimitResult = await rateLimitMiddleware(req);
   // if (rateLimitResult) return rateLimitResult;
 
+  // Log request for audit purposes
+  console.warn('Feature flags requested from:', req.headers.get('user-agent'));
+
   try {
     const { userId } = await auth();
     if (!userId) {

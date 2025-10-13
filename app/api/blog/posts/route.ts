@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
     const category = searchParams.get('category');
+    console.warn(`Blog posts requested for category: ${category || 'all'}`);
     const published = searchParams.get('published') !== 'false'; // Default to true
 
     const where: any = {};

@@ -6,7 +6,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useGameEngine } from '@/hooks/useGameEngine';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Note {
@@ -62,13 +61,6 @@ const SAMPLE_TRACKS: Track[] = [
 ];
 
 export default function PetalStormRhythm() {
-  const gameEngine = useGameEngine({
-    gameId: 'petal-storm-rhythm',
-    enableAchievements: true,
-    enableLeaderboards: true,
-    enablePetals: true,
-  });
-
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'completed' | 'paused'>('menu');
   const [selectedTrack, setSelectedTrack] = useState<Track>(SAMPLE_TRACKS[0]);
   const [currentTime, setCurrentTime] = useState(0);
@@ -79,12 +71,13 @@ export default function PetalStormRhythm() {
   const [accuracy, setAccuracy] = useState({ perfect: 0, great: 0, good: 0, miss: 0 });
   const [health, setHealth] = useState(100);
   const [multiplier, setMultiplier] = useState(1);
-  const [sessionId, setSessionId] = useState<string>('');
+  const [finalScore, setFinalScore] = useState(0);
 
   // Refs for game loop
   const gameLoopRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const _audioRef = useRef<HTMLAudioElement | null>(null);
+  const sessionId = useRef<string | null>(null);
 
   // Lane positions (4 lanes)
   const LANE_COUNT = 4;
@@ -107,7 +100,7 @@ export default function PetalStormRhythm() {
     for (let beat = 0; beat < totalBeats; beat++) {
       // Generate notes based on difficulty
       const shouldAddNote = Math.random() < getDifficulty(track.difficulty);
-      
+
       if (shouldAddNote) {
         const note: Note = {
           id: `note_${beat}_${Math.random()}`,
@@ -137,43 +130,81 @@ export default function PetalStormRhythm() {
 
   const getDifficulty = (difficulty: string): number => {
     switch (difficulty) {
-      case 'easy': return 0.3;
-      case 'normal': return 0.5;
-      case 'hard': return 0.7;
-      case 'expert': return 0.9;
-      default: return 0.5;
+      case 'easy':
+        return 0.3;
+      case 'normal':
+        return 0.5;
+      case 'hard':
+        return 0.7;
+      case 'expert':
+        return 0.9;
+      default:
+        return 0.5;
     }
   };
 
-  // Initialize game
-  const startGame = useCallback(() => {
-    const trackNotes = generateNotes(selectedTrack);
-    setNotes(trackNotes);
-    setCurrentTime(0);
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
-    setAccuracy({ perfect: 0, great: 0, good: 0, miss: 0 });
-    setHealth(100);
-    setMultiplier(1);
-    
-    // Start game session
-    const newSessionId = gameEngine.startSession();
-    setSessionId(newSessionId);
-    
-    // Record game start
-    gameEngine.recordAction('game_start', { 
-      track: selectedTrack.id,
-      difficulty: selectedTrack.difficulty,
-      noteCount: trackNotes.length 
-    });
-    
-    setGameState('playing');
-    startTimeRef.current = Date.now();
-    
-    // Start game loop
-    gameLoop();
-  }, [selectedTrack, gameEngine]);
+  // End game (game over)
+  const endGame = useCallback(() => {
+    setGameState('completed');
+
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+    }
+  }, []);
+
+  // Complete game
+  const completeGame = useCallback(async () => {
+    setGameState('completed');
+
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+    }
+
+    const totalNotes = accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss;
+    const finalAccuracy =
+      totalNotes > 0 ? (accuracy.perfect + accuracy.great + accuracy.good) / totalNotes : 0;
+
+    // Calculate final score with bonuses
+    const comboBonus = maxCombo * 100;
+    const accuracyBonus = Math.round(finalAccuracy * 10000);
+    const healthBonus = health * 50;
+    const finalScore = score + comboBonus + accuracyBonus + healthBonus;
+    setFinalScore(finalScore);
+
+    // Award completion petals
+    const petalReward = Math.round(finalScore / 100);
+    try {
+      await fetch('/api/v1/petals/collect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: petalReward,
+          source: 'petal-storm-rhythm',
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to award petals:', error);
+    }
+
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/petal-storm-rhythm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScore,
+          metadata: {
+            accuracy: finalAccuracy,
+            maxCombo,
+            track: selectedTrack.id,
+            difficulty: selectedTrack.difficulty,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [score, accuracy, maxCombo, health, selectedTrack]);
 
   // Game loop
   const gameLoop = useCallback(() => {
@@ -184,24 +215,20 @@ export default function PetalStormRhythm() {
     setCurrentTime(elapsed);
 
     // Check for missed notes
-    setNotes(prev => prev.map(note => {
-      if (!note.hit && elapsed > note.time + TIMING_WINDOWS.miss) {
-        // Missed note
-        setCombo(0);
-        setMultiplier(1);
-        setHealth(h => Math.max(0, h - 10));
-        setAccuracy(acc => ({ ...acc, miss: acc.miss + 1 }));
-        
-        gameEngine.recordAction('note_miss', { 
-          noteId: note.id, 
-          time: elapsed,
-          lane: note.lane 
-        });
-        
-        return { ...note, hit: true, accuracy: 'miss' };
-      }
-      return note;
-    }));
+    setNotes((prev) =>
+      prev.map((note) => {
+        if (!note.hit && elapsed > note.time + TIMING_WINDOWS.miss) {
+          // Missed note
+          setCombo(0);
+          setMultiplier(1);
+          setHealth((h) => Math.max(0, h - 10));
+          setAccuracy((acc) => ({ ...acc, miss: acc.miss + 1 }));
+
+          return { ...note, hit: true, accuracy: 'miss' };
+        }
+        return note;
+      }),
+    );
 
     // Check for game over
     if (health <= 0) {
@@ -216,177 +243,96 @@ export default function PetalStormRhythm() {
     }
 
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState, health, selectedTrack.duration]);
+  }, [gameState, health, selectedTrack.duration, endGame, completeGame]);
+
+  // Initialize game
+  const startGame = useCallback(() => {
+    const trackNotes = generateNotes(selectedTrack);
+    setNotes(trackNotes);
+    setCurrentTime(0);
+    setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setAccuracy({ perfect: 0, great: 0, good: 0, miss: 0 });
+    setHealth(100);
+    setMultiplier(1);
+
+    setGameState('playing');
+    startTimeRef.current = Date.now();
+
+    // Start game loop
+    gameLoop();
+  }, [selectedTrack, gameLoop]);
 
   // Handle note hit
-  const hitNote = useCallback((laneIndex: number) => {
-    if (gameState !== 'playing') return;
+  const hitNote = useCallback(
+    (laneIndex: number) => {
+      if (gameState !== 'playing') return;
 
-    const currentTimeMs = currentTime;
-    
-    // Find the closest note in this lane
-    const laneNotes = notes.filter(note => 
-      note.lane === laneIndex && 
-      !note.hit && 
-      Math.abs(currentTimeMs - note.time) <= TIMING_WINDOWS.miss
-    );
+      const currentTimeMs = currentTime;
 
-    if (laneNotes.length === 0) return;
+      // Find the closest note in this lane
+      const laneNotes = notes.filter(
+        (note) =>
+          note.lane === laneIndex &&
+          !note.hit &&
+          Math.abs(currentTimeMs - note.time) <= TIMING_WINDOWS.miss,
+      );
 
-    const closestNote = laneNotes.reduce((closest, note) => 
-      Math.abs(currentTimeMs - note.time) < Math.abs(currentTimeMs - closest.time) 
-        ? note : closest
-    );
+      if (laneNotes.length === 0) return;
 
-    const timeDiff = Math.abs(currentTimeMs - closestNote.time);
-    let accuracy: 'perfect' | 'great' | 'good' | 'miss';
-    let points = 0;
+      const closestNote = laneNotes.reduce((closest, note) =>
+        Math.abs(currentTimeMs - note.time) < Math.abs(currentTimeMs - closest.time)
+          ? note
+          : closest,
+      );
 
-    // Determine accuracy
-    if (timeDiff <= TIMING_WINDOWS.perfect) {
-      accuracy = 'perfect';
-      points = 1000;
-    } else if (timeDiff <= TIMING_WINDOWS.great) {
-      accuracy = 'great';
-      points = 500;
-    } else if (timeDiff <= TIMING_WINDOWS.good) {
-      accuracy = 'good';
-      points = 200;
-    } else {
-      accuracy = 'miss';
-      points = 0;
-    }
+      const timeDiff = Math.abs(currentTimeMs - closestNote.time);
+      let accuracy: 'perfect' | 'great' | 'good' | 'miss';
+      let points = 0;
 
-    // Update note
-    setNotes(prev => prev.map(note => 
-      note.id === closestNote.id 
-        ? { ...note, hit: true, accuracy }
-        : note
-    ));
-
-    // Update score and combo
-    if (accuracy !== 'miss') {
-      setCombo(prev => prev + 1);
-      setScore(prev => prev + (points * multiplier));
-      setAccuracy(acc => ({ ...acc, [accuracy]: acc[accuracy] + 1 }));
-      
-      // Update multiplier based on combo
-      if (combo >= 50) setMultiplier(4);
-      else if (combo >= 25) setMultiplier(3);
-      else if (combo >= 10) setMultiplier(2);
-      else setMultiplier(1);
-
-      // Award petals for good hits
-      if (accuracy === 'perfect') {
-        gameEngine.awardPetals(5, 'Perfect hit');
-      } else if (accuracy === 'great') {
-        gameEngine.awardPetals(3, 'Great hit');
+      // Determine accuracy
+      if (timeDiff <= TIMING_WINDOWS.perfect) {
+        accuracy = 'perfect';
+        points = 1000;
+      } else if (timeDiff <= TIMING_WINDOWS.great) {
+        accuracy = 'great';
+        points = 500;
+      } else if (timeDiff <= TIMING_WINDOWS.good) {
+        accuracy = 'good';
+        points = 200;
+      } else {
+        accuracy = 'miss';
+        points = 0;
       }
-    } else {
-      setCombo(0);
-      setMultiplier(1);
-      setHealth(h => Math.max(0, h - 5));
-    }
 
-    // Update max combo
-    setMaxCombo(prev => Math.max(prev, combo));
+      // Update note
+      setNotes((prev) =>
+        prev.map((note) => (note.id === closestNote.id ? { ...note, hit: true, accuracy } : note)),
+      );
 
-    // Record action
-    gameEngine.recordAction('note_hit', {
-      noteId: closestNote.id,
-      accuracy,
-      timeDiff,
-      combo,
-      score: score + (points * multiplier),
-    });
-  }, [gameState, currentTime, notes, combo, multiplier, score, gameEngine]);
+      // Update score and combo
+      if (accuracy !== 'miss') {
+        setCombo((prev) => prev + 1);
+        setScore((prev) => prev + points * multiplier);
+        setAccuracy((acc) => ({ ...acc, [accuracy]: acc[accuracy] + 1 }));
 
-  // Complete game
-  const completeGame = useCallback(async () => {
-    setGameState('completed');
-    
-    if (gameLoopRef.current) {
-      cancelAnimationFrame(gameLoopRef.current);
-    }
+        // Update multiplier based on combo
+        if (combo >= 50) setMultiplier(4);
+        else if (combo >= 25) setMultiplier(3);
+        else if (combo >= 10) setMultiplier(2);
+        else setMultiplier(1);
+      } else {
+        setCombo(0);
+        setMultiplier(1);
+        setHealth((h) => Math.max(0, h - 5));
+      }
 
-    const totalNotes = accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss;
-    const finalAccuracy = totalNotes > 0 ? 
-      (accuracy.perfect + accuracy.great + accuracy.good) / totalNotes : 0;
-
-    // Calculate final score with bonuses
-    const comboBonus = maxCombo * 100;
-    const accuracyBonus = Math.round(finalAccuracy * 10000);
-    const healthBonus = health * 50;
-    const finalScore = score + comboBonus + accuracyBonus + healthBonus;
-
-    // Update game engine
-    gameEngine.updateScore(finalScore, {
-      accuracy: finalAccuracy,
-      maxCombo,
-      perfectHits: accuracy.perfect,
-      track: selectedTrack.id,
-      difficulty: selectedTrack.difficulty,
-    });
-
-    // Submit to leaderboard
-    await gameEngine.submitScore('score', finalScore, {
-      accuracy: finalAccuracy,
-      maxCombo,
-      track: selectedTrack.id,
-      difficulty: selectedTrack.difficulty,
-    });
-
-    // Check achievements
-    await gameEngine.checkAchievements(gameEngine.gameState!);
-    
-    // Specific achievements
-    if (finalAccuracy >= 0.95) {
-      await gameEngine.unlockAchievement('rhythm-master', 1, { 
-        accuracy: finalAccuracy, 
-        track: selectedTrack.id 
-      });
-    }
-    
-    if (maxCombo >= 100) {
-      await gameEngine.unlockAchievement('combo-god', 1, { maxCombo });
-    }
-
-    if (accuracy.perfect >= totalNotes * 0.8) {
-      await gameEngine.unlockAchievement('perfect-storm', 1, { 
-        perfectRatio: accuracy.perfect / totalNotes 
-      });
-    }
-
-    // Award completion petals
-    const completionPetals = Math.round(finalScore / 100);
-    await gameEngine.awardPetals(completionPetals, 'Rhythm game completion');
-
-    // End session
-    await gameEngine.endSession();
-
-    // Record completion
-    gameEngine.recordAction('game_complete', {
-      finalScore,
-      accuracy: finalAccuracy,
-      maxCombo,
-      track: selectedTrack.id,
-    });
-  }, [score, accuracy, maxCombo, health, selectedTrack, gameEngine]);
-
-  // End game (game over)
-  const endGame = useCallback(() => {
-    setGameState('completed');
-    
-    if (gameLoopRef.current) {
-      cancelAnimationFrame(gameLoopRef.current);
-    }
-
-    gameEngine.recordAction('game_over', {
-      finalScore: score,
-      reason: 'health_depleted',
-      time: currentTime,
-    });
-  }, [score, currentTime, gameEngine]);
+      // Update max combo
+      setMaxCombo((prev) => Math.max(prev, combo));
+    },
+    [gameState, currentTime, notes, combo, multiplier, score],
+  );
 
   // Keyboard controls
   useEffect(() => {
@@ -412,7 +358,7 @@ export default function PetalStormRhythm() {
           break;
         case ' ':
           e.preventDefault();
-          setGameState(prev => prev === 'playing' ? 'paused' : 'playing');
+          setGameState((prev) => (prev === 'playing' ? 'paused' : 'playing'));
           break;
       }
     };
@@ -434,7 +380,7 @@ export default function PetalStormRhythm() {
   const formatScore = (num: number) => num.toLocaleString();
 
   // Get visible notes
-  const visibleNotes = notes.filter(note => {
+  const visibleNotes = notes.filter((note) => {
     const notePosition = (currentTime - note.time + 2000) / 2000; // 2s travel time
     return notePosition >= -0.1 && notePosition <= 1.1 && !note.hit;
   });
@@ -444,7 +390,9 @@ export default function PetalStormRhythm() {
       {/* Header */}
       <div className="text-center p-4">
         <h1 className="text-4xl font-bold text-pink-400 mb-2">Petal Storm Rhythm</h1>
-        <p className="text-slate-300 italic">"Stormy rhythm playlist—precision timing for petals."</p>
+        <p className="text-slate-300 italic">
+          "Stormy rhythm playlist—precision timing for petals."
+        </p>
       </div>
 
       {/* Track Selection Menu */}
@@ -456,7 +404,7 @@ export default function PetalStormRhythm() {
         >
           <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
             <h2 className="text-2xl font-semibold text-white mb-6 text-center">Select Track</h2>
-            
+
             <div className="grid gap-4">
               {SAMPLE_TRACKS.map((track) => (
                 <motion.button
@@ -476,15 +424,23 @@ export default function PetalStormRhythm() {
                       <p className="text-slate-300">{track.artist}</p>
                       <div className="flex gap-4 mt-2 text-sm text-slate-400">
                         <span>BPM: {track.bpm}</span>
-                        <span>Duration: {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}</span>
+                        <span>
+                          Duration: {Math.floor(track.duration / 60)}:
+                          {(track.duration % 60).toString().padStart(2, '0')}
+                        </span>
                       </div>
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      track.difficulty === 'easy' ? 'bg-green-600/20 text-green-400' :
-                      track.difficulty === 'normal' ? 'bg-blue-600/20 text-blue-400' :
-                      track.difficulty === 'hard' ? 'bg-orange-600/20 text-orange-400' :
-                      'bg-red-600/20 text-red-400'
-                    }`}>
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        track.difficulty === 'easy'
+                          ? 'bg-green-600/20 text-green-400'
+                          : track.difficulty === 'normal'
+                            ? 'bg-blue-600/20 text-blue-400'
+                            : track.difficulty === 'hard'
+                              ? 'bg-orange-600/20 text-orange-400'
+                              : 'bg-red-600/20 text-red-400'
+                      }`}
+                    >
                       {track.difficulty.toUpperCase()}
                     </div>
                   </div>
@@ -549,10 +505,9 @@ export default function PetalStormRhythm() {
               <div>
                 <div className="text-slate-400 text-sm">Health</div>
                 <div className="w-full bg-slate-700 rounded-full h-2 mt-1">
-                  <div 
+                  <div
                     className={`h-2 rounded-full transition-all ${
-                      health > 60 ? 'bg-green-500' :
-                      health > 30 ? 'bg-yellow-500' : 'bg-red-500'
+                      health > 60 ? 'bg-green-500' : health > 30 ? 'bg-yellow-500' : 'bg-red-500'
                     }`}
                     style={{ width: `${health}%` }}
                   />
@@ -594,10 +549,14 @@ export default function PetalStormRhythm() {
                   key={laneIndex}
                   className="flex-1 relative border-r border-slate-700/50 bg-gradient-to-b from-transparent to-slate-900/20"
                   onClick={() => hitNote(laneIndex)}
+                  onKeyDown={(e) => e.key === 'Enter' && hitNote(laneIndex)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Hit note in lane ${laneIndex}`}
                 >
                   {/* Hit Zone */}
                   <div className="absolute bottom-20 left-2 right-2 h-16 bg-pink-500/20 border-2 border-pink-400/50 rounded-lg" />
-                  
+
                   {/* Lane Label */}
                   <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-pink-400 font-bold">
                     {['A', 'S', 'D', 'F'][laneIndex]}
@@ -606,11 +565,11 @@ export default function PetalStormRhythm() {
                   {/* Notes */}
                   <AnimatePresence>
                     {visibleNotes
-                      .filter(note => note.lane === laneIndex)
+                      .filter((note) => note.lane === laneIndex)
                       .map((note) => {
                         const notePosition = (currentTime - note.time + 2000) / 2000;
                         const top = `${(1 - notePosition) * 100}%`;
-                        
+
                         return (
                           <motion.div
                             key={note.id}
@@ -618,9 +577,11 @@ export default function PetalStormRhythm() {
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 1.2, opacity: 0 }}
                             className={`absolute left-2 right-2 h-12 rounded-lg border-2 flex items-center justify-center ${
-                              note.type === 'normal' ? 'bg-pink-500/80 border-pink-400' :
-                              note.type === 'hold' ? 'bg-purple-500/80 border-purple-400' :
-                              'bg-blue-500/80 border-blue-400'
+                              note.type === 'normal'
+                                ? 'bg-pink-500/80 border-pink-400'
+                                : note.type === 'hold'
+                                  ? 'bg-purple-500/80 border-purple-400'
+                                  : 'bg-blue-500/80 border-blue-400'
                             }`}
                             style={{ top }}
                           >
@@ -649,12 +610,14 @@ export default function PetalStormRhythm() {
             <h2 className="text-3xl font-bold text-pink-400 mb-4">
               {health > 0 ? ' Rhythm Master!' : ' Song Ended'}
             </h2>
-            <p className="text-slate-300 mb-6">"Perfect timing creates the most beautiful storms."</p>
-            
+            <p className="text-slate-300 mb-6">
+              "Perfect timing creates the most beautiful storms."
+            </p>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Final Score</div>
-                <div className="text-white font-bold text-xl">{formatScore(score)}</div>
+                <div className="text-white font-bold text-xl">{formatScore(finalScore)}</div>
               </div>
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Max Combo</div>
@@ -663,8 +626,15 @@ export default function PetalStormRhythm() {
               <div className="bg-slate-700/50 rounded-lg p-3">
                 <div className="text-slate-400 text-sm">Accuracy</div>
                 <div className="text-white font-bold text-xl">
-                  {Math.round(((accuracy.perfect + accuracy.great + accuracy.good) / 
-                    Math.max(accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss, 1)) * 100)}%
+                  {Math.round(
+                    ((accuracy.perfect + accuracy.great + accuracy.good) /
+                      Math.max(
+                        accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss,
+                        1,
+                      )) *
+                      100,
+                  )}
+                  %
                 </div>
               </div>
               <div className="bg-slate-700/50 rounded-lg p-3">

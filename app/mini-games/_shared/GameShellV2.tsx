@@ -15,6 +15,7 @@ import GameCubeBootV2 from './GameCubeBootV2';
 import { useGameSaveV2, type GameSaveDataV2 } from './SaveSystemV2';
 import LeaderboardSystemV2, { type AchievementProgress } from './LeaderboardSystemV2';
 import { useGameTelemetry } from './GameTelemetryV2';
+import { achievementBus, type AchievementEvent } from '@/lib/events/achievement-bus';
 
 // Shared components
 import PauseOverlay from './PauseOverlay';
@@ -68,7 +69,7 @@ export default function GameShellV2({
   maxPlayers = 1,
   difficulty = 'medium',
 }: GameShellV2Props) {
-  const { isSignedIn, userId } = useAuth();
+  const { isSignedIn: _isSignedIn, userId } = useAuth();
 
   // Game state
   const [gameState, setGameState] = useState<GameState>({
@@ -86,20 +87,67 @@ export default function GameShellV2({
   const [showBootAnimation, setShowBootAnimation] = useState(enableBootAnimation);
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [showPauseMenu, setShowPauseMenu] = useState(false);
+  const [latestAchievement, setLatestAchievement] = useState<AchievementEvent | null>(null);
+  const [playerSlots, setPlayerSlots] = useState<number[]>(
+    Array.from({ length: maxPlayers }, (_, i) => i + 1),
+  );
 
   // V2 Systems
   const saveSystem = useGameSaveV2(gameKey);
   const telemetry = useGameTelemetry(gameKey);
 
+  // Achievement event bus listener
+  useEffect(() => {
+    if (!enableAchievements) return;
+
+    const unsubscribe = achievementBus.on((achievement) => {
+      // Only show achievements for this game
+      if (achievement.gameId === gameKey || !achievement.gameId) {
+        setLatestAchievement(achievement);
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+          setLatestAchievement(null);
+        }, 5000);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [enableAchievements, gameKey]);
+
+  // Log game configuration (development only)
+  // GameShell initialization tracking removed - use React DevTools for component inspection
+
+  // Error handler
+  const handleError = useCallback(
+    (error: Error) => {
+      console.error(`[GameShell:${gameKey}] Error:`, error);
+      setGameState((prev) => ({ ...prev, hasError: true, isPlaying: false }));
+
+      if (onError) {
+        onError(error);
+      }
+
+      if (enableTelemetry) {
+        telemetry.trackError(error, 'GameShell');
+      }
+    },
+    [gameKey, onError, enableTelemetry, telemetry],
+  );
+
   // Boot animation completion
   const handleBootComplete = useCallback(() => {
-    setShowBootAnimation(false);
-    setGameState((prev) => ({ ...prev, isLoading: false }));
+    try {
+      setShowBootAnimation(false);
+      setGameState((prev) => ({ ...prev, isLoading: false }));
 
-    if (enableTelemetry) {
-      telemetry.startSession(userId || undefined);
+      if (enableTelemetry) {
+        telemetry.startSession(userId || undefined);
+      }
+    } catch (error) {
+      handleError(error instanceof Error ? error : new Error(String(error)));
     }
-  }, [userId, enableTelemetry, telemetry]);
+  }, [userId, enableTelemetry, telemetry, handleError]);
 
   // Game lifecycle methods
   const startGame = useCallback(() => {
@@ -259,7 +307,9 @@ export default function GameShellV2({
                     className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
                     aria-label="Pause game"
                   >
-                    ⏸️
+                    <span role="img" aria-label="Pause">
+                      ⏸
+                    </span>
                   </button>
                 )}
 
@@ -384,27 +434,61 @@ export default function GameShellV2({
           )}
 
           {/* Achievement Notifications */}
-          <div className="fixed bottom-4 left-4 z-50 space-y-2">
-            <AnimatePresence>
-              {achievements.map((achievement) => (
-                <motion.div
-                  key={achievement.id}
-                  initial={{ opacity: 0, x: -100, scale: 0.8 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: -100, scale: 0.8 }}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-4 shadow-2xl max-w-sm"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="text-2xl"></div>
-                    <div>
-                      <h4 className="font-bold text-white">Achievement Unlocked!</h4>
-                      <p className="text-white/90 text-sm">{achievement.name}</p>
-                    </div>
+          {enableAchievements && latestAchievement && (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="fixed bottom-4 right-4 z-50"
+            >
+              <div
+                className={`bg-gradient-to-r rounded-xl p-4 shadow-2xl max-w-sm ${
+                  latestAchievement.rarity === 'legendary'
+                    ? 'from-purple-500 to-pink-500'
+                    : latestAchievement.rarity === 'epic'
+                      ? 'from-blue-500 to-purple-500'
+                      : latestAchievement.rarity === 'rare'
+                        ? 'from-green-500 to-blue-500'
+                        : latestAchievement.rarity === 'uncommon'
+                          ? 'from-gray-500 to-green-500'
+                          : 'from-yellow-500 to-orange-500'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">🏆</div>
+                  <div>
+                    <h4 className="font-bold text-white">Achievement Unlocked!</h4>
+                    <p className="text-white font-medium">{latestAchievement.title}</p>
+                    {latestAchievement.description && (
+                      <p className="text-white/80 text-sm">{latestAchievement.description}</p>
+                    )}
+                    <p className="text-white/60 text-xs uppercase mt-1">
+                      {latestAchievement.rarity}
+                    </p>
                   </div>
-                </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Multiplayer Player Slots */}
+          {maxPlayers > 1 && (
+            <div className="absolute top-4 left-4 z-40 flex gap-2">
+              {playerSlots.map((slot) => (
+                <div
+                  key={slot}
+                  className={`px-4 py-2 rounded-lg border ${
+                    slot === 1
+                      ? 'bg-pink-500/20 border-pink-500/40 text-pink-300'
+                      : 'bg-gray-500/20 border-gray-500/40 text-gray-400'
+                  }`}
+                >
+                  <div className="text-xs font-medium">Player {slot}</div>
+                  <div className="text-lg font-bold">{slot === 1 ? '👤' : '💤'}</div>
+                </div>
               ))}
-            </AnimatePresence>
-          </div>
+            </div>
+          )}
         </motion.div>
       )}
     </div>

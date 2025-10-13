@@ -27,7 +27,7 @@ export const PetalEffect = ({
   count = 8,
   color = '#FF69B4',
   size = 20,
-  duration = 4,
+  duration: _duration = 4,
   interactive = false,
   onCollect,
 }: PetalEffectProps) => {
@@ -43,7 +43,7 @@ export const PetalEffect = ({
     mouseY.set(e.clientY);
   };
 
-  const handlePetalClick = (index: number) => {
+  const handlePetalClick = (_index: number) => {
     if (!interactive) return;
 
     playSound('petal');

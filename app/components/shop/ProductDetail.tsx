@@ -145,18 +145,22 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
         {/* Quantity */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-white">Quantity</label>
-          <div className="flex items-center gap-2">
+          <div className="mb-2 block text-sm font-medium text-white">Quantity</div>
+          <div className="flex items-center gap-2" role="group" aria-label="Quantity selector">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white hover:bg-white/10"
+              aria-label="Decrease quantity"
             >
               -
             </button>
-            <span className="w-12 text-center text-white">{quantity}</span>
+            <span className="w-12 text-center text-white" aria-live="polite">
+              {quantity}
+            </span>
             <button
               onClick={() => setQuantity(quantity + 1)}
               className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-white hover:bg-white/10"
+              aria-label="Increase quantity"
             >
               +
             </button>

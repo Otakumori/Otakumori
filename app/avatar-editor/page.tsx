@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import AvatarSystem from '@/components/avatar/AvatarSystem';
-import { ProceduralCharacterConfig } from '@/lib/avatar/procedural-generator';
+import { type ProceduralCharacterConfig } from '@/lib/avatar/procedural-generator';
 
 export default function AvatarEditorPage() {
   const [showAvatarSystem, setShowAvatarSystem] = useState(false);

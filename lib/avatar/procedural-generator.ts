@@ -526,8 +526,21 @@ export class ProceduralCharacterGenerator {
 
   // Generate clothing mesh
   private generateClothingMesh(config: ProceduralCharacterConfig): THREE.Mesh | null {
-    // Basic clothing implementation
-    const geometry = new THREE.CylinderGeometry(0.4, 0.3, 0.8, 16);
+    // Scale clothing based on body proportions
+    const topRadius = 0.3 + config.body.shoulderWidth * 0.2;
+    const bottomRadius = 0.25 + config.body.waistSize * 0.15;
+    const height = 0.6 + config.body.height * 0.3;
+
+    // Adjust proportions based on gender
+    const genderScale = config.gender === 'female' ? 0.95 : config.gender === 'male' ? 1.05 : 1.0;
+
+    const geometry = new THREE.CylinderGeometry(
+      topRadius * genderScale,
+      bottomRadius * genderScale,
+      height,
+      16,
+    );
+
     const material = new THREE.MeshStandardMaterial({
       color: 0xff6b9d,
       metalness: 0.2,
@@ -535,7 +548,7 @@ export class ProceduralCharacterGenerator {
     });
 
     const clothingMesh = new THREE.Mesh(geometry, material);
-    clothingMesh.position.y = 0.8;
+    clothingMesh.position.y = 0.8 * (config.body.height + 0.5);
 
     return clothingMesh;
   }

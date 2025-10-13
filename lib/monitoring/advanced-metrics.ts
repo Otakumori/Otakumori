@@ -216,6 +216,11 @@ export class AdvancedMetricsCollector {
       if (rule.metric === metricName) {
         const triggered = this.evaluateAlertCondition(rule, point);
         if (triggered) {
+          console.warn(`[Alert ${alertId}] Triggered for metric ${metricName}:`, {
+            threshold: rule.threshold,
+            actual: point.value,
+            condition: rule.condition,
+          });
           this.triggerAlert(rule, point);
         }
       }
@@ -308,16 +313,31 @@ export class AdvancedMetricsCollector {
 
   private async sendSlackAlert(alert: any): Promise<void> {
     // Slack integration placeholder
-    // Slack alert sent
+    console.warn('Slack alert triggered:', {
+      type: alert.type,
+      severity: alert.severity,
+      metric: alert.metricName,
+    });
+    // TODO: Implement Slack webhook integration
   }
 
   private async sendEmailAlert(alert: any): Promise<void> {
     // Email integration placeholder
-    // Email alert sent
+    console.warn('Email alert triggered:', {
+      type: alert.type,
+      severity: alert.severity,
+      metric: alert.metricName,
+    });
+    // TODO: Implement email notification via Resend
   }
 
   private async sendWebhookAlert(alert: any): Promise<void> {
     // Webhook integration placeholder
+    console.warn('Webhook alert triggered:', {
+      type: alert.type,
+      severity: alert.severity,
+      metric: alert.metricName,
+    });
     // Webhook alert sent
   }
 

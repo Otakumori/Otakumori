@@ -224,7 +224,7 @@ export class InputManager {
     }
   }
 
-  private handleGamepadConnected(event: GamepadEvent): void {
+  private handleGamepadConnected(_event: GamepadEvent): void {
     // 'Gamepad connected:', event.gamepad
   }
 

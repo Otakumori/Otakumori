@@ -34,12 +34,20 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Redirect to sign-in if user is not authenticated
+  useEffect(() => {
+    if (isOpen && !user) {
+      console.warn('User not authenticated - friends feature requires sign-in');
+      onClose();
+    }
+  }, [isOpen, user, onClose]);
+
   // Load friends data from API
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && user) {
       loadFriendsData();
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   const loadFriendsData = async () => {
     setIsLoading(true);
@@ -72,6 +80,7 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
     }
   };
 
+  // Helper functions for friend status display
   const getStatusColor = (status: Friend['status']) => {
     switch (status) {
       case 'online':
@@ -254,6 +263,8 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
                               key={friend.id}
                               friend={friend}
                               onToggleFavorite={handleToggleFavorite}
+                              getStatusColor={getStatusColor}
+                              getStatusText={getStatusText}
                             />
                           ))}
                         </div>
@@ -273,6 +284,8 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
                               key={friend.id}
                               friend={friend}
                               onToggleFavorite={handleToggleFavorite}
+                              getStatusColor={getStatusColor}
+                              getStatusText={getStatusText}
                             />
                           ))}
                         </div>
@@ -292,6 +305,8 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
                               key={friend.id}
                               friend={friend}
                               onToggleFavorite={handleToggleFavorite}
+                              getStatusColor={getStatusColor}
+                              getStatusText={getStatusText}
                             />
                           ))}
                         </div>
@@ -311,6 +326,8 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
                               key={friend.id}
                               friend={friend}
                               onToggleFavorite={handleToggleFavorite}
+                              getStatusColor={getStatusColor}
+                              getStatusText={getStatusText}
                             />
                           ))}
                         </div>
@@ -407,24 +424,11 @@ export default function FriendsOverlay({ isOpen, onClose }: FriendsOverlayProps)
 interface FriendItemProps {
   friend: Friend;
   onToggleFavorite: (friendId: string) => void;
+  getStatusColor: (status: Friend['status']) => string;
+  getStatusText: (status: Friend['status']) => string;
 }
 
-function FriendItem({ friend, onToggleFavorite }: FriendItemProps) {
-  const getStatusColor = (status: Friend['status']) => {
-    switch (status) {
-      case 'online':
-        return 'bg-green-500';
-      case 'away':
-        return 'bg-yellow-500';
-      case 'busy':
-        return 'bg-red-500';
-      case 'offline':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
+function FriendItem({ friend, onToggleFavorite, getStatusColor, getStatusText }: FriendItemProps) {
   return (
     <div className="flex items-center justify-between p-3 bg-pink-900/20 rounded-lg border border-pink-500/20 hover:bg-pink-900/30 transition-colors">
       <div className="flex items-center gap-3">
@@ -442,6 +446,7 @@ function FriendItem({ friend, onToggleFavorite }: FriendItemProps) {
             {friend.isFavorite && <span className="text-yellow-400"></span>}
           </div>
           <p className="text-sm text-pink-300/70">@{friend.username}</p>
+          <p className="text-xs text-pink-400/80">{getStatusText(friend.status)}</p>
           {friend.game && <p className="text-xs text-green-400">Playing {friend.game}</p>}
         </div>
       </div>

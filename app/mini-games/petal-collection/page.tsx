@@ -2,7 +2,7 @@ import { type Metadata } from 'next';
 import GameShell from '../_shared/GameShell';
 
 export const metadata: Metadata = {
-  title: 'Petal Collection | Otakumori',
+  title: 'Petal Collection | Otaku-mori',
   description: 'Collect falling petals and rack up combos.',
 };
 

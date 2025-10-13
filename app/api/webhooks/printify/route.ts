@@ -44,8 +44,14 @@ export async function POST(req: NextRequest) {
     let payload: any;
     try {
       payload = JSON.parse(raw);
-    } catch (_e) {
-      logger.error('invalid json', { requestId, route }, { rawSnippet: raw.slice(0, 200) });
+    } catch (e: unknown) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      logger.error(
+        'invalid json',
+        { requestId, route, extra: { parseError: error.message, rawSnippet: raw.slice(0, 200) } },
+        undefined,
+        error,
+      );
       return NextResponse.json({ ok: false, error: 'invalid json' }, { status: 400 });
     }
 

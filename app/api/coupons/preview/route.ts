@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     const codes = parsed.data.codes.map(normalizeCode).filter((c) => !!c);
     const items = parsed.data.cart.items;
     const shipping = parsed.data.cart.shipping ?? { provider: 'stripe' as const, fee: 0 };
+    console.warn(`Coupon preview requested for ${items?.length || 0} items`);
 
     // Fetch coupons metadata, cached briefly
     const metas: CouponMeta[] = [];
@@ -155,9 +156,9 @@ export async function POST(req: NextRequest) {
 
     const breakdown = await getApplicableCoupons({
       now: new Date(),
-      items: [],
-      shipping: { provider: 'stripe', fee: 0 },
-      coupons: [],
+      items: items || [],
+      shipping: shipping,
+      coupons: metas,
       codesOrder: codes,
     });
 

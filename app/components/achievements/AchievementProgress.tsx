@@ -15,6 +15,12 @@ export function AchievementProgress({ achievement }: AchievementProgressProps) {
   const current = achievement.progress || 0;
   const target = achievement.total || 1;
 
+  // Auto-unlock if progress reached target
+  if (current >= target && !isUnlocked && achievement.id) {
+    console.warn('Achievement ready to unlock:', achievement.id);
+    unlockAchievement(achievement.id);
+  }
+
   return (
     <div className="w-full">
       <div className="mb-1 flex items-center justify-between">

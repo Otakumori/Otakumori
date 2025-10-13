@@ -75,8 +75,13 @@ export class GLBCharacterImporter {
         url,
         (gltf) => resolve(gltf),
         (progress) => {
-          // Progress tracking - could be replaced with proper progress callback
-          // console.log('Loading progress:', (progress.loaded / progress.total) * 100 + '%');
+          // Progress tracking - log for debugging 3D model loading
+          if (progress.total > 0) {
+            const percentComplete = Math.round((progress.loaded / progress.total) * 100);
+            console.warn(
+              `Loading GLB: ${percentComplete}% (${progress.loaded}/${progress.total} bytes)`,
+            );
+          }
         },
         (error) => reject(error),
       );
@@ -268,13 +273,28 @@ export class GLBCharacterImporter {
     const userData = gltf.scene.userData || {};
     const asset = gltf.asset || {};
 
-    return {
+    // Extract metadata from GLTF userData and asset
+    const metadata = {
       name: userData.name || asset.generator || 'Imported Character',
       author: userData.author || 'Unknown',
       version: asset.version || '1.0.0',
       description: userData.description || 'Imported from GLB file',
-      tags: userData.tags || ['imported', 'glb'],
+      tags: this.buildTags(userData.tags, config),
     };
+
+    return metadata;
+  }
+
+  // Build tags based on config and user data
+  private buildTags(userTags: string[] | undefined, config: GLBImportConfig): string[] {
+    const tags = userTags || ['imported', 'glb'];
+
+    // Add tags based on config features
+    if (config.enablePhysics) tags.push('physics-enabled');
+    if (config.enableMorphTargets) tags.push('morph-targets');
+    if (config.materialOverrides) tags.push('custom-materials');
+
+    return tags;
   }
 
   // Material type detection helpers

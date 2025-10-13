@@ -76,7 +76,7 @@ export default async function AccountPage() {
               }
             </h2>
             <UsernameSuggestion
-              onUsernameSelect={(username) => {
+              onUsernameSelect={(_username) => {
                 // Username selected
                 // TODO: Implement username update logic
               }}

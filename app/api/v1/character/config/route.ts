@@ -8,6 +8,9 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
+    // Log character config request
+    console.warn('Character config GET from:', request.headers.get('user-agent'));
+
     const { userId } = await auth();
 
     if (!userId) {

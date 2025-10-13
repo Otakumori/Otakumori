@@ -83,6 +83,10 @@ export function GameAvatarIntegration({
         <div
           className={`${size === 'small' ? 'w-12 h-12' : size === 'medium' ? 'w-16 h-16' : 'w-24 h-24'} rounded-lg bg-white/10 border border-dashed border-white/30 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors`}
           onClick={handleAvatarClick}
+          onKeyDown={(e) => e.key === 'Enter' && handleAvatarClick()}
+          role="button"
+          tabIndex={0}
+          aria-label="Avatar placeholder"
         >
           <span className="text-white/60 text-lg"></span>
         </div>
@@ -142,9 +146,7 @@ export function GameAvatarIntegration({
                 <button
                   onClick={() => setShowAvatarSelector(false)}
                   className="text-white/60 hover:text-white transition-colors"
-                >
-                  
-                </button>
+                ></button>
               </div>
 
               <AvatarSelector

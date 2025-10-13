@@ -108,7 +108,9 @@ const EnhancedNavbar: React.FC = () => {
           {/* Search Bar */}
           <div className="hidden md:flex items-center gap-4">
             <form onSubmit={handleSearch} className="relative">
-              <div className="relative">
+              <div
+                className={`relative transition-all ${isSearchFocused ? 'ring-2 ring-pink-500/50 rounded-lg' : ''}`}
+              >
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400" />
                 <input
                   ref={searchRef}
@@ -120,6 +122,15 @@ const EnhancedNavbar: React.FC = () => {
                   onBlur={() => setIsSearchFocused(false)}
                   className="form-input pl-10 pr-4 py-2 w-64"
                 />
+                {/* Category dropdown placeholder - implement if needed */}
+                {isCategoryDropdownOpen && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute top-full mt-2 bg-black/90 rounded-lg p-2 shadow-lg"
+                  >
+                    <div className="text-white text-sm">Categories (coming soon)</div>
+                  </div>
+                )}
               </div>
             </form>
 

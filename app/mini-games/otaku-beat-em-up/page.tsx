@@ -2,7 +2,7 @@ import { type Metadata } from 'next';
 import GameShell from '../_shared/GameShell';
 
 export const metadata: Metadata = {
-  title: 'Rhythm Beat-Em-Up | Otakumori',
+  title: 'Rhythm Beat-Em-Up | Otaku-mori',
   description: "Sync to the Moon Prism's pulse.",
 };
 

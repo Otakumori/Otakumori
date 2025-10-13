@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -43,7 +41,7 @@ export default function BootSequence({ onDone }: { onDone: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
       <div className="text-center">
-        <LogoOtakumoriSVG className="mx-auto mb-8 h-32 w-32 animate-pulse" />
+        <LogoOtakuMoriSVG className="mx-auto mb-8 h-32 w-32 animate-pulse" />
         <div className="text-2xl font-bold text-white mb-4">Otaku-mori</div>
         <div className="text-gray-400 mb-8">Press ESC to skip</div>
         <div className="text-sm text-gray-500">Loading your adventure...</div>
@@ -52,7 +50,7 @@ export default function BootSequence({ onDone }: { onDone: () => void }) {
   );
 }
 
-function LogoOtakumoriSVG({ className }: { className?: string }) {
+function LogoOtakuMoriSVG({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="50" cy="50" r="45" fill="#FF69B4" opacity="0.8" />

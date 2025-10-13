@@ -11,7 +11,7 @@ export default function LRoom404Page() {
   const [currentPhase, setCurrentPhase] = useState<
     'timeline' | 'herring' | 'name' | 'complete' | 'fallback'
   >('timeline');
-  const [timelineOrder, setTimelineOrder] = useState<number[]>([]);
+  const [_timelineOrder, _setTimelineOrder] = useState<number[]>([]);
   const [selectedTimestamps, setSelectedTimestamps] = useState<number[]>([]);
   const [herringSelections, setHerringSelections] = useState<number[]>([]);
   const [nameInput, setNameInput] = useState('');
@@ -51,8 +51,17 @@ export default function LRoom404Page() {
 
     return () => {
       if (timeout) clearTimeout(timeout);
+      setTimeoutId(null);
     };
   }, []);
+
+  // Clear timeout when puzzle is completed or fallback is triggered
+  useEffect(() => {
+    if ((currentPhase === 'complete' || currentPhase === 'fallback') && timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+  }, [currentPhase, timeoutId]);
 
   // Phase 1: Timeline Anomaly
   const handleTimestampClick = (id: number) => {
