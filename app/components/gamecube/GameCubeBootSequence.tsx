@@ -99,7 +99,7 @@ export default function GameCubeBootSequence({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background: 'radial-gradient(ellipse at center, #1a0b2e 0%, #0a0520 100%)',
+        background: 'radial-gradient(ellipse at center, #2e0b1a 0%, #0a0520 100%)',
       }}
     >
       {/* Skip button */}
@@ -134,14 +134,14 @@ export default function GameCubeBootSequence({
                 ease: [0.45, 0, 0.15, 1], // Ease out cubic
               }}
             >
-              {/* O-Cube faces with hollow center */}
+              {/* O-Cube faces with hollow center - SAKURA PINK */}
               {['front', 'back', 'right', 'left', 'top', 'bottom'].map((face) => (
                 <div
                   key={face}
                   className="absolute w-full h-full"
                   style={{
-                    background: 'linear-gradient(135deg, #C7D0FF 0%, #9FB0FF 50%, #8b5cf6 100%)',
-                    border: '2px solid #9FB0FF',
+                    background: 'linear-gradient(135deg, #ffc7d9 0%, #ff9fbe 50%, #ec4899 100%)',
+                    border: '2px solid #ff9fbe',
                     transform:
                       face === 'front'
                         ? 'translateZ(96px)'
@@ -198,12 +198,12 @@ export default function GameCubeBootSequence({
               className="absolute inset-0 transform-gpu"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              {/* Front face of O-Cube */}
+              {/* Front face of O-Cube - SAKURA PINK */}
               <div
                 className="absolute w-full h-full"
                 style={{
-                  background: 'linear-gradient(135deg, #C7D0FF 0%, #9FB0FF 50%, #8b5cf6 100%)',
-                  border: '2px solid #9FB0FF',
+                  background: 'linear-gradient(135deg, #ffc7d9 0%, #ff9fbe 50%, #ec4899 100%)',
+                  border: '2px solid #ff9fbe',
                   transform: 'translateZ(96px)',
                 }}
               >
@@ -221,7 +221,7 @@ export default function GameCubeBootSequence({
                   style={{
                     background:
                       'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(0,0,0,0.3) 100%)',
-                    boxShadow: '0 0 30px rgba(199, 208, 255, 0.6)',
+                    boxShadow: '0 0 30px rgba(236, 72, 153, 0.6)',
                   }}
                 />
               </div>
@@ -237,7 +237,7 @@ export default function GameCubeBootSequence({
           animate={{ opacity: 1 }}
           className="text-center relative"
         >
-          {/* O-Cube with intense glow */}
+          {/* O-Cube with intense glow - SAKURA PINK */}
           <div className="relative w-48 h-48 mx-auto mb-8" style={{ perspective: '800px' }}>
             <div
               className="absolute inset-0 transform-gpu"
@@ -246,10 +246,10 @@ export default function GameCubeBootSequence({
               <div
                 className="absolute w-full h-full"
                 style={{
-                  background: 'linear-gradient(135deg, #C7D0FF 0%, #9FB0FF 50%, #8b5cf6 100%)',
-                  border: '2px solid #9FB0FF',
+                  background: 'linear-gradient(135deg, #ffc7d9 0%, #ff9fbe 50%, #ec4899 100%)',
+                  border: '2px solid #ff9fbe',
                   transform: 'translateZ(96px)',
-                  boxShadow: '0 0 60px rgba(199, 208, 255, 1)',
+                  boxShadow: '0 0 60px rgba(236, 72, 153, 1)',
                 }}
               >
                 <div
