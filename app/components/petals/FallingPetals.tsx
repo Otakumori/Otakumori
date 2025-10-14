@@ -266,7 +266,7 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
       ref={canvasRef}
       onClick={handleCanvasClick}
       className="fixed inset-0 pointer-events-auto cursor-pointer"
-      style={{ zIndex: 0 }}
+      style={{ zIndex: 5 }}
       aria-label="Falling cherry blossom petals - click to collect"
     />
   );

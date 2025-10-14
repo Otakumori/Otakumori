@@ -23,7 +23,7 @@ export default function PetalSystem() {
 
   return (
     <>
-      {/* Falling petals canvas - z-index: 0 (behind main content at z-index: 10+) */}
+      {/* Falling petals canvas - z-index: 5 (above starfield at z-0, behind main content at z-index: 10+) */}
       <FallingPetals onPetalCollect={handlePetalCollect} />
 
       {/* Achievement notification - only shows on first collection */}

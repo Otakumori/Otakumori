@@ -7,9 +7,10 @@ import { useEffect, useState } from 'react';
  *
  * CRITICAL SPECIFICATIONS:
  * - Absolute position (spans full page height)
- * - Scroll-reveal effect (tree reveals from top to bottom as user scrolls)
- * - Initially shows top ~50% of tree (canopy)
- * - Progressively reveals bottom portion (trunk/roots) as user scrolls
+ * - Scroll-reveal effect (tree moves UP as user scrolls DOWN)
+ * - Initially shows top of tree (canopy) at page top
+ * - As user scrolls, tree moves up to reveal trunk/roots at page bottom
+ * - Tree ends at footer (bottom of tree aligned with bottom of page)
  * - Extends edge-to-edge, behind ALL content
  * - Proper z-index layering (z-index: -10)
  * - Smooth gradient fades at top/bottom
@@ -54,8 +55,8 @@ export default function TreeBackground() {
   }, []);
 
   // Calculate tree reveal position based on scroll progress
-  // Start at -50% (showing top half), end at 0% (showing full tree)
-  const treeRevealY = -50 + scrollProgress * 50;
+  // Tree is 200% height - start at 0% (showing top half), move UP to -100% (showing bottom half at footer)
+  const treeRevealY = 0 - scrollProgress * 100;
 
   return (
     <>
