@@ -38,9 +38,9 @@ function getColorOverride(): string | undefined {
   // Next.js inlines NEXT_PUBLIC_ variables at build time
   // This is client-side only, so we access it safely
   if (typeof window === 'undefined') return undefined;
-  
+
   // For NEXT_PUBLIC_ variables, direct access is required for proper tree-shaking
-  // eslint-disable-next-line n/no-process-env, no-restricted-syntax
+  // eslint-disable-next-line no-restricted-syntax -- Next.js public env var, client-side safe
   return process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE;
 }
 
