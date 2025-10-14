@@ -45,24 +45,27 @@ export default function TreeBackground() {
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -10 }} aria-hidden="true">
         {/* Tree with parallax effect */}
         <div
-          className="absolute inset-0 will-change-transform"
+          className="absolute will-change-transform"
           style={{
             transform: `translate3d(0, ${-scrollY}px, 0)`,
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center bottom',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',
-            // Ensure tree extends beyond viewport for parallax scrolling
-            height: '120vh',
-            minHeight: '1200px',
+            // Full viewport coverage with extra space for parallax
+            top: '-10vh',
+            left: 0,
+            right: 0,
+            bottom: '-20vh',
+            minHeight: '130vh',
           }}
         />
 
-        {/* Top fade gradient - blends tree into dark header */}
+        {/* Top fade gradient - subtle blend into dark header */}
         <div
-          className="absolute inset-x-0 top-0 h-40 pointer-events-none"
+          className="absolute inset-x-0 top-0 h-20 pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, #080611 0%, transparent 100%)',
+            background: 'linear-gradient(to bottom, #080611 0%, #080611ee 30%, transparent 100%)',
             zIndex: -5,
           }}
         />
