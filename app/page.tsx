@@ -7,7 +7,6 @@ import ShopTeaser from './components/ShopTeaser';
 import BlogTeaser from './components/BlogTeaser';
 import MiniGameTeaser from './components/MiniGameTeaser';
 import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
-import TreeBackground from './components/TreeBackground';
 
 // Server components - conditionally imported based on feature flags
 import ShopSection from '@/app/(site)/home/ShopSection';
@@ -28,9 +27,6 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Tree Background - extends full page height */}
-      <TreeBackground />
-
       <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* HERO */}
         {NEXT_PUBLIC_FEATURE_HERO === '1' && (
