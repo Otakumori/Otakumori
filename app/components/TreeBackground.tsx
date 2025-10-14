@@ -48,7 +48,7 @@ export default function TreeBackground() {
           className="absolute inset-0 will-change-transform"
           style={{
             transform: `translate3d(0, ${-scrollY}px, 0)`,
-            backgroundImage: 'url(/assets/images/tree-bg.png)',
+            backgroundImage: 'url(/assets/images/cherry-tree.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center bottom',
             backgroundRepeat: 'no-repeat',
