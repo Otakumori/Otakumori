@@ -17,6 +17,9 @@ import InteractivePetals from '@/components/hero/InteractivePetals';
 // Client-side petal system components
 import PetalSystem from './components/petals/PetalSystem';
 
+// Cherry blossom tree background
+import TreeBackground from './components/TreeBackground';
+
 export const revalidate = 60;
 
 export default async function HomePage() {
@@ -30,6 +33,9 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Cherry blossom tree background - fixed with parallax */}
+      <TreeBackground />
+
       {/* Petal collection system - renders behind main content */}
       <PetalSystem />
 
