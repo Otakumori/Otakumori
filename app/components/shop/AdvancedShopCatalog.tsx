@@ -38,9 +38,9 @@ function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
   const availableVariants = product.variants.filter((v) => v.is_enabled && v.is_available);
 
   return (
-    <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden hover:border-pink-500/50 transition-all duration-300">
+    <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden hover:border-pink-500/50 hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-300 hover:-translate-y-1">
       {/* Product Image */}
-      <div className="relative aspect-square bg-white/5">
+      <div className="relative aspect-square bg-white/5 overflow-hidden">
         {displayImage ? (
           <Image
             src={displayImage.src}
@@ -150,7 +150,7 @@ function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
 
         {/* Action Button */}
         <button
-          className="w-full bg-gradient-to-r from-pink-500/80 to-purple-500/80 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-gradient-to-r from-pink-500/80 to-purple-500/80 hover:from-pink-500 hover:to-purple-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-pink-500/40 hover:scale-105 active:scale-95"
           disabled={availableVariants.length === 0}
         >
           {availableVariants.length > 0 ? 'View Details' : 'Out of Stock'}

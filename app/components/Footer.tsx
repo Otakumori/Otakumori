@@ -1,18 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToastContext } from '@/app/contexts/ToastContext';
 
 export default function Footer() {
   const [soapstoneText, setSoapstoneText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
+  const { success, error: showError } = useToastContext();
 
   const handleSoapstoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!soapstoneText.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
-    setMessage('');
 
     try {
       const res = await fetch('/api/soapstone', {
@@ -22,14 +22,15 @@ export default function Footer() {
       });
 
       if (res.ok) {
-        setMessage('Sign left for travelers ✓');
+        success('Sign carved into the earth. May it guide others.');
         setSoapstoneText('');
-        setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage('Failed to leave sign');
+        const result = await res.json();
+        showError(result.error || 'Failed to leave sign');
       }
-    } catch (_error) {
-      setMessage('Error leaving sign');
+    } catch (error) {
+      showError('Failed to connect. Try again, chosen undead.');
+      console.error('Soapstone submit error:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -37,12 +38,12 @@ export default function Footer() {
 
   return (
     <footer
-      className="backdrop-blur-lg border-t border-white/10"
-      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}
+      className="relative backdrop-blur-lg border-t border-white/10"
+      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)', zIndex: 50 }}
     >
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Compact Soapstone Input */}
-        <div className="mb-8">
+        <div className="mb-8 relative z-10">
           <form onSubmit={handleSoapstoneSubmit} className="max-w-2xl mx-auto">
             <div className="flex gap-2">
               <input
@@ -51,23 +52,16 @@ export default function Footer() {
                 onChange={(e) => setSoapstoneText(e.target.value)}
                 placeholder="Leave a sign for fellow travelers..."
                 maxLength={140}
-                className="flex-1 px-4 py-2 bg-black/40 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-pink-400/50 text-sm"
+                className="flex-1 px-4 py-3 bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-pink-400/70 focus:ring-2 focus:ring-pink-500/30 focus:shadow-lg focus:shadow-pink-500/20 text-sm transition-all"
               />
               <button
                 type="submit"
                 disabled={!soapstoneText.trim() || isSubmitting}
-                className="px-6 py-2 bg-pink-500/20 border border-pink-400/30 text-pink-100 rounded-lg hover:bg-pink-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+                className="px-8 py-3 bg-gradient-to-r from-pink-500/40 to-purple-500/40 hover:from-pink-500/60 hover:to-purple-500/60 border border-pink-400/40 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm font-bold transition-all shadow-lg hover:shadow-pink-500/40 hover:scale-105 active:scale-95"
               >
-                {isSubmitting ? 'Sending...' : 'Send'}
+                {isSubmitting ? 'Carving...' : 'Carve Sign'}
               </button>
             </div>
-            {message && (
-              <p
-                className={`text-center mt-2 text-sm ${message.includes('✓') ? 'text-green-400' : 'text-red-400'}`}
-              >
-                {message}
-              </p>
-            )}
           </form>
         </div>
 

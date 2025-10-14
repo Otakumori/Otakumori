@@ -20,6 +20,7 @@ import PetalField from './components/effects/PetalField';
 import { ScrollToTop } from './components/ui/ScrollToTop';
 import { QuickSearch } from './components/ui/QuickSearch';
 import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
+import { SoapstoneGlow } from './components/effects/SoapstoneGlow';
 
 // Boot-time Inngest health check (disabled - run Inngest dev server separately)
 // bootCheckInngest();
@@ -66,6 +67,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
           {/* Global Background Effects (z-0) */}
           <StarfieldBackground className="fixed inset-0 z-0" />
+          <SoapstoneGlow />
           <PetalField density="site" />
 
           {/* Cursor Glow disabled per user preference */}

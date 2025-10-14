@@ -152,13 +152,16 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
   }
 
   return (
-    <div className="glass-panel rounded-2xl p-6 space-y-6">
+    <div className="glass-panel rounded-2xl p-6 space-y-6 border-pink-500/20 shadow-2xl shadow-pink-500/10">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-pink-200">What travelers say</h3>
+        <h3 className="text-2xl font-bold text-pink-200 flex items-center gap-2">
+          <span className="text-pink-400">⚔</span>
+          What travelers say
+        </h3>
         {!composing && (
           <button
             onClick={() => setComposing(true)}
-            className="text-sm px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white transition-all"
+            className="text-sm px-6 py-2 bg-gradient-to-r from-pink-500/30 to-purple-500/30 hover:from-pink-500/50 hover:to-purple-500/50 border border-pink-400/30 rounded-xl text-white font-semibold transition-all shadow-lg hover:shadow-pink-500/30 hover:scale-105"
           >
             Leave a sign
           </button>
