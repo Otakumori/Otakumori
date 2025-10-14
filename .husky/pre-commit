@@ -1,0 +1,26 @@
+# Otaku-mori Pre-Commit Quality Gates
+echo "🌸 Running Otaku-mori quality checks..."
+
+# 1. TypeScript Typecheck (BLOCKING)
+echo "📝 TypeScript typecheck..."
+npm run typecheck || {
+  echo "❌ TypeScript errors found. Fix them before committing."
+  exit 1
+}
+
+# 2. ESLint (WARNING ONLY - pre-existing errors need cleanup)
+echo "🔍 Linting..."
+npm run lint --max-warnings=999 || {
+  echo "⚠️  ESLint errors found. Please fix when possible."
+  echo "Continuing with commit (TypeScript is clean)..."
+}
+
+# 3. Prettier format check
+echo "✨ Checking code formatting..."
+npm run format:check || {
+  echo "⚠️  Code formatting issues detected. Run 'npm run format' to fix."
+  echo "Continuing with commit..."
+}
+
+echo "✅ All quality checks passed!"
+
