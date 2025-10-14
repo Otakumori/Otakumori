@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { PrintifyProduct } from '@/app/lib/printify/service';
+import { FeaturedCarousel } from './FeaturedCarousel';
 
 // Enterprise-grade Product Card for Real Printify Products
 function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
@@ -252,6 +253,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchResult, setSearchResult] = useState<ProductSearchResult | null>(null);
+  const [featuredProducts, setFeaturedProducts] = useState<PrintifyProduct[]>([]);
 
   // Parse search parameters
   const filters = useMemo(
@@ -272,6 +274,28 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
     }),
     [searchParams],
   );
+
+  // Fetch featured products for carousel (once on mount)
+  useEffect(() => {
+    async function fetchFeatured() {
+      try {
+        const response = await fetch('/api/v1/printify/search?limit=5&sortBy=relevance', {
+          credentials: 'same-origin',
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          const data = result.data || result;
+          const featured = (data.products || []).slice(0, 5);
+          setFeaturedProducts(featured);
+        }
+      } catch (err) {
+        console.warn('Failed to load featured products:', err);
+      }
+    }
+
+    fetchFeatured();
+  }, []);
 
   // Fetch products using the advanced search API
   useEffect(() => {
@@ -443,7 +467,19 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 space-y-12">
+      {/* Featured Products Carousel */}
+      {featuredProducts.length > 0 && (
+        <section>
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-white mb-2">Featured Products</h2>
+            <p className="text-zinc-300">Curated treasures for fellow travelers</p>
+          </div>
+          <FeaturedCarousel products={featuredProducts} autoplay={true} interval={6000} />
+        </section>
+      )}
+
+      {/* Main Catalog Section */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Filters Sidebar */}
         <div className="lg:col-span-1">
