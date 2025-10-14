@@ -67,10 +67,10 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
         setTimeout(() => setShowPetals(false), 2000);
       }
 
-      // Move to next game after delay
+      // Move to next game after delay (increased from 1500ms for better pacing)
       setTimeout(() => {
         setCurrentGameIndex((prev) => (prev + 1) % playlist.length);
-      }, 1500);
+      }, 3500);
     },
     [
       currentGame,
