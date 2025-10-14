@@ -117,9 +117,7 @@ export default function PerformanceMonitor({
                   <div
                     key={t}
                     className={`flex-1 px-2 py-1 rounded text-xs font-medium text-center ${
-                      tier === t
-                        ? 'bg-pink-600 text-white'
-                        : 'bg-white/10 text-white/50'
+                      tier === t ? 'bg-pink-600 text-white' : 'bg-white/10 text-white/50'
                     }`}
                   >
                     {tierLabels[t]}

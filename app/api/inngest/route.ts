@@ -14,6 +14,7 @@
  * - INNGEST_SIGNING_KEY: For webhook signature verification
  */
 import { serve } from 'inngest/next';
+import { env } from '@/env.mjs';
 import { inngest } from '../../../inngest/client';
 import {
   syncUserToSupabase,
@@ -47,6 +48,5 @@ export const { GET, POST, PUT } = serve({
     retryFailedOperation,
     cleanupOldData,
   ],
-  // eslint-disable-next-line no-restricted-syntax -- Inngest serve() requires direct process.env access
-  signingKey: process.env.INNGEST_SIGNING_KEY,
+  signingKey: env.INNGEST_SIGNING_KEY,
 });

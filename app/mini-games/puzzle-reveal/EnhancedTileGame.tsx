@@ -106,14 +106,14 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
     // Load image
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    
+
     // Use placeholder if asset doesn't exist
     img.src = selectedArt.url;
     img.onerror = () => {
       // Fallback to procedural gradient
       img.src = generateFallbackImage(800, 600);
     };
-    
+
     img.onload = () => {
       imageRef.current = img;
       initializeTiles();
@@ -423,9 +423,10 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
   };
 
   // Calculate reveal percentage
-  const revealPercent = gameState.totalTiles > 0 
-    ? Math.round((gameState.tilesRevealed / gameState.totalTiles) * 100) 
-    : 0;
+  const revealPercent =
+    gameState.totalTiles > 0
+      ? Math.round((gameState.tilesRevealed / gameState.totalTiles) * 100)
+      : 0;
 
   return (
     <div className="relative">
@@ -553,4 +554,3 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
     </div>
   );
 }
-

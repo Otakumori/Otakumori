@@ -45,13 +45,24 @@ export async function GET(req: NextRequest) {
     //   await redis.setex(cacheKey, 30, JSON.stringify(transformedProducts));
     // }
 
-    return NextResponse.json({ ok: true, items: transformedProducts });
+    return NextResponse.json({ ok: true, products: transformedProducts });
   } catch (e) {
     log('products_error', { message: String(e) });
 
-    // Fallback to seeded products if database fails
+    // Fallback to Printify API if database fails
+    try {
+      const printifyResponse = await fetch(`${req.nextUrl.origin}/api/shop/products`);
+      if (printifyResponse.ok) {
+        const printifyData = await printifyResponse.json();
+        return NextResponse.json({ ok: true, products: printifyData.products || [] });
+      }
+    } catch (printifyError) {
+      log('printify_fallback_error', { message: String(printifyError) });
+    }
+
+    // Last resort: seeded products
     const fallbackProducts = getSeededProducts();
-    return NextResponse.json({ ok: true, items: fallbackProducts });
+    return NextResponse.json({ ok: true, products: fallbackProducts });
   }
 }
 

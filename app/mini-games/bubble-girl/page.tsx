@@ -39,8 +39,8 @@ export default function InteractiveBuddyPage() {
                 Interactive Buddy
               </h1>
               <p className="text-zinc-300 font-medium">
-                Physics-based character interaction. Click, drag, and use tools for satisfying ragdoll
-                mayhem!
+                Physics-based character interaction. Click, drag, and use tools for satisfying
+                ragdoll mayhem!
               </p>
             </div>
             <a href="/mini-games">
@@ -115,8 +115,8 @@ export default function InteractiveBuddyPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-red-400 mt-0.5">•</span>
                   <span>
-                    <strong className="text-red-400">Destructive:</strong> Deal damage with satisfying
-                    physics (slap, punch, bat, bomb, laser)
+                    <strong className="text-red-400">Destructive:</strong> Deal damage with
+                    satisfying physics (slap, punch, bat, bomb, laser)
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -142,7 +142,8 @@ export default function InteractiveBuddyPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-blue-400 mt-0.5">•</span>
                   <span>
-                    <strong>Sandbox:</strong> Unlimited money, all tools available, pure experimentation
+                    <strong>Sandbox:</strong> Unlimited money, all tools available, pure
+                    experimentation
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -155,8 +156,8 @@ export default function InteractiveBuddyPage() {
                 <li className="flex items-start gap-2">
                   <span className="text-blue-400 mt-0.5">•</span>
                   <span>
-                    <strong>Challenge:</strong> Earn money by interacting, buy better tools, maximize
-                    score
+                    <strong>Challenge:</strong> Earn money by interacting, buy better tools,
+                    maximize score
                   </span>
                 </li>
               </ul>
@@ -200,12 +201,15 @@ export default function InteractiveBuddyPage() {
               <li className="flex items-start gap-2">
                 <span className="text-purple-400">→</span>
                 <span>
-                  Use healing tools strategically in Challenge mode to keep the character alive longer
+                  Use healing tools strategically in Challenge mode to keep the character alive
+                  longer
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-400">→</span>
-                <span>Experiment with gravity and wind tools for creative physics interactions</span>
+                <span>
+                  Experiment with gravity and wind tools for creative physics interactions
+                </span>
               </li>
             </ul>
           </div>

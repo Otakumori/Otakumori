@@ -29,6 +29,7 @@ npm run quality:full
 ```
 
 This runs:
+
 - TypeScript typecheck
 - ESLint validation
 - Unit tests
@@ -41,18 +42,18 @@ This runs:
 
 ### Core Web Vitals Targets
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| LCP (Largest Contentful Paint) | < 2.5s | ✓ |
-| FID (First Input Delay) | < 100ms | ✓ |
-| CLS (Cumulative Layout Shift) | < 0.1 | ✓ |
+| Metric                         | Target  | Current |
+| ------------------------------ | ------- | ------- |
+| LCP (Largest Contentful Paint) | < 2.5s  | ✓       |
+| FID (First Input Delay)        | < 100ms | ✓       |
+| CLS (Cumulative Layout Shift)  | < 0.1   | ✓       |
 
 ### Bundle Size Budgets
 
-| Bundle | Limit | Enforcement |
-|--------|-------|-------------|
-| Main | 230KB gzipped | ❌ BLOCKING |
-| Route chunks | 150KB each | ⚠️ WARNING |
+| Bundle        | Limit         | Enforcement |
+| ------------- | ------------- | ----------- |
+| Main          | 230KB gzipped | ❌ BLOCKING |
+| Route chunks  | 150KB each    | ⚠️ WARNING  |
 | Total initial | 500KB gzipped | ❌ BLOCKING |
 
 ---
@@ -98,11 +99,11 @@ npm run verify:a11y
 
 ### Test Coverage
 
-| Type | Minimum Coverage | Current |
-|------|------------------|---------|
-| Unit Tests | 60% | In Progress |
-| Integration Tests | 40% | In Progress |
-| E2E Tests | Critical paths | In Progress |
+| Type              | Minimum Coverage | Current     |
+| ----------------- | ---------------- | ----------- |
+| Unit Tests        | 60%              | In Progress |
+| Integration Tests | 40%              | In Progress |
+| E2E Tests         | Critical paths   | In Progress |
 
 ### Test Commands
 
@@ -122,8 +123,8 @@ npm run test:coverage      # Coverage report
 ```typescript
 // ✅ GOOD
 interface AvatarConfig {
-  height: number;  // 0.8-1.3 scale
-  build: number;   // 0-100 (slim to muscular)
+  height: number; // 0.8-1.3 scale
+  build: number; // 0-100 (slim to muscular)
 }
 
 const getUserRole = async (userId: string): Promise<Role> => {
@@ -131,8 +132,9 @@ const getUserRole = async (userId: string): Promise<Role> => {
 };
 
 // ❌ BAD
-const x: any = {};  // No any without justification
-function foo() {    // Use arrow functions for consistency
+const x: any = {}; // No any without justification
+function foo() {
+  // Use arrow functions for consistency
   // ...
 }
 ```
@@ -228,11 +230,11 @@ npm run ci:validate
 
 ### Alerts
 
-| Condition | Action |
-|-----------|--------|
-| Error rate > 1% | Page team immediately |
+| Condition              | Action                 |
+| ---------------------- | ---------------------- |
+| Error rate > 1%        | Page team immediately  |
 | Performance score < 85 | Investigate within 24h |
-| Security vulnerability | Fix within 4h |
+| Security vulnerability | Fix within 4h          |
 
 ---
 
@@ -288,4 +290,3 @@ npm run ci:validate
 
 **Last Updated**: 2025-01-14
 **Maintained by**: Otaku-mori Dev Team
-

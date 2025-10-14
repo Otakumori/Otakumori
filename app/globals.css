@@ -1906,6 +1906,42 @@ textarea,
   }
 }
 
+/* Cherry Blossom Petal Collection System Animations */
+@keyframes slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.8);
+  }
+}
+
+/* Apply animations to utility classes */
+.animate-slide-down {
+  animation: slide-down 250ms ease-out;
+}
+
+.animate-float-up {
+  animation: float-up 1s ease-out forwards;
+}
+
 .animate-petal-float {
   animation: petal-float 3s ease-out infinite;
 }

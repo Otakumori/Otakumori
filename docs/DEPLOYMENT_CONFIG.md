@@ -38,6 +38,7 @@ Production base URL: `https://www.otaku-mori.com/api/v1`
 See `.env.example` for complete list of required environment variables.
 
 Critical production variables:
+
 - `NEXT_PUBLIC_APP_URL=https://www.otaku-mori.com`
 - `INNGEST_SERVE_URL=https://www.otaku-mori.com/api/inngest`
 - `CLERK_WEBHOOK_URL=https://www.otaku-mori.com/api/webhooks/clerk`
@@ -62,4 +63,3 @@ Validates all images, audio, and 3D models against quality standards.
 
 **Last Updated**: 2025-01-14
 **Maintained by**: Otaku-mori Dev Team
-

@@ -6,7 +6,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 
 type GameMode = 'sandbox' | 'stress-relief' | 'challenge';
@@ -60,14 +60,14 @@ const TOOLS: Tool[] = [
   { id: 'tickle', name: 'Tickle', icon: '✦', type: 'fun', cost: 10, effect: 'giggle' },
   { id: 'compliment', name: 'Compliment', icon: '♥', type: 'healing', cost: 20, damage: -10 },
   { id: 'headpat', name: 'Head Pat', icon: '~', type: 'healing', cost: 15, damage: -15 },
-  
+
   // Destructive Tools
   { id: 'slap', name: 'Slap', icon: '/', type: 'destructive', cost: 5, damage: 15 },
   { id: 'punch', name: 'Punch', icon: '✕', type: 'destructive', cost: 25, damage: 30 },
   { id: 'bat', name: 'Baseball Bat', icon: '|', type: 'destructive', cost: 50, damage: 50 },
   { id: 'bomb', name: 'Cherry Bomb', icon: '●', type: 'destructive', cost: 100, damage: 80 },
   { id: 'laser', name: 'Laser Beam', icon: '⚡', type: 'destructive', cost: 150, damage: 60 },
-  
+
   // Special Tools
   { id: 'gravity', name: 'Anti-Gravity', icon: '○', type: 'fun', cost: 30, effect: 'float' },
   { id: 'wind', name: 'Wind Blast', icon: '≈', type: 'fun', cost: 40, effect: 'push' },
@@ -78,7 +78,7 @@ export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: Game
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<PhysicsEngine | null>(null);
   const animationRef = useRef<number | null>(null);
-  
+
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     money: mode === 'sandbox' ? 1000 : 0,
@@ -157,22 +157,19 @@ export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: Game
   );
 
   // Handle drag interactions
-  const handleCanvasDrag = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!engineRef.current || event.buttons !== 1) return;
+  const handleCanvasDrag = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!engineRef.current || event.buttons !== 1) return;
 
-      const canvas = canvasRef.current!;
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
 
-      const x = (event.clientX - rect.left) * scaleX;
-      const y = (event.clientY - rect.top) * scaleY;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
 
-      engineRef.current.dragCharacter(x, y);
-    },
-    [],
-  );
+    engineRef.current.dragCharacter(x, y);
+  }, []);
 
   // Reset character
   const handleReset = useCallback(() => {
@@ -218,7 +215,8 @@ export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: Game
             animate={{ scale: 1, opacity: 1 }}
             className="bg-gradient-to-r from-orange-500/40 to-red-500/40 backdrop-blur-lg px-4 py-2 rounded-xl border border-red-400/50 text-white font-bold"
           >
-            <span className="text-yellow-300">★</span> {gameState.comboMultiplier.toFixed(1)}x COMBO!
+            <span className="text-yellow-300">★</span> {gameState.comboMultiplier.toFixed(1)}x
+            COMBO!
           </motion.div>
         )}
       </div>
@@ -229,7 +227,7 @@ export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: Game
           <h3 className="text-pink-300 font-bold mb-3 flex items-center gap-2">
             <span className="text-xl">⚙</span> Tools
           </h3>
-          
+
           <div className="grid grid-cols-3 gap-2 max-h-96 overflow-y-auto custom-scrollbar">
             {TOOLS.map((tool) => {
               const canAfford = mode === 'sandbox' || tool.cost <= gameState.money;
@@ -294,7 +292,7 @@ class PhysicsEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private mode: GameMode;
-  
+
   // Character (simplified ragdoll)
   private character: {
     head: CharacterPart;
@@ -446,7 +444,7 @@ class PhysicsEngine {
       this.ctx.save();
       this.ctx.globalAlpha = particle.life;
       this.ctx.fillStyle = particle.color;
-      
+
       if (particle.type === 'heart') {
         this.drawHeart(particle.x, particle.y, particle.size);
       } else if (particle.type === 'star') {
@@ -456,7 +454,7 @@ class PhysicsEngine {
         this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         this.ctx.fill();
       }
-      
+
       this.ctx.restore();
     });
 
@@ -485,13 +483,7 @@ class PhysicsEngine {
     // Draw body
     this.ctx.fillStyle = bodyGradient;
     this.ctx.beginPath();
-    this.ctx.roundRect(
-      -torso.width / 2,
-      -torso.height / 2,
-      torso.width,
-      torso.height,
-      15,
-    );
+    this.ctx.roundRect(-torso.width / 2, -torso.height / 2, torso.width, torso.height, 15);
     this.ctx.fill();
 
     // Outfit details
@@ -510,7 +502,7 @@ class PhysicsEngine {
     const headGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, head.width / 2);
     headGradient.addColorStop(0, '#ffc7d9');
     headGradient.addColorStop(1, '#ff9fbe');
-    
+
     this.ctx.fillStyle = headGradient;
     this.ctx.beginPath();
     this.ctx.arc(0, 0, head.width / 2, 0, Math.PI * 2);
@@ -548,11 +540,29 @@ class PhysicsEngine {
     this.ctx.restore();
 
     // Draw health bars
-    this.drawHealthBar(head.x, head.y - head.height / 2 - 15, head.width, head.health, head.maxHealth);
-    this.drawHealthBar(torso.x, torso.y - torso.height / 2 - 15, torso.width, torso.health, torso.maxHealth);
+    this.drawHealthBar(
+      head.x,
+      head.y - head.height / 2 - 15,
+      head.width,
+      head.health,
+      head.maxHealth,
+    );
+    this.drawHealthBar(
+      torso.x,
+      torso.y - torso.height / 2 - 15,
+      torso.width,
+      torso.health,
+      torso.maxHealth,
+    );
   }
 
-  private drawHealthBar(x: number, y: number, width: number, health: number, maxHealth: number): void {
+  private drawHealthBar(
+    x: number,
+    y: number,
+    width: number,
+    health: number,
+    maxHealth: number,
+  ): void {
     const barWidth = width * 0.8;
     const barHeight = 6;
     const healthPercent = health / maxHealth;
@@ -562,7 +572,8 @@ class PhysicsEngine {
     this.ctx.fillRect(x - barWidth / 2, y, barWidth, barHeight);
 
     // Health
-    const healthColor = healthPercent > 0.6 ? '#4ade80' : healthPercent > 0.3 ? '#fb923c' : '#ef4444';
+    const healthColor =
+      healthPercent > 0.6 ? '#4ade80' : healthPercent > 0.3 ? '#fb923c' : '#ef4444';
     this.ctx.fillStyle = healthColor;
     this.ctx.fillRect(x - barWidth / 2, y, barWidth * healthPercent, barHeight);
 
@@ -597,7 +608,7 @@ class PhysicsEngine {
 
   useTool(tool: Tool, x: number, y: number): void {
     const { head, torso } = this.character;
-    
+
     // Check which part was hit
     const hitHead = this.checkHit(head, x, y);
     const hitTorso = this.checkHit(torso, x, y);
@@ -649,11 +660,12 @@ class PhysicsEngine {
 
   private spawnParticles(x: number, y: number, type: string): void {
     const count = 8 + Math.floor(Math.random() * 8);
-    const colors = type === 'destructive' 
-      ? ['#ef4444', '#f97316', '#fb923c']
-      : type === 'healing'
-        ? ['#4ade80', '#86efac', '#bbf7d0']
-        : ['#ec4899', '#f472b6', '#fbbf24'];
+    const colors =
+      type === 'destructive'
+        ? ['#ef4444', '#f97316', '#fb923c']
+        : type === 'healing'
+          ? ['#4ade80', '#86efac', '#bbf7d0']
+          : ['#ec4899', '#f472b6', '#fbbf24'];
 
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2;
@@ -740,4 +752,3 @@ class PhysicsEngine {
     // Cleanup
   }
 }
-

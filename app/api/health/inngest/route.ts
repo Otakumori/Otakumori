@@ -7,7 +7,9 @@ export async function GET() {
   const results: Record<string, any> = {
     serveUrl: SERVE_URL,
     env: {
+      // eslint-disable-next-line no-restricted-syntax
       INNGEST_EVENT_KEY: Boolean(process.env.INNGEST_EVENT_KEY),
+      // eslint-disable-next-line no-restricted-syntax
       INNGEST_SIGNING_KEY: Boolean(process.env.INNGEST_SIGNING_KEY),
     },
   };

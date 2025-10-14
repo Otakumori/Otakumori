@@ -735,9 +735,9 @@ class GameEngine {
     const petalCount = 15;
     for (let i = 0; i < petalCount; i++) {
       const x = (this.gameTime * 20 + i * 50) % (this.canvas.width + 100);
-      const y = ((this.gameTime * 15 + i * 40) % this.canvas.height);
+      const y = (this.gameTime * 15 + i * 40) % this.canvas.height;
       const size = 4 + (i % 3) * 2;
-      const alpha = 0.1 + (Math.sin(this.gameTime + i) * 0.05);
+      const alpha = 0.1 + Math.sin(this.gameTime + i) * 0.05;
 
       this.ctx.save();
       this.ctx.globalAlpha = alpha;
@@ -753,7 +753,7 @@ class GameEngine {
     // Premium samurai character in bottom-center
     const centerX = this.canvas.width / 2;
     const baseY = this.canvas.height - 80;
-    
+
     // Character stance animation (subtle breathing/idle)
     const breatheOffset = Math.sin(this.gameTime * 2) * 2;
     const slashPose = this.slashTrail.length > 0;
@@ -809,7 +809,7 @@ class GameEngine {
     // Head (detailed anime-style face)
     this.ctx.save();
     this.ctx.translate(0, breatheOffset);
-    
+
     // Head shape with gradient
     const headGradient = this.ctx.createRadialGradient(
       centerX,
@@ -821,7 +821,7 @@ class GameEngine {
     );
     headGradient.addColorStop(0, '#ffe0e6');
     headGradient.addColorStop(1, '#ffc7d9');
-    
+
     this.ctx.fillStyle = headGradient;
     this.ctx.beginPath();
     this.ctx.arc(centerX, baseY - 35, 25, 0, Math.PI * 2);
@@ -847,7 +847,7 @@ class GameEngine {
     // Eyes (detailed anime style)
     const eyeY = baseY - 38;
     const eyeSpacing = 10;
-    
+
     // Left eye
     this.ctx.fillStyle = '#ffffff';
     this.ctx.beginPath();
@@ -905,7 +905,7 @@ class GameEngine {
     // Sword (katana) - positioned based on slash state
     this.ctx.save();
     this.ctx.translate(0, breatheOffset);
-    
+
     const swordX = slashPose ? centerX + 35 : centerX + 25;
     const swordY = slashPose ? baseY - 10 : baseY + 5;
     const swordAngle = slashPose ? -Math.PI / 3 : Math.PI / 6;

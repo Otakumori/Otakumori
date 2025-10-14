@@ -14,6 +14,9 @@ import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
 import BlogSection from '@/app/(site)/home/BlogSection';
 import InteractivePetals from '@/components/hero/InteractivePetals';
 
+// Client-side petal system components
+import PetalSystem from './components/petals/PetalSystem';
+
 export const revalidate = 60;
 
 export default async function HomePage() {
@@ -27,6 +30,9 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Petal collection system - renders behind main content */}
+      <PetalSystem />
+
       <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* HERO */}
         {NEXT_PUBLIC_FEATURE_HERO === '1' && (

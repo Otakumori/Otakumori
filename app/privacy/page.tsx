@@ -243,9 +243,7 @@ export default function PrivacyPage() {
 
             <div className="mt-6">
               <a href="/" aria-label="Back to Home">
-                <GlassButton>
-                  ⟵ Back to Home
-                </GlassButton>
+                <GlassButton>⟵ Back to Home</GlassButton>
               </a>
             </div>
           </GlassCard>
