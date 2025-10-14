@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 
 type Props = {
   mode: 'classic' | 'storm' | 'endless';
@@ -214,6 +215,14 @@ export default function Game({ mode }: Props) {
 
   return (
     <div className="relative">
+      {/* Keyboard Controls Display */}
+      <GameControls 
+        game="Petal Samurai" 
+        controls={[...CONTROL_PRESETS['petal-samurai']]}
+        position="bottom-left"
+        autoHideDelay={8000}
+      />
+
       {/* Game Canvas */}
       <canvas
         ref={canvasRef}
