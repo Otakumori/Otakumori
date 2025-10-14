@@ -219,7 +219,7 @@ export default function Game({ mode }: Props) {
         ref={canvasRef}
         width={800}
         height={600}
-        className="w-full h-auto cursor-crosshair bg-gradient-to-br from-black via-purple-950/30 to-black"
+        className="w-full h-auto cursor-crosshair rounded-2xl border border-pink-500/20 shadow-2xl"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -576,13 +576,14 @@ class GameEngine {
   }
 
   render() {
-    // Clear canvas
+    // CLEAR canvas properly (CRITICAL FIX)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Draw background gradient
+    // Draw background gradient (ENHANCED - more visible, dark sakura theme)
     const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-    gradient.addColorStop(0, 'rgba(255, 182, 193, 0.1)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+    gradient.addColorStop(0, '#1a0d2e'); // Deep purple-black
+    gradient.addColorStop(0.5, '#2e0b1a'); // Dark sakura pink
+    gradient.addColorStop(1, '#0f0718'); // Near black
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
