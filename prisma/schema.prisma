@@ -235,6 +235,8 @@ model User {
   searchAnalytics           SearchAnalytics[]
   searchHistory             SearchHistory[]
   soapstoneMessages         SoapstoneMessage[]
+  productSoapstones         ProductSoapstone[]
+  productSoapstonePraises   ProductSoapstonePraise[]
   streakShards              StreakShard[]
   stripe                    StripeCustomer?
   achievements              UserAchievement[]
@@ -1610,6 +1612,40 @@ model SoapstoneVote {
   @@unique([userId, soapstoneId])
   @@index([userId])
   @@index([soapstoneId])
+}
+
+model ProductSoapstone {
+  id          String                   @id @default(cuid())
+  productId   String
+  userId      String
+  message     String                   @db.Text
+  template    String?
+  praiseCount Int                      @default(0)
+  reportCount Int                      @default(0)
+  status      SoapstoneStatus          @default(VISIBLE)
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  praises     ProductSoapstonePraise[]
+
+  @@index([productId])
+  @@index([userId])
+  @@index([praiseCount])
+  @@index([createdAt])
+  @@index([status])
+}
+
+model ProductSoapstonePraise {
+  id          String           @id @default(cuid())
+  soapstoneId String
+  userId      String
+  createdAt   DateTime         @default(now())
+  soapstone   ProductSoapstone @relation(fields: [soapstoneId], references: [id], onDelete: Cascade)
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([soapstoneId, userId])
+  @@index([soapstoneId])
+  @@index([userId])
 }
 
 model StripeCustomer {

@@ -36,7 +36,32 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const result = await getPrintifyService().getProducts(query.page, query.per_page);
+    let result;
+    try {
+      result = await getPrintifyService().getProducts(query.page, query.per_page);
+    } catch (serviceError) {
+      console.error('Printify service error:', serviceError);
+
+      // Return empty result instead of 500
+      return NextResponse.json(
+        {
+          ok: true,
+          data: {
+            products: [],
+            pagination: {
+              currentPage: 1,
+              totalPages: 0,
+              total: 0,
+              perPage: query.per_page,
+            },
+          },
+          source: 'error-fallback',
+          error: serviceError instanceof Error ? serviceError.message : 'Service unavailable',
+          requestId,
+        },
+        { status: 200 },
+      );
+    }
 
     // Transform products to match expected format
     const products = result.data.map((product: any) => ({
@@ -144,9 +169,9 @@ function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, '') // Remove all HTML tags
     .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
-    .replace(/&amp;/g, '&')  // Replace &amp; with &
-    .replace(/&lt;/g, '<')   // Replace &lt; with <
-    .replace(/&gt;/g, '>')   // Replace &gt; with >
+    .replace(/&amp;/g, '&') // Replace &amp; with &
+    .replace(/&lt;/g, '<') // Replace &lt; with <
+    .replace(/&gt;/g, '>') // Replace &gt; with >
     .replace(/&quot;/g, '"') // Replace &quot; with "
     .replace(/&#039;/g, "'") // Replace &#039; with '
     .trim();

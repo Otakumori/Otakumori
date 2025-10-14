@@ -61,7 +61,34 @@ export async function GET(request: NextRequest) {
       limit: params.limit || 20,
     };
 
-    const result = await advancedService.searchProducts(searchOptions);
+    let result;
+    try {
+      result = await advancedService.searchProducts(searchOptions);
+    } catch (serviceError) {
+      console.error('Printify search service error:', serviceError);
+
+      // Return empty result with error info instead of throwing
+      return NextResponse.json({
+        ok: true,
+        data: {
+          products: [],
+          pagination: {
+            page: 1,
+            totalPages: 0,
+            total: 0,
+            perPage: params.limit || 20,
+          },
+          filters: {
+            availableCategories: [],
+            priceRange: { min: 0, max: 0 },
+            availableColors: [],
+            availableSizes: [],
+          },
+        },
+        error:
+          serviceError instanceof Error ? serviceError.message : 'Service temporarily unavailable',
+      });
+    }
 
     // Track search event for analytics
     if (typeof globalThis !== 'undefined' && 'gtag' in globalThis) {

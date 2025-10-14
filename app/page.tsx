@@ -115,6 +115,9 @@ export default async function HomePage() {
 
         {/* Existing drift animation layer - soapstone now only in footer */}
         <SoapstoneHomeDrift />
+
+        {/* Spacer to ensure footer sits below the tree */}
+        <div className="h-64" aria-hidden="true" />
       </main>
     </>
   );

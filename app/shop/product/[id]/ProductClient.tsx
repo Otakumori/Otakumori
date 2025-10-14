@@ -10,6 +10,7 @@ import { paths } from '@/lib/paths';
 import { ShareButtons } from '@/app/components/shop/ShareButtons';
 import { useRecentlyViewed } from '@/app/hooks/useRecentlyViewed';
 import { useToastContext } from '@/app/contexts/ToastContext';
+import { ProductSoapstoneWall } from '@/app/components/shop/ProductSoapstoneWall';
 
 interface ProductVariant {
   id: string;
@@ -269,6 +270,11 @@ export default function ProductClient({ productId }: { productId: string }) {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Soapstone Messages from fellow travelers */}
+        <div className="mt-12">
+          <ProductSoapstoneWall productId={product.id} />
         </div>
       </div>
     </div>
