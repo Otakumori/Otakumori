@@ -127,10 +127,10 @@ export const CONTROL_PRESETS = {
     { key: 'ESC', action: 'Return to Menu' },
   ],
   'bubble-girl': [
-    { key: 'Click', action: 'Spawn Bubble', icon: '🖱️' },
-    { key: 'Click + Drag', action: 'Move Character' },
+    { key: 'Click', action: 'Use Tool on Character' },
+    { key: 'Click + Drag', action: 'Drag Character' },
     { key: '1-9', action: 'Select Tool' },
-    { key: 'ESC', action: 'Pause' },
+    { key: 'R', action: 'Reset Character' },
   ],
   'dungeon-of-desire': [
     { key: '← →', action: 'Move Left/Right', icon: '⬅️➡️' },
