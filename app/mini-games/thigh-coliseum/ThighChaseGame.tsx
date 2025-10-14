@@ -69,13 +69,13 @@ export default function ThighChaseGame() {
 
   const { saveOnExit, autoSave } = useGameSave('thigh-coliseum');
 
-  // Game constants
+  // Game constants (REBALANCED for fairness)
   const CANVAS_WIDTH = 800;
   const CANVAS_HEIGHT = 600;
   const GROUND_Y = 400;
   const GRAVITY = 0.8;
   const JUMP_FORCE = -15;
-  const BASE_SPEED = 4;
+  const BASE_SPEED = 3; // Reduced from 4 for slower gameplay
 
   // Start game
   const startGame = useCallback(() => {
@@ -83,7 +83,7 @@ export default function ThighChaseGame() {
     setScore(0);
     setDistance(0);
     setStage(1);
-    setLives(3);
+    setLives(5); // Increased from 3 for better survivability
     setGameTime(0);
     setPlayer({
       x: 100,
@@ -158,7 +158,7 @@ export default function ThighChaseGame() {
     ];
 
     const template = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-    const speed = BASE_SPEED + stage * 0.5;
+    const speed = BASE_SPEED + stage * 0.3; // Reduced from 0.5 for gentler difficulty curve
 
     const newObstacle: Obstacle = {
       id: nextObstacleId,
@@ -201,10 +201,10 @@ export default function ThighChaseGame() {
 
       // Update distance
       setDistance((prev) => {
-        const newDistance = prev + (BASE_SPEED + stage * 0.5);
+        const newDistance = prev + (BASE_SPEED + stage * 0.3); // Match reduced speed scaling
 
-        // Stage progression every 1000 distance units
-        if (Math.floor(newDistance / 1000) > stage - 1) {
+        // Stage progression every 1500 distance units (was 1000, slower progression)
+        if (Math.floor(newDistance / 1500) > stage - 1) {
           setStage((s) => s + 1);
         }
 
@@ -255,18 +255,18 @@ export default function ThighChaseGame() {
         };
       });
 
-      // Update pursuer (always getting closer)
+      // Update pursuer (always getting closer - REBALANCED)
       setPursuer((prev) => {
         const targetDistance = 150; // Ideal distance behind player
         const currentDistance = player.x - prev.x;
-        let newSpeed = prev.speed + 0.01; // Gradually getting faster
+        let newSpeed = prev.speed + 0.005; // Reduced from 0.01 (half speed increase)
 
         if (currentDistance < 50) {
           // Too close - catching the player
           return { ...prev, catching: true, speed: newSpeed };
         } else if (currentDistance > targetDistance) {
-          // Too far - speed up
-          newSpeed += 0.5;
+          // Too far - speed up (but not as dramatically)
+          newSpeed += 0.2; // Reduced from 0.5 for fairer catch-up
         }
 
         return {
@@ -277,9 +277,9 @@ export default function ThighChaseGame() {
         };
       });
 
-      // Spawn obstacles
+      // Spawn obstacles (REBALANCED spawn rate)
       setObstacleSpawnTimer((prev) => {
-        const spawnRate = Math.max(800, 2000 - stage * 100); // Faster spawning each stage
+        const spawnRate = Math.max(1200, 2000 - stage * 80); // Increased minimum from 800ms, slower scaling
         if (prev <= 0) {
           if (Math.random() < 0.7) spawnObstacle();
           return spawnRate;
@@ -287,11 +287,11 @@ export default function ThighChaseGame() {
         return prev - deltaTime;
       });
 
-      // Spawn powerups
+      // Spawn powerups (REBALANCED for more frequent help)
       setPowerupSpawnTimer((prev) => {
         if (prev <= 0) {
-          if (Math.random() < 0.3) spawnPowerup();
-          return 5000; // Every 5 seconds chance
+          if (Math.random() < 0.6) spawnPowerup(); // Increased from 0.3 (30%) to 0.6 (60%)
+          return 4000; // Every 4 seconds chance (was 5000)
         }
         return prev - deltaTime;
       });
@@ -303,10 +303,10 @@ export default function ThighChaseGame() {
           .filter((obstacle) => obstacle.x > -100),
       );
 
-      // Update powerups
+      // Update powerups (match rebalanced speed)
       setPowerups((prev) =>
         prev
-          .map((powerup) => ({ ...powerup, x: powerup.x - (BASE_SPEED + stage * 0.5) }))
+          .map((powerup) => ({ ...powerup, x: powerup.x - (BASE_SPEED + stage * 0.3) })) // Match reduced scaling
           .filter((powerup) => powerup.x > -50 && !powerup.collected),
       );
 
