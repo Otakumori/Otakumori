@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 
 interface TreeBackgroundProps {
   className?: string;
@@ -27,11 +26,11 @@ const getSeasonalTreePath = (season: string): string => {
     winter: '/season/tree-winter.svg',
   };
 
-  return treeMap[season] || '/assets/images/cherry-tree.png'; // Fallback to original
+  return treeMap[season] || '/season/tree-spring.svg'; // Fallback to spring
 };
 
 export default function TreeBackground({ className = '' }: TreeBackgroundProps) {
-  const [documentHeight, setDocumentHeight] = useState<number>(0);
+  const [scrollY, setScrollY] = useState(0);
   const [currentSeason, setCurrentSeason] = useState<string>('spring');
   const [treeImagePath, setTreeImagePath] = useState<string>('');
 
@@ -43,30 +42,25 @@ export default function TreeBackground({ className = '' }: TreeBackgroundProps) 
   }, []);
 
   useEffect(() => {
-    const updateHeight = () => {
-      const body = document.body;
-      const html = document.documentElement;
-      const height = Math.max(
-        body.scrollHeight,
-        body.offsetHeight,
-        html.clientHeight,
-        html.scrollHeight,
-        html.offsetHeight,
-      );
-      setDocumentHeight(height);
+    const handleScroll = () => {
+      // Parallax: Tree moves at 50% of scroll speed for depth effect
+      setScrollY(window.scrollY * 0.5);
     };
 
-    updateHeight();
-
-    const resizeObserver = new ResizeObserver(updateHeight);
-    resizeObserver.observe(document.body);
-
-    window.addEventListener('resize', updateHeight);
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', updateHeight);
+    // Throttle for 60fps performance (16ms per frame)
+    let ticking = false;
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
+
+    window.addEventListener('scroll', scrollListener, { passive: true });
+    return () => window.removeEventListener('scroll', scrollListener);
   }, []);
 
   // Update season daily (check every hour)
@@ -85,44 +79,48 @@ export default function TreeBackground({ className = '' }: TreeBackgroundProps) 
     return () => clearInterval(seasonInterval);
   }, [currentSeason]);
 
-  if (documentHeight === 0 || !treeImagePath) {
+  if (!treeImagePath) {
     return null;
   }
 
   return (
     <>
+      {/* Fixed tree background - extends full viewport, never scrolls WITH page */}
       <div
-        className={`fixed left-0 top-0 pointer-events-none ${className}`}
-        style={{
-          width: '55%',
-          height: `${documentHeight}px`,
-          zIndex: 1,
-        }}
+        className={`fixed inset-0 pointer-events-none ${className}`}
+        style={{ zIndex: -10 }}
+        aria-hidden="true"
       >
-        <Image
-          src={treeImagePath}
-          alt={`${currentSeason} cherry blossom tree`}
-          fill
-          className="object-cover object-left-top"
-          priority
-          sizes="55vw"
-          onError={() => {
-            // Fallback to original tree image if seasonal tree fails to load
-            setTreeImagePath('/assets/images/cherry-tree.png');
+        {/* Tree with parallax effect */}
+        <div
+          className="absolute inset-0 will-change-transform transition-transform"
+          style={{
+            transform: `translate3d(0, ${-scrollY}px, 0)`,
+            backgroundImage: `url(${treeImagePath})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+
+        {/* Top gradient fade - blends tree into dark header */}
+        <div
+          className="absolute inset-x-0 top-0 h-40 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, #080611 0%, transparent 100%)',
+            zIndex: -5,
+          }}
+        />
+
+        {/* Bottom gradient fade - blends tree into dark footer */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, #080611 0%, transparent 100%)',
+            zIndex: -5,
           }}
         />
       </div>
-
-      {/* Gradient overlay for navbar blending */}
-      <div
-        className="fixed left-0 top-0 pointer-events-none"
-        style={{
-          width: '55%',
-          height: '80px', // Height of navbar
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
-          zIndex: 2,
-        }}
-      />
     </>
   );
 }

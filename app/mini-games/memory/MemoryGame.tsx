@@ -201,6 +201,10 @@ export default function MemoryGame({ onGameComplete }: MemoryGameProps) {
       const card = gameState.cards.find((c) => c.id === cardId);
       if (!card || card.isFlipped || card.isMatched || gameState.flippedCards.length >= 2) return;
 
+      // BUG FIX: Check if this is the first or second card BEFORE updating state
+      const isSecondCard = gameState.flippedCards.length === 1;
+      const firstCardId = isSecondCard ? gameState.flippedCards[0] : null;
+
       // Flip the card
       setGameState((prev) => ({
         ...prev,
@@ -209,11 +213,11 @@ export default function MemoryGame({ onGameComplete }: MemoryGameProps) {
       }));
 
       // Check for match after second card is flipped
-      if (gameState.flippedCards.length === 1) {
-        const firstCardId = gameState.flippedCards[0];
+      if (isSecondCard && firstCardId) {
         const firstCard = gameState.cards.find((c) => c.id === firstCardId);
 
-        if (firstCard && firstCard.value === card.value) {
+        // CRITICAL FIX: Only match if values are equal AND they're not the same card
+        if (firstCard && firstCard.value === card.value && firstCardId !== cardId) {
           // Match found!
           setTimeout(() => {
             setGameState((prev) => ({

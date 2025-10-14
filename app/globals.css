@@ -3,6 +3,115 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   GAME-LIKE FLUIDITY STANDARDS
+   Every interaction should feel like AAA game
+   ======================================== */
+
+/* Global smooth transitions - 60fps optimized */
+@layer base {
+  * {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Performance optimization for animations */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+}
+
+/* Hover states - instant feedback */
+@layer components {
+  button:not(:disabled):hover,
+  a:not([aria-disabled='true']):hover {
+    transform: translateY(-2px);
+    transition-duration: 150ms;
+  }
+
+  button:not(:disabled):active,
+  a:not([aria-disabled='true']):active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: 100ms;
+  }
+
+  /* Glass elements get subtle lift */
+  .glass-panel:hover,
+  .glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transition-duration: 200ms;
+  }
+}
+
+/* Page transition animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Apply page transition to main content */
+.page-transition {
+  animation: fadeInUp 400ms ease-out;
+}
+
+.fade-in {
+  animation: fadeIn 300ms ease-out;
+}
+
+.slide-in-left {
+  animation: slideInFromLeft 400ms ease-out;
+}
+
+.slide-in-right {
+  animation: slideInFromRight 400ms ease-out;
+}
+
 /* Parallax Tree Effect */
 .parallax-tree {
   background-attachment: fixed;

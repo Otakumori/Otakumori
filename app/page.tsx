@@ -31,7 +31,7 @@ export default async function HomePage() {
       {/* Tree Background - extends full page height */}
       <TreeBackground />
 
-      <main className="relative min-h-screen" style={{ zIndex: 10 }}>
+      <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* HERO */}
         {NEXT_PUBLIC_FEATURE_HERO === '1' && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
