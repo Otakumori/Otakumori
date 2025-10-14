@@ -216,8 +216,8 @@ export default function Game({ mode }: Props) {
   return (
     <div className="relative">
       {/* Keyboard Controls Display */}
-      <GameControls 
-        game="Petal Samurai" 
+      <GameControls
+        game="Petal Samurai"
         controls={[...CONTROL_PRESETS['petal-samurai']]}
         position="bottom-left"
         autoHideDelay={8000}
@@ -588,13 +588,20 @@ class GameEngine {
     // CLEAR canvas properly (CRITICAL FIX)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Draw background gradient (ENHANCED - more visible, dark sakura theme)
-    const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-    gradient.addColorStop(0, '#1a0d2e'); // Deep purple-black
-    gradient.addColorStop(0.5, '#2e0b1a'); // Dark sakura pink
-    gradient.addColorStop(1, '#0f0718'); // Near black
-    this.ctx.fillStyle = gradient;
+    // Draw background gradient (PREMIUM - layered gradients for depth)
+    const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+    bgGradient.addColorStop(0, '#1a0d2e'); // Deep purple-black
+    bgGradient.addColorStop(0.3, '#2e0b1a'); // Dark sakura pink
+    bgGradient.addColorStop(0.7, '#3d0a1f'); // Deep red-black
+    bgGradient.addColorStop(1, '#0f0718'); // Near black
+    this.ctx.fillStyle = bgGradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // Atmospheric particles (ambient petals)
+    this.renderAtmosphericPetals();
+
+    // Draw premium samurai character
+    this.renderSamuraiCharacter();
 
     // Draw petals
     this.petals.forEach((petal) => {
@@ -719,6 +726,242 @@ class GameEngine {
       this.ctx.globalAlpha = Math.min(0.2, (this.combo - 5) * 0.015);
       this.ctx.fillStyle = 'rgba(255, 105, 180, 0.3)';
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.restore();
+    }
+  }
+
+  private renderAtmosphericPetals() {
+    // Ambient floating petals in background
+    const petalCount = 15;
+    for (let i = 0; i < petalCount; i++) {
+      const x = (this.gameTime * 20 + i * 50) % (this.canvas.width + 100);
+      const y = ((this.gameTime * 15 + i * 40) % this.canvas.height);
+      const size = 4 + (i % 3) * 2;
+      const alpha = 0.1 + (Math.sin(this.gameTime + i) * 0.05);
+
+      this.ctx.save();
+      this.ctx.globalAlpha = alpha;
+      this.ctx.fillStyle = '#ffc7d9';
+      this.ctx.beginPath();
+      this.ctx.ellipse(x, y, size, size * 0.6, (this.gameTime + i) * 0.5, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+  }
+
+  private renderSamuraiCharacter() {
+    // Premium samurai character in bottom-center
+    const centerX = this.canvas.width / 2;
+    const baseY = this.canvas.height - 80;
+    
+    // Character stance animation (subtle breathing/idle)
+    const breatheOffset = Math.sin(this.gameTime * 2) * 2;
+    const slashPose = this.slashTrail.length > 0;
+
+    // Shadow
+    this.ctx.save();
+    this.ctx.globalAlpha = 0.3;
+    this.ctx.fillStyle = '#000000';
+    this.ctx.beginPath();
+    this.ctx.ellipse(centerX, baseY + 60, 40, 10, 0, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.restore();
+
+    // Body (kimono with detailed gradients)
+    const bodyGradient = this.ctx.createLinearGradient(
+      centerX - 40,
+      baseY - 20,
+      centerX + 40,
+      baseY + 50,
+    );
+    bodyGradient.addColorStop(0, '#c1185b');
+    bodyGradient.addColorStop(0.5, '#e91e63');
+    bodyGradient.addColorStop(1, '#ad1457');
+
+    this.ctx.save();
+    this.ctx.translate(0, breatheOffset);
+    this.ctx.fillStyle = bodyGradient;
+    this.ctx.beginPath();
+    this.ctx.moveTo(centerX, baseY - 10);
+    this.ctx.lineTo(centerX - 45, baseY + 10);
+    this.ctx.lineTo(centerX - 40, baseY + 55);
+    this.ctx.lineTo(centerX + 40, baseY + 55);
+    this.ctx.lineTo(centerX + 45, baseY + 10);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Kimono details (obi belt)
+    this.ctx.fillStyle = '#ffd700';
+    this.ctx.fillRect(centerX - 40, baseY + 15, 80, 12);
+    this.ctx.strokeStyle = '#b8860b';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(centerX - 40, baseY + 15, 80, 12);
+
+    // Shoulders/sleeves
+    this.ctx.fillStyle = '#d81b60';
+    this.ctx.beginPath();
+    this.ctx.ellipse(centerX - 28, baseY - 5, 18, 12, -0.3, 0, Math.PI * 2);
+    this.ctx.ellipse(centerX + 28, baseY - 5, 18, 12, 0.3, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    this.ctx.restore();
+
+    // Head (detailed anime-style face)
+    this.ctx.save();
+    this.ctx.translate(0, breatheOffset);
+    
+    // Head shape with gradient
+    const headGradient = this.ctx.createRadialGradient(
+      centerX,
+      baseY - 35,
+      0,
+      centerX,
+      baseY - 35,
+      25,
+    );
+    headGradient.addColorStop(0, '#ffe0e6');
+    headGradient.addColorStop(1, '#ffc7d9');
+    
+    this.ctx.fillStyle = headGradient;
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, baseY - 35, 25, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Hair (detailed with multiple layers)
+    this.ctx.fillStyle = '#2c1810';
+    this.ctx.beginPath();
+    this.ctx.ellipse(centerX, baseY - 45, 28, 20, 0, 0, Math.PI, true);
+    this.ctx.fill();
+
+    // Hair strands (detailed)
+    this.ctx.strokeStyle = '#1a0f0a';
+    this.ctx.lineWidth = 3;
+    this.ctx.lineCap = 'round';
+    for (let i = -2; i <= 2; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(centerX + i * 8, baseY - 50);
+      this.ctx.lineTo(centerX + i * 10, baseY - 30);
+      this.ctx.stroke();
+    }
+
+    // Eyes (detailed anime style)
+    const eyeY = baseY - 38;
+    const eyeSpacing = 10;
+    
+    // Left eye
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.beginPath();
+    this.ctx.ellipse(centerX - eyeSpacing, eyeY, 5, 7, 0, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.fillStyle = '#4a90e2';
+    this.ctx.beginPath();
+    this.ctx.arc(centerX - eyeSpacing, eyeY, 4, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.fillStyle = '#1a1a1a';
+    this.ctx.beginPath();
+    this.ctx.arc(centerX - eyeSpacing, eyeY, 2.5, 0, Math.PI * 2);
+    this.ctx.fill();
+    // Eye shine
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.beginPath();
+    this.ctx.arc(centerX - eyeSpacing - 1, eyeY - 1, 1.5, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Right eye
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.beginPath();
+    this.ctx.ellipse(centerX + eyeSpacing, eyeY, 5, 7, 0, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.fillStyle = '#4a90e2';
+    this.ctx.beginPath();
+    this.ctx.arc(centerX + eyeSpacing, eyeY, 4, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.fillStyle = '#1a1a1a';
+    this.ctx.beginPath();
+    this.ctx.arc(centerX + eyeSpacing, eyeY, 2.5, 0, Math.PI * 2);
+    this.ctx.fill();
+    // Eye shine
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.beginPath();
+    this.ctx.arc(centerX + eyeSpacing + 1, eyeY - 1, 1.5, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Blush
+    this.ctx.fillStyle = 'rgba(255, 182, 193, 0.4)';
+    this.ctx.beginPath();
+    this.ctx.ellipse(centerX - 18, baseY - 32, 6, 4, 0, 0, Math.PI * 2);
+    this.ctx.ellipse(centerX + 18, baseY - 32, 6, 4, 0, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Mouth (subtle smile)
+    this.ctx.strokeStyle = '#d946ef';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, baseY - 28, 6, 0.2, Math.PI - 0.2);
+    this.ctx.stroke();
+
+    this.ctx.restore();
+
+    // Sword (katana) - positioned based on slash state
+    this.ctx.save();
+    this.ctx.translate(0, breatheOffset);
+    
+    const swordX = slashPose ? centerX + 35 : centerX + 25;
+    const swordY = slashPose ? baseY - 10 : baseY + 5;
+    const swordAngle = slashPose ? -Math.PI / 3 : Math.PI / 6;
+
+    this.ctx.translate(swordX, swordY);
+    this.ctx.rotate(swordAngle);
+
+    // Sword handle
+    const handleGradient = this.ctx.createLinearGradient(-2, 0, 2, 0);
+    handleGradient.addColorStop(0, '#8b4513');
+    handleGradient.addColorStop(0.5, '#a0522d');
+    handleGradient.addColorStop(1, '#8b4513');
+    this.ctx.fillStyle = handleGradient;
+    this.ctx.fillRect(-2, -15, 4, 30);
+
+    // Sword guard (tsuba)
+    this.ctx.fillStyle = '#ffd700';
+    this.ctx.fillRect(-8, -18, 16, 6);
+    this.ctx.strokeStyle = '#b8860b';
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(-8, -18, 16, 6);
+
+    // Blade
+    const bladeGradient = this.ctx.createLinearGradient(-1, -18, 1, -18);
+    bladeGradient.addColorStop(0, '#c0c0c0');
+    bladeGradient.addColorStop(0.5, '#ffffff');
+    bladeGradient.addColorStop(1, '#c0c0c0');
+    this.ctx.fillStyle = bladeGradient;
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, -20);
+    this.ctx.lineTo(-3, -20);
+    this.ctx.lineTo(-1.5, -65);
+    this.ctx.lineTo(1.5, -65);
+    this.ctx.lineTo(3, -20);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    // Blade edge highlight
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    this.ctx.lineWidth = 0.5;
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, -20);
+    this.ctx.lineTo(0, -65);
+    this.ctx.stroke();
+
+    this.ctx.restore();
+
+    // Power-up aura if active
+    if (this.activePowerUps.size > 0) {
+      this.ctx.save();
+      this.ctx.globalAlpha = 0.3 + Math.sin(this.gameTime * 5) * 0.1;
+      this.ctx.strokeStyle = '#4ade80';
+      this.ctx.lineWidth = 3;
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, baseY - 10 + breatheOffset, 60, 0, Math.PI * 2);
+      this.ctx.stroke();
       this.ctx.restore();
     }
   }
