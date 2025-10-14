@@ -372,6 +372,7 @@ export function logDeviceCapabilities(): void {
   const features = checkWebGLFeatureSupport();
   const settings = getQualitySettings(capabilities.tier);
 
+  /* eslint-disable no-console -- Developer diagnostic function for WebGL capabilities */
   console.group('🎮 WebGL Performance Capabilities');
   console.log('Performance Tier:', capabilities.tier.toUpperCase());
   console.log('WebGL Version:', capabilities.webglVersion);
@@ -400,4 +401,5 @@ export function logDeviceCapabilities(): void {
   console.log('Vertex Array Objects:', features.vao);
   console.log('Float Textures:', features.floatTextures);
   console.groupEnd();
+  /* eslint-enable no-console */
 }

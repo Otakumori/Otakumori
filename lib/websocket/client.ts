@@ -55,6 +55,7 @@ class CommunityWebSocketClient {
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
+        // eslint-disable-next-line no-console
         console.log('✅ WebSocket connected');
         this.reconnectAttempts = 0;
         this.startHeartbeat();
@@ -74,6 +75,7 @@ class CommunityWebSocketClient {
       };
 
       this.ws.onclose = () => {
+        // eslint-disable-next-line no-console
         console.log('WebSocket disconnected');
         this.stopHeartbeat();
         this.attemptReconnect();
@@ -88,6 +90,7 @@ class CommunityWebSocketClient {
    * Mock mode for development/fallback
    */
   private startMockMode(): void {
+    // eslint-disable-next-line no-console
     console.log('📡 Starting WebSocket mock mode');
     this.isMockMode = true;
 
@@ -163,6 +166,7 @@ class CommunityWebSocketClient {
    */
   send(data: unknown): void {
     if (this.isMockMode) {
+      // eslint-disable-next-line no-console
       console.log('Mock mode: Message not sent', data);
       return;
     }
@@ -205,6 +209,7 @@ class CommunityWebSocketClient {
    */
   private attemptReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      // eslint-disable-next-line no-console
       console.log('Max reconnection attempts reached, switching to mock mode');
       this.startMockMode();
       return;
@@ -213,6 +218,7 @@ class CommunityWebSocketClient {
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 
+    // eslint-disable-next-line no-console
     console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
     setTimeout(() => {
