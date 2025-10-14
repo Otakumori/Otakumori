@@ -80,10 +80,7 @@ export default function GameControls({
             {/* Controls List */}
             <div className="space-y-2">
               {controls.map((control, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between gap-4 text-sm"
-                >
+                <div key={index} className="flex items-center justify-between gap-4 text-sm">
                   <span className="text-white/70">{control.action}</span>
                   <kbd className="px-3 py-1 bg-gradient-to-br from-pink-600 to-pink-700 text-white font-mono text-xs rounded-lg shadow-lg border border-pink-400/30 min-w-[3rem] text-center">
                     {control.icon || control.key}
@@ -148,10 +145,9 @@ export const CONTROL_PRESETS = {
     { key: 'ESC', action: 'Pause' },
   ],
   'puzzle-reveal': [
-    { key: 'Click', action: 'Clear Tile', icon: '🖱️' },
-    { key: 'Arrow Keys', action: 'Navigate', icon: '⬆️⬇️⬅️➡️' },
-    { key: 'SPACE', action: 'Clear Selected' },
-    { key: 'H', action: 'Hint' },
+    { key: 'Click', action: 'Reveal Tile', icon: '🖱️' },
+    { key: 'Fast Clicks', action: 'Build Combo (10x max)', icon: '⚡' },
+    { key: 'ESC', action: 'Pause Game' },
   ],
   'thigh-coliseum': [
     { key: 'Click', action: 'Select Option', icon: '🖱️' },
@@ -163,4 +159,3 @@ export const CONTROL_PRESETS = {
     { key: 'ESC', action: 'Skip Game' },
   ],
 } as const;
-
