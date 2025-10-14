@@ -39,7 +39,7 @@ export async function bootCheckInngest() {
     const missing = [];
     if (!hasEventKey) missing.push('INNGEST_EVENT_KEY');
     if (!hasSigningKey) missing.push('INNGEST_SIGNING_KEY');
-    // eslint-disable-next-line no-console
+
     console.warn('[Inngest] Missing env:', missing.join(', '));
   }
 

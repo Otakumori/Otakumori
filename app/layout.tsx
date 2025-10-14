@@ -17,6 +17,9 @@ import PerformanceMonitor from './components/PerformanceMonitor';
 import { enforceNoMocks } from '@/lib/no-mocks';
 import StarfieldBackground from '@/components/background/StarfieldBackground';
 import PetalField from './components/effects/PetalField';
+import { ScrollToTop } from './components/ui/ScrollToTop';
+import { QuickSearch } from './components/ui/QuickSearch';
+import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
 
 // Boot-time Inngest health check (disabled - run Inngest dev server separately)
 // bootCheckInngest();
@@ -71,6 +74,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <PetalHUD />
           <Konami />
           <PetalProgressBar />
+          <ScrollToTop />
+          <QuickSearch />
+          <KeyboardShortcuts />
           <ClientErrorBoundary>
             <Providers>
               <div className="flex min-h-screen flex-col relative z-10">

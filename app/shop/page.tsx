@@ -1,17 +1,22 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
+import { ShopGridSkeleton } from '../components/ui/Skeleton';
 
 async function getLogger() {
   const { logger } = await import('@/app/lib/logger');
   return logger;
 }
 
-export const metadata: Metadata = {
-  title: 'Shop | Otaku-mori',
+import { generateSEO } from '../lib/seo';
+
+export const metadata: Metadata = generateSEO({
+  title: 'Shop',
   description:
     'Discover exclusive anime merchandise and gaming accessories with advanced search and filtering',
-};
+  url: '/shop',
+  type: 'website',
+});
 
 // Use ISR for better performance and real-time inventory updates
 export const revalidate = 300; // 5 minutes
@@ -48,11 +53,7 @@ export default async function ShopPage({
           <Suspense
             fallback={
               <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} className="glass-panel h-96 animate-pulse rounded-2xl" />
-                  ))}
-                </div>
+                <ShopGridSkeleton count={6} />
               </div>
             }
           >

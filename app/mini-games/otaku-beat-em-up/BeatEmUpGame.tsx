@@ -272,7 +272,9 @@ export default function BeatEmUpGame({ mode }: Props) {
           score: prev.score + Math.floor(damage * 10),
           combo: player.comboCount,
           multiplier: player.beatMultiplier,
-          beatAccuracy: isPerfectBeat ? 100 : prev.beatAccuracy * 0.95 + (isPerfectBeat ? 100 : 70) * 0.05,
+          beatAccuracy: isPerfectBeat
+            ? 100
+            : prev.beatAccuracy * 0.95 + (isPerfectBeat ? 100 : 70) * 0.05,
         }));
 
         return {
@@ -403,8 +405,10 @@ export default function BeatEmUpGame({ mode }: Props) {
 
         if (distance > 60) {
           enemy.state = 'walk';
-          enemy.vx = (dx / distance) * (enemy.type === 'ninja' ? 2.5 : enemy.type === 'brute' ? 1.0 : 1.5);
-          enemy.vy = (dy / distance) * (enemy.type === 'ninja' ? 2.5 : enemy.type === 'brute' ? 1.0 : 1.5);
+          enemy.vx =
+            (dx / distance) * (enemy.type === 'ninja' ? 2.5 : enemy.type === 'brute' ? 1.0 : 1.5);
+          enemy.vy =
+            (dy / distance) * (enemy.type === 'ninja' ? 2.5 : enemy.type === 'brute' ? 1.0 : 1.5);
           enemy.facing = dx > 0 ? 'right' : 'left';
         } else {
           enemy.vx = 0;
@@ -413,7 +417,8 @@ export default function BeatEmUpGame({ mode }: Props) {
           // Attack player
           if (enemy.attackCooldown <= 0) {
             enemy.state = 'attack';
-            enemy.attackCooldown = enemy.type === 'ninja' ? 800 : enemy.type === 'brute' ? 1500 : 1000;
+            enemy.attackCooldown =
+              enemy.type === 'ninja' ? 800 : enemy.type === 'brute' ? 1500 : 1000;
 
             // Deal damage to player if not blocking
             if (player.state !== 'block' && player.invulnerable <= 0) {
@@ -454,7 +459,10 @@ export default function BeatEmUpGame({ mode }: Props) {
       // Spawn enemies
       enemySpawnTimer += deltaTime * 1000;
       const spawnInterval = mode === 'survival' ? 2000 : ENEMY_SPAWN_INTERVAL;
-      if (enemySpawnTimer > spawnInterval && enemiesRef.current.length < (mode === 'survival' ? 10 : 5)) {
+      if (
+        enemySpawnTimer > spawnInterval &&
+        enemiesRef.current.length < (mode === 'survival' ? 10 : 5)
+      ) {
         const types: Enemy['type'][] = ['grunt', 'grunt', 'ninja', 'brute'];
         const randomType = types[Math.floor(Math.random() * types.length)];
         spawnEnemy(randomType);
@@ -570,7 +578,12 @@ export default function BeatEmUpGame({ mode }: Props) {
     }
 
     // Body
-    const bodyGradient = ctx.createLinearGradient(player.x - 20, player.y - 40, player.x + 20, player.y + 20);
+    const bodyGradient = ctx.createLinearGradient(
+      player.x - 20,
+      player.y - 40,
+      player.x + 20,
+      player.y + 20,
+    );
     bodyGradient.addColorStop(0, '#4ade80');
     bodyGradient.addColorStop(1, '#22c55e');
     ctx.fillStyle = bodyGradient;
@@ -593,7 +606,8 @@ export default function BeatEmUpGame({ mode }: Props) {
     // Attack effect
     if (player.state === 'attack') {
       const attackX = player.facing === 'right' ? player.x + 40 : player.x - 40;
-      ctx.fillStyle = player.beatMultiplier > 1.5 ? 'rgba(255, 215, 0, 0.6)' : 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle =
+        player.beatMultiplier > 1.5 ? 'rgba(255, 215, 0, 0.6)' : 'rgba(255, 255, 255, 0.4)';
       ctx.beginPath();
       ctx.arc(attackX, player.y - 10, 25, 0, Math.PI * 2);
       ctx.fill();
@@ -653,7 +667,12 @@ export default function BeatEmUpGame({ mode }: Props) {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(enemy.x - healthBarWidth / 2, enemy.y - size - 10, healthBarWidth, 4);
     ctx.fillStyle = healthPercent > 0.5 ? '#4ade80' : healthPercent > 0.25 ? '#fbbf24' : '#ef4444';
-    ctx.fillRect(enemy.x - healthBarWidth / 2, enemy.y - size - 10, healthBarWidth * healthPercent, 4);
+    ctx.fillRect(
+      enemy.x - healthBarWidth / 2,
+      enemy.y - size - 10,
+      healthBarWidth * healthPercent,
+      4,
+    );
 
     ctx.restore();
   };
@@ -710,8 +729,12 @@ export default function BeatEmUpGame({ mode }: Props) {
 
         <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white border border-white/20">
           <div className="text-xs text-purple-300 mb-1">BEAT ACCURACY</div>
-          <div className="text-lg font-bold text-purple-400">{gameState.beatAccuracy.toFixed(0)}%</div>
-          <div className="text-xs text-zinc-400">Multiplier: {gameState.multiplier.toFixed(1)}x</div>
+          <div className="text-lg font-bold text-purple-400">
+            {gameState.beatAccuracy.toFixed(0)}%
+          </div>
+          <div className="text-xs text-zinc-400">
+            Multiplier: {gameState.multiplier.toFixed(1)}x
+          </div>
         </div>
       </div>
 
@@ -739,9 +762,18 @@ export default function BeatEmUpGame({ mode }: Props) {
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 text-center max-w-md mx-4">
             <h2 className="text-3xl font-bold text-white mb-4">GAME OVER</h2>
             <div className="space-y-2 mb-6 text-zinc-200">
-              <p>Final Score: <span className="text-yellow-400 font-bold">{gameState.score}</span></p>
-              <p>Best Combo: <span className="text-pink-400 font-bold">{gameState.combo}x</span></p>
-              <p>Beat Accuracy: <span className="text-purple-400 font-bold">{gameState.beatAccuracy.toFixed(0)}%</span></p>
+              <p>
+                Final Score: <span className="text-yellow-400 font-bold">{gameState.score}</span>
+              </p>
+              <p>
+                Best Combo: <span className="text-pink-400 font-bold">{gameState.combo}x</span>
+              </p>
+              <p>
+                Beat Accuracy:{' '}
+                <span className="text-purple-400 font-bold">
+                  {gameState.beatAccuracy.toFixed(0)}%
+                </span>
+              </p>
               <p className="text-sm text-pink-300 italic mt-4">
                 "I didn't lose. Just ran out of health." – Edward Elric
               </p>
@@ -760,4 +792,3 @@ export default function BeatEmUpGame({ mode }: Props) {
     </div>
   );
 }
-

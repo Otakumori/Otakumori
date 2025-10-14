@@ -57,7 +57,6 @@ class AchievementEventBus {
     // Log to console in development
     // eslint-disable-next-line no-restricted-syntax -- Universal runtime check for NODE_ENV
     if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
       console.warn(`🏆 Achievement Unlocked: ${achievement.title} [${achievement.rarity}]`);
     }
 

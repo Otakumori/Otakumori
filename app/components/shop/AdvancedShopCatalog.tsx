@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { PrintifyProduct } from '@/app/lib/printify/service';
 import { FeaturedCarousel } from './FeaturedCarousel';
+import { RecentlyViewed } from './RecentlyViewed';
 
 // Enterprise-grade Product Card for Real Printify Products
 function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
@@ -47,6 +48,9 @@ function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvc3ZnPg=="
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
@@ -467,10 +471,10 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 space-y-12">
+    <div className="space-y-12">
       {/* Featured Products Carousel */}
       {featuredProducts.length > 0 && (
-        <section>
+        <section className="container mx-auto px-4">
           <div className="mb-6">
             <h2 className="text-3xl font-bold text-white mb-2">Featured Products</h2>
             <p className="text-zinc-300">Curated treasures for fellow travelers</p>
@@ -479,169 +483,178 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         </section>
       )}
 
-      {/* Main Catalog Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Filters Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-6">
-            <h3 className="text-white font-semibold mb-4">Search & Filters</h3>
+      {/* Recently Viewed Products */}
+      <RecentlyViewed />
 
-            {/* Search */}
-            <div className="mb-6">
-              <label htmlFor="search-input" className="block text-white text-sm mb-2">
-                Search
-              </label>
-              <input
-                id="search-input"
-                type="text"
-                value={filters.q}
-                onChange={(e) => updateFilters({ q: e.target.value })}
-                placeholder="Search products..."
-                className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400"
+      {/* Main Catalog Section */}
+      <div className="container mx-auto px-4 py-0">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Filters Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 p-6">
+              <h3 className="text-white font-semibold mb-4">Search & Filters</h3>
+
+              {/* Search */}
+              <div className="mb-6">
+                <label htmlFor="search-input" className="block text-white text-sm mb-2">
+                  Search
+                </label>
+                <input
+                  id="search-input"
+                  type="text"
+                  value={filters.q}
+                  onChange={(e) => updateFilters({ q: e.target.value })}
+                  placeholder="Search products..."
+                  className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <div className="mb-6">
+                <label htmlFor="category-select" className="block text-white text-sm mb-2">
+                  Category
+                </label>
+                <select
+                  id="category-select"
+                  value={filters.category}
+                  onChange={(e) => updateFilters({ category: e.target.value })}
+                  className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white"
+                >
+                  <option value="">All Categories</option>
+                  <option value="clothing">Clothing</option>
+                  <option value="accessories">Accessories</option>
+                  <option value="posters">Posters</option>
+                  <option value="home-decor">Home Decor</option>
+                </select>
+              </div>
+
+              {/* Price Range */}
+              <div className="mb-6">
+                <div className="block text-white text-sm mb-2">Price Range</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    aria-label="Minimum price"
+                    value={filters.minPrice || ''}
+                    onChange={(e) =>
+                      updateFilters({
+                        minPrice: e.target.value ? Number(e.target.value) : undefined,
+                      })
+                    }
+                    className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400 text-sm"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={filters.maxPrice || ''}
+                    onChange={(e) =>
+                      updateFilters({
+                        maxPrice: e.target.value ? Number(e.target.value) : undefined,
+                      })
+                    }
+                    className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400 text-sm"
+                    aria-label="Maximum price"
+                  />
+                </div>
+              </div>
+
+              {/* Stock Filter */}
+              <div className="mb-6">
+                <label className="flex items-center text-white text-sm">
+                  <input
+                    type="checkbox"
+                    checked={filters.inStock}
+                    onChange={(e) => updateFilters({ inStock: e.target.checked })}
+                    className="mr-2 rounded"
+                  />
+                  In Stock Only
+                </label>
+              </div>
+
+              {/* Clear Filters */}
+              <button
+                onClick={() =>
+                  updateFilters({
+                    q: '',
+                    category: '',
+                    minPrice: undefined,
+                    maxPrice: undefined,
+                    inStock: false,
+                  })
+                }
+                className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl transition-colors text-sm"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {/* Search Results Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div>
+                <p className="text-white text-lg">
+                  {searchResult?.total || 0} products found
+                  {filters.q && <span className="text-zinc-300"> for "{filters.q}"</span>}
+                </p>
+                {filters.category && <p className="text-zinc-400 text-sm">in {filters.category}</p>}
+              </div>
+
+              <ProductSort
+                sortBy={filters.sortBy}
+                sortOrder={filters.sortOrder}
+                onSortChange={(sortBy: string, sortOrder: string) =>
+                  updateFilters({ sortBy, sortOrder })
+                }
               />
             </div>
 
-            {/* Category Filter */}
-            <div className="mb-6">
-              <label htmlFor="category-select" className="block text-white text-sm mb-2">
-                Category
-              </label>
-              <select
-                id="category-select"
-                value={filters.category}
-                onChange={(e) => updateFilters({ category: e.target.value })}
-                className="w-full bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white"
-              >
-                <option value="">All Categories</option>
-                <option value="clothing">Clothing</option>
-                <option value="accessories">Accessories</option>
-                <option value="posters">Posters</option>
-                <option value="home-decor">Home Decor</option>
-              </select>
-            </div>
-
-            {/* Price Range */}
-            <div className="mb-6">
-              <div className="block text-white text-sm mb-2">Price Range</div>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="number"
-                  placeholder="Min"
-                  aria-label="Minimum price"
-                  value={filters.minPrice || ''}
-                  onChange={(e) =>
-                    updateFilters({ minPrice: e.target.value ? Number(e.target.value) : undefined })
-                  }
-                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400 text-sm"
-                />
-                <input
-                  type="number"
-                  placeholder="Max"
-                  value={filters.maxPrice || ''}
-                  onChange={(e) =>
-                    updateFilters({ maxPrice: e.target.value ? Number(e.target.value) : undefined })
-                  }
-                  className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white placeholder-zinc-400 text-sm"
-                  aria-label="Maximum price"
-                />
+            {/* Products Grid */}
+            {products.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+                {products.map((product) => (
+                  <RealPrintifyProductCard key={product.id} product={product} />
+                ))}
               </div>
-            </div>
-
-            {/* Stock Filter */}
-            <div className="mb-6">
-              <label className="flex items-center text-white text-sm">
-                <input
-                  type="checkbox"
-                  checked={filters.inStock}
-                  onChange={(e) => updateFilters({ inStock: e.target.checked })}
-                  className="mr-2 rounded"
-                />
-                In Stock Only
-              </label>
-            </div>
-
-            {/* Clear Filters */}
-            <button
-              onClick={() =>
-                updateFilters({
-                  q: '',
-                  category: '',
-                  minPrice: undefined,
-                  maxPrice: undefined,
-                  inStock: false,
-                })
-              }
-              className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl transition-colors text-sm"
-            >
-              Clear All Filters
-            </button>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="lg:col-span-3">
-          {/* Search Results Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <div>
-              <p className="text-white text-lg">
-                {searchResult?.total || 0} products found
-                {filters.q && <span className="text-zinc-300"> for "{filters.q}"</span>}
-              </p>
-              {filters.category && <p className="text-zinc-400 text-sm">in {filters.category}</p>}
-            </div>
-
-            <ProductSort
-              sortBy={filters.sortBy}
-              sortOrder={filters.sortOrder}
-              onSortChange={(sortBy: string, sortOrder: string) =>
-                updateFilters({ sortBy, sortOrder })
-              }
-            />
-          </div>
-
-          {/* Products Grid */}
-          {products.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-              {products.map((product) => (
-                <RealPrintifyProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/20 p-8">
-                <h3 className="text-xl font-bold text-white mb-4">No products found</h3>
-                <p className="text-zinc-300 mb-6">
-                  Try adjusting your search terms or filters to find what you're looking for.
-                </p>
-                <button
-                  onClick={() =>
-                    updateFilters({
-                      q: '',
-                      category: '',
-                      minPrice: undefined,
-                      maxPrice: undefined,
-                      colors: [],
-                      sizes: [],
-                      inStock: false,
-                      expressEligible: false,
-                    })
-                  }
-                  className="bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 px-6 py-3 rounded-xl transition-colors"
-                >
-                  Clear All Filters
-                </button>
+            ) : (
+              <div className="text-center py-12">
+                <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/20 p-8">
+                  <h3 className="text-xl font-bold text-white mb-4">No products found</h3>
+                  <p className="text-zinc-300 mb-6">
+                    Try adjusting your search terms or filters to find what you're looking for.
+                  </p>
+                  <button
+                    onClick={() =>
+                      updateFilters({
+                        q: '',
+                        category: '',
+                        minPrice: undefined,
+                        maxPrice: undefined,
+                        colors: [],
+                        sizes: [],
+                        inStock: false,
+                        expressEligible: false,
+                      })
+                    }
+                    className="bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 px-6 py-3 rounded-xl transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Pagination */}
-          {searchResult && searchResult.totalPages > 1 && (
-            <Pagination
-              currentPage={searchResult.page}
-              totalPages={searchResult.totalPages}
-              onPageChange={(page: number) => updateFilters({ page })}
-            />
-          )}
+            {/* Pagination */}
+            {searchResult && searchResult.totalPages > 1 && (
+              <Pagination
+                currentPage={searchResult.page}
+                totalPages={searchResult.totalPages}
+                onPageChange={(page: number) => updateFilters({ page })}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

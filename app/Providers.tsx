@@ -7,6 +7,7 @@ import { CartProvider } from './components/cart/CartProvider';
 import { PetalProvider } from '../providers';
 import { WorldProvider } from './world/WorldProvider';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import GlobalMusicProvider from '../components/music/GlobalMusicProvider';
 import GlobalMusicBar from '../components/music/GlobalMusicBar';
 import SoapstoneDock from '../components/SoapstoneDock';
@@ -21,22 +22,24 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <PostHogProvider>
       <ClerkPostHogBridge />
-      <AuthProvider>
-        <WorldProvider>
-          <PetalProvider>
-            <CartProvider>
-              <GlobalMusicProvider>
-                {/* Site-wide background (fixed, behind everything) */}
-                {showTree && <GlobalBackground />}
-                {children}
-                <GlobalMusicBar />
-                <SoapstoneDock />
-                <QuakeHUD />
-              </GlobalMusicProvider>
-            </CartProvider>
-          </PetalProvider>
-        </WorldProvider>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <WorldProvider>
+            <PetalProvider>
+              <CartProvider>
+                <GlobalMusicProvider>
+                  {/* Site-wide background (fixed, behind everything) */}
+                  {showTree && <GlobalBackground />}
+                  {children}
+                  <GlobalMusicBar />
+                  <SoapstoneDock />
+                  <QuakeHUD />
+                </GlobalMusicProvider>
+              </CartProvider>
+            </PetalProvider>
+          </WorldProvider>
+        </AuthProvider>
+      </ToastProvider>
     </PostHogProvider>
   );
 }

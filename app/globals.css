@@ -3,6 +3,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Smooth scroll behavior for anchor links and programmatic scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* ========================================
    GAME-LIKE FLUIDITY STANDARDS
    Every interaction should feel like AAA game

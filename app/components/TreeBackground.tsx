@@ -6,61 +6,34 @@ import { useEffect, useState } from 'react';
  * Cherry Blossom Tree Background Component
  *
  * CRITICAL SPECIFICATIONS:
- * - Absolute position (spans full page height)
- * - Scroll-reveal effect (tree moves UP as user scrolls DOWN)
- * - Initially shows top of tree (canopy) at page top
- * - As user scrolls, tree moves up to reveal trunk/roots at page bottom
- * - Tree ends at footer (bottom of tree aligned with bottom of page)
+ * - Absolute position (spans full page height exactly)
+ * - Tree flows naturally with page scroll (no aggressive movement)
+ * - Top of tree aligns with top of page
+ * - Bottom of tree aligns with footer
  * - Extends edge-to-edge, behind ALL content
  * - Proper z-index layering (z-index: -10)
  * - Smooth gradient fades at top/bottom
  * - 60fps performance optimized
  */
 export default function TreeBackground() {
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [pageHeight, setPageHeight] = useState(0);
 
   useEffect(() => {
-    // Throttled scroll handler for 60fps performance
-    let ticking = false;
-
     const updateDimensions = () => {
       setPageHeight(document.documentElement.scrollHeight);
-    };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const scrolled = window.scrollY;
-          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-          const progress = maxScroll > 0 ? scrolled / maxScroll : 0;
-          setScrollProgress(progress);
-          ticking = false;
-        });
-        ticking = true;
-      }
     };
 
     // Initialize dimensions
     updateDimensions();
 
-    // Use passive listeners for better scroll performance
+    // Update on resize
     window.addEventListener('resize', updateDimensions);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-      window.removeEventListener('scroll', handleScroll);
-    };
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
-
-  // Calculate tree reveal position based on scroll progress
-  // Tree is 200% height - start at 0% (showing top half), move UP to -100% (showing bottom half at footer)
-  const treeRevealY = 0 - scrollProgress * 100;
 
   return (
     <>
-      {/* Absolute tree background - spans full page height */}
+      {/* Absolute tree background - spans exactly full page height */}
       <div
         className="absolute inset-x-0 pointer-events-none"
         style={{
@@ -70,16 +43,14 @@ export default function TreeBackground() {
         }}
         aria-hidden="true"
       >
-        {/* Tree with scroll-reveal effect */}
+        {/* Tree image - natural flow with page */}
         <div
-          className="absolute inset-0 will-change-transform"
+          className="absolute inset-0"
           style={{
-            transform: `translate3d(0, ${treeRevealY}%, 0)`,
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
             backgroundSize: 'cover',
-            backgroundPosition: 'center top',
+            backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',
-            height: '200%',
           }}
         />
 
