@@ -286,6 +286,8 @@ class SessionTracker {
     if (allSessions.length > 100) {
       const toDelete = allSessions.slice(0, allSessions.length - 100);
       for (const session of toDelete) {
+        // Delete specific session by ID
+        // eslint-disable-next-line drizzle/enforce-delete-with-where -- Deleting by specific ID from loop
         await this.db.delete('sessions', session.id);
       }
     }

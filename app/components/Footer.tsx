@@ -28,7 +28,7 @@ export default function Footer() {
       } else {
         setMessage('Failed to leave sign');
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage('Error leaving sign');
     } finally {
       setIsSubmitting(false);

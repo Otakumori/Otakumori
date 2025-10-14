@@ -96,7 +96,7 @@ class CommunityWebSocketClient {
 
     // Simulate real-time global petal updates
     setInterval(() => {
-      const randomIncrement = Math.floor(Math.random() * 10) + 1;
+      const _randomIncrement = Math.floor(Math.random() * 10) + 1;
       this.handleMessage({
         type: 'global-petals',
         count: Math.floor(Math.random() * 1000000) + 500000,
