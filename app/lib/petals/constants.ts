@@ -14,9 +14,9 @@ export const PHYSICS = {
 
 // Spawn configuration
 export const SPAWN = {
-  MAX_PETALS: 25,
-  MIN_PETALS: 15,
-  SPAWN_INTERVAL: 2000, // ms between spawns
+  MAX_PETALS: 30,
+  MIN_PETALS: 20,
+  SPAWN_INTERVAL: 800, // ms between spawns (more frequent)
   RARE_CHANCE: 0.2, // 20% chance for gold petal
 } as const;
 
@@ -58,4 +58,3 @@ export const COLLECTION = {
   DEBOUNCE_MS: 1000,
   BATCH_SIZE: 10,
 } as const;
-

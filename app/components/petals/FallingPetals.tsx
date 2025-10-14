@@ -122,6 +122,18 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
     setPetals((prev) => [...prev, newPetal]);
   }, []);
 
+  // Spawn initial petals on mount
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    
+    // Spawn 5 initial petals immediately
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        spawnPetal();
+      }, i * 200);
+    }
+  }, [prefersReducedMotion, spawnPetal]);
+
   // Main animation loop
   useEffect(() => {
     if (prefersReducedMotion || !canvasRef.current) return;
