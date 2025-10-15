@@ -798,8 +798,6 @@ model AvatarAnimation {
   @@index([isDefault])
 }
 
-}
-
 model CharacterConfig {
   id          String              @id @default(cuid())
   userId      String
