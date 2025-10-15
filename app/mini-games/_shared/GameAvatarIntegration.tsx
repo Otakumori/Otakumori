@@ -53,7 +53,7 @@ export function GameAvatarIntegration({
   position = [0, 0, 0],
   scale = [1, 1, 1],
 }: GameAvatarIntegrationProps) {
-  const { avatarData, isLoading, error } = useGameAvatar(gameId, gameMode);
+  const { data: avatarData, isLoading, error } = useGameAvatar(gameId, gameMode);
 
   if (isLoading) {
     return (
@@ -160,9 +160,9 @@ export const GameAvatarUtils = {
     }
 
     // Check for high-end GPU
-    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    const debugInfo = (gl as any).getExtension('WEBGL_debug_renderer_info');
     if (debugInfo) {
-      const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      const renderer = (gl as any).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       if (
         renderer.includes('RTX') ||
         renderer.includes('GTX 1080') ||

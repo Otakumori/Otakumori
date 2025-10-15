@@ -64,8 +64,13 @@ function GameAvatar3D({
       enableLOD: true,
       enableInstancing: true,
       enableTextureCompression: true,
+      enableProgressiveLoading: true,
       maxTextureSize: quality === 'low' ? 512 : quality === 'medium' ? 1024 : 2048,
-      maxPolygonCount: quality === 'low' ? 5000 : quality === 'medium' ? 15000 : 50000,
+      shadowMapSize: 1024,
+      maxLights: quality === 'low' ? 2 : quality === 'medium' ? 4 : 8,
+      maxParticles: quality === 'low' ? 50 : quality === 'medium' ? 100 : 200,
+      enableFrustumCulling: true,
+      enableOcclusionCulling: quality !== 'low',
     });
   }, [quality]);
 
@@ -192,22 +197,10 @@ export default function GameAvatarRenderer({
             id: 'default-character',
             userId: 'default',
             baseModel: 'female',
-            parts: [
-              {
-                id: 'part-head-1',
-                configurationId: 'default-character',
-                partId: 'head_001',
-                partType: 'head',
-                createdAt: new Date(),
-              },
-              {
-                id: 'part-body-1',
-                configurationId: 'default-character',
-                partId: 'body_001',
-                partType: 'body',
-                createdAt: new Date(),
-              },
-            ],
+            parts: {
+              head: 'head_001',
+              body: 'body_001',
+            },
             morphTargets: {},
             materialOverrides: {},
             contentRating: 'sfw',
@@ -217,8 +210,8 @@ export default function GameAvatarRenderer({
             idleAnimations: ['idle'],
             allowExport: false,
             exportFormat: 'glb',
-            version: 1,
-            isPublic: false,
+            // version: 1, // TODO: Add version to AvatarConfiguration interface
+            // isPublic: false, // TODO: Add isPublic to AvatarConfiguration interface
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -247,22 +240,10 @@ export default function GameAvatarRenderer({
             id: 'default-character',
             userId: user.id,
             baseModel: 'female',
-            parts: [
-              {
-                id: 'part-head-1',
-                configurationId: 'default-character',
-                partId: 'head_001',
-                partType: 'head',
-                createdAt: new Date(),
-              },
-              {
-                id: 'part-body-1',
-                configurationId: 'default-character',
-                partId: 'body_001',
-                partType: 'body',
-                createdAt: new Date(),
-              },
-            ],
+            parts: {
+              head: 'head_001',
+              body: 'body_001',
+            },
             morphTargets: {},
             materialOverrides: {},
             contentRating: 'sfw',
@@ -272,8 +253,8 @@ export default function GameAvatarRenderer({
             idleAnimations: ['idle'],
             allowExport: false,
             exportFormat: 'glb',
-            version: 1,
-            isPublic: false,
+            // version: 1, // TODO: Add version to AvatarConfiguration interface
+            // isPublic: false, // TODO: Add isPublic to AvatarConfiguration interface
             createdAt: new Date(),
             updatedAt: new Date(),
           },

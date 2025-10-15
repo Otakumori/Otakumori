@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { GameAvatarIntegration } from '../_shared/GameAvatarIntegration';
 
 type Props = {
   mode: 'classic' | 'daily' | 'challenge';
@@ -198,7 +199,7 @@ export default function Game({ mode }: Props) {
         enable3D={false}
         enableAnimations={false}
       />
-      
+
       {/* Game Board */}
       <div
         className="grid gap-2 p-4"

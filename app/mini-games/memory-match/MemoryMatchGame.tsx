@@ -228,14 +228,7 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
   return (
     <div className="h-full flex flex-col p-4 relative">
       {/* Avatar Integration */}
-      <GameAvatarIntegration
-        gameMode="puzzle"
-        performance="balanced"
-        showSelector={true}
-        position="top-right"
-        size="medium"
-        interactive={true}
-      />
+      <GameAvatarIntegration gameId="memory-match" gameMode="puzzle" position={[0, 0, 0]} />
 
       {/* Game Stats */}
       <div className="flex justify-between items-center mb-4 text-white">
