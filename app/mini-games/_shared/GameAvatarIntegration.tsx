@@ -1,182 +1,216 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAvatarRenderer } from './useAvatarForGame';
-import { AvatarRenderer } from '@/app/components/avatar/AvatarRenderer';
-import { AvatarSelector } from '@/app/components/avatar/AvatarSelector';
+import React from 'react';
+import { useGameAvatar, drawGameAvatar } from './GameAvatarRenderer';
 
 interface GameAvatarIntegrationProps {
-  gameMode: 'action' | 'puzzle' | 'strategy' | 'rhythm';
-  performance?: 'low' | 'balanced' | 'high';
-  showSelector?: boolean;
-  onAvatarSelect?: (config: any) => void;
+  gameId: string;
+  gameMode?: string;
+  quality?: 'low' | 'medium' | 'high' | 'ultra';
   className?: string;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
-  size?: 'small' | 'medium' | 'large';
-  interactive?: boolean;
+  style?: React.CSSProperties;
+  enable3D?: boolean;
+  enableAnimations?: boolean;
+  animationState?: string;
+  position?: [number, number, number];
+  scale?: [number, number, number];
 }
 
-export function GameAvatarIntegration({
-  gameMode,
-  performance = 'balanced',
-  showSelector = false,
-  onAvatarSelect,
-  className = '',
-  position = 'top-right',
-  size = 'medium',
-  interactive = true,
-}: GameAvatarIntegrationProps) {
-  const [showAvatarSelector, setShowAvatarSelector] = useState(false);
-  const [selectedConfig, setSelectedConfig] = useState<any>(null);
+// Hook for canvas-based games to get avatar data
+export function useGameAvatarData(gameId: string, gameMode?: string) {
+  const { data: avatarData, isLoading, error } = useGameAvatar(gameId, gameMode);
 
-  const {
-    config,
+  return {
+    avatarData,
     isLoading,
-    isCustomAvatar,
-    hasAvatar,
-    mode,
-    interactions,
-    physics,
-    fallbackTo2D,
-  } = useAvatarRenderer(gameMode, performance);
-
-  // Position classes
-  const positionClasses = {
-    'top-left': 'top-4 left-4',
-    'top-right': 'top-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-    center: 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2',
+    error,
+    // Helper function for canvas rendering
+    drawAvatar: (
+      ctx: CanvasRenderingContext2D,
+      x: number,
+      y: number,
+      width: number,
+      height: number,
+      rotation: number = 0,
+    ) => {
+      if (avatarData) {
+        drawGameAvatar(ctx, avatarData, x, y, width, height, rotation);
+      }
+    },
   };
+}
 
-  const handleAvatarClick = () => {
-    if (interactive && showSelector) {
-      setShowAvatarSelector(true);
-    }
-  };
-
-  const handleAvatarSelect = (config: any) => {
-    setSelectedConfig(config);
-    onAvatarSelect?.(config);
-    setShowAvatarSelector(false);
-  };
-
-  // Use selected config if available, otherwise use loaded config
-  const currentConfig = selectedConfig || config;
+// Component for games that want to render avatars in DOM
+export function GameAvatarIntegration({
+  gameId,
+  gameMode = 'default',
+  quality = 'medium',
+  className = '',
+  style = {},
+  enable3D = true,
+  enableAnimations = true,
+  animationState = 'idle',
+  position = [0, 0, 0],
+  scale = [1, 1, 1],
+}: GameAvatarIntegrationProps) {
+  const { avatarData, isLoading, error } = useGameAvatar(gameId, gameMode);
 
   if (isLoading) {
     return (
-      <div className={`absolute ${positionClasses[position]} ${className}`}>
-        <div
-          className={`w-16 h-16 rounded-lg bg-white/10 animate-pulse flex items-center justify-center`}
-        >
-          <div className="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+      <div className={`flex items-center justify-center ${className}`} style={style}>
+        <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+          <span className="text-white text-lg">⏳</span>
         </div>
       </div>
     );
   }
 
-  if (!hasAvatar && !selectedConfig) {
+  if (error || !avatarData) {
     return (
-      <div className={`absolute ${positionClasses[position]} ${className}`}>
-        <div
-          className={`${size === 'small' ? 'w-12 h-12' : size === 'medium' ? 'w-16 h-16' : 'w-24 h-24'} rounded-lg bg-white/10 border border-dashed border-white/30 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors`}
-          onClick={handleAvatarClick}
-          onKeyDown={(e) => e.key === 'Enter' && handleAvatarClick()}
-          role="button"
-          tabIndex={0}
-          aria-label="Avatar placeholder"
-        >
-          <span className="text-white/60 text-lg"></span>
+      <div className={`flex items-center justify-center ${className}`} style={style}>
+        <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+          <span className="text-white text-lg">👤</span>
         </div>
       </div>
     );
   }
 
+  // For now, render a simple 2D avatar
+  // In the future, this could render a 3D avatar based on enable3D prop
   return (
-    <>
-      {/* Avatar Display */}
-      <div className={`absolute ${positionClasses[position]} ${className}`}>
-        <motion.div
-          className="cursor-pointer"
-          onClick={handleAvatarClick}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ duration: 0.2 }}
-        >
-          <AvatarRenderer
-            config={currentConfig}
-            mode={mode as '2d' | '3d' | 'hybrid' | 'auto'}
-            size={size}
-            interactions={interactions}
-            physics={physics}
-            fallbackTo2D={fallbackTo2D}
-            className="rounded-lg overflow-hidden border-2 border-white/20"
+    <div className={`flex items-center justify-center ${className}`} style={style}>
+      <div
+        className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg"
+        style={{
+          transform: `scale(${scale[0]}) translate(${position[0]}px, ${position[1]}px)`,
+          transformOrigin: 'center center',
+        }}
+      >
+        {avatarData.fallbackSpriteUrl ? (
+          <img
+            src={avatarData.fallbackSpriteUrl}
+            alt="Avatar"
+            className="w-10 h-10 object-cover rounded-full"
+            style={{ imageRendering: 'pixelated' }}
           />
-
-          {/* Custom Avatar Indicator */}
-          {isCustomAvatar && (
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-pink-500 rounded-full flex items-center justify-center">
-              <span className="text-xs text-white"></span>
-            </div>
-          )}
-        </motion.div>
-      </div>
-
-      {/* Avatar Selector Modal */}
-      <AnimatePresence>
-        {showAvatarSelector && (
-          <motion.div
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowAvatarSelector(false)}
-          >
-            <motion.div
-              className="bg-gray-900 rounded-xl p-6 max-w-md w-full mx-4 border border-white/20"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">Choose Avatar</h3>
-                <button
-                  onClick={() => setShowAvatarSelector(false)}
-                  className="text-white/60 hover:text-white transition-colors"
-                ></button>
-              </div>
-
-              <AvatarSelector
-                onSelect={handleAvatarSelect}
-                selectedConfig={selectedConfig}
-                gameMode={true}
-                className="max-h-96 overflow-y-auto"
-              />
-            </motion.div>
-          </motion.div>
+        ) : (
+          <span className="text-white text-lg">👤</span>
         )}
-      </AnimatePresence>
-    </>
+      </div>
+    </div>
   );
 }
 
-// Higher-order component for easy game integration
-export function withAvatarIntegration<P extends object>(
-  Component: React.ComponentType<P>,
-  gameMode: 'action' | 'puzzle' | 'strategy' | 'rhythm',
-  options?: Partial<GameAvatarIntegrationProps>,
-) {
-  return function AvatarIntegratedGame(props: P) {
-    return (
-      <div className="relative w-full h-full">
-        <Component {...props} />
-        <GameAvatarIntegration gameMode={gameMode} {...options} />
-      </div>
-    );
-  };
-}
+// Utility functions for game developers
+export const GameAvatarUtils = {
+  // Get avatar configuration for a specific game
+  getAvatarConfig: async (gameId: string, gameMode?: string, userId?: string) => {
+    try {
+      const response = await fetch(
+        `/api/v1/character/config?gameId=${gameId}&mode=${gameMode || 'default'}`,
+      );
+      if (response.ok) {
+        const data = await response.json();
+        return data.ok ? data.data : null;
+      }
+    } catch (error) {
+      console.error('Failed to fetch avatar config:', error);
+    }
+    return null;
+  },
 
-export default GameAvatarIntegration;
+  // Save avatar configuration
+  saveAvatarConfig: async (config: any) => {
+    try {
+      const response = await fetch('/api/v1/character/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.ok ? data.data : null;
+      }
+    } catch (error) {
+      console.error('Failed to save avatar config:', error);
+    }
+    return null;
+  },
+
+  // Generate sprite from 3D model (placeholder for future implementation)
+  generateSpriteFrom3D: async (
+    config: any,
+    options: { width: number; height: number; angle?: number },
+  ) => {
+    // This would use the 3D avatar system to render a sprite
+    // For now, return a default sprite URL
+    return '/assets/default-avatar.png';
+  },
+
+  // Get performance settings based on device capabilities
+  getPerformanceSettings: () => {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+    if (!gl) {
+      return { quality: 'low', enable3D: false, enableAnimations: false };
+    }
+
+    // Check for high-end GPU
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (debugInfo) {
+      const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      if (
+        renderer.includes('RTX') ||
+        renderer.includes('GTX 1080') ||
+        renderer.includes('RX 580')
+      ) {
+        return { quality: 'high', enable3D: true, enableAnimations: true };
+      }
+      if (renderer.includes('Intel')) {
+        return { quality: 'low', enable3D: false, enableAnimations: false };
+      }
+    }
+
+    // Default settings
+    return { quality: 'medium', enable3D: true, enableAnimations: true };
+  },
+};
+
+// Game-specific avatar presets
+export const GameAvatarPresets = {
+  // Bubble Ragdoll specific settings
+  bubbleRagdoll: {
+    quality: 'medium' as const,
+    enable3D: false, // Canvas-based game
+    enableAnimations: true,
+    animationState: 'idle',
+  },
+
+  // Petal Samurai specific settings
+  petalSamurai: {
+    quality: 'high' as const,
+    enable3D: true,
+    enableAnimations: true,
+    animationState: 'idle',
+  },
+
+  // Memory Match specific settings
+  memoryMatch: {
+    quality: 'low' as const,
+    enable3D: false,
+    enableAnimations: false,
+    animationState: 'idle',
+  },
+
+  // Puzzle Reveal specific settings
+  puzzleReveal: {
+    quality: 'medium' as const,
+    enable3D: false,
+    enableAnimations: false,
+    animationState: 'idle',
+  },
+};

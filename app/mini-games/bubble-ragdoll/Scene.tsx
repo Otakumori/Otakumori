@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getAsset } from '../_shared/assets-resolver';
 import { play } from '../_shared/audio-bus';
 import { useAvatarForGame } from '../_shared/useAvatarForGame';
+import { useGameAvatar, drawGameAvatar } from '../_shared/GameAvatarRenderer';
 import '../_shared/cohesion.css';
 
 const ROUND_MS = 60_000;
@@ -51,7 +52,8 @@ export default function BubbleRagdoll() {
     return im;
   }, [bgUrl]);
 
-  // avatar (if enabled)
+  // avatar integration
+  const { data: avatarData } = useGameAvatar('bubble-ragdoll', 'default');
   const { enabled: avatarEnabled, avatar } = useAvatarForGame(true);
 
   useEffect(() => {
@@ -282,8 +284,19 @@ export default function BubbleRagdoll() {
       ctx.lineTo(pts[pTorsoBot].x, pts[pTorsoBot].y);
       ctx.stroke();
 
-      // sprite billboard on torso if available
-      if (avatarEnabled && avatar?.spriteUrl) {
+      // Use new avatar system
+      if (avatarData) {
+        const dx = pts[pTorsoBot].x - pts[pTorsoTop].x;
+        const dy = pts[pTorsoBot].y - pts[pTorsoTop].y;
+        const ang = Math.atan2(dy, dx) + Math.PI / 2;
+        const len = Math.hypot(dx, dy);
+        const w = Math.max(48, len * 1.6);
+        const h = w * 1.3;
+        
+        // Use the new drawGameAvatar function
+        drawGameAvatar(ctx, avatarData, pts[pTorsoTop].x - w/2, pts[pTorsoTop].y - h*0.1, w, h, ang);
+      } else if (avatarEnabled && avatar?.spriteUrl) {
+        // Fallback to old system
         const dx = pts[pTorsoBot].x - pts[pTorsoTop].x;
         const dy = pts[pTorsoBot].y - pts[pTorsoTop].y;
         const ang = Math.atan2(dy, dx) + Math.PI / 2;
@@ -295,7 +308,6 @@ export default function BubbleRagdoll() {
         ctx.rotate(ang);
         const img = new Image();
         img.src = avatar.spriteUrl!;
-        // (best practice: preload outside; simplified here)
         ctx.globalAlpha = 0.95;
         ctx.drawImage(img, -w / 2, -h * 0.1, w, h);
         ctx.restore();

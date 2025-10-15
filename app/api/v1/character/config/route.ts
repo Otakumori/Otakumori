@@ -1,206 +1,323 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { CharacterConfigRequestSchema } from '@/app/lib/contracts';
+import { db } from '@/app/lib/db';
+import { withRateLimit } from '@/app/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
+// GET /api/v1/character/config - Get user's character configuration for games
 export async function GET(request: NextRequest) {
-  try {
-    // Log character config request
-    console.warn('Character config GET from:', request.headers.get('user-agent'));
+  return withRateLimit(request, async () => {
+    try {
+      const { userId } = await auth();
+      const { searchParams } = new URL(request.url);
+      const gameId = searchParams.get('gameId');
+      const mode = searchParams.get('mode') || 'default';
 
-    const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json(
+          { ok: false, error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
 
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
-    });
-
-    if (!currentUser) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
-    }
-
-    // Get active character config
-    const activeConfig = await db.characterConfig.findFirst({
-      where: {
-        userId: currentUser.id,
-        isActive: true,
-      },
-    });
-
-    // Get all user's character configs
-    const allConfigs = await db.characterConfig.findMany({
-      where: { userId: currentUser.id },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    // Get user's unlocked presets
-    const userPresets = await db.userCharacterPreset.findMany({
-      where: { userId: currentUser.id },
-      include: { preset: true },
-    });
-
-    // Get character reactions for active config
-    const reactions = activeConfig
-      ? await db.characterReaction.findMany({
-          where: { characterConfigId: activeConfig.id },
-        })
-      : [];
-
-    // Transform data
-    const config = activeConfig
-      ? {
-          id: activeConfig.id,
-          userId: activeConfig.userId,
-          name: activeConfig.name,
-          isActive: activeConfig.isActive,
-          configData: activeConfig.configData,
-          meshData: activeConfig.meshData,
-          textureData: activeConfig.textureData,
-          createdAt: activeConfig.createdAt.toISOString(),
-          updatedAt: activeConfig.updatedAt.toISOString(),
-        }
-      : null;
-
-    const presets = userPresets.map((up) => ({
-      id: up.preset.id,
-      name: up.preset.name,
-      description: up.preset.description,
-      category: up.preset.category,
-      meshData: up.preset.meshData,
-      textureData: up.preset.textureData,
-      colorPalette: up.preset.colorPalette,
-      rarity: up.preset.rarity,
-      unlockCondition: up.preset.unlockCondition,
-      isDefault: up.preset.isDefault,
-      createdAt: up.preset.createdAt.toISOString(),
-      updatedAt: up.preset.updatedAt.toISOString(),
-    }));
-
-    const transformedReactions = reactions.map((reaction) => ({
-      id: reaction.id,
-      characterConfigId: reaction.characterConfigId,
-      context: reaction.context,
-      reactionType: reaction.reactionType,
-      animationData: reaction.animationData,
-      triggerConditions: reaction.triggerConditions,
-      createdAt: reaction.createdAt.toISOString(),
-    }));
-
-    const responseData = {
-      config,
-      presets,
-      reactions: transformedReactions,
-      allConfigs: allConfigs.map((config) => ({
-        id: config.id,
-        name: config.name,
-        isActive: config.isActive,
-        createdAt: config.createdAt.toISOString(),
-        updatedAt: config.updatedAt.toISOString(),
-      })),
-    };
-
-    return NextResponse.json({ ok: true, data: responseData });
-  } catch (error) {
-    console.error('Character config fetch error:', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const { userId } = await auth();
-
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const validatedData = CharacterConfigRequestSchema.parse(body);
-
-    // Get current user
-    const currentUser = await db.user.findUnique({
-      where: { clerkId: userId },
-    });
-
-    if (!currentUser) {
-      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
-    }
-
-    // If setting as active, deactivate other configs
-    if (validatedData.isActive) {
-      await db.characterConfig.updateMany({
-        where: { userId: currentUser.id },
-        data: { isActive: false },
-      });
-    }
-
-    // Create new character config
-    const newConfig = await db.characterConfig.create({
-      data: {
-        userId: currentUser.id,
-        name: validatedData.name,
-        isActive: validatedData.isActive || false,
-        configData: validatedData.configData as any,
-        meshData: validatedData.configData as any, // For now, use configData as meshData
-        textureData: validatedData.configData as any, // For now, use configData as textureData
-      },
-    });
-
-    // Create default reactions for this config
-    const contexts = ['home', 'shop', 'games', 'social', 'achievements'];
-    const reactionTypes = ['idle', 'happy', 'excited', 'focused', 'sleepy'];
-
-    for (const context of contexts) {
-      for (const reactionType of reactionTypes) {
-        await db.characterReaction.create({
-          data: {
-            characterConfigId: newConfig.id,
-            context,
-            reactionType,
-            animationData: {
-              duration: 1000,
-              keyframes: [
-                { time: 0, transform: 'scale(1) rotate(0deg)' },
-                { time: 0.5, transform: 'scale(1.1) rotate(5deg)' },
-                { time: 1, transform: 'scale(1) rotate(0deg)' },
-              ],
-            },
-            triggerConditions: {
-              context,
-              reactionType,
+      // Try to find user's avatar configuration
+      const avatarConfig = await db.avatarConfiguration.findFirst({
+        where: {
+          userId,
+          isPublic: true, // Only get public configurations for games
+        },
+        include: {
+          parts: {
+            include: {
+              part: true,
             },
           },
+          morphTargets: true,
+          materialOverrides: true,
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      });
+
+      if (!avatarConfig) {
+        // Return default character configuration
+        const defaultConfig = {
+          id: 'default-character',
+          userId: 'default',
+          baseModel: 'female',
+          parts: [
+            {
+              id: 'part-head-1',
+              configurationId: 'default-character',
+              partId: 'head_001',
+              partType: 'head',
+              createdAt: new Date(),
+            },
+            {
+              id: 'part-body-1',
+              configurationId: 'default-character',
+              partId: 'body_001',
+              partType: 'body',
+              createdAt: new Date(),
+            },
+          ],
+          morphTargets: {},
+          materialOverrides: {},
+          contentRating: 'sfw',
+          showNsfwContent: false,
+          ageVerified: false,
+          defaultAnimation: 'idle',
+          idleAnimations: ['idle'],
+          allowExport: false,
+          exportFormat: 'glb',
+          version: 1,
+          isPublic: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        return NextResponse.json({
+          ok: true,
+          data: defaultConfig,
+          isCustom: false,
+          fallbackSpriteUrl: '/assets/default-avatar.png',
+          defaultCharacterId: 'default_female',
         });
       }
+
+      // Transform database result to API format
+      const transformedConfig = {
+        id: avatarConfig.id,
+        userId: avatarConfig.userId,
+        name: avatarConfig.name,
+        baseModel: avatarConfig.baseModel,
+        baseModelUrl: avatarConfig.baseModelUrl,
+        contentRating: avatarConfig.contentRating,
+        showNsfwContent: avatarConfig.showNsfwContent,
+        ageVerified: avatarConfig.ageVerified,
+        defaultAnimation: avatarConfig.defaultAnimation,
+        idleAnimations: avatarConfig.idleAnimations,
+        allowExport: avatarConfig.allowExport,
+        exportFormat: avatarConfig.exportFormat,
+        version: avatarConfig.version,
+        isPublic: avatarConfig.isPublic,
+        thumbnailUrl: avatarConfig.thumbnailUrl,
+        createdAt: avatarConfig.createdAt,
+        updatedAt: avatarConfig.updatedAt,
+        parts: avatarConfig.parts.map(p => ({
+          id: p.id,
+          configurationId: p.configurationId,
+          partId: p.partId,
+          partType: p.partType,
+          attachmentOrder: p.attachmentOrder,
+          createdAt: p.createdAt,
+        })),
+        morphTargets: avatarConfig.morphTargets.reduce((acc, mt) => {
+          acc[mt.targetName] = mt.value;
+          return acc;
+        }, {} as Record<string, number>),
+        materialOverrides: avatarConfig.materialOverrides.reduce((acc, mo) => {
+          acc[mo.slot] = {
+            type: mo.type,
+            value: mo.value,
+            opacity: mo.opacity,
+            metallic: mo.metallic,
+            roughness: mo.roughness,
+            normalStrength: mo.normalStrength,
+          };
+          return acc;
+        }, {} as Record<string, any>),
+      };
+
+      return NextResponse.json({
+        ok: true,
+        data: transformedConfig,
+        isCustom: true,
+        fallbackSpriteUrl: '/assets/default-avatar.png', // TODO: Generate sprite from 3D model
+        defaultCharacterId: avatarConfig.baseModel,
+      });
+
+    } catch (error) {
+      console.error('Failed to fetch character config:', error);
+      return NextResponse.json(
+        { ok: false, error: 'Failed to fetch character configuration' },
+        { status: 500 }
+      );
     }
+  }, {
+    windowMs: 60 * 1000, // 1 minute
+    max: 30, // 30 requests per minute
+  });
+}
 
-    const response = {
-      id: newConfig.id,
-      userId: newConfig.userId,
-      name: newConfig.name,
-      isActive: newConfig.isActive,
-      configData: newConfig.configData,
-      meshData: newConfig.meshData,
-      textureData: newConfig.textureData,
-      createdAt: newConfig.createdAt.toISOString(),
-      updatedAt: newConfig.updatedAt.toISOString(),
-    };
+// POST /api/v1/character/config - Create or update character configuration
+export async function POST(request: NextRequest) {
+  return withRateLimit(request, async () => {
+    try {
+      const { userId } = await auth();
+      
+      if (!userId) {
+        return NextResponse.json(
+          { ok: false, error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
 
-    return NextResponse.json({ ok: true, data: response });
-  } catch (error) {
-    console.error('Character config creation error:', error);
+      const body = await request.json();
+      const {
+        name,
+        baseModel,
+        baseModelUrl,
+        contentRating,
+        showNsfwContent,
+        ageVerified,
+        defaultAnimation,
+        idleAnimations,
+        allowExport,
+        exportFormat,
+        parts,
+        morphTargets,
+        materialOverrides,
+      } = body;
 
-    if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });
+      // Validate content rating and age verification
+      if (contentRating === 'nsfw' || contentRating === 'explicit') {
+        if (!ageVerified) {
+          return NextResponse.json(
+            { ok: false, error: 'Age verification required for NSFW content' },
+            { status: 403 }
+          );
+        }
+      }
+
+      // Create or update configuration
+      const avatarConfig = await db.avatarConfiguration.upsert({
+        where: {
+          userId,
+        },
+        update: {
+          name,
+          baseModel,
+          baseModelUrl,
+          contentRating,
+          showNsfwContent,
+          ageVerified,
+          defaultAnimation,
+          idleAnimations,
+          allowExport,
+          exportFormat,
+          updatedAt: new Date(),
+        },
+        create: {
+          userId,
+          name,
+          baseModel,
+          baseModelUrl,
+          contentRating,
+          showNsfwContent,
+          ageVerified,
+          defaultAnimation,
+          idleAnimations,
+          allowExport,
+          exportFormat,
+        },
+      });
+
+      // Update parts
+      if (parts) {
+        // Delete existing parts
+        await db.avatarConfigurationPart.deleteMany({
+          where: {
+            configurationId: avatarConfig.id,
+          },
+        });
+
+        // Create new parts
+        await db.avatarConfigurationPart.createMany({
+          data: parts.map((part: any, index: number) => ({
+            configurationId: avatarConfig.id,
+            partId: part.partId,
+            partType: part.partType,
+            attachmentOrder: index,
+          })),
+        });
+      }
+
+      // Update morph targets
+      if (morphTargets) {
+        // Delete existing morph targets
+        await db.avatarMorphTarget.deleteMany({
+          where: {
+            configurationId: avatarConfig.id,
+          },
+        });
+
+        // Create new morph targets
+        await db.avatarMorphTarget.createMany({
+          data: Object.entries(morphTargets).map(([targetName, value]) => ({
+            configurationId: avatarConfig.id,
+            targetName,
+            value: value as number,
+          })),
+        });
+      }
+
+      // Update material overrides
+      if (materialOverrides) {
+        // Delete existing material overrides
+        await db.avatarMaterialOverride.deleteMany({
+          where: {
+            configurationId: avatarConfig.id,
+          },
+        });
+
+        // Create new material overrides
+        await db.avatarMaterialOverride.createMany({
+          data: Object.entries(materialOverrides).map(([slot, override]: [string, any]) => ({
+            configurationId: avatarConfig.id,
+            slot,
+            type: override.type,
+            value: override.value,
+            opacity: override.opacity,
+            metallic: override.metallic,
+            roughness: override.roughness,
+            normalStrength: override.normalStrength,
+          })),
+        });
+      }
+
+      return NextResponse.json({
+        ok: true,
+        data: {
+          id: avatarConfig.id,
+          userId: avatarConfig.userId,
+          name: avatarConfig.name,
+          baseModel: avatarConfig.baseModel,
+          contentRating: avatarConfig.contentRating,
+          showNsfwContent: avatarConfig.showNsfwContent,
+          ageVerified: avatarConfig.ageVerified,
+          defaultAnimation: avatarConfig.defaultAnimation,
+          idleAnimations: avatarConfig.idleAnimations,
+          allowExport: avatarConfig.allowExport,
+          exportFormat: avatarConfig.exportFormat,
+          version: avatarConfig.version,
+          isPublic: avatarConfig.isPublic,
+          createdAt: avatarConfig.createdAt,
+          updatedAt: avatarConfig.updatedAt,
+        },
+      });
+
+    } catch (error) {
+      console.error('Failed to save character config:', error);
+      return NextResponse.json(
+        { ok: false, error: 'Failed to save character configuration' },
+        { status: 500 }
+      );
     }
-
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
-  }
+  }, {
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // 10 requests per minute
+  });
 }

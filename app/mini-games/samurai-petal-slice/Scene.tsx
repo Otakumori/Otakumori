@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getAsset } from '../_shared/assets-resolver';
 import { play } from '../_shared/audio-bus';
 import { useGameSave } from '../_shared/SaveSystem';
+import { useGameAvatarData } from '../_shared/GameAvatarIntegration';
 import '../_shared/cohesion.css';
 
 // --- tunables (env/admin later) ---
@@ -34,6 +35,7 @@ export default function SamuraiSlice() {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { saveOnExit, autoSave, load } = useGameSave('samurai-petal-slice');
+  const { avatarData, drawAvatar } = useGameAvatarData('samurai-petal-slice', 'default');
   const [over, setOver] = useState<null | {
     score: number;
     hits: number;
@@ -312,6 +314,12 @@ export default function SamuraiSlice() {
           ctx.stroke();
         }
         ctx.restore();
+      }
+
+      // Avatar rendering
+      if (avatarData) {
+        // Draw avatar in top-right corner
+        drawAvatar(ctx, W - 80, 20, 60, 60, 0);
       }
 
       // UI: timer & score

@@ -189,6 +189,16 @@ export default function Game({ mode }: Props) {
 
   return (
     <div className="relative">
+      {/* Avatar Display */}
+      <GameAvatarIntegration
+        gameId="memory-match"
+        gameMode={mode}
+        className="absolute top-4 right-4 z-10"
+        quality="low"
+        enable3D={false}
+        enableAnimations={false}
+      />
+      
       {/* Game Board */}
       <div
         className="grid gap-2 p-4"

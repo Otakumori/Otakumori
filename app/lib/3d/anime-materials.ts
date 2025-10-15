@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { ShaderMaterial } from 'three';
 
 // Import shader source code
-import { animePbrVert } from '../shaders/anime-pbr.vert';
-import { animePbrFrag } from '../shaders/anime-pbr.frag';
-import { outlineVert } from '../shaders/outline.vert';
-import { outlineFrag } from '../shaders/outline.frag';
-import { hairAnisotropicFrag } from '../shaders/hair-anisotropic.frag';
+import { animePbrVert } from '../shaders/anime-pbr.vert.ts';
+import { animePbrFrag } from '../shaders/anime-pbr.frag.ts';
+import { outlineVert } from '../shaders/outline.vert.ts';
+import { outlineFrag } from '../shaders/outline.frag.ts';
+import { hairAnisotropicFrag } from '../shaders/hair-anisotropic.frag.ts';
 
 export interface AnimeMaterialOptions {
   // Base material properties
