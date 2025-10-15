@@ -258,6 +258,7 @@ model User {
   petalWallet               PetalWallet?             @relation("PetalWallet")
   petalTransactions         PetalTransaction[]       @relation("PetalTransactions")
   avatarCustomizations      AvatarCustomization[]
+  avatarConfigurations      AvatarConfiguration[]
 
   @@index([clerkId])
 }
@@ -627,6 +628,176 @@ model CharacterPreset {
 
   @@index([category])
   @@index([rarity])
+}
+
+// High-fidelity avatar system models
+model AvatarPart {
+  id          String  @id @default(cuid())
+  type        String // head, face, hair, body, clothing, accessories, nsfw_anatomy
+  category    String // head, body, clothing, accessories, nsfw, cosmetic
+  name        String
+  description String?
+
+  // Asset URLs
+  modelUrl     String // GLTF/GLB file URL (Vercel Blob)
+  thumbnailUrl String // Preview image URL
+  iconUrl      String? // UI icon URL
+
+  // Metadata
+  contentRating String  @default("sfw") // sfw, nsfw, explicit
+  rarity        String  @default("common") // common, rare, epic, legendary
+  isDefault     Boolean @default(false)
+  isPremium     Boolean @default(false)
+
+  // Customization options
+  customizable     Boolean @default(true)
+  materialSlots    Json // Array of MaterialSlot objects
+  morphTargets     Json? // Array of MorphTarget objects
+  attachmentPoints Json // Array of AttachmentPoint objects
+
+  // Compatibility
+  compatibleParts String[] // Array of compatible part IDs
+  conflictsWith   String[] // Array of conflicting part IDs
+
+  // Physics
+  physicsEnabled Boolean @default(false)
+  colliderShape  String? // box, sphere, capsule, mesh
+
+  // Adult content
+  adultContent            Boolean @default(false)
+  ageVerificationRequired Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  avatarConfigurations AvatarConfigurationPart[]
+
+  @@index([type])
+  @@index([category])
+  @@index([contentRating])
+  @@index([rarity])
+  @@index([adultContent])
+}
+
+model AvatarConfiguration {
+  id     String  @id @default(cuid())
+  userId String
+  name   String?
+
+  // Base configuration
+  baseModel    String // male, female, custom
+  baseModelUrl String? // Custom model URL
+
+  // Content settings
+  contentRating   String  @default("sfw") // sfw, nsfw, explicit
+  showNsfwContent Boolean @default(false)
+  ageVerified     Boolean @default(false)
+
+  // Animation preferences
+  defaultAnimation String   @default("idle")
+  idleAnimations   String[] // Array of animation names
+
+  // Export settings
+  allowExport  Boolean @default(false)
+  exportFormat String  @default("glb") // glb, gltf, fbx
+
+  // Metadata
+  version      Int     @default(1)
+  isPublic     Boolean @default(false)
+  thumbnailUrl String? // Pre-rendered thumbnail URL
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user              User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parts             AvatarConfigurationPart[]
+  morphTargets      AvatarMorphTarget[]
+  materialOverrides AvatarMaterialOverride[]
+
+  @@index([userId])
+  @@index([contentRating])
+  @@index([isPublic])
+  @@index([createdAt])
+}
+
+model AvatarConfigurationPart {
+  id              String @id @default(cuid())
+  configurationId String
+  partId          String
+  partType        String // head, hair, body, clothing, etc.
+  attachmentOrder Int? // Order of attachment for layering
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  configuration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+  part          AvatarPart          @relation(fields: [partId], references: [id], onDelete: Cascade)
+
+  @@unique([configurationId, partId])
+  @@index([configurationId, partType])
+}
+
+model AvatarMorphTarget {
+  id              String @id @default(cuid())
+  configurationId String
+  targetName      String // breast_size, penis_length, etc.
+  value           Float // Morph target value
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  configuration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  @@unique([configurationId, targetName])
+  @@index([configurationId])
+}
+
+model AvatarMaterialOverride {
+  id              String  @id @default(cuid())
+  configurationId String
+  partId          String? // If null, applies to all parts
+  slot            String // Material slot name
+  type            String // color, texture, pattern
+  value           Json // Color values, texture URLs, etc.
+  opacity         Float?
+  metallic        Float?
+  roughness       Float?
+  normalStrength  Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  configuration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  @@index([configurationId, partId])
+  @@index([configurationId, slot])
+}
+
+model AvatarAnimation {
+  id            String  @id @default(cuid())
+  name          String
+  description   String?
+  category      String // idle, emote, action, nsfw
+  contentRating String  @default("sfw")
+  duration      Float? // Animation duration in seconds
+  loop          Boolean @default(true)
+  isDefault     Boolean @default(false)
+
+  // Animation data
+  animationData Json // Animation keyframes and data
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([contentRating])
+  @@index([isDefault])
+}
+
 }
 
 model CharacterConfig {

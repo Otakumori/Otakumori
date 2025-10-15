@@ -1,0 +1,538 @@
+import * as THREE from 'three';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+
+export interface PerformanceSettings {
+  quality: 'low' | 'medium' | 'high' | 'ultra';
+  targetFPS: number;
+  enableLOD: boolean;
+  enableInstancing: boolean;
+  enableTextureCompression: boolean;
+  enableProgressiveLoading: boolean;
+  maxTextureSize: number;
+  shadowMapSize: number;
+  maxLights: number;
+  maxParticles: number;
+  enableFrustumCulling: boolean;
+  enableOcclusionCulling: boolean;
+}
+
+export interface LODLevel {
+  distance: number;
+  geometry: THREE.BufferGeometry;
+  material?: THREE.Material;
+  mesh?: THREE.Mesh;
+}
+
+export interface PerformanceMetrics {
+  fps: number;
+  frameTime: number;
+  drawCalls: number;
+  triangles: number;
+  textures: number;
+  memoryUsage: number;
+  gpuMemory: number;
+}
+
+export class PerformanceOptimizer {
+  private settings: PerformanceSettings;
+  private metrics: PerformanceMetrics;
+  private lastFrameTime: number = 0;
+  private frameCount: number = 0;
+  private fpsHistory: number[] = [];
+  private adaptiveQuality: boolean = true;
+
+  // LOD management
+  private lodGroups: Map<string, THREE.LOD> = new Map();
+  private instancedMeshes: Map<string, THREE.InstancedMesh> = new Map();
+
+  // Texture optimization
+  private textureCache: Map<string, THREE.Texture> = new Map();
+  private compressedTextures: Map<string, THREE.CompressedTexture> = new Map();
+
+  // Geometry optimization
+  private geometryCache: Map<string, THREE.BufferGeometry> = new Map();
+  private simplifiedGeometries: Map<string, THREE.BufferGeometry> = new Map();
+
+  constructor(settings: PerformanceSettings) {
+    this.settings = { ...settings };
+    this.metrics = {
+      fps: 60,
+      frameTime: 16.67,
+      drawCalls: 0,
+      triangles: 0,
+      textures: 0,
+      memoryUsage: 0,
+      gpuMemory: 0,
+    };
+
+    this.initializeOptimizations();
+  }
+
+  private initializeOptimizations() {
+    // Set up adaptive quality based on device capabilities
+    if (this.adaptiveQuality) {
+      this.detectDeviceCapabilities();
+    }
+  }
+
+  private detectDeviceCapabilities() {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+
+    if (!gl) {
+      this.settings.quality = 'low';
+      return;
+    }
+
+    // Check GPU memory (approximate)
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (debugInfo) {
+      const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      console.warn('GPU:', renderer);
+
+      // Adjust settings based on GPU
+      if (renderer.includes('Intel')) {
+        this.settings.quality = 'medium';
+        this.settings.maxTextureSize = Math.min(this.settings.maxTextureSize, 1024);
+      } else if (renderer.includes('NVIDIA') || renderer.includes('AMD')) {
+        this.settings.quality = 'high';
+      }
+    }
+
+    // Check available extensions
+    const extensions = gl.getSupportedExtensions();
+    if (!extensions?.includes('WEBGL_compressed_texture_s3tc')) {
+      this.settings.enableTextureCompression = false;
+    }
+  }
+
+  // LOD System
+  createLODGroup(id: string, meshes: THREE.Mesh[], distances: number[]): THREE.LOD {
+    const lod = new THREE.LOD();
+
+    meshes.forEach((mesh, index) => {
+      const distance = distances[index] || index * 10;
+      lod.addLevel(mesh, distance);
+    });
+
+    this.lodGroups.set(id, lod);
+    return lod;
+  }
+
+  updateLOD(camera: THREE.Camera) {
+    this.lodGroups.forEach((lod) => {
+      lod.update(camera);
+    });
+  }
+
+  // Geometry Optimization
+  simplifyGeometry(geometry: THREE.BufferGeometry, targetTriangles: number): THREE.BufferGeometry {
+    const originalTriangles = geometry.index
+      ? geometry.index.count / 3
+      : geometry.attributes.position.count / 3;
+
+    if (originalTriangles <= targetTriangles) {
+      return geometry;
+    }
+
+    const cacheKey = `${geometry.uuid}_${targetTriangles}`;
+    if (this.simplifiedGeometries.has(cacheKey)) {
+      return this.simplifiedGeometries.get(cacheKey)!;
+    }
+
+    // Simple decimation algorithm
+    const simplified = this.decimateGeometry(geometry, targetTriangles);
+    this.simplifiedGeometries.set(cacheKey, simplified);
+
+    return simplified;
+  }
+
+  private decimateGeometry(
+    geometry: THREE.BufferGeometry,
+    targetTriangles: number,
+  ): THREE.BufferGeometry {
+    // This is a simplified decimation - in production, use proper mesh simplification
+    const simplified = geometry.clone();
+
+    if (simplified.index) {
+      const originalCount = simplified.index.count;
+      const targetCount = targetTriangles * 3;
+      const ratio = targetCount / originalCount;
+
+      // Simple edge collapse simulation
+      if (ratio < 1) {
+        const newIndex = new THREE.BufferAttribute(
+          new Uint32Array(Math.floor(originalCount * ratio)),
+          1,
+        );
+
+        for (let i = 0; i < newIndex.count; i++) {
+          newIndex.setX(i, simplified.index.getX(Math.floor(i / ratio)));
+        }
+
+        simplified.setIndex(newIndex);
+      }
+    }
+
+    return simplified;
+  }
+
+  // Instancing
+  createInstancedMesh(
+    geometry: THREE.BufferGeometry,
+    material: THREE.Material,
+    count: number,
+  ): THREE.InstancedMesh {
+    const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
+
+    // Set up instance matrix attributes
+    const matrix = new THREE.Matrix4();
+    const position = new THREE.Vector3();
+    const rotation = new THREE.Euler();
+    const scale = new THREE.Vector3(1, 1, 1);
+
+    for (let i = 0; i < count; i++) {
+      position.set(
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+      );
+
+      rotation.set(
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2,
+        Math.random() * Math.PI * 2,
+      );
+
+      matrix.compose(position, new THREE.Quaternion().setFromEuler(rotation), scale);
+      instancedMesh.setMatrixAt(i, matrix);
+    }
+
+    instancedMesh.instanceMatrix.needsUpdate = true;
+    return instancedMesh;
+  }
+
+  // Texture Optimization
+  async compressTexture(texture: THREE.Texture): Promise<THREE.CompressedTexture> {
+    const cacheKey = texture.uuid;
+    if (this.compressedTextures.has(cacheKey)) {
+      return this.compressedTextures.get(cacheKey)!;
+    }
+
+    // In a real implementation, you would use a texture compression library
+    // For now, we'll create a compressed version with reduced resolution
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+
+    canvas.width = Math.min(texture.image.width, this.settings.maxTextureSize);
+    canvas.height = Math.min(texture.image.height, this.settings.maxTextureSize);
+
+    ctx.drawImage(texture.image, 0, 0, canvas.width, canvas.height);
+
+    const compressedTexture = new THREE.CanvasTexture(canvas);
+    compressedTexture.format = texture.format;
+    compressedTexture.type = texture.type;
+    compressedTexture.generateMipmaps = texture.generateMipmaps;
+    compressedTexture.minFilter = texture.minFilter;
+    compressedTexture.magFilter = texture.magFilter;
+
+    this.compressedTextures.set(cacheKey, compressedTexture as unknown as THREE.CompressedTexture);
+    return compressedTexture as unknown as THREE.CompressedTexture;
+  }
+
+  // Progressive Loading
+  async loadModelProgressively(
+    url: string,
+    onProgress: (progress: number) => void,
+    onComplete: (gltf: GLTF) => void,
+    onError: (error: Error) => void,
+  ): Promise<void> {
+    try {
+      // Load geometry first
+      onProgress(0.2);
+      const geometry = await this.loadGeometry(url);
+
+      // Load materials
+      onProgress(0.5);
+      const materials = await this.loadMaterials(url);
+
+      // Load textures
+      onProgress(0.8);
+      await this.loadTextures(url);
+
+      // Combine into GLTF-like structure
+      onProgress(1.0);
+      const gltf = this.assembleGLTF(geometry, materials, []);
+
+      onComplete(gltf);
+    } catch (error) {
+      onError(error as Error);
+    }
+  }
+
+  private async loadGeometry(_url: string): Promise<THREE.BufferGeometry> {
+    // Placeholder for progressive geometry loading
+    return new THREE.BoxGeometry(1, 1, 1);
+  }
+
+  private async loadMaterials(_url: string): Promise<THREE.Material[]> {
+    // Placeholder for progressive material loading
+    return [new THREE.MeshStandardMaterial()];
+  }
+
+  private async loadTextures(_url: string): Promise<THREE.Texture[]> {
+    // Placeholder for progressive texture loading
+    return [];
+  }
+
+  private assembleGLTF(
+    geometry: THREE.BufferGeometry,
+    materials: THREE.Material[],
+    _textures: THREE.Texture[],
+  ): GLTF {
+    const mesh = new THREE.Mesh(geometry, materials[0]);
+    const group = new THREE.Group();
+    group.add(mesh);
+
+    return {
+      scene: group as any,
+      scenes: [group as any],
+      cameras: [],
+      animations: [],
+      asset: { version: '2.0', generator: 'PerformanceOptimizer' },
+      parser: {} as any,
+      userData: {},
+    };
+  }
+
+  // Performance Monitoring
+  updateMetrics(renderer: THREE.WebGLRenderer) {
+    const currentTime = performance.now();
+    const deltaTime = currentTime - this.lastFrameTime;
+
+    this.metrics.frameTime = deltaTime;
+    this.metrics.fps = 1000 / deltaTime;
+
+    this.fpsHistory.push(this.metrics.fps);
+    if (this.fpsHistory.length > 60) {
+      this.fpsHistory.shift();
+    }
+
+    // Calculate average FPS
+    const avgFPS = this.fpsHistory.reduce((a, b) => a + b, 0) / this.fpsHistory.length;
+    this.metrics.fps = avgFPS;
+
+    // Get renderer info
+    const info = renderer.info;
+    this.metrics.drawCalls = info.render.calls;
+    this.metrics.triangles = info.render.triangles;
+
+    // Estimate memory usage
+    this.estimateMemoryUsage();
+
+    // Adaptive quality adjustment
+    if (this.adaptiveQuality) {
+      this.adjustQualityBasedOnPerformance();
+    }
+
+    this.lastFrameTime = currentTime;
+  }
+
+  private estimateMemoryUsage() {
+    // Rough estimation of memory usage
+    let totalMemory = 0;
+
+    // Geometry memory
+    this.geometryCache.forEach((geometry) => {
+      if (geometry.attributes.position) {
+        totalMemory += geometry.attributes.position.array.byteLength;
+      }
+      if (geometry.index) {
+        totalMemory += geometry.index.array.byteLength;
+      }
+    });
+
+    // Texture memory
+    this.textureCache.forEach((texture) => {
+      if (texture.image) {
+        const width = texture.image.width || 512;
+        const height = texture.image.height || 512;
+        totalMemory += width * height * 4; // RGBA
+      }
+    });
+
+    this.metrics.memoryUsage = totalMemory / 1024 / 1024; // MB
+  }
+
+  private adjustQualityBasedOnPerformance() {
+    const targetFPS = this.settings.targetFPS;
+    const currentFPS = this.metrics.fps;
+
+    if (currentFPS < targetFPS * 0.8) {
+      // Performance is poor, reduce quality
+      this.reduceQuality();
+    } else if (currentFPS > targetFPS * 1.2 && this.canIncreaseQuality()) {
+      // Performance is good, increase quality
+      this.increaseQuality();
+    }
+  }
+
+  private reduceQuality() {
+    switch (this.settings.quality) {
+      case 'ultra':
+        this.settings.quality = 'high';
+        this.settings.maxTextureSize = 2048;
+        this.settings.shadowMapSize = 4096;
+        break;
+      case 'high':
+        this.settings.quality = 'medium';
+        this.settings.maxTextureSize = 1024;
+        this.settings.shadowMapSize = 2048;
+        break;
+      case 'medium':
+        this.settings.quality = 'low';
+        this.settings.maxTextureSize = 512;
+        this.settings.shadowMapSize = 1024;
+        break;
+    }
+
+    console.warn(`Quality reduced to ${this.settings.quality} due to performance`);
+  }
+
+  private increaseQuality() {
+    switch (this.settings.quality) {
+      case 'low':
+        this.settings.quality = 'medium';
+        this.settings.maxTextureSize = 1024;
+        this.settings.shadowMapSize = 2048;
+        break;
+      case 'medium':
+        this.settings.quality = 'high';
+        this.settings.maxTextureSize = 2048;
+        this.settings.shadowMapSize = 4096;
+        break;
+      case 'high':
+        this.settings.quality = 'ultra';
+        this.settings.maxTextureSize = 4096;
+        this.settings.shadowMapSize = 8192;
+        break;
+    }
+
+    console.warn(`Quality increased to ${this.settings.quality} due to good performance`);
+  }
+
+  private canIncreaseQuality(): boolean {
+    return this.settings.quality !== 'ultra';
+  }
+
+  // Frustum Culling
+  setupFrustumCulling(camera: THREE.Camera, objects: THREE.Object3D[]) {
+    if (!this.settings.enableFrustumCulling) return;
+
+    const frustum = new THREE.Frustum();
+    const matrix = new THREE.Matrix4();
+
+    objects.forEach((obj) => {
+      matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      frustum.setFromProjectionMatrix(matrix);
+
+      obj.visible = frustum.intersectsObject(obj);
+    });
+  }
+
+  // Batch Management
+  batchMeshesByMaterial(meshes: THREE.Mesh[]): Map<string, THREE.Mesh[]> {
+    const batches = new Map<string, THREE.Mesh[]>();
+
+    meshes.forEach((mesh) => {
+      const materialKey = Array.isArray(mesh.material)
+        ? mesh.material.map((m) => m.uuid).join(',')
+        : mesh.material.uuid;
+
+      if (!batches.has(materialKey)) {
+        batches.set(materialKey, []);
+      }
+
+      batches.get(materialKey)!.push(mesh);
+    });
+
+    return batches;
+  }
+
+  // Cleanup
+  dispose() {
+    // Dispose geometries
+    this.geometryCache.forEach((geometry) => geometry.dispose());
+    this.geometryCache.clear();
+
+    // Dispose textures
+    this.textureCache.forEach((texture) => texture.dispose());
+    this.textureCache.clear();
+
+    // Dispose compressed textures
+    this.compressedTextures.forEach((texture) => texture.dispose());
+    this.compressedTextures.clear();
+
+    // Clear LOD groups
+    this.lodGroups.clear();
+
+    // Clear instanced meshes
+    this.instancedMeshes.clear();
+  }
+
+  // Getters
+  getSettings(): PerformanceSettings {
+    return { ...this.settings };
+  }
+
+  getMetrics(): PerformanceMetrics {
+    return { ...this.metrics };
+  }
+
+  setQuality(quality: 'low' | 'medium' | 'high' | 'ultra') {
+    this.settings.quality = quality;
+
+    // Update settings based on quality
+    switch (quality) {
+      case 'low':
+        this.settings.maxTextureSize = 512;
+        this.settings.shadowMapSize = 1024;
+        this.settings.enableLOD = false;
+        break;
+      case 'medium':
+        this.settings.maxTextureSize = 1024;
+        this.settings.shadowMapSize = 2048;
+        this.settings.enableLOD = true;
+        break;
+      case 'high':
+        this.settings.maxTextureSize = 2048;
+        this.settings.shadowMapSize = 4096;
+        this.settings.enableLOD = true;
+        break;
+      case 'ultra':
+        this.settings.maxTextureSize = 4096;
+        this.settings.shadowMapSize = 8192;
+        this.settings.enableLOD = true;
+        break;
+    }
+  }
+}
+
+// Default performance settings
+export const DEFAULT_PERFORMANCE_SETTINGS: PerformanceSettings = {
+  quality: 'high',
+  targetFPS: 60,
+  enableLOD: true,
+  enableInstancing: true,
+  enableTextureCompression: true,
+  enableProgressiveLoading: true,
+  maxTextureSize: 2048,
+  shadowMapSize: 4096,
+  maxLights: 8,
+  maxParticles: 1000,
+  enableFrustumCulling: true,
+  enableOcclusionCulling: false,
+};
+
+// Singleton performance optimizer
+export const performanceOptimizer = new PerformanceOptimizer(DEFAULT_PERFORMANCE_SETTINGS);

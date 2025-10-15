@@ -125,7 +125,7 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
   // Spawn initial petals on mount
   useEffect(() => {
     if (prefersReducedMotion) return;
-    
+
     // Spawn 5 initial petals immediately
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
