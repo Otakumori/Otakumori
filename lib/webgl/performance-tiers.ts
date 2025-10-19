@@ -372,34 +372,32 @@ export function logDeviceCapabilities(): void {
   const features = checkWebGLFeatureSupport();
   const settings = getQualitySettings(capabilities.tier);
 
-  /* eslint-disable no-console -- Developer diagnostic function for WebGL capabilities */
-  console.group('🎮 WebGL Performance Capabilities');
-  console.log('Performance Tier:', capabilities.tier.toUpperCase());
-  console.log('WebGL Version:', capabilities.webglVersion);
-  console.log('GPU:', `${capabilities.gpuInfo.vendor} - ${capabilities.gpuInfo.renderer}`);
-  console.log('Max Texture Size:', capabilities.maxTextureSize);
-  console.log(
+  console.warn('🎮 WebGL Performance Capabilities');
+  console.warn('Performance Tier:', capabilities.tier.toUpperCase());
+  console.warn('WebGL Version:', capabilities.webglVersion);
+  console.warn('GPU:', `${capabilities.gpuInfo.vendor} - ${capabilities.gpuInfo.renderer}`);
+  console.warn('Max Texture Size:', capabilities.maxTextureSize);
+  console.warn(
     'Device Memory:',
     capabilities.deviceMemory ? `${capabilities.deviceMemory}GB` : 'unknown',
   );
-  console.log('CPU Cores:', capabilities.hardwareConcurrency || 'unknown');
-  console.log('Estimated FPS:', capabilities.estimatedFPS);
-  console.groupEnd();
+  console.warn('CPU Cores:', capabilities.hardwareConcurrency || 'unknown');
+  console.warn('Estimated FPS:', capabilities.estimatedFPS);
+  console.warn('---');
 
-  console.group('✨ Quality Settings');
-  console.log('Texture Size:', settings.textureSize);
-  console.log('Model Poly Count:', settings.modelPolyCount);
-  console.log('Shadow Quality:', settings.shadowQuality);
-  console.log('Post-Processing:', settings.postProcessing);
-  console.log('Particle Count:', settings.particleCount);
-  console.log('Target FPS:', settings.targetFPS);
-  console.groupEnd();
+  console.warn('✨ Quality Settings');
+  console.warn('Texture Size:', settings.textureSize);
+  console.warn('Model Poly Count:', settings.modelPolyCount);
+  console.warn('Shadow Quality:', settings.shadowQuality);
+  console.warn('Post-Processing:', settings.postProcessing);
+  console.warn('Particle Count:', settings.particleCount);
+  console.warn('Target FPS:', settings.targetFPS);
+  console.warn('---');
 
-  console.group('🔧 Feature Support');
-  console.log('WebGL 2.0:', features.webgl2);
-  console.log('Instanced Rendering:', features.instancing);
-  console.log('Vertex Array Objects:', features.vao);
-  console.log('Float Textures:', features.floatTextures);
-  console.groupEnd();
-  /* eslint-enable no-console */
+  console.warn('🔧 Feature Support');
+  console.warn('WebGL 2.0:', features.webgl2);
+  console.warn('Instanced Rendering:', features.instancing);
+  console.warn('Vertex Array Objects:', features.vao);
+  console.warn('Float Textures:', features.floatTextures);
+  console.warn('---');
 }

@@ -33,6 +33,31 @@ const EnvSchema = z.object({
   NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: z.string().optional(),
   NEXT_PUBLIC_FEATURE_JIGGLE: z.string().optional(),
   NEXT_PUBLIC_FEATURE_EVENTS: z.string().optional(),
+  NEXT_PUBLIC_FEATURE_PERF_MODULE: z.string().optional(),
+  // Audio and WebSocket settings
+  NEXT_PUBLIC_ENABLE_AUDIO: z.string().optional(),
+  NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: z.string().optional(),
+  NEXT_PUBLIC_COMMUNITY_WS_URL: z.string().optional(),
+  // Admin API
+  NEXT_PUBLIC_ADMIN_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_API_KEY: z.string().optional(),
+  // Inngest
+  INNGEST_EVENT_KEY: z.string().optional(),
+  INNGEST_SIGNING_KEY: z.string().optional(),
+  INNGEST_PROBE: z.string().optional(),
+  INNGEST_SERVE_URL: z.string().optional(),
+  // Next.js
+  NEXT_RUNTIME: z.string().optional(),
+  // Petals
+  NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: z.string().optional(),
+  // App Environment
+  NEXT_PUBLIC_APP_ENV: z.string().optional(),
+  NEXT_PHASE: z.string().optional(),
+  // Feature Flags
+  NEXT_PUBLIC_FLAGS_PUBLIC_KEY: z.string().optional(),
+  FEATURE_FLAG_PROVIDER: z.string().optional(),
+  // Storage
+  ADULTS_STORAGE_INDEX_URL: z.string().optional(),
 });
 
 export const env = EnvSchema.parse({
@@ -66,4 +91,29 @@ export const env = EnvSchema.parse({
   NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: process.env.NEXT_PUBLIC_FEATURE_DIRTY_EMOTES,
   NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE,
   NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
+  NEXT_PUBLIC_FEATURE_PERF_MODULE: process.env.NEXT_PUBLIC_FEATURE_PERF_MODULE,
+  // Audio and WebSocket settings
+  NEXT_PUBLIC_ENABLE_AUDIO: process.env.NEXT_PUBLIC_ENABLE_AUDIO,
+  NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+  NEXT_PUBLIC_COMMUNITY_WS_URL: process.env.NEXT_PUBLIC_COMMUNITY_WS_URL,
+  // Admin API
+  NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY,
+  NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
+  // Inngest
+  INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+  INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+  INNGEST_PROBE: process.env.INNGEST_PROBE,
+  INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
+  // Next.js
+  NEXT_RUNTIME: process.env.NEXT_RUNTIME,
+  // Petals
+  NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE,
+  // App Environment
+  NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+  NEXT_PHASE: process.env.NEXT_PHASE,
+  // Feature Flags
+  NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
+  FEATURE_FLAG_PROVIDER: process.env.FEATURE_FLAG_PROVIDER,
+  // Storage
+  ADULTS_STORAGE_INDEX_URL: process.env.ADULTS_STORAGE_INDEX_URL,
 });

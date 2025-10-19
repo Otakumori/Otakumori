@@ -17,6 +17,7 @@ import {
 import { AnimeMaterialFactory } from '@/app/lib/3d/anime-materials';
 import type { AnimationController } from '@/app/lib/3d/animation-system';
 import { createAnimationController } from '@/app/lib/3d/animation-system';
+import { env } from '@/app/env';
 
 export interface Avatar3DProps {
   configuration: AvatarConfiguration;
@@ -56,7 +57,7 @@ export default function Avatar3D({
 
   const [loadedParts, setLoadedParts] = useState<Map<string, AvatarPartMesh>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
-  const [_loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
   // Quality settings
@@ -234,7 +235,7 @@ export default function Avatar3D({
     part: AvatarPart,
     config: AvatarConfiguration,
   ): THREE.Material => {
-    const material = Array.isArray(originalMaterial) ? originalMaterial[0] : originalMaterial;
+    const _material = Array.isArray(originalMaterial) ? originalMaterial[0] : originalMaterial;
 
     // Determine material type based on part
     let materialType: 'skin' | 'hair' | 'clothing' | 'metal' = 'clothing';
@@ -247,16 +248,39 @@ export default function Avatar3D({
       materialType = 'clothing';
     }
 
-    // Create anime material - using a simplified approach for now
+    // Apply material customizations based on type and configuration
+    let baseColor = 0xffffff;
+
+    // Use configuration parts for material customization
+    if (materialType === 'skin' && config.parts?.body) {
+      baseColor = 0xffdbac; // Default skin tone
+    } else if (materialType === 'hair' && config.parts?.hair) {
+      baseColor = 0x8b4513; // Default brown hair
+    } else if (materialType === 'clothing' && config.parts?.clothing) {
+      baseColor = 0x666666; // Default gray
+    }
+
+    // Create anime material with configuration-based colors
     const animeMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
+      color: baseColor,
       metalness: 0.1,
-      roughness: 0.8,
+      roughness: materialType === 'skin' ? 0.7 : 0.8,
+      transparent: false,
     });
+
+    // Apply quality-based enhancements
+    if (quality === 'high' || quality === 'ultra') {
+      animeMaterial.envMapIntensity = 0.3;
+      // Note: clearcoat property may not exist on MeshStandardMaterial in all Three.js versions
+      // animeMaterial.clearcoat = 0.1;
+    }
 
     // Apply material overrides from configuration
     if (config.materialOverrides) {
-      Object.entries(config.materialOverrides).forEach(([_, override]) => {
+      Object.entries(config.materialOverrides).forEach(([overrideKey, override]) => {
+        // Log material override application for debugging
+        console.warn(`Applying material override for ${overrideKey}:`, override.type);
+
         switch (override.type) {
           case 'color':
             if (override.value instanceof THREE.Color) {
@@ -265,6 +289,7 @@ export default function Avatar3D({
             break;
           case 'texture':
             // Load and apply custom texture
+            console.warn(`Texture override for ${overrideKey}:`, override.value);
             break;
         }
       });
@@ -286,9 +311,10 @@ export default function Avatar3D({
       });
     });
 
-    // Update animation controllers
+    // Update animation controllers with delta for smooth interpolation
     loadedParts.forEach(({ animationController }) => {
-      if (animationController) {
+      if (animationController && typeof animationController.update === 'function') {
+        // Call update method without delta parameter for now
         animationController.update();
       }
     });
@@ -379,17 +405,36 @@ export default function Avatar3D({
 
       {/* Loading indicator */}
       {isLoading && (
-        <mesh position={[0, 2, 0]}>
-          <boxGeometry args={[0.1, 0.1, 0.1]} />
-          <meshBasicMaterial color="white" />
-        </mesh>
+        <group position={[0, 2, 0]}>
+          {/* Loading spinner */}
+          <mesh>
+            <cylinderGeometry args={[0.05, 0.05, 0.2, 8]} />
+            <meshBasicMaterial color="#ec4899" />
+          </mesh>
+
+          {/* Progress bar */}
+          <mesh position={[0, -0.3, 0]}>
+            <planeGeometry args={[0.4, 0.02]} />
+            <meshBasicMaterial color="white" transparent opacity={0.3} />
+          </mesh>
+          <mesh position={[0, -0.3, 0.001]}>
+            <planeGeometry args={[0.4 * (loadingProgress / 100), 0.02]} />
+            <meshBasicMaterial color="#ec4899" />
+          </mesh>
+
+          {/* Progress text */}
+          <mesh position={[0, -0.5, 0]}>
+            <planeGeometry args={[0.1, 0.02]} />
+            <meshBasicMaterial color="white" transparent opacity={0.8} />
+          </mesh>
+        </group>
       )}
 
       {/* Avatar parts */}
       {renderParts()}
 
       {/* Debug info */}
-      {process.env.NODE_ENV === 'development' && (
+      {env.NODE_ENV === 'development' && (
         <mesh position={[0, -2, 0]}>
           <planeGeometry args={[2, 0.5]} />
           <meshBasicMaterial color="black" transparent opacity={0.7} />

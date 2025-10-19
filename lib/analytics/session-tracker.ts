@@ -24,7 +24,7 @@ export interface GameSession {
   synced: boolean;
 }
 
-interface SessionDB extends DBSchema {
+type SessionDB = DBSchema & {
   sessions: {
     key: string;
     value: GameSession;
@@ -33,8 +33,8 @@ interface SessionDB extends DBSchema {
       bySynced: boolean;
       byStartTime: number;
     };
-  } & any; // Workaround for DBSchema typing issue
-}
+  };
+};
 
 class SessionTracker {
   private db: IDBPDatabase<SessionDB> | null = null;
@@ -285,11 +285,20 @@ class SessionTracker {
     // Keep only the 100 most recent sessions
     if (allSessions.length > 100) {
       const toDelete = allSessions.slice(0, allSessions.length - 100);
+      let deletedCount = 0;
+
       for (const session of toDelete) {
-        // Delete specific session by ID
-        // eslint-disable-next-line drizzle/enforce-delete-with-where -- Deleting by specific ID from loop
-        await this.db.delete('sessions', session.id);
+        try {
+          // Delete specific session by ID
+          // eslint-disable-next-line drizzle/enforce-delete-with-where -- Using IndexedDB, not Drizzle
+          await this.db.delete('sessions', session.id);
+          deletedCount++;
+        } catch (error) {
+          console.error(`Failed to delete session ${session.id}:`, error);
+        }
       }
+
+      console.warn(`Session cleanup: deleted ${deletedCount} old sessions`);
     }
   }
 }
