@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 // Removed supabase import - using API routes for admin actions
 import { motion } from 'framer-motion';
+import { env } from '@/app/env';
 
 interface QuickAction {
   id: string;
@@ -29,7 +30,7 @@ export default function QuickActions() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+          'x-api-key': env.NEXT_PUBLIC_API_KEY || 'dev-key',
         },
       });
 
@@ -48,7 +49,7 @@ export default function QuickActions() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+          'x-api-key': env.NEXT_PUBLIC_API_KEY || 'dev-key',
         },
         body: JSON.stringify({
           maintenance: !maintenanceStatus,
@@ -149,7 +150,7 @@ export default function QuickActions() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+              'x-api-key': env.NEXT_PUBLIC_API_KEY || 'dev-key',
             },
           });
 
@@ -179,7 +180,7 @@ export default function QuickActions() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+              'x-api-key': env.NEXT_PUBLIC_API_KEY || 'dev-key',
             },
           });
 
@@ -240,7 +241,7 @@ export default function QuickActions() {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': process.env.NEXT_PUBLIC_API_KEY || 'dev-key',
+                'x-api-key': env.NEXT_PUBLIC_API_KEY || 'dev-key',
               },
               body: JSON.stringify({ message }),
             });

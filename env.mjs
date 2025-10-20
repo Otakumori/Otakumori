@@ -38,9 +38,6 @@ try {
       NODE_OPTIONS: z.string().optional(),
       RESEND_API_KEY: z.string().optional(),
       EMAIL_FROM: z.string().optional(),
-      // Stripe
-      STRIPE_SECRET_KEY: z.string(),
-      STRIPE_WEBHOOK_SECRET: z.string(),
       // EasyPost
       EASYPOST_API_KEY: z.string().optional(),
       EASYPOST_WEBHOOK_SECRET: z.string().optional(),
@@ -55,8 +52,6 @@ try {
       SANITY_DATASET: z.string().optional(),
       SANITY_API_READ_TOKEN: z.string().optional(),
       SANITY_WEBHOOK_SECRET: z.string().optional(),
-      // Algolia
-      NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().optional(),
       ALGOLIA_ADMIN_API_KEY: z.string().optional(),
       ALGOLIA_INDEX_BLOG: z.string().optional(),
       ALGOLIA_INDEX_GAMES: z.string().optional(),
@@ -102,10 +97,13 @@ try {
       SENTRY_AUTH_TOKEN: z.string().optional(),
       SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
       STACK_SECRET_SERVER_KEY: z.string().optional(),
+      SENTRY_ORG: z.string().optional(),
+      SENTRY_PROJECT: z.string().optional(),
       // Prisma Accelerate
       PRISMA_ACCELERATE_API_KEY: z.string().optional(),
       // Misc
       DEBUG_MODE: z.string().optional(),
+      ANALYZE: z.string().optional(),
       // Feature Flags
       FEATURE_FLAG_PROVIDER: z
         .enum(['local', 'configcat', 'flagsmith'])
@@ -199,21 +197,6 @@ try {
       NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
       NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
       SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
-      // Feature flags - consolidated definitions
-      NEXT_PUBLIC_FEATURE_MINIGAMES: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_RUNE: z.enum(['on', 'off']).default('off'),
-      NEXT_PUBLIC_FEATURE_SOAPSTONE: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_PETALS: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_CURSOR_GLOW: z.enum(['on', 'off']).default('off'),
-      NEXT_PUBLIC_FEATURE_STARFIELD: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: z.enum(['on', 'off']).default('off'),
-      NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_JIGGLE: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_EVENTS: z.enum(['on', 'off']).default('on'),
-      NEXT_PUBLIC_FEATURE_CUBE_HUB: z.string().optional(),
-      NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().optional(),
       NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
       NEXT_PUBLIC_LIVE_DATA: z.string().default('1'),
       NEXT_PUBLIC_PROBE_MODE: z.string().default('1'),
@@ -224,6 +207,7 @@ try {
       NEXT_PUBLIC_FEATURE_BLOG: z.string().default('1'),
       NEXT_PUBLIC_FEATURE_SOAPSTONES: z.string().default('1'),
       NEXT_PUBLIC_EVENT_CODE: z.string().optional(),
+      NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: z.string().optional(),
       // Misc
       NEXT_PUBLIC_API_KEY: z.string().optional(),
       NEXT_PUBLIC_ADMIN_API_KEY: z.string().optional(),
@@ -329,6 +313,18 @@ try {
       ANALYZE: process.env.ANALYZE,
       SENTRY_ORG: process.env.SENTRY_ORG,
       SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+      // Feature flags
+      FEATURE_FLAG_PROVIDER: process.env.FEATURE_FLAG_PROVIDER,
+      FEATURE_FLAG_API_KEY: process.env.FEATURE_FLAG_API_KEY,
+      FEATURE_FLAG_BASE_URL: process.env.FEATURE_FLAG_BASE_URL,
+      // Inngest
+      INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+      INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+      INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
+      INNGEST_PROBE: process.env.INNGEST_PROBE,
+      // Next.js runtime
+      NEXT_PHASE: process.env.NEXT_PHASE,
+      NEXT_RUNTIME: process.env.NEXT_RUNTIME,
 
       // Client environment variables
       NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
@@ -389,6 +385,8 @@ try {
       NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT,
       NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA,
       NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE,
+      NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
+      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
       // Homepage feature flags
       NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO,
       NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
@@ -396,6 +394,7 @@ try {
       NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG,
       NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES,
       NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE,
+      NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE,
       // Misc
       NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
       NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY,
@@ -530,6 +529,7 @@ try {
     NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '',
     NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500',
     NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE || '',
+    NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE || '',
     NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
     NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
     // WebSocket

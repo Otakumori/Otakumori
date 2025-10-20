@@ -6,6 +6,7 @@ import {
   type LightSource,
   type VolumetricEffect,
 } from '@/lib/lighting/dynamic-lighting';
+import { env } from '@/app/env';
 
 interface DynamicLightingSystemProps {
   className?: string;
@@ -370,7 +371,7 @@ export default function DynamicLightingSystem({
       />
 
       {/* Debug info */}
-      {process.env.NODE_ENV === 'development' && isInitialized && (
+      {env.NODE_ENV === 'development' && isInitialized && (
         <div className="absolute top-2 left-2 bg-black/60 text-white p-2 rounded text-xs font-mono z-50">
           <div>Lighting Engine: Active</div>
           <div>Theme: {gameTheme || 'default'}</div>

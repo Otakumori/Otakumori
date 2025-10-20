@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import GlassPanel from '../GlassPanel';
-import { env } from '@/env.mjs';
+// Server component: prefer relative API calls to avoid SSR base-URL issues
 
 type BlogPost = {
   id: string;
@@ -16,9 +16,13 @@ type BlogPost = {
 
 async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/content/blog?limit=12`, {
-      next: { revalidate: 300 },
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(`/api/v1/content/blog?limit=12`, {
+      cache: 'no-store',
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) return [];
 

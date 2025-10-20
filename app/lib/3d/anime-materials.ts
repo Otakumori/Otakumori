@@ -7,6 +7,10 @@ import { animePbrFrag } from '../shaders/anime-pbr.frag.ts';
 import { outlineVert } from '../shaders/outline.vert.ts';
 import { outlineFrag } from '../shaders/outline.frag.ts';
 import { hairAnisotropicFrag } from '../shaders/hair-anisotropic.frag.ts';
+import { subsurfaceScatteringFrag } from '../shaders/subsurface-scattering.frag.ts';
+import { fabricClothFrag } from '../shaders/fabric-cloth.frag.ts';
+import { metallicGlossyFrag } from '../shaders/metallic-glossy.frag.ts';
+import { transparencyGlassFrag } from '../shaders/transparency-glass.frag.ts';
 
 export interface AnimeMaterialOptions {
   // Base material properties
@@ -401,3 +405,143 @@ export const MATERIAL_PRESETS = {
     lace: { roughness: 0.4, metallic: 0.0, alpha: 0.8 },
   },
 } as const;
+
+// Subsurface Scattering Material for Skin
+export class SubsurfaceScatteringMaterial extends ShaderMaterial {
+  constructor(options: {
+    skinTone?: THREE.Color;
+    subsurfaceStrength?: number;
+    subsurfaceColor?: THREE.Color;
+    thicknessScale?: number;
+    diffuseMap?: THREE.Texture;
+    thicknessMap?: THREE.Texture;
+    normalMap?: THREE.Texture;
+  } = {}) {
+    super({
+      vertexShader: animePbrVert,
+      fragmentShader: subsurfaceScatteringFrag,
+      uniforms: {
+        uDiffuseMap: { value: options.diffuseMap || null },
+        uNormalMap: { value: options.normalMap || null },
+        uThicknessMap: { value: options.thicknessMap || null },
+        uSkinTone: { value: options.skinTone || new THREE.Color(1.0, 0.8, 0.7) },
+        uSubsurfaceStrength: { value: options.subsurfaceStrength || 0.3 },
+        uSubsurfaceColor: { value: options.subsurfaceColor || new THREE.Color(1.0, 0.4, 0.4) },
+        uThicknessScale: { value: options.thicknessScale || 1.0 },
+        uLightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        uLightColor: { value: new THREE.Color(1, 1, 1) },
+        uCameraPosition: { value: new THREE.Vector3() },
+        uTime: { value: 0 },
+      },
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+  }
+}
+
+// Fabric/Cloth Material
+export class FabricClothMaterial extends ShaderMaterial {
+  constructor(options: {
+    fabricColor?: THREE.Color;
+    fabricRoughness?: number;
+    fabricMetallic?: number;
+    patternScale?: number;
+    patternIntensity?: number;
+    diffuseMap?: THREE.Texture;
+    normalMap?: THREE.Texture;
+    roughnessMap?: THREE.Texture;
+    fabricPatternMap?: THREE.Texture;
+  } = {}) {
+    super({
+      vertexShader: animePbrVert,
+      fragmentShader: fabricClothFrag,
+      uniforms: {
+        uDiffuseMap: { value: options.diffuseMap || null },
+        uNormalMap: { value: options.normalMap || null },
+        uRoughnessMap: { value: options.roughnessMap || null },
+        uFabricPatternMap: { value: options.fabricPatternMap || null },
+        uFabricColor: { value: options.fabricColor || new THREE.Color(0.8, 0.8, 0.8) },
+        uFabricRoughness: { value: options.fabricRoughness || 0.7 },
+        uFabricMetallic: { value: options.fabricMetallic || 0.0 },
+        uPatternScale: { value: options.patternScale || 1.0 },
+        uPatternIntensity: { value: options.patternIntensity || 0.5 },
+        uLightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        uLightColor: { value: new THREE.Color(1, 1, 1) },
+        uCameraPosition: { value: new THREE.Vector3() },
+        uTime: { value: 0 },
+      },
+    });
+  }
+}
+
+// Metallic/Glossy Material
+export class MetallicGlossyMaterial extends ShaderMaterial {
+  constructor(options: {
+    metallicColor?: THREE.Color;
+    metallicRoughness?: number;
+    metallicMetallic?: number;
+    reflectionStrength?: number;
+    diffuseMap?: THREE.Texture;
+    normalMap?: THREE.Texture;
+    roughnessMap?: THREE.Texture;
+    metallicMap?: THREE.Texture;
+    environmentMap?: THREE.Texture;
+  } = {}) {
+    super({
+      vertexShader: animePbrVert,
+      fragmentShader: metallicGlossyFrag,
+      uniforms: {
+        uDiffuseMap: { value: options.diffuseMap || null },
+        uNormalMap: { value: options.normalMap || null },
+        uRoughnessMap: { value: options.roughnessMap || null },
+        uMetallicMap: { value: options.metallicMap || null },
+        uEnvironmentMap: { value: options.environmentMap || null },
+        uMetallicColor: { value: options.metallicColor || new THREE.Color(0.8, 0.8, 0.8) },
+        uMetallicRoughness: { value: options.metallicRoughness || 0.1 },
+        uMetallicMetallic: { value: options.metallicMetallic || 1.0 },
+        uReflectionStrength: { value: options.reflectionStrength || 1.0 },
+        uLightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        uLightColor: { value: new THREE.Color(1, 1, 1) },
+        uCameraPosition: { value: new THREE.Vector3() },
+        uTime: { value: 0 },
+      },
+    });
+  }
+}
+
+// Transparency/Glass Material
+export class TransparencyGlassMaterial extends ShaderMaterial {
+  constructor(options: {
+    glassColor?: THREE.Color;
+    glassRoughness?: number;
+    refractionIndex?: number;
+    transparency?: number;
+    fresnelPower?: number;
+    diffuseMap?: THREE.Texture;
+    normalMap?: THREE.Texture;
+    roughnessMap?: THREE.Texture;
+    environmentMap?: THREE.Texture;
+  } = {}) {
+    super({
+      vertexShader: animePbrVert,
+      fragmentShader: transparencyGlassFrag,
+      uniforms: {
+        uDiffuseMap: { value: options.diffuseMap || null },
+        uNormalMap: { value: options.normalMap || null },
+        uRoughnessMap: { value: options.roughnessMap || null },
+        uEnvironmentMap: { value: options.environmentMap || null },
+        uGlassColor: { value: options.glassColor || new THREE.Color(0.9, 0.9, 1.0) },
+        uGlassRoughness: { value: options.glassRoughness || 0.0 },
+        uRefractionIndex: { value: options.refractionIndex || 1.5 },
+        uTransparency: { value: options.transparency || 0.8 },
+        uFresnelPower: { value: options.fresnelPower || 5.0 },
+        uLightDirection: { value: new THREE.Vector3(1, 1, 1).normalize() },
+        uLightColor: { value: new THREE.Color(1, 1, 1) },
+        uCameraPosition: { value: new THREE.Vector3() },
+        uTime: { value: 0 },
+      },
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+  }
+}

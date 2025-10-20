@@ -6,11 +6,11 @@ import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 
 export default function CharacterEditorPage() {
   const handleConfigurationChange = (config: AvatarConfiguration) => {
-    console.log('Configuration updated:', config);
+    console.warn('Configuration updated:', config);
   };
 
   const handleSave = (config: AvatarConfiguration) => {
-    console.log('Saving configuration:', config);
+    console.warn('Saving configuration:', config);
     // Here you would typically save to database or local storage
     alert('Character saved! (Check console for details)');
   };

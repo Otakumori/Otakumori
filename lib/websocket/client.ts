@@ -55,8 +55,7 @@ class CommunityWebSocketClient {
       this.ws = new WebSocket(wsUrl);
 
       this.ws.onopen = () => {
-        // eslint-disable-next-line no-console
-        console.log('✅ WebSocket connected');
+        console.warn('✅ WebSocket connected');
         this.reconnectAttempts = 0;
         this.startHeartbeat();
       };
@@ -75,8 +74,7 @@ class CommunityWebSocketClient {
       };
 
       this.ws.onclose = () => {
-        // eslint-disable-next-line no-console
-        console.log('WebSocket disconnected');
+        console.warn('WebSocket disconnected');
         this.stopHeartbeat();
         this.attemptReconnect();
       };
@@ -90,17 +88,33 @@ class CommunityWebSocketClient {
    * Mock mode for development/fallback
    */
   private startMockMode(): void {
-    // eslint-disable-next-line no-console
-    console.log('📡 Starting WebSocket mock mode');
+    console.warn('📡 Starting WebSocket mock mode');
     this.isMockMode = true;
 
-    // Simulate real-time global petal updates
+    // Simulate real-time global petal updates with realistic growth
+    let globalPetalCount = 750000; // Starting count
+    let dailyCollectorCount = 2500; // Starting collector count
+
     setInterval(() => {
-      const _randomIncrement = Math.floor(Math.random() * 10) + 1;
+      // Realistic increment based on time of day and activity
+      const hour = new Date().getHours();
+      const isPeakTime = hour >= 18 && hour <= 23; // Evening peak hours
+      const baseIncrement = Math.floor(Math.random() * 8) + 2; // 2-9 petals
+      const peakMultiplier = isPeakTime ? 2.5 : 1;
+      const randomIncrement = Math.floor(baseIncrement * peakMultiplier);
+
+      // Apply increment to global count
+      globalPetalCount += randomIncrement;
+
+      // Occasionally add new collectors (1-3 per update)
+      if (Math.random() < 0.3) {
+        dailyCollectorCount += Math.floor(Math.random() * 3) + 1;
+      }
+
       this.handleMessage({
         type: 'global-petals',
-        count: Math.floor(Math.random() * 1000000) + 500000,
-        dailyCollectors: Math.floor(Math.random() * 5000) + 1000,
+        count: globalPetalCount,
+        dailyCollectors: dailyCollectorCount,
       });
     }, 5000);
 
@@ -166,8 +180,7 @@ class CommunityWebSocketClient {
    */
   send(data: unknown): void {
     if (this.isMockMode) {
-      // eslint-disable-next-line no-console
-      console.log('Mock mode: Message not sent', data);
+      console.warn('Mock mode: Message not sent', data);
       return;
     }
 
@@ -209,8 +222,7 @@ class CommunityWebSocketClient {
    */
   private attemptReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      // eslint-disable-next-line no-console
-      console.log('Max reconnection attempts reached, switching to mock mode');
+      console.warn('Max reconnection attempts reached, switching to mock mode');
       this.startMockMode();
       return;
     }
@@ -218,8 +230,7 @@ class CommunityWebSocketClient {
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 
-    // eslint-disable-next-line no-console
-    console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+    console.warn(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
 
     setTimeout(() => {
       this.connect();

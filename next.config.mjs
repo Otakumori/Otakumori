@@ -9,7 +9,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // safety net during build; real fix is dynamic rendering
-  staticPageGenerationTimeout: 120,
+  staticPageGenerationTimeout: 300,
   // Enable source maps for Edge Tools debugging
   productionBrowserSourceMaps: true,
   // Fix lockfile detection warning
@@ -157,6 +157,17 @@ const nextConfig = {
       {
         source: '/ingest/:path*',
         destination: 'https://us.i.posthog.com/:path*',
+      },
+    ];
+  },
+
+  // Redirects for legacy routes
+  async redirects() {
+    return [
+      {
+        source: '/mini-games/anime-memory-match',
+        destination: '/mini-games/memory-match',
+        permanent: true,
       },
     ];
   },

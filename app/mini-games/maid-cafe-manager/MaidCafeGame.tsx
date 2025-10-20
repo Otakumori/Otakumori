@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
+import { env } from '@/app/env';
 
 interface Customer {
   id: number;
@@ -435,7 +436,7 @@ export default function MaidCafeGame() {
           <div>Money: ${money}</div>
           <div>Level: {level}</div>
           <div>Time: {formatTime(gameTime)}</div>
-          {process.env.NODE_ENV === 'development' && (
+          {env.NODE_ENV === 'development' && (
             <>
               <div className="text-gray-400">Speed: {gameSpeed.toFixed(1)}x</div>
               <div className="text-gray-400">

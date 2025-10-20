@@ -8,6 +8,10 @@ export const metadata: Metadata = {
   description: 'Discover the latest insights, stories, and community highlights.',
 };
 
+// Force dynamic rendering to prevent timeout during static generation
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function BlogPage() {
   return (
     <main className="relative min-h-screen vignette">

@@ -1,6 +1,7 @@
 import { type Metadata } from 'next';
 import { generateSEO } from '@/app/lib/seo';
 import ProductClient from './ProductClient';
+import { env } from '@/app/env';
 
 interface PageProps {
   params: { id: string };
@@ -8,7 +9,7 @@ interface PageProps {
 
 async function getProductData(productId: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/v1/printify/products?productId=${productId}`, {
       cache: 'no-store',
     });

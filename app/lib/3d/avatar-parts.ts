@@ -18,7 +18,15 @@ export type AvatarPartType =
   | 'nsfw_anatomy'
   | 'intimate_accessories'
   | 'facial_features'
-  | 'body_modifications';
+  | 'body_modifications'
+  | 'wings'
+  | 'tails'
+  | 'horns'
+  | 'tattoos'
+  | 'markings'
+  | 'glow_effects'
+  | 'particle_effects'
+  | 'cosmetic_overlays';
 
 export type PartCategory = 'head' | 'body' | 'clothing' | 'accessories' | 'nsfw' | 'cosmetic';
 
@@ -88,6 +96,57 @@ export interface AttachmentPoint {
   rotation: THREE.Euler;
   scale: THREE.Vector3;
   parentBone?: string;
+}
+
+export interface TattooLayer {
+  id: string;
+  name: string;
+  textureUrl: string;
+  position: THREE.Vector3;
+  rotation: THREE.Euler;
+  scale: THREE.Vector3;
+  opacity: number;
+  blendMode: 'normal' | 'multiply' | 'overlay' | 'screen';
+  bodyPart: string;
+  contentRating: ContentRating;
+}
+
+export interface GlowEffect {
+  id: string;
+  name: string;
+  color: THREE.Color;
+  intensity: number;
+  radius: number;
+  animation: 'none' | 'pulse' | 'flicker' | 'wave';
+  speed: number;
+  bodyPart: string;
+}
+
+export interface ParticleEffect {
+  id: string;
+  name: string;
+  particleType: 'sparkles' | 'hearts' | 'stars' | 'flames' | 'ice' | 'lightning';
+  color: THREE.Color;
+  intensity: number;
+  size: number;
+  speed: number;
+  lifetime: number;
+  emissionRate: number;
+  bodyPart: string;
+  contentRating: ContentRating;
+}
+
+export interface TextureOverlay {
+  id: string;
+  name: string;
+  textureUrl: string;
+  patternType: 'solid' | 'stripes' | 'polka_dots' | 'floral' | 'geometric' | 'custom';
+  color: THREE.Color;
+  scale: number;
+  rotation: number;
+  opacity: number;
+  bodyPart: string;
+  materialSlot: string;
 }
 
 // NSFW-specific anatomy morphing targets
@@ -570,6 +629,135 @@ export class AvatarPartManager {
       if (part.contentRating === 'explicit') return rating === 'explicit' && userAgeVerified;
       return false;
     });
+  }
+
+  // Advanced customization examples
+  getWingsParts(): AvatarPart[] {
+    return [
+      {
+        id: 'wings_angel_001',
+        type: 'wings',
+        category: 'accessories',
+        name: 'Angel Wings',
+        description: 'Pure white angel wings with soft feathers',
+        modelUrl: '/assets/parts/wings/angel_001.glb',
+        thumbnailUrl: '/assets/parts/wings/angel_001_thumb.jpg',
+        contentRating: 'sfw',
+        rarity: 'rare',
+        isDefault: false,
+        isPremium: true,
+        customizable: true,
+        materialSlots: [
+          { name: 'feathers', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+          { name: 'bones', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+        ],
+        attachmentPoints: [
+          { name: 'back_center', position: new THREE.Vector3(0, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+        ],
+        compatibleParts: ['body_001', 'body_002'],
+        conflictsWith: ['wings_demon_001', 'wings_dragon_001'],
+        physicsEnabled: true,
+        colliderShape: 'mesh',
+        adultContent: false,
+        ageVerificationRequired: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 'wings_demon_001',
+        type: 'wings',
+        category: 'accessories',
+        name: 'Demon Wings',
+        description: 'Dark leathery demon wings with bat-like appearance',
+        modelUrl: '/assets/parts/wings/demon_001.glb',
+        thumbnailUrl: '/assets/parts/wings/demon_001_thumb.jpg',
+        contentRating: 'nsfw',
+        rarity: 'epic',
+        isDefault: false,
+        isPremium: true,
+        customizable: true,
+        materialSlots: [
+          { name: 'membrane', type: 'diffuse', customizable: true, colorable: true, patternable: true },
+          { name: 'bones', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+        ],
+        attachmentPoints: [
+          { name: 'back_center', position: new THREE.Vector3(0, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+        ],
+        compatibleParts: ['body_001', 'body_002'],
+        conflictsWith: ['wings_angel_001', 'wings_dragon_001'],
+        physicsEnabled: true,
+        colliderShape: 'mesh',
+        adultContent: true,
+        ageVerificationRequired: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+  }
+
+  getTailsParts(): AvatarPart[] {
+    return [
+      {
+        id: 'tail_cat_001',
+        type: 'tails',
+        category: 'accessories',
+        name: 'Cat Tail',
+        description: 'Fluffy cat tail with realistic fur',
+        modelUrl: '/assets/parts/tails/cat_001.glb',
+        thumbnailUrl: '/assets/parts/tails/cat_001_thumb.jpg',
+        contentRating: 'sfw',
+        rarity: 'common',
+        isDefault: false,
+        isPremium: false,
+        customizable: true,
+        materialSlots: [
+          { name: 'fur', type: 'diffuse', customizable: true, colorable: true, patternable: true },
+        ],
+        attachmentPoints: [
+          { name: 'tail_base', position: new THREE.Vector3(0, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+        ],
+        compatibleParts: ['body_001', 'body_002'],
+        conflictsWith: ['tail_dog_001', 'tail_fox_001'],
+        physicsEnabled: true,
+        colliderShape: 'capsule',
+        adultContent: false,
+        ageVerificationRequired: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+  }
+
+  getHornsParts(): AvatarPart[] {
+    return [
+      {
+        id: 'horns_demon_001',
+        type: 'horns',
+        category: 'accessories',
+        name: 'Demon Horns',
+        description: 'Curved demon horns with metallic finish',
+        modelUrl: '/assets/parts/horns/demon_001.glb',
+        thumbnailUrl: '/assets/parts/horns/demon_001_thumb.jpg',
+        contentRating: 'nsfw',
+        rarity: 'rare',
+        isDefault: false,
+        isPremium: true,
+        customizable: true,
+        materialSlots: [
+          { name: 'horn_material', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+        ],
+        attachmentPoints: [
+          { name: 'head_top', position: new THREE.Vector3(0, 0.1, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+        ],
+        compatibleParts: ['head_001', 'head_002'],
+        conflictsWith: ['horns_unicorn_001'],
+        physicsEnabled: false,
+        adultContent: true,
+        ageVerificationRequired: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
   }
 
   // Configuration management

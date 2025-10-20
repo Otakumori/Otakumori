@@ -7,12 +7,12 @@ export const runtime = 'nodejs';
 
 // GET /api/v1/character/config - Get user's character configuration for games
 export async function GET(request: NextRequest) {
-  return withRateLimit('character-config-get', async (req) => {
+  return withRateLimit('character-config-get', async (_req) => {
     try {
       const { userId } = await auth();
       const { searchParams } = new URL(request.url);
-      const gameId = searchParams.get('gameId');
-      const mode = searchParams.get('mode') || 'default';
+      const _gameId = searchParams.get('gameId');
+      const _mode = searchParams.get('mode') || 'default';
 
       if (!userId) {
         return NextResponse.json({ ok: false, error: 'Authentication required' }, { status: 401 });
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/v1/character/config - Create or update character configuration
 export async function POST(request: NextRequest) {
-  return withRateLimit('character-config-post', async (req) => {
+  return withRateLimit('character-config-post', async (_req) => {
     try {
       const { userId } = await auth();
 

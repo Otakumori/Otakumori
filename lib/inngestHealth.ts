@@ -1,11 +1,10 @@
-import { env } from '@/env';
+import { env } from '@/app/env';
 
 let started = false;
 
 function isBuildPhase() {
   // Next sets this during `next build`
-  // eslint-disable-next-line no-restricted-syntax -- Next.js internal build variable
-  return process.env.NEXT_PHASE === 'phase-production-build';
+  return env.NEXT_PHASE === 'phase-production-build';
 }
 
 function isEdgeRuntime() {
@@ -19,8 +18,7 @@ export async function bootCheckInngest() {
   started = true;
 
   // Allow opt-out via env (e.g. INNGEST_PROBE=off)
-  // eslint-disable-next-line no-restricted-syntax -- Server-only health check variable
-  if (process.env.INNGEST_PROBE === 'off') return;
+  if (env.INNGEST_PROBE === 'off') return;
 
   // Never run during `next build` / SSG pre-render
   if (isBuildPhase()) return;
@@ -28,12 +26,9 @@ export async function bootCheckInngest() {
   // Skip on edge runtime (network constraints, no need to probe here)
   if (isEdgeRuntime()) return;
 
-  // eslint-disable-next-line no-restricted-syntax -- Server-only health check variable
-  const serveUrl = process.env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
-  // eslint-disable-next-line no-restricted-syntax -- Server-only health check variable
-  const hasEventKey = !!process.env.INNGEST_EVENT_KEY;
-  // eslint-disable-next-line no-restricted-syntax -- Server-only health check variable
-  const hasSigningKey = !!process.env.INNGEST_SIGNING_KEY;
+  const serveUrl = env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
+  const hasEventKey = !!env.INNGEST_EVENT_KEY;
+  const hasSigningKey = !!env.INNGEST_SIGNING_KEY;
 
   if (!hasEventKey || !hasSigningKey) {
     const missing = [];

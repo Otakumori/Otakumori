@@ -3,6 +3,8 @@
  * Centralized event system for unlocking and tracking achievements
  */
 
+import { env } from '@/env.mjs';
+
 export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 export interface AchievementEvent {
@@ -55,8 +57,7 @@ class AchievementEventBus {
     });
 
     // Log to console in development
-    // eslint-disable-next-line no-restricted-syntax -- Universal runtime check for NODE_ENV
-    if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') {
+    if (typeof window !== 'undefined' && env.NODE_ENV === 'development') {
       console.warn(`🏆 Achievement Unlocked: ${achievement.title} [${achievement.rarity}]`);
     }
 

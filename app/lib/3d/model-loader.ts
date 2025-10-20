@@ -66,6 +66,8 @@ export class ModelLoader {
   private loader: GLTFLoader;
   private dracoLoader?: DRACOLoader;
   private cache: Map<string, OptimizedModel> = new Map();
+  private textureAtlas: Map<string, THREE.Texture> = new Map();
+  private loadingProgress: Map<string, number> = new Map();
 
   constructor() {
     this.loader = new GLTFLoader();
@@ -98,24 +100,24 @@ export class ModelLoader {
       }
 
       // Optimize the model
-      const optimizedGltf = await this.optimizeModel(gltf, options);
+      const optimizedModel = await this.optimizeModel(gltf, options);
 
       // Generate LOD levels if requested
       let lods: GLTF[] | undefined;
       if (options.generateLOD) {
-        lods = await this.generateLODs(optimizedGltf, options.lodLevels || [0.5, 0.25, 0.1]);
+        lods = await this.generateLODs(optimizedModel.gltf, options.lodLevels || [0.5, 0.25, 0.1]);
       }
 
       const loadTime = performance.now() - startTime;
 
       const result: OptimizedModel = {
-        gltf: optimizedGltf,
+        gltf: optimizedModel.gltf,
         lods,
-        validation,
+        validation: optimizedModel.validation,
         metadata: {
           originalUrl: url,
           loadTime,
-          compressionRatio: this.calculateCompressionRatio(gltf, optimizedGltf),
+          compressionRatio: this.calculateCompressionRatio(gltf, optimizedModel.gltf),
         },
       };
 
@@ -141,6 +143,58 @@ export class ModelLoader {
         (error) => reject(error),
       );
     });
+  }
+
+  // Optimize model after loading
+  private async optimizeModel(gltf: GLTF, options: ModelLoadOptions): Promise<OptimizedModel> {
+    const startTime = performance.now();
+
+    // Clone the GLTF to avoid modifying the original
+    const optimizedGltf = this.cloneGLTF(gltf);
+
+    // Optimize geometries
+    optimizedGltf.scene.traverse((child: any) => {
+      if (child instanceof THREE.Mesh) {
+        // Optimize geometry
+        if (options.simplifyGeometry && options.targetTriangles) {
+          child.geometry = this.simplifyGeometry(child.geometry, options.targetTriangles);
+        }
+
+        // Optimize materials
+        if (child.material) {
+          child.material = this.optimizeMaterial(child.material, options);
+        }
+      }
+    });
+
+    // Validate the optimized model
+    const validation = await this.validateModel(optimizedGltf, options);
+
+    const loadTime = performance.now() - startTime;
+
+    return {
+      gltf: optimizedGltf,
+      validation,
+      metadata: {
+        originalUrl: 'optimized',
+        loadTime,
+        compressionRatio: 0.8, // Placeholder
+      },
+    };
+  }
+
+  // Clone GLTF object
+  private cloneGLTF(gltf: GLTF): GLTF {
+    return {
+      ...gltf,
+      scene: gltf.scene.clone(),
+      scenes: gltf.scenes.map((scene) => scene.clone()),
+      cameras: gltf.cameras.map((camera) => camera.clone()),
+      animations: [...gltf.animations],
+      asset: { ...gltf.asset },
+      parser: gltf.parser,
+      userData: { ...gltf.userData },
+    };
   }
 
   // Validate model structure and content
@@ -288,33 +342,6 @@ export class ModelLoader {
     return hasNsfwContent;
   }
 
-  // Optimize model for performance
-  private async optimizeModel(gltf: GLTF, options: ModelLoadOptions): Promise<GLTF> {
-    const optimized = { ...gltf };
-
-    // Optimize geometries
-    optimized.scene.traverse((child: any) => {
-      if (child instanceof THREE.Mesh) {
-        // Merge vertices
-        if (child.geometry.index) {
-          child.geometry = child.geometry.toNonIndexed();
-        }
-
-        // Optimize materials
-        if (child.material) {
-          child.material = this.optimizeMaterial(child.material, options);
-        }
-
-        // Simplify geometry if requested
-        if (options.simplifyGeometry && options.targetTriangles) {
-          child.geometry = this.simplifyGeometry(child.geometry, options.targetTriangles);
-        }
-      }
-    });
-
-    return optimized;
-  }
-
   // Optimize material for performance
   private optimizeMaterial(material: THREE.Material, options: ModelLoadOptions): THREE.Material {
     if (material instanceof THREE.MeshStandardMaterial) {
@@ -323,22 +350,16 @@ export class ModelLoader {
       // Reduce texture sizes
       if (options.maxTextureSize) {
         if (optimized.map) {
-          optimized.map = this.resizeTexture(optimized.map, options.maxTextureSize);
+          this.resizeTexture(optimized.map, options.maxTextureSize);
         }
         if (optimized.normalMap) {
-          optimized.normalMap = this.resizeTexture(optimized.normalMap, options.maxTextureSize);
+          this.resizeTexture(optimized.normalMap, options.maxTextureSize);
         }
         if (optimized.roughnessMap) {
-          optimized.roughnessMap = this.resizeTexture(
-            optimized.roughnessMap,
-            options.maxTextureSize,
-          );
+          this.resizeTexture(optimized.roughnessMap, options.maxTextureSize);
         }
         if (optimized.metalnessMap) {
-          optimized.metalnessMap = this.resizeTexture(
-            optimized.metalnessMap,
-            options.maxTextureSize,
-          );
+          this.resizeTexture(optimized.metalnessMap, options.maxTextureSize);
         }
       }
 
@@ -354,34 +375,10 @@ export class ModelLoader {
     return material;
   }
 
-  // Resize texture to target size
-  private resizeTexture(texture: THREE.Texture, maxSize: number): THREE.Texture {
-    // This is a simplified version - in production, you'd use canvas or WebGL to resize
-    if (texture.image && texture.image.width > maxSize) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        canvas.width = maxSize;
-        canvas.height = maxSize;
-        ctx.drawImage(texture.image, 0, 0, maxSize, maxSize);
-
-        const resizedTexture = new THREE.CanvasTexture(canvas);
-        resizedTexture.wrapS = texture.wrapS;
-        resizedTexture.wrapT = texture.wrapT;
-        resizedTexture.minFilter = texture.minFilter;
-        resizedTexture.magFilter = texture.magFilter;
-
-        return resizedTexture;
-      }
-    }
-
-    return texture;
-  }
-
   // Simplify geometry to target triangle count
   private simplifyGeometry(
     geometry: THREE.BufferGeometry,
-    targetTriangles: number,
+    _targetTriangles: number,
   ): THREE.BufferGeometry {
     // This is a placeholder - you'd use a library like three-mesh-bvh or similar
     // for actual geometry simplification
@@ -445,6 +442,178 @@ export class ModelLoader {
       this.dracoLoader.dispose();
     }
     this.clearCache();
+  }
+
+  // Texture Atlasing Methods
+  async createTextureAtlas(
+    textures: THREE.Texture[],
+    atlasSize: number = 2048,
+  ): Promise<THREE.Texture> {
+    const canvas = document.createElement('canvas');
+    canvas.width = atlasSize;
+    canvas.height = atlasSize;
+    const ctx = canvas.getContext('2d')!;
+
+    const textureSize = Math.floor(atlasSize / Math.ceil(Math.sqrt(textures.length)));
+
+    // Pack textures into atlas
+    let x = 0,
+      y = 0;
+    for (let i = 0; i < textures.length; i++) {
+      const texture = textures[i];
+
+      // Create image element from texture
+      const image = await this.textureToImage(texture);
+
+      // Draw texture to canvas
+      ctx.drawImage(image, x, y, textureSize, textureSize);
+
+      // Move to next position
+      x += textureSize;
+      if (x >= atlasSize) {
+        x = 0;
+        y += textureSize;
+      }
+    }
+
+    // Create atlas texture
+    const atlasTexture = new THREE.CanvasTexture(canvas);
+    atlasTexture.flipY = false;
+    atlasTexture.wrapS = THREE.ClampToEdgeWrapping;
+    atlasTexture.wrapT = THREE.ClampToEdgeWrapping;
+    atlasTexture.generateMipmaps = true;
+
+    return atlasTexture;
+  }
+
+  private async textureToImage(texture: THREE.Texture): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.crossOrigin = 'anonymous';
+
+      if (texture.source.data) {
+        image.src = texture.source.data.src;
+      } else {
+        // Convert texture to data URL
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        canvas.width = texture.image.width;
+        canvas.height = texture.image.height;
+        ctx.drawImage(texture.image, 0, 0);
+        image.src = canvas.toDataURL();
+      }
+
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+    });
+  }
+
+  // Progressive Loading Methods
+  async loadModelProgressively(
+    url: string,
+    options: ModelLoadOptions = {},
+    onProgress?: (progress: number) => void,
+  ): Promise<OptimizedModel> {
+    const startTime = performance.now();
+    this.loadingProgress.set(url, 0);
+
+    try {
+      // Stage 1: Load basic geometry (20%)
+      onProgress?.(0.2);
+      const gltf = await this.loadGLTF(url, { ...options, loadAnimations: false });
+
+      // Stage 2: Load low-res textures (40%)
+      onProgress?.(0.4);
+      await this.loadTexturesProgressively(gltf, 'low');
+
+      // Stage 3: Load animations (60%)
+      onProgress?.(0.6);
+      if (options.loadAnimations) {
+        await this.loadAnimations(gltf);
+      }
+
+      // Stage 4: Load high-res textures (80%)
+      onProgress?.(0.8);
+      await this.loadTexturesProgressively(gltf, 'high');
+
+      // Stage 5: Final optimization (100%)
+      onProgress?.(1.0);
+      const optimizedModel = await this.optimizeModel(gltf, options);
+
+      const loadTime = performance.now() - startTime;
+      this.loadingProgress.set(url, 1.0);
+
+      return {
+        gltf: optimizedModel.gltf,
+        validation: optimizedModel.validation,
+        metadata: {
+          originalUrl: url,
+          loadTime,
+        },
+      };
+    } catch (error) {
+      this.loadingProgress.delete(url);
+      throw error;
+    }
+  }
+
+  private async loadTexturesProgressively(gltf: GLTF, quality: 'low' | 'high'): Promise<void> {
+    const textureSize = quality === 'low' ? 512 : 2048;
+
+    gltf.scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.material) {
+        const material = child.material as THREE.MeshStandardMaterial;
+
+        if (material.map) {
+          this.resizeTexture(material.map, textureSize);
+        }
+        if (material.normalMap) {
+          this.resizeTexture(material.normalMap, textureSize);
+        }
+        if (material.roughnessMap) {
+          this.resizeTexture(material.roughnessMap, textureSize);
+        }
+        if (material.metalnessMap) {
+          this.resizeTexture(material.metalnessMap, textureSize);
+        }
+      }
+    });
+  }
+
+  private resizeTexture(texture: THREE.Texture, size: number): void {
+    if (texture.image && texture.image.width !== size) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      canvas.width = size;
+      canvas.height = size;
+
+      ctx.drawImage(texture.image, 0, 0, size, size);
+      texture.image = canvas;
+      texture.needsUpdate = true;
+    }
+  }
+
+  private async loadAnimations(_gltf: GLTF): Promise<void> {
+    // Load animations asynchronously
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Animation loading logic would go here
+        resolve();
+      }, 100);
+    });
+  }
+
+  // Memory Management
+  disposeTextureAtlas(atlasId: string): void {
+    const atlas = this.textureAtlas.get(atlasId);
+    if (atlas) {
+      atlas.dispose();
+      this.textureAtlas.delete(atlasId);
+    }
+  }
+
+  getLoadingProgress(url: string): number {
+    return this.loadingProgress.get(url) || 0;
   }
 }
 

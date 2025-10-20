@@ -19,6 +19,7 @@ interface GalleryAvatar {
 export function AvatarGallery() {
   const [filter, setFilter] = useState<'all' | 'trending' | 'recent' | 'popular'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('3d');
 
   // Mock data - in real implementation, this would come from API
   const galleryAvatars: GalleryAvatar[] = [
@@ -31,13 +32,13 @@ export function AvatarGallery() {
         age: 'young-adult',
         hair: { color: '#00FFFF', style: 'short' },
         face: { eyes: { color: '#00FF00' }, skin: { tone: 0.5 } },
-        outfit: { primary: { type: 'cyberpunk', color: '#1A1A1A' } }
+        outfit: { primary: { type: 'cyberpunk', color: '#1A1A1A' } },
       },
       likes: 247,
       downloads: 89,
       tags: ['cyberpunk', 'ninja', 'futuristic'],
       isPublic: true,
-      createdAt: '2024-01-15'
+      createdAt: '2024-01-15',
     },
     {
       id: '2',
@@ -48,13 +49,13 @@ export function AvatarGallery() {
         age: 'teen',
         hair: { color: '#FFB6C1', style: 'twintails' },
         face: { eyes: { color: '#9370DB' }, skin: { tone: 0.8 } },
-        outfit: { primary: { type: 'kawaii', color: '#FF69B4' } }
+        outfit: { primary: { type: 'kawaii', color: '#FF69B4' } },
       },
       likes: 189,
       downloads: 67,
       tags: ['kawaii', 'magic', 'cute'],
       isPublic: true,
-      createdAt: '2024-01-14'
+      createdAt: '2024-01-14',
     },
     {
       id: '3',
@@ -65,13 +66,13 @@ export function AvatarGallery() {
         age: 'adult',
         hair: { color: '#000000', style: 'long' },
         face: { eyes: { color: '#FF0000' }, skin: { tone: 0.3 } },
-        outfit: { primary: { type: 'gothic', color: '#2F2F2F' } }
+        outfit: { primary: { type: 'gothic', color: '#2F2F2F' } },
       },
       likes: 156,
       downloads: 45,
       tags: ['gothic', 'vampire', 'dark'],
       isPublic: true,
-      createdAt: '2024-01-13'
+      createdAt: '2024-01-13',
     },
     {
       id: '4',
@@ -82,27 +83,30 @@ export function AvatarGallery() {
         age: 'young-adult',
         hair: { color: '#FF69B4', style: 'long' },
         face: { eyes: { color: '#FFD700' }, skin: { tone: 0.7 } },
-        outfit: { primary: { type: 'fantasy', color: '#8B0000' } }
+        outfit: { primary: { type: 'fantasy', color: '#8B0000' } },
       },
       likes: 312,
       downloads: 123,
       tags: ['anime', 'warrior', 'fantasy'],
       isPublic: true,
-      createdAt: '2024-01-12'
-    }
+      createdAt: '2024-01-12',
+    },
   ];
 
-  const filteredAvatars = galleryAvatars.filter(avatar => {
-    const matchesFilter = filter === 'all' || 
+  const filteredAvatars = galleryAvatars.filter((avatar) => {
+    const matchesFilter =
+      filter === 'all' ||
       (filter === 'trending' && avatar.likes > 200) ||
-      (filter === 'recent' && new Date(avatar.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+      (filter === 'recent' &&
+        new Date(avatar.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
       (filter === 'popular' && avatar.downloads > 50);
-    
-    const matchesSearch = searchQuery === '' || 
+
+    const matchesSearch =
+      searchQuery === '' ||
       avatar.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       avatar.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      avatar.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+      avatar.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+
     return matchesFilter && matchesSearch;
   });
 
@@ -110,9 +114,7 @@ export function AvatarGallery() {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-white mb-4">Community Avatar Gallery</h2>
-        <p className="text-zinc-300 mb-6">
-          Discover amazing avatars created by the community
-        </p>
+        <p className="text-zinc-300 mb-6">Discover amazing avatars created by the community</p>
       </div>
 
       {/* Filters and Search */}
@@ -122,7 +124,7 @@ export function AvatarGallery() {
             { id: 'all', label: 'All' },
             { id: 'trending', label: 'Trending' },
             { id: 'recent', label: 'Recent' },
-            { id: 'popular', label: 'Popular' }
+            { id: 'popular', label: 'Popular' },
           ].map((filterOption) => (
             <button
               key={filterOption.id}
@@ -138,6 +140,30 @@ export function AvatarGallery() {
           ))}
         </div>
         
+        {/* View Mode Toggle */}
+        <div className="flex space-x-1 bg-white/10 rounded-lg p-1">
+          <button
+            onClick={() => setViewMode('3d')}
+            className={`px-4 py-2 rounded-md transition-all duration-200 ${
+              viewMode === '3d'
+                ? 'bg-pink-500 text-white'
+                : 'text-zinc-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            3D View
+          </button>
+          <button
+            onClick={() => setViewMode('2d')}
+            className={`px-4 py-2 rounded-md transition-all duration-200 ${
+              viewMode === '2d'
+                ? 'bg-pink-500 text-white'
+                : 'text-zinc-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            2D View
+          </button>
+        </div>
+
         <input
           type="text"
           placeholder="Search avatars, authors, or tags..."
@@ -158,18 +184,24 @@ export function AvatarGallery() {
           >
             {/* Avatar Display */}
             <div className="flex justify-center mb-3">
-              <AvatarCard
-                config={avatar.config}
-                size="medium"
-                className="group-hover:scale-105 transition-transform duration-200"
-              />
+              {viewMode === '3d' ? (
+                <div className="w-32 h-40 bg-gray-800 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-400 text-sm">3D View</span>
+                </div>
+              ) : (
+                <AvatarCard
+                  config={avatar.config}
+                  size="medium"
+                  className="group-hover:scale-105 transition-transform duration-200"
+                />
+              )}
             </div>
 
             {/* Avatar Info */}
             <div className="space-y-2">
               <h3 className="font-semibold text-white text-center truncate">{avatar.name}</h3>
               <p className="text-sm text-zinc-400 text-center">by {avatar.author}</p>
-              
+
               {/* Tags */}
               <div className="flex flex-wrap gap-1 justify-center">
                 {avatar.tags.slice(0, 2).map((tag) => (

@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { env } from '@/env';
+import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { db, DatabaseAccess } from '@/app/lib/db';
 import { withRateLimit, rateLimitConfigs } from '@/app/lib/rateLimit';
 
@@ -94,8 +95,8 @@ export async function POST(req: NextRequest) {
         mode: 'payment',
         success_url:
           successUrl ||
-          `${env.NEXT_PUBLIC_SITE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: cancelUrl || `${env.NEXT_PUBLIC_SITE_URL}/shop/cart`,
+          `${getRuntimeOrigin()}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: cancelUrl || `${getRuntimeOrigin()}/shop/cart`,
         metadata: {
           userId,
           orderId: order.id,

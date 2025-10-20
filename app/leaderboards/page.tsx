@@ -10,13 +10,21 @@ export const metadata: Metadata = {
   description: 'See how you rank among other travelers.',
 };
 
-import { env } from '@/env';
+// Force dynamic rendering to prevent timeout during static generation
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Use relative API path during SSR to avoid base-URL issues
 
 async function getLeaderboardData() {
   try {
-    const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/leaderboard`, {
-      next: { revalidate: 60 },
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(`/api/v1/leaderboard`, {
+      cache: 'no-store',
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) return { weekly: [], seasonal: [], userRank: null };
     return response.json();

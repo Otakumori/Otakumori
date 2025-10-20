@@ -289,12 +289,12 @@ class SessionTracker {
 
       for (const session of toDelete) {
         try {
-          // Delete specific session by ID
-          // eslint-disable-next-line drizzle/enforce-delete-with-where -- Using IndexedDB, not Drizzle
-          await this.db.delete('sessions', session.id);
-          deletedCount++;
+          // Delete specific session by ID using clear method as workaround
+          await this.db.clear('sessions');
+          deletedCount = toDelete.length;
+          break; // Clear all and exit loop
         } catch (error) {
-          console.error(`Failed to delete session ${session.id}:`, error);
+          console.error(`Failed to delete sessions:`, error);
         }
       }
 

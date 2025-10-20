@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { env } from '@/env';
+// Use relative API path during SSR to avoid base-URL issues
 import StarfieldPurple from '../../components/StarfieldPurple';
 import Navbar from '../../components/layout/Navbar';
 import FooterDark from '../../components/FooterDark';
@@ -10,11 +10,19 @@ export const metadata: Metadata = {
   description: 'Leave messages for other travelers in the digital abyss.',
 };
 
+// Force dynamic rendering to prevent timeout during static generation
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getSoapstones() {
   try {
-    const response = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/v1/community/soapstones`, {
-      next: { revalidate: 30 },
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(`/api/v1/community/soapstones`, {
+      cache: 'no-store',
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) return [];
     return response.json();

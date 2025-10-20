@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { env } from '@/env';
+import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { prisma } from '@/app/lib/prisma';
 import { CheckoutRequest } from '@/app/lib/contracts';
 import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
@@ -194,8 +195,8 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       success_url:
         successUrl ??
-        `${env.NEXT_PUBLIC_SITE_URL}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl ?? `${env.NEXT_PUBLIC_SITE_URL}/shop/cart`,
+        `${getRuntimeOrigin()}/shop/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl ?? `${getRuntimeOrigin()}/shop/cart`,
       client_reference_id: userId,
       customer_email: shippingInfo?.email ?? user.email,
       shipping_address_collection: {

@@ -52,6 +52,11 @@ export class PerformanceOptimizer {
   // Geometry optimization
   private geometryCache: Map<string, THREE.BufferGeometry> = new Map();
   private simplifiedGeometries: Map<string, THREE.BufferGeometry> = new Map();
+  
+  // GPU instancing
+  private instancedGroups: Map<string, THREE.InstancedMesh> = new Map();
+  private materialBatches: Map<string, THREE.Material[]> = new Map();
+  private mergedGeometries: Map<string, THREE.BufferGeometry> = new Map();
 
   constructor(settings: PerformanceSettings) {
     this.settings = { ...settings };
@@ -177,40 +182,6 @@ export class PerformanceOptimizer {
     return simplified;
   }
 
-  // Instancing
-  createInstancedMesh(
-    geometry: THREE.BufferGeometry,
-    material: THREE.Material,
-    count: number,
-  ): THREE.InstancedMesh {
-    const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
-
-    // Set up instance matrix attributes
-    const matrix = new THREE.Matrix4();
-    const position = new THREE.Vector3();
-    const rotation = new THREE.Euler();
-    const scale = new THREE.Vector3(1, 1, 1);
-
-    for (let i = 0; i < count; i++) {
-      position.set(
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-      );
-
-      rotation.set(
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2,
-      );
-
-      matrix.compose(position, new THREE.Quaternion().setFromEuler(rotation), scale);
-      instancedMesh.setMatrixAt(i, matrix);
-    }
-
-    instancedMesh.instanceMatrix.needsUpdate = true;
-    return instancedMesh;
-  }
 
   // Texture Optimization
   async compressTexture(texture: THREE.Texture): Promise<THREE.CompressedTexture> {
@@ -515,6 +486,197 @@ export class PerformanceOptimizer {
         this.settings.enableLOD = true;
         break;
     }
+  }
+
+  // GPU Instancing Methods
+  createInstancedMesh(geometry: THREE.BufferGeometry, material: THREE.Material, count: number, groupId: string): THREE.InstancedMesh {
+    const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
+    this.instancedGroups.set(groupId, instancedMesh);
+    return instancedMesh;
+  }
+
+  updateInstancedMeshTransform(groupId: string, index: number, matrix: THREE.Matrix4): void {
+    const instancedMesh = this.instancedGroups.get(groupId);
+    if (instancedMesh && index < instancedMesh.count) {
+      instancedMesh.setMatrixAt(index, matrix);
+      instancedMesh.instanceMatrix.needsUpdate = true;
+    }
+  }
+
+  removeInstancedMesh(groupId: string): void {
+    const instancedMesh = this.instancedGroups.get(groupId);
+    if (instancedMesh) {
+      instancedMesh.geometry.dispose();
+      if (Array.isArray(instancedMesh.material)) {
+        instancedMesh.material.forEach(mat => mat.dispose());
+      } else {
+        instancedMesh.material.dispose();
+      }
+      this.instancedGroups.delete(groupId);
+    }
+  }
+
+  // Material Batching Methods
+  batchMaterials(materials: THREE.Material[], batchId: string): THREE.Material[] {
+    if (!this.settings.enableInstancing) {
+      return materials;
+    }
+
+    // Group similar materials together
+    const materialGroups = new Map<string, THREE.Material[]>();
+    
+    materials.forEach(material => {
+      const key = this.getMaterialKey(material);
+      if (!materialGroups.has(key)) {
+        materialGroups.set(key, []);
+      }
+      materialGroups.get(key)!.push(material);
+    });
+
+    // Create batched materials
+    const batchedMaterials: THREE.Material[] = [];
+    materialGroups.forEach((group, key) => {
+      if (group.length > 1) {
+        // Create a single material for the batch
+        const batchedMaterial = this.createBatchedMaterial(group);
+        batchedMaterials.push(batchedMaterial);
+      } else {
+        batchedMaterials.push(...group);
+      }
+    });
+
+    this.materialBatches.set(batchId, batchedMaterials);
+    return batchedMaterials;
+  }
+
+  private getMaterialKey(material: THREE.Material): string {
+    // Create a key based on material properties for batching
+    const props = [
+      material.type,
+      material.transparent ? 'transparent' : 'opaque',
+      material.alphaTest,
+      material.side,
+      material.blending,
+    ];
+    return props.join('_');
+  }
+
+  private createBatchedMaterial(materials: THREE.Material[]): THREE.Material {
+    // Create a material that can handle multiple textures/settings
+    // This is a simplified version - in practice, you'd need more sophisticated batching
+    const baseMaterial = materials[0].clone();
+    
+    // Add texture arrays for batching
+    if (baseMaterial instanceof THREE.MeshStandardMaterial) {
+      // Add texture arrays for diffuse, normal, roughness, etc.
+      // This would require custom shader modifications
+    }
+    
+    return baseMaterial;
+  }
+
+  // Geometry Merging Methods
+  mergeGeometries(geometries: THREE.BufferGeometry[], mergeId: string): THREE.BufferGeometry {
+    if (!this.settings.enableInstancing) {
+      return geometries[0]; // Return first geometry if instancing disabled
+    }
+
+    const mergedGeometry = new THREE.BufferGeometry();
+    const positions: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
+
+    let vertexOffset = 0;
+
+    geometries.forEach(geometry => {
+      const positionAttribute = geometry.getAttribute('position');
+      const normalAttribute = geometry.getAttribute('normal');
+      const uvAttribute = geometry.getAttribute('uv');
+      const indexAttribute = geometry.getIndex();
+
+      if (positionAttribute) {
+        for (let i = 0; i < positionAttribute.count; i++) {
+          positions.push(
+            positionAttribute.getX(i),
+            positionAttribute.getY(i),
+            positionAttribute.getZ(i)
+          );
+        }
+      }
+
+      if (normalAttribute) {
+        for (let i = 0; i < normalAttribute.count; i++) {
+          normals.push(
+            normalAttribute.getX(i),
+            normalAttribute.getY(i),
+            normalAttribute.getZ(i)
+          );
+        }
+      }
+
+      if (uvAttribute) {
+        for (let i = 0; i < uvAttribute.count; i++) {
+          uvs.push(
+            uvAttribute.getX(i),
+            uvAttribute.getY(i)
+          );
+        }
+      }
+
+      if (indexAttribute) {
+        for (let i = 0; i < indexAttribute.count; i++) {
+          indices.push(indexAttribute.getX(i) + vertexOffset);
+        }
+        vertexOffset += positionAttribute.count;
+      }
+    });
+
+    mergedGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    mergedGeometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+    mergedGeometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    mergedGeometry.setIndex(indices);
+
+    this.mergedGeometries.set(mergeId, mergedGeometry);
+    return mergedGeometry;
+  }
+
+  // Memory Management
+  disposeInstancedGroup(groupId: string): void {
+    this.removeInstancedMesh(groupId);
+  }
+
+  disposeMaterialBatch(batchId: string): void {
+    const materials = this.materialBatches.get(batchId);
+    if (materials) {
+      materials.forEach(material => material.dispose());
+      this.materialBatches.delete(batchId);
+    }
+  }
+
+  disposeMergedGeometry(mergeId: string): void {
+    const geometry = this.mergedGeometries.get(mergeId);
+    if (geometry) {
+      geometry.dispose();
+      this.mergedGeometries.delete(mergeId);
+    }
+  }
+
+  // Performance monitoring for instancing
+  getInstancingStats(): { groups: number; totalInstances: number; memoryUsage: number } {
+    let totalInstances = 0;
+    let memoryUsage = 0;
+
+    this.instancedGroups.forEach(mesh => {
+      totalInstances += mesh.count;
+      memoryUsage += mesh.geometry.attributes.position?.count * 3 * 4 || 0; // Rough estimate
+    });
+
+    return {
+      groups: this.instancedGroups.size,
+      totalInstances,
+      memoryUsage,
+    };
   }
 }
 

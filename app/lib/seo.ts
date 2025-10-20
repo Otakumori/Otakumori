@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { env } from '@/env';
 
 interface SEOProps {
   title: string;
@@ -21,7 +22,7 @@ export function generateSEO({
 }: SEOProps): Metadata {
   const siteName = 'Otaku-mori';
   const fullTitle = `${title} | ${siteName}`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://otakumori.com';
+  const siteUrl = env.NEXT_PUBLIC_SITE_URL || 'https://otakumori.com';
   const fullUrl = url ? `${siteUrl}${url}` : siteUrl;
   const fullImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
 
@@ -64,7 +65,22 @@ export function generateSEO({
     },
   };
 
-  // Product metadata handled above (OpenGraph doesn't have product type, so we use website)
+  // Add product metadata if price is provided
+  if (type === 'product') {
+    if (price === undefined) {
+      console.warn('SEO: Product type requires price parameter');
+      // Use default price for products without explicit pricing
+      metadata.other = {
+        'product:price:amount': '0.00',
+        'product:price:currency': currency,
+      };
+    } else {
+      metadata.other = {
+        'product:price:amount': price.toString(),
+        'product:price:currency': currency,
+      };
+    }
+  }
 
   return metadata;
 }

@@ -93,7 +93,12 @@ export class AnimationController {
   }
 
   private setupDefaultStates() {
-    // Setup common animation states - removed unused variable
+    // Setup common animation states
+    this.setupIdleAnimations();
+    this.setupMovementAnimations();
+    this.setupEmotionAnimations();
+    this.setupFacialExpressions();
+    this.setupSpecialAnimations();
 
     // Setup default transitions
     this.setupDefaultTransitions();
@@ -102,6 +107,103 @@ export class AnimationController {
     if (this.options.autoPlay && this.options.defaultState) {
       this.setState(this.options.defaultState);
     }
+  }
+
+  private setupIdleAnimations() {
+    // Idle animation variations
+    const idleAnimations = ['idle', 'idle_2', 'idle_3', 'breathe', 'look_around'];
+    idleAnimations.forEach((name) => {
+      if (this.states.has(name)) {
+        this.states.get(name)!.loop = true;
+        this.states.get(name)!.timeScale = 0.8 + Math.random() * 0.4; // Vary speed slightly
+      }
+    });
+  }
+
+  private setupMovementAnimations() {
+    // Movement animations
+    const movementAnimations = [
+      { name: 'walk', timeScale: 1.0, loop: true },
+      { name: 'run', timeScale: 1.2, loop: true },
+      { name: 'sprint', timeScale: 1.5, loop: true },
+      { name: 'jump', timeScale: 1.0, loop: false },
+      { name: 'land', timeScale: 1.0, loop: false },
+      { name: 'crouch', timeScale: 1.0, loop: true },
+      { name: 'crawl', timeScale: 0.8, loop: true },
+      { name: 'swim', timeScale: 1.0, loop: true },
+      { name: 'climb', timeScale: 1.0, loop: true },
+    ];
+
+    movementAnimations.forEach(({ name, timeScale, loop }) => {
+      if (this.states.has(name)) {
+        this.states.get(name)!.timeScale = timeScale;
+        this.states.get(name)!.loop = loop;
+      }
+    });
+  }
+
+  private setupEmotionAnimations() {
+    // Emotion and expression animations
+    const emotionAnimations = [
+      { name: 'happy', timeScale: 1.0, loop: false },
+      { name: 'sad', timeScale: 0.8, loop: false },
+      { name: 'angry', timeScale: 1.2, loop: false },
+      { name: 'surprised', timeScale: 1.0, loop: false },
+      { name: 'confused', timeScale: 0.9, loop: false },
+      { name: 'excited', timeScale: 1.3, loop: false },
+      { name: 'tired', timeScale: 0.7, loop: true },
+      { name: 'proud', timeScale: 1.0, loop: false },
+      { name: 'shy', timeScale: 0.8, loop: false },
+      { name: 'cheerful', timeScale: 1.1, loop: true },
+    ];
+
+    emotionAnimations.forEach(({ name, timeScale, loop }) => {
+      if (this.states.has(name)) {
+        this.states.get(name)!.timeScale = timeScale;
+        this.states.get(name)!.loop = loop;
+      }
+    });
+  }
+
+  private setupFacialExpressions() {
+    // Facial expression blend shapes (if available)
+    const facialExpressions = [
+      'smile', 'frown', 'surprise', 'anger', 'fear', 'disgust', 'sadness',
+      'wink_left', 'wink_right', 'blink', 'eyebrow_raise', 'eyebrow_furrow',
+      'mouth_open', 'mouth_pucker', 'cheek_puff', 'nose_scrunch'
+    ];
+
+    facialExpressions.forEach((name) => {
+      if (this.states.has(name)) {
+        this.states.get(name)!.loop = false;
+        this.states.get(name)!.timeScale = 1.0;
+      }
+    });
+  }
+
+  private setupSpecialAnimations() {
+    // Special and dance animations
+    const specialAnimations = [
+      { name: 'dance_1', timeScale: 1.0, loop: true },
+      { name: 'dance_2', timeScale: 1.2, loop: true },
+      { name: 'dance_3', timeScale: 0.9, loop: true },
+      { name: 'pose_1', timeScale: 1.0, loop: false },
+      { name: 'pose_2', timeScale: 1.0, loop: false },
+      { name: 'victory', timeScale: 1.0, loop: false },
+      { name: 'defeat', timeScale: 0.8, loop: false },
+      { name: 'celebration', timeScale: 1.1, loop: true },
+      { name: 'wave', timeScale: 1.0, loop: false },
+      { name: 'bow', timeScale: 1.0, loop: false },
+      { name: 'salute', timeScale: 1.0, loop: false },
+      { name: 'thumbs_up', timeScale: 1.0, loop: false },
+    ];
+
+    specialAnimations.forEach(({ name, timeScale, loop }) => {
+      if (this.states.has(name)) {
+        this.states.get(name)!.timeScale = timeScale;
+        this.states.get(name)!.loop = loop;
+      }
+    });
   }
 
   private setupDefaultTransitions() {

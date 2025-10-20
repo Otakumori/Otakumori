@@ -1,6 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
 
 function uniq<T>(arr: T[], key: (x: T) => string) {
   const m = new Set<string>();
@@ -18,7 +17,7 @@ export async function GET(req: Request) {
 
   if (!q) return NextResponse.json({ suggestions: [] });
 
-  const r = await fetch(`${env.NEXT_PUBLIC_SITE_URL || ''}/api/printify/products`, {
+  const r = await fetch(`/api/printify/products`, {
     cache: 'no-store',
   }).catch(() => null);
   const data = (await r?.json().catch(() => ({ products: [] }))) || { products: [] };

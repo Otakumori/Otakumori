@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 import { env } from '@/env';
+import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-08-27.basil',
@@ -51,8 +52,8 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      success_url: `${env.NEXT_PUBLIC_SITE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${env.NEXT_PUBLIC_SITE_URL}/cart`,
+      success_url: `${getRuntimeOrigin()}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getRuntimeOrigin()}/cart`,
       metadata: {
         clerk_user_id: userId,
         items: JSON.stringify(items),

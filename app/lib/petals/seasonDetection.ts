@@ -3,6 +3,8 @@
  * Determines petal color based on current season or admin override
  */
 
+import { env } from '@/app/env';
+
 export type Season = 'spring' | 'summer' | 'fall' | 'winter';
 
 export interface PetalColorConfig {
@@ -39,9 +41,8 @@ function getColorOverride(): string | undefined {
   // This is client-side only, so we access it safely
   if (typeof window === 'undefined') return undefined;
 
-  // For NEXT_PUBLIC_ variables, direct access is required for proper tree-shaking
-  // eslint-disable-next-line no-restricted-syntax -- Next.js public env var, client-side safe
-  return process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE;
+  // Use env import for proper validation
+  return env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE;
 }
 
 /**

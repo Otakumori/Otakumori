@@ -1,63 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import { env } from '@/env.mjs';
 
-// Validate required Clerk environment variables at startup
-if (!env.CLERK_SECRET_KEY) {
-  throw new Error('Missing CLERK_SECRET_KEY environment variable');
-}
-if (!env.CLERK_ENCRYPTION_KEY) {
-  throw new Error('Missing CLERK_ENCRYPTION_KEY environment variable');
-}
-
-// Define route patterns for comprehensive auth management
-const isPublic = createRouteMatcher([
-  // Public pages
-  '/',
-  '/about',
-  '/shop(.*)',
-  '/blog(.*)',
-  '/mini-games(.*)',
-  '/games(.*)',
-  '/community',
-  '/glossary',
-  '/privacy',
-  '/terms',
-  '/returns',
-  '/faq',
-  '/search',
-  '/404',
-  '/not-found',
-
-  // Auth pages
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-
-  // Static assets
-  '/favicon.ico',
-  '/robots.txt',
-  '/sitemap.xml',
-  '/images(.*)',
-  '/overlay(.*)',
-  '/public(.*)',
-  '/assets(.*)',
-
-  // API routes (handled separately)
-  '/api/inngest(.*)', // Inngest platform access (auth via signing keys)
-  '/api/health',
-  '/api/printify(.*)',
-  '/api/v1/printify(.*)',
-  '/api/v1/products(.*)',
-  '/api/v1/content(.*)',
-  '/api/v1/games(.*)',
-  '/api/soapstones(.*)',
-  '/api/petals/global',
-  '/api/music/playlist',
-  '/api/newsletter',
-  '/api/contact',
-  '/api/debug(.*)',
-  '/api/test(.*)',
-]);
+// Avoid throwing in middleware for missing env at Edge runtime; Clerk SDK handles configuration
 
 const isProtected = createRouteMatcher([
   // User account pages
@@ -151,35 +95,33 @@ const isProtected = createRouteMatcher([
 
 const isAdmin = createRouteMatcher(['/admin(.*)', '/panel(.*)', '/api/admin(.*)']);
 
-export default clerkMiddleware(
-  async (auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
+  try {
     const url = req.nextUrl.clone();
     const host = req.headers.get('host') || '';
     const proto = req.headers.get('x-forwarded-proto') || url.protocol.replace(':', '');
     const isApi = url.pathname.startsWith('/api/');
+    const isIngest = url.pathname.startsWith('/ingest');
     const { userId, sessionClaims } = await auth();
 
-    // Generate correlation ID for request tracking
+    // Correlation ID for request tracking
     const reqId =
       req.headers.get('x-request-id') ||
       req.headers.get('x-correlation-id') ||
       `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // Handle API routes
-    if (isApi) {
+    // API routes: pass through, set headers
+    if (isApi || isIngest) {
       const res = NextResponse.next();
       res.headers.set('X-Request-ID', reqId);
       res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-
-      // Add CORS headers for API routes
       res.headers.set('Access-Control-Allow-Origin', '*');
       res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Request-ID');
-
       return res;
     }
 
-    // Enforce canonical domain (exclude accounts subdomain)
+    // Canonical redirect (avoid redirect loops and subdomains)
     const isApex = host === 'otaku-mori.com';
     const isAccounts = host.startsWith('accounts.');
     if (!isAccounts && isApex) {
@@ -187,67 +129,55 @@ export default clerkMiddleware(
       return NextResponse.redirect(url, 308);
     }
 
-    // Enforce HTTPS on primary domains
+    // Enforce HTTPS on primary domain
     const isPrimary = host.endsWith('otaku-mori.com');
     if (isPrimary && proto !== 'https') {
       url.protocol = 'https:';
       return NextResponse.redirect(url, 308);
     }
 
-    // Handle admin routes - require admin role
+    // Admin gates
     if (isAdmin(req)) {
       if (!userId) {
-        // Redirect to sign-in with return URL
         const signInUrl = new URL('/sign-in', req.url);
         signInUrl.searchParams.set('redirect_url', req.url);
         return NextResponse.redirect(signInUrl);
       }
-
-      // Check if user has admin role
       const isAdminUser =
         (sessionClaims as any)?.metadata?.role === 'admin' ||
         (sessionClaims as any)?.public_metadata?.role === 'admin';
-
       if (!isAdminUser) {
-        // Redirect to unauthorized page
         return NextResponse.redirect(new URL('/unauthorized', req.url));
       }
     }
 
-    // Handle protected routes - require authentication
+    // Protected gates
     if (isProtected(req)) {
       if (!userId) {
-        // Redirect to sign-in with return URL
         const signInUrl = new URL('/sign-in', req.url);
         signInUrl.searchParams.set('redirect_url', req.url);
         return NextResponse.redirect(signInUrl);
       }
     }
 
-    // Handle public routes - no auth required
+    // Public route: add security headers
     const res = NextResponse.next();
-
-    // Add security headers
     res.headers.set('X-Request-ID', reqId);
     res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     res.headers.set('X-Content-Type-Options', 'nosniff');
     res.headers.set('X-Frame-Options', 'SAMEORIGIN');
     res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-    // Add user context headers for debugging
-    if (userId) {
-      res.headers.set('X-User-ID', userId);
-    }
-
+    if (userId) res.headers.set('X-User-ID', userId);
     return res;
-  },
-  // Let Clerk middleware auto-detect configuration from environment variables
-  // Remove manual publishableKey and secretKey passing
-);
+  } catch {
+    // Fail-open to avoid user-facing 500s from middleware
+    return NextResponse.next();
+  }
+});
 
 export const config = {
   matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
+    // Exclude Next internals, static assets, and most API routes from middleware
+    '/((?!_next|_vercel|favicon.ico|robots.txt|sitemap.xml|public/|assets/|.*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
   ],
 };

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/app/env';
 
 const SERVE_URL = env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
 
@@ -7,10 +7,8 @@ export async function GET() {
   const results: Record<string, any> = {
     serveUrl: SERVE_URL,
     env: {
-      // eslint-disable-next-line no-restricted-syntax
-      INNGEST_EVENT_KEY: Boolean(process.env.INNGEST_EVENT_KEY),
-      // eslint-disable-next-line no-restricted-syntax
-      INNGEST_SIGNING_KEY: Boolean(process.env.INNGEST_SIGNING_KEY),
+      INNGEST_EVENT_KEY: Boolean(env.INNGEST_EVENT_KEY),
+      INNGEST_SIGNING_KEY: Boolean(env.INNGEST_SIGNING_KEY),
     },
   };
 
