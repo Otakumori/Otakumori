@@ -23,8 +23,11 @@ try {
       PRINTIFY_SHOP_ID: z.string(),
       PRINTIFY_API_URL: z.string().url(),
       PRINTIFY_WEBHOOK_SECRET: z.string(),
-      BLOB_READ_WRITE_TOKEN: z.string(),
+      BLOB_READ_WRITE_TOKEN: z.string().optional(),
       BLOB_READ_WRITE_URL: z.string().url().optional(),
+      BLOB_PUBLIC_BASE_URL: z.string().url().optional(),
+      BLOB_BUCKET_PREFIX: z.string().default('om'),
+      NSFW_GLOBAL: z.enum(['on', 'off']).default('off'),
       API_KEY: z.string().optional(),
       CRON_SECRET: z.string().optional(),
       INTERNAL_AUTH_TOKEN: z.string().optional(),
@@ -117,6 +120,8 @@ try {
       FEATURE_GATED_COSMETICS: z.string().optional(),
       FEATURE_AVATARS: z.string().optional(),
       FEATURE_AVATAR_STYLIZED_SHADERS: z.string().optional(),
+      // Checkout
+      CHECKOUT_LINK_LABEL: z.string().optional().default('Add to Bottomless Bag'),
       // Storage/CDN
       CLOUDINARY_CLOUD_NAME: z.string().optional(),
       CLOUDINARY_API_KEY: z.string().optional(),
@@ -208,6 +213,8 @@ try {
       NEXT_PUBLIC_FEATURE_SOAPSTONES: z.string().default('1'),
       NEXT_PUBLIC_EVENT_CODE: z.string().optional(),
       NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: z.string().optional(),
+      // Checkout
+      NEXT_PUBLIC_CHECKOUT_LINK_LABEL: z.string().optional().default('Add to Bottomless Bag'),
       // Misc
       NEXT_PUBLIC_API_KEY: z.string().optional(),
       NEXT_PUBLIC_ADMIN_API_KEY: z.string().optional(),
@@ -280,6 +287,7 @@ try {
       INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
       INNGEST_PROBE: process.env.INNGEST_PROBE,
       BASE_URL: process.env.BASE_URL,
+      CHECKOUT_LINK_LABEL: process.env.CHECKOUT_LINK_LABEL,
       // Next.js runtime detection
       NEXT_PHASE: process.env.NEXT_PHASE,
       NEXT_RUNTIME: process.env.NEXT_RUNTIME,
@@ -395,6 +403,8 @@ try {
       NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES,
       NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE,
       NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE,
+      // Checkout
+      NEXT_PUBLIC_CHECKOUT_LINK_LABEL: process.env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL,
       // Misc
       NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
       NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY,
@@ -530,6 +540,8 @@ try {
     NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500',
     NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE || '',
     NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE || '',
+    NEXT_PUBLIC_CHECKOUT_LINK_LABEL:
+      process.env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL || 'Add to Bottomless Bag',
     NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
     NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
     // WebSocket

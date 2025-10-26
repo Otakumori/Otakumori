@@ -2,8 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NSFWContextType {
   isNSFWAllowed: boolean;
-  verifyAge: (age: number) => void;
-  resetAge: () => void;
+  verifyAge: (age: number) => Promise<void>;
+  resetAge: () => Promise<void>;
 }
 
 const NSFWContext = createContext<NSFWContextType | undefined>(undefined);
@@ -23,11 +23,18 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsNSFWAllowed(allowed === 'true');
   }, []);
 
-  const verifyAge = (age: number) => {
+  const verifyAge = async (age: number) => {
     if (age >= 18) {
       setIsNSFWAllowed(true);
       localStorage.setItem('otakumori_nsfw_allowed', 'true');
       setShowModal(false);
+
+      // Set server-side HTTP-only cookie for asset access
+      try {
+        await fetch('/api/policy/age', { method: 'POST' });
+      } catch (error) {
+        console.error('Failed to set server-side age verification:', error);
+      }
     } else {
       setIsNSFWAllowed(false);
       localStorage.setItem('otakumori_nsfw_allowed', 'false');
@@ -35,10 +42,17 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const resetAge = () => {
+  const resetAge = async () => {
     setIsNSFWAllowed(false);
     localStorage.setItem('otakumori_nsfw_allowed', 'false');
     setShowModal(true);
+
+    // Clear server-side HTTP-only cookie
+    try {
+      await fetch('/api/policy/age', { method: 'DELETE' });
+    } catch (error) {
+      console.error('Failed to clear server-side age verification:', error);
+    }
   };
 
   return (
