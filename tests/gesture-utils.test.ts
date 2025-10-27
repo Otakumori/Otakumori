@@ -7,7 +7,7 @@ import {
   getFaceAngle,
   getFacePosition,
   isTap,
-} from '@/app/lib/gesture-utils';
+} from '../app/lib/gesture-utils';
 
 describe('gesture-utils', () => {
   describe('detectSwipeDirection', () => {

@@ -864,7 +864,7 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
   if (!gameKey) return <div className="text-pink-200">No game selected.</div>;
 
   const Map: Record<string, React.ComponentType<any>> = {
-    'petal-collection': dynamic(() => import('../petal-collection/Scene'), { ssr: false }),
+    'petal-collection': dynamic(() => import('../petal-collection/Scene.js'), { ssr: false }),
     'memory-match': dynamic(() => import('../memory-match/InCard'), { ssr: false }),
     'rhythm-beat-em-up': dynamic(() => import('../rhythm-beat-em-up/Scene'), { ssr: false }),
     'bubble-girl': dynamic(() => import('../bubble-girl/InCard'), { ssr: false }),

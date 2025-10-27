@@ -2,7 +2,20 @@
  * ECS Systems - Functions that operate on world state
  */
 
-import type { World } from './world';
+import type { EntityId, World } from './world';
+
+export interface ComponentMap {
+  [key: string]: unknown;
+}
+
+export interface Query<T extends ComponentMap> {
+  components: (keyof T)[];
+}
+
+export interface SystemDefinition<T extends ComponentMap> {
+  query: Query<T>;
+  update: (entities: Array<{ id: EntityId; components: T }>, delta: number) => void;
+}
 
 /**
  * System function signature

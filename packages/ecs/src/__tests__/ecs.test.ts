@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createEntityId, type EntityId, type System, type ComponentMap } from '../index.js';
+import { createEntityId, type EntityId, type System } from '../index.js';
 
 describe('ECS Types', () => {
   it('should create an EntityId', () => {
@@ -8,19 +8,11 @@ describe('ECS Types', () => {
   });
 
   it('should define a valid system', () => {
-    interface TestComponents extends ComponentMap {
-      position: { x: number; y: number };
-      velocity: { dx: number; dy: number };
-    }
-
-    const movementSystem: System<TestComponents> = {
-      query: { components: ['position', 'velocity'] },
-      update: (entities, _delta) => {
-        expect(entities).toBeDefined();
-      },
+    const movementSystem: System = (world, dt) => {
+      expect(world).toBeDefined();
+      expect(dt).toBeGreaterThanOrEqual(0);
     };
 
-    expect(movementSystem.query.components).toContain('position');
-    expect(movementSystem.query.components).toContain('velocity');
+    expect(typeof movementSystem).toBe('function');
   });
 });

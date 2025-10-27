@@ -64,15 +64,22 @@ export async function POST(request: NextRequest) {
       selectedReward = rewards[0]; // Fallback to common
     }
 
+    // Ensure we have a valid reward
+    if (!selectedReward) {
+      return NextResponse.json({ ok: false, error: 'Failed to select reward' }, { status: 500 });
+    }
+
+    const reward = selectedReward;
+
     // Record the gacha pull using existing models
-    if (selectedReward.type === 'petals' && selectedReward.amount) {
+    if (reward.type === 'petals' && reward.amount) {
       // Record petal reward in PetalLedger
       await db.petalLedger.create({
         data: {
           userId: user.id,
           type: 'earn',
-          amount: selectedReward.amount,
-          reason: `Gacha pull - ${selectedReward.rarity} reward`,
+          amount: reward.amount,
+          reason: `Gacha pull - ${reward.rarity} reward`,
         },
       });
 
@@ -81,23 +88,23 @@ export async function POST(request: NextRequest) {
         where: { id: user.id },
         data: {
           petalBalance: {
-            increment: selectedReward.amount,
+            increment: reward.amount,
           },
         },
       });
-    } else if (selectedReward.type === 'achievement' && selectedReward.name) {
+    } else if (reward.type === 'achievement' && reward.name) {
       // Check if achievement exists, create if not
       let achievement = await db.achievement.findFirst({
-        where: { name: selectedReward.name },
+        where: { name: reward.name },
       });
 
       if (!achievement) {
         achievement = await db.achievement.create({
           data: {
-            code: `gacha_${selectedReward.name?.toLowerCase().replace(/\s+/g, '_')}`,
-            name: selectedReward.name,
+            code: `gacha_${reward.name.toLowerCase().replace(/\s+/g, '_')}`,
+            name: reward.name,
             description: `Earned from gacha pull`,
-            points: selectedReward.rarity === 'rare' ? 50 : 100,
+            points: reward.rarity === 'rare' ? 50 : 100,
           },
         });
       }
@@ -114,9 +121,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       data: {
-        reward: selectedReward,
-        message: `You got ${selectedReward.amount || selectedReward.name}!`,
-        rarity: selectedReward.rarity,
+        reward,
+        message: `You got ${reward.amount || reward.name}!`,
+        rarity: reward.rarity,
       },
     });
   } catch (error) {
