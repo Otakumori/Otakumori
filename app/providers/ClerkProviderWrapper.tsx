@@ -5,7 +5,7 @@ import { env } from '@/server/env';
 
 interface ClerkProviderWrapperProps {
   children: React.ReactNode;
-  nonce?: string;
+  nonce?: string | undefined;
 }
 
 export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {

@@ -66,8 +66,8 @@ export default function OwnedRunesGrid() {
           >
             <div className="flex items-center justify-between">
               <div className="text-2xl">
-                <RuneGlyph 
-                  canonicalId={it.canonicalId} 
+                <RuneGlyph
+                  canonicalId={it.canonicalId}
                   glyph={it.glyph}
                   displayName={it.displayName}
                   size="sm"

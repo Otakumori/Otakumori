@@ -67,17 +67,18 @@ function mapResult(result: SearchResult): ExtendedResult {
   const priceValue = typeof priceCandidate === "number" ? priceCandidate : undefined;
   const normalizedPrice = typeof priceValue === "number" && priceValue > 1_000 ? priceValue / 100 : priceValue;
 
-  return {
+  const extendedResult: any = {
     id: result.id,
     type: deriveExtendedType(result),
     title: result.title,
-    description: result.description ?? undefined,
-    image: typeof imageCandidate === "string" ? imageCandidate : undefined,
     url: result.url,
-    price: normalizedPrice,
-    publishedAt: typeof publishedCandidate === "string" ? publishedCandidate : undefined,
-    category: typeof metadata["category"] === "string" ? (metadata["category"] as string) : undefined,
   };
+  if (result.description !== undefined) extendedResult.description = result.description;
+  if (typeof imageCandidate === "string") extendedResult.image = imageCandidate;
+  if (normalizedPrice !== undefined) extendedResult.price = normalizedPrice;
+  if (typeof publishedCandidate === "string") extendedResult.publishedAt = publishedCandidate;
+  if (typeof metadata["category"] === "string") extendedResult.category = metadata["category"];
+  return extendedResult;
 }
 
 export default function SearchInterface() {

@@ -105,17 +105,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Update session
+    const updateData: any = { ...validatedData };
+    if (validatedData.status === 'completed' || validatedData.status === 'abandoned') {
+      updateData.endedAt = new Date();
+    } else if (validatedData.endedAt) {
+      updateData.endedAt = new Date(validatedData.endedAt);
+    }
     const updatedSession = await db.coopSession.update({
       where: { id: params.id },
-      data: {
-        ...validatedData,
-        endedAt:
-          validatedData.status === 'completed' || validatedData.status === 'abandoned'
-            ? new Date()
-            : validatedData.endedAt
-              ? new Date(validatedData.endedAt)
-              : undefined,
-      },
+      data: updateData,
       include: {
         party: {
           select: {

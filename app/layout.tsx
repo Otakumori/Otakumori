@@ -16,7 +16,7 @@ import { isCursorGlowEnabled } from "./flags";
 
 export function generateMetadata(): Metadata {
   return {
-    title: "Welcome Home, Traveler – Otaku-mori",
+    title: "Welcome Home, Traveler ï¿½ Otaku-mori",
     description: "Anime and gaming hub for petals, runes, and rewards.",
     other: {
       ...Sentry.getTraceData(),
@@ -29,10 +29,10 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  const nonce = headers().get("x-nonce") ?? undefined;
+  const nonce = headers().get('x-nonce') ?? undefined;
 
   return (
-    <ClerkProviderWrapper nonce={nonce}>
+    <ClerkProviderWrapper nonce={nonce || undefined}>
       <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
