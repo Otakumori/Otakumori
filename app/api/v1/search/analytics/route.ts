@@ -28,16 +28,20 @@ export async function POST(request: NextRequest) {
     });
 
     // Save search analytics
+    const analyticsData: any = {
+      query: analyticsRequest.query,
+      searchType: analyticsRequest.searchType,
+      resultCount: analyticsRequest.resultCount,
+      userId,
+    };
+    if (analyticsRequest.clickedResultId !== undefined)
+      analyticsData.clickedResultId = analyticsRequest.clickedResultId;
+    if (analyticsRequest.clickedResultType !== undefined)
+      analyticsData.clickedResultType = analyticsRequest.clickedResultType;
+    if (analyticsRequest.sessionId !== undefined)
+      analyticsData.sessionId = analyticsRequest.sessionId;
     await db.searchAnalytics.create({
-      data: {
-        query: analyticsRequest.query,
-        searchType: analyticsRequest.searchType,
-        resultCount: analyticsRequest.resultCount,
-        clickedResultId: analyticsRequest.clickedResultId,
-        clickedResultType: analyticsRequest.clickedResultType,
-        sessionId: analyticsRequest.sessionId,
-        userId,
-      },
+      data: analyticsData,
     });
 
     // Update search suggestion popularity if it's a click
