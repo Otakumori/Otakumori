@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 interface CherryTreeProps {
   swayIntensity?: number;
@@ -22,7 +22,7 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
   const [currentSway, setCurrentSway] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const treeRef = useRef<HTMLDivElement>(null);
-  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -56,13 +56,15 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
       return () => undefined;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      setIsVisible(entry?.isIntersecting ?? true);
-    },
-    {
-      threshold: 0.1,
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsVisible(entry?.isIntersecting ?? true);
+      },
+      {
+        threshold: 0.1,
+      },
+    );
 
     observer.observe(element);
     return () => observer.disconnect();
@@ -70,9 +72,7 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
 
   const containerClassName = useMemo(
     () =>
-      ["pointer-events-none absolute inset-0 overflow-hidden", className]
-        .filter(Boolean)
-        .join(" "),
+      ['pointer-events-none absolute inset-0 overflow-hidden', className].filter(Boolean).join(' '),
     [className],
   );
 
@@ -81,18 +81,18 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
       <motion.div
         className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 transform"
         style={{ transform: `translateX(${prefersReducedMotion ? 0 : currentSway}px)` }}
-        animate={
-          prefersReducedMotion || !isVisible
-            ? undefined
-            : {
+        {...(prefersReducedMotion || !isVisible
+          ? {}
+          : {
+              animate: {
                 y: [0, -2, 0],
                 transition: {
                   duration: 4,
                   repeat: Infinity,
-                  ease: "easeInOut",
+                  ease: 'easeInOut',
                 },
-              }
-        }
+              },
+            })}
       >
         <div className="absolute bottom-0 left-1/2 h-32 w-8 -translate-x-1/2 transform rounded-full bg-gradient-to-t from-amber-800 to-amber-600" />
 
@@ -112,20 +112,20 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                   left: `${20 + Math.sin(index * 0.8) * 15}%`,
                   top: `${30 + Math.cos(index * 0.8) * 15}%`,
                 }}
-                animate={
-                  prefersReducedMotion || !isVisible
-                    ? undefined
-                    : {
+                {...(prefersReducedMotion || !isVisible
+                  ? {}
+                  : {
+                      animate: {
                         scale: [1, 1.1, 1],
                         opacity: [0.8, 1, 0.8],
                         transition: {
                           duration: 3 + index * 0.2,
                           repeat: Infinity,
                           delay: index * 0.1,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                         },
-                      }
-                }
+                      },
+                    })}
               />
             ))}
           </div>
@@ -139,20 +139,20 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                   left: `${20 + Math.sin(index * 0.8) * 15}%`,
                   top: `${30 + Math.cos(index * 0.8) * 15}%`,
                 }}
-                animate={
-                  prefersReducedMotion || !isVisible
-                    ? undefined
-                    : {
+                {...(prefersReducedMotion || !isVisible
+                  ? {}
+                  : {
+                      animate: {
                         scale: [1, 1.1, 1],
                         opacity: [0.8, 1, 0.8],
                         transition: {
                           duration: 3 + index * 0.2,
                           repeat: Infinity,
                           delay: index * 0.1 + 0.5,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                         },
-                      }
-                }
+                      },
+                    })}
               />
             ))}
           </div>
@@ -166,20 +166,20 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                   left: `${25 + Math.sin(index * 0.5) * 20}%`,
                   top: `${20 + Math.cos(index * 0.5) * 20}%`,
                 }}
-                animate={
-                  prefersReducedMotion || !isVisible
-                    ? undefined
-                    : {
+                {...(prefersReducedMotion || !isVisible
+                  ? {}
+                  : {
+                      animate: {
                         scale: [1, 1.2, 1],
                         opacity: [0.9, 1, 0.9],
                         transition: {
                           duration: 2.5 + index * 0.15,
                           repeat: Infinity,
                           delay: index * 0.08,
-                          ease: "easeInOut",
+                          ease: 'easeInOut',
                         },
-                      }
-                }
+                      },
+                    })}
               />
             ))}
           </div>
@@ -202,7 +202,7 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                     duration: 4 + index * 0.3,
                     repeat: Infinity,
                     delay: index * 0.2,
-                    ease: "easeInOut",
+                    ease: 'easeInOut',
                   },
                 }}
               />

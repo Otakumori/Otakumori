@@ -1,0 +1,20 @@
+[33m1e3aad35[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstabilize/enterprise-pass[m[33m)[m fix(achievements): conditionally add coupon discount fields to avoid undefined
+[33m36f84ae9[m fix(components/coop): conditionally include optional fields in Clerk, search, and coop sessions
+[33m1751f092[m fix(mini-games/lib): conditionally include optional fields in runes and rails
+[33m8f6a1ee0[m fix(components): conditionally include optional props in FramedBadge and profile pages
+[33mc99b4868[m fix(search/lib): conditionally include optional fields in search parse and petal economy
+[33m2bdbf6c8[m fix(search): conditionally add optional fields in search analytics and suggestions
+[33mf9a1216f[m fix(lib): conditionally include optional fields in analytics, petals, and http
+[33mb079639c[m fix(api): conditionally add optional fields in coop and party routes
+[33m298ebb41[m fix: conditionally include optional fields in logger and webhooks
+[33mbfa956bb[m fix(api): conditionally add Prisma optional fields across routes
+[33mceff27bd[m fix(db): conditionally include Prisma user fields to avoid undefined values
+[33m86dfbd1a[m fix(webhooks): conditionally include Prisma update fields
+[33mb76e7200[m fix(api): conditionally include Prisma optional fields to avoid undefined values
+[33m98502f2e[m fix(api): conditionally add optional requestId parameter
+[33m4936e787[m fix(api): handle undefined userId in games/finish route
+[33m9dea2bfc[m fix(api): handle undefined requestId in mini-games submit and gacha routes
+[33m09f01dd6[m fix(types): resolve exactOptionalPropertyTypes in LogCtx and CouponMeta
+[33m0e8129ea[m[33m ([m[1;33mtag: [m[1;33mpre-enterprise-audit[m[33m, [m[1;32mrecovery/rebuild-phase4[m[33m)[m chore: tighten strict typings for stats, leaderboard, and moderation
+[33m381aee07[m fix: harden admin media routes and strict helpers
+[33m4c5be70b[m chore: redirect legacy admin duplicates

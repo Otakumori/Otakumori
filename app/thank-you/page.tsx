@@ -247,8 +247,8 @@ export default function ThankYouPage() {
                       <div className="mb-3 text-4xl leading-none">
                         <RuneGlyph
                           canonicalId={rune.canonicalId as any}
-                          glyph={rune.glyph ?? undefined}
-                          displayName={rune.displayName ?? undefined}
+                          {...(rune.glyph ? { glyph: rune.glyph } : {})}
+                          {...(rune.displayName ? { displayName: rune.displayName } : {})}
                           size="lg"
                           animated={true}
                         />

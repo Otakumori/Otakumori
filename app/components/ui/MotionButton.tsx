@@ -25,24 +25,32 @@ const SIZE_CLASSNAMES: Record<NonNullable<MotionButtonProps["size"]>, string> = 
 };
 
 const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
-  ({ variant = "primary", size = "md", disabled = false, className, children, ...props }, ref) => (
-    <motion.button
-      ref={ref}
-      className={cn(
+  ({ variant = "primary", size = "md", disabled = false, className, children, ...props }, ref) => {
+    const motionProps: any = {
+      ref,
+      className: cn(
         "rounded-xl font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 focus:ring-offset-black",
         VARIANT_CLASSNAMES[variant],
         SIZE_CLASSNAMES[size],
         disabled && "cursor-not-allowed opacity-50",
         className,
-      )}
-      whileHover={disabled ? undefined : { scale: 1.02 }}
-      whileTap={disabled ? undefined : { scale: 0.98 }}
-      disabled={disabled}
-      {...props}
-    >
-      {children}
-    </motion.button>
-  ),
+      ),
+      disabled,
+    };
+    if (!disabled) {
+      motionProps.whileHover = { scale: 1.02 };
+      motionProps.whileTap = { scale: 0.98 };
+    }
+    // Filter undefined from props
+    Object.entries(props).forEach(([key, value]) => {
+      if (value !== undefined) motionProps[key] = value;
+    });
+    return (
+      <motion.button {...motionProps}>
+        {children}
+      </motion.button>
+    );
+  },
 );
 
 MotionButton.displayName = "MotionButton";

@@ -689,7 +689,7 @@ export default function ConsoleCard({
   const PlayingGame = () => (
     <div className="rounded-xl border border-white/15 bg-black/60">
       <div className="aspect-[16/9] w-full grid place-items-center">
-        <GameViewport gameKey={gameKey} />
+        <GameViewport {...(gameKey ? { gameKey } : {})} />
       </div>
       <div className="px-3 py-1 text-[11px] text-zinc-400 text-right">Press Esc or B to quit</div>
     </div>

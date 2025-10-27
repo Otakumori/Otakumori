@@ -25,15 +25,21 @@ export function Skeleton({ className, variant = "rectangular", width, height, li
     backgroundSize: "200% 100%",
   };
 
-  const renderLine = (key: string | number) => (
-    <motion.div
-      key={key}
-      className={cn(baseClass, VARIANT_CLASSNAMES[variant], className)}
-      style={style}
-      animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-      transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-    />
-  );
+  const renderLine = (key: string | number) => {
+    const motionStyle: any = {};
+    Object.entries(style).forEach(([k, v]) => {
+      if (v !== undefined) motionStyle[k] = v;
+    });
+    return (
+      <motion.div
+        key={key}
+        className={cn(baseClass, VARIANT_CLASSNAMES[variant], className)}
+        style={motionStyle}
+        animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
+        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+      />
+    );
+  };
 
   if (lines > 1) {
     return <div className="space-y-2">{Array.from({ length: lines }).map((_, index) => renderLine(index))}</div>;

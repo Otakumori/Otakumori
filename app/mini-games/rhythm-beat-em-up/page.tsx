@@ -19,7 +19,7 @@ export default function Page() {
     <BootScreen gameId="rhythm-beat">
       <div className="mx-auto w-full max-w-6xl px-4 py-6">
         <GameShell gameKey="rhythm-beat-em-up" title="Rhythm Beat-Em-Up">
-          <Scene mapUrl={mapOverride ?? undefined} />
+          <Scene {...(mapOverride ? { mapUrl: mapOverride } : {})} />
         </GameShell>
 
         {/* Dev-only UI for signed-in users */}
