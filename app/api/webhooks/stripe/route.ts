@@ -130,34 +130,32 @@ export async function POST(req: Request) {
         typeof fullSession.payment_intent === 'string' ? fullSession.payment_intent : null;
 
       // Create or update Order using existing model
+      const updateData: any = {
+        status: 'shipped',
+        totalAmount: total,
+        currency: currency.toUpperCase(),
+        paidAt: new Date(),
+        appliedCouponCodes: (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as string[] | undefined) ?? [],
+      };
+      if (paymentIntentId) updateData.paymentIntentId = paymentIntentId;
+
+      const createData: any = {
+        id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId: user.id,
+        stripeId: fullSession.id,
+        totalAmount: total,
+        currency: currency.toUpperCase(),
+        status: 'shipped',
+        paidAt: new Date(),
+        updatedAt: new Date(),
+        appliedCouponCodes: (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as string[] | undefined) ?? [],
+      };
+      if (paymentIntentId) createData.paymentIntentId = paymentIntentId;
+
       const order = await prisma.order.upsert({
         where: { stripeId: fullSession.id },
-        update: {
-          status: 'shipped', // using existing enum value
-          paymentIntentId: paymentIntentId ?? undefined,
-          totalAmount: total,
-          currency: currency.toUpperCase(),
-          paidAt: new Date(),
-          appliedCouponCodes:
-            (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
-              | string[]
-              | undefined) ?? [],
-        },
-        create: {
-          id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          userId: user.id,
-          stripeId: fullSession.id,
-          paymentIntentId: paymentIntentId ?? undefined,
-          totalAmount: total,
-          currency: currency.toUpperCase(),
-          status: 'shipped', // using existing enum value
-          paidAt: new Date(),
-          updatedAt: new Date(),
-          appliedCouponCodes:
-            (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
-              | string[]
-              | undefined) ?? [],
-        },
+        update: updateData,
+        create: createData,
       });
 
       // Mark coupon redemptions as succeeded

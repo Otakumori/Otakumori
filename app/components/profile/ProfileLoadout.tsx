@@ -103,7 +103,7 @@ function Slot({
   onChange,
 }: {
   label: string;
-  value?: string;
+  value?: string | undefined;
   onChange: (v: string) => void;
 }) {
   return (
