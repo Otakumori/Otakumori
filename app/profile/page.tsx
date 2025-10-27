@@ -21,7 +21,7 @@ export default async function ProfilePage() {
       </section>
 
       {/* Gamertag */}
-      <OneTapGamertag initial={gamertag || undefined} />
+      {gamertag && <OneTapGamertag initial={gamertag} />}
 
       {/* Daily Quests */}
       <DailyQuests />
