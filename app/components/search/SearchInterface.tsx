@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { Clock, Gamepad2, Search, ShoppingBag, Trash2 } from "lucide-react";
-import GlassPanel from "../GlassPanel";
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Clock, Gamepad2, Search, ShoppingBag, Trash2 } from 'lucide-react';
+import GlassPanel from '../GlassPanel';
 import {
   type ApiEnvelope,
   type SearchRequest,
   type SearchResponse,
   type SearchResult,
-} from "@/app/lib/contracts";
-import { t } from "@/lib/microcopy";
-import { cn } from "@/lib/utils";
+} from '@/app/lib/contracts';
+import { t } from '@/lib/microcopy';
+import { cn } from '@/lib/utils';
 
-const HISTORY_STORAGE_KEY = "search-history";
+const HISTORY_STORAGE_KEY = 'search-history';
 const HISTORY_LIMIT = 10;
 
-const TAB_TO_SEARCH_TYPE: Record<TabKey, SearchRequest["searchType"]> = {
-  all: "all",
-  products: "products",
-  posts: "content",
-  games: "content",
+const TAB_TO_SEARCH_TYPE: Record<TabKey, SearchRequest['searchType']> = {
+  all: 'all',
+  products: 'products',
+  posts: 'content',
+  games: 'content',
 };
 
-type TabKey = "all" | "products" | "posts" | "games";
+type TabKey = 'all' | 'products' | 'posts' | 'games';
 
 type ExtendedResult = {
   id: string;
-  type: "product" | "post" | "game";
+  type: 'product' | 'post' | 'game';
   title: string;
   description?: string;
   image?: string;
@@ -40,32 +40,33 @@ type ExtendedResult = {
 };
 
 async function getLogger() {
-  const { logger } = await import("@/app/lib/logger");
+  const { logger } = await import('@/app/lib/logger');
   return logger;
 }
 
-function deriveExtendedType(result: SearchResult): ExtendedResult["type"] {
-  if (result.type === "product") {
-    return "product";
+function deriveExtendedType(result: SearchResult): ExtendedResult['type'] {
+  if (result.type === 'product') {
+    return 'product';
   }
 
   const metadata = (result.metadata ?? {}) as Record<string, unknown>;
-  const category = metadata["category"];
-  if (category === "game" || category === "mini_game" || result.type === "activity") {
-    return "game";
+  const category = metadata['category'];
+  if (category === 'game' || category === 'mini_game' || result.type === 'activity') {
+    return 'game';
   }
 
-  return "post";
+  return 'post';
 }
 
 function mapResult(result: SearchResult): ExtendedResult {
   const metadata = (result.metadata ?? {}) as Record<string, unknown>;
-  const imageCandidate = metadata["image"] ?? metadata["imageUrl"] ?? metadata["thumbnail"];
-  const priceCandidate = metadata["price"] ?? metadata["priceCents"];
-  const publishedCandidate = metadata["publishedAt"] ?? metadata["createdAt"];
+  const imageCandidate = metadata['image'] ?? metadata['imageUrl'] ?? metadata['thumbnail'];
+  const priceCandidate = metadata['price'] ?? metadata['priceCents'];
+  const publishedCandidate = metadata['publishedAt'] ?? metadata['createdAt'];
 
-  const priceValue = typeof priceCandidate === "number" ? priceCandidate : undefined;
-  const normalizedPrice = typeof priceValue === "number" && priceValue > 1_000 ? priceValue / 100 : priceValue;
+  const priceValue = typeof priceCandidate === 'number' ? priceCandidate : undefined;
+  const normalizedPrice =
+    typeof priceValue === 'number' && priceValue > 1_000 ? priceValue / 100 : priceValue;
 
   const extendedResult: any = {
     id: result.id,
@@ -74,10 +75,10 @@ function mapResult(result: SearchResult): ExtendedResult {
     url: result.url,
   };
   if (result.description !== undefined) extendedResult.description = result.description;
-  if (typeof imageCandidate === "string") extendedResult.image = imageCandidate;
+  if (typeof imageCandidate === 'string') extendedResult.image = imageCandidate;
   if (normalizedPrice !== undefined) extendedResult.price = normalizedPrice;
-  if (typeof publishedCandidate === "string") extendedResult.publishedAt = publishedCandidate;
-  if (typeof metadata["category"] === "string") extendedResult.category = metadata["category"];
+  if (typeof publishedCandidate === 'string') extendedResult.publishedAt = publishedCandidate;
+  if (typeof metadata['category'] === 'string') extendedResult.category = metadata['category'];
   return extendedResult;
 }
 
@@ -85,27 +86,28 @@ export default function SearchInterface() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [query, setQuery] = useState("");
-  const [activeQuery, setActiveQuery] = useState("");
+  const [query, setQuery] = useState('');
+  const [activeQuery, setActiveQuery] = useState('');
   const [results, setResults] = useState<ExtendedResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const savedHistory = typeof window !== "undefined" ? window.localStorage.getItem(HISTORY_STORAGE_KEY) : null;
+    const savedHistory =
+      typeof window !== 'undefined' ? window.localStorage.getItem(HISTORY_STORAGE_KEY) : null;
     if (savedHistory) {
       try {
         const parsed = JSON.parse(savedHistory);
-        if (Array.isArray(parsed) && parsed.every((item) => typeof item === "string")) {
+        if (Array.isArray(parsed) && parsed.every((item) => typeof item === 'string')) {
           setSearchHistory(parsed);
         }
       } catch (err) {
         void getLogger().then((logger) =>
-          logger.warn("Failed to parse search history", {
+          logger.warn('Failed to parse search history', {
             extra: { error: err instanceof Error ? err.message : String(err) },
           }),
         );
@@ -114,26 +116,26 @@ export default function SearchInterface() {
   }, []);
 
   useEffect(() => {
-    const paramQuery = searchParams.get("q") ?? "";
+    const paramQuery = searchParams.get('q') ?? '';
     setQuery(paramQuery);
     setActiveQuery(paramQuery);
   }, [searchParams]);
 
   const filteredResults = useMemo(() => {
-    if (activeTab === "all") {
+    if (activeTab === 'all') {
       return results;
     }
 
     return results.filter((result) => {
-      if (activeTab === "products") {
-        return result.type === "product";
+      if (activeTab === 'products') {
+        return result.type === 'product';
       }
 
-      if (activeTab === "games") {
-        return result.type === "game";
+      if (activeTab === 'games') {
+        return result.type === 'game';
       }
 
-      return result.type === "post";
+      return result.type === 'post';
     });
   }, [activeTab, results]);
 
@@ -161,9 +163,9 @@ export default function SearchInterface() {
           offset: 0,
         };
 
-        const response = await fetch("/api/v1/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('/api/v1/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody),
           signal: controller.signal,
         });
@@ -180,14 +182,14 @@ export default function SearchInterface() {
         const mapped = payload.data.results.map(mapResult);
         setResults(mapped);
       } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") {
+        if (err instanceof DOMException && err.name === 'AbortError') {
           return;
         }
 
         const message = err instanceof Error ? err.message : String(err);
         setError(message);
         const logger = await getLogger();
-        logger.error("Search interface query failed", { extra: { error: message } });
+        logger.error('Search interface query failed', { extra: { error: message } });
       } finally {
         setIsLoading(false);
       }
@@ -229,8 +231,8 @@ export default function SearchInterface() {
     updateHistory(normalized);
 
     const params = new URLSearchParams();
-    params.set("q", normalized);
-    params.set("type", activeTab);
+    params.set('q', normalized);
+    params.set('type', activeTab);
     router.push(`/search?${params.toString()}`);
   };
 
@@ -240,8 +242,8 @@ export default function SearchInterface() {
     updateHistory(value);
 
     const params = new URLSearchParams();
-    params.set("q", value);
-    params.set("type", activeTab);
+    params.set('q', value);
+    params.set('type', activeTab);
     router.push(`/search?${params.toString()}`);
   };
 
@@ -258,7 +260,7 @@ export default function SearchInterface() {
       <GlassPanel className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <label htmlFor="search-query" className="block text-sm font-medium text-white/80">
-            {t("search", "label") ?? "Search"}
+            {t('search', 'label') ?? 'Search'}
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">
@@ -269,23 +271,23 @@ export default function SearchInterface() {
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("search", "placeholder") ?? "Find something magical"}
+              placeholder={t('search', 'placeholder') ?? 'Find something magical'}
               className="w-full rounded-lg border border-white/10 bg-white/10 py-3 pl-11 pr-4 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500"
               autoComplete="off"
             />
           </div>
 
           <div className="flex gap-2 text-sm">
-            {( ["all", "products", "posts", "games"] as const).map((tab) => (
+            {(['all', 'products', 'posts', 'games'] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "rounded-full px-4 py-2 transition-colors",
+                  'rounded-full px-4 py-2 transition-colors',
                   activeTab === tab
-                    ? "bg-fuchsia-600 text-white"
-                    : "bg-white/10 text-white/60 hover:bg-white/20",
+                    ? 'bg-fuchsia-600 text-white'
+                    : 'bg-white/10 text-white/60 hover:bg-white/20',
                 )}
                 aria-pressed={activeTab === tab}
               >
@@ -335,7 +337,10 @@ export default function SearchInterface() {
         <div className="space-y-4">
           {isLoading ? (
             <div className="py-12 text-center">
-              <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-fuchsia-500" aria-label="Loading" />
+              <div
+                className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-fuchsia-500"
+                aria-label="Loading"
+              />
               <p className="text-zinc-400">Searching...</p>
             </div>
           ) : error ? (
@@ -344,7 +349,8 @@ export default function SearchInterface() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-white">
-                  {filteredResults.length} result{filteredResults.length === 1 ? "" : "s"} for "{activeQuery}"
+                  {filteredResults.length} result{filteredResults.length === 1 ? '' : 's'} for "
+                  {activeQuery}"
                 </h3>
               </div>
 
@@ -354,13 +360,19 @@ export default function SearchInterface() {
                     <div className="flex-shrink-0">
                       {result.image ? (
                         <div className="relative h-16 w-16 overflow-hidden rounded-lg">
-                          <Image src={result.image} alt={result.title} fill sizes="64px" className="object-cover" />
+                          <Image
+                            src={result.image}
+                            alt={result.title}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
                         </div>
                       ) : (
                         <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-white/5 text-fuchsia-300">
-                          {result.type === "product" ? (
+                          {result.type === 'product' ? (
                             <ShoppingBag className="h-6 w-6" aria-hidden="true" />
-                          ) : result.type === "game" ? (
+                          ) : result.type === 'game' ? (
                             <Gamepad2 className="h-6 w-6" aria-hidden="true" />
                           ) : (
                             <Search className="h-6 w-6" aria-hidden="true" />
@@ -371,21 +383,29 @@ export default function SearchInterface() {
 
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex items-center gap-2">
-                        <h4 className="truncate text-lg font-semibold text-white">{result.title}</h4>
+                        <h4 className="truncate text-lg font-semibold text-white">
+                          {result.title}
+                        </h4>
                         <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/70">
                           {result.type.toUpperCase()}
                         </span>
                       </div>
 
                       {result.description && (
-                        <p className="mb-2 line-clamp-2 text-sm text-zinc-300">{result.description}</p>
+                        <p className="mb-2 line-clamp-2 text-sm text-zinc-300">
+                          {result.description}
+                        </p>
                       )}
 
                       <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400">
-                        {typeof result.price === "number" && (
-                          <span className="font-semibold text-fuchsia-300">${result.price.toFixed(2)}</span>
+                        {typeof result.price === 'number' && (
+                          <span className="font-semibold text-fuchsia-300">
+                            ${result.price.toFixed(2)}
+                          </span>
                         )}
-                        {result.publishedAt && <span>{new Date(result.publishedAt).toLocaleDateString()}</span>}
+                        {result.publishedAt && (
+                          <span>{new Date(result.publishedAt).toLocaleDateString()}</span>
+                        )}
                         {result.category && <span>{result.category}</span>}
                       </div>
                     </div>
@@ -396,7 +416,9 @@ export default function SearchInterface() {
           ) : (
             <GlassPanel className="p-8 text-center">
               <h3 className="mb-4 text-xl font-semibold text-white">No results found</h3>
-              <p className="text-zinc-400">Try searching for something else or check your spelling.</p>
+              <p className="text-zinc-400">
+                Try searching for something else or check your spelling.
+              </p>
               <ul className="mt-4 space-y-1 text-sm text-zinc-500">
                 <li>- Try different keywords</li>
                 <li>- Check your spelling</li>
@@ -409,7 +431,7 @@ export default function SearchInterface() {
 
       {!activeQuery && (
         <GlassPanel className="p-8 text-center">
-          <h3 className="mb-4 text-xl font-semibold text-white">{t("search", "suggesting")}</h3>
+          <h3 className="mb-4 text-xl font-semibold text-white">{t('search', 'suggesting')}</h3>
           <p className="text-zinc-400">Search for products, blog posts, or games to get started.</p>
         </GlassPanel>
       )}

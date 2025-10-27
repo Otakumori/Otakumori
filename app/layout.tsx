@@ -1,23 +1,23 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
-import * as Sentry from "@sentry/nextjs";
-import { headers } from "next/headers";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Providers from "./Providers";
-import ClerkProviderWrapper from "./providers/ClerkProviderWrapper";
-import CherryBlossomEffect from "./components/CherryBlossomEffect";
-import CursorGlow from "./components/effects/CursorGlow";
-import PetalHUD from "./components/petals/PetalHUD";
-import Konami from "./components/fun/Konami";
-import PetalProgressBar from "./components/progress/PetalProgressBar";
-import { isCursorGlowEnabled } from "./flags";
+import './globals.css';
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+import * as Sentry from '@sentry/nextjs';
+import { headers } from 'next/headers';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Providers from './Providers';
+import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
+import CherryBlossomEffect from './components/CherryBlossomEffect';
+import CursorGlow from './components/effects/CursorGlow';
+import PetalHUD from './components/petals/PetalHUD';
+import Konami from './components/fun/Konami';
+import PetalProgressBar from './components/progress/PetalProgressBar';
+import { isCursorGlowEnabled } from './flags';
 
 export function generateMetadata(): Metadata {
   return {
-    title: "Welcome Home, Traveler � Otaku-mori",
-    description: "Anime and gaming hub for petals, runes, and rewards.",
+    title: 'Welcome Home, Traveler � Otaku-mori',
+    description: 'Anime and gaming hub for petals, runes, and rewards.',
     other: {
       ...Sentry.getTraceData(),
     },
