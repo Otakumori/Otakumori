@@ -70,14 +70,17 @@ export async function POST(request: NextRequest) {
       ? new Date(validatedData.expiresAt)
       : new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+    const inviteData: any = {
+      partyId: validatedData.partyId,
+      inviterId: userId,
+      inviteeId: validatedData.inviteeId,
+      expiresAt,
+    };
+    if (validatedData.message !== undefined) {
+      inviteData.message = validatedData.message;
+    }
     const invitation = await db.partyInvitation.create({
-      data: {
-        partyId: validatedData.partyId,
-        inviterId: userId,
-        inviteeId: validatedData.inviteeId,
-        message: validatedData.message,
-        expiresAt,
-      },
+      data: inviteData,
       include: {
         party: {
           select: {

@@ -159,14 +159,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Create comment
+    const commentData: any = {
+      content: validatedData.content,
+      authorId: currentUser.id,
+      contentType: validatedData.contentType,
+      contentId: validatedData.contentId,
+    };
+    if (validatedData.parentId !== undefined) {
+      commentData.parentId = validatedData.parentId;
+    }
     const newComment = await db.comment.create({
-      data: {
-        content: validatedData.content,
-        authorId: currentUser.id,
-        parentId: validatedData.parentId,
-        contentType: validatedData.contentType,
-        contentId: validatedData.contentId,
-      },
+      data: commentData,
       include: {
         author: {
           select: {

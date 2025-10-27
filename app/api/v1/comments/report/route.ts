@@ -55,14 +55,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Create report
-    await db.commentReport.create({
-      data: {
-        commentId: validatedData.commentId,
-        reporterId: currentUser.id,
-        reason: validatedData.reason,
-        description: validatedData.description,
-      },
-    });
+    const reportData: any = {
+      commentId: validatedData.commentId,
+      reporterId: currentUser.id,
+      reason: validatedData.reason,
+    };
+    if (validatedData.description !== undefined) {
+      reportData.description = validatedData.description;
+    }
+    await db.commentReport.create({ data: reportData });
 
     // Auto-moderate if multiple reports
     const reportCount = await db.commentReport.count({

@@ -29,7 +29,7 @@ export async function GET(req: Request) {
   if (userId) {
     const u = await prisma.user.findUnique({ where: { clerkId: userId } });
     balances = { petals: u?.petalBalance ?? 0, runes: u?.runes ?? 0 };
-    const inv = await prisma.inventoryItem.findMany({ where: { userId: u?.id } });
+    const inv = await prisma.inventoryItem.findMany({ where: u?.id ? { userId: u.id } : {} });
     inventory = inv.map((x) => ({
       sku: x.sku,
       kind: x.kind,

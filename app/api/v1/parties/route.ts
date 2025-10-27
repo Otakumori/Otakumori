@@ -132,22 +132,23 @@ export async function POST(request: Request) {
 
     const payload = CreateSchema.parse(await request.json());
 
-    const party = await db.party.create({
-      data: {
-        name: payload.name,
-        description: payload.description,
-        maxMembers: payload.maxMembers,
-        isPublic: payload.isPublic,
-        gameMode: payload.gameMode,
-        settings: payload.settings,
-        leaderId: user.id,
-        members: {
-          create: {
-            userId: user.id,
-            role: "leader",
-          },
+    const partyData: any = {
+      name: payload.name,
+      maxMembers: payload.maxMembers,
+      isPublic: payload.isPublic,
+      leaderId: user.id,
+      members: {
+        create: {
+          userId: user.id,
+          role: "leader",
         },
       },
+    };
+    if (payload.description !== undefined) partyData.description = payload.description;
+    if (payload.gameMode !== undefined) partyData.gameMode = payload.gameMode;
+    if (payload.settings !== undefined) partyData.settings = payload.settings;
+    const party = await db.party.create({
+      data: partyData,
       include: {
         leader: { select: memberSelect },
         members: {
