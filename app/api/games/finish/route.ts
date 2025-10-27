@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   const petalsGranted = calculatePetals(body.game, score);
 
   if (petalsGranted > 0) {
-    logger.info("petals_granted", { userId, game: body.game, score, petalsGranted });
+    logger.info("petals_granted", { userId: userId || undefined, game: body.game, score, petalsGranted });
     // TODO: integrate with petals ledger + achievements once migrations are stable
   }
 
