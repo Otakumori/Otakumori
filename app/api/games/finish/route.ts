@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { z } from 'zod';
 
-import { GAME_FLAGS } from "@/config/games";
-import { logger } from "@/app/lib/logger";
-import { db } from "@/lib/db";
+import { GAME_FLAGS } from '@/config/games';
+import { logger } from '@/app/lib/logger';
+import { db } from '@/lib/db';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 export const maxDuration = 10;
 
 const MAX_TOP = 25;
@@ -36,14 +36,14 @@ export async function POST(request: Request) {
   const parsed = BodySchema.safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, error: "bad_input" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'bad_input' }, { status: 400 });
   }
 
   const body = parsed.data;
   const flags = GAME_FLAGS[body.game as keyof typeof GAME_FLAGS];
 
   if (!flags?.enabled) {
-    return NextResponse.json({ ok: false, error: "game_disabled" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'game_disabled' }, { status: 400 });
   }
 
   if (flags.practice) {
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
   }
 
   const score = clamp(Math.trunc(body.score), 0, 10_000_000);
-  const diff = typeof body.stats.diff === "string" ? body.stats.diff : null;
+  const diff = typeof body.stats.diff === 'string' ? body.stats.diff : null;
 
   if (!userId) {
     return NextResponse.json({ ok: true, guest: true, score });
@@ -60,7 +60,12 @@ export async function POST(request: Request) {
   const petalsGranted = calculatePetals(body.game, score);
 
   if (petalsGranted > 0) {
-    logger.info("petals_granted", { userId: userId || undefined, game: body.game, score, petalsGranted });
+    logger.info('petals_granted', {
+      userId: userId || undefined,
+      game: body.game,
+      score,
+      petalsGranted,
+    });
     // TODO: integrate with petals ledger + achievements once migrations are stable
   }
 
@@ -102,7 +107,7 @@ export async function POST(request: Request) {
       personalBest = true;
     }
   } catch (error) {
-    logger.error("leaderboard upsert error", { extra: { error } });
+    logger.error('leaderboard upsert error', { extra: { error } });
   }
 
   const top = await db.leaderboardScore.findMany({
@@ -110,7 +115,7 @@ export async function POST(request: Request) {
       game: body.game,
       ...(diff ? { diff } : {}),
     },
-    orderBy: [{ score: "desc" }, { updatedAt: "asc" }],
+    orderBy: [{ score: 'desc' }, { updatedAt: 'asc' }],
     take: MAX_TOP,
   });
 

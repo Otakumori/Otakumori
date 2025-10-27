@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json(problem(401, 'Authentication required'), { status: 401 });
     }
-    
+
     const db = await getDb();
 
     const body = await req.json().catch(() => null);

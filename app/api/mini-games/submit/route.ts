@@ -1,26 +1,26 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { type NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
-import { rateLimit } from "@/app/api/rate-limit";
-import { logger } from "@/app/lib/logger";
-import { db } from "@/lib/db";
-import { problem } from "@/lib/http/problem";
-import { reqId } from "@/lib/log";
-import { creditPetals } from "@/lib/petals";
-import { submitScoreReq } from "@/lib/schemas/minigames";
+import { rateLimit } from '@/app/api/rate-limit';
+import { logger } from '@/app/lib/logger';
+import { db } from '@/lib/db';
+import { problem } from '@/lib/http/problem';
+import { reqId } from '@/lib/log';
+import { creditPetals } from '@/lib/petals';
+import { submitScoreReq } from '@/lib/schemas/minigames';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 export const maxDuration = 10;
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 function calcAward(game: string, score: number): number {
   switch (game) {
-    case "petal-run":
+    case 'petal-run':
       return clamp(Math.floor(score / 10), 0, 50);
-    case "memory":
+    case 'memory':
       return clamp(Math.floor(score / 20), 0, 30);
-    case "rhythm":
+    case 'rhythm':
       return clamp(Math.floor(score / 12), 0, 60);
     default:
       return 0;
@@ -29,7 +29,7 @@ function calcAward(game: string, score: number): number {
 
 export async function POST(req: NextRequest) {
   const requestId = reqId(req.headers);
-  logger.request(req, "POST /api/mini-games/submit");
+  logger.request(req, 'POST /api/mini-games/submit');
 
   const { userId } = await auth();
 
@@ -37,19 +37,19 @@ export async function POST(req: NextRequest) {
   try {
     payload = await req.json();
   } catch (error) {
-    logger.error("mini-game submit JSON parse failed", { requestId }, { error });
-    return NextResponse.json(problem(400, "Invalid request"), { status: 400 });
+    logger.error('mini-game submit JSON parse failed', { requestId }, { error });
+    return NextResponse.json(problem(400, 'Invalid request'), { status: 400 });
   }
 
   const parsed = submitScoreReq.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json(problem(400, "Invalid request"), { status: 400 });
+    return NextResponse.json(problem(400, 'Invalid request'), { status: 400 });
   }
 
   const { score, game } = parsed.data;
 
   if (!userId) {
-    const data: Parameters<typeof upsertLeaderboardScore>[0] = { userId: "guest", game, score };
+    const data: Parameters<typeof upsertLeaderboardScore>[0] = { userId: 'guest', game, score };
     if (requestId) {
       data.requestId = requestId;
     }
@@ -59,12 +59,12 @@ export async function POST(req: NextRequest) {
 
   const limit = await rateLimit(
     req,
-    { windowMs: 60_000, maxRequests: 6, keyPrefix: "mg:submit" },
+    { windowMs: 60_000, maxRequests: 6, keyPrefix: 'mg:submit' },
     `${userId}:${game}`,
   );
 
   if (limit.limited) {
-    return NextResponse.json(problem(429, "Rate limit exceeded"), { status: 429 });
+    return NextResponse.json(problem(429, 'Rate limit exceeded'), { status: 429 });
   }
 
   const scoreData: Parameters<typeof upsertLeaderboardScore>[0] = { userId, game, score };
@@ -78,10 +78,14 @@ export async function POST(req: NextRequest) {
 
   if (petalsGranted > 0) {
     try {
-      const result = await creditPetals(userId, petalsGranted, "mini-game-reward");
+      const result = await creditPetals(userId, petalsGranted, 'mini-game-reward');
       balance = result.balance;
     } catch (error) {
-      logger.error("petals_award_error", { requestId: requestId || undefined, userId, game }, { error });
+      logger.error(
+        'petals_award_error',
+        { requestId: requestId || undefined, userId, game },
+        { error },
+      );
       petalsGranted = 0;
     }
   }
@@ -126,6 +130,6 @@ async function upsertLeaderboardScore({
       });
     }
   } catch (error) {
-    logger.error("leaderboard_upsert_error", { requestId, userId, game }, { error });
+    logger.error('leaderboard_upsert_error', { requestId, userId, game }, { error });
   }
 }

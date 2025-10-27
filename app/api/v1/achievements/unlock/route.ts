@@ -136,10 +136,14 @@ export async function POST(request: NextRequest) {
             code: couponCode,
             discountType: isPercent ? 'PERCENT' : 'OFF_AMOUNT',
             expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-            ...(isPercent && achievement.reward.value !== null && achievement.reward.value !== undefined
+            ...(isPercent &&
+            achievement.reward.value !== null &&
+            achievement.reward.value !== undefined
               ? { percentOff: achievement.reward.value as number }
               : {}),
-            ...(!isPercent && achievement.reward.value !== null && achievement.reward.value !== undefined
+            ...(!isPercent &&
+            achievement.reward.value !== null &&
+            achievement.reward.value !== undefined
               ? { amountOff: achievement.reward.value as number }
               : {}),
           };
