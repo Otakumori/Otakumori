@@ -77,29 +77,30 @@ export async function POST(req: Request) {
       imageUrl: u.image_url ?? null,
     };
 
+    const updateData: any = {};
+    if (userData.email) updateData.email = userData.email;
+    if (userData.username) updateData.username = userData.username;
+    if (userData.firstName && userData.lastName) {
+      updateData.display_name = `${userData.firstName} ${userData.lastName}`;
+    }
+    if (userData.imageUrl) updateData.avatarUrl = userData.imageUrl;
+
+    const createData: any = {
+      clerkId: u.id,
+      email: userData.email || '',
+      username: userData.username || `user_${u.id.slice(0, 8)}`,
+      wallet: { create: { petals: 0, runes: 0 } },
+      profile: { create: {} },
+    };
+    if (userData.firstName && userData.lastName) {
+      createData.display_name = `${userData.firstName} ${userData.lastName}`;
+    }
+    if (userData.imageUrl) createData.avatarUrl = userData.imageUrl;
+
     await prisma.user.upsert({
       where: { clerkId: u.id },
-      update: {
-        email: userData.email || undefined,
-        username: userData.username || undefined,
-        display_name:
-          userData.firstName && userData.lastName
-            ? `${userData.firstName} ${userData.lastName}`
-            : undefined,
-        avatarUrl: userData.imageUrl || undefined,
-      },
-      create: {
-        clerkId: u.id,
-        email: userData.email || '',
-        username: userData.username || `user_${u.id.slice(0, 8)}`,
-        display_name:
-          userData.firstName && userData.lastName
-            ? `${userData.firstName} ${userData.lastName}`
-            : undefined,
-        avatarUrl: userData.imageUrl || undefined,
-        wallet: { create: { petals: 0, runes: 0 } },
-        profile: { create: {} },
-      },
+      update: updateData,
+      create: createData,
     });
 
     return NextResponse.json({ ok: true });
