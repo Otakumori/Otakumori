@@ -1,9 +1,10 @@
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 export type LogCtx = {
-  requestId?: string;
-  route?: string;
-  userId?: string;
-  extra?: Record<string, unknown>;
+  requestId?: string | undefined;
+  route?: string | undefined;
+  userId?: string | undefined;
+  game?: string | undefined;
+  extra?: Record<string, unknown> | undefined;
 };
 
 export interface LogEntry {

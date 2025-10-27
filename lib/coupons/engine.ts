@@ -15,19 +15,19 @@ export type CouponMeta = {
   code: string;
   type: 'PERCENT' | 'FIXED' | 'FREESHIP';
   valueCents: number; // for FIXED, dollars*100; for PERCENT, percent*100? No: store percent in 0..100 as integer but we standardize to valuePct for percent
-  valuePct?: number; // 0..100 for percent coupons
+  valuePct?: number | undefined; // 0..100 for percent coupons
   enabled: boolean;
-  startsAt?: Date | null;
-  endsAt?: Date | null;
-  maxRedemptions?: number | null;
-  maxRedemptionsPerUser?: number | null;
-  minSubtotalCents?: number | null;
-  allowedProductIds?: string[];
-  excludedProductIds?: string[];
-  allowedCollections?: string[];
-  excludedCollections?: string[];
-  stackable?: boolean;
-  oneTimeCode?: boolean;
+  startsAt?: Date | null | undefined;
+  endsAt?: Date | null | undefined;
+  maxRedemptions?: number | null | undefined;
+  maxRedemptionsPerUser?: number | null | undefined;
+  minSubtotalCents?: number | null | undefined;
+  allowedProductIds?: string[] | undefined;
+  excludedProductIds?: string[] | undefined;
+  allowedCollections?: string[] | undefined;
+  excludedCollections?: string[] | undefined;
+  stackable?: boolean | undefined;
+  oneTimeCode?: boolean | undefined;
 };
 
 export type EngineInput = {
