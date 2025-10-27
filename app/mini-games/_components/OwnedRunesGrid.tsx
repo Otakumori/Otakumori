@@ -68,8 +68,8 @@ export default function OwnedRunesGrid() {
               <div className="text-2xl">
                 <RuneGlyph 
                   canonicalId={it.canonicalId} 
-                  glyph={it.glyph ?? undefined}
-                  displayName={it.displayName ?? undefined}
+                  glyph={it.glyph}
+                  displayName={it.displayName}
                   size="sm"
                   animated={true}
                 />
