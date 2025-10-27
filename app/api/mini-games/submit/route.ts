@@ -49,7 +49,11 @@ export async function POST(req: NextRequest) {
   const { score, game } = parsed.data;
 
   if (!userId) {
-    await upsertLeaderboardScore({ userId: "guest", game, score, requestId: requestId || undefined });
+    const data: Parameters<typeof upsertLeaderboardScore>[0] = { userId: "guest", game, score };
+    if (requestId) {
+      data.requestId = requestId;
+    }
+    await upsertLeaderboardScore(data);
     return NextResponse.json({ ok: true, score, petalsGranted: 0 });
   }
 
@@ -63,7 +67,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(problem(429, "Rate limit exceeded"), { status: 429 });
   }
 
-  await upsertLeaderboardScore({ userId, game, score, requestId: requestId || undefined });
+  const scoreData: Parameters<typeof upsertLeaderboardScore>[0] = { userId, game, score };
+  if (requestId) {
+    scoreData.requestId = requestId;
+  }
+  await upsertLeaderboardScore(scoreData);
 
   let petalsGranted = calcAward(game, score);
   let balance: number | undefined;
@@ -96,7 +104,7 @@ async function upsertLeaderboardScore({
   userId: string;
   game: string;
   score: number;
-  requestId?: string;
+  requestId?: string | undefined;
 }) {
   try {
     const previous = await db.leaderboardScore.findFirst({
