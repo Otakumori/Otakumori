@@ -135,7 +135,10 @@ export async function POST(req: Request) {
         totalAmount: total,
         currency: currency.toUpperCase(),
         paidAt: new Date(),
-        appliedCouponCodes: (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as string[] | undefined) ?? [],
+        appliedCouponCodes:
+          (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
+            | string[]
+            | undefined) ?? [],
       };
       if (paymentIntentId) updateData.paymentIntentId = paymentIntentId;
 
@@ -148,7 +151,10 @@ export async function POST(req: Request) {
         status: 'shipped',
         paidAt: new Date(),
         updatedAt: new Date(),
-        appliedCouponCodes: (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as string[] | undefined) ?? [],
+        appliedCouponCodes:
+          (fullSession.metadata?.coupon_codes?.split(',').filter(Boolean) as
+            | string[]
+            | undefined) ?? [],
       };
       if (paymentIntentId) createData.paymentIntentId = paymentIntentId;
 

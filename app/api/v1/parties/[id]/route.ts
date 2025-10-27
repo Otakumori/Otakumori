@@ -117,9 +117,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       );
     }
 
+    const updateData: any = {};
+    if (validatedData.name !== undefined) updateData.name = validatedData.name;
+    if (validatedData.status !== undefined) updateData.status = validatedData.status;
+    if (validatedData.description !== undefined) updateData.description = validatedData.description;
+    if (validatedData.maxMembers !== undefined) updateData.maxMembers = validatedData.maxMembers;
+    if (validatedData.isPublic !== undefined) updateData.isPublic = validatedData.isPublic;
+    if (validatedData.gameMode !== undefined) updateData.gameMode = validatedData.gameMode;
+    if (validatedData.settings !== undefined) updateData.settings = validatedData.settings;
     const updatedParty = await db.party.update({
       where: { id: params.id },
-      data: validatedData,
+      data: updateData,
       include: {
         leader: {
           select: {

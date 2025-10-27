@@ -47,13 +47,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create coop session
+    const sessionData: any = {
+      partyId: validatedData.partyId,
+      gameType: validatedData.gameType,
+    };
+    if (validatedData.gameId !== undefined) sessionData.gameId = validatedData.gameId;
+    if (validatedData.settings !== undefined) sessionData.settings = validatedData.settings;
     const session = await db.coopSession.create({
-      data: {
-        partyId: validatedData.partyId,
-        gameType: validatedData.gameType,
-        gameId: validatedData.gameId,
-        settings: validatedData.settings,
-      },
+      data: sessionData,
       include: {
         party: {
           select: {
