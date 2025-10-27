@@ -74,13 +74,12 @@ export async function POST(request: NextRequest) {
 async function updateSuggestionPopularity(analyticsRequest: SearchAnalyticsRequest) {
   try {
     // Find matching search suggestion
-    const suggestion = await db.searchSuggestion.findFirst({
-      where: {
-        query: analyticsRequest.query,
-        targetId: analyticsRequest.clickedResultId,
-        suggestionType: analyticsRequest.clickedResultType!,
-      },
-    });
+    const whereClause: any = { query: analyticsRequest.query };
+    if (analyticsRequest.clickedResultId !== undefined)
+      whereClause.targetId = analyticsRequest.clickedResultId;
+    if (analyticsRequest.clickedResultType)
+      whereClause.suggestionType = analyticsRequest.clickedResultType;
+    const suggestion = await db.searchSuggestion.findFirst({ where: whereClause });
 
     if (suggestion) {
       // Update popularity and last used
@@ -93,16 +92,17 @@ async function updateSuggestionPopularity(analyticsRequest: SearchAnalyticsReque
       });
     } else {
       // Create new suggestion if it doesn't exist
-      await db.searchSuggestion.create({
-        data: {
-          query: analyticsRequest.query,
-          suggestionType: analyticsRequest.clickedResultType!,
-          targetId: analyticsRequest.clickedResultId,
-          targetType: analyticsRequest.clickedResultType!,
-          popularity: 1,
-          lastUsed: new Date(),
-        },
-      });
+      const suggestionData: any = {
+        query: analyticsRequest.query,
+        targetType: analyticsRequest.clickedResultType!,
+        popularity: 1,
+        lastUsed: new Date(),
+      };
+      if (analyticsRequest.clickedResultType)
+        suggestionData.suggestionType = analyticsRequest.clickedResultType;
+      if (analyticsRequest.clickedResultId !== undefined)
+        suggestionData.targetId = analyticsRequest.clickedResultId;
+      await db.searchSuggestion.create({ data: suggestionData });
     }
   } catch (error) {
     // Don't fail the analytics request if suggestion update fails

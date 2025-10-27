@@ -51,11 +51,10 @@ async function getSearchSuggestions(request: SearchSuggestionRequest) {
   const { query, searchType, limit } = request;
 
   // Get existing suggestions from database
+  const whereClause: any = { query: { contains: query, mode: 'insensitive' } };
+  if (searchType !== 'all') whereClause.suggestionType = searchType;
   const existingSuggestions = await db.searchSuggestion.findMany({
-    where: {
-      query: { contains: query, mode: 'insensitive' },
-      suggestionType: searchType === 'all' ? undefined : searchType,
-    },
+    where: whereClause,
     orderBy: [{ popularity: 'desc' }, { lastUsed: 'desc' }],
     take: limit,
   });
