@@ -175,12 +175,14 @@ export default function GameShell({
             }
             primary={{ label: 'Play Again', onClick: () => window.location.reload() }}
             secondary={{ label: 'Quit to Hub', onClick: quitToHub }}
-            footer={{
-              creditsText: theme.creditsText,
-              creditsUrl: theme.creditsUrl,
-              pledgeLabel: theme.pledgeLabel,
-              pledgeUrl: theme.pledgeUrl,
-            }}
+            footer={(() => {
+              const footerData: any = {};
+              if (theme.creditsText !== undefined) footerData.creditsText = theme.creditsText;
+              if (theme.creditsUrl !== undefined) footerData.creditsUrl = theme.creditsUrl;
+              if (theme.pledgeLabel !== undefined) footerData.pledgeLabel = theme.pledgeLabel;
+              if (theme.pledgeUrl !== undefined) footerData.pledgeUrl = theme.pledgeUrl;
+              return Object.keys(footerData).length > 0 ? footerData : undefined;
+            })()}
           />
         )}
       </div>

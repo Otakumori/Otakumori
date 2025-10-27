@@ -19,10 +19,11 @@ export function parseQuery(query: string): ParsedQuery {
     }
   }
 
-  return {
-    searchTerm: searchTerm.replace(/sort:\w+(?:\s+(asc|desc))?/g, "").trim(),
+  const result: any = {
+    searchTerm: searchTerm.replace(/sort:\w+(?:\s+(asc|desc))?/g, '').trim(),
     filters,
-    sortBy,
     sortOrder,
   };
+  if (sortBy !== undefined) result.sortBy = sortBy;
+  return result;
 }

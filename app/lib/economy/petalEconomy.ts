@@ -194,15 +194,15 @@ class PetalEconomy {
     game: string,
     mode?: string,
   ): void {
-    const entry: LeaderboardEntry = {
+    const entry: any = {
       userId,
       userName,
       score,
       game,
-      mode,
       timestamp: new Date(),
       rank: 0, // Will be calculated
     };
+    if (mode !== undefined) entry.mode = mode;
 
     const gameLeaderboard = this.leaderboards.get(game) || [];
     gameLeaderboard.push(entry);

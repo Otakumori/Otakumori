@@ -35,11 +35,10 @@ export function parseQuery(query: string): ParsedQuery {
   // Remove cat:<slug> from query to get remaining text
   const text = trimmed.replace(/cat:[a-z0-9-]+/gi, '').trim();
 
-  return {
-    category: category || undefined,
-    text: text || undefined,
-    original: trimmed,
-  };
+  const result: any = { original: trimmed };
+  if (category) result.category = category;
+  if (text) result.text = text;
+  return result;
 }
 
 /**
