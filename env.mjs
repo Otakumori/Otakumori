@@ -239,6 +239,11 @@ try {
       PRINTIFY_WEBHOOK_SECRET: process.env.PRINTIFY_WEBHOOK_SECRET,
       BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
       BLOB_READ_WRITE_URL: process.env.BLOB_READ_WRITE_URL,
+      BLOB_PUBLIC_BASE_URL: process.env.BLOB_PUBLIC_BASE_URL,
+      BLOB_BUCKET_PREFIX: process.env.BLOB_BUCKET_PREFIX,
+      NSFW_GLOBAL: process.env.NSFW_GLOBAL,
+      OTEL_SDK_DISABLED: process.env.OTEL_SDK_DISABLED,
+      INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN,
       API_KEY: process.env.API_KEY,
       CRON_SECRET: process.env.CRON_SECRET,
       UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
@@ -446,6 +451,11 @@ try {
     // Storage
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
     BLOB_READ_WRITE_URL: process.env.BLOB_READ_WRITE_URL || '',
+    BLOB_PUBLIC_BASE_URL: process.env.BLOB_PUBLIC_BASE_URL || '',
+    BLOB_BUCKET_PREFIX: process.env.BLOB_BUCKET_PREFIX || 'om',
+    NSFW_GLOBAL: process.env.NSFW_GLOBAL || 'off',
+    OTEL_SDK_DISABLED: process.env.OTEL_SDK_DISABLED || '',
+    INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN || '',
 
     // Redis
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL || '',
