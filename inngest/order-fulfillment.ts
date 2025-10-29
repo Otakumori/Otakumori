@@ -42,7 +42,7 @@ export const fulfillOrder = inngest.createFunction(
         throw new Error(`Order not found: ${orderId}`);
       }
 
-      if (orderData.status !== 'paid' && orderData.status !== 'pending_mapping') {
+      if (orderData.status !== 'pending' && orderData.status !== 'pending_mapping') {
         throw new Error(`Order not paid: ${orderId}, status: ${orderData.status}`);
       }
 
@@ -101,7 +101,7 @@ export const fulfillOrder = inngest.createFunction(
         await db.order.update({
           where: { id: order.id },
           data: {
-            status: 'fulfillment_failed',
+            status: 'cancelled',
             updatedAt: new Date(),
           },
         });
@@ -175,13 +175,6 @@ export const awardPurchasePetals = inngest.createFunction(
             type: 'purchase_bonus',
             amount: petalsToAward,
             reason: 'Purchase bonus',
-            source: 'purchase',
-            description: `Purchase bonus for order ${orderId}`,
-            metadata: {
-              orderId,
-              stripeSessionId,
-              amountCents,
-            },
           },
         });
 
@@ -238,12 +231,6 @@ export const deductRefundPetals = inngest.createFunction(
             type: 'adjust',
             amount: -petalsToDeduct,
             reason: 'Refund deduction',
-            source: 'refund',
-            description: `Refund deduction for order ${orderId}`,
-            metadata: {
-              orderId,
-              amountCents,
-            },
           },
         });
 

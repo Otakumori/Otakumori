@@ -8,8 +8,15 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { resolvePolicy, validateAvatar } from '@om/avatar';
 import type { AvatarSpecV15Type } from '@om/avatar';
 import { assertRenderable } from '@/lib/avatar/validate';
+import type { ResolvedEquipment } from '@/lib/avatar/validate';
 import { db } from '@/lib/db';
-import { generateRequestId } from '@/lib/request-id';
+import { newRequestId } from '@/lib/requestId';
+
+function isResolvedEquipment(
+  value: ResolvedEquipment | null | undefined,
+): value is ResolvedEquipment {
+  return value != null;
+}
 
 export const runtime = 'nodejs';
 
@@ -73,7 +80,7 @@ function generateSVGThumbnail(spec: AvatarSpecV15Type, resolvedIds: string[]): s
  * Accepts avatar spec and generates thumbnail
  */
 export async function POST(request: NextRequest) {
-  const requestId = generateRequestId();
+  const requestId = newRequestId();
 
   try {
     const body = await request.json();
@@ -99,8 +106,8 @@ export async function POST(request: NextRequest) {
     const nsfwCookie = request.cookies.get('nsfw-preference')?.value;
 
     const policy = resolvePolicy({
-      cookieValue: nsfwCookie,
       adultVerified,
+      ...(typeof nsfwCookie === 'string' ? { cookieValue: nsfwCookie } : {}),
     });
 
     // Resolve equipment
@@ -108,8 +115,8 @@ export async function POST(request: NextRequest) {
 
     // Extract resolved IDs for hash
     const resolvedIds = Object.values(resolved)
-      .filter((r) => r !== null)
-      .map((r) => r!.id);
+      .filter(isResolvedEquipment)
+      .map((equipment) => equipment.id);
 
     // Generate SVG
     const svg = generateSVGThumbnail(spec, resolvedIds);
@@ -139,7 +146,7 @@ export async function POST(request: NextRequest) {
  * Generates thumbnail from stored avatar config
  */
 export async function GET(request: NextRequest) {
-  const requestId = generateRequestId();
+  const requestId = newRequestId();
 
   try {
     const { searchParams } = new URL(request.url);
@@ -156,15 +163,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch user's avatar config
-    const user = await db.user.findUnique({
+    // Fetch avatar config from character configs
+    const characterConfig = await db.characterConfig.findUnique({
       where: { id: avatarId },
       select: {
-        avatarConfig: true,
+        configData: true,
       },
     });
 
-    if (!user || !user.avatarConfig) {
+    if (!characterConfig || !characterConfig.configData) {
       return NextResponse.json(
         {
           ok: false,
@@ -175,8 +182,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const storedConfig = characterConfig.configData as unknown;
+
     // Validate stored config
-    if (!validateAvatar(user.avatarConfig)) {
+    if (!validateAvatar(storedConfig)) {
       return NextResponse.json(
         {
           ok: false,
@@ -187,7 +196,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const spec = user.avatarConfig as AvatarSpecV15Type;
+    const spec = storedConfig as AvatarSpecV15Type;
 
     // Get NSFW policy
     const { userId } = await auth();
@@ -196,8 +205,8 @@ export async function GET(request: NextRequest) {
     const nsfwCookie = request.cookies.get('nsfw-preference')?.value;
 
     const policy = resolvePolicy({
-      cookieValue: nsfwCookie,
       adultVerified,
+      ...(typeof nsfwCookie === 'string' ? { cookieValue: nsfwCookie } : {}),
     });
 
     // Resolve equipment
@@ -205,8 +214,8 @@ export async function GET(request: NextRequest) {
 
     // Extract resolved IDs for hash
     const resolvedIds = Object.values(resolved)
-      .filter((r) => r !== null)
-      .map((r) => r!.id);
+      .filter(isResolvedEquipment)
+      .map((equipment) => equipment.id);
 
     // Generate SVG
     const svg = generateSVGThumbnail(spec, resolvedIds);

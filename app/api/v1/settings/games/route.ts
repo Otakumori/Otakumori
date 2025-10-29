@@ -1,19 +1,16 @@
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-export const fetchCache = "force-no-store";
-export const runtime = "nodejs";
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
-import { auth } from "@clerk/nextjs/server";
-import type { GameSettings as PrismaGameSettings, Prisma } from "@prisma/client";
-import { type NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { auth } from '@clerk/nextjs/server';
+import type { GameSettings as PrismaGameSettings, Prisma } from '@prisma/client';
+import { type NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
-import {
-  GameSettingsListRequestSchema,
-  GameSettingsUpdateSchema,
-} from "@/app/lib/contracts";
-import { logger } from "@/app/lib/logger";
-import { db } from "@/lib/db";
+import { GameSettingsListRequestSchema, GameSettingsUpdateSchema } from '@/app/lib/contracts';
+import { logger } from '@/app/lib/logger';
+import { db } from '@/lib/db';
 
 function normalise(settings: PrismaGameSettings) {
   return {
@@ -27,15 +24,15 @@ export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const listRequest = GameSettingsListRequestSchema.parse({
-      gameCode: searchParams.get("gameCode") ?? undefined,
+      gameCode: searchParams.get('gameCode') ?? undefined,
     });
 
-    logger.request(request, "Fetching game settings", {
+    logger.request(request, 'Fetching game settings', {
       userId,
       extra: { gameCode: listRequest.gameCode },
     });
@@ -45,7 +42,7 @@ export async function GET(request: NextRequest) {
         userId,
         ...(listRequest.gameCode ? { gameCode: listRequest.gameCode } : {}),
       },
-      orderBy: { gameCode: "asc" },
+      orderBy: { gameCode: 'asc' },
     });
 
     return NextResponse.json({
@@ -56,11 +53,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: "Invalid request parameters" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Invalid request parameters' }, { status: 400 });
     }
 
-    logger.apiError(request, "Failed to fetch game settings", error as Error);
-    return NextResponse.json({ ok: false, error: "Failed to fetch game settings" }, { status: 500 });
+    logger.apiError(request, 'Failed to fetch game settings', error as Error);
+    return NextResponse.json(
+      { ok: false, error: 'Failed to fetch game settings' },
+      { status: 500 },
+    );
   }
 }
 
@@ -68,13 +68,13 @@ export async function PUT(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const updates = GameSettingsUpdateSchema.parse(body);
 
-    logger.request(request, "Updating game settings", {
+    logger.request(request, 'Updating game settings', {
       userId,
       extra: { gameCode: updates.gameCode },
     });
@@ -93,11 +93,14 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ ok: true, data: normalise(result) });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: "Invalid game settings data" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Invalid game settings data' }, { status: 400 });
     }
 
-    logger.apiError(request, "Failed to update game settings", error as Error);
-    return NextResponse.json({ ok: false, error: "Failed to update game settings" }, { status: 500 });
+    logger.apiError(request, 'Failed to update game settings', error as Error);
+    return NextResponse.json(
+      { ok: false, error: 'Failed to update game settings' },
+      { status: 500 },
+    );
   }
 }
 
@@ -106,9 +109,9 @@ function buildCreateData(
   updates: z.infer<typeof GameSettingsUpdateSchema>,
 ): Prisma.GameSettingsCreateInput {
   return {
-    userId,
+    user: { connect: { id: userId } },
     gameCode: updates.gameCode,
-    difficulty: updates.difficulty ?? "normal",
+    difficulty: updates.difficulty ?? 'normal',
     soundEffects: updates.soundEffects ?? true,
     music: updates.music ?? true,
     hapticFeedback: updates.hapticFeedback ?? true,
@@ -126,19 +129,19 @@ function buildUpdateData(
     data.difficulty = updates.difficulty;
   }
 
-  if (typeof updates.soundEffects === "boolean") {
+  if (typeof updates.soundEffects === 'boolean') {
     data.soundEffects = updates.soundEffects;
   }
 
-  if (typeof updates.music === "boolean") {
+  if (typeof updates.music === 'boolean') {
     data.music = updates.music;
   }
 
-  if (typeof updates.hapticFeedback === "boolean") {
+  if (typeof updates.hapticFeedback === 'boolean') {
     data.hapticFeedback = updates.hapticFeedback;
   }
 
-  if (typeof updates.autoSave === "boolean") {
+  if (typeof updates.autoSave === 'boolean') {
     data.autoSave = updates.autoSave;
   }
 

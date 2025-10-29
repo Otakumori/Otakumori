@@ -91,15 +91,13 @@ export const PetalEffect = ({
             y: interactive ? y : 0,
           },
           variants: petalFloat,
-          initial: "initial",
+          initial: 'initial',
           animate: controls,
           custom: index,
           onClick: () => handlePetalClick(index),
+          ...(interactive && { whileHover: { scale: 1.2 } }),
+          ...(interactive && { whileTap: { scale: 0.8 } }),
         };
-        if (interactive) {
-          motionProps.whileHover = { scale: 1.2 };
-          motionProps.whileTap = { scale: 0.8 };
-        }
         return (
           <motion.div {...motionProps}>
             <svg

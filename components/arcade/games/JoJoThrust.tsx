@@ -19,6 +19,9 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
     { emoji: '💥', label: 'Explosion' },
   ];
 
+  const fallbackPose = poses[0] ?? { emoji: '✨', label: 'Sparkle' };
+  const activePose = poses[currentPose] ?? fallbackPose;
+
   useEffect(() => {
     const showTimer = setTimeout(() => setShowCharacter(true), 300);
     return () => clearTimeout(showTimer);
@@ -78,8 +81,8 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
             <div className="text-8xl">
-              <span role="img" aria-label={poses[currentPose].label}>
-                {poses[currentPose].emoji}
+              <span role="img" aria-label={activePose.label}>
+                {activePose.emoji}
               </span>
             </div>
           </motion.div>

@@ -1,4 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';

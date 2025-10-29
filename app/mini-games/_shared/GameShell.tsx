@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAsset } from './assets-resolver';
 import { play } from './audio-bus';
@@ -21,6 +22,23 @@ type Theme = {
   pledgeLabel?: string | null;
   pledgeUrl?: string | null;
   showCreditsInPause: ShowCreditsMode;
+};
+
+type OverlayFooter = {
+  creditsText?: string | null;
+  creditsUrl?: string | null;
+  pledgeLabel?: string | null;
+  pledgeUrl?: string | null;
+};
+
+type OverlayProps = {
+  title: string;
+  bg: string;
+  accent: string;
+  body?: ReactNode;
+  primary: { label: string; onClick: () => void };
+  secondary: { label: string; onClick: () => void };
+  footer?: OverlayFooter;
 };
 
 export default function GameShell({
@@ -101,6 +119,24 @@ export default function GameShell({
     setTimeout(() => router.push(returnTo), 420);
   }
 
+  const pauseFooter: OverlayFooter | undefined = showFooter
+    ? {
+        creditsText: theme.creditsText ?? null,
+        creditsUrl: theme.creditsUrl ?? null,
+        pledgeLabel: theme.pledgeLabel ?? null,
+        pledgeUrl: theme.pledgeUrl ?? null,
+      }
+    : undefined;
+
+  const resultsFooter: OverlayFooter | undefined = (() => {
+    const footer: OverlayFooter = {};
+    if (theme.creditsText !== undefined) footer.creditsText = theme.creditsText ?? null;
+    if (theme.creditsUrl !== undefined) footer.creditsUrl = theme.creditsUrl ?? null;
+    if (theme.pledgeLabel !== undefined) footer.pledgeLabel = theme.pledgeLabel ?? null;
+    if (theme.pledgeUrl !== undefined) footer.pledgeUrl = theme.pledgeUrl ?? null;
+    return Object.keys(footer).length > 0 ? footer : undefined;
+  })();
+
   return (
     <div
       ref={shellRef}
@@ -148,16 +184,7 @@ export default function GameShell({
             accent={theme.accent}
             primary={{ label: 'Resume', onClick: () => setPaused(false) }}
             secondary={{ label: 'Quit to Hub', onClick: quitToHub }}
-            footer={
-              showFooter
-                ? {
-                    creditsText: theme.creditsText,
-                    creditsUrl: theme.creditsUrl,
-                    pledgeLabel: theme.pledgeLabel,
-                    pledgeUrl: theme.pledgeUrl,
-                  }
-                : undefined
-            }
+            {...(pauseFooter ? { footer: pauseFooter } : {})}
           />
         )}
 
@@ -175,14 +202,7 @@ export default function GameShell({
             }
             primary={{ label: 'Play Again', onClick: () => window.location.reload() }}
             secondary={{ label: 'Quit to Hub', onClick: quitToHub }}
-            footer={(() => {
-              const footerData: any = {};
-              if (theme.creditsText !== undefined) footerData.creditsText = theme.creditsText;
-              if (theme.creditsUrl !== undefined) footerData.creditsUrl = theme.creditsUrl;
-              if (theme.pledgeLabel !== undefined) footerData.pledgeLabel = theme.pledgeLabel;
-              if (theme.pledgeUrl !== undefined) footerData.pledgeUrl = theme.pledgeUrl;
-              return Object.keys(footerData).length > 0 ? footerData : undefined;
-            })()}
+            {...(resultsFooter ? { footer: resultsFooter } : {})}
           />
         )}
       </div>
@@ -190,28 +210,7 @@ export default function GameShell({
   );
 }
 
-function Overlay({
-  title,
-  bg,
-  accent,
-  body,
-  primary,
-  secondary,
-  footer,
-}: {
-  title: string;
-  bg: string;
-  accent: string;
-  body?: React.ReactNode;
-  primary: { label: string; onClick: () => void };
-  secondary: { label: string; onClick: () => void };
-  footer?: {
-    creditsText?: string | null;
-    creditsUrl?: string | null;
-    pledgeLabel?: string | null;
-    pledgeUrl?: string | null;
-  };
-}) {
+function Overlay({ title, bg, accent, body, primary, secondary, footer }: OverlayProps) {
   return (
     <div className="absolute inset-0 grid place-items-center" style={{ background: bg }}>
       <div

@@ -174,10 +174,14 @@ export function useToastHelpers() {
   const { addToast } = useToast();
 
   return {
-    success: (title: string, message?: string) => addToast({ type: 'success', title, message }),
-    error: (title: string, message?: string) => addToast({ type: 'error', title, message }),
-    warning: (title: string, message?: string) => addToast({ type: 'warning', title, message }),
-    info: (title: string, message?: string) => addToast({ type: 'info', title, message }),
+    success: (title: string, message?: string) =>
+      addToast({ type: 'success', title, ...(message && { message }) }),
+    error: (title: string, message?: string) =>
+      addToast({ type: 'error', title, ...(message && { message }) }),
+    warning: (title: string, message?: string) =>
+      addToast({ type: 'warning', title, ...(message && { message }) }),
+    info: (title: string, message?: string) =>
+      addToast({ type: 'info', title, ...(message && { message }) }),
     custom: addToast,
   };
 }

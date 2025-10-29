@@ -12,18 +12,18 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error?: Error;
-  errorInfo?: ErrorInfo;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error, errorInfo: null };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -75,7 +75,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <div className="mb-2">
                     <strong>Error:</strong> {this.state.error.message}
                   </div>
-                  {this.state.errorInfo && (
+                   {this.state.errorInfo && (
                     <div>
                       <strong>Stack:</strong>
                       <pre className="mt-1 text-xs overflow-x-auto">
@@ -96,7 +96,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={() =>
-                  this.setState({ hasError: false, error: undefined, errorInfo: undefined })
+                  this.setState({ hasError: false, error: null, errorInfo: null })
                 }
                 className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >

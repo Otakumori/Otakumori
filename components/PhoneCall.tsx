@@ -33,6 +33,10 @@ export const PhoneCall = ({ character, messages, onComplete }: PhoneCallProps) =
     }
 
     const message = messages[currentMessageIndex];
+    if (!message) {
+      setIsTyping(false);
+      return;
+    }
     setIsTyping(true);
     setDisplayedText('');
 

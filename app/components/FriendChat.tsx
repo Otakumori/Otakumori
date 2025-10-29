@@ -61,8 +61,9 @@ export const FriendChat: React.FC = () => {
               "I'm so jealous!",
               "Can't wait to see more!",
             ];
-            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-            addMessage(selectedFriend.id, selectedFriend.name, randomResponse, false);
+            const randomResponse =
+              responses[Math.floor(Math.random() * responses.length)] ?? 'Hey!';
+            addMessage(selectedFriend.id, selectedFriend.name ?? 'Friend', randomResponse, false);
           }
         },
         2000 + Math.random() * 3000,

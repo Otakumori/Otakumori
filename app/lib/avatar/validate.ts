@@ -5,6 +5,7 @@
 
 import type { AvatarSpecV15Type, EquipmentSlotType, PolicyResult } from '@om/avatar';
 import { clampAllMorphs, isNSFWSlot } from '@om/avatar';
+import type { AssetSlot } from '@om/game-kit';
 import { getAssetsByIds, getCachedFallbackForSlot } from './db';
 
 /**
@@ -26,6 +27,65 @@ export interface ResolvedEquipment {
 export interface RenderableResult {
   resolved: Partial<Record<EquipmentSlotType, ResolvedEquipment | null>>;
   hadNSFWSwaps: boolean;
+}
+
+const HEAD_SLOTS = new Set<EquipmentSlotType>([
+  'Head',
+  'Face',
+  'Eyes',
+  'Eyebrows',
+  'Nose',
+  'Mouth',
+  'Ears',
+  'Hair',
+  'FacialHair',
+  'Eyelashes',
+  'Headwear',
+  'Eyewear',
+  'Earrings',
+  'AnimalEars',
+  'Halo',
+  'Horns',
+]);
+
+const TORSO_SLOTS = new Set<EquipmentSlotType>([
+  'Torso',
+  'Chest',
+  'Arms',
+  'Hands',
+  'Underwear',
+  'InnerWear',
+  'OuterWear',
+  'Gloves',
+  'Back',
+  'NSFWChest',
+  'Shield',
+]);
+
+const LEG_SLOTS = new Set<EquipmentSlotType>([
+  'Legs',
+  'Feet',
+  'Pants',
+  'Shoes',
+  'Tail',
+  'NSFWGroin',
+]);
+
+function mapSlotToAssetSlot(slot: EquipmentSlotType): AssetSlot | null {
+  if (HEAD_SLOTS.has(slot)) return 'Head';
+  if (TORSO_SLOTS.has(slot)) return 'Torso';
+  if (LEG_SLOTS.has(slot)) return 'Legs';
+  return 'Accessory';
+}
+
+function isAssetNSFW(asset: any, slot: EquipmentSlotType): boolean {
+  if (typeof asset?.nsfw === 'boolean') {
+    return asset.nsfw || isNSFWSlot(slot);
+  }
+  if (typeof asset?.contentRating === 'string') {
+    return asset.contentRating === 'nsfw' || isNSFWSlot(slot);
+  }
+  return isNSFWSlot(slot);
 }
 
 /**
@@ -83,36 +143,52 @@ export async function assertRenderable(
 
     // Unknown asset - use fallback
     if (!asset) {
-      const fallback = await getCachedFallbackForSlot(slot);
-      resolved[slot] = {
-        id: fallback.id,
-        url: fallback.url,
-      };
-      hadNSFWSwaps = true;
+      const fallbackSlot = mapSlotToAssetSlot(slot);
+      if (fallbackSlot) {
+        const fallback = await getCachedFallbackForSlot(fallbackSlot);
+        resolved[slot] = {
+          id: fallback.id,
+          url: fallback.url,
+        };
+        hadNSFWSwaps = true;
+      } else {
+        resolved[slot] = null;
+        hadNSFWSwaps = true;
+      }
       continue;
     }
 
     // Check if URL is from allowed host
     if (!isAllowedHost(asset.url)) {
-      const fallback = await getCachedFallbackForSlot(slot);
-      resolved[slot] = {
-        id: fallback.id,
-        url: fallback.url,
-      };
+      const fallbackSlot = mapSlotToAssetSlot(slot);
+      if (fallbackSlot) {
+        const fallback = await getCachedFallbackForSlot(fallbackSlot);
+        resolved[slot] = {
+          id: fallback.id,
+          url: fallback.url,
+        };
+      } else {
+        resolved[slot] = null;
+      }
       hadNSFWSwaps = true;
       continue;
     }
 
     // NSFW content check
-    const isNSFW = asset.contentRating === 'nsfw' || isNSFWSlot(slot);
+    const nsfw = isAssetNSFW(asset, slot);
 
-    if (isNSFW && !policy.nsfwAllowed) {
+    if (nsfw && !policy.nsfwAllowed) {
       // Swap to safe fallback
-      const fallback = await getCachedFallbackForSlot(slot);
-      resolved[slot] = {
-        id: fallback.id,
-        url: fallback.url,
-      };
+      const fallbackSlot = mapSlotToAssetSlot(slot);
+      if (fallbackSlot) {
+        const fallback = await getCachedFallbackForSlot(fallbackSlot);
+        resolved[slot] = {
+          id: fallback.id,
+          url: fallback.url,
+        };
+      } else {
+        resolved[slot] = null;
+      }
       hadNSFWSwaps = true;
     } else {
       // Asset is safe or policy allows it
@@ -189,9 +265,9 @@ export async function assertPublishable(
       );
     }
 
-    const isNSFW = asset.contentRating === 'nsfw' || isNSFWSlot(slot);
+    const nsfw = isAssetNSFW(asset, slot);
 
-    if (isNSFW && !policy.nsfwAllowed) {
+    if (nsfw && !policy.nsfwAllowed) {
       throw new ValidationError(
         'NSFW_NOT_ALLOWED',
         `NSFW content in slot ${slot} is not allowed by current policy`,

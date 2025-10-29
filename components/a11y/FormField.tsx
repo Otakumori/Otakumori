@@ -13,6 +13,14 @@ export function FormField({ id, label, hint, error, children }: FormFieldProps) 
   const errId = error ? `${id}-err` : undefined;
   const describedBy = [hintId, errId].filter(Boolean).join(' ') || undefined;
 
+  const childProps: { id: string; describedBy?: string; ariaInvalid?: boolean } = {
+    id,
+    ariaInvalid: !!error,
+  };
+  if (describedBy) {
+    childProps.describedBy = describedBy;
+  }
+
   return (
     <div>
       <label htmlFor={id}>
@@ -20,7 +28,7 @@ export function FormField({ id, label, hint, error, children }: FormFieldProps) 
         {error && <span aria-hidden="true"> *</span>}
       </label>
       {hint && <p id={hintId}>{hint}</p>}
-      {children({ id, describedBy, ariaInvalid: !!error })}
+      {children(childProps)}
       {error && (
         <p id={errId} role="alert">
           {error}

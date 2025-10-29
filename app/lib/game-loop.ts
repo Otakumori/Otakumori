@@ -39,9 +39,9 @@ export class GameLoop {
     this.targetFPS = options.targetFPS ?? 60;
     this.targetFrameTime = 1000 / this.targetFPS;
     this.maxFrameSkip = options.maxFrameSkip ?? 5;
-    this.onUpdate = options.onUpdate;
-    this.onRender = options.onRender;
-    this.onError = options.onError;
+    if (options.onUpdate) this.onUpdate = options.onUpdate;
+    if (options.onRender) this.onRender = options.onRender;
+    if (options.onError) this.onError = options.onError;
   }
 
   start(): void {
@@ -165,9 +165,10 @@ export class GameLoop {
 
   dispose(): void {
     this.stop();
-    this.onUpdate = undefined;
-    this.onRender = undefined;
-    this.onError = undefined;
+    // Reset callbacks - they can be null/undefined
+    this.onUpdate = undefined as any;
+    this.onRender = undefined as any;
+    this.onError = undefined as any;
   }
 }
 

@@ -120,16 +120,18 @@ export default function PetalCollector() {
     if (Math.random() < 0.1) {
       const powerUpTypes: ('time' | 'multiplier' | 'magnet')[] = ['time', 'multiplier', 'magnet'];
       const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
-      setPowerUps((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          type,
-          duration: 10,
-          active: true,
-        },
-      ]);
-      powerUpSoundRef.current?.play();
+      if (type) {
+        setPowerUps((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            type,
+            duration: 10,
+            active: true,
+          },
+        ]);
+        powerUpSoundRef.current?.play();
+      }
     }
   };
 

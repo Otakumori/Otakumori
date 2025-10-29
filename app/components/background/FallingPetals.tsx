@@ -45,7 +45,7 @@ export default function FallingPetals() {
         fallSpeed: Math.random() * 2 + 1,
         driftSpeed: (Math.random() - 0.5) * 0.5,
         opacity: Math.random() * 0.6 + 0.4,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color: colors[Math.floor(Math.random() * colors.length)] ?? '#FF6B9D',
         life: 0,
         maxLife: Math.random() * 300 + 200,
       };

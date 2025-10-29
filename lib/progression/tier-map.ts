@@ -82,7 +82,15 @@ export function tierPreset(tier: number): TierPreset {
 
   const preset = presets[tier];
   if (preset) return preset;
-  return presets[1];
+  return (
+    presets[1] ?? {
+      hue: 315,
+      thickness: 1,
+      motion: 'none',
+      description: 'Fallen Leaf',
+      visualTheme: 'thin ring, faint petals',
+    }
+  );
 }
 
 export function getTierMotionDuration(motion: 'none' | 'low' | 'med' | 'high'): number {

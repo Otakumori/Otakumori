@@ -17,7 +17,7 @@ export default function GameCubeHub() {
   const [idx, setIdx] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const active = faces[idx];
+  const active = faces[idx] ?? faces[0] ?? null;
 
   useEffect(() => {
     const node = containerRef.current;
@@ -25,11 +25,15 @@ export default function GameCubeHub() {
     const cleanup = initInput(node, {
       onRotateLeft: () => setIdx((i) => (i + faces.length - 1) % faces.length),
       onRotateRight: () => setIdx((i) => (i + 1) % faces.length),
-      onSelect: () => router.push(active.href),
+      onSelect: () => {
+        if (active) {
+          router.push(active.href);
+        }
+      },
       onBack: () => setIdx(0),
     });
     return cleanup;
-  }, [active.href, router]);
+  }, [active, router]);
 
   const listboxId = useMemo(() => `faces_${Math.random().toString(36).slice(2, 8)}`, []);
 
@@ -48,7 +52,7 @@ export default function GameCubeHub() {
         <div
           className="flex max-w-[720px] flex-wrap items-center justify-center gap-2"
           role="listbox"
-          aria-activedescendant={`${listboxId}_${active.id}`}
+          aria-activedescendant={active ? `${listboxId}_${active.id}` : undefined}
         >
           {faces.map((f, i) => (
             <FaceLabel

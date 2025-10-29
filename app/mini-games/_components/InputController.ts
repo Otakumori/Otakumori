@@ -28,10 +28,10 @@ export function initInput(node: HTMLElement, h: Handlers) {
   // Basic touch handling
   let startX = 0;
   const onTouchStart = (e: TouchEvent) => {
-    if (e.touches.length === 1) startX = e.touches[0].clientX;
+    if (e.touches.length === 1) startX = e.touches[0]?.clientX ?? 0;
   };
   const onTouchEnd = (e: TouchEvent) => {
-    const endX = e.changedTouches[0].clientX;
+    const endX = e.changedTouches[0]?.clientX ?? 0;
     const dx = endX - startX;
     if (Math.abs(dx) > 44) {
       if (dx < 0) h.onRotateRight();

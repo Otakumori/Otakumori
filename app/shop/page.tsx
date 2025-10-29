@@ -84,17 +84,30 @@ async function loadDbFallback() {
 
     await prisma.$disconnect();
 
-    return products.map((product) => ({
-      id: product.id,
-      title: product.name,
-      description: product.description || undefined,
-      images: product.primaryImageUrl ? [{ src: product.primaryImageUrl }] : [],
-      variants: product.ProductVariant.map((variant) => ({
-        id: variant.id,
-        price: variant.priceCents ? variant.priceCents / 100 : 0,
-        is_enabled: variant.isEnabled,
-      })),
-    }));
+    return products.map((product) => {
+      const mapped: {
+        id: string;
+        title: string;
+        description?: string;
+        images: { src: string }[];
+        variants: Array<{ id: string; price: number; is_enabled: boolean }>;
+      } = {
+        id: product.id,
+        title: product.name,
+        images: product.primaryImageUrl ? [{ src: product.primaryImageUrl }] : [],
+        variants: product.ProductVariant.map((variant) => ({
+          id: variant.id,
+          price: variant.priceCents ? variant.priceCents / 100 : 0,
+          is_enabled: variant.isEnabled,
+        })),
+      };
+
+      if (product.description) {
+        mapped.description = product.description;
+      }
+
+      return mapped;
+    });
   } catch (error) {
     const logger = await getLogger();
     logger.error(
@@ -130,12 +143,39 @@ async function loadProducts(searchParams: {
   }> = [];
 
   if (printifyResult.ok && printifyResult.data.items.length > 0) {
-    products = printifyResult.data.items.map((item) => ({
-      id: item.id || `printify_${Math.random()}`,
-      title: item.title,
-      images: item.images || [],
-      variants: item.variants || [],
-    }));
+    products = printifyResult.data.items.map((item) => {
+      const images = Array.isArray(item.images)
+        ? item.images
+            .map((img: any) => {
+              if (typeof img === 'string') return { src: img };
+              if (img && typeof img === 'object' && typeof img.src === 'string') {
+                return { src: img.src };
+              }
+              return null;
+            })
+            .filter((img): img is { src: string } => !!img && img.src.length > 0)
+        : [];
+
+      const productData: {
+        id: string;
+        title: string;
+        description?: string;
+        images: { src: string }[];
+        variants: any[];
+      } = {
+        id: item.id || `printify_${Math.random()}`,
+        title: item.title,
+        images,
+        variants: item.variants || [],
+      };
+
+      const maybeDescription = (item as any)?.description;
+      if (typeof maybeDescription === 'string' && maybeDescription.length > 0) {
+        productData.description = maybeDescription;
+      }
+
+      return productData;
+    });
 
     logger.info('Loaded products from Printify', {
       extra: { count: products.length },

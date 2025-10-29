@@ -29,3 +29,17 @@ export type PrintifyOrder = {
   status?: string;
   metadata?: Record<string, unknown>;
 };
+
+export type PrintifyOrderPayload = {
+  external_id: string;
+  line_items: Array<{
+    product_id: string;
+    variant_id: number;
+    quantity: number;
+    print_provider_id?: number;
+    blueprint_id?: number;
+  }>;
+  shipping_method: number;
+  address_to: PrintifyAddress;
+  send_shipping_notification?: boolean;
+};

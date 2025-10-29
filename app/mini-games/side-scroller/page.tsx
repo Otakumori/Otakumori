@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
-import { createWorld, spawn, add } from '@om/ecs';
+import { createWorld, type EntityId } from '@om/ecs';
 import { useGameLoop } from '@om/ecs/react';
 import {
   createInputSystem,
@@ -22,8 +22,8 @@ import {
   spawnPlayer,
   type Vec3,
 } from '@om/game-kit';
-import { getPolicyFromClient } from '@/app/lib/policy/fromRequest';
-import { resolveEquipmentForGame } from '@/app/lib/avatar/resolve-equipment';
+import { getPolicyFromClient } from '@/lib/policy/fromRequest';
+import { resolveEquipmentForGame } from '@/lib/avatar/resolve-equipment';
 import { InputHints } from '@/app/components/games/InputHints';
 import { prefersReducedMotion } from '@/app/lib/device-profile';
 
@@ -32,9 +32,16 @@ export default function SideScrollerDemo() {
   const [isPaused, setIsPaused] = useState(false);
   const world = useMemo(() => createWorld(), []);
   const inputSystem = useRef(createInputSystem());
-  const playerEntity = useRef<number | null>(null);
+  const playerEntity = useRef<EntityId | null>(null);
   const adapter = useRef(createSide2DAdapter(10, 0.1));
-  const camera = useRef(createOrthoCamera(10, window.innerWidth / window.innerHeight));
+  const camera = useRef(
+    createOrthoCamera(
+      10,
+      typeof window !== 'undefined' && window.innerHeight > 0
+        ? window.innerWidth / window.innerHeight
+        : 16 / 9,
+    ),
+  );
 
   // Initialize game
   useEffect(() => {
@@ -108,7 +115,7 @@ export default function SideScrollerDemo() {
       (_w: any, dt: number) => {
         if (!playerEntity.current) return;
 
-        const transform = world.components.get('Transform')?.get(playerEntity.current);
+        const transform = (world.components as any).get('Transform')?.get(playerEntity.current);
         if (transform) {
           followTarget(
             camera.current,

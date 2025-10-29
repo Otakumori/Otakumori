@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
-import { createWorld } from '@om/ecs';
+import { createWorld, type EntityId } from '@om/ecs';
 import { useGameLoop } from '@om/ecs/react';
 import {
   createInputSystem,
@@ -16,17 +16,23 @@ import {
   applyVelocity,
   spawnPlayer,
 } from '@om/game-kit';
-import { getPolicyFromClient } from '@/app/lib/policy/fromRequest';
-import { resolveEquipmentForGame } from '@/app/lib/avatar/resolve-equipment';
+import { getPolicyFromClient } from '@/lib/policy/fromRequest';
+import { resolveEquipmentForGame } from '@/lib/avatar/resolve-equipment';
 import { InputHints } from '@/app/components/games/InputHints';
 import { prefersReducedMotion } from '@/app/lib/device-profile';
+
+const DUMMY_POSITIONS: ReadonlyArray<[number, number, number]> = [
+  [-5, 0, -5],
+  [5, 0, -5],
+  [0, 0, -8],
+];
 
 export default function Arena3DDemo() {
   const [isReady, setIsReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const world = useMemo(() => createWorld(), []);
   const inputSystem = useRef(createInputSystem());
-  const playerEntity = useRef<number | null>(null);
+  const playerEntity = useRef<EntityId | null>(null);
 
   // Initialize game
   useEffect(() => {
@@ -144,11 +150,7 @@ export default function Arena3DDemo() {
         ))}
 
         {/* Target Dummies */}
-        {[
-          [-5, 0, -5],
-          [5, 0, -5],
-          [0, 0, -8],
-        ].map(([x, y, z], i) => (
+        {DUMMY_POSITIONS.map(([x, y, z], i) => (
           <mesh key={`dummy-${i}`} position={[x, y + 1, z]} castShadow>
             <cylinderGeometry args={[0.5, 0.5, 2, 16]} />
             <meshStandardMaterial color="#f59e0b" />

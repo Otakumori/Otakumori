@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { requireUserId } from '@/app/lib/auth';
-
-const db = new PrismaClient();
+import { requireUserId } from '@/lib/auth';
+import { db } from '@/lib/db';
 
 const COST = 50; // petals per pull
-const TABLE = [
+const TABLE: ReadonlyArray<{ key: string; weight: number }> = [
   { key: 'banner_sakura', weight: 30 },
   { key: 'frame_violet', weight: 30 },
   { key: 'title_ashen', weight: 25 },
@@ -13,13 +11,20 @@ const TABLE = [
   { key: 'relic_arcane', weight: 5 },
 ];
 
-function pick(table = TABLE) {
+function pick(table: ReadonlyArray<{ key: string; weight: number }> = TABLE): string {
+  if (table.length === 0) {
+    throw new Error('Reward table cannot be empty');
+  }
   const sum = table.reduce((s, r) => s + r.weight, 0);
   let r = Math.random() * sum;
   for (const row of table) {
     if ((r -= row.weight) <= 0) return row.key;
   }
-  return table[0].key;
+  const fallback = table[0];
+  if (!fallback) {
+    throw new Error('Failed to select fallback reward');
+  }
+  return fallback.key;
 }
 
 export async function POST() {

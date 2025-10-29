@@ -35,7 +35,11 @@ function WindTree({
 
   const mat = useRef<THREE.ShaderMaterial>(null!);
   useFrame((_, dt) => {
-    if (mat.current) mat.current.uniforms.uTime.value += dt;
+    const uniforms = mat.current?.uniforms as {
+      uTime?: { value: number };
+    } | undefined;
+    if (!uniforms?.uTime) return;
+    uniforms.uTime.value += dt;
   });
 
   return (

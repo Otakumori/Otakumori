@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { env } from '@/env';
-import type { PrintifyOrder } from './types';
+import type { PrintifyOrder, PrintifyOrderPayload } from './types';
 
 const client = axios.create({
   baseURL: 'https://api.printify.com/v1',
@@ -18,7 +18,7 @@ export async function getPrintifyOrder(
 
 export async function createPrintifyOrder(
   shopId: string,
-  payload: unknown,
+  payload: PrintifyOrderPayload,
 ): Promise<PrintifyOrder> {
   const { data } = await client.post(`/shops/${shopId}/orders.json`, payload);
   return data;

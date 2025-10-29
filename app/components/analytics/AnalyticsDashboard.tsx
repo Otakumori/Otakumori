@@ -102,12 +102,17 @@ export default function AnalyticsDashboard() {
               { name: 'Accessories', sales: 33, percentage: 14 },
             ],
           },
-          timeSeriesData: Array.from({ length: 30 }, (_, i) => ({
-            date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            users: Math.floor(Math.random() * 50) + 800,
-            revenue: Math.floor(Math.random() * 200) + 300,
-            sales: Math.floor(Math.random() * 10) + 5,
-          })),
+          timeSeriesData: Array.from({ length: 30 }, (_, i) => {
+            const dateStr = new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split('T')[0];
+            return {
+              date: dateStr ?? '',
+              users: Math.floor(Math.random() * 50) + 800,
+              revenue: Math.floor(Math.random() * 200) + 300,
+              sales: Math.floor(Math.random() * 10) + 5,
+            };
+          }),
         };
 
         setData(mockData);

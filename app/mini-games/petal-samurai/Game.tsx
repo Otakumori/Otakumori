@@ -359,7 +359,7 @@ class GameEngine {
       'gold',
       'cursed',
     ];
-    const type = types[Math.floor(Math.random() * types.length)];
+    const type = types[Math.floor(Math.random() * types.length)] ?? 'normal';
 
     const petal: Petal = {
       id: Math.random().toString(36).substr(2, 9),
@@ -381,7 +381,7 @@ class GameEngine {
       'combo_boost',
       'miss_forgive',
     ];
-    const type = types[Math.floor(Math.random() * types.length)];
+    const type = types[Math.floor(Math.random() * types.length)] ?? 'slow_time';
 
     const powerUp: PowerUp = {
       id: Math.random().toString(36).substr(2, 9),

@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import type { Group, SkinnedMesh, Mesh } from 'three';
+import * as THREE from 'three';
 import type { AvatarSpecV15Type, EquipmentSlotType } from '../spec';
 
 export interface ResolvedEquipment {
@@ -33,7 +33,7 @@ export function AvatarRenderer({
   onLoad,
   onError,
 }: AvatarRendererProps) {
-  const groupRef = useRef<Group>(null);
+  const groupRef = useRef<THREE.Group | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load base mesh (useGLTF suspends on error, no error prop)
@@ -46,17 +46,20 @@ export function AvatarRenderer({
     try {
       // Find skinned meshes with morph targets
       baseScene.traverse((node) => {
-        if ((node as SkinnedMesh).isSkinnedMesh || (node as Mesh).isMesh) {
-          const mesh = node as SkinnedMesh | Mesh;
-          if (mesh.morphTargetInfluences && mesh.morphTargetDictionary) {
-            // Apply morph weights
-            Object.entries(spec.morphWeights).forEach(([morphId, weight]) => {
-              const index = mesh.morphTargetDictionary![morphId];
-              if (index !== undefined && mesh.morphTargetInfluences) {
-                mesh.morphTargetInfluences[index] = weight;
-              }
-            });
+        if (node instanceof THREE.SkinnedMesh || node instanceof THREE.Mesh) {
+          const mesh = node as THREE.SkinnedMesh | THREE.Mesh;
+          const influences = mesh.morphTargetInfluences;
+          const dictionary = mesh.morphTargetDictionary;
+          if (!influences || !dictionary) {
+            return;
           }
+
+          Object.entries(spec.morphWeights).forEach(([morphId, weight]) => {
+            const index = dictionary[morphId];
+            if (index !== undefined) {
+              influences[index] = weight;
+            }
+          });
         }
       });
 
@@ -93,7 +96,15 @@ export function AvatarRenderer({
     }
   }, [resolved]);
 
-  return <group ref={groupRef}>{baseScene && <primitive object={baseScene.clone()} />}</group>;
+  return (
+    <group
+      ref={(group) => {
+        groupRef.current = group ? ((group as unknown) as THREE.Group) : null;
+      }}
+    >
+      {baseScene && <primitive object={baseScene.clone()} />}
+    </group>
+  );
 }
 
 // Preload utility for better performance

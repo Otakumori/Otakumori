@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -221,6 +219,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
   const handleTouchStart = (event: TouchEvent) => {
     event.preventDefault();
     const touch = event.touches[0];
+    if (!touch) return;
     isMouseDown.current = true;
     lastMousePos.current = { x: touch.clientX, y: touch.clientY };
     mousePos.current = { x: touch.clientX, y: touch.clientY };
@@ -229,6 +228,7 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
   const handleTouchMove = (event: TouchEvent) => {
     event.preventDefault();
     const touch = event.touches[0];
+    if (!touch) return;
     mousePos.current = { x: touch.clientX, y: touch.clientY };
   };
 
@@ -472,9 +472,12 @@ export default function SamuraiPetalSlice({ gameDef }: SamuraiPetalSliceProps) {
     // Render slice trails
     sliceTrailsRef.current.forEach((trail) => {
       const graphics = new PIXI.Graphics();
+      const pt0 = trail.points[0];
+      const pt1 = trail.points[1];
+      if (!pt0 || !pt1) return;
       graphics.lineStyle(trail.width, 0xff6b6b, trail.alpha);
-      graphics.moveTo(trail.points[0].x, trail.points[0].y);
-      graphics.lineTo(trail.points[1].x, trail.points[1].y);
+      graphics.moveTo(pt0.x, pt0.y);
+      graphics.lineTo(pt1.x, pt1.y);
       appRef.current!.stage.addChild(graphics);
 
       // Remove after rendering

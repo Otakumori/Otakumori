@@ -58,17 +58,20 @@ class PetalEconomy {
     const dayOfWeek = today.getDay();
     const gameIndex = dayOfWeek % games.length;
 
-    this.dailyModifiers = [
-      {
-        id: 'daily_boost',
-        game: games[gameIndex],
-        multiplier: 1.5,
-        description: `+50% petals in ${games[gameIndex].replace('-', ' ')} today!`,
-        startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-        endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
-        active: true,
-      },
-    ];
+    const selectedGame = games[gameIndex];
+    if (selectedGame) {
+      this.dailyModifiers = [
+        {
+          id: 'daily_boost',
+          game: selectedGame,
+          multiplier: 1.5,
+          description: `+50% petals in ${selectedGame.replace('-', ' ')} today!`,
+          startDate: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+          endDate: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
+          active: true,
+        },
+      ];
+    }
   }
 
   // Calculate petal earnings with modifiers
@@ -255,7 +258,7 @@ class PetalEconomy {
       type: 'spend',
       source: 'purchase',
       description: reason,
-      metadata,
+      ...(metadata && { metadata }),
     });
 
     return true;

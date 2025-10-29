@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { createPrintifyOrder, type PrintifyOrderPayload } from '@/lib/printify/client';
+import { env } from '@/env';
+import { createPrintifyOrder } from '@/lib/printify/printifyClient';
+import type { PrintifyOrderPayload } from '@/lib/printify/types';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -39,7 +41,7 @@ const CheckoutOrderSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
@@ -61,6 +63,19 @@ export async function POST(req: NextRequest) {
     const { orderId, lineItems, shippingMethod, shippingAddress } = parsed.data;
 
     // Build Printify payload
+    const addressTo: PrintifyOrderPayload['address_to'] = {
+      first_name: shippingAddress.firstName,
+      last_name: shippingAddress.lastName,
+      email: shippingAddress.email,
+      phone: shippingAddress.phone,
+      country: shippingAddress.country,
+      region: shippingAddress.region,
+      address1: shippingAddress.address1,
+      city: shippingAddress.city,
+      zip: shippingAddress.zip,
+      ...(shippingAddress.address2 ? { address2: shippingAddress.address2 } : {}),
+    };
+
     const printifyPayload: PrintifyOrderPayload = {
       external_id: orderId,
       line_items: lineItems.map((item) => ({
@@ -69,22 +84,18 @@ export async function POST(req: NextRequest) {
         quantity: item.quantity,
       })),
       shipping_method: shippingMethod,
-      address_to: {
-        first_name: shippingAddress.firstName,
-        last_name: shippingAddress.lastName,
-        email: shippingAddress.email,
-        phone: shippingAddress.phone,
-        country: shippingAddress.country,
-        region: shippingAddress.region,
-        address1: shippingAddress.address1,
-        address2: shippingAddress.address2,
-        city: shippingAddress.city,
-        zip: shippingAddress.zip,
-      },
+      address_to: addressTo,
     };
 
     // Submit to Printify
-    const printifyOrder = await createPrintifyOrder(printifyPayload);
+    const shopId = env.PRINTIFY_SHOP_ID;
+    if (!shopId) {
+      return NextResponse.json(
+        { ok: false, error: 'Printify shop is not configured' },
+        { status: 500 },
+      );
+    }
+    const printifyOrder = await createPrintifyOrder(shopId, printifyPayload);
 
     // Store sync record
     await db.printifyOrderSync.create({
@@ -118,6 +129,7 @@ export async function POST(req: NextRequest) {
         await db.printifyOrderSync.create({
           data: {
             localOrderId: orderId,
+            printifyOrderId: 'failed', // Use placeholder since order creation failed
             status: 'failed',
             error: errorMessage.substring(0, 500), // Limit error message length
           },
@@ -137,7 +149,7 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { audio } from '@/app/lib/audio';
 import { http } from '@/app/lib/http';
@@ -293,13 +293,16 @@ export default function ConsoleCard({
     const dist = (a: { rx: number; ry: number }, b: { rx: number; ry: number }) =>
       Math.hypot(a.rx - b.rx, a.ry - b.ry);
     const current = rotation;
-    const nearest = withAngles.reduce(
-      (best, cur) => (dist(current, cur.rot) < dist(current, best.rot) ? cur : best),
-      withAngles[0],
+    const nearest = withAngles.reduce<{ f: number; rot: { rx: number; ry: number } } | null>(
+      (best, cur) => {
+        if (!best) return cur;
+        return dist(current, cur.rot) < dist(current, best.rot) ? cur : best;
+      },
+      null,
     );
     if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) {
       setFace(face);
-    } else {
+    } else if (nearest) {
       // Rubber-band overshoot then snap
       const toward = { rx: Math.sign(-dy), ry: Math.sign(dx) };
       const overshoot = 8; // deg
@@ -310,6 +313,8 @@ export default function ConsoleCard({
         setAnimMs(duration);
         setFace(nearest.f);
       }, 120);
+    } else {
+      setFace(face);
     }
   };
 
@@ -638,7 +643,7 @@ export default function ConsoleCard({
             disabled={busy}
             data-testid="fuse-submit"
           >
-            {busy ? 'Fusing…' : 'Fuse'}
+            {busy ? 'Fusingâ€¦' : 'Fuse'}
           </button>
         </div>
         {result && <div className="mt-2 text-xs text-zinc-300">{result}</div>}
@@ -663,7 +668,7 @@ export default function ConsoleCard({
     }, []);
     return (
       <div className="rounded-full bg-white/10 px-3 py-1 text-xs text-white" title="Slot A: petals">
-        Slot A: {balance ?? '…'} petals
+        Slot A: {balance ?? 'â€¦'} petals
       </div>
     );
   };
@@ -672,7 +677,7 @@ export default function ConsoleCard({
     <div className="grid place-items-center h-64" data-testid="boot-seen">
       <div className="text-center text-pink-200">
         <div className="mb-2 text-lg">GameCube BIOS</div>
-        <div className="text-xs opacity-80">Booting…</div>
+        <div className="text-xs opacity-80">Bootingâ€¦</div>
       </div>
     </div>
   );
@@ -802,10 +807,10 @@ export default function ConsoleCard({
         </div>
       )}
       <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-400">
-        <div>Arrows/Stick: rotate • A/Enter: select • B/Esc: back</div>
+        <div>Arrows/Stick: rotate â€¢ A/Enter: select â€¢ B/Esc: back</div>
         <div className="inline-flex items-center gap-2">
           <span className="material-symbols-outlined">view_in_ar</span>
-          <span className="emoji-noto">🎮</span>
+          <span className="emoji-noto">ðŸŽ®</span>
         </div>
       </div>
     </section>
@@ -834,7 +839,7 @@ function AchievementsPreview() {
     <div className="rounded-lg border border-white/15 bg-white/5 p-3">
       <div className="mb-2 text-xs text-zinc-300">Recent Achievements</div>
       {loading ? (
-        <div className="text-xs text-zinc-400">Loading…</div>
+        <div className="text-xs text-zinc-400">Loadingâ€¦</div>
       ) : items.length === 0 ? (
         <div className="text-xs text-zinc-400">No recent achievements.</div>
       ) : (
@@ -908,7 +913,12 @@ function GameIcon({ slug, icon }: { slug: string; icon: string }) {
         if (!cancelled) setImgSrc(null);
         return;
       }
-      const src = candidates[i++];
+      const src = candidates[i];
+      i += 1;
+      if (!src) {
+        tryNext();
+        return;
+      }
       const img = new Image();
       img.onload = () => {
         if (!cancelled) setImgSrc(src);
@@ -1077,7 +1087,7 @@ function CommunityFace() {
             // ignore
           }
         }
-        const jitter = Math.floor(Math.random() * 1000) - 500; // ±500ms
+        const jitter = Math.floor(Math.random() * 1000) - 500; // Â±500ms
         wsTimerRef.current = window.setTimeout(tick, 4000 + jitter) as any;
       };
       if (!wsTimerRef.current) wsTimerRef.current = window.setTimeout(tick, 1200) as any;
@@ -1157,7 +1167,7 @@ function CommunityFace() {
         className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm text-zinc-300"
         data-testid="face2-card-root"
       >
-        Loading…
+        Loadingâ€¦
       </div>
     );
   }
@@ -1197,7 +1207,7 @@ function CommunityFace() {
             className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300"
             data-testid="ws-banner-degraded"
           >
-            Degraded Realtime: reconnecting… polling active
+            Degraded Realtime: reconnectingâ€¦ polling active
           </div>
         )}
         <AvatarCreator
@@ -1216,13 +1226,15 @@ function CommunityFace() {
           className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300"
           data-testid="ws-banner-degraded"
         >
-          Degraded Realtime: reconnecting… polling active
+          Degraded Realtime: reconnectingâ€¦ polling active
         </div>
       )}
       <CommunityLobby
-        avatarUrl={data.avatar.url}
+        avatarUrl={data.avatar?.url ?? ''}
         prefs={prefs}
-        onPrefs={(p) => setData({ avatar: data.avatar, prefs: p })}
+        onPrefs={(p) =>
+          setData((prev) => (prev ? { ...prev, prefs: p } : prev))
+        }
         saving={saving}
         setSaving={setSaving}
         pendingInteraction={pendingInteraction}
@@ -1463,7 +1475,7 @@ function AvatarCreator({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15"
-            placeholder="https://…/avatar.png"
+            placeholder="https://â€¦/avatar.png"
           />
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
@@ -1500,7 +1512,7 @@ function AvatarCreator({
           disabled={saving}
           className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50"
         >
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Savingâ€¦' : 'Save'}
         </button>
       </div>
     </div>
@@ -1580,7 +1592,7 @@ function CommunityLobby({
                 </span>
               </span>
             ) : (
-              '—'
+              'â€”'
             )}
           </div>
         ))}
@@ -1606,7 +1618,7 @@ function CommunityLobby({
           disabled={saving}
           className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50"
         >
-          {saving ? 'Saving…' : 'Save Preferences'}
+          {saving ? 'Savingâ€¦' : 'Save Preferences'}
         </button>
         <button
           onClick={onQuestComplete}

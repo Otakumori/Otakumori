@@ -20,8 +20,9 @@ export const AchievementNotificationManager: React.FC = () => {
     // In a real app, you would listen for an event from your achievement system
     // For now, we'll just simulate it with a timeout
     const timer = setTimeout(() => {
-      if (achievements.length > 0) {
-        handleAchievementUnlock(achievements[0]);
+      const achievement = achievements[0];
+      if (achievement) {
+        handleAchievementUnlock(achievement);
       }
     }, 5000);
 

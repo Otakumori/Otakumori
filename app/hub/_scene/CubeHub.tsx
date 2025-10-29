@@ -119,9 +119,11 @@ export default function CubeHub() {
 
       // ease toward target face orientation
       const target = faceRot[face];
-      cube.rotation.x += (target.x - cube.rotation.x) * 0.08;
-      cube.rotation.y += (target.y - cube.rotation.y) * 0.08;
-      cube.rotation.z += (target.z - cube.rotation.z) * 0.08;
+      if (target) {
+        cube.rotation.x += (target.x - cube.rotation.x) * 0.08;
+        cube.rotation.y += (target.y - cube.rotation.y) * 0.08;
+        cube.rotation.z += (target.z - cube.rotation.z) * 0.08;
+      }
 
       // zoom pulse on confirm (handled by page route after 450ms)
       if (isZooming) {

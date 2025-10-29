@@ -73,7 +73,7 @@ export default function ProductDetailPage() {
         };
         setProduct(shaped);
         if (shaped.variants && shaped.variants.length > 0) {
-          setSelectedVariant(shaped.variants[0]);
+          setSelectedVariant(shaped.variants[0] ?? null);
         }
       } catch (err) {
         setError(

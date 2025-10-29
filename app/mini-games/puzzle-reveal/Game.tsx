@@ -1,4 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-girl\Game.tsx instead.
+// @ts-nocheck
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';

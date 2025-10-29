@@ -13,8 +13,9 @@ export type GenerateOpts = {
 function titleCase(s: string) {
   return s.replace(/\b([a-z])/g, (_, c) => c.toUpperCase()).replace(/[^A-Za-z0-9]+/g, '');
 }
-function pick<T>(arr: T[], r: () => number) {
-  return arr[Math.floor(r() * arr.length)];
+function pick<T>(arr: T[], r: () => number): T | undefined {
+  const index = Math.floor(r() * arr.length);
+  return arr[index];
 }
 function rng(seed?: number) {
   let x = seed ? seed : (Math.random() * 1e9) | 0;
@@ -40,17 +41,21 @@ export function generateCandidate(opts: GenerateOpts = {}): string {
   // (no emoji, DS tone, punchy)
   const templates: Array<() => string> = [
     () =>
-      `${titleCase(pick(bank.adjectives, r))}${separator}${titleCase(pick(bank.concreteNouns, r))}`,
+      `${titleCase(pick(bank.adjectives, r) ?? 'mystic')}${separator}${titleCase(pick(bank.concreteNouns, r) ?? 'star')}`,
     () =>
-      `${r() < 0.5 ? 'The' + separator : ''}${titleCase(pick(bank.adjectives, r))}${titleCase(pick(bank.concreteNouns, r))}`,
-    () => `${titleCase(pick(bank.verbs, r))}${titleCase(pick(bank.concreteNouns, r))}`,
+      `${r() < 0.5 ? 'The' + separator : ''}${titleCase(pick(bank.adjectives, r) ?? 'mystic')}${titleCase(pick(bank.concreteNouns, r) ?? 'star')}`,
     () =>
-      `${titleCase(pick(bank.animals, r))}${separator}${titleCase(pick(bank.containerTypes, r))}`,
-    () => `${titleCase(pick(bank.adverbs, r))}${separator}${titleCase(pick(bank.adjectives, r))}`,
-    () => `${titleCase(pick(bank.adjectives, r))}${titleCase(pick(bank.nouns, r))}`,
+      `${titleCase(pick(bank.verbs, r) ?? 'forge')}${titleCase(pick(bank.concreteNouns, r) ?? 'star')}`,
+    () =>
+      `${titleCase(pick(bank.animals, r) ?? 'fox')}${separator}${titleCase(pick(bank.containerTypes, r) ?? 'void')}`,
+    () =>
+      `${titleCase(pick(bank.adverbs, r) ?? 'lunar')}${separator}${titleCase(pick(bank.adjectives, r) ?? 'mystic')}`,
+    () =>
+      `${titleCase(pick(bank.adjectives, r) ?? 'mystic')}${titleCase(pick(bank.nouns, r) ?? 'star')}`,
   ];
 
-  let base = templates[Math.floor(r() * templates.length)]();
+  const selectedTemplate = templates[Math.floor(r() * templates.length)];
+  let base = selectedTemplate?.() ?? 'mystic-star';
 
   // Optional numeric garnish
   if (numbers !== 'none') {

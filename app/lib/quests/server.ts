@@ -36,7 +36,9 @@ export async function ensureDailyAssignments(userId: string, day = userDayNY(), 
 
   while (picks.length < Math.min(perDay, pool.length)) {
     const i = Math.floor(rng() * pool.length);
-    const k = pool[i].key;
+    const entry = pool[i];
+    if (!entry) continue;
+    const { key: k } = entry;
     if (!picks.includes(k)) picks.push(k);
   }
 
@@ -65,19 +67,24 @@ export async function ensureDailyAssignments(userId: string, day = userDayNY(), 
   // create assignments for picked quests
   const quests = await prisma.quest.findMany({ where: { key: { in: picks } } });
   for (const q of quests) {
+    const questDef = QUEST_POOL.find((p) => p.key === q.key);
+    if (!questDef) {
+      continue;
+    }
+
     await prisma.questAssignment.upsert({
       where: {
         userId_questId_day: { userId, questId: q.id, day },
       },
       update: {
         bonusEligible: true,
-        target: QUEST_POOL.find((p) => p.key === q.key)!.target,
+        target: questDef.target,
       },
       create: {
         userId,
         questId: q.id,
         day,
-        target: QUEST_POOL.find((p) => p.key === q.key)!.target,
+        target: questDef.target,
         bonusEligible: true,
       },
     });

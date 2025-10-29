@@ -51,20 +51,23 @@ export async function POST(request: Request) {
   }
 
   const score = clamp(Math.trunc(body.score), 0, 10_000_000);
-  const diff = typeof body.stats.diff === 'string' ? body.stats.diff : null;
+  const diff = typeof body.stats.diff === 'string' ? body.stats.diff : undefined;
 
   if (!userId) {
     return NextResponse.json({ ok: true, guest: true, score });
   }
 
+  const playerId = userId;
   const petalsGranted = calculatePetals(body.game, score);
 
   if (petalsGranted > 0) {
     logger.info('petals_granted', {
-      userId: userId || undefined,
+      userId: playerId,
       game: body.game,
-      score,
-      petalsGranted,
+      extra: {
+        score,
+        petalsGranted,
+      },
     });
     // TODO: integrate with petals ledger + achievements once migrations are stable
   }
@@ -72,49 +75,88 @@ export async function POST(request: Request) {
   let personalBest = false;
 
   try {
-    const previous = await db.leaderboardScore.findUnique({
-      where: {
-        userId_game_diff: {
-          userId,
-          game: body.game,
-          diff,
-        },
-      },
-    });
-
-    if (!previous || score > previous.score) {
-      await db.leaderboardScore.upsert({
+    if (diff) {
+      const previous = await db.leaderboardScore.findUnique({
         where: {
           userId_game_diff: {
-            userId,
+            userId: playerId,
             game: body.game,
             diff,
           },
         },
-        create: {
-          userId,
+      });
+
+      if (!previous || score > previous.score) {
+        await db.leaderboardScore.upsert({
+          where: {
+            userId_game_diff: {
+              userId: playerId,
+              game: body.game,
+              diff,
+            },
+          },
+          create: {
+            userId: playerId,
+            game: body.game,
+            diff,
+            score,
+            statsJson: body.stats ?? {},
+          },
+          update: {
+            score,
+            statsJson: body.stats ?? {},
+          },
+        });
+
+        personalBest = true;
+      }
+    } else {
+      const previous = await db.leaderboardScore.findFirst({
+        where: {
+          userId: playerId,
           game: body.game,
-          diff,
-          score,
-          statsJson: body.stats ?? {},
-        },
-        update: {
-          score,
-          statsJson: body.stats ?? {},
+          diff: null,
         },
       });
 
-      personalBest = true;
+      if (!previous || score > previous.score) {
+        if (previous) {
+          await db.leaderboardScore.update({
+            where: { id: previous.id },
+            data: {
+              score,
+              statsJson: body.stats ?? {},
+            },
+          });
+        } else {
+          await db.leaderboardScore.create({
+            data: {
+              userId: playerId,
+              game: body.game,
+              diff: null,
+              score,
+              statsJson: body.stats ?? {},
+            },
+          });
+        }
+
+        personalBest = true;
+      }
     }
   } catch (error) {
     logger.error('leaderboard upsert error', { extra: { error } });
   }
 
   const top = await db.leaderboardScore.findMany({
-    where: {
-      game: body.game,
-      ...(diff ? { diff } : {}),
-    },
+    where: diff
+      ? {
+          game: body.game,
+          diff,
+        }
+      : {
+          game: body.game,
+          diff: null,
+        },
     orderBy: [{ score: 'desc' }, { updatedAt: 'asc' }],
     take: MAX_TOP,
   });

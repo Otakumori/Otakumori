@@ -60,12 +60,14 @@ export const FriendChat = ({ friendId }: { friendId: string }) => {
 
   if (!friend) return null;
 
+  const friendInitial = friend.username.charAt(0)?.toUpperCase() ?? '?';
+
   return (
     <div className="mx-auto w-full max-w-md rounded-lg bg-white/10 p-4 shadow-lg backdrop-blur-lg">
       <div className="mb-4 flex items-center space-x-3">
         <div className="relative">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-500 text-white">
-            {friend.username[0].toUpperCase()}
+            {friendInitial}
           </div>
           <div
             className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${

@@ -1,6 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\components\Toast.tsx instead.
 'use client';
-'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { createContext, useContext, useState, useCallback } from 'react';
@@ -23,7 +22,10 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   const showToast = useCallback((message: string, type: Toast['type'], icon?: string) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setToasts((prev) => [...prev, { id, message, type, icon }]);
+    setToasts((prev) => {
+      const nextToast: Toast = icon ? { id, message, type, icon } : { id, message, type };
+      return [...prev, nextToast];
+    });
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 3000);

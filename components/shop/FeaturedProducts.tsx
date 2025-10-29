@@ -56,41 +56,44 @@ export function FeaturedProducts() {
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {products
         .filter((product) => !product.isNSFW || isAuthenticated)
-        .map((product, index) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            <Link href={`/shop/${product.id}`}>
-              <div className="group relative overflow-hidden rounded-lg bg-gray-800/50 transition-colors duration-300 hover:bg-gray-800/70">
-                <div className="relative aspect-square">
-                  <Image
-                    src={product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                  {product.isNSFW && (
-                    <div className="absolute right-2 top-2 rounded-full bg-pink-600 px-2 py-1 text-xs text-white">
-                      NSFW
+        .map((product, index) => {
+          const imageSrc = product.images[0] ?? '/placeholder.png';
+          return (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Link href={`/shop/${product.id}`}>
+                <div className="group relative overflow-hidden rounded-lg bg-gray-800/50 transition-colors duration-300 hover:bg-gray-800/70">
+                  <div className="relative aspect-square">
+                    <Image
+                      src={imageSrc}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    {product.isNSFW && (
+                      <div className="absolute right-2 top-2 rounded-full bg-pink-600 px-2 py-1 text-xs text-white">
+                        NSFW
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="mb-2 text-xl font-bold text-white">{product.name}</h3>
+                    <p className="mb-4 line-clamp-2 text-sm text-gray-300">{product.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-pink-500">${product.price.toFixed(2)}</span>
+                      <span className="text-sm text-white/50">View Details →</span>
                     </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="mb-2 text-xl font-bold text-white">{product.name}</h3>
-                  <p className="mb-4 line-clamp-2 text-sm text-gray-300">{product.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-pink-500">${product.price.toFixed(2)}</span>
-                    <span className="text-sm text-white/50">View Details →</span>
                   </div>
                 </div>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+              </Link>
+            </motion.div>
+          );
+        })}
     </div>
   );
 }

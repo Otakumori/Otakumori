@@ -12,11 +12,18 @@ const bins: Record<string, number[]> = {};
 
 export async function POST(req: Request) {
   const now = Date.now();
-  const { userId } = await auth();
+  const authResult = await auth();
+  const userId = authResult?.userId;
   if (!userId) return NextResponse.json({ ok: false, code: 'UNAUTHENTICATED' }, { status: 401 });
-  const key = userId;
+  const key: string = userId;
   const arr = bins[key] ?? (bins[key] = []);
-  while (arr.length && now - arr[0] > windowMs) arr.shift();
+  while (arr.length > 0) {
+    const oldest = arr[0]!;
+    if (now - oldest <= windowMs) {
+      break;
+    }
+    arr.shift();
+  }
   if (arr.length >= limit) {
     const res = NextResponse.json(
       { ok: false, code: 'RATE_LIMIT', message: 'Too many emotes' },

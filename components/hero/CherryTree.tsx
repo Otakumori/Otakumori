@@ -76,23 +76,26 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
     [className],
   );
 
+  const treeAnimation =
+    prefersReducedMotion || !isVisible
+      ? {}
+      : {
+          animate: {
+            y: [0, -2, 0],
+            transition: {
+              duration: 4,
+              repeat: Infinity,
+              ease: 'easeInOut' as const,
+            },
+          },
+        };
+
   return (
     <div ref={treeRef} className={containerClassName} aria-hidden={!isVisible}>
       <motion.div
         className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 transform"
         style={{ transform: `translateX(${prefersReducedMotion ? 0 : currentSway}px)` }}
-        {...(prefersReducedMotion || !isVisible
-          ? {}
-          : {
-              animate: {
-                y: [0, -2, 0],
-                transition: {
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                },
-              },
-            })}
+        {...treeAnimation}
       >
         <div className="absolute bottom-0 left-1/2 h-32 w-8 -translate-x-1/2 transform rounded-full bg-gradient-to-t from-amber-800 to-amber-600" />
 
@@ -104,15 +107,9 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
 
         <div className="absolute bottom-16 left-1/2 h-40 w-80 -translate-x-1/2 transform">
           <div className="absolute bottom-0 left-0 h-32 w-32">
-            {LEFT_CLUSTER.map((index) => (
-              <motion.div
-                key={`left-${index}`}
-                className="absolute h-3 w-3 rounded-full bg-pink-300 opacity-80"
-                style={{
-                  left: `${20 + Math.sin(index * 0.8) * 15}%`,
-                  top: `${30 + Math.cos(index * 0.8) * 15}%`,
-                }}
-                {...(prefersReducedMotion || !isVisible
+            {LEFT_CLUSTER.map((index) => {
+              const animation =
+                prefersReducedMotion || !isVisible
                   ? {}
                   : {
                       animate: {
@@ -122,24 +119,28 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                           duration: 3 + index * 0.2,
                           repeat: Infinity,
                           delay: index * 0.1,
-                          ease: 'easeInOut',
+                          ease: 'easeInOut' as const,
                         },
                       },
-                    })}
-              />
-            ))}
+                    };
+              return (
+                <motion.div
+                  key={`left-${index}`}
+                  className="absolute h-3 w-3 rounded-full bg-pink-300 opacity-80"
+                  style={{
+                    left: `${20 + Math.sin(index * 0.8) * 15}%`,
+                    top: `${30 + Math.cos(index * 0.8) * 15}%`,
+                  }}
+                  {...animation}
+                />
+              );
+            })}
           </div>
 
           <div className="absolute bottom-0 right-0 h-32 w-32">
-            {RIGHT_CLUSTER.map((index) => (
-              <motion.div
-                key={`right-${index}`}
-                className="absolute h-3 w-3 rounded-full bg-pink-300 opacity-80"
-                style={{
-                  left: `${20 + Math.sin(index * 0.8) * 15}%`,
-                  top: `${30 + Math.cos(index * 0.8) * 15}%`,
-                }}
-                {...(prefersReducedMotion || !isVisible
+            {RIGHT_CLUSTER.map((index) => {
+              const animation =
+                prefersReducedMotion || !isVisible
                   ? {}
                   : {
                       animate: {
@@ -149,24 +150,28 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                           duration: 3 + index * 0.2,
                           repeat: Infinity,
                           delay: index * 0.1 + 0.5,
-                          ease: 'easeInOut',
+                          ease: 'easeInOut' as const,
                         },
                       },
-                    })}
-              />
-            ))}
+                    };
+              return (
+                <motion.div
+                  key={`right-${index}`}
+                  className="absolute h-3 w-3 rounded-full bg-pink-300 opacity-80"
+                  style={{
+                    left: `${20 + Math.sin(index * 0.8) * 15}%`,
+                    top: `${30 + Math.cos(index * 0.8) * 15}%`,
+                  }}
+                  {...animation}
+                />
+              );
+            })}
           </div>
 
           <div className="absolute bottom-0 left-1/2 h-32 w-40 -translate-x-1/2 transform">
-            {CENTER_CLUSTER.map((index) => (
-              <motion.div
-                key={`center-${index}`}
-                className="absolute h-3 w-3 rounded-full bg-pink-200 opacity-90"
-                style={{
-                  left: `${25 + Math.sin(index * 0.5) * 20}%`,
-                  top: `${20 + Math.cos(index * 0.5) * 20}%`,
-                }}
-                {...(prefersReducedMotion || !isVisible
+            {CENTER_CLUSTER.map((index) => {
+              const animation =
+                prefersReducedMotion || !isVisible
                   ? {}
                   : {
                       animate: {
@@ -176,12 +181,22 @@ export function CherryTree({ swayIntensity = 0.5, onPetalSpawn, className }: Che
                           duration: 2.5 + index * 0.15,
                           repeat: Infinity,
                           delay: index * 0.08,
-                          ease: 'easeInOut',
+                          ease: 'easeInOut' as const,
                         },
                       },
-                    })}
-              />
-            ))}
+                    };
+              return (
+                <motion.div
+                  key={`center-${index}`}
+                  className="absolute h-3 w-3 rounded-full bg-pink-200 opacity-90"
+                  style={{
+                    left: `${25 + Math.sin(index * 0.5) * 20}%`,
+                    top: `${20 + Math.cos(index * 0.5) * 20}%`,
+                  }}
+                  {...animation}
+                />
+              );
+            })}
           </div>
         </div>
 

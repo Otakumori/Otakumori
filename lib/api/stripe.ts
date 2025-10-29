@@ -76,7 +76,7 @@ export async function createCheckoutSession(params: {
   cancelUrl: string;
   metadata?: Record<string, string>;
 }) {
-  const session = await stripe.checkout.sessions.create({
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [
@@ -85,11 +85,19 @@ export async function createCheckoutSession(params: {
         quantity: 1,
       },
     ],
-    customer_email: params.customerEmail,
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
-    metadata: params.metadata,
-  });
+  };
+
+  if (params.customerEmail) {
+    sessionParams.customer_email = params.customerEmail;
+  }
+
+  if (params.metadata) {
+    sessionParams.metadata = params.metadata;
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
 
   return session;
 }
@@ -103,11 +111,19 @@ export async function createCustomer(params: {
   name?: string;
   metadata?: Record<string, string>;
 }) {
-  return stripe.customers.create({
+  const customerParams: Stripe.CustomerCreateParams = {
     email: params.email,
-    name: params.name,
-    metadata: params.metadata,
-  });
+  };
+
+  if (params.name) {
+    customerParams.name = params.name;
+  }
+
+  if (params.metadata) {
+    customerParams.metadata = params.metadata;
+  }
+
+  return stripe.customers.create(customerParams);
 }
 
 export async function getPaymentIntent(paymentIntentId: string) {

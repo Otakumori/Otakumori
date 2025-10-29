@@ -76,8 +76,10 @@ export default function CharacterReaction({
         const randomReactions = ['happy', 'excited', 'focused'];
         const randomReaction = randomReactions[Math.floor(Math.random() * randomReactions.length)];
 
-        setCurrentReaction(randomReaction);
-        setIsVisible(true);
+        if (randomReaction) {
+          setCurrentReaction(randomReaction);
+          setIsVisible(true);
+        }
 
         setTimeout(() => {
           setIsVisible(false);

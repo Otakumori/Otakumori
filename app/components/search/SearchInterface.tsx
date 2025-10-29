@@ -260,7 +260,7 @@ export default function SearchInterface() {
       <GlassPanel className="p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <label htmlFor="search-query" className="block text-sm font-medium text-white/80">
-            {t('search', 'label') ?? 'Search'}
+            {t('search', 'placeholder') ?? 'Search'}
           </label>
           <div className="relative">
             <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-500">
