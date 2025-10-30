@@ -20,9 +20,13 @@ export function parseIntegrationRef(ref: string): { shopId: string; productId: s
   const match = ref.match(/^printify:([^:]+):(.+)$/);
   if (!match) return null;
 
+  const shopId = match[1];
+  const productId = match[2];
+  if (!shopId || !productId) return null;
+
   return {
-    shopId: match[1],
-    productId: match[2],
+    shopId,
+    productId,
   };
 }
 

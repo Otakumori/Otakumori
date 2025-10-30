@@ -59,17 +59,22 @@ export default function SakuraParticles3D({
     scene.add(particles);
 
     // Animation loop (simple floating)
+    let animationFrameId: number;
+
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
 
       // Simple floating animation
       for (let i = 0; i < particleCount; i++) {
-        positions[i * 3 + 1] -= 0.005; // Move down
-        if (positions[i * 3 + 1] < -5) {
-          positions[i * 3 + 1] = 5; // Reset to top
-        }
+        const yIndex = i * 3 + 1;
+        const currentY = positions[yIndex] ?? 0;
+        const nextY = currentY - 0.005;
+        positions[yIndex] = nextY < -5 ? 5 : nextY;
       }
-      particlesGeometry.attributes.position.needsUpdate = true;
+      const positionAttribute = particlesGeometry.getAttribute('position');
+      if (positionAttribute instanceof THREE.BufferAttribute) {
+        positionAttribute.needsUpdate = true;
+      }
 
       renderer.render(scene, camera);
     };
@@ -78,6 +83,7 @@ export default function SakuraParticles3D({
 
     // Handle resize
     const handleResize = () => {
+      if (!currentMount) return;
       camera.aspect = currentMount.clientWidth / currentMount.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(currentMount.clientWidth, currentMount.clientHeight);
@@ -87,7 +93,12 @@ export default function SakuraParticles3D({
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
-      currentMount.removeChild(renderer.domElement);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (currentMount.contains(renderer.domElement)) {
+        currentMount.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, [particleCount, sakuraTexture]);

@@ -36,16 +36,18 @@ export class GameLoop {
   };
 
   constructor(options: GameLoopOptions = {}) {
-    this.targetFPS = options.targetFPS || 60;
+    this.targetFPS = options.targetFPS ?? 60;
     this.targetFrameTime = 1000 / this.targetFPS;
-    this.maxFrameSkip = options.maxFrameSkip || 5;
-    this.onUpdate = options.onUpdate;
-    this.onRender = options.onRender;
-    this.onError = options.onError;
+    this.maxFrameSkip = options.maxFrameSkip ?? 5;
+    if (options.onUpdate) this.onUpdate = options.onUpdate;
+    if (options.onRender) this.onRender = options.onRender;
+    if (options.onError) this.onError = options.onError;
   }
 
   start(): void {
-    if (this.isRunning) return;
+    if (this.isRunning) {
+      return;
+    }
 
     this.isRunning = true;
     this.lastTime = performance.now();
@@ -56,7 +58,7 @@ export class GameLoop {
       updateTime: 0,
       renderTime: 0,
       frameCount: 0,
-      lastFrameTime: 0,
+      lastFrameTime: this.lastTime,
     };
 
     this.loop();
@@ -71,7 +73,9 @@ export class GameLoop {
   }
 
   private loop(): void {
-    if (!this.isRunning) return;
+    if (!this.isRunning) {
+      return;
+    }
 
     const currentTime = performance.now();
     const deltaTime = Math.min(
@@ -79,38 +83,27 @@ export class GameLoop {
       this.targetFrameTime * this.maxFrameSkip,
     );
     this.lastTime = currentTime;
-
     this.accumulator += deltaTime;
 
-    // Update stats
     this.stats.frameTime = deltaTime;
     this.stats.lastFrameTime = currentTime;
-    this.stats.frameCount++;
+    this.stats.frameCount += 1;
 
-    // Calculate FPS
     if (this.stats.frameCount % 60 === 0) {
-      this.stats.fps = 1000 / (this.stats.frameTime || 1);
+      this.stats.fps = 1000 / Math.max(this.stats.frameTime, 1);
     }
 
-    // Fixed timestep updates
     const updateStart = performance.now();
     while (this.accumulator >= this.targetFrameTime) {
       try {
-        if (this.onUpdate) {
-          this.onUpdate(this.targetFrameTime);
-        }
-        this.accumulator -= this.targetFrameTime;
+        this.onUpdate?.(this.targetFrameTime);
       } catch (error) {
-        if (this.onError) {
-          this.onError(error as Error);
-        } else {
-          console.error('Game loop update error:', error);
-        }
+        this.handleError(error);
       }
+      this.accumulator -= this.targetFrameTime;
     }
     this.stats.updateTime = performance.now() - updateStart;
 
-    // Render with interpolation
     const renderStart = performance.now();
     try {
       if (this.onRender) {
@@ -118,19 +111,21 @@ export class GameLoop {
         this.onRender(alpha);
       }
     } catch (error) {
-      if (this.onError) {
-        this.onError(error as Error);
-      } else {
-        console.error('Game loop render error:', error);
-      }
+      this.handleError(error);
     }
     this.stats.renderTime = performance.now() - renderStart;
 
-    // Schedule next frame
     this.animationFrameId = requestAnimationFrame(() => this.loop());
   }
 
-  // Public API
+  private handleError(error: unknown) {
+    if (error instanceof Error) {
+      this.onError?.(error);
+    } else {
+      this.onError?.(new Error(String(error)));
+    }
+  }
+
   isGameRunning(): boolean {
     return this.isRunning;
   }
@@ -140,7 +135,7 @@ export class GameLoop {
   }
 
   setTargetFPS(fps: number): void {
-    this.targetFPS = Math.max(1, Math.min(120, fps));
+    this.targetFPS = Math.min(Math.max(1, fps), 120);
     this.targetFrameTime = 1000 / this.targetFPS;
   }
 
@@ -148,7 +143,6 @@ export class GameLoop {
     return this.targetFPS;
   }
 
-  // Utility methods for time management
   getTime(): number {
     return performance.now();
   }
@@ -157,7 +151,6 @@ export class GameLoop {
     return this.targetFrameTime;
   }
 
-  // Pause/resume functionality
   pause(): void {
     if (this.isRunning) {
       this.stop();
@@ -170,17 +163,15 @@ export class GameLoop {
     }
   }
 
-  // Cleanup
   dispose(): void {
     this.stop();
-    this.onUpdate = undefined;
-    this.onRender = undefined;
-    this.onError = undefined;
+    // Reset callbacks - they can be null/undefined
+    this.onUpdate = undefined as any;
+    this.onRender = undefined as any;
+    this.onError = undefined as any;
   }
 }
 
-// Export convenience functions
-export const createGameLoop = (options: GameLoopOptions) => new GameLoop(options);
+export const createGameLoop = (options: GameLoopOptions = {}) => new GameLoop(options);
 
-// Export a default game loop instance for simple use cases
 export const defaultGameLoop = new GameLoop();

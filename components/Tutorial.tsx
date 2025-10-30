@@ -139,12 +139,15 @@ export const Tutorial = () => {
 
   if (!showTutorial) return null;
 
+  const step = TUTORIAL_STEPS[currentStep];
+  if (!step) return null;
+
   return (
     <AnimatePresence>
       {showTutorial && (
         <PhoneCall
-          character={TUTORIAL_STEPS[currentStep].character}
-          messages={TUTORIAL_STEPS[currentStep].messages}
+          character={step.character}
+          messages={step.messages}
           onComplete={handleStepComplete}
         />
       )}

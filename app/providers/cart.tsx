@@ -15,11 +15,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, set] = useState<CartItem[]>([]);
   const add = (id: string, qty = 1) =>
     set((s) => {
-      const i = s.findIndex((x) => x.id === id);
-      if (i >= 0) {
-        const c = [...s];
-        c[i] = { ...c[i], qty: c[i].qty + qty };
-        return c;
+      const index = s.findIndex((x) => x.id === id);
+      if (index >= 0) {
+        const next = [...s];
+        const currentItem = next[index];
+        if (!currentItem) {
+          return next;
+        }
+        next[index] = { ...currentItem, qty: currentItem.qty + qty };
+        return next;
       }
       return [...s, { id, qty }];
     });

@@ -58,13 +58,13 @@ export default async function BlogIndex() {
       {/* Featured Post */}
       {posts.length > 0 && (
         <GlassPanel className="overflow-hidden">
-          <Link href={`/blog/${posts[0].slug}`} className="block">
+          <Link href={`/blog/${posts[0]?.slug ?? 'unknown'}`} className="block">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="relative aspect-video md:aspect-square">
-                {posts[0].image ? (
+                {posts[0]?.image ? (
                   <Image
                     src={posts[0].image}
-                    alt={posts[0].title}
+                    alt={posts[0]?.title ?? ''}
                     fill
                     sizes="(max-width:768px) 100vw, 50vw"
                     className="object-cover"
@@ -78,17 +78,17 @@ export default async function BlogIndex() {
               </div>
               <div className="p-6 flex flex-col justify-center">
                 <h2 className="text-2xl font-bold text-white mb-3 group-hover:text-fuchsia-300 transition-colors">
-                  {posts[0].title}
+                  {posts[0]?.title ?? ''}
                 </h2>
-                {posts[0].excerpt && (
+                {posts[0]?.excerpt && (
                   <p className="text-zinc-300 mb-4 line-clamp-3">{posts[0].excerpt}</p>
                 )}
                 <div className="flex items-center gap-4 text-sm text-zinc-400">
-                  {posts[0].publishedAt && (
+                  {posts[0]?.publishedAt && (
                     <span>{new Date(posts[0].publishedAt).toLocaleDateString()}</span>
                   )}
-                  {posts[0].readTime && <span>{posts[0].readTime} min read</span>}
-                  {posts[0].author && <span>by {posts[0].author}</span>}
+                  {posts[0]?.readTime && <span>{posts[0].readTime} min read</span>}
+                  {posts[0]?.author && <span>by {posts[0].author}</span>}
                 </div>
               </div>
             </div>

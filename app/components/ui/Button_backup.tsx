@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import { forwardRef } from 'react';
+import type { ButtonHTMLAttributes, MouseEventHandler } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
@@ -34,27 +35,36 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  playClickSound?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, onClick, ...props }, ref) => {
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    { className, variant, size, asChild = false, onClick, playClickSound = true, ...props },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : 'button';
-    const { play: playClickSound } = useAudio('/assets/sounds/ui-click.mp3');
+    const { play } = useAudio('/assets/sounds/ui-click.mp3');
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      playClickSound();
-      if (onClick) {
-        onClick(event);
+    const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+      if (playClickSound) {
+        try {
+          play();
+        } catch {
+          /* ignore playback errors */
+        }
       }
+
+      onClick?.(event);
     };
 
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        className={cn(buttonVariants({ variant, size }), className)}
         onClick={handleClick}
         {...props}
       />

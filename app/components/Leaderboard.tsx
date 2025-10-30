@@ -216,13 +216,13 @@ export const Leaderboard: React.FC = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-purple-500 font-bold text-white">
-                  {entry.username[0].toUpperCase()}
+                  {entry.username?.[0]?.toUpperCase() ?? 'U'}
                 </div>
                 <div>
                   <p
                     className={`font-semibold ${entry.isCurrentUser ? 'text-blue-600' : 'text-gray-800'}`}
                   >
-                    {entry.username}
+                    {entry.username ?? 'Unknown'}
                     {entry.isCurrentUser && (
                       <span className="ml-2 rounded bg-blue-100 px-2 py-1 text-xs text-blue-600">
                         You

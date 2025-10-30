@@ -35,8 +35,11 @@ export const useHub = create<HubState>((set, get) => ({
       return;
     }
     const idx = ORDER.indexOf(cur as any);
-    const next = ORDER[(idx + (dir === 1 ? 1 : -1) + ORDER.length) % ORDER.length];
-    set({ face: next });
+    const nextIdx = (idx + (dir === 1 ? 1 : -1) + ORDER.length) % ORDER.length;
+    const next = ORDER[nextIdx];
+    if (next) {
+      set({ face: next });
+    }
   },
   focusChip(i) {
     if (get().face === 'front') set({ selectorIndex: Math.max(0, Math.min(3, i)) });
@@ -46,7 +49,9 @@ export const useHub = create<HubState>((set, get) => ({
     const state = get();
     if (state.face === 'front') {
       const target = ORDER[state.selectorIndex];
-      set({ face: target }); // spin toward that side first
+      if (target) {
+        set({ face: target }); // spin toward that side first
+      }
       return;
     }
     set({ isZooming: true, idle: false });

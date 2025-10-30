@@ -48,16 +48,19 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     if (!isInStock) return;
     setIsAddingToCart(true);
     try {
-      addItem({
+      const imageUrl = images[0];
+      if (!imageUrl) return;
+      const cartItem = {
         id: product.id,
         name: product.name,
         price: currentPrice,
         quantity,
-        image: images?.[0],
-        selectedVariant: selectedVariant
-          ? { id: selectedVariant.id, title: selectedVariant.name }
-          : undefined,
-      });
+        image: imageUrl,
+        ...(selectedVariant
+          ? { selectedVariant: { id: selectedVariant.id, title: selectedVariant.name } }
+          : {}),
+      };
+      addItem(cartItem);
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
     } finally {
@@ -71,7 +74,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <div className="space-y-4">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
           <Image
-            src={images?.[selectedImage]}
+            src={images[selectedImage] ?? images[0] ?? '/placeholder.png'}
             alt={product.name}
             fill
             sizes="(max-width:1024px) 100vw, 50vw"

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "assets": {},
+  "fallbacks": {
+    "Head": "",
+    "Torso": "",
+    "Legs": "",
+    "Accessory": ""
+  }
+}

@@ -45,16 +45,19 @@ export function extractClientIP(request: Request): string | null {
 
   // Cloudflare
   if (cfConnectingIP) {
-    return cfConnectingIP.split(',')[0].trim();
+    const [first] = cfConnectingIP.split(',');
+    return first?.trim() || null;
   }
 
   // Standard proxy headers
   if (forwarded) {
-    return forwarded.split(',')[0].trim();
+    const [first] = forwarded.split(',');
+    return first?.trim() || null;
   }
 
   if (realIP) {
-    return realIP.split(',')[0].trim();
+    const [first] = realIP.split(',');
+    return first?.trim() || null;
   }
 
   return null;

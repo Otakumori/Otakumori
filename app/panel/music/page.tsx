@@ -61,6 +61,16 @@ export default function MusicPanel() {
     setCurrentTrack((prev) => (prev - 1 + playlist.length) % playlist.length);
   };
 
+  const defaultTrack = {
+    id: -1,
+    title: 'Unknown Track',
+    artist: 'Unknown Artist',
+    duration: '--:--',
+    genre: 'Unknown',
+  } as const;
+
+  const currentTrackData = playlist[currentTrack] ?? playlist[0] ?? defaultTrack;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center">
@@ -438,10 +448,10 @@ export default function MusicPanel() {
               <Music className="h-24 w-24 text-purple-400" />
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
-              {playlist[currentTrack].title}
+              {currentTrackData.title}
             </h3>
-            <p className="text-neutral-300 mb-1">{playlist[currentTrack].artist}</p>
-            <p className="text-sm text-neutral-400">{playlist[currentTrack].genre}</p>
+            <p className="text-neutral-300 mb-1">{currentTrackData.artist}</p>
+            <p className="text-sm text-neutral-400">{currentTrackData.genre}</p>
           </div>
 
           {/* Player Controls */}
@@ -499,7 +509,7 @@ export default function MusicPanel() {
                 </>
               }
             </span>
-            <span>{playlist[currentTrack].duration}</span>
+            <span>{currentTrackData.duration}</span>
           </div>
         </div>
 

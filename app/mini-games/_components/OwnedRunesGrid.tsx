@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import RuneGlyph from '@/components/runes/RuneGlyph';
 import { type CanonicalRuneId } from '@/types/runes';
@@ -68,21 +68,21 @@ export default function OwnedRunesGrid() {
               <div className="text-2xl">
                 <RuneGlyph
                   canonicalId={it.canonicalId}
-                  glyph={it.glyph ?? undefined}
-                  displayName={it.displayName ?? undefined}
+                  {...(it.glyph != null ? { glyph: it.glyph } : {})}
+                  {...(it.displayName != null ? { displayName: it.displayName } : {})}
                   size="sm"
                   animated={true}
                 />
               </div>
               <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-200">
-                ×{it.quantity}
+                Ã—{it.quantity}
               </span>
             </div>
             <div
               className="mt-1 truncate text-xs text-zinc-300"
-              title={it.displayName || it.canonicalId}
+              title={it.displayName ?? it.canonicalId}
             >
-              {it.displayName || it.canonicalId}
+              {it.displayName ?? it.canonicalId}
             </div>
             {it.lore && (
               <div

@@ -52,116 +52,24 @@ export default function GameCubeHub() {
   const [currentSaveData, setCurrentSaveData] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
-  // Initialize game systems
-  const [achievementSystem] = useState(() => createAchievementSystem());
-  const [leaderboardSystem] = useState(() => createLeaderboardSystem());
-  const [saveSystem] = useState(() => createSaveSystem());
-
-  const totalPages = Math.ceil(allGames.length / GAMES_PER_PAGE);
-
-  // Initialize systems on mount
-  useEffect(() => {
-    // Set up achievement system callbacks
-    achievementSystem.setOnUnlock((_achievement) => {
-      // Achievement unlocked (logging disabled for production)
-      // Show achievement notification
-    });
-
-    // Set up leaderboard system callbacks
-    leaderboardSystem.setOnEntryAdded((_entry) => {
-      // New leaderboard entry (logging disabled for production)
-    });
-
-    // Set up save system callbacks
-    saveSystem.setOnSaveCreated((_save) => {
-      // Save created (logging disabled for production)
-    });
-
-    // Set current user context (this would come from auth)
-    const userId = 'user_123'; // Replace with actual user ID
-    leaderboardSystem.setCurrentUserId(userId);
-    saveSystem.setCurrentContext(userId, 'all');
-
-    // Check if boot screen should be shown
-    const lastBootDate = localStorage.getItem('otm-gamecube-boot');
-    const today = new Date().toISOString().split('T')[0];
-
-    if (lastBootDate !== today) {
-      setShowBootScreen(true);
-      localStorage.setItem('otm-gamecube-boot', today);
-    } else {
-      setShowBootScreen(false);
-    }
-  }, [achievementSystem, leaderboardSystem, saveSystem]);
-
-  // Handle boot screen completion
-  const handleBootComplete = useCallback(() => {
-    setShowBootScreen(false);
-  }, []);
-
-  // Handle boot screen skip
-  const handleBootSkip = useCallback(() => {
-    setShowBootScreen(false);
-  }, []);
-
-  // Handle memory card insert
-  const handleMemoryCardInsert = useCallback(() => {
-    setShowMemoryCard(false);
-    // Load save data
-    const saves = saveSystem.getSaveSlots();
-    if (saves.length > 0) {
-      setCurrentSaveData(saves[0]);
-    }
-  }, [saveSystem]);
-
-  // Handle memory card eject
-  const handleMemoryCardEject = useCallback(() => {
-    setShowMemoryCard(true);
-    setCurrentSaveData(null);
-  }, []);
+  const active = faces[idx] ?? faces[0] ?? null;
 
   useEffect(() => {
     const node = containerRef.current;
     if (!node) return;
 
     const cleanup = initInput(node, {
-      onRotateLeft: () => {
-        if (showGamesList) {
-          setShowGamesList(false);
-        } else {
-          setCurrentPage((p) => (p + totalPages - 1) % totalPages);
-        }
-      },
-      onRotateRight: () => {
-        if (showGamesList) {
-          setShowGamesList(false);
-        } else {
-          setCurrentPage((p) => (p + 1) % totalPages);
-        }
-      },
+      onRotateLeft: () => setIdx((i) => (i + faces.length - 1) % faces.length),
+      onRotateRight: () => setIdx((i) => (i + 1) % faces.length),
       onSelect: () => {
-        if (showGamesList) {
-          setShowGamesList(false);
-        } else {
-          setShowGamesList(true);
+        if (active) {
+          router.push(active.href);
         }
       },
-      onBack: () => {
-        if (showGamesList) {
-          setShowGamesList(false);
-        } else if (showSettings) {
-          setShowSettings(false);
-        } else {
-          setCurrentPage(0);
-        }
-      },
-      onSettings: () => {
-        setShowSettings(!showSettings);
-      },
+      onBack: () => setIdx(0),
     });
     return cleanup;
-  }, [showGamesList, showSettings, totalPages]);
+  }, [active, router]);
 
   // const handlePageChange = (direction: 'prev' | 'next') => {
   //   if (direction === 'prev' && currentPage > 0) {
@@ -209,17 +117,20 @@ export default function GameCubeHub() {
       {/* Authentic GameCube background pattern */}
       <div className="absolute inset-0 opacity-20">
         <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 25% 25%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
-              radial-gradient(circle at 75% 75%, rgba(79, 70, 229, 0.2) 0%, transparent 50%),
-              linear-gradient(rgba(147, 51, 234, 0.05) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(147, 51, 234, 0.05) 1px, transparent 1px)
-            `,
-            backgroundSize: '600px 600px, 800px 800px, 60px 60px, 60px 60px',
-          }}
-        />
+          className="flex max-w-[720px] flex-wrap items-center justify-center gap-2"
+          role="listbox"
+          aria-activedescendant={active ? `${listboxId}_${active.id}` : undefined}
+        >
+          {faces.map((f, i) => (
+            <FaceLabel
+              key={f.id}
+              id={`${listboxId}_${f.id}`}
+              label={f.label}
+              href={f.href}
+              active={i === idx}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Authentic GameCube Main Face UI */}

@@ -50,8 +50,12 @@ export default function LanguageSwitcher({
         className="flex items-center gap-2"
       >
         <Globe className="h-4 w-4" />
-        <span className="hidden sm:inline">{currentLang.flag}</span>
-        <span className="hidden md:inline">{currentLang.nativeName}</span>
+        {currentLang && (
+          <>
+            <span className="hidden sm:inline">{currentLang.flag}</span>
+            <span className="hidden md:inline">{currentLang.nativeName}</span>
+          </>
+        )}
       </Button>
 
       {isOpen && (

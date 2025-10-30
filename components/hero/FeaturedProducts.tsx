@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { type ApiEnvelope, type Product } from "@/app/lib/contracts";
 
-interface Product {
+interface FeaturedProduct {
   id: string;
   title: string;
   price: number;
@@ -12,131 +13,72 @@ interface Product {
   url: string;
 }
 
+const PLACEHOLDER_IMAGE = "/placeholder-product.jpg";
+const MAX_FEATURED_PRODUCTS = 8;
+
+async function getLogger() {
+  const { logger } = await import("@/app/lib/logger");
+  return logger;
+}
+
 export function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<FeaturedProduct[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setError(null);
-        const response = await fetch('/api/shop/products');
 
-        if (response.ok) {
-          const data = await response.json();
-          // API Response logged
+        const response = await fetch("/api/shop/products", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`API response not ok (${response.status})`);
+        }
 
-          if (data.products && Array.isArray(data.products)) {
-            // Transform Printify data and limit to 8 items
-            const transformedProducts = data.products
-              .filter((p: any) => p.published !== false) // Include products that are published or don't have published field
-              .slice(0, 8)
-              .map((p: any) => ({
-                id: p.id,
-                title: p.title,
-                price: typeof p.price === 'number' ? p.price : (p.variants?.[0]?.price || 0) / 100,
-                image: p.images?.[0]?.src || p.images?.[0] || '/placeholder-product.jpg',
-                url: `/shop/product/${p.id}`,
-              }));
+        const payload: ApiEnvelope<{ products: Product[] }> = await response.json();
+        if (!payload.ok) {
+          throw new Error(payload.error);
+        }
 
-            if (transformedProducts.length > 0) {
-              setProducts(transformedProducts);
-            } else {
-              // No products found, use fallback
-              setProducts(getFallbackProducts());
-            }
-          } else {
-            console.warn('No products array in response, using fallback');
-            setProducts(getFallbackProducts());
-          }
+        const logger = await getLogger();
+        logger.info("Featured products fetched", {
+          extra: { count: payload.data.products.length },
+        });
+
+        const featured = transformProducts(payload.data.products);
+        if (featured.length > 0) {
+          setProducts(featured);
         } else {
-          console.error('API response not ok:', response.status, response.statusText);
-          setError(`API Error: ${response.status}`);
           setProducts(getFallbackProducts());
         }
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-        setError('Failed to fetch products');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        setError(message);
+        const logger = await getLogger();
+        logger.warn("Failed to fetch featured products", { extra: { error: message } });
         setProducts(getFallbackProducts());
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    fetchProducts();
+    void fetchProducts();
   }, []);
 
-  const getFallbackProducts = (): Product[] => [
-    {
-      id: '1',
-      title: 'Cherry Blossom Tee',
-      price: 29.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '2',
-      title: 'Pixel Art Hoodie',
-      price: 49.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '3',
-      title: 'Otaku-mori Sticker Pack',
-      price: 9.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '4',
-      title: 'Digital Shrine Poster',
-      price: 19.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '5',
-      title: 'Retro Gaming Mug',
-      price: 14.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '6',
-      title: 'Anime Character Pin Set',
-      price: 12.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '7',
-      title: 'Gaming Mousepad',
-      price: 24.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-    {
-      id: '8',
-      title: 'Limited Edition Poster',
-      price: 34.99,
-      image: '/placeholder-product.jpg',
-      url: '/shop',
-    },
-  ];
+  const heading = useMemo(() => "Featured", []);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <section id="featured-products" className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold text-white">Featured</h2>
+          <h2 className="mb-12 text-center text-3xl font-bold text-white">{heading}</h2>
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="mb-3 h-48 rounded-lg glass-card-dark"></div>
-                <div className="mb-2 h-4 rounded glass-card-dark"></div>
-                <div className="h-4 w-1/2 rounded glass-card-dark"></div>
+            {Array.from({ length: MAX_FEATURED_PRODUCTS }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="mb-3 h-48 rounded-lg bg-white/10" />
+                <div className="mb-2 h-4 rounded bg-white/10" />
+                <div className="h-4 w-1/2 rounded bg-white/10" />
               </div>
             ))}
           </div>
@@ -148,11 +90,11 @@ export function FeaturedProducts() {
   return (
     <section id="featured-products" className="py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-3xl font-bold text-white">Featured</h2>
+        <h2 className="mb-12 text-center text-3xl font-bold text-white">{heading}</h2>
 
         {error && (
           <div className="mb-8 text-center">
-            <p className="text-amber-300 glass-card-dark px-4 py-2 rounded-lg inline-block">
+            <p className="inline-block rounded-lg border border-amber-300/40 bg-amber-300/10 px-4 py-2 text-amber-200">
               {error} - Showing sample products
             </p>
           </div>
@@ -161,12 +103,13 @@ export function FeaturedProducts() {
         <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {products.map((product) => (
             <Link key={product.id} href={product.url} className="group">
-              <div className="overflow-hidden rounded-lg glass-card-dark transition-all duration-300 hover:shadow-xl">
+              <div className="overflow-hidden rounded-lg bg-white/10 transition-all duration-300 hover:shadow-xl">
                 <div className="relative h-48 bg-white/5">
                   <Image
                     src={product.image}
                     alt={product.title}
                     fill
+                    sizes="(min-width: 768px) 25vw, 50vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>
@@ -178,6 +121,7 @@ export function FeaturedProducts() {
             </Link>
           ))}
         </div>
+
         <div className="mt-8 text-center">
           <Link
             href="/shop"
@@ -189,4 +133,48 @@ export function FeaturedProducts() {
       </div>
     </section>
   );
+}
+
+function transformProducts(products: Product[]): FeaturedProduct[] {
+  return products
+    .filter((product) => product.active !== false)
+    .slice(0, MAX_FEATURED_PRODUCTS)
+    .map((product) => {
+      const primaryImage = product.primaryImageUrl ?? product.variants[0]?.previewImageUrl ?? PLACEHOLDER_IMAGE;
+      const price = computeProductPrice(product);
+
+      return {
+        id: product.id,
+        title: product.name,
+        price,
+        image: primaryImage,
+        url: `/shop/product/${product.id}`,
+      } satisfies FeaturedProduct;
+    });
+}
+
+function computeProductPrice(product: Product): number {
+  if (product.variants.length > 0) {
+    const price = product.variants[0]?.priceCents;
+    if (typeof price === "number" && price > 0) {
+      return price / 100;
+    }
+  }
+
+  return 0;
+}
+
+function getFallbackProducts(): FeaturedProduct[] {
+  const samples: Array<Omit<FeaturedProduct, "id"> & { id: string }> = [
+    { id: "1", title: "Cherry Blossom Tee", price: 29.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "2", title: "Pixel Art Hoodie", price: 49.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "3", title: "Otaku-mori Sticker Pack", price: 9.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "4", title: "Digital Shrine Poster", price: 19.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "5", title: "Retro Gaming Mug", price: 14.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "6", title: "Anime Character Pin Set", price: 12.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "7", title: "Gaming Mousepad", price: 24.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+    { id: "8", title: "Limited Edition Poster", price: 34.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+  ];
+
+  return samples.slice(0, MAX_FEATURED_PRODUCTS);
 }

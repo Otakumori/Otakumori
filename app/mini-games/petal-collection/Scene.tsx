@@ -157,7 +157,7 @@ export default function PetalCollection() {
           if (sCollect) play(sCollect, -10);
           // spill to pile
           const idx = pileIndex(p.x);
-          pileHeights[idx] = Math.min(FLOOR_BAND - 2, pileHeights[idx] + 2);
+          pileHeights[idx] = Math.min(FLOOR_BAND - 2, (pileHeights[idx] ?? 0) + 2);
           continue;
         }
 
@@ -169,7 +169,7 @@ export default function PetalCollection() {
           mult = 1;
           if (sMiss) play(sMiss, -14);
           const idx = pileIndex(p.x);
-          pileHeights[idx] = Math.min(FLOOR_BAND - 2, pileHeights[idx] + 1.2);
+          pileHeights[idx] = Math.min(FLOOR_BAND - 2, (pileHeights[idx] ?? 0) + 1.2);
         }
       }
     }
@@ -228,7 +228,7 @@ export default function PetalCollection() {
       ctx.fillStyle = 'rgba(255,183,197,0.28)';
       for (let i = 0; i < 64; i++) {
         const colW = W / 64;
-        const h = pileHeights[i];
+        const h = pileHeights[i] ?? 0;
         if (h > 0) ctx.fillRect(i * colW, bandY + (FLOOR_BAND - h), colW, h);
       }
 

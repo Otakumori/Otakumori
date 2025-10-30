@@ -168,6 +168,9 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
   const [showCharacter, setShowCharacter] = useState(false);
   const [actionIntensity, setActionIntensity] = useState(0);
 
+  const fallbackPose = poses[0] ?? { emoji: '✨', label: 'Sparkle' };
+  const activePose = poses[currentPose] ?? fallbackPose;
+
   useEffect(() => {
     const showTimer = setTimeout(() => setShowCharacter(true), 500);
     return () => clearTimeout(showTimer);
@@ -227,7 +230,11 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
             transition={{ duration: 0.8, type: 'spring' }}
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
           >
-            <JoJoCharacter pose={currentPose} isThrusting={isThrusting} />
+            <div className="text-8xl">
+              <span role="img" aria-label={activePose.label}>
+                {activePose.emoji}
+              </span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

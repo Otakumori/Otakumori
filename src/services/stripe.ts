@@ -29,6 +29,33 @@ export interface StripePrice {
   created: number;
 }
 
+function toStripeProduct(product: Stripe.Product): StripeProduct {
+  const normalized: StripeProduct = {
+    id: product.id,
+    name: product.name,
+    active: product.active,
+    created: product.created,
+    updated: product.updated,
+  };
+
+  if (product.description) {
+    normalized.description = product.description;
+  }
+
+  if (product.images && product.images.length > 0) {
+    normalized.images = product.images;
+  }
+
+  if (product.default_price) {
+    normalized.default_price =
+      typeof product.default_price === 'string'
+        ? product.default_price
+        : product.default_price.id;
+  }
+
+  return normalized;
+}
+
 export async function getStripeProducts(): Promise<Result<StripeProduct[]>> {
   return safeAsync(
     async () => {
@@ -37,16 +64,7 @@ export async function getStripeProducts(): Promise<Result<StripeProduct[]>> {
         limit: 100,
       });
 
-      return products.data.map((product) => ({
-        id: product.id,
-        name: product.name,
-        description: product.description || undefined,
-        images: product.images || [],
-        active: product.active,
-        default_price: product.default_price as string | undefined,
-        created: product.created,
-        updated: product.updated,
-      }));
+      return products.data.map(toStripeProduct);
     },
     'STRIPE_FETCH_ERROR',
     'Failed to fetch products from Stripe',
@@ -58,16 +76,7 @@ export async function getStripeProduct(productId: string): Promise<Result<Stripe
     async () => {
       const product = await stripe.products.retrieve(productId);
 
-      return {
-        id: product.id,
-        name: product.name,
-        description: product.description || undefined,
-        images: product.images || [],
-        active: product.active,
-        default_price: product.default_price as string | undefined,
-        created: product.created,
-        updated: product.updated,
-      };
+      return toStripeProduct(product);
     },
     'STRIPE_FETCH_ERROR',
     `Failed to fetch product ${productId} from Stripe`,

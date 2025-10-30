@@ -31,8 +31,10 @@ export default function StorageManager() {
   }, []);
 
   async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files?.length) return;
-    const file = e.target.files[0];
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files.item(0);
+    if (!file) return;
     setUploading(true);
 
     try {

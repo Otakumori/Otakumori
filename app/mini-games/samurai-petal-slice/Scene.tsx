@@ -148,15 +148,17 @@ export default function SamuraiSlice() {
     function pruneTrail(now: number) {
       // keep only last SLASH_LIFE ms
       for (let i = trail.length - 1; i >= 0; i--) {
-        if (now - trail[i].t > SLASH_LIFE) trail.splice(i, 1);
+        const pt = trail[i];
+        if (pt && now - pt.t > SLASH_LIFE) trail.splice(i, 1);
       }
     }
 
     // simple spatial grid to speed intersections
     function checkIntersections() {
       if (trail.length < 2) return;
-      const a = trail[trail.length - 2],
-        b = trail[trail.length - 1];
+      const a = trail[trail.length - 2];
+      const b = trail[trail.length - 1];
+      if (!a || !b) return;
       const dx = b.x - a.x,
         dy = b.y - a.y;
       const len = Math.hypot(dx, dy);
@@ -228,6 +230,7 @@ export default function SamuraiSlice() {
       const grav = reduced ? 0.6 : 1.0;
       for (let i = petals.length - 1; i >= 0; i--) {
         const p = petals[i];
+        if (!p) continue;
         if (p.hit) {
           p.y -= 0.06 * dt;
           p.r += 0.02 * dt;
@@ -302,8 +305,9 @@ export default function SamuraiSlice() {
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
         for (let i = 1; i < trail.length; i++) {
-          const a = trail[i - 1],
-            b = trail[i];
+          const a = trail[i - 1];
+          const b = trail[i];
+          if (!a || !b) continue;
           const age = (now - b.t) / SLASH_LIFE;
           if (age > 1) continue;
           ctx.strokeStyle = `rgba(255,170,190,${Math.max(0, 1 - age)})`;

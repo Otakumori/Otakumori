@@ -112,27 +112,31 @@ function getSeasonalPetals(season: string, burstActive: boolean): PetalTypeKey[]
 }
 
 function weightedRandom(types: PetalTypeKey[]): PetalTypeKey {
-  const weights = types.map((type) => PetalTypes[type].rarity);
-  const total = weights.reduce((a, b) => a + b);
+  if (types.length === 0) return 'normal';
+  const weights = types.map((type) => PetalTypes[type]?.rarity ?? 1);
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total <= 0) return types[0] ?? 'normal';
   const rand = Math.random() * total;
   let sum = 0;
-  for (let i = 0; i < types.length; i++) {
-    sum += weights[i];
-    if (rand < sum) return types[i];
+  for (const [index, type] of types.entries()) {
+    sum += weights[index] ?? 0;
+    if (rand < sum) return type;
   }
-  return types[0];
+  return types[0] ?? 'normal';
 }
 
 function createPetal(typeKey: PetalTypeKey) {
   const id = `${Date.now()}-${Math.random()}`;
-  const { name, reward, img } = PetalTypes[typeKey];
+  const petalType = PetalTypes[typeKey];
+  if (!petalType) throw new Error(`Invalid petal type: ${typeKey}`);
+  const { name, reward, img } = petalType;
   return {
     id,
     type: typeKey,
     name,
     x: Math.random() * 90 + 5,
     y: Math.random() * 80 + 5,
-    reward: getRandomInt(reward[0], reward[1]),
+    reward: getRandomInt(reward[0] ?? 1, reward[1] ?? 5),
     animating: false,
     img,
   };
@@ -406,9 +410,12 @@ const InteractiveHeroSection: React.FC = () => {
           setTimeout(() => setShowTrailBonus(false), 2000);
         }
         if (next % 10 === 0) {
-          const line = senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)];
-          setSenpaiTrailTip(line);
-          setTimeout(() => setSenpaiTrailTip(''), 3500);
+          const line =
+            senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)] ?? '';
+          if (line) {
+            setSenpaiTrailTip(line);
+            setTimeout(() => setSenpaiTrailTip(''), 3500);
+          }
         }
         return next;
       });

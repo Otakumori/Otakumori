@@ -136,18 +136,28 @@ export async function POST(request: NextRequest) {
         case 'COUPON_PERCENT':
         case 'COUPON_AMOUNT':
           const couponCode = `ACH_${achievement.code}_${Date.now()}`;
-          await db.couponGrant.create({
-            data: {
-              userId: user.id,
-              code: couponCode,
-              discountType: achievement.reward.kind === 'COUPON_PERCENT' ? 'PERCENT' : 'OFF_AMOUNT',
-              percentOff:
-                achievement.reward.kind === 'COUPON_PERCENT' ? achievement.reward.value : undefined,
-              amountOff:
-                achievement.reward.kind === 'COUPON_AMOUNT' ? achievement.reward.value : undefined,
-              expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-            },
-          });
+          const isPercent = achievement.reward.kind === 'COUPON_PERCENT';
+          const couponData: any = {
+            userId: user.id,
+            code: couponCode,
+            discountType: isPercent ? 'PERCENT' : 'OFF_AMOUNT',
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          };
+          if (
+            isPercent &&
+            achievement.reward.value !== null &&
+            achievement.reward.value !== undefined
+          ) {
+            couponData.percentOff = achievement.reward.value as number;
+          }
+          if (
+            !isPercent &&
+            achievement.reward.value !== null &&
+            achievement.reward.value !== undefined
+          ) {
+            couponData.amountOff = achievement.reward.value as number;
+          }
+          await db.couponGrant.create({ data: couponData });
 
           rewardDetails = { type: 'coupon', code: couponCode };
           break;

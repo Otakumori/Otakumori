@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json(problem(401, 'Authentication required'), { status: 401 });
     }
-    
+
     const db = await getDb();
 
     const body = await req.json().catch(() => null);
@@ -61,8 +61,8 @@ export async function POST(req: NextRequest) {
         productId: validated.productId,
         userId,
         rating: validated.rating,
-        title: validated.title,
-        body: validated.body,
+        ...(validated.title !== undefined ? { title: validated.title } : {}),
+        ...(validated.body !== undefined ? { body: validated.body } : {}),
         images: validated.images,
         isApproved: false,
       },

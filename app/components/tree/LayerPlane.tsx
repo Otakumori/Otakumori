@@ -158,8 +158,12 @@ export function LayerPlane({
     [tex, hue, sat, val, amp, speed, footerFade, leftJustify],
   );
 
-  useFrame((_, t) => {
-    if (matRef.current) matRef.current.uniforms.uTime.value = t;
+  useFrame((state) => {
+    const uniforms = matRef.current?.uniforms as {
+      uTime?: { value: number };
+    } | undefined;
+    if (!uniforms?.uTime) return;
+    uniforms.uTime.value = state.clock.elapsedTime;
   });
 
   // Plane size preserves image aspect (left/bottom anchored)

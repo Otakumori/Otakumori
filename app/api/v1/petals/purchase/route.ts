@@ -70,10 +70,6 @@ export async function POST(request: Request) {
       data: {
         key: payload.idempotencyKey,
         purpose: 'petal_purchase',
-        method: 'POST',
-        path: '/api/v1/petals/purchase',
-        response: JSON.stringify({ pending: true }),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 
@@ -146,8 +142,9 @@ function normalizeInventoryKind(kind: string | null | undefined): InventoryKind 
   }
 
   const normalized = kind.toUpperCase();
-  if ((InventoryKind as Record<string, InventoryKind>)[normalized]) {
-    return (InventoryKind as Record<string, InventoryKind>)[normalized];
+  const kindValue = (InventoryKind as Record<string, InventoryKind>)[normalized];
+  if (kindValue) {
+    return kindValue;
   }
 
   return InventoryKind.COSMETIC;

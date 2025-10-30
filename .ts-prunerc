@@ -1,0 +1,21 @@
+{
+  "ignore": [
+    "page.tsx",
+    "layout.tsx",
+    "route.ts",
+    "route.tsx",
+    "middleware.ts",
+    "instrumentation.ts",
+    "instrumentation-client.ts",
+    "not-found.tsx",
+    "error.tsx",
+    "loading.tsx",
+    "template.tsx",
+    "default.tsx",
+    "global-error.tsx",
+    "opengraph-image.tsx",
+    "twitter-image.tsx",
+    "icon.tsx",
+    "apple-icon.tsx"
+  ]
+}

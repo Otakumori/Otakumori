@@ -117,6 +117,10 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
 
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
+        if (!s) {
+          stars[i] = spawn();
+          continue;
+        }
         s.pz = s.z;
         s.z -= dt * zStep * (0.15 + s.z * 1.1);
         if (s.z <= 0.02) {
@@ -126,8 +130,8 @@ export default function StarfieldPurple({ density = 0.72, speed = 0.62 }: Props)
 
         const sx = (s.x / s.z) * fov + w * 0.5;
         const sy = (s.y / s.z) * fov + h * 0.5;
-        const psx = (s.x / s.pz) * fov + w * 0.5;
-        const psy = (s.y / s.pz) * fov + h * 0.5;
+        const psx = (s.x / (s.pz ?? 0.001)) * fov + w * 0.5;
+        const psy = (s.y / (s.pz ?? 0.001)) * fov + h * 0.5;
 
         const alpha = 0.8 - s.z * 0.65;
         const size = Math.max(0.5 * DPR, (1 - s.z) * 2.0 * DPR);

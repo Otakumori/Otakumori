@@ -44,6 +44,9 @@ export async function mapUPCsToRunes(upcs: string[]): Promise<CanonicalRuneId[]>
       if (availableRunes.length > 0) {
         const randomIndex = Math.floor(Math.random() * availableRunes.length);
         const selectedRune = availableRunes[randomIndex];
+        if (!selectedRune) {
+          continue;
+        }
 
         // Assign this UPC to the selected rune permanently
         await assignUPCToRune(upc, selectedRune.canonicalId);

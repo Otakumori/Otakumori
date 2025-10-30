@@ -29,16 +29,22 @@ export async function httpFetch<T>(
     const id = setTimeout(() => ctrl.abort(), timeoutMs);
 
     try {
-      const res = await fetch(url, {
+      const requestHeaders: Record<string, string> = body
+        ? { 'content-type': 'application/json', ...headers }
+        : { ...headers };
+
+      const requestInit: RequestInit = {
         method,
-        headers: {
-          'content-type': body ? 'application/json' : 'text/plain',
-          ...headers,
-        },
-        body: body ? JSON.stringify(body) : undefined,
+        headers: requestHeaders,
         signal: ctrl.signal,
         cache: method === 'GET' ? cache : 'no-store',
-      });
+      };
+
+      if (body !== undefined) {
+        requestInit.body = JSON.stringify(body);
+      }
+
+      const res = await fetch(url, requestInit);
 
       clearTimeout(id);
 

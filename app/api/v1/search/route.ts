@@ -399,11 +399,10 @@ async function saveSearchHistory(
 
 async function getSearchSuggestions(query: string, searchType: string) {
   try {
+    const whereClause: any = { query: { contains: query, mode: 'insensitive' } };
+    if (searchType !== 'all') whereClause.suggestionType = searchType;
     const suggestions = await db.searchSuggestion.findMany({
-      where: {
-        query: { contains: query, mode: 'insensitive' },
-        suggestionType: searchType === 'all' ? undefined : searchType,
-      },
+      where: whereClause,
       orderBy: [{ popularity: 'desc' }, { lastUsed: 'desc' }],
       take: 5,
     });

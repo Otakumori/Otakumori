@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -97,8 +95,11 @@ export default function BubbleRagdoll() {
       return pts.length - 1;
     }
     function addStick(a: number, b: number, stiff = 1) {
-      const dx = pts[b].x - pts[a].x,
-        dy = pts[b].y - pts[a].y;
+      const ptA = pts[a];
+      const ptB = pts[b];
+      if (!ptA || !ptB) return;
+      const dx = ptB.x - ptA.x;
+      const dy = ptB.y - ptA.y;
       sticks.push({ a, b, len: Math.hypot(dx, dy), stiff });
     }
     const cx = W * 0.5,
@@ -119,7 +120,7 @@ export default function BubbleRagdoll() {
       let hit = -1;
       for (let i = bubbles.length - 1; i >= 0; i--) {
         const b = bubbles[i];
-        if (b.popped) continue;
+        if (!b || b.popped) continue;
         const d2 = (b.x - x) ** 2 + (b.y - y) ** 2;
         if (d2 < (b.r * 1.05) ** 2) {
           hit = i;
@@ -128,25 +129,29 @@ export default function BubbleRagdoll() {
       }
       if (hit >= 0) {
         const b = bubbles[hit];
+        if (!b) return;
         b.popped = true;
         score += 100 + Math.floor(combo * 7);
         combo = Math.min(99, combo + 1);
         bestCombo = Math.max(bestCombo, combo);
         if (sPop) play(sPop, -6);
         // upward impulse to ragdoll if near
-        const near = Math.hypot(pts[pTorsoBot].x - b.x, pts[pTorsoBot].y - b.y);
+        const ptBot = pts[pTorsoBot];
+        if (!ptBot) return;
+        const near = Math.hypot(ptBot.x - b.x, ptBot.y - b.y);
         if (near < b.r * 2) {
-          const pt = pts[pTorsoBot];
           const j = Math.max(0.5, 1.6 - near / (b.r * 2)); // weaker if further
-          const vy = pt.y - pt.py;
-          pt.py = pt.y - (vy - j * 8); // kick upward
+          const vy = ptBot.y - ptBot.py;
+          ptBot.py = ptBot.y - (vy - j * 8); // kick upward
           if (sBoing) play(sBoing, -12);
         }
       } else {
         // small lateral shove on avatar
         const pt = pts[pTorsoTop];
-        pt.px -= (x - pt.x) * 0.02;
-        pt.py -= (y - pt.y) * 0.02;
+        if (pt) {
+          pt.px -= (x - pt.x) * 0.02;
+          pt.py -= (y - pt.y) * 0.02;
+        }
         misses++;
       }
     }
@@ -174,14 +179,15 @@ export default function BubbleRagdoll() {
       // constraints solve
       for (let k = 0; k < 3; k++) {
         for (const s of sticks) {
-          const a = pts[s.a],
-            b = pts[s.b];
-          const dx = b.x - a.x,
-            dy = b.y - a.y;
+          const a = pts[s.a];
+          const b = pts[s.b];
+          if (!a || !b) continue;
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
           const dist = Math.hypot(dx, dy) || 0.0001;
           const diff = ((dist - s.len) / dist) * s.stiff;
-          const ox = dx * 0.5 * diff,
-            oy = dy * 0.5 * diff;
+          const ox = dx * 0.5 * diff;
+          const oy = dy * 0.5 * diff;
           a.x += ox;
           a.y += oy;
           b.x -= ox;
@@ -189,6 +195,7 @@ export default function BubbleRagdoll() {
         }
         // floor/walls
         for (const p of pts) {
+          if (!p) continue;
           if (p.x < 0) p.x = 0;
           if (p.x > W) p.x = W;
           if (p.y < 0) p.y = 0;
@@ -202,13 +209,15 @@ export default function BubbleRagdoll() {
 
     // bubble collisions with ragdoll (torso only)
     function collide() {
-      const torso = [pts[pTorsoTop], pts[pTorsoBot]];
+      const torso = [pts[pTorsoTop], pts[pTorsoBot]].filter(
+        (t): t is (typeof pts)[0] => t !== undefined,
+      );
       for (const b of bubbles) {
         if (b.popped) continue;
         // bubble vs bottom of torso
         for (const t of torso) {
-          const dx = t.x - b.x,
-            dy = t.y - b.y;
+          const dx = t.x - b.x;
+          const dy = t.y - b.y;
           const dist = Math.hypot(dx, dy);
           const r = b.r + 18; // torso radius ~18
           if (dist < r && dist > 0) {
@@ -276,35 +285,29 @@ export default function BubbleRagdoll() {
       }
     }
     function drawAvatar() {
+      const ptTop = pts[pTorsoTop];
+      const ptBot = pts[pTorsoBot];
+      const pHeadPt = pts[pHead];
+      if (!ptTop || !ptBot || !pHeadPt) return;
+
       // torso path
       ctx.strokeStyle = 'rgba(230,240,255,0.25)';
       ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.moveTo(pts[pTorsoTop].x, pts[pTorsoTop].y);
-      ctx.lineTo(pts[pTorsoBot].x, pts[pTorsoBot].y);
+      ctx.moveTo(ptTop.x, ptTop.y);
+      ctx.lineTo(ptBot.x, ptBot.y);
       ctx.stroke();
 
-      // Use new avatar system
-      if (avatarData) {
-        const dx = pts[pTorsoBot].x - pts[pTorsoTop].x;
-        const dy = pts[pTorsoBot].y - pts[pTorsoTop].y;
-        const ang = Math.atan2(dy, dx) + Math.PI / 2;
-        const len = Math.hypot(dx, dy);
-        const w = Math.max(48, len * 1.6);
-        const h = w * 1.3;
-        
-        // Use the new drawGameAvatar function
-        drawGameAvatar(ctx, avatarData, pts[pTorsoTop].x - w/2, pts[pTorsoTop].y - h*0.1, w, h, ang);
-      } else if (avatarEnabled && avatar?.spriteUrl) {
-        // Fallback to old system
-        const dx = pts[pTorsoBot].x - pts[pTorsoTop].x;
-        const dy = pts[pTorsoBot].y - pts[pTorsoTop].y;
+      // sprite billboard on torso if available
+      if (avatarEnabled && avatar?.spriteUrl) {
+        const dx = ptBot.x - ptTop.x;
+        const dy = ptBot.y - ptTop.y;
         const ang = Math.atan2(dy, dx) + Math.PI / 2;
         const len = Math.hypot(dx, dy);
         const w = Math.max(48, len * 1.6);
         const h = w * 1.3;
         ctx.save();
-        ctx.translate(pts[pTorsoTop].x, pts[pTorsoTop].y);
+        ctx.translate(ptTop.x, ptTop.y);
         ctx.rotate(ang);
         const img = new Image();
         img.src = avatar.spriteUrl!;
@@ -315,10 +318,10 @@ export default function BubbleRagdoll() {
         // neutral head/torso
         ctx.fillStyle = 'rgba(255,255,255,0.85)';
         ctx.beginPath();
-        ctx.arc(pts[pHead].x, pts[pHead].y, 10, 0, Math.PI * 2);
+        ctx.arc(pHeadPt.x, pHeadPt.y, 10, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(pts[pTorsoBot].x, pts[pTorsoBot].y, 14, 0, Math.PI * 2);
+        ctx.arc(ptBot.x, ptBot.y, 14, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -354,7 +357,8 @@ export default function BubbleRagdoll() {
       ctx.fillText(`Time ${Math.ceil(remain / 1000)}s`, 12, 66);
 
       // end conditions
-      if (pts[pTorsoBot].y > H + 40 || now >= endAt) {
+      const botPt = pts[pTorsoBot];
+      if (botPt && (botPt.y > H + 40 || now >= endAt)) {
         end(now);
         return;
       }

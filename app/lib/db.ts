@@ -66,27 +66,32 @@ export class DatabaseAccess {
    * Create or update a user record from Clerk data
    */
   static async upsertUserFromClerk(clerkUser: any) {
+    const updateData: any = {};
+    const updateEmail = clerkUser.emailAddresses?.[0]?.emailAddress;
+    const updateUsername = clerkUser.username;
+    const updateDisplayName =
+      clerkUser.firstName && clerkUser.lastName
+        ? `${clerkUser.firstName} ${clerkUser.lastName}`
+        : undefined;
+    const updateAvatar = clerkUser.imageUrl;
+
+    if (updateEmail) updateData.email = updateEmail;
+    if (updateUsername) updateData.username = updateUsername;
+    if (updateDisplayName) updateData.display_name = updateDisplayName;
+    if (updateAvatar) updateData.avatarUrl = updateAvatar;
+
+    const createData: any = {
+      clerkId: clerkUser.id,
+      email: clerkUser.emailAddresses?.[0]?.emailAddress || '',
+      username: clerkUser.username || `user_${clerkUser.id.slice(0, 8)}`,
+    };
+    if (updateDisplayName) createData.display_name = updateDisplayName;
+    if (updateAvatar) createData.avatarUrl = updateAvatar;
+
     return await db.user.upsert({
       where: { clerkId: clerkUser.id },
-      update: {
-        email: clerkUser.emailAddresses[0]?.emailAddress || undefined,
-        username: clerkUser.username || undefined,
-        display_name:
-          clerkUser.firstName && clerkUser.lastName
-            ? `${clerkUser.firstName} ${clerkUser.lastName}`
-            : undefined,
-        avatarUrl: clerkUser.imageUrl || undefined,
-      },
-      create: {
-        clerkId: clerkUser.id,
-        email: clerkUser.emailAddresses[0]?.emailAddress || '',
-        username: clerkUser.username || `user_${clerkUser.id.slice(0, 8)}`,
-        display_name:
-          clerkUser.firstName && clerkUser.lastName
-            ? `${clerkUser.firstName} ${clerkUser.lastName}`
-            : undefined,
-        avatarUrl: clerkUser.imageUrl || undefined,
-      },
+      update: updateData,
+      create: createData,
     });
   }
 

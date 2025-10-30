@@ -27,20 +27,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user profile
+    const updateData: any = {};
+    if (validatedData.display_name !== undefined)
+      updateData.display_name = validatedData.display_name;
+    if (validatedData.bio !== undefined) updateData.bio = validatedData.bio;
+    if (validatedData.location !== undefined) updateData.location = validatedData.location;
+    if (validatedData.website !== undefined) updateData.website = validatedData.website;
+    if (validatedData.bannerUrl !== undefined) updateData.bannerUrl = validatedData.bannerUrl;
+    if (validatedData.avatarUrl !== undefined) updateData.avatarUrl = validatedData.avatarUrl;
+    if (validatedData.visibility !== undefined) updateData.visibility = validatedData.visibility;
     const updatedUser = await db.user.update({
       where: { id: user.id },
-      data: {
-        display_name: validatedData.display_name,
-        bio: validatedData.bio,
-        location: validatedData.location,
-        website: validatedData.website,
-        bannerUrl: validatedData.bannerUrl,
-        avatarUrl: validatedData.avatarUrl,
-        // Convert lowercase visibility to uppercase for Prisma enum
-        visibility: validatedData.visibility
-          ? (validatedData.visibility.toUpperCase() as 'PUBLIC' | 'FRIENDS' | 'PRIVATE')
-          : undefined,
-      },
+      data: updateData,
       select: {
         id: true,
         username: true,

@@ -55,11 +55,11 @@ class HttpClient {
       headers.set('x-idempotency-key', options.body.idempotencyKey);
     }
 
-    const config: RequestInit = {
+    const config: any = {
       method,
       headers,
-      signal: options.timeout ? AbortSignal.timeout(options.timeout) : undefined,
     };
+    if (options.timeout) config.signal = AbortSignal.timeout(options.timeout);
 
     if (options.body && method !== 'GET') {
       config.body = JSON.stringify(options.body);

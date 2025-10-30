@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         message,
-        imageUrl,
+        imageUrl: imageUrl ?? null,
         userId: userId || null,
       },
     });

@@ -1,594 +1,97 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
-// Note: dotenv loading removed to eliminate import trace warnings
-// Next.js automatically loads .env.local in development
-// For scripts, manually source .env.local before running
-
-let safeEnv;
-try {
-  safeEnv = createEnv({
-    skipValidation: true, // Skip validation to prevent crashes
-    server: {
-      NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-      DATABASE_URL: z.string().url(),
-      DIRECT_URL: z.string().url(),
-      STRIPE_SECRET_KEY: z.string(),
-      STRIPE_WEBHOOK_SECRET: z.string(),
-      CLERK_SECRET_KEY: z.string(),
-      // Make CLERK_ENCRYPTION_KEY required - critical for Clerk functionality
-      CLERK_ENCRYPTION_KEY: z.string().min(1, 'CLERK_ENCRYPTION_KEY is required'),
-      CLERK_WEBHOOK_SECRET: z.string(),
-      PRINTIFY_API_KEY: z.string(),
-      PRINTIFY_SHOP_ID: z.string(),
-      PRINTIFY_API_URL: z.string().url(),
-      PRINTIFY_WEBHOOK_SECRET: z.string(),
-      BLOB_READ_WRITE_TOKEN: z.string().optional(),
-      BLOB_READ_WRITE_URL: z.string().url().optional(),
-      BLOB_PUBLIC_BASE_URL: z.string().url().optional(),
-      BLOB_BUCKET_PREFIX: z.string().default('om'),
-      NSFW_GLOBAL: z.enum(['on', 'off']).default('off'),
-      API_KEY: z.string().optional(),
-      CRON_SECRET: z.string().optional(),
-      INTERNAL_AUTH_TOKEN: z.string().optional(),
-      UPSTASH_REDIS_REST_URL: z.string().url(),
-      UPSTASH_REDIS_REST_TOKEN: z.string(),
-      PETAL_SALT: z.string().optional(),
-      VERCEL: z.string().optional(),
-      VERCEL_URL: z.string().optional(),
-      AUTHORIZED_PARTIES: z.string().optional(),
-      NEXT_TELEMETRY_DISABLED: z.string().optional(),
-      NODE_OPTIONS: z.string().optional(),
-      RESEND_API_KEY: z.string().optional(),
-      EMAIL_FROM: z.string().optional(),
-      // EasyPost
-      EASYPOST_API_KEY: z.string().optional(),
-      EASYPOST_WEBHOOK_SECRET: z.string().optional(),
-      DEFAULT_SHIP_FROM_NAME: z.string().optional(),
-      DEFAULT_SHIP_FROM_STREET: z.string().optional(),
-      DEFAULT_SHIP_FROM_CITY: z.string().optional(),
-      DEFAULT_SHIP_FROM_STATE: z.string().optional(),
-      DEFAULT_SHIP_FROM_ZIP: z.string().optional(),
-      DEFAULT_SHIP_FROM_COUNTRY: z.string().optional(),
-      // Sanity
-      SANITY_PROJECT_ID: z.string().optional(),
-      SANITY_DATASET: z.string().optional(),
-      SANITY_API_READ_TOKEN: z.string().optional(),
-      SANITY_WEBHOOK_SECRET: z.string().optional(),
-      ALGOLIA_ADMIN_API_KEY: z.string().optional(),
-      ALGOLIA_INDEX_BLOG: z.string().optional(),
-      ALGOLIA_INDEX_GAMES: z.string().optional(),
-      ALGOLIA_INDEX_PAGES: z.string().optional(),
-      // Redis / Rate-limits / Idempotency
-      IDEMPOTENCY_TTL_SECONDS: z.coerce.number().default(86400),
-      PETALS_DAILY_CAP: z.coerce.number().default(500),
-      RATE_LIMIT_COLLECT_PER_MINUTE: z.coerce.number().default(30),
-      RATE_LIMIT_SUBMIT_PER_MINUTE: z.coerce.number().default(10),
-      // Game/Economy security
-      GAME_HMAC_SECRET: z.string().min(32),
-      // Analytics/Observability (optional)
-      NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-      NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
-      SENTRY_DSN: z.string().url().optional(),
-      // Anti-bot (Cloudflare Turnstile) – optional
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
-      TURNSTILE_SECRET_KEY: z.string().optional(),
-      INNGEST_EVENT_KEY: z.string().optional(),
-      INNGEST_SIGNING_KEY: z.string().optional(),
-      INNGEST_SERVE_URL: z.string().url().optional(),
-      INNGEST_PROBE: z.string().optional(),
-      BASE_URL: z.string().url().optional(),
-      // Next.js runtime detection
-      NEXT_PHASE: z.string().optional(),
-      NEXT_RUNTIME: z.string().optional(),
-      SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
-      OTEL_SDK_DISABLED: z.string().optional(),
-      // Google OAuth
-      GOOGLE_CLIENT_ID: z.string().optional(),
-      GOOGLE_CLIENT_SECRET: z.string().optional(),
-      GOOGLE_PROJECT_ID: z.string().optional(),
-      GOOGLE_AUTH_URI: z.string().url().optional(),
-      GOOGLE_TOKEN_URI: z.string().url().optional(),
-      GOOGLE_AUTH_PROVIDER_X509_CERT_URL: z.string().url().optional(),
-      GOOGLE_REDIRECT_URI: z.string().url().optional(),
-      // NextAuth
-      NEXTAUTH_SECRET: z.string().optional(),
-      NEXTAUTH_URL: z.string().url().optional(),
-      // GitHub
-      GITHUB_PAT: z.string().optional(),
-      // Sentry/Stack
-      SENTRY_AUTH_TOKEN: z.string().optional(),
-      SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
-      STACK_SECRET_SERVER_KEY: z.string().optional(),
-      SENTRY_ORG: z.string().optional(),
-      SENTRY_PROJECT: z.string().optional(),
-      // Prisma Accelerate
-      PRISMA_ACCELERATE_API_KEY: z.string().optional(),
-      // Misc
-      DEBUG_MODE: z.string().optional(),
-      ANALYZE: z.string().optional(),
-      // Feature Flags
-      FEATURE_FLAG_PROVIDER: z
-        .enum(['local', 'configcat', 'flagsmith'])
-        .optional()
-        .default('local'),
-      FEATURE_FLAG_API_KEY: z.string().optional(),
-      FEATURE_FLAG_BASE_URL: z.string().url().optional(),
-      FEATURE_EASYPOST: z.string().optional(),
-      // Adult Zone Feature Flags
-      FEATURE_ADULT_ZONE: z.string().optional(),
-      FEATURE_GATED_COSMETICS: z.string().optional(),
-      FEATURE_AVATARS: z.string().optional(),
-      FEATURE_AVATAR_STYLIZED_SHADERS: z.string().optional(),
-      // Checkout
-      CHECKOUT_LINK_LABEL: z.string().optional().default('Add to Bottomless Bag'),
-      // Storage/CDN
-      CLOUDINARY_CLOUD_NAME: z.string().optional(),
-      CLOUDINARY_API_KEY: z.string().optional(),
-      CLOUDINARY_API_SECRET: z.string().optional(),
-      S3_ACCESS_KEY_ID: z.string().optional(),
-      S3_SECRET_ACCESS_KEY: z.string().optional(),
-      S3_BUCKET: z.string().optional(),
-      S3_REGION: z.string().optional(),
-      // Gated Content
-      ADULTS_STORAGE_INDEX_URL: z.string().url().optional(),
-    },
-    client: {
-      NEXT_PUBLIC_APP_URL: z.string().url(),
-      NEXT_PUBLIC_SITE_URL: z.string().url(),
-      NEXT_PUBLIC_CANONICAL_ORIGIN: z.string().url().optional(),
-      NEXT_PUBLIC_VERCEL_ENVIRONMENT: z.string().optional(),
-      NEXT_PUBLIC_APP_ENV: z.string().optional(),
-      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: z.string().optional(),
-      // Supabase
-      NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
-      // Clerk - all required for proper functionality
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z
-        .string()
-        .min(1, 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required'),
-      NEXT_PUBLIC_CLERK_DEV_PUBLISHABLE_KEY: z.string().optional(),
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
-      NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
-      NEXT_PUBLIC_CLERK_PROXY_URL: z.string().url().optional(),
-      NEXT_PUBLIC_CLERK_DOMAIN: z.string().optional(),
-      // Remove deprecated after sign in/up URL env vars - use fallbackRedirectUrl in provider
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: z.string().optional(),
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: z.string().optional(),
-      NEXT_PUBLIC_CLERK_IS_SATELLITE: z.string().optional(),
-      // Stripe
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string(),
-      // Algolia (site-wide search only, not catalog)
-      NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().optional(),
-      // Analytics/Observability (optional)
-      NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-      NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
-      // Anti-bot (Cloudflare Turnstile) – optional
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
-      // Stack
-      NEXT_PUBLIC_STACK_PROJECT_ID: z.string().optional(),
-      NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY: z.string().optional(),
-      // WebSocket
-      NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: z.string().optional(),
-      NEXT_PUBLIC_COMMUNITY_WS_URL: z.string().optional(),
-      // Feature flags
-      NEXT_PUBLIC_FEATURE_GA_ENABLED: z.string().default('true'),
-      NEXT_PUBLIC_FEATURE_OTEL_CLIENT: z.string().default('false'),
-      NEXT_PUBLIC_FEATURE_PERF_MODULE: z.string().default('true'),
-      NEXT_PUBLIC_FEATURE_MINIGAMES: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_RUNE: z.string().default('off'),
-      NEXT_PUBLIC_FEATURE_SOAPSTONE: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_PETALS: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_CURSOR_GLOW: z.string().default('off'),
-      NEXT_PUBLIC_FEATURE_STARFIELD: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: z.string().default('off'),
-      NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_JIGGLE: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_EVENTS: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_CUBE_HUB: z.string().default('on'),
-      NEXT_PUBLIC_FEATURE_PETALS_ABOUT: z.string().default('on'),
-      // Sentry
-      NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
-      SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
-      SENTRY_UPLOAD_SOURCE_MAPS: z.string().optional(),
-      SENTRY_IGNORE_API_RESOLUTION_ERROR: z.string().optional(),
-      // Vercel Environment
-      NEXT_PUBLIC_VERCEL_ENV: z.enum(['development', 'preview', 'production']).optional(),
-      // App Version
-      NEXT_PUBLIC_APP_VERSION: z.string().optional().default('1.0.0'),
-      // Analytics
-      NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-      NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
-      SENTRY_SKIP_AUTO_RELEASE: z.string().optional(),
-      NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
-      NEXT_PUBLIC_LIVE_DATA: z.string().default('1'),
-      NEXT_PUBLIC_PROBE_MODE: z.string().default('1'),
-      // Homepage feature flags
-      NEXT_PUBLIC_FEATURE_HERO: z.string().default('1'),
-      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: z.string().default('1'),
-      NEXT_PUBLIC_FEATURE_SHOP: z.string().default('1'),
-      NEXT_PUBLIC_FEATURE_BLOG: z.string().default('1'),
-      NEXT_PUBLIC_FEATURE_SOAPSTONES: z.string().default('1'),
-      NEXT_PUBLIC_EVENT_CODE: z.string().optional(),
-      NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: z.string().optional(),
-      // Checkout
-      NEXT_PUBLIC_CHECKOUT_LINK_LABEL: z.string().optional().default('Add to Bottomless Bag'),
-      // Misc
-      NEXT_PUBLIC_API_KEY: z.string().optional(),
-      NEXT_PUBLIC_ADMIN_API_KEY: z.string().optional(),
-      NEXT_PUBLIC_ENABLE_AUDIO: z.string().optional(),
-      NEXT_PUBLIC_GA_ID: z.string().optional(),
-      VERCEL_ENVIRONMENT: z.string().optional(),
-      BASE_URL: z.string().url().optional(),
-    },
-    runtimeEnv: {
-      // Server environment variables
-      NODE_ENV: process.env.NODE_ENV,
-      DATABASE_URL: process.env.DATABASE_URL,
-      DIRECT_URL: process.env.DIRECT_URL,
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-      CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-      CLERK_ENCRYPTION_KEY: process.env.CLERK_ENCRYPTION_KEY,
-      CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
-      PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
-      PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
-      PRINTIFY_API_URL: process.env.PRINTIFY_API_URL,
-      PRINTIFY_WEBHOOK_SECRET: process.env.PRINTIFY_WEBHOOK_SECRET,
-      BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
-      BLOB_READ_WRITE_URL: process.env.BLOB_READ_WRITE_URL,
-      BLOB_PUBLIC_BASE_URL: process.env.BLOB_PUBLIC_BASE_URL,
-      BLOB_BUCKET_PREFIX: process.env.BLOB_BUCKET_PREFIX,
-      NSFW_GLOBAL: process.env.NSFW_GLOBAL,
-      OTEL_SDK_DISABLED: process.env.OTEL_SDK_DISABLED,
-      INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN,
-      API_KEY: process.env.API_KEY,
-      CRON_SECRET: process.env.CRON_SECRET,
-      UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
-      UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
-      PETAL_SALT: process.env.PETAL_SALT,
-      RESEND_API_KEY: process.env.RESEND_API_KEY,
-      EMAIL_FROM: process.env.EMAIL_FROM,
-      // Stripe
-      STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-      STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-      // EasyPost
-      EASYPOST_API_KEY: process.env.EASYPOST_API_KEY,
-      EASYPOST_WEBHOOK_SECRET: process.env.EASYPOST_WEBHOOK_SECRET,
-      DEFAULT_SHIP_FROM_NAME: process.env.DEFAULT_SHIP_FROM_NAME,
-      DEFAULT_SHIP_FROM_STREET: process.env.DEFAULT_SHIP_FROM_STREET,
-      DEFAULT_SHIP_FROM_CITY: process.env.DEFAULT_SHIP_FROM_CITY,
-      DEFAULT_SHIP_FROM_STATE: process.env.DEFAULT_SHIP_FROM_STATE,
-      DEFAULT_SHIP_FROM_ZIP: process.env.DEFAULT_SHIP_FROM_ZIP,
-      DEFAULT_SHIP_FROM_COUNTRY: process.env.DEFAULT_SHIP_FROM_COUNTRY,
-      // Sanity
-      SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
-      SANITY_DATASET: process.env.SANITY_DATASET,
-      SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN,
-      SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET,
-      // Algolia
-      ALGOLIA_ADMIN_API_KEY: process.env.ALGOLIA_ADMIN_API_KEY,
-      ALGOLIA_INDEX_BLOG: process.env.ALGOLIA_INDEX_BLOG,
-      ALGOLIA_INDEX_GAMES: process.env.ALGOLIA_INDEX_GAMES,
-      ALGOLIA_INDEX_PAGES: process.env.ALGOLIA_INDEX_PAGES,
-      // Redis / Rate-limits / Idempotency
-      IDEMPOTENCY_TTL_SECONDS: process.env.IDEMPOTENCY_TTL_SECONDS,
-      PETALS_DAILY_CAP: process.env.PETALS_DAILY_CAP,
-      RATE_LIMIT_COLLECT_PER_MINUTE: process.env.RATE_LIMIT_COLLECT_PER_MINUTE,
-      RATE_LIMIT_SUBMIT_PER_MINUTE: process.env.RATE_LIMIT_SUBMIT_PER_MINUTE,
-      // Game/Economy security
-      GAME_HMAC_SECRET: process.env.GAME_HMAC_SECRET,
-      // Analytics/Observability (optional)
-      NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-      SENTRY_DSN: process.env.SENTRY_DSN,
-      // Anti-bot (Cloudflare Turnstile) – optional
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-      TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY,
-      INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
-      INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
-      INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
-      INNGEST_PROBE: process.env.INNGEST_PROBE,
-      BASE_URL: process.env.BASE_URL,
-      CHECKOUT_LINK_LABEL: process.env.CHECKOUT_LINK_LABEL,
-      // Next.js runtime detection
-      NEXT_PHASE: process.env.NEXT_PHASE,
-      NEXT_RUNTIME: process.env.NEXT_RUNTIME,
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      // Google OAuth
-      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-      GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-      GOOGLE_PROJECT_ID: process.env.GOOGLE_PROJECT_ID,
-      GOOGLE_AUTH_URI: process.env.GOOGLE_AUTH_URI,
-      GOOGLE_TOKEN_URI: process.env.GOOGLE_TOKEN_URI,
-      GOOGLE_AUTH_PROVIDER_X509_CERT_URL: process.env.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
-      GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
-      // NextAuth
-      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-      NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-      // GitHub
-      GITHUB_PAT: process.env.GITHUB_PAT,
-      // Sentry/Stack
-      SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
-      STACK_SECRET_SERVER_KEY: process.env.STACK_SECRET_SERVER_KEY,
-      // Prisma Accelerate
-      PRISMA_ACCELERATE_API_KEY: process.env.PRISMA_ACCELERATE_API_KEY,
-      // Misc
-      DEBUG_MODE: process.env.DEBUG_MODE,
-      FEATURE_EASYPOST: process.env.FEATURE_EASYPOST,
-      VERCEL: process.env.VERCEL,
-      VERCEL_URL: process.env.VERCEL_URL,
-      AUTHORIZED_PARTIES: process.env.AUTHORIZED_PARTIES,
-      NEXT_TELEMETRY_DISABLED: process.env.NEXT_TELEMETRY_DISABLED,
-      NODE_OPTIONS: process.env.NODE_OPTIONS,
-      ANALYZE: process.env.ANALYZE,
-      SENTRY_ORG: process.env.SENTRY_ORG,
-      SENTRY_PROJECT: process.env.SENTRY_PROJECT,
-      // Feature flags
-      FEATURE_FLAG_PROVIDER: process.env.FEATURE_FLAG_PROVIDER,
-      FEATURE_FLAG_API_KEY: process.env.FEATURE_FLAG_API_KEY,
-      FEATURE_FLAG_BASE_URL: process.env.FEATURE_FLAG_BASE_URL,
-      // Inngest
-      INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
-      INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
-      INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
-      INNGEST_PROBE: process.env.INNGEST_PROBE,
-      // Next.js runtime
-      NEXT_PHASE: process.env.NEXT_PHASE,
-      NEXT_RUNTIME: process.env.NEXT_RUNTIME,
-
-      // Client environment variables
-      NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-      NEXT_PUBLIC_CANONICAL_ORIGIN: process.env.NEXT_PUBLIC_CANONICAL_ORIGIN,
-      NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
-      NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
-      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
-      // Supabase
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      // Clerk
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
-      NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
-      NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,
-      NEXT_PUBLIC_CLERK_DOMAIN: process.env.NEXT_PUBLIC_CLERK_DOMAIN,
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL,
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
-      NEXT_PUBLIC_CLERK_IS_SATELLITE: process.env.NEXT_PUBLIC_CLERK_IS_SATELLITE,
-      // Stripe
-      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-      // Algolia
-      NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
-      // Analytics/Observability (optional)
-      NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
-      NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-      // Anti-bot (Cloudflare Turnstile) – optional
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
-      // Stack
-      NEXT_PUBLIC_STACK_PROJECT_ID: process.env.NEXT_PUBLIC_STACK_PROJECT_ID,
-      NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY:
-        process.env.NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY,
-      // WebSocket
-      NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
-      NEXT_PUBLIC_COMMUNITY_WS_URL: process.env.NEXT_PUBLIC_COMMUNITY_WS_URL,
-      // Feature flags
-      NEXT_PUBLIC_FEATURE_GA_ENABLED: process.env.NEXT_PUBLIC_FEATURE_GA_ENABLED,
-      NEXT_PUBLIC_FEATURE_OTEL_CLIENT: process.env.NEXT_PUBLIC_FEATURE_OTEL_CLIENT,
-      NEXT_PUBLIC_FEATURE_PERF_MODULE: process.env.NEXT_PUBLIC_FEATURE_PERF_MODULE,
-      // Sentry
-      NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
-      // Feature flags
-      NEXT_PUBLIC_FEATURE_MINIGAMES: process.env.NEXT_PUBLIC_FEATURE_MINIGAMES,
-      NEXT_PUBLIC_FEATURE_RUNE: process.env.NEXT_PUBLIC_FEATURE_RUNE,
-      NEXT_PUBLIC_FEATURE_SOAPSTONE: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONE,
-      NEXT_PUBLIC_FEATURE_PETALS: process.env.NEXT_PUBLIC_FEATURE_PETALS,
-      NEXT_PUBLIC_FEATURE_CURSOR_GLOW: process.env.NEXT_PUBLIC_FEATURE_CURSOR_GLOW,
-      NEXT_PUBLIC_FEATURE_STARFIELD: process.env.NEXT_PUBLIC_FEATURE_STARFIELD,
-      NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: process.env.NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2,
-      NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: process.env.NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY,
-      NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: process.env.NEXT_PUBLIC_FEATURE_TRADE_PROPOSE,
-      NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: process.env.NEXT_PUBLIC_FEATURE_DIRTY_EMOTES,
-      NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE,
-      NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
-      NEXT_PUBLIC_FEATURE_CUBE_HUB: process.env.NEXT_PUBLIC_FEATURE_CUBE_HUB,
-      NEXT_PUBLIC_FEATURE_PETALS_ABOUT: process.env.NEXT_PUBLIC_FEATURE_PETALS_ABOUT,
-      NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT,
-      NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA,
-      NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE,
-      NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
-      NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
-      // Homepage feature flags
-      NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO,
-      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
-      NEXT_PUBLIC_FEATURE_SHOP: process.env.NEXT_PUBLIC_FEATURE_SHOP,
-      NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG,
-      NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES,
-      NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE,
-      NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE,
-      // Checkout
-      NEXT_PUBLIC_CHECKOUT_LINK_LABEL: process.env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL,
-      // Misc
-      NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
-      NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY,
-      NEXT_PUBLIC_ENABLE_AUDIO: process.env.NEXT_PUBLIC_ENABLE_AUDIO,
-      NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
-      VERCEL_ENVIRONMENT: process.env.VERCEL_ENVIRONMENT,
-    },
-    skipValidation: true, // Always skip validation to prevent crashes
-    // Fail fast in development if required server vars are missing
-    onValidationError: (error) => {
-      console.warn(' Environment validation warnings:', error.errors);
-      return error;
-    },
-  });
-} catch (err) {
-  console.warn(' Environment validation failed, using fallback values:', err.message);
-  // Comprehensive fallback environment object with safe defaults for all used variables
-  safeEnv = {
-    // Core server environment
-    NODE_ENV: process.env.NODE_ENV || 'development',
-    DATABASE_URL: process.env.DATABASE_URL || '',
-    DIRECT_URL: process.env.DIRECT_URL || '',
-
-    // Authentication
-    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY || '',
-    CLERK_ENCRYPTION_KEY: process.env.CLERK_ENCRYPTION_KEY || '',
-    CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET || '',
-
-    // Payments
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
-
-    // Print on demand
-    PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY || '',
-    PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID || '',
-    PRINTIFY_API_URL: process.env.PRINTIFY_API_URL || 'https://api.printify.com/v1/',
-    PRINTIFY_WEBHOOK_SECRET: process.env.PRINTIFY_WEBHOOK_SECRET || '',
-
-    // Storage
-    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
-    BLOB_READ_WRITE_URL: process.env.BLOB_READ_WRITE_URL || '',
-    BLOB_PUBLIC_BASE_URL: process.env.BLOB_PUBLIC_BASE_URL || '',
-    BLOB_BUCKET_PREFIX: process.env.BLOB_BUCKET_PREFIX || 'om',
-    NSFW_GLOBAL: process.env.NSFW_GLOBAL || 'off',
-    OTEL_SDK_DISABLED: process.env.OTEL_SDK_DISABLED || '',
-    INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN || '',
-
-    // Redis
-    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL || '',
-    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-
-    // Email
-    RESEND_API_KEY: process.env.RESEND_API_KEY || '',
-    EMAIL_FROM: process.env.EMAIL_FROM || '',
-
-    // Stripe
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || '',
-
-    // EasyPost
-    EASYPOST_API_KEY: process.env.EASYPOST_API_KEY || '',
-    EASYPOST_WEBHOOK_SECRET: process.env.EASYPOST_WEBHOOK_SECRET || '',
-    DEFAULT_SHIP_FROM_NAME: process.env.DEFAULT_SHIP_FROM_NAME || '',
-    DEFAULT_SHIP_FROM_STREET: process.env.DEFAULT_SHIP_FROM_STREET || '',
-    DEFAULT_SHIP_FROM_CITY: process.env.DEFAULT_SHIP_FROM_CITY || '',
-    DEFAULT_SHIP_FROM_STATE: process.env.DEFAULT_SHIP_FROM_STATE || '',
-    DEFAULT_SHIP_FROM_ZIP: process.env.DEFAULT_SHIP_FROM_ZIP || '',
-    DEFAULT_SHIP_FROM_COUNTRY: process.env.DEFAULT_SHIP_FROM_COUNTRY || '',
-
-    // Sanity
-    SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID || '',
-    SANITY_DATASET: process.env.SANITY_DATASET || '',
-    SANITY_API_READ_TOKEN: process.env.SANITY_API_READ_TOKEN || '',
-    SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET || '',
-
-    // Algolia
-    ALGOLIA_ADMIN_API_KEY: process.env.ALGOLIA_ADMIN_API_KEY || '',
-    ALGOLIA_INDEX_BLOG: process.env.ALGOLIA_INDEX_BLOG || '',
-    ALGOLIA_INDEX_GAMES: process.env.ALGOLIA_INDEX_GAMES || '',
-    ALGOLIA_INDEX_PAGES: process.env.ALGOLIA_INDEX_PAGES || '',
-
-    // Redis / Rate-limits / Idempotency
-    IDEMPOTENCY_TTL_SECONDS: process.env.IDEMPOTENCY_TTL_SECONDS || 86400,
-    PETALS_DAILY_CAP: process.env.PETALS_DAILY_CAP || 500,
-    RATE_LIMIT_COLLECT_PER_MINUTE: process.env.RATE_LIMIT_COLLECT_PER_MINUTE || 30,
-    RATE_LIMIT_SUBMIT_PER_MINUTE: process.env.RATE_LIMIT_SUBMIT_PER_MINUTE || 10,
-    // Game/Economy security
-    GAME_HMAC_SECRET: process.env.GAME_HMAC_SECRET || '',
-    // Analytics/Observability (optional)
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || '',
-    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
-    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
-    SENTRY_DSN: process.env.SENTRY_DSN || '',
-    SENTRY_SKIP_AUTO_RELEASE: process.env.SENTRY_SKIP_AUTO_RELEASE || '',
-    // Anti-bot (Cloudflare Turnstile) – optional
-    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
-    TURNSTILE_SECRET_KEY: process.env.TURNSTILE_SECRET_KEY || '',
-    INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY || '',
-    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY || '',
-    INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL || '',
-    INNGEST_PROBE: process.env.INNGEST_PROBE || 'on',
-    FEATURE_EASYPOST: process.env.FEATURE_EASYPOST || '',
-    // Next.js runtime detection
-    NEXT_PHASE: process.env.NEXT_PHASE || '',
-    NEXT_RUNTIME: process.env.NEXT_RUNTIME || '',
-
-    // Supabase
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-
-    // Utilities
-    API_KEY: process.env.API_KEY || '',
-    CRON_SECRET: process.env.CRON_SECRET || '',
-    PETAL_SALT: process.env.PETAL_SALT || '',
-    VERCEL_URL: process.env.VERCEL_URL || '',
-    BASE_URL: process.env.BASE_URL || '',
-
-    // Public client variables
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
-    NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in',
-    NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up',
-    NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL || '',
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || '',
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || '',
-    NEXT_PUBLIC_CANONICAL_ORIGIN: process.env.NEXT_PUBLIC_CANONICAL_ORIGIN || '',
-    NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT || 'development',
-    NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV || 'development',
-    NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY || '',
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
-    NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || '',
-    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY || '',
-    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST || '',
-    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN || '',
-    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
-    NEXT_PUBLIC_FEATURE_GA_ENABLED: process.env.NEXT_PUBLIC_FEATURE_GA_ENABLED || 'false',
-    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '',
-    NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT || '500',
-    NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE || '',
-    NEXT_PUBLIC_PETAL_COLOR_OVERRIDE: process.env.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE || '',
-    NEXT_PUBLIC_CHECKOUT_LINK_LABEL:
-      process.env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL || 'Add to Bottomless Bag',
-    NEXT_PUBLIC_ADMIN_API_KEY: process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
-    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
-    // WebSocket
-    NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS:
-      process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS || 'true',
-    NEXT_PUBLIC_COMMUNITY_WS_URL:
-      process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/ws',
-
-    // Feature flags
-    NEXT_PUBLIC_FEATURE_MINIGAMES: process.env.NEXT_PUBLIC_FEATURE_MINIGAMES || 'on',
-    NEXT_PUBLIC_FEATURE_RUNE: process.env.NEXT_PUBLIC_FEATURE_RUNE || 'on',
-    NEXT_PUBLIC_FEATURE_CUBE_HUB: process.env.NEXT_PUBLIC_FEATURE_CUBE_HUB || 'true',
-    NEXT_PUBLIC_FEATURE_PETALS_ABOUT: process.env.NEXT_PUBLIC_FEATURE_PETALS_ABOUT || 'true',
-    NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: process.env.NEXT_PUBLIC_FEATURE_DIRTY_EMOTES || 'on',
-    NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE || 'on',
-    NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS || 'on',
-    NEXT_PUBLIC_FEATURE_SOAPSTONE: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONE || 'on',
-    NEXT_PUBLIC_FEATURE_PETALS: process.env.NEXT_PUBLIC_FEATURE_PETALS || 'on',
-    NEXT_PUBLIC_FEATURE_CURSOR_GLOW: process.env.NEXT_PUBLIC_FEATURE_CURSOR_GLOW || 'off',
-    NEXT_PUBLIC_FEATURE_STARFIELD: process.env.NEXT_PUBLIC_FEATURE_STARFIELD || 'on',
-    NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2: process.env.NEXT_PUBLIC_FEATURE_COMMUNITY_FACE2 || 'on',
-    NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY: process.env.NEXT_PUBLIC_FEATURE_CRT_CARD_ONLY || 'on',
-    NEXT_PUBLIC_FEATURE_TRADE_PROPOSE: process.env.NEXT_PUBLIC_FEATURE_TRADE_PROPOSE || 'off',
-    NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA || '1',
-    NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE || '1',
-    // Homepage feature flags
-    NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO || '1',
-    NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE:
-      process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE || '1',
-    NEXT_PUBLIC_FEATURE_SHOP: process.env.NEXT_PUBLIC_FEATURE_SHOP || '1',
-    NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG || '1',
-    NEXT_PUBLIC_FEATURE_SOAPSTONES: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONES || '1',
-
-    // Additional missing variables
-    NEXT_PUBLIC_CLERK_DOMAIN: process.env.NEXT_PUBLIC_CLERK_DOMAIN || '',
-    VERCEL_ENVIRONMENT: process.env.VERCEL_ENVIRONMENT || '',
-  };
-}
-
-export const env = safeEnv;
+export const env = createEnv({
+  server: {
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    DATABASE_URL: z.string().url().optional(),
+    DIRECT_URL: z.string().url().optional(),
+    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    CLERK_SECRET_KEY: z.string(),
+    CLERK_WEBHOOK_SECRET: z.string().optional(),
+    PRINTIFY_API_KEY: z.string(),
+    PRINTIFY_SHOP_ID: z.string(),
+    PRINTIFY_API_URL: z.string().url(),
+    UPSTASH_REDIS_REST_URL: z.string().url(),
+    UPSTASH_REDIS_REST_TOKEN: z.string(),
+    PETAL_SALT: z.string().optional(),
+    VERCEL: z.string().optional(),
+    AUTHORIZED_PARTIES: z.string().optional(),
+    NEXT_TELEMETRY_DISABLED: z.string().optional(),
+    NODE_OPTIONS: z.string().optional(),
+    RESEND_API_KEY: z.string().optional(),
+    EMAIL_FROM: z.string().email().optional(),
+    INNGEST_SERVE_URL: z.string().url().optional(),
+    BASE_URL: z.string().url().optional(),
+  },
+  client: {
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
+    NEXT_PUBLIC_CLERK_PROXY_URL: z.string().url().optional(),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string(),
+    NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().default('/sign-in'),
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().default('/sign-up'),
+    NEXT_PUBLIC_VERCEL_ENVIRONMENT: z.string().optional(),
+    NEXT_PUBLIC_GA_ID: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_MINIGAMES: z.enum(['on', 'off']).default('on'),
+    NEXT_PUBLIC_FEATURE_RUNE: z.enum(['on', 'off']).default('off'),
+    NEXT_PUBLIC_FEATURE_SOAPSTONE: z.enum(['on', 'off']).default('on'),
+    NEXT_PUBLIC_FEATURE_PETALS: z.enum(['on', 'off']).default('on'),
+    NEXT_PUBLIC_FEATURE_CURSOR_GLOW: z.enum(['on', 'off']).default('off'),
+    NEXT_PUBLIC_FEATURE_STARFIELD: z.enum(['on', 'off']).default('on'),
+    NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
+    NEXT_PUBLIC_CHECKOUT_LINK_LABEL: z.string().optional(),
+  },
+  runtimeEnv: {
+    NODE_ENV: process.env.NODE_ENV,
+    DATABASE_URL: process.env.DATABASE_URL,
+    DIRECT_URL: process.env.DIRECT_URL,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
+    PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
+    PRINTIFY_SHOP_ID: process.env.PRINTIFY_SHOP_ID,
+    PRINTIFY_API_URL: process.env.PRINTIFY_API_URL,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+    PETAL_SALT: process.env.PETAL_SALT,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    INNGEST_SERVE_URL: process.env.INNGEST_SERVE_URL,
+    BASE_URL: process.env.BASE_URL,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
+    NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
+    NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+    NEXT_PUBLIC_FEATURE_MINIGAMES: process.env.NEXT_PUBLIC_FEATURE_MINIGAMES,
+    NEXT_PUBLIC_FEATURE_RUNE: process.env.NEXT_PUBLIC_FEATURE_RUNE,
+    NEXT_PUBLIC_FEATURE_SOAPSTONE: process.env.NEXT_PUBLIC_FEATURE_SOAPSTONE,
+    NEXT_PUBLIC_FEATURE_PETALS: process.env.NEXT_PUBLIC_FEATURE_PETALS,
+    NEXT_PUBLIC_FEATURE_CURSOR_GLOW: process.env.NEXT_PUBLIC_FEATURE_CURSOR_GLOW,
+    NEXT_PUBLIC_FEATURE_STARFIELD: process.env.NEXT_PUBLIC_FEATURE_STARFIELD,
+    NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT,
+    NEXT_PUBLIC_CHECKOUT_LINK_LABEL: process.env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    VERCEL: process.env.VERCEL,
+    AUTHORIZED_PARTIES: process.env.AUTHORIZED_PARTIES,
+    NEXT_TELEMETRY_DISABLED: process.env.NEXT_TELEMETRY_DISABLED,
+    NODE_OPTIONS: process.env.NODE_OPTIONS,
+    ANALYZE: process.env.ANALYZE,
+    SENTRY_ORG: process.env.SENTRY_ORG,
+    SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+    SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+  },
+  skipValidation: !!process.env.CI,
+});

@@ -1831,6 +1831,21 @@ model WebhookEvent {
   createdAt DateTime @default(now())
 }
 
+model PrintifyOrderSync {
+  id              String    @id @default(cuid())
+  localOrderId    String    @unique
+  printifyOrderId String
+  status          String
+  lastSyncAt      DateTime?
+  error           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([localOrderId])
+  @@index([printifyOrderId])
+  @@index([status])
+}
+
 model Cart {
   id        String     @id @default(cuid())
   userId    String     @unique

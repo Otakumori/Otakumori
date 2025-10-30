@@ -49,10 +49,16 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
 
   const endGame = useCallback(
     (success: boolean, score: number, petals: number) => {
+      const game = currentGame;
+      if (!game) {
+        setIsPlaying(false);
+        return;
+      }
+
       setIsPlaying(false);
 
       if (success) {
-        updateBestScore(currentGame.id, score);
+        updateBestScore(game.id, score);
         updateDailyStreak();
         addPetalsEarned(petals);
 
@@ -69,8 +75,11 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
 
       // Move to next game after delay (increased from 1500ms for better pacing)
       setTimeout(() => {
-        setCurrentGameIndex((prev) => (prev + 1) % playlist.length);
-      }, 3500);
+        setCurrentGameIndex((prev) => {
+          if (playlist.length === 0) return prev;
+          return (prev + 1) % playlist.length;
+        });
+      }, 1500);
     },
     [
       currentGame,

@@ -82,24 +82,25 @@ export const PetalEffect = ({
       aria-hidden="true"
     >
       {Array.from({ length: count }).map((_, index) => {
+        const motionProps: any = {
+          key: index,
+          className: `absolute ${interactive ? 'cursor-pointer' : ''}`,
+          style: {
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            x: interactive ? x : 0,
+            y: interactive ? y : 0,
+          },
+          variants: petalFloat,
+          initial: 'initial',
+          animate: controls,
+          custom: index,
+          onClick: () => handlePetalClick(index),
+          ...(interactive && { whileHover: { scale: 1.2 } }),
+          ...(interactive && { whileTap: { scale: 0.8 } }),
+        };
         return (
-          <motion.div
-            key={index}
-            className={`absolute ${interactive ? 'cursor-pointer' : ''}`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              x: interactive ? x : 0,
-              y: interactive ? y : 0,
-            }}
-            variants={petalFloat}
-            initial="initial"
-            animate={controls}
-            custom={index}
-            onClick={() => handlePetalClick(index)}
-            whileHover={interactive ? { scale: 1.2 } : undefined}
-            whileTap={interactive ? { scale: 0.8 } : undefined}
-          >
+          <motion.div {...motionProps}>
             <svg
               width={size}
               height={size}

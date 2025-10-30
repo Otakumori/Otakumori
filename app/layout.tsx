@@ -2,48 +2,40 @@ import 'server-only';
 import './globals.css';
 import './styles/glassmorphic-effects.css';
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+import * as Sentry from '@sentry/nextjs';
+import { headers } from 'next/headers';
+import Header from './components/Header';
 import Footer from './components/Footer';
 import Navbar from './components/layout/Navbar';
 import Providers from './Providers';
-import * as Sentry from '@sentry/nextjs';
 import ClerkProviderWrapper from './providers/ClerkProviderWrapper';
-import ClientErrorBoundary from '@/components/ClientErrorBoundary';
-import { headers } from 'next/headers';
+import CherryBlossomEffect from './components/CherryBlossomEffect';
+import CursorGlow from './components/effects/CursorGlow';
 import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
-import GoogleAnalytics from './components/analytics/GoogleAnalytics';
-import PerformanceMonitor from './components/PerformanceMonitor';
-import { enforceNoMocks } from '@/lib/no-mocks';
-import StarfieldBackground from '@/components/background/StarfieldBackground';
-import PetalField from './components/effects/PetalField';
-import { ScrollToTop } from './components/ui/ScrollToTop';
-import { QuickSearch } from './components/ui/QuickSearch';
-import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
-import { SoapstoneGlow } from './components/effects/SoapstoneGlow';
-
-// Boot-time Inngest health check (disabled - run Inngest dev server separately)
-// bootCheckInngest();
-
-// Enforce no mock data in production
-enforceNoMocks();
+import { isCursorGlowEnabled } from './flags';
 
 export function generateMetadata(): Metadata {
   return {
-    title: 'Welcome Home, Traveler — Otaku-mori',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    title: 'Welcome Home, Traveler � Otaku-mori',
+    description: 'Anime and gaming hub for petals, runes, and rewards.',
     other: {
       ...Sentry.getTraceData(),
     },
   };
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const headersList = await headers();
-  const nonce = headersList.get('x-nonce') ?? undefined;
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  const nonce = headers().get('x-nonce') ?? undefined;
 
   return (
-    <ClerkProviderWrapper nonce={nonce}>
+    <ClerkProviderWrapper nonce={nonce || undefined}>
       <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -61,25 +53,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             rel="stylesheet"
           />
         </head>
-        <body className="min-h-screen flex flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50 font-body">
-          <GoogleAnalytics />
-          <PerformanceMonitor />
-
-          {/* Global Background Effects (z-0) */}
-          <StarfieldBackground className="fixed inset-0 z-0" />
-          <SoapstoneGlow />
-          <PetalField density="site" />
-
-          {/* Cursor Glow disabled per user preference */}
-          {/* {isCursorGlowEnabled() && <CursorGlow />} */}
-
+        <body className="flex min-h-screen flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
+          <CherryBlossomEffect density="site" />
+          {isCursorGlowEnabled() && <CursorGlow />}
           <PetalHUD />
           <Konami />
           <PetalProgressBar />
-          <ScrollToTop />
-          <QuickSearch />
-          <KeyboardShortcuts />
-          <ClientErrorBoundary>
+          <Sentry.ErrorBoundary
+            fallback={
+              <div className="p-8 text-center">
+                <h1 className="text-2xl font-bold text-red-500">Something went wrong!</h1>
+                <p className="mt-2 text-gray-400">Please refresh the page or contact support.</p>
+              </div>
+            }
+          >
             <Providers>
               <div className="flex min-h-screen flex-col relative z-10">
                 <Navbar />

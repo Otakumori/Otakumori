@@ -2,6 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 import {
   UserReportCreateSchema,
   ReportListRequestSchema,
@@ -125,16 +126,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has already reported this content
-    const existingReport = await db.userReport.findFirst({
-      where: {
-        reporterId: userId,
-        contentType: validatedData.contentType,
-        contentId: validatedData.contentId,
-        reportedUserId: validatedData.reportedUserId,
-        status: {
-          in: ['pending', 'reviewed'],
-        },
+    const existingReportWhere: Prisma.UserReportWhereInput = {
+      reporterId: userId,
+      contentType: validatedData.contentType,
+      status: {
+        in: ['pending', 'reviewed'],
       },
+    };
+    if (validatedData.contentId !== undefined) {
+      existingReportWhere.contentId = validatedData.contentId;
+    }
+    if (validatedData.reportedUserId !== undefined) {
+      existingReportWhere.reportedUserId = validatedData.reportedUserId ?? null;
+    }
+
+    const existingReport = await db.userReport.findFirst({
+      where: existingReportWhere,
     });
 
     if (existingReport) {
@@ -144,13 +151,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const reportData: Prisma.UserReportUncheckedCreateInput = {
+      reporterId: userId,
+      contentType: validatedData.contentType,
+      reason: validatedData.reason,
+    };
+    if (validatedData.reportedUserId !== undefined) {
+      reportData.reportedUserId = validatedData.reportedUserId ?? null;
+    }
+    if (validatedData.contentId !== undefined) {
+      reportData.contentId = validatedData.contentId;
+    }
+    if (validatedData.description !== undefined) {
+      reportData.description = validatedData.description;
+    }
+    if (validatedData.evidence !== undefined) {
+      reportData.evidence = validatedData.evidence;
+    }
+
     // Create the report
     const report = await db.userReport.create({
-      data: {
-        ...validatedData,
-        evidence: validatedData.evidence as any,
-        reporterId: userId,
-      },
+      data: reportData,
       include: {
         reporter: {
           select: {

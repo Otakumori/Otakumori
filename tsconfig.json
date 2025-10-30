@@ -39,9 +39,16 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@/lib/*": ["./lib/*", "./app/lib/*"],
+      "@om/avatar": ["./packages/avatar/src/index.ts"],
+      "@om/avatar/*": ["./packages/avatar/src/*"],
+      "@om/game-kit": ["./packages/game-kit/src/index.ts"],
+      "@om/game-kit/*": ["./packages/game-kit/src/*"],
+      "@om/ecs": ["./packages/ecs/src/index.ts"],
+      "@om/ecs/*": ["./packages/ecs/src/*"],
+      "@om/shaders": ["./packages/shaders/src/index.ts"],
+      "@om/shaders/*": ["./packages/shaders/src/*"]
     }
   },
   "include": [

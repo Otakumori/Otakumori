@@ -150,6 +150,27 @@ export function MonitoringDashboard() {
   };
 
   const latestMetrics = metrics[metrics.length - 1];
+  const previousMetrics = metrics.length > 1 ? metrics[metrics.length - 2] : undefined;
+
+  const safeActiveUsers = latestMetrics?.activeUsers ?? 0;
+  const prevActiveUsers = previousMetrics?.activeUsers ?? 0;
+  const activeUsersDelta = safeActiveUsers - prevActiveUsers;
+  const activeUsersTrend = activeUsersDelta >= 0 ? '+' : '-';
+
+  const safeResponseTime = latestMetrics?.avgResponseTime ?? 0;
+  const prevResponseTime = previousMetrics?.avgResponseTime ?? 0;
+  const responseTimeDelta = safeResponseTime - prevResponseTime;
+  const responseTrend = responseTimeDelta <= 0 ? '+' : '-';
+
+  const safeCpu = latestMetrics?.cpu ?? 0;
+  const prevCpu = previousMetrics?.cpu ?? 0;
+  const cpuDelta = safeCpu - prevCpu;
+  const cpuTrend = cpuDelta <= 0 ? '+' : '-';
+
+  const safeMemory = latestMetrics?.memory ?? 0;
+  const prevMemory = previousMetrics?.memory ?? 0;
+  const memoryDelta = safeMemory - prevMemory;
+  const memoryTrend = memoryDelta <= 0 ? '+' : '-';
 
   return (
     <motion.div
@@ -213,20 +234,15 @@ export function MonitoringDashboard() {
             </CardHeader>
             <CardContent>
               <motion.div
-                key={latestMetrics?.activeUsers}
+                key={safeActiveUsers}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="text-2xl font-bold"
               >
-                {latestMetrics?.activeUsers || 0}
+                {safeActiveUsers}
               </motion.div>
               <p className="text-muted-foreground text-xs">
-                {latestMetrics?.activeUsers > metrics[metrics.length - 2]?.activeUsers ? '+' : '-'}
-                {Math.abs(
-                  (latestMetrics?.activeUsers || 0) -
-                    (metrics[metrics.length - 2]?.activeUsers || 0),
-                )}{' '}
-                from last check
+                {activeUsersTrend} {Math.abs(activeUsersDelta)} from last check
               </p>
             </CardContent>
           </Card>
@@ -241,22 +257,15 @@ export function MonitoringDashboard() {
             </CardHeader>
             <CardContent>
               <motion.div
-                key={latestMetrics?.avgResponseTime}
+                key={safeResponseTime}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="text-2xl font-bold"
               >
-                {latestMetrics?.avgResponseTime || 0}ms
+                {safeResponseTime}ms
               </motion.div>
               <p className="text-muted-foreground text-xs">
-                {latestMetrics?.avgResponseTime < metrics[metrics.length - 2]?.avgResponseTime
-                  ? '+'
-                  : '-'}
-                {Math.abs(
-                  (latestMetrics?.avgResponseTime || 0) -
-                    (metrics[metrics.length - 2]?.avgResponseTime || 0),
-                )}
-                ms from last check
+                {responseTrend} {Math.abs(responseTimeDelta)} ms from last check
               </p>
             </CardContent>
           </Card>
@@ -271,17 +280,15 @@ export function MonitoringDashboard() {
             </CardHeader>
             <CardContent>
               <motion.div
-                key={latestMetrics?.cpu}
+                key={safeCpu}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="text-2xl font-bold"
               >
-                {latestMetrics?.cpu || 0}%
+                {safeCpu}%
               </motion.div>
               <p className="text-muted-foreground text-xs">
-                {latestMetrics?.cpu < metrics[metrics.length - 2]?.cpu ? '+' : '-'}
-                {Math.abs((latestMetrics?.cpu || 0) - (metrics[metrics.length - 2]?.cpu || 0))}%
-                from last check
+                {cpuTrend} {Math.abs(cpuDelta)}% from last check
               </p>
             </CardContent>
           </Card>
@@ -296,19 +303,15 @@ export function MonitoringDashboard() {
             </CardHeader>
             <CardContent>
               <motion.div
-                key={latestMetrics?.memory}
+                key={safeMemory}
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="text-2xl font-bold"
               >
-                {latestMetrics?.memory || 0}%
+                {safeMemory}%
               </motion.div>
               <p className="text-muted-foreground text-xs">
-                {latestMetrics?.memory < metrics[metrics.length - 2]?.memory ? '+' : '-'}
-                {Math.abs(
-                  (latestMetrics?.memory || 0) - (metrics[metrics.length - 2]?.memory || 0),
-                )}
-                % from last check
+                {memoryTrend} {Math.abs(memoryDelta)}% from last check
               </p>
             </CardContent>
           </Card>

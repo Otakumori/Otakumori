@@ -404,13 +404,13 @@ export class PetalService {
         ? new Date(lastDailyReward.getTime() + 24 * 60 * 60 * 1000)
         : undefined;
 
-      const petalInfo: PetalBalance = {
+      const petalInfo: any = {
         balance: user.petalBalance,
         totalEarned,
         totalSpent,
-        lastDailyReward,
-        nextDailyReward,
       };
+      if (lastDailyReward !== undefined) petalInfo.lastDailyReward = lastDailyReward;
+      if (nextDailyReward !== undefined) petalInfo.nextDailyReward = nextDailyReward;
 
       logger.debug('Petal info retrieved', {
         requestId,

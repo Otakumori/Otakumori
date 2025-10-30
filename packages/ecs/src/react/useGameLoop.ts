@@ -1,0 +1,114 @@
+/**
+ * React hook for game loop integration
+ */
+
+import { useEffect, useRef, useState, useMemo } from 'react';
+import type { World } from '../world';
+import type { System } from '../system';
+import { createGameLoop, type GameLoop } from '../loop';
+
+export interface UseGameLoopOptions {
+  world: World;
+  systems: System[];
+  autoStart?: boolean;
+  fixedDt?: number;
+  maxAccumulator?: number;
+}
+
+export interface UseGameLoopResult {
+  start: () => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+  isRunning: boolean;
+  isPaused: boolean;
+  currentTick: number;
+  fps: number;
+}
+
+/**
+ * React hook for managing game loop lifecycle
+ */
+export function useGameLoop(options: UseGameLoopOptions): UseGameLoopResult {
+  const { world, systems, autoStart = false, fixedDt, maxAccumulator } = options;
+
+  const loopRef = useRef<GameLoop | null>(null);
+  const [tick, setTick] = useState(0);
+  const [fps, setFps] = useState(60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Create game loop
+  const loop = useMemo(() => {
+    const options: any = {
+      world,
+      systems,
+      onTick: (currentTick: number) => {
+        setTick(currentTick);
+        if (loopRef.current) {
+          setFps(loopRef.current.fps);
+        }
+      },
+    };
+
+    if (fixedDt !== undefined) {
+      options.fixedDt = fixedDt;
+    }
+
+    if (maxAccumulator !== undefined) {
+      options.maxAccumulator = maxAccumulator;
+    }
+
+    const newLoop = createGameLoop(options);
+    loopRef.current = newLoop;
+    return newLoop;
+  }, [world, systems, fixedDt, maxAccumulator]);
+
+  // Auto-start if requested
+  useEffect(() => {
+    if (autoStart) {
+      loop.start();
+      setIsRunning(true);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (loopRef.current) {
+        loopRef.current.stop();
+      }
+    };
+  }, [autoStart, loop]);
+
+  const start = () => {
+    loop.start();
+    setIsRunning(true);
+    setIsPaused(false);
+  };
+
+  const pause = () => {
+    loop.pause();
+    setIsPaused(true);
+  };
+
+  const resume = () => {
+    loop.resume();
+    setIsPaused(false);
+  };
+
+  const stop = () => {
+    loop.stop();
+    setIsRunning(false);
+    setIsPaused(false);
+  };
+
+  return {
+    start,
+    pause,
+    resume,
+    stop,
+    isRunning,
+    isPaused,
+    currentTick: tick,
+    fps,
+  };
+}

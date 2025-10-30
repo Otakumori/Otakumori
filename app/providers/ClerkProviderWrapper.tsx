@@ -5,7 +5,7 @@ import { env } from '@/env.mjs';
 
 interface ClerkProviderWrapperProps {
   children: React.ReactNode;
-  nonce?: string;
+  nonce?: string | undefined;
 }
 
 export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderWrapperProps) {

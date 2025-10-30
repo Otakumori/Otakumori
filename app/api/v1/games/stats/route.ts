@@ -32,62 +32,62 @@ export async function GET(request: NextRequest) {
       orderBy: { startedAt: 'desc' },
     });
 
-    // Group by game and calculate stats
-    const gameStats = new Map<
-      string,
-      {
-        gameKey: string;
-        totalRuns: number;
-        bestScore: number;
-        averageScore: number;
-        totalPetalsEarned: number;
-        lastPlayed?: string;
-      }
-    >();
+    type GameStatAccumulator = {
+      gameKey: string;
+      totalRuns: number;
+      totalScore: number;
+      bestScore: number;
+      totalPetalsEarned: number;
+      lastPlayed?: string;
+    };
 
-    gameRuns.forEach((run) => {
-      const existing = gameStats.get(run.gameKey) || {
-        gameKey: run.gameKey,
-        totalRuns: 0,
-        bestScore: 0,
-        averageScore: 0,
-        totalPetalsEarned: 0,
-        lastPlayed: undefined,
+    const accumulators = new Map<string, GameStatAccumulator>();
+
+    for (const run of gameRuns) {
+      let stats = accumulators.get(run.gameKey);
+      if (!stats) {
+        stats = {
+          gameKey: run.gameKey,
+          totalRuns: 0,
+          totalScore: 0,
+          bestScore: 0,
+          totalPetalsEarned: 0,
+        };
+        accumulators.set(run.gameKey, stats);
+      }
+
+      stats.totalRuns += 1;
+      stats.totalScore += run.score;
+      stats.bestScore = Math.max(stats.bestScore, run.score);
+      stats.totalPetalsEarned += run.rewardPetals;
+
+      const startedAtIso = run.startedAt.toISOString();
+      if (!stats.lastPlayed || startedAtIso > stats.lastPlayed) {
+        stats.lastPlayed = startedAtIso;
+      }
+    }
+
+    const statsList = Array.from(accumulators.values());
+    const responseStats = statsList.map((stat) => {
+      const { totalScore, lastPlayed, ...rest } = stat;
+      const base = {
+        ...rest,
+        averageScore: rest.totalRuns > 0 ? Math.round(totalScore / rest.totalRuns) : 0,
       };
-
-      existing.totalRuns += 1;
-      existing.bestScore = Math.max(existing.bestScore, run.score);
-      existing.totalPetalsEarned += run.rewardPetals;
-
-      if (!existing.lastPlayed || run.startedAt > new Date(existing.lastPlayed)) {
-        existing.lastPlayed = run.startedAt.toISOString();
-      }
-
-      gameStats.set(run.gameKey, existing);
+      return lastPlayed ? { ...base, lastPlayed } : base;
     });
 
-    // Calculate average scores
-    gameStats.forEach((stats) => {
-      const gameRunsForGame = gameRuns.filter((run) => run.gameKey === stats.gameKey);
-      const totalScore = gameRunsForGame.reduce((sum, run) => sum + run.score, 0);
-      stats.averageScore = Math.round(totalScore / stats.totalRuns);
-    });
-
-    // Calculate total stats
     const totalStats = {
       totalRuns: gameRuns.length,
       totalPetalsEarned: gameRuns.reduce((sum, run) => sum + run.rewardPetals, 0),
-      favoriteGame:
-        gameStats.size > 0
-          ? Array.from(gameStats.values()).reduce((a, b) => (a.totalRuns > b.totalRuns ? a : b))
-              .gameKey
-          : undefined,
+      favoriteGame: statsList.length
+        ? statsList.reduce((prev, current) => (current.totalRuns > prev.totalRuns ? current : prev)).gameKey
+        : undefined,
     };
-
     return NextResponse.json({
       ok: true,
       data: {
-        stats: Array.from(gameStats.values()),
+        stats: responseStats,
         totalStats,
       },
     });

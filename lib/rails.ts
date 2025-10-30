@@ -86,15 +86,14 @@ export async function createRail(data: {
   startsAt?: Date;
   endsAt?: Date;
 }) {
-  return await db.homeRail.create({
-    data: {
-      key: data.key,
-      title: data.title,
-      productSlugs: data.productSlugs,
-      startsAt: data.startsAt,
-      endsAt: data.endsAt,
-    },
-  });
+  const railData: any = {
+    key: data.key,
+    title: data.title,
+    productSlugs: data.productSlugs,
+  };
+  if (data.startsAt !== undefined) railData.startsAt = data.startsAt;
+  if (data.endsAt !== undefined) railData.endsAt = data.endsAt;
+  return await db.homeRail.create({ data: railData });
 }
 
 export async function updateRail(

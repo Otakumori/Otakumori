@@ -60,7 +60,9 @@ export class InputManager {
 
     // Check button states
     for (let i = 0; i < gamepad.buttons.length; i++) {
-      if (gamepad.buttons[i].pressed) {
+      const button = gamepad.buttons[i];
+      if (!button) continue;
+      if (button.pressed) {
         currentState.add(i);
 
         // Check if this button was just pressed
@@ -69,7 +71,7 @@ export class InputManager {
           this.emitInputEvent({
             type: 'gamepad',
             action: `gamepad_${gamepad.index}_button_${i}`,
-            value: gamepad.buttons[i].value,
+            value: button.value ?? 1,
             timestamp: performance.now(),
           });
         }
@@ -83,32 +85,38 @@ export class InputManager {
 
     // Left stick
     if (
-      Math.abs(gamepad.axes[0]) > leftStickThreshold ||
-      Math.abs(gamepad.axes[1]) > leftStickThreshold
+      gamepad.axes &&
+      (Math.abs(gamepad.axes[0] ?? 0) > leftStickThreshold ||
+        Math.abs(gamepad.axes[1] ?? 0) > leftStickThreshold)
     ) {
+      const x = gamepad.axes[0] ?? 0;
+      const y = gamepad.axes[1] ?? 0;
       this.emitInputEvent({
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_left_stick`,
-        value: Math.sqrt(gamepad.axes[0] ** 2 + gamepad.axes[1] ** 2),
+        value: Math.sqrt(x ** 2 + y ** 2),
         timestamp: performance.now(),
       });
     }
 
     // Right stick
     if (
-      Math.abs(gamepad.axes[2]) > rightStickThreshold ||
-      Math.abs(gamepad.axes[3]) > rightStickThreshold
+      gamepad.axes &&
+      (Math.abs(gamepad.axes[2] ?? 0) > rightStickThreshold ||
+        Math.abs(gamepad.axes[3] ?? 0) > rightStickThreshold)
     ) {
+      const x = gamepad.axes[2] ?? 0;
+      const y = gamepad.axes[3] ?? 0;
       this.emitInputEvent({
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_right_stick`,
-        value: Math.sqrt(gamepad.axes[2] ** 2 + gamepad.axes[3] ** 2),
+        value: Math.sqrt(x ** 2 + y ** 2),
         timestamp: performance.now(),
       });
     }
 
     // Triggers
-    if (gamepad.axes[4] > triggerThreshold) {
+    if (gamepad.axes && gamepad.axes[4] !== undefined && gamepad.axes[4] > triggerThreshold) {
       this.emitInputEvent({
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_left_trigger`,
@@ -117,7 +125,7 @@ export class InputManager {
       });
     }
 
-    if (gamepad.axes[5] > triggerThreshold) {
+    if (gamepad.axes && gamepad.axes[5] !== undefined && gamepad.axes[5] > triggerThreshold) {
       this.emitInputEvent({
         type: 'gamepad',
         action: `gamepad_${gamepad.index}_right_trigger`,

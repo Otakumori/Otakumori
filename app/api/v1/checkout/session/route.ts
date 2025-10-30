@@ -189,9 +189,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const session = await stripe.checkout.sessions.create({
+    const shippingOptions =
+      shippingDiscountCents > 0
+        ? [
+            {
+              shipping_rate_data: {
+                type: 'fixed_amount',
+                fixed_amount: { amount: 0, currency: 'usd' },
+                display_name: 'Free shipping',
+              },
+            },
+          ]
+        : undefined;
+
+    const sessionParams: any = {
       payment_method_types: ['card'],
-      line_items: lineItems as any,
+      line_items: lineItems,
       mode: 'payment',
       success_url:
         successUrl ??
@@ -202,23 +215,17 @@ export async function POST(req: NextRequest) {
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'JP'],
       },
-      shipping_options:
-        shippingDiscountCents > 0
-          ? [
-              {
-                shipping_rate_data: {
-                  type: 'fixed_amount',
-                  fixed_amount: { amount: 0, currency: 'usd' },
-                  display_name: 'Free shipping',
-                },
-              },
-            ]
-          : undefined,
       metadata: {
         coupon_codes: appliedCodes.join(','),
         discount_total_cents: String(discountTotalCents),
       },
-    });
+    };
+
+    if (shippingOptions) {
+      sessionParams.shipping_options = shippingOptions;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     await prisma.order.update({
       where: { id: order.id },

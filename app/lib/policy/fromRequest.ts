@@ -1,62 +1,135 @@
-/**
- * NSFW Policy Helper (Server-Only)
- *
- * Single source of truth for NSFW content access policy.
- * Checks age verification cookie, Clerk adult verification, and global override.
- */
+import { resolvePolicy } from '@om/avatar';
 
-import 'server-only';
-import { cookies } from 'next/headers';
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { env } from '@/env';
+type PolicySource = 'client' | 'server';
 
-export interface NSFWPolicy {
+export interface ContentPolicy {
   nsfwAllowed: boolean;
+  adultVerified: boolean;
+  cookieValue: string | null;
+  region: string | null;
+  source: PolicySource;
 }
 
-/**
- * Get NSFW access policy from request context
- *
- * Checks three sources in order:
- * 1. om_age_ok cookie (set by age verification API)
- * 2. Clerk user adultVerified metadata
- * 3. NSFW_GLOBAL environment variable (for testing)
- *
- * @returns Policy object with nsfwAllowed flag
- */
-export async function getPolicyFromRequest(): Promise<NSFWPolicy> {
-  const cookieStore = await cookies();
-  const ageFlag = cookieStore.get('om_age_ok')?.value === '1';
+const NSFW_COOKIE = 'nsfw-preference';
+const LEGACY_COOKIE = 'om_age_ok';
 
-  // Check Clerk adult verification if user is authenticated
-  let adultVerified = false;
+const DEFAULT_POLICY: ContentPolicy = {
+  nsfwAllowed: false,
+  adultVerified: false,
+  cookieValue: null,
+  region: null,
+  source: 'server',
+};
+
+function readCookie(cookieString: string | null | undefined, name: string): string | null {
+  if (!cookieString) return null;
+  const value = cookieString
+    .split(';')
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`));
+  if (!value) return null;
   try {
-    const { userId } = await auth();
-    if (userId) {
-      const user = await currentUser();
-      adultVerified = user?.publicMetadata?.adultVerified === true;
-    }
-  } catch (error) {
-    // If auth check fails, continue with cookie/global checks only
-    console.warn('Failed to check Clerk adult verification:', error);
+    return decodeURIComponent(value.split('=').slice(1).join('='));
+  } catch {
+    return null;
+  }
+}
+
+function computePolicy(
+  source: PolicySource,
+  cookieValue: string | null,
+  adultVerified: boolean,
+  region: string | null,
+): ContentPolicy {
+  const overrideEnabled =
+    typeof process !== 'undefined' && process.env?.NSFW_GLOBAL === 'enabled';
+
+  if (overrideEnabled) {
+    return {
+      nsfwAllowed: true,
+      adultVerified,
+      cookieValue,
+      region,
+      source,
+    };
   }
 
-  // Global override for testing (never use in production with "on")
-  const global = (env.NSFW_GLOBAL ?? 'off').toLowerCase() === 'on';
+  const context: { adultVerified: boolean; cookieValue?: string } = {
+    adultVerified,
+  };
+  if (cookieValue !== null && cookieValue !== undefined) {
+    context.cookieValue = cookieValue;
+  }
 
-  return { nsfwAllowed: ageFlag || adultVerified || global };
+  const result = resolvePolicy(context);
+
+  return {
+    nsfwAllowed: result.nsfwAllowed,
+    adultVerified,
+    cookieValue,
+    region,
+    source,
+  };
 }
 
-/**
- * Synchronous version that only checks cookie (for middleware use)
- *
- * @param req - Request object with cookies
- * @returns Policy object with nsfwAllowed flag
- */
-export function getPolicyFromRequestSync(req: Request): NSFWPolicy {
-  const cookieHeader = req.headers.get('cookie') || '';
-  const ageFlag = cookieHeader.includes('om_age_ok=1');
-  const global = (env.NSFW_GLOBAL ?? 'off').toLowerCase() === 'on';
+export function getPolicyFromRequest(
+  request: Request,
+  options: { adultVerified?: boolean; region?: string | null } = {},
+): ContentPolicy {
+  if (!request) {
+    return { ...DEFAULT_POLICY };
+  }
 
-  return { nsfwAllowed: ageFlag || global };
+  const cookieHeader = request.headers.get('cookie');
+  const cookieValue =
+    readCookie(cookieHeader, NSFW_COOKIE) ?? readCookie(cookieHeader, LEGACY_COOKIE);
+  const region =
+    options.region ??
+    request.headers.get('x-vercel-ip-country') ??
+    request.headers.get('cf-ipcountry') ??
+    null;
+
+  return computePolicy('server', cookieValue, options.adultVerified === true, region);
+}
+
+export function getPolicyFromHeaders(
+  headers: Headers,
+  options: { adultVerified?: boolean; region?: string | null } = {},
+): ContentPolicy {
+  const cookieHeader = headers.get('cookie');
+  const cookieValue =
+    readCookie(cookieHeader, NSFW_COOKIE) ?? readCookie(cookieHeader, LEGACY_COOKIE);
+  const region =
+    options.region ??
+    headers.get('x-vercel-ip-country') ??
+    headers.get('cf-ipcountry') ??
+    null;
+
+  return computePolicy('server', cookieValue, options.adultVerified === true, region);
+}
+
+export function getPolicyFromClient(): ContentPolicy {
+  if (typeof document === 'undefined') {
+    return { ...DEFAULT_POLICY, source: 'client' };
+  }
+
+  const cookieString = document.cookie;
+  const cookieValue =
+    readCookie(cookieString, NSFW_COOKIE) ?? readCookie(cookieString, LEGACY_COOKIE);
+
+  let adultVerified = false;
+  try {
+    adultVerified =
+      window.localStorage?.getItem('adult-verified') === 'true' ||
+      window.localStorage?.getItem('nsfw-adult-verified') === 'true';
+  } catch {
+    adultVerified = false;
+  }
+
+  const locale =
+    typeof navigator !== 'undefined' && navigator.language
+      ? navigator.language.split('-')[1]?.toUpperCase() ?? null
+      : null;
+
+  return computePolicy('client', cookieValue, adultVerified, locale);
 }

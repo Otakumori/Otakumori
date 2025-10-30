@@ -55,44 +55,50 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
         <h2 className="mb-8 text-center text-3xl font-bold">Featured Products</h2>
         {products && products.length > 0 ? (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {products.map((product: Product) => (
-              <motion.div
-                key={product.id}
-                className="overflow-hidden rounded-xl bg-gray-800 transition-shadow hover:shadow-lg"
-                whileHover={{ y: -5 }}
-              >
-                <Link href={`/shop/${product.id}`}>
-                  {product.images && product.images.length > 0 ? (
-                    <Image
-                      src={product.images[0]}
-                      alt={product.title || 'Product image'}
-                      width={400}
-                      height={192}
-                      className="h-48 w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-48 w-full items-center justify-center bg-gray-700 text-gray-400">
-                      No Image
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <h3 className="mb-2 text-xl font-semibold">{product.title}</h3>
-                    {product.variants && product.variants.length > 0 ? (
-                      <p className="font-bold text-pink-500">
-                        ${(product.variants[0].price / 100).toFixed(2)}
-                      </p>
+            {products.map((product: Product) => {
+              const imageSrc = product.images?.[0] ?? null;
+              const firstVariant = product.variants?.[0] ?? null;
+              const productTitle = product.title ?? 'Product';
+
+              return (
+                <motion.div
+                  key={product.id}
+                  className="overflow-hidden rounded-xl bg-gray-800 transition-shadow hover:shadow-lg"
+                  whileHover={{ y: -5 }}
+                >
+                  <Link href={`/shop/${product.id}`}>
+                    {imageSrc ? (
+                      <Image
+                        src={imageSrc}
+                        alt={productTitle}
+                        width={400}
+                        height={192}
+                        className="h-48 w-full object-cover"
+                      />
                     ) : (
-                      <p className="text-gray-400">Price N/A</p>
+                      <div className="flex h-48 w-full items-center justify-center bg-gray-700 text-gray-400">
+                        No Image
+                      </div>
                     )}
+                    <div className="p-4">
+                      <h3 className="mb-2 text-xl font-semibold">{productTitle}</h3>
+                      {firstVariant ? (
+                        <p className="font-bold text-pink-500">
+                          ${(firstVariant.price / 100).toFixed(2)}
+                        </p>
+                      ) : (
+                        <p className="text-gray-400">Price N/A</p>
+                      )}
+                    </div>
+                  </Link>
+                  <div className="p-4 pt-0">
+                    <button className="w-full rounded-lg bg-pink-600 py-2 text-white transition-colors hover:bg-pink-700">
+                      Add to Cart
+                    </button>
                   </div>
-                </Link>
-                <div className="p-4 pt-0">
-                  <button className="w-full rounded-lg bg-pink-600 py-2 text-white transition-colors hover:bg-pink-700">
-                    Add to Cart
-                  </button>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         ) : (
           <p className="text-center">No featured products found.</p>

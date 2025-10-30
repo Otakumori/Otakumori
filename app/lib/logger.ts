@@ -1,9 +1,10 @@
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 export type LogCtx = {
-  requestId?: string;
-  route?: string;
-  userId?: string;
-  extra?: Record<string, unknown>;
+  requestId?: string | undefined;
+  route?: string | undefined;
+  userId?: string | undefined;
+  game?: string | undefined;
+  extra?: Record<string, unknown> | undefined;
 };
 
 export interface LogEntry {
@@ -30,26 +31,31 @@ class Logger {
   private isTest = (env.NODE_ENV ?? '') === 'test';
 
   private formatError(error: Error): LogEntry['error'] {
-    return {
+    const errorData: any = {
       name: error.name,
       message: error.message,
-      stack: this.isDevelopment ? error.stack : undefined,
-      cause: error.cause,
     };
+    if (error.stack && this.isDevelopment) {
+      errorData.stack = error.stack;
+    }
+    if (error.cause) {
+      errorData.cause = error.cause;
+    }
+    return errorData;
   }
 
   private base(level: LogLevel, msg: string, ctx?: LogCtx, data?: unknown, error?: Error) {
-    const entry: LogEntry = {
+    const entry: any = {
       ts: new Date().toISOString(),
       level,
       msg,
-      requestId: ctx?.requestId,
-      route: ctx?.route,
-      userId: ctx?.userId,
-      extra: ctx?.extra,
-      data,
-      ...(error && { error: this.formatError(error) }),
     };
+    if (ctx?.requestId) entry.requestId = ctx.requestId;
+    if (ctx?.route) entry.route = ctx.route;
+    if (ctx?.userId) entry.userId = ctx.userId;
+    if (ctx?.extra) entry.extra = ctx.extra;
+    if (data) entry.data = data;
+    if (error) entry.error = this.formatError(error);
 
     const line = JSON.stringify(entry);
 

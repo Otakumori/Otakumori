@@ -28,10 +28,54 @@ async function getProductData(productId: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const product = await getProductData(params.id);
 
-  if (!product) {
-    return {
-      title: 'Product Not Found | Otaku-mori',
-      description: 'This product could not be found.',
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/v1/products/${productId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch product: ${response.statusText}`);
+        }
+        const json = await response.json();
+        const p = json?.data;
+        if (!p) {
+          setError('Product not found');
+          return;
+        }
+        const shaped: Product = {
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          image_url: p.images?.[0],
+          price: p.price,
+          currency: 'USD',
+          variants: (p.variants ?? []).map((v: any) => ({
+            id: v.id,
+            title: String(v.printifyVariantId ?? 'Variant'),
+            price: (v.priceCents ?? 0) / 100,
+            is_enabled: v.isEnabled,
+            is_default: false,
+            sku: String(v.printifyVariantId ?? v.id),
+          })),
+        };
+        setProduct(shaped);
+        if (shaped.variants && shaped.variants.length > 0) {
+          setSelectedVariant(shaped.variants[0] ?? null);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'An error occurred while fetching the product',
+        );
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
     };
   }
 
