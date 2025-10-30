@@ -285,8 +285,8 @@ class GameCubePerformanceChecker {
     // `
     // Frame rate monitoring
     let frameCount = 0;
-    let lastTime = performance.now(
-    
+    let lastTime = performance.now();
+
     const checkFPS = () => {
       frameCount++;
       const currentTime = performance.now();

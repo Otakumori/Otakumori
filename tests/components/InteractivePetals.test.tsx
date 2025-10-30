@@ -21,7 +21,7 @@ jest.mock('@/app/components/tree/CherryTree', () => ({
 }));
 
 // Mock matchMedia for reduced motion
-Object.defineProperty(window, {"'"}matchMedia', {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,

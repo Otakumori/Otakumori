@@ -143,9 +143,7 @@ class APIHealthChecker {
     if (passedTests.length > 0) {
       // '\n PASSED TESTS:'
       passedTests.forEach((test) => {
-        // 
-          `  • ${test.method} ${test.endpoint} (${test.statusCode} - ${test.responseTime}ms`,
-        );
+        // `  • ${test.method} ${test.endpoint} (${test.statusCode} - ${test.responseTime}ms`
       });
     }
 

@@ -255,9 +255,7 @@ class SEOAuditor {
       // `   H1: ${result.h1.valid ? '' : ''} (${result.h1.count} found`);
       // `   Canonical: ${result.canonical.present ? '' : ''}`
       // `   Open Graph: ${Object.values(result.openGraph.filter(Boolean).length}/4 tags`
-      // 
-        `   JSON-LD: ${result.jsonLd.present ? '' : ''} (${result.jsonLd.types.join(', '})`,
-      );
+      // `   JSON-LD: ${result.jsonLd.present ? '' : ''} (${result.jsonLd.types.join(', ')}`
     });
 
     if (this.warnings.length > 0) {

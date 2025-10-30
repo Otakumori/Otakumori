@@ -138,14 +138,14 @@ async function main() {
     // `  → ${cmd}`
 
     const { stdout, stderr } = await execAsync(cmd, { cwd: process.cwd() });
-    if (stdout) // stdout
-    if (stderr) // stderr
+    // if (stdout) stdout
+    // if (stderr) stderr
 
     // ` SFX generated successfully\n`
   } catch (error: any) {
     console.error(` Failed to generate SFX:`, error.message);
-    if (error.stdout) // error.stdout
-    if (error.stderr) // error.stderr
+    // if (error.stdout) error.stdout
+    // if (error.stderr) error.stderr
     // ''
   }
 

@@ -262,9 +262,7 @@ async function main() {
       };
 
   if (ditherCfg) {
-    // 
-      ` Dithering: ${ditherCfg.mode} (strength: ${ditherCfg.strength}, alpha: ${ditherCfg.alphaThreshold}`,
-    );
+    // ` Dithering: ${ditherCfg.mode} (strength: ${ditherCfg.strength}, alpha: ${ditherCfg.alphaThreshold}`
   }
 
   const endpoint = gen.endpoint || 'http://127.0.0.1:8188';

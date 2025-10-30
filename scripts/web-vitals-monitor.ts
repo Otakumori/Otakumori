@@ -524,8 +524,8 @@ export function trackUserJourney(journeyName: string, action: 'start' | 'complet
     // In GameCube components:
     import { useGameCubePerformance } from '@/lib/web-vitals';
     
-    const { startTracking, stopTracking } = useGameCubePerformance(
-    
+    const { startTracking, stopTracking } = useGameCubePerformance();
+
     useEffect(() => {
       startTracking();
       return () => stopTracking();
@@ -535,7 +535,7 @@ export function trackUserJourney(journeyName: string, action: 'start' | 'complet
     // import { trackUserJourney } from '@/lib/web-vitals';
     // trackUserJourney('checkout', 'start');
     // ... user completes checkout
-    trackUserJourney('checkout', 'complete');
+    // trackUserJourney('checkout', 'complete');
     `);
 
     // '\n='.repeat(60);
