@@ -9,7 +9,7 @@ if (env.NEXT_PUBLIC_POSTHOG_KEY) {
     ui_host: 'https://us.posthog.com',
     defaults: '2025-05-24',
     capture_exceptions: true, // Enables capturing exceptions via PostHog Error Tracking
-    debug: env.NODE_ENV === 'development',
+    debug: process.env.NODE_ENV === 'development',
   });
 }
 
@@ -24,7 +24,7 @@ if (env.NEXT_PUBLIC_SENTRY_DSN) {
     ],
 
     // Performance tracing
-    tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
     // Propagate traces to API + your domains
     tracePropagationTargets: [
@@ -35,10 +35,10 @@ if (env.NEXT_PUBLIC_SENTRY_DSN) {
     ],
 
     // JS profiling (browser)
-    profilesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
     // Optional: Replay sampling (uncomment if using replayIntegration above)
-    // replaysSessionSampleRate: env.NODE_ENV === 'production' ? 0.05 : 1.0,
+    // replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.05 : 1.0,
     // replaysOnErrorSampleRate: 1.0,
 
     // PII (ensure policy covers this)
