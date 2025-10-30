@@ -100,7 +100,7 @@ class EnhancedPrintifyService {
     }
 
     for (const variant of product.variants ?? []) {
-      if (!variant.is_enabled && variant.in_stock) {
+      if (!variant.is_enabled && variant.is_available) {
         issues.push({
           productId: product.id,
           sku: String(variant.id),

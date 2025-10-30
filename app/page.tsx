@@ -80,7 +80,7 @@ export default async function HomePage() {
         )}
 
         {/* MINI-GAMES */}
-        {NEXT_PUBLIC_FEATURE_MINIGAMES === '1' && (
+        {NEXT_PUBLIC_FEATURE_MINIGAMES === 'on' && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
             <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
               <MiniGamesSection />
@@ -89,7 +89,7 @@ export default async function HomePage() {
         )}
 
         {/* Fallback sections when feature flags are off */}
-        {NEXT_PUBLIC_FEATURE_SHOP !== '1' && (
+        {NEXT_PUBLIC_FEATURE_SHOP !== 'on' && (
           <section className="bg-gradient-to-b from-transparent via-black/10 to-black/30 py-24">
             <div className="mx-auto w-full max-w-7xl px-4">
               <ShopTeaser />
@@ -97,7 +97,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        {NEXT_PUBLIC_FEATURE_BLOG !== '1' && (
+        {NEXT_PUBLIC_FEATURE_BLOG !== 'on' && (
           <section className="bg-gradient-to-b from-black/30 via-black/20 to-transparent py-24">
             <div className="mx-auto w-full max-w-7xl px-4">
               <BlogTeaser />
@@ -105,7 +105,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        {NEXT_PUBLIC_FEATURE_MINIGAMES !== '1' && (
+        {NEXT_PUBLIC_FEATURE_MINIGAMES !== 'on' && (
           <section className="bg-gradient-to-b from-transparent via-black/20 to-black/40 py-24">
             <div className="mx-auto w-full max-w-7xl px-4">
               <MiniGameTeaser />

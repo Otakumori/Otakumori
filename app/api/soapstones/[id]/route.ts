@@ -10,12 +10,18 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
   const body = await req.json().catch(() => ({}));
   const { isHidden, isFlagged } = body as Partial<{ isHidden: boolean; isFlagged: boolean }>;
+  const { SoapstoneStatus } = await import('@prisma/client');
+  const updateData: any = {};
+  if (typeof isHidden === 'boolean') {
+    updateData.status = isHidden ? SoapstoneStatus.REPORTED : SoapstoneStatus.VISIBLE;
+  }
+  if (typeof isFlagged === 'boolean') {
+    updateData.status = isFlagged ? SoapstoneStatus.REPORTED : SoapstoneStatus.VISIBLE;
+  }
+  
   const msg = await prisma.soapstoneMessage.update({
     where: { id: params.id },
-    data: {
-      ...(typeof isHidden === 'boolean' ? { status: isHidden ? 'REPORTED' : 'VISIBLE' } : {}),
-      ...(typeof isFlagged === 'boolean' ? { status: isFlagged ? 'REPORTED' : 'VISIBLE' } : {}),
-    },
+    data: updateData,
   });
   return NextResponse.json({ ok: true, msg });
 }

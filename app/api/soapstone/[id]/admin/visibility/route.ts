@@ -12,15 +12,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
 
+  const { SoapstoneStatus } = await import('@prisma/client');
+  const newStatus = parsed.data.status === 'PUBLIC'
+    ? SoapstoneStatus.VISIBLE
+    : parsed.data.status === 'HIDDEN'
+      ? SoapstoneStatus.REPORTED
+      : SoapstoneStatus.REMOVED;
+  
   const message = await db.soapstoneMessage.update({
     where: { id: params.id },
     data: {
-      status:
-        parsed.data.status === 'PUBLIC'
-          ? 'VISIBLE'
-          : parsed.data.status === 'HIDDEN'
-            ? 'REPORTED'
-            : 'REMOVED',
+      status: newStatus,
     },
   });
 

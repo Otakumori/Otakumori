@@ -12,7 +12,7 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   // Simple: set status = HIDDEN; You could also store a separate Flag table if needed
   await prisma.soapstoneMessage.update({
     where: { id: params.id },
-    data: { status: 'REPORTED' },
+    data: { status: 'REPORTED' as const },
   });
   return NextResponse.json({ ok: true });
 }

@@ -499,7 +499,7 @@ export class ProceduralTextureGenerator {
       options.format === 'rgba'
         ? THREE.RGBAFormat
         : options.format === 'rgb'
-          ? THREE.RGBFormat
+          ? THREE.RGBAFormat
           : THREE.RedFormat;
 
     texture.type =

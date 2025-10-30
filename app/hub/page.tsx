@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
 'use client';
 import { useEffect } from 'react';
-import CubeHub from './_scene/CubeHub';
+import CubeHub from '../mini-games/components/CubeHub';
 import AvatarPerch from './_scene/AvatarPerch';
 import FrontSelector from './_scene/FrontSelector';
 import { useHub } from './_scene/store';

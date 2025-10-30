@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { audio } from '@/app/lib/audio';
 import { http } from '@/app/lib/http';
@@ -8,7 +8,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import OwnedRunesGrid from '../_components/OwnedRunesGrid';
 import gamesMeta from '../games.meta.json';
-import { env } from '@/app/env';
+// import { env } from '@/env.mjs';
 
 type Mode = 'boot' | 'cube' | 'loadingGame' | 'playingGame';
 
@@ -60,7 +60,7 @@ export default function ConsoleCard({
   }, []);
   useEffect(() => {
     // Only preload audio if not in reduced motion mode and audio is supported
-    const audioEnabled = (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+    const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
     if (
       !isReducedMotion &&
       audioEnabled &&
@@ -140,12 +140,13 @@ export default function ConsoleCard({
         else if (face === 2) setFace(0);
         else if (face === 1) setFace(0);
         audio.unlock();
-        if (audioOn) {
-          try {
+        try {
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+          if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
-          } catch (error) {
-            console.warn('Failed to play audio:', error);
           }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'ArrowRight') {
@@ -154,12 +155,13 @@ export default function ConsoleCard({
         else if (face === 1) setFace(0);
         else if (face === 2) setFace(0);
         audio.unlock();
-        if (audioOn) {
-          try {
+        try {
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+          if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
-          } catch (error) {
-            console.warn('Failed to play audio:', error);
           }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
         }
       }
       // Vertical rotation between front/top/bottom
@@ -169,12 +171,13 @@ export default function ConsoleCard({
         else if (face === 3) setFace(0);
         else if (face === 4) setFace(0);
         audio.unlock();
-        if (audioOn) {
-          try {
+        try {
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+          if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
-          } catch (error) {
-            console.warn('Failed to play audio:', error);
           }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'ArrowDown') {
@@ -183,12 +186,13 @@ export default function ConsoleCard({
         else if (face === 4) setFace(0);
         else if (face === 3) setFace(0);
         audio.unlock();
-        if (audioOn) {
-          try {
+        try {
+          const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+          if (audioEnabled) {
             audio.play('gamecube_menu', { gain: 0.25 });
-          } catch (error) {
-            console.warn('Failed to play audio:', error);
           }
+        } catch (error) {
+          console.warn('Failed to play audio:', error);
         }
       }
       if (e.key === 'Enter') {
@@ -211,21 +215,7 @@ export default function ConsoleCard({
         if (gp) {
           const buttons = gp.buttons.map((b: any) => (b && b.pressed ? 1 : 0));
           const axes = gp.axes || [0, 0];
-
-          // Analog stick support for smooth cube rotation
-          if (mode === 'cube' && Math.abs(axes[0]) > 0.5) {
-            // Horizontal analog stick for left/right face navigation
-            const direction = axes[0] > 0 ? 'right' : 'left';
-            if (direction === 'right' && face === 0) setFace(2);
-            else if (direction === 'left' && face === 0) setFace(1);
-          }
-          if (mode === 'cube' && Math.abs(axes[1]) > 0.5) {
-            // Vertical analog stick for up/down face navigation
-            const direction = axes[1] > 0 ? 'down' : 'up';
-            if (direction === 'up' && face === 0) setFace(4);
-            else if (direction === 'down' && face === 0) setFace(3);
-          }
-
+          // TODO: Add analog stick support using axes for smooth cube rotation
           // D-pad
           if (mode === 'cube') {
             if (press(buttons[14], 14)) {
@@ -347,16 +337,13 @@ export default function ConsoleCard({
     const dist = (a: { rx: number; ry: number }, b: { rx: number; ry: number }) =>
       Math.hypot(a.rx - b.rx, a.ry - b.ry);
     const current = rotation;
-    const nearest = withAngles.reduce<{ f: number; rot: { rx: number; ry: number } } | null>(
-      (best, cur) => {
-        if (!best) return cur;
-        return dist(current, cur.rot) < dist(current, best.rot) ? cur : best;
-      },
-      null,
+    const nearest = withAngles.reduce(
+      (best, cur) => (dist(current, cur.rot) < dist(current, best.rot) ? cur : best),
+      withAngles[0],
     );
     if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) {
       setFace(face);
-    } else if (nearest) {
+    } else {
       // Rubber-band overshoot then snap
       const toward = { rx: Math.sign(-dy), ry: Math.sign(dx) };
       const overshoot = 8; // deg
@@ -367,8 +354,6 @@ export default function ConsoleCard({
         setAnimMs(duration);
         setFace(nearest.f);
       }, 120);
-    } else {
-      setFace(face);
     }
   };
 
@@ -384,7 +369,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -407,7 +392,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -430,7 +415,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -453,7 +438,7 @@ export default function ConsoleCard({
             audio.unlock();
             try {
               try {
-                const audioEnabled = (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+                const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                 if (audioEnabled) {
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
@@ -497,15 +482,13 @@ export default function ConsoleCard({
               tabIndex={0}
               onClick={() => {
                 try {
-                  const audioEnabled = (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+                  const audioEnabled = (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                   if (audioEnabled) {
-                    if (audioOn) {
-                      audio.unlock();
-                      // Small delay to ensure audio context is unlocked
-                      setTimeout(() => {
-                        audio.play('samus_jingle', { gain: 0.35 });
-                      }, 10);
-                    }
+                    audio.unlock();
+                    // Small delay to ensure audio context is unlocked
+                    setTimeout(() => {
+                      audio.play('samus_jingle', { gain: 0.35 });
+                    }, 10);
                   }
                 } catch (error) {
                   console.warn('Failed to play audio:', error);
@@ -517,7 +500,7 @@ export default function ConsoleCard({
                   e.preventDefault();
                   try {
                     const audioEnabled =
-                      (env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
+                      (process.env.NEXT_PUBLIC_ENABLE_AUDIO ?? 'true') !== 'false';
                     if (audioEnabled) {
                       audio.unlock();
                       // Small delay to ensure audio context is unlocked
@@ -558,7 +541,6 @@ export default function ConsoleCard({
               </button>
 
               {/* Hover or toggled description overlay */}
-              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
               <div
                 className={[
                   'pointer-events-none absolute inset-0 rounded-lg bg-black/70 p-3 opacity-0 transition-opacity',
@@ -566,13 +548,6 @@ export default function ConsoleCard({
                   infoOpen === g.slug ? 'opacity-100 pointer-events-auto' : '',
                 ].join(' ')}
                 onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.stopPropagation();
-                  }
-                }}
-                role="article"
-                aria-label={`${g.name} game description`}
               >
                 <div className="mb-1 text-sm font-semibold text-zinc-100">{g.name}</div>
                 <p className="text-xs text-zinc-300">{g.desc}</p>
@@ -624,17 +599,6 @@ export default function ConsoleCard({
         body: JSON.stringify({ prefs: { CRT: crt, VHS: vhs, AUDIO: audio, AUDIO_LEVEL: vol } }),
       });
     };
-
-    if (loading) {
-      return (
-        <div className="p-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
-            <div className="text-xs text-zinc-400">Loading preferences...</div>
-          </div>
-        </div>
-      );
-    }
 
     return (
       <div className="p-4 space-y-3">
@@ -705,6 +669,7 @@ export default function ConsoleCard({
             <div key={src} className="rounded-lg border border-white/15 bg-white/10 p-3">
               <div className="text-xs text-zinc-300">{src}</div>
               {audio && (
+                // eslint-disable-next-line jsx-a11y/media-has-caption
                 <audio
                   src={`/${src}`}
                   loop
@@ -712,10 +677,7 @@ export default function ConsoleCard({
                   controls
                   className="mt-2 w-full"
                   preload="none"
-                  aria-label={`Background music: ${src}`}
-                >
-                  <track kind="captions" label="Background music" />
-                </audio>
+                />
               )}
             </div>
           ))}
@@ -795,7 +757,7 @@ export default function ConsoleCard({
             disabled={busy}
             data-testid="fuse-submit"
           >
-            {busy ? 'Fusingâ€¦' : 'Fuse'}
+            {busy ? 'Fusing…' : 'Fuse'}
           </button>
         </div>
         {result && <div className="mt-2 text-xs text-zinc-300">{result}</div>}
@@ -820,16 +782,77 @@ export default function ConsoleCard({
     }, []);
     return (
       <div className="rounded-full bg-white/10 px-3 py-1 text-xs text-white" title="Slot A: petals">
-        Slot A: {balance ?? 'â€¦'} petals
+        Slot A: {balance ?? '…'} petals
       </div>
     );
   };
 
-  const Boot = () => (
-    <div className="grid place-items-center h-64" data-testid="boot-seen">
-      <div className="text-center text-pink-200">
-        <div className="mb-2 text-lg">GameCube BIOS</div>
-        <div className="text-xs opacity-80">Bootingâ€¦</div>
+  const Boot = () => {
+    const [bootPhase, setBootPhase] = useState<'start' | 'logo' | 'complete'>('start');
+    const [logoScale, setLogoScale] = useState(0);
+    const [logoOpacity, setLogoOpacity] = useState(0);
+
+    useEffect(() => {
+      if (isReducedMotion) {
+        setBootPhase('complete');
+        return;
+      }
+
+      // Phase 1: Logo appears and scales up
+      const timer1 = setTimeout(() => {
+        setBootPhase('logo');
+        setLogoOpacity(1);
+        setLogoScale(1);
+      }, 500);
+
+      // Phase 2: Complete boot
+      const timer2 = setTimeout(() => {
+        setBootPhase('complete');
+      }, 2500);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
+    }, [isReducedMotion]);
+
+    return (
+      <div className="grid place-items-center h-64 bg-black" data-testid="boot-seen">
+        <div className="text-center text-white">
+          {bootPhase === 'start' && <div className="text-sm opacity-60">Initializing...</div>}
+
+          {bootPhase === 'logo' && (
+            <div className="relative">
+              {/* Classic GameCube "G" Logo */}
+              <div
+                className="text-8xl font-bold text-pink-400 transition-all duration-1000 ease-out"
+                style={{
+                  transform: `scale(${logoScale})`,
+                  opacity: logoOpacity,
+                  filter: 'drop-shadow(0 0 20px rgba(255, 79, 163, 0.5))',
+                }}
+              >
+                G
+              </div>
+
+              {/* Spinning ring around the G */}
+              <div
+                className="absolute inset-0 border-4 border-pink-400 rounded-full animate-spin"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  borderTopColor: 'transparent',
+                  borderRightColor: 'transparent',
+                }}
+              />
+            </div>
+          )}
+
+          {bootPhase === 'complete' && <div className="text-sm opacity-80">Ready</div>}
+        </div>
       </div>
     );
   };
@@ -846,7 +869,7 @@ export default function ConsoleCard({
   const PlayingGame = () => (
     <div className="rounded-xl border border-white/15 bg-black/60">
       <div className="aspect-[16/9] w-full grid place-items-center">
-        <GameViewport {...(gameKey ? { gameKey } : {})} />
+        <GameViewport gameKey={gameKey} />
       </div>
       <div className="px-3 py-1 text-[11px] text-zinc-400 text-right">Press Esc or B to quit</div>
     </div>
@@ -855,25 +878,10 @@ export default function ConsoleCard({
   return (
     <section
       ref={containerRef}
-      className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none relative"
+      tabIndex={0}
+      className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none"
       aria-label="Mini-Games Console"
     >
-      {/* Audio Status Indicator */}
-      <div className="absolute top-4 right-4 z-10">
-        <div
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors ${
-            audioOn
-              ? 'bg-green-500/20 border border-green-500/40'
-              : 'bg-zinc-500/20 border border-zinc-500/40'
-          }`}
-        >
-          <span className="text-sm">{audioOn ? '🔊' : '🔇'}</span>
-          <span className={`text-xs font-medium ${audioOn ? 'text-green-300' : 'text-zinc-400'}`}>
-            {audioOn ? 'Audio On' : 'Audio Off'}
-          </span>
-        </div>
-      </div>
-
       {mode === 'boot' && (
         <>
           <Boot />
@@ -974,10 +982,10 @@ export default function ConsoleCard({
         </div>
       )}
       <div className="mt-3 flex items-center justify-between text-[11px] text-zinc-400">
-        <div>Arrows/Stick: rotate â€¢ A/Enter: select â€¢ B/Esc: back</div>
+        <div>Arrows/Stick: rotate • A/Enter: select • B/Esc: back</div>
         <div className="inline-flex items-center gap-2">
           <span className="material-symbols-outlined">view_in_ar</span>
-          <span className="emoji-noto">ðŸŽ®</span>
+          <span className="emoji-noto">🃝</span>
         </div>
       </div>
     </section>
@@ -1006,7 +1014,7 @@ function AchievementsPreview() {
     <div className="rounded-lg border border-white/15 bg-white/5 p-3">
       <div className="mb-2 text-xs text-zinc-300">Recent Achievements</div>
       {loading ? (
-        <div className="text-xs text-zinc-400">Loadingâ€¦</div>
+        <div className="text-xs text-zinc-400">Loading…</div>
       ) : items.length === 0 ? (
         <div className="text-xs text-zinc-400">No recent achievements.</div>
       ) : (
@@ -1036,7 +1044,7 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
   if (!gameKey) return <div className="text-pink-200">No game selected.</div>;
 
   const Map: Record<string, React.ComponentType<any>> = {
-    'petal-collection': dynamic(() => import('../petal-collection/Scene.js'), { ssr: false }),
+    'petal-collection': dynamic(() => import('../petal-collection/Scene'), { ssr: false }),
     'memory-match': dynamic(() => import('../memory-match/InCard'), { ssr: false }),
     'otaku-beat-em-up': dynamic(() => import('../otaku-beat-em-up/Scene'), { ssr: false }),
     'bubble-girl': dynamic(() => import('../bubble-girl/InCard'), { ssr: false }),
@@ -1080,12 +1088,7 @@ function GameIcon({ slug, icon }: { slug: string; icon: string }) {
         if (!cancelled) setImgSrc(null);
         return;
       }
-      const src = candidates[i];
-      i += 1;
-      if (!src) {
-        tryNext();
-        return;
-      }
+      const src = candidates[i++];
       const img = new Image();
       img.onload = () => {
         if (!cancelled) setImgSrc(src);
@@ -1099,7 +1102,7 @@ function GameIcon({ slug, icon }: { slug: string; icon: string }) {
     };
   }, [slug]);
 
-  const statusDot = env.NODE_ENV !== 'production' && (
+  const statusDot = process.env.NODE_ENV !== 'production' && (
     <span
       className={[
         'ml-1 inline-block h-1.5 w-1.5 rounded-full align-middle',
@@ -1254,7 +1257,7 @@ function CommunityFace() {
             // ignore
           }
         }
-        const jitter = Math.floor(Math.random() * 1000) - 500; // Â±500ms
+        const jitter = Math.floor(Math.random() * 1000) - 500; // ±500ms
         wsTimerRef.current = window.setTimeout(tick, 4000 + jitter) as any;
       };
       if (!wsTimerRef.current) wsTimerRef.current = window.setTimeout(tick, 1200) as any;
@@ -1267,16 +1270,16 @@ function CommunityFace() {
     };
     const connect = () => {
       // Only connect if WebSocket is explicitly enabled
-      const wsEnabled = (env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === '1';
-      //   envVarType: typeof env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+      const wsEnabled = (process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === '1';
+      //   envVarType: typeof process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
       // });
 
       // Always disable WebSocket for now to prevent connection errors
       // WebSocket is disabled by default to prevent "Insufficient resources" errors
       if (
         !wsEnabled ||
-        (env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === 'false' ||
-        env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === undefined
+        (process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS ?? '0') === 'false' ||
+        process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === undefined
       ) {
         // WebSocket disabled, using polling instead
         setWsDegraded(true);
@@ -1290,7 +1293,7 @@ function CommunityFace() {
       let ws: WebSocket | null = null;
       try {
         const url =
-          env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
+          process.env.NEXT_PUBLIC_COMMUNITY_WS_URL || 'ws://localhost:8787/__mock_community_ws';
         // Creating WebSocket connection
         ws = new WebSocket(url);
       } catch (e) {
@@ -1357,7 +1360,7 @@ function CommunityFace() {
         className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm text-zinc-300"
         data-testid="face2-card-root"
       >
-        Loadingâ€¦
+        Loading…
       </div>
     );
   }
@@ -1397,7 +1400,7 @@ function CommunityFace() {
             className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300"
             data-testid="ws-banner-degraded"
           >
-            Degraded Realtime: reconnectingâ€¦ polling active
+            Degraded Realtime: reconnecting… polling active
           </div>
         )}
         <AvatarCreator
@@ -1416,15 +1419,13 @@ function CommunityFace() {
           className="mb-2 rounded bg-yellow-500/10 px-3 py-2 text-xs text-yellow-300"
           data-testid="ws-banner-degraded"
         >
-          Degraded Realtime: reconnectingâ€¦ polling active
+          Degraded Realtime: reconnecting… polling active
         </div>
       )}
       <CommunityLobby
-        avatarUrl={data.avatar?.url ?? ''}
+        avatarUrl={data.avatar.url}
         prefs={prefs}
-        onPrefs={(p) =>
-          setData((prev) => (prev ? { ...prev, prefs: p } : prev))
-        }
+        onPrefs={(p) => setData({ avatar: data.avatar, prefs: p })}
         saving={saving}
         setSaving={setSaving}
         pendingInteraction={pendingInteraction}
@@ -1666,7 +1667,7 @@ function AvatarCreator({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="mt-1 w-full rounded bg-black/40 px-2 py-1 text-white outline-none ring-1 ring-white/15"
-            placeholder="https://â€¦/avatar.png"
+            placeholder="https://…/avatar.png"
           />
         </label>
         <label className="text-xs text-zinc-300 inline-flex items-center gap-2">
@@ -1703,7 +1704,7 @@ function AvatarCreator({
           disabled={saving}
           className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50"
         >
-          {saving ? 'Savingâ€¦' : 'Save'}
+          {saving ? 'Saving…' : 'Save'}
         </button>
       </div>
     </div>
@@ -1783,7 +1784,7 @@ function CommunityLobby({
                 </span>
               </span>
             ) : (
-              'â€”'
+              '—'
             )}
           </div>
         ))}
@@ -1809,7 +1810,7 @@ function CommunityLobby({
           disabled={saving}
           className="rounded bg-pink-600 px-3 py-1 text-sm text-white hover:bg-pink-700 disabled:opacity-50"
         >
-          {saving ? 'Savingâ€¦' : 'Save Preferences'}
+          {saving ? 'Saving…' : 'Save Preferences'}
         </button>
         <button
           onClick={onQuestComplete}

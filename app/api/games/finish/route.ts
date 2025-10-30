@@ -83,8 +83,6 @@ export async function POST(request: Request) {
             userId: playerId,
             game: body.game,
             diff: diff ?? null,
-            score,
-            statsJson: body.stats ?? {},
           },
         },
       });

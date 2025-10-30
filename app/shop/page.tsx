@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { env } from '@/env';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
 import { ShopGridSkeleton } from '../components/ui/Skeleton';
 
@@ -32,9 +34,10 @@ async function loadPrintifyProducts(): Promise<ApiResponse> {
     // Use the request URL to construct the base URL dynamically
     const baseUrl =
       env.NODE_ENV === 'production' ? 'https://www.otaku-mori.com' : 'http://localhost:3000';
+    const headersList = await headers();
     const response = await fetch(`${baseUrl}/api/printify/products`, {
       headers: {
-        'x-req-id': headers().get('x-req-id') ?? '',
+        'x-req-id': headersList.get('x-req-id') ?? '',
       },
       cache: 'no-store',
     });

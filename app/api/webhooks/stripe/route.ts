@@ -8,7 +8,8 @@ export const runtime = 'nodejs'; // needed for crypto, raw body
 export const dynamic = 'force-dynamic';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-10-29.clover',
+  typescript: true,
 });
 
 async function saveEventOnce(id: string, type: string, payload: any) {
@@ -58,16 +59,16 @@ async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.
     shipping_method: 1, // Standard shipping
     send_shipping_notification: true,
     address_to: {
-      first_name: session.shipping_details?.name?.split(' ')[0] ?? 'Customer',
-      last_name: session.shipping_details?.name?.split(' ').slice(1).join(' ') ?? '',
+      first_name: (session as any).shipping_details?.name?.split(' ')[0] ?? 'Customer',
+      last_name: (session as any).shipping_details?.name?.split(' ').slice(1).join(' ') ?? '',
       email: session.customer_details?.email ?? '',
       phone: session.customer_details?.phone ?? '',
-      country: session.shipping_details?.address?.country ?? 'US',
-      region: session.shipping_details?.address?.state ?? '',
-      city: session.shipping_details?.address?.city ?? '',
-      address1: session.shipping_details?.address?.line1 ?? '',
-      address2: session.shipping_details?.address?.line2 ?? '',
-      zip: session.shipping_details?.address?.postal_code ?? '',
+      country: (session as any).shipping_details?.address?.country ?? 'US',
+      region: (session as any).shipping_details?.address?.state ?? '',
+      city: (session as any).shipping_details?.address?.city ?? '',
+      address1: (session as any).shipping_details?.address?.line1 ?? '',
+      address2: (session as any).shipping_details?.address?.line2 ?? '',
+      zip: (session as any).shipping_details?.address?.postal_code ?? '',
     },
   };
 
@@ -92,7 +93,8 @@ async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.
 }
 
 export async function POST(req: Request) {
-  const sig = headers().get('stripe-signature');
+  const headersList = await headers();
+  const sig = headersList.get('stripe-signature');
   if (!sig) return new NextResponse('Missing Stripe-Signature', { status: 400 });
 
   const secret = env.STRIPE_WEBHOOK_SECRET;

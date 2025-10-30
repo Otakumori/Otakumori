@@ -69,7 +69,12 @@ export async function POST(request: Request) {
     await db.idempotencyKey.create({
       data: {
         key: payload.idempotencyKey,
+        method: 'POST',
+        path: '/api/v1/petals/purchase',
+        userId: user.id,
+        response: '',  // Will be updated after transaction
         purpose: 'petal_purchase',
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 

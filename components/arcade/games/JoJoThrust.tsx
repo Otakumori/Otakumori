@@ -168,6 +168,15 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
   const [showCharacter, setShowCharacter] = useState(false);
   const [actionIntensity, setActionIntensity] = useState(0);
 
+  // JoJo-style poses
+  const poses = [
+    { emoji: '👊', label: 'ORA!' },
+    { emoji: '🔥', label: 'MUDA!' },
+    { emoji: '⭐', label: 'STAR PLATINUM!' },
+    { emoji: '⏰', label: 'THE WORLD!' },
+    { emoji: '✨', label: 'MENACING' },
+  ];
+
   const fallbackPose = poses[0] ?? { emoji: '✨', label: 'Sparkle' };
   const activePose = poses[currentPose] ?? fallbackPose;
 

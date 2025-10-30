@@ -133,3 +133,6 @@ export function getPolicyFromClient(): ContentPolicy {
 
   return computePolicy('client', cookieValue, adultVerified, locale);
 }
+
+// Alias for backwards compatibility
+export const getPolicyFromRequestSync = getPolicyFromRequest;

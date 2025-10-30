@@ -134,9 +134,8 @@ export default function PetalEmitterTree({
       for (let i = 0; i < 40; i++) {
         const x = Math.random() * W;
         const y = Math.random() * (H * 0.9);
-        const data = octx.getImageData(x, y, 1, 1).data;
-        const a = data[3];
-        if (a !== undefined && a > 10) return { x, y };
+        const a = octx.getImageData(x, y, 1, 1).data[3];
+        if (a > 10) return { x, y };
       }
       return { x: W * (0.3 + Math.random() * 0.4), y: H * 0.35 };
     }
@@ -188,7 +187,6 @@ export default function PetalEmitterTree({
     function hitPetal(x: number, y: number): number | null {
       for (let i = petals.length - 1; i >= 0; i--) {
         const p = petals[i];
-        if (!p) continue;
         const w = 18 * p.s,
           h = 12 * p.s;
         if (x > p.x - w / 2 && x < p.x + w / 2 && y > p.y - h / 2 && y < p.y + h / 2) {
@@ -208,22 +206,11 @@ export default function PetalEmitterTree({
       if (idx !== null) collect(idx);
     };
 
-    const onPointerMove = (e: PointerEvent) => {
-      if (!pointerDown) return; // Only collect during drag if pointer is down
-
-      const rect = c.getBoundingClientRect();
-      px = e.clientX - rect.left;
-      py = e.clientY - rect.top;
-      const idx = hitPetal(px, py);
-      if (idx !== null) collect(idx);
-    };
-
     const onPointerUp = () => {
       pointerDown = false;
     };
 
     c.addEventListener('pointerdown', onPointerDown);
-    c.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
 
     async function collect(idx: number) {
@@ -264,26 +251,10 @@ export default function PetalEmitterTree({
 
       const gust = windBase + noise(tNoise) * 0.6;
 
-      // physics & draw petals
-      for (let i = 0; i < petals.length; i++) {
-        const p = petals[i];
-        if (!p) continue;
-        if (!p.settled) {
-          p.life += dt;
-          p.x += (p.vx + gust) * dt * 0.04 + Math.sin((p.y + p.life) * 0.01) * 0.22;
-          p.y += p.vy * dt * 0.05;
-          // settle when reaching ground band
-          if (p.y >= groundY - 6) {
-            p.y = groundY - 6 + Math.random() * 2;
-            p.vx *= 0.2;
-            p.vy = 0;
-            p.vr *= 0.2;
-            p.settled = true;
-          }
-        } else {
-          // gentle slide along ground to create a pile that looks fluid
-          p.x += gust * 0.02 + Math.sin((p.id + tNoise) * 1.7) * 0.1;
-        }
+      // Use optimized particle system if available
+      if (particleSystem) {
+        particleSystem.update(dt);
+        const visibleParticles = particleSystem.getVisibleParticles();
 
         // Update viewport
         particleSystem.setViewport(0, 0, W, H);
@@ -345,7 +316,6 @@ export default function PetalEmitterTree({
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
-      c.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
 
       // Clean up ResizeObserver

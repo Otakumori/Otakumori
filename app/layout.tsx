@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { headers } from 'next/headers';
-import Header from './components/Header';
+import Header from './components/layout/Header';
 import Footer from './components/Footer';
 import Navbar from './components/layout/Navbar';
 import Providers from './Providers';
@@ -19,7 +19,7 @@ import { isCursorGlowEnabled } from './flags';
 
 export function generateMetadata(): Metadata {
   return {
-    title: 'Welcome Home, Traveler � Otaku-mori',
+    title: 'Welcome Home, Traveler - Otaku-mori',
     description: 'Anime and gaming hub for petals, runes, and rewards.',
     other: {
       ...Sentry.getTraceData(),
@@ -31,8 +31,9 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  const nonce = headers().get('x-nonce') ?? undefined;
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') ?? undefined;
 
   return (
     <ClerkProviderWrapper nonce={nonce || undefined}>
@@ -76,7 +77,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <Footer />
               </div>
             </Providers>
-          </ClientErrorBoundary>
+          </Sentry.ErrorBoundary>
         </body>
       </html>
     </ClerkProviderWrapper>

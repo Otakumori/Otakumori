@@ -16,7 +16,7 @@ export default async function SettingsPage() {
       <h1 className="mb-6 text-2xl font-semibold">Settings</h1>
       {(() => {
         const initial = (profile?.gamertag ?? me?.publicMetadata?.gamertag) as string | undefined;
-        return initial && <OneTapGamertag initial={initial} />;
+        return initial && <OneTapGamertagWrapper initial={initial} />;
       })()}
     </div>
   );

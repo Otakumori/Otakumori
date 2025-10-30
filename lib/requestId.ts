@@ -7,3 +7,6 @@ export function generateRequestId(): string {
   const randomPart = Math.random().toString(36).substring(2, 9);
   return `otm_${timestamp}_${randomPart}`;
 }
+
+// Alias for backwards compatibility
+export const newRequestId = generateRequestId;

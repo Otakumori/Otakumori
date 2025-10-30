@@ -5,5 +5,63 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "markdown.validate.enabled": true
+  "markdown.validate.enabled": true,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.turbo/**": true,
+    "**/packages/**/dist/**": true
+  },
+  "search.exclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.turbo/**": true,
+    "**/packages/**/dist/**": true
+  },
+  "typescript.tsserver.maxTsServerMemory": 3072,
+  "typescript.disableAutomaticTypeAcquisition": true,
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEvents"
+  },
+  "typescript.tsserver.useSeparateSyntaxServer": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "workbench.editor.enablePreview": true,
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.perEditorGroup": 8,
+  "tailwindCSS.includeLanguages": {
+    "typescriptreact": "html"
+  },
+  "prisma.lsp.trace.server": "off",
+  "eslint.lintOnType": false,
+  "eslint.run": "onSave",
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    },
+    {
+      "directory": "app",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "components",
+      "changeProcessCWD": true
+    },
+    {
+      "directory": "lib",
+      "changeProcessCWD": true
+    }
+  ],
+  "files.exclude": {
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.turbo/**": true,
+    "**/packages/**/dist/**": true
+  },
+  "search.followSymlinks": false
 }

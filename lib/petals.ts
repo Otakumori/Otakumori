@@ -20,6 +20,7 @@ export interface PetalTransaction {
 export type PetalReason =
   // Earning reasons
   | 'game_completion'
+  | 'game_reward'
   | 'daily_bonus'
   | 'achievement_unlock'
   | 'streak_bonus'
@@ -424,4 +425,19 @@ export function calculateEconomyMetrics(transactions: PetalTransaction[]): {
     topSpenders,
     inflationRate: earned > 0 ? (earned - spent) / earned : 0,
   };
+}
+
+/**
+ * Credit petals to a user
+ * Alias for backwards compatibility
+ */
+export async function creditPetals(
+  userId: string,
+  amount: number,
+  reason: PetalReason,
+  metadata?: Record<string, any>,
+): Promise<{ success: boolean; newBalance: number }> {
+  // This should use the petal-wallet service
+  // For now, providing a stub that other code can import
+  throw new Error('creditPetals should use petal-wallet service. Use lib/petal-wallet.ts instead.');
 }

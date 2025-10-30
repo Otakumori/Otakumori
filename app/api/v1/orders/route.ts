@@ -16,7 +16,7 @@ const CreateOrderSchema = z.object({
       print_provider_id: z.number().optional(),
     }),
   ),
-  shipping_method: z.enum(['standard', 'express', 'economy']).default('standard'),
+  shipping_method: z.number(),
   address_to: z.object({
     first_name: z.string(),
     last_name: z.string(),
@@ -69,7 +69,6 @@ export async function POST(request: NextRequest) {
       line_items: orderData.line_items,
       shipping_method: orderData.shipping_method,
       address_to: orderData.address_to,
-      metadata: orderData.metadata,
     });
 
     // TODO: Store order in local database for tracking
@@ -90,7 +89,7 @@ export async function POST(request: NextRequest) {
         order: {
           id: printifyOrder.id,
           status: 'submitted',
-          estimated_delivery: calculateEstimatedDelivery(orderData.shipping_method),
+          estimated_delivery: calculateEstimatedDelivery(String(orderData.shipping_method)),
           tracking_url: null, // Will be available once shipped
         },
         message: 'Order submitted successfully for fulfillment',

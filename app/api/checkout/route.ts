@@ -6,7 +6,8 @@ import { env } from '@/env';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-08-27.basil',
+  apiVersion: '2025-10-29.clover',
+  typescript: true,
 });
 
 export async function POST(request: NextRequest) {

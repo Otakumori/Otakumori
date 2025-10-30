@@ -78,8 +78,8 @@ export async function POST(req: NextRequest) {
 
   if (petalsGranted > 0) {
     try {
-      const result = await creditPetals(userId, petalsGranted, 'mini-game-reward');
-      balance = result.balance;
+      const result = await creditPetals(userId, petalsGranted, 'game_reward');
+      balance = result.newBalance;
     } catch (error) {
       logger.error(
         'petals_award_error',

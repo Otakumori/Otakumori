@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { SoapstoneStatus } from '@prisma/client';
 import {
   SoapstoneCreateSchema,
   createApiSuccess,
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     const messages = await db.soapstoneMessage.findMany({
       where: {
-        status: 'VISIBLE',
+        status: SoapstoneStatus.VISIBLE,
       },
       orderBy: {
         createdAt: 'desc',
@@ -129,7 +130,7 @@ export async function POST(req: NextRequest) {
         data: {
           text: messageBody,
           authorId: userId,
-          status: 'VISIBLE',
+          status: SoapstoneStatus.VISIBLE,
         },
         include: {
           user: {
