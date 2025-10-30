@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * React Three Fiber Avatar Renderer Component
  * Policy-agnostic renderer that receives pre-resolved equipment URLs

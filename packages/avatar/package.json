@@ -3,18 +3,18 @@
   "version": "0.0.0",
   "type": "module",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "types": "./src/index.ts",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsup src/index.ts src/renderer/AvatarRenderer.tsx --dts --format esm,cjs --clean --external react --external react-dom --external three --external @react-three/fiber --external @react-three/drei --external three-stdlib",
+    "build": "tsup src/index.ts src/renderer/AvatarRenderer.tsx --format esm,cjs --clean --external react --external react-dom --external three --external @react-three/fiber --external @react-three/drei --external three-stdlib",
     "type-check": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run"

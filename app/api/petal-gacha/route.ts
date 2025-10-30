@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { requireUserId } from '@/lib/auth';
-import { db } from '@/lib/db';
 
 const COST = 50; // petals per pull
 const TABLE: ReadonlyArray<{ key: string; weight: number }> = [
@@ -29,6 +28,7 @@ function pick(table: ReadonlyArray<{ key: string; weight: number }> = TABLE): st
 
 export async function POST() {
   const userId = await requireUserId();
+  const { db } = await import('@/lib/db');
 
   const u = await db.userPetals.findUnique({ where: { userId } });
   const total = u?.total ?? 0;

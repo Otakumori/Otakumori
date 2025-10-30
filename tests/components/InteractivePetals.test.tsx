@@ -113,7 +113,7 @@ describe('InteractivePetals', () => {
 
     // Verify telemetry was called
     expect(telemetry.trackPetalCollect).toHaveBeenCalledWith(
-      {"'"}hero',
+      'hero',
       expect.objectContaining({
         x: expect.any(Number),
         y: expect.any(Number),
@@ -172,7 +172,7 @@ describe('InteractivePetals', () => {
     });
 
     // Press Enter key
-    fireEvent.keyDown(petal, { key: {"'"}Enter' });
+    fireEvent.keyDown(petal, { key: 'Enter' });
 
     // Wait for the petal to be collected
     await waitFor(() => {
@@ -197,7 +197,7 @@ describe('InteractivePetals', () => {
     const petal = screen.getAllByRole('button', { hidden: true })[0];
 
     // Press Escape key
-    fireEvent.keyDown(petal, { key: {"'"}Escape' });
+    fireEvent.keyDown(petal, { key: 'Escape' });
 
     // Petal should not be collected
     expect(petal).not.toHaveStyle('opacity: 0');
