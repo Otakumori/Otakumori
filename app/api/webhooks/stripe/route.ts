@@ -73,7 +73,7 @@ async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.
   };
 
   // Log the simulated Printify order creation
-  console.log('Simulated Printify order creation:', {
+  console.warn('Simulated Printify order creation:', {
     orderId: order.id,
     printifyData: printifyOrderData,
     timestamp: new Date().toISOString(),

@@ -2,7 +2,7 @@
  * Asset loader - Runtime loading using registry
  */
 
-import type { AssetMeta, AssetRegistry, AssetSlot } from '@om/game-kit';
+import type { AssetMeta, AssetSlot } from '@om/game-kit';
 import {
   loadRegistry as loadRegistryFromPackage,
   getAsset,

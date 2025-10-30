@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
 import { auth, currentUser } from '@clerk/nextjs/server';
+import { env } from '@/env';
 
 export const runtime = 'nodejs';
 
 function getListOptions() {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const token = env.BLOB_READ_WRITE_TOKEN;
   if (token) {
     return { prefix: 'media/', token } as const;
   }

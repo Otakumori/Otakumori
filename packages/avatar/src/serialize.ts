@@ -1,4 +1,4 @@
-import { AvatarSpecV15, type AvatarSpecV15Type } from './spec.js';
+import { AvatarSpecV15, type AvatarSpecV15Type } from './spec';
 
 /**
  * Serializes an avatar spec to a compact JSON string

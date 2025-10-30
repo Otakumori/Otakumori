@@ -12,7 +12,6 @@ import { useGameLoop } from '@om/ecs/react';
 import {
   createInputSystem,
   pollInput,
-  createCharacterController,
   updateCharacter,
   applyVelocity,
   createSide2DAdapter,
@@ -20,7 +19,6 @@ import {
   createOrthoCamera,
   constrainPosition,
   spawnPlayer,
-  type Vec3,
 } from '@om/game-kit';
 import { getPolicyFromClient } from '@/lib/policy/fromRequest';
 import { resolveEquipmentForGame } from '@/lib/avatar/resolve-equipment';

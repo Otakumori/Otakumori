@@ -13,6 +13,7 @@ const server = z.object({
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
   BLOB_READ_WRITE_URL: z.string().optional(),
+  NSFW_GLOBAL: z.enum(['on', 'off', 'enabled']).optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']),
   NEXT_RUNTIME: z.enum(['nodejs', 'edge']).optional(),
   PRINTIFY_API_KEY: z.string().optional(),

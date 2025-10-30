@@ -27,7 +27,7 @@ interface AssetRegistry {
  * Main curate function
  */
 async function curateAssets(): Promise<AssetRegistry> {
-  console.log('🎨 Curating assets...');
+  console.warn('🎨 Curating assets...');
 
   // Load scan results
   const scanPath = 'app/lib/assets/scan-results.json';
@@ -38,7 +38,7 @@ async function curateAssets(): Promise<AssetRegistry> {
   const scanData = await readFile(scanPath, 'utf-8');
   const scanResults: ScanResults = JSON.parse(scanData);
 
-  console.log(`Processing ${scanResults.totalAssets} assets...`);
+  console.warn(`Processing ${scanResults.totalAssets} assets...`);
 
   // Filter valid assets (must have slot)
   const validAssets = scanResults.assets.filter((a) => a.slot !== null);
@@ -72,7 +72,7 @@ async function curateAssets(): Promise<AssetRegistry> {
     fallbacks,
   };
 
-  console.log(`✅ Created registry with ${Object.keys(assets).length} assets`);
+  console.warn(`✅ Created registry with ${Object.keys(assets).length} assets`);
 
   return registry;
 }
@@ -170,7 +170,7 @@ async function saveRegistry(registry: AssetRegistry): Promise<void> {
   // Save registry JSON
   const registryPath = 'app/lib/assets/registry.json';
   await writeFile(registryPath, JSON.stringify(registry, null, 2));
-  console.log(`✅ Registry saved to ${registryPath}`);
+  console.warn(`✅ Registry saved to ${registryPath}`);
 
   // Create thumbs directory
   const thumbsDir = 'app/lib/assets/thumbs';
@@ -187,7 +187,7 @@ async function saveRegistry(registry: AssetRegistry): Promise<void> {
     thumbCount++;
   }
 
-  console.log(`✅ Generated ${thumbCount} SVG thumbnails in ${thumbsDir}/`);
+  console.warn(`✅ Generated ${thumbCount} SVG thumbnails in ${thumbsDir}/`);
 }
 
 /**
@@ -197,7 +197,7 @@ async function main() {
   try {
     const registry = await curateAssets();
     await saveRegistry(registry);
-    console.log('\n✨ Asset curation complete!');
+    console.warn('\n✨ Asset curation complete!');
   } catch (error) {
     console.error('❌ Curation failed:', error);
     process.exit(1);

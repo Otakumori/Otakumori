@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/authz';
 import { put } from '@vercel/blob';
+import { env } from '@/env';
 
 export const runtime = 'nodejs';
 
 function ensureBlobToken(): string {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const token = env.BLOB_READ_WRITE_TOKEN;
   if (!token) {
     throw new Error('Missing BLOB_READ_WRITE_TOKEN');
   }

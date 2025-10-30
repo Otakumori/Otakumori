@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { getAsset } from '../_shared/assets-resolver';
 import { play } from '../_shared/audio-bus';
 import { useAvatarForGame } from '../_shared/useAvatarForGame';
-import { useGameAvatar, drawGameAvatar } from '../_shared/GameAvatarRenderer';
+import { useGameAvatar } from '../_shared/GameAvatarRenderer';
 import '../_shared/cohesion.css';
 
 const ROUND_MS = 60_000;

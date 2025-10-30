@@ -32,13 +32,13 @@ const ASSET_ROOT = 'public/assets';
  * Main scan function
  */
 async function scanAssets(): Promise<ScanResults> {
-  console.log('🔍 Scanning assets...');
+  console.warn('🔍 Scanning assets...');
 
   // Find all supported files
   const pattern = `${ASSET_ROOT}/**/*.{glb,gltf,ktx2,png,jpg,jpeg}`;
   const files = await glob(pattern, { nodir: true });
 
-  console.log(`Found ${files.length} asset files`);
+  console.warn(`Found ${files.length} asset files`);
 
   const assets: ScannedAsset[] = [];
 
@@ -116,10 +116,10 @@ function detectSlot(filename: string): string | null {
 async function saveScanResults(results: ScanResults): Promise<void> {
   const outputPath = 'app/lib/assets/scan-results.json';
   await writeFile(outputPath, JSON.stringify(results, null, 2));
-  console.log(`✅ Scan results saved to ${outputPath}`);
-  console.log(`   Total assets: ${results.totalAssets}`);
-  console.log(`   NSFW: ${results.assets.filter((a) => a.nsfw).length}`);
-  console.log(`   Safe: ${results.assets.filter((a) => !a.nsfw).length}`);
+  console.warn(`✅ Scan results saved to ${outputPath}`);
+  console.warn(`   Total assets: ${results.totalAssets}`);
+  console.warn(`   NSFW: ${results.assets.filter((a) => a.nsfw).length}`);
+  console.warn(`   Safe: ${results.assets.filter((a) => !a.nsfw).length}`);
 }
 
 /**

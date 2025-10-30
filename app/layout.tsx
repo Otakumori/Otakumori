@@ -5,7 +5,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { headers } from 'next/headers';
-import Header from './components/layout/Header';
 import Footer from './components/Footer';
 import Navbar from './components/layout/Navbar';
 import Providers from './Providers';

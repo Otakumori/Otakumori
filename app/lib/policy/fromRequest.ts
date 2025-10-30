@@ -1,4 +1,5 @@
 import { resolvePolicy } from '@om/avatar';
+import { env } from '@/env';
 
 type PolicySource = 'client' | 'server';
 
@@ -41,7 +42,7 @@ function computePolicy(
   adultVerified: boolean,
   region: string | null,
 ): ContentPolicy {
-  const overrideEnabled = typeof process !== 'undefined' && process.env?.NSFW_GLOBAL === 'enabled';
+  const overrideEnabled = env.NSFW_GLOBAL === 'enabled';
 
   if (overrideEnabled) {
     return {

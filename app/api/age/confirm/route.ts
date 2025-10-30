@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { env } from '@/env';
 
 const confirmSchema = z.object({
   returnTo: z.string().min(1),
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
     });
 
     // Set session-only cookie (no maxAge/expires)
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = env.NODE_ENV === 'production';
     response.cookies.set('om_age_ok', '1', {
       httpOnly: true,
       sameSite: 'lax',

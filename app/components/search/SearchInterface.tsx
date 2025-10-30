@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Clock, Gamepad2, Search, ShoppingBag, Trash2 } from 'lucide-react';
+import { Gamepad2, Search, ShoppingBag, Trash2 } from 'lucide-react';
 import GlassPanel from '../GlassPanel';
 import {
   type ApiEnvelope,

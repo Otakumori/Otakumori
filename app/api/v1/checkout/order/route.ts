@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(
+    console.warn(
       `[Printify] Order ${orderId} synced successfully. Printify ID: ${printifyOrder.id}`,
     );
 
