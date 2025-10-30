@@ -1,6 +1,13 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
+// Preprocess: trim all env values to remove trailing whitespace/newlines
+const trimmedEnv = Object.fromEntries(
+  Object.entries(process.env).map(([key, value]) => [key, value?.trim()])
+);
+// Assign back to process.env
+Object.assign(process.env, trimmedEnv);
+
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
