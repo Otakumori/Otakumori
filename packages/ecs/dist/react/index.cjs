@@ -1,31 +1,33 @@
-"use strict";
+'use strict';
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name in all) __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
+  if ((from && typeof from === 'object') || typeof from === 'function') {
     for (let key of __getOwnPropNames(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+        __defProp(to, key, {
+          get: () => from[key],
+          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+        });
   }
   return to;
 };
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __toCommonJS = (mod) => __copyProps(__defProp({}, '__esModule', { value: true }), mod);
 
 // src/react/index.ts
 var react_exports = {};
 __export(react_exports, {
-  useGameLoop: () => useGameLoop
+  useGameLoop: () => useGameLoop,
 });
 module.exports = __toCommonJS(react_exports);
 
 // src/react/useGameLoop.ts
-var import_react = require("react");
+var import_react = require('react');
 
 // src/loop.ts
 var DEFAULT_FIXED_DT = 1 / 60;
@@ -84,7 +86,7 @@ function createGameLoop(options) {
     isPaused = false;
     lastTime = 0;
     accumulator = 0;
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     rafId = requestAnimationFrame(tick);
   };
   const pause = () => {
@@ -116,7 +118,7 @@ function createGameLoop(options) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
     lastTime = 0;
     accumulator = 0;
     currentTick = 0;
@@ -137,7 +139,7 @@ function createGameLoop(options) {
     },
     get fps() {
       return fps;
-    }
+    },
   };
 }
 
@@ -158,7 +160,7 @@ function useGameLoop(options) {
         if (loopRef.current) {
           setFps(loopRef.current.fps);
         }
-      }
+      },
     };
     if (fixedDt !== void 0) {
       options2.fixedDt = fixedDt;
@@ -207,10 +209,11 @@ function useGameLoop(options) {
     isRunning,
     isPaused,
     currentTick: tick,
-    fps
+    fps,
   };
 }
 // Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  useGameLoop
-});
+0 &&
+  (module.exports = {
+    useGameLoop,
+  });

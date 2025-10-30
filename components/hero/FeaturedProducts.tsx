@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { type ApiEnvelope, type Product } from "@/app/lib/contracts";
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { type ApiEnvelope, type Product } from '@/app/lib/contracts';
 
 interface FeaturedProduct {
   id: string;
@@ -13,11 +13,11 @@ interface FeaturedProduct {
   url: string;
 }
 
-const PLACEHOLDER_IMAGE = "/placeholder-product.jpg";
+const PLACEHOLDER_IMAGE = '/placeholder-product.jpg';
 const MAX_FEATURED_PRODUCTS = 8;
 
 async function getLogger() {
-  const { logger } = await import("@/app/lib/logger");
+  const { logger } = await import('@/app/lib/logger');
   return logger;
 }
 
@@ -31,7 +31,7 @@ export function FeaturedProducts() {
       try {
         setError(null);
 
-        const response = await fetch("/api/shop/products", { cache: "no-store" });
+        const response = await fetch('/api/shop/products', { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`API response not ok (${response.status})`);
         }
@@ -42,7 +42,7 @@ export function FeaturedProducts() {
         }
 
         const logger = await getLogger();
-        logger.info("Featured products fetched", {
+        logger.info('Featured products fetched', {
           extra: { count: payload.data.products.length },
         });
 
@@ -56,7 +56,7 @@ export function FeaturedProducts() {
         const message = err instanceof Error ? err.message : String(err);
         setError(message);
         const logger = await getLogger();
-        logger.warn("Failed to fetch featured products", { extra: { error: message } });
+        logger.warn('Failed to fetch featured products', { extra: { error: message } });
         setProducts(getFallbackProducts());
       } finally {
         setIsLoading(false);
@@ -66,7 +66,7 @@ export function FeaturedProducts() {
     void fetchProducts();
   }, []);
 
-  const heading = useMemo(() => "Featured", []);
+  const heading = useMemo(() => 'Featured', []);
 
   if (isLoading) {
     return (
@@ -140,7 +140,8 @@ function transformProducts(products: Product[]): FeaturedProduct[] {
     .filter((product) => product.active !== false)
     .slice(0, MAX_FEATURED_PRODUCTS)
     .map((product) => {
-      const primaryImage = product.primaryImageUrl ?? product.variants[0]?.previewImageUrl ?? PLACEHOLDER_IMAGE;
+      const primaryImage =
+        product.primaryImageUrl ?? product.variants[0]?.previewImageUrl ?? PLACEHOLDER_IMAGE;
       const price = computeProductPrice(product);
 
       return {
@@ -156,7 +157,7 @@ function transformProducts(products: Product[]): FeaturedProduct[] {
 function computeProductPrice(product: Product): number {
   if (product.variants.length > 0) {
     const price = product.variants[0]?.priceCents;
-    if (typeof price === "number" && price > 0) {
+    if (typeof price === 'number' && price > 0) {
       return price / 100;
     }
   }
@@ -165,15 +166,39 @@ function computeProductPrice(product: Product): number {
 }
 
 function getFallbackProducts(): FeaturedProduct[] {
-  const samples: Array<Omit<FeaturedProduct, "id"> & { id: string }> = [
-    { id: "1", title: "Cherry Blossom Tee", price: 29.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "2", title: "Pixel Art Hoodie", price: 49.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "3", title: "Otaku-mori Sticker Pack", price: 9.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "4", title: "Digital Shrine Poster", price: 19.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "5", title: "Retro Gaming Mug", price: 14.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "6", title: "Anime Character Pin Set", price: 12.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "7", title: "Gaming Mousepad", price: 24.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
-    { id: "8", title: "Limited Edition Poster", price: 34.99, image: PLACEHOLDER_IMAGE, url: "/shop" },
+  const samples: Array<Omit<FeaturedProduct, 'id'> & { id: string }> = [
+    { id: '1', title: 'Cherry Blossom Tee', price: 29.99, image: PLACEHOLDER_IMAGE, url: '/shop' },
+    { id: '2', title: 'Pixel Art Hoodie', price: 49.99, image: PLACEHOLDER_IMAGE, url: '/shop' },
+    {
+      id: '3',
+      title: 'Otaku-mori Sticker Pack',
+      price: 9.99,
+      image: PLACEHOLDER_IMAGE,
+      url: '/shop',
+    },
+    {
+      id: '4',
+      title: 'Digital Shrine Poster',
+      price: 19.99,
+      image: PLACEHOLDER_IMAGE,
+      url: '/shop',
+    },
+    { id: '5', title: 'Retro Gaming Mug', price: 14.99, image: PLACEHOLDER_IMAGE, url: '/shop' },
+    {
+      id: '6',
+      title: 'Anime Character Pin Set',
+      price: 12.99,
+      image: PLACEHOLDER_IMAGE,
+      url: '/shop',
+    },
+    { id: '7', title: 'Gaming Mousepad', price: 24.99, image: PLACEHOLDER_IMAGE, url: '/shop' },
+    {
+      id: '8',
+      title: 'Limited Edition Poster',
+      price: 34.99,
+      image: PLACEHOLDER_IMAGE,
+      url: '/shop',
+    },
   ];
 
   return samples.slice(0, MAX_FEATURED_PRODUCTS);

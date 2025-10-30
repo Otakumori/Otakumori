@@ -165,7 +165,9 @@ export default function GameCubeBoot({ onBootComplete }) {
           }}
           transition={{ duration: petal.speed, repeat: Infinity }}
         >
-          <span role="img" aria-label="Cherry blossom petal">🌸</span>
+          <span role="img" aria-label="Cherry blossom petal">
+            🌸
+          </span>
         </motion.div>
       ))}
 

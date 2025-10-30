@@ -78,9 +78,7 @@ export default function GlobalMusicBar() {
               className="rounded px-2 py-1 hover:bg-zinc-900"
               aria-label="Mute"
             >
-              <span role="img" aria-label="Muted speaker">
-                
-              </span>
+              <span role="img" aria-label="Muted speaker"></span>
             </button>
           </>
         )}

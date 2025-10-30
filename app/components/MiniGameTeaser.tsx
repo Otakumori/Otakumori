@@ -90,9 +90,11 @@ export default async function MiniGameTeaser() {
 
               <div className="mb-4">
                 <div className="w-16 h-16 mx-auto bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl text-white" role="img" aria-label="Game controller">
-                    
-                  </span>
+                  <span
+                    className="text-2xl text-white"
+                    role="img"
+                    aria-label="Game controller"
+                  ></span>
                 </div>
               </div>
 

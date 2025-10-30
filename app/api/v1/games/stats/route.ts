@@ -81,7 +81,8 @@ export async function GET(request: NextRequest) {
       totalRuns: gameRuns.length,
       totalPetalsEarned: gameRuns.reduce((sum, run) => sum + run.rewardPetals, 0),
       favoriteGame: statsList.length
-        ? statsList.reduce((prev, current) => (current.totalRuns > prev.totalRuns ? current : prev)).gameKey
+        ? statsList.reduce((prev, current) => (current.totalRuns > prev.totalRuns ? current : prev))
+            .gameKey
         : undefined,
     };
     return NextResponse.json({

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface BubbleTextProps {
   text: string;
@@ -10,8 +10,8 @@ interface BubbleTextProps {
 
 export function BubbleText({ text, className }: BubbleTextProps) {
   return (
-    <div className={cn("relative", className)}>
-      {text.split("").map((character, index) => (
+    <div className={cn('relative', className)}>
+      {text.split('').map((character, index) => (
         <motion.span
           key={`${character}-${index}`}
           className="inline-block"
@@ -21,10 +21,10 @@ export function BubbleText({ text, className }: BubbleTextProps) {
             duration: 1.5,
             repeat: Infinity,
             delay: index * 0.1,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         >
-          {character === " " ? "\u00A0" : character}
+          {character === ' ' ? '\u00A0' : character}
         </motion.span>
       ))}
     </div>

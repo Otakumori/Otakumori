@@ -61,7 +61,7 @@ export function CommunitySettings() {
           <h3 className="text-xl font-semibold text-white mb-4">Adult Content Preferences</h3>
           <div className="mb-4 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
             <p className="text-yellow-200 text-sm">
-               These settings require adult verification. Some content may not be suitable for all
+              These settings require adult verification. Some content may not be suitable for all
               audiences.
             </p>
           </div>

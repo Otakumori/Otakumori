@@ -26,12 +26,12 @@ export default function ShopTeaser() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await fetch('/api/shop/products');
-        
+
         if (response.ok) {
           const data = await response.json();
-          
+
           if (data.products && Array.isArray(data.products)) {
             // Transform Printify products to display format and limit to 4
             const transformedProducts = data.products.slice(0, 4).map((product: any) => ({
@@ -43,7 +43,7 @@ export default function ShopTeaser() {
               available: product.variants?.some((v: any) => v.is_enabled && v.is_available) || true,
               slug: product.id,
             }));
-            
+
             setProducts(transformedProducts);
           } else {
             console.warn('No products array in response');
@@ -94,8 +94,8 @@ export default function ShopTeaser() {
           </div>
           <h3 className="text-xl text-white mb-2">Unable to Load Products</h3>
           <p className="text-gray-400">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-colors"
           >
             Retry

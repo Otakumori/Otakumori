@@ -3,22 +3,22 @@
  * Determines NSFW content permissions based on user preferences and verification
  */
 export interface PolicyContext {
-    /**
-     * User's cookie preference for NSFW content
-     * Expected format: "enabled" | "disabled" | undefined
-     */
-    cookieValue?: string;
-    /**
-     * Whether the user has completed adult verification (from Clerk metadata)
-     */
-    adultVerified?: boolean;
+  /**
+   * User's cookie preference for NSFW content
+   * Expected format: "enabled" | "disabled" | undefined
+   */
+  cookieValue?: string;
+  /**
+   * Whether the user has completed adult verification (from Clerk metadata)
+   */
+  adultVerified?: boolean;
 }
 export interface PolicyResult {
-    /**
-     * Whether NSFW content is allowed for this request
-     * Requires BOTH cookie opt-in AND adult verification
-     */
-    nsfwAllowed: boolean;
+  /**
+   * Whether NSFW content is allowed for this request
+   * Requires BOTH cookie opt-in AND adult verification
+   */
+  nsfwAllowed: boolean;
 }
 /**
  * Resolves NSFW content policy based on user context

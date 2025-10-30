@@ -3,16 +3,19 @@
  */
 import { GameAction, type InputMapping, type ActionState } from './actions';
 export interface InputSystem {
-    mapping: InputMapping;
-    keyPressed: Set<string>;
-    prevKeyPressed: Set<string>;
-    gamepadIndex: number | null;
-    touchActive: boolean;
-    touchState: Map<string, {
-        x: number;
-        y: number;
-    }>;
-    enabled: boolean;
+  mapping: InputMapping;
+  keyPressed: Set<string>;
+  prevKeyPressed: Set<string>;
+  gamepadIndex: number | null;
+  touchActive: boolean;
+  touchState: Map<
+    string,
+    {
+      x: number;
+      y: number;
+    }
+  >;
+  enabled: boolean;
 }
 /**
  * Create an input system

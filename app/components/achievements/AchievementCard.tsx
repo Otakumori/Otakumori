@@ -1,24 +1,24 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
-import type { Achievement } from "./AchievementProvider";
-import { useAchievements } from "./AchievementProvider";
+import type { Achievement } from './AchievementProvider';
+import { useAchievements } from './AchievementProvider';
 
 interface AchievementCardProps {
   achievement: Achievement;
 }
 
-const isImageSource = (value: string) => value.startsWith("/") || value.startsWith("http");
+const isImageSource = (value: string) => value.startsWith('/') || value.startsWith('http');
 
 const rewardLabel = (achievement: Achievement) => {
   if (!achievement.reward) {
-    return "";
+    return '';
   }
 
-  if (achievement.reward.type === "points") {
+  if (achievement.reward.type === 'points') {
     return `${achievement.reward.value} Points`;
   }
 
-  if (achievement.reward.type === "discount") {
+  if (achievement.reward.type === 'discount') {
     return `${achievement.reward.value}% Discount`;
   }
 
@@ -35,11 +35,11 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={[
-        "rounded-lg bg-white p-6 shadow-lg transition-opacity dark:bg-gray-800",
-        !unlocked ? "opacity-80" : "",
+        'rounded-lg bg-white p-6 shadow-lg transition-opacity dark:bg-gray-800',
+        !unlocked ? 'opacity-80' : '',
       ]
         .filter(Boolean)
-        .join(" ")}
+        .join(' ')}
     >
       <div className="flex items-start space-x-4">
         <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-pink-100 text-2xl">
@@ -47,15 +47,12 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
             <img
               src={achievement.icon}
               alt="Achievement icon"
-              className={[
-                "h-full w-full rounded-lg object-cover",
-                !unlocked ? "grayscale" : "",
-              ]
+              className={['h-full w-full rounded-lg object-cover', !unlocked ? 'grayscale' : '']
                 .filter(Boolean)
-                .join(" ")}
+                .join(' ')}
             />
           ) : (
-            <span className={!unlocked ? "opacity-70" : undefined}>{achievement.icon}</span>
+            <span className={!unlocked ? 'opacity-70' : undefined}>{achievement.icon}</span>
           )}
         </div>
         <div className="min-w-0 flex-1">

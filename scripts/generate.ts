@@ -233,9 +233,7 @@ async function main() {
     }
     presetId = family[classKey];
 
-    // 
-      ` Generating ${classKey} for avatar "${avatar}" (${vibe} vibe → preset: ${presetId}`,
-    );
+    // ` Generating ${classKey} for avatar "${avatar}" (${vibe} vibe → preset: ${presetId}`
   } else {
     // User passed a direct preset id like "minigame.noir.tech"
     presetId = targetOrPreset;

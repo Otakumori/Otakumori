@@ -10,20 +10,20 @@
  * @returns PolicyResult indicating if NSFW content is permitted
  */
 export function resolvePolicy(ctx) {
-    // Default to safe mode
-    if (!ctx.cookieValue || !ctx.adultVerified) {
-        return { nsfwAllowed: false };
-    }
-    // Both checks must pass
-    const cookieOptIn = ctx.cookieValue === 'enabled';
-    const verified = ctx.adultVerified === true;
-    return {
-        nsfwAllowed: cookieOptIn && verified,
-    };
+  // Default to safe mode
+  if (!ctx.cookieValue || !ctx.adultVerified) {
+    return { nsfwAllowed: false };
+  }
+  // Both checks must pass
+  const cookieOptIn = ctx.cookieValue === 'enabled';
+  const verified = ctx.adultVerified === true;
+  return {
+    nsfwAllowed: cookieOptIn && verified,
+  };
 }
 /**
  * Determines if an equipment slot contains NSFW content by name
  */
 export function isNSFWSlot(slot) {
-    return slot.startsWith('NSFW');
+  return slot.startsWith('NSFW');
 }

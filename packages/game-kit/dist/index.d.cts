@@ -5,54 +5,54 @@ import { EntityId, World } from '@om/ecs';
  * Game input actions and default mappings
  */
 declare enum GameAction {
-    MoveX = "MoveX",
-    MoveY = "MoveY",
-    Jump = "Jump",
-    Attack = "Attack",
-    Dash = "Dash",
-    Pause = "Pause"
+  MoveX = 'MoveX',
+  MoveY = 'MoveY',
+  Jump = 'Jump',
+  Attack = 'Attack',
+  Dash = 'Dash',
+  Pause = 'Pause',
 }
 interface KeyboardMapping {
-    [GameAction.MoveX]: string[];
-    [GameAction.MoveY]: string[];
-    [GameAction.Jump]: string[];
-    [GameAction.Attack]: string[];
-    [GameAction.Dash]: string[];
-    [GameAction.Pause]: string[];
+  [GameAction.MoveX]: string[];
+  [GameAction.MoveY]: string[];
+  [GameAction.Jump]: string[];
+  [GameAction.Attack]: string[];
+  [GameAction.Dash]: string[];
+  [GameAction.Pause]: string[];
 }
 interface GamepadAxisMapping {
-    axis: number;
-    deadzone: number;
-    invert?: boolean;
+  axis: number;
+  deadzone: number;
+  invert?: boolean;
 }
 interface GamepadButtonMapping {
-    button: number;
+  button: number;
 }
 interface GamepadMapping {
-    [GameAction.MoveX]: GamepadAxisMapping;
-    [GameAction.MoveY]: GamepadAxisMapping;
-    [GameAction.Jump]: GamepadButtonMapping;
-    [GameAction.Attack]: GamepadButtonMapping;
-    [GameAction.Dash]: GamepadButtonMapping;
-    [GameAction.Pause]: GamepadButtonMapping;
+  [GameAction.MoveX]: GamepadAxisMapping;
+  [GameAction.MoveY]: GamepadAxisMapping;
+  [GameAction.Jump]: GamepadButtonMapping;
+  [GameAction.Attack]: GamepadButtonMapping;
+  [GameAction.Dash]: GamepadButtonMapping;
+  [GameAction.Pause]: GamepadButtonMapping;
 }
 interface TouchControl {
-    type: 'button' | 'joystick';
-    position: 'left' | 'right' | 'center';
-    size: number;
+  type: 'button' | 'joystick';
+  position: 'left' | 'right' | 'center';
+  size: number;
 }
 interface TouchMapping {
-    [GameAction.MoveX]: TouchControl;
-    [GameAction.MoveY]: TouchControl;
-    [GameAction.Jump]: TouchControl;
-    [GameAction.Attack]: TouchControl;
-    [GameAction.Dash]: TouchControl;
-    [GameAction.Pause]: TouchControl;
+  [GameAction.MoveX]: TouchControl;
+  [GameAction.MoveY]: TouchControl;
+  [GameAction.Jump]: TouchControl;
+  [GameAction.Attack]: TouchControl;
+  [GameAction.Dash]: TouchControl;
+  [GameAction.Pause]: TouchControl;
 }
 interface InputMapping {
-    keyboard: KeyboardMapping;
-    gamepad: GamepadMapping;
-    touch: TouchMapping;
+  keyboard: KeyboardMapping;
+  gamepad: GamepadMapping;
+  touch: TouchMapping;
 }
 /**
  * Default input mapping
@@ -62,12 +62,12 @@ declare const DEFAULT_INPUT_MAP: InputMapping;
  * Action state for a single frame
  */
 interface ActionState {
-    [GameAction.MoveX]: number;
-    [GameAction.MoveY]: number;
-    [GameAction.Jump]: boolean;
-    [GameAction.Attack]: boolean;
-    [GameAction.Dash]: boolean;
-    [GameAction.Pause]: boolean;
+  [GameAction.MoveX]: number;
+  [GameAction.MoveY]: number;
+  [GameAction.Jump]: boolean;
+  [GameAction.Attack]: boolean;
+  [GameAction.Dash]: boolean;
+  [GameAction.Pause]: boolean;
 }
 /**
  * Create empty action state
@@ -79,16 +79,19 @@ declare function createActionState(): ActionState;
  */
 
 interface InputSystem {
-    mapping: InputMapping;
-    keyPressed: Set<string>;
-    prevKeyPressed: Set<string>;
-    gamepadIndex: number | null;
-    touchActive: boolean;
-    touchState: Map<string, {
-        x: number;
-        y: number;
-    }>;
-    enabled: boolean;
+  mapping: InputMapping;
+  keyPressed: Set<string>;
+  prevKeyPressed: Set<string>;
+  gamepadIndex: number | null;
+  touchActive: boolean;
+  touchState: Map<
+    string,
+    {
+      x: number;
+      y: number;
+    }
+  >;
+  enabled: boolean;
 }
 /**
  * Create an input system
@@ -119,34 +122,38 @@ declare function setInputEnabled(system: InputSystem, enabled: boolean): void;
  * Physics-related ECS components
  */
 interface Vec3 {
-    x: number;
-    y: number;
-    z: number;
+  x: number;
+  y: number;
+  z: number;
 }
 interface Quaternion {
-    x: number;
-    y: number;
-    z: number;
-    w: number;
+  x: number;
+  y: number;
+  z: number;
+  w: number;
 }
 /**
  * Transform component
  */
 interface Transform {
-    position: Vec3;
-    rotation: Quaternion;
-    scale: Vec3;
+  position: Vec3;
+  rotation: Quaternion;
+  scale: Vec3;
 }
 /**
  * Create a default transform
  */
-declare function createTransform(position?: [number, number, number], rotation?: [number, number, number, number], scale?: [number, number, number]): Transform;
+declare function createTransform(
+  position?: [number, number, number],
+  rotation?: [number, number, number, number],
+  scale?: [number, number, number],
+): Transform;
 /**
  * Velocity component
  */
 interface Velocity {
-    linear: Vec3;
-    angular: Vec3;
+  linear: Vec3;
+  angular: Vec3;
 }
 /**
  * Create a default velocity
@@ -156,56 +163,58 @@ declare function createVelocity(): Velocity;
  * Rigid body types
  */
 declare enum RigidBodyType {
-    Dynamic = "dynamic",
-    Fixed = "fixed",
-    Kinematic = "kinematic"
+  Dynamic = 'dynamic',
+  Fixed = 'fixed',
+  Kinematic = 'kinematic',
 }
 /**
  * Rigid body component (stores Rapier handle)
  */
 interface RigidBody {
-    handle: number;
-    type: RigidBodyType;
-    mass: number;
-    friction: number;
-    restitution: number;
+  handle: number;
+  type: RigidBodyType;
+  mass: number;
+  friction: number;
+  restitution: number;
 }
 /**
  * Collider component (stores Rapier handle)
  */
 interface Collider {
-    handle: number;
-    sensor: boolean;
+  handle: number;
+  sensor: boolean;
 }
 /**
  * Character controller state
  */
 interface CharacterController {
-    velocity: Vec3;
-    onGround: boolean;
-    coyoteTime: number;
-    jumpBuffer: number;
-    slopeLimit: number;
-    stepOffset: number;
-    speed: number;
-    jumpForce: number;
-    grounded: boolean;
-    groundedFrames: number;
+  velocity: Vec3;
+  onGround: boolean;
+  coyoteTime: number;
+  jumpBuffer: number;
+  slopeLimit: number;
+  stepOffset: number;
+  speed: number;
+  jumpForce: number;
+  grounded: boolean;
+  groundedFrames: number;
 }
 /**
  * Create a default character controller
  */
-declare function createCharacterController(options?: Partial<CharacterController>): CharacterController;
+declare function createCharacterController(
+  options?: Partial<CharacterController>,
+): CharacterController;
 /**
  * Helper: Vec3 operations
  */
 declare const Vec3Math: {
-    add(a: Vec3, b: Vec3): Vec3;
-    sub(a: Vec3, b: Vec3): Vec3;
-    scale(v: Vec3, s: number): Vec3;
-    length(v: Vec3): number;
-    normalize(v: Vec3): Vec3;
-    zero(): Vec3;
+  add(a: Vec3, b: Vec3): Vec3;
+  sub(a: Vec3, b: Vec3): Vec3;
+  scale(v: Vec3, s: number): Vec3;
+  length(v: Vec3): number;
+  normalize(v: Vec3): Vec3;
+  zero(): Vec3;
 };
 
 /**
@@ -218,9 +227,9 @@ type RapierWorld = any;
  * Physics world wrapper
  */
 interface PhysicsWorld {
-    rapierWorld: RapierWorld;
-    rapier: any;
-    gravity: Vec3;
+  rapierWorld: RapierWorld;
+  rapier: any;
+  gravity: Vec3;
 }
 /**
  * Create a Rapier physics world
@@ -245,15 +254,28 @@ declare function createKinematicBody(world: PhysicsWorld, position: Vec3): numbe
 /**
  * Create a box collider
  */
-declare function createBoxCollider(world: PhysicsWorld, bodyHandle: number, halfExtents: Vec3): number;
+declare function createBoxCollider(
+  world: PhysicsWorld,
+  bodyHandle: number,
+  halfExtents: Vec3,
+): number;
 /**
  * Create a sphere collider
  */
-declare function createSphereCollider(world: PhysicsWorld, bodyHandle: number, radius: number): number;
+declare function createSphereCollider(
+  world: PhysicsWorld,
+  bodyHandle: number,
+  radius: number,
+): number;
 /**
  * Create a capsule collider
  */
-declare function createCapsuleCollider(world: PhysicsWorld, bodyHandle: number, halfHeight: number, radius: number): number;
+declare function createCapsuleCollider(
+  world: PhysicsWorld,
+  bodyHandle: number,
+  halfHeight: number,
+  radius: number,
+): number;
 /**
  * Get rigid body position
  */
@@ -286,7 +308,12 @@ declare function checkGrounded(world: PhysicsWorld, position: Vec3, distance?: n
 /**
  * Update character controller based on input
  */
-declare function updateCharacter(controller: CharacterController, input: ActionState, dt: number, gravity?: Vec3): void;
+declare function updateCharacter(
+  controller: CharacterController,
+  input: ActionState,
+  dt: number,
+  gravity?: Vec3,
+): void;
 /**
  * Check if character should be grounded
  */
@@ -302,7 +329,11 @@ declare function resolveSlopeCollision(controller: CharacterController, slopeAng
 /**
  * Handle step offset (stairs)
  */
-declare function handleStepOffset(position: Vec3, controller: CharacterController, obstacleHeight: number): Vec3;
+declare function handleStepOffset(
+  position: Vec3,
+  controller: CharacterController,
+  obstacleHeight: number,
+): Vec3;
 /**
  * Get horizontal speed
  */
@@ -316,21 +347,21 @@ declare function getMovementDirection(velocity: Vec3): Vec3;
  * Animation state definitions
  */
 declare enum AnimState {
-    Idle = "Idle",
-    Walk = "Walk",
-    Run = "Run",
-    Jump = "Jump",
-    Fall = "Fall",
-    Land = "Land",
-    Attack = "Attack"
+  Idle = 'Idle',
+  Walk = 'Walk',
+  Run = 'Run',
+  Jump = 'Jump',
+  Fall = 'Fall',
+  Land = 'Land',
+  Attack = 'Attack',
 }
 /**
  * Animation clip data
  */
 interface AnimationClip {
-    name: string;
-    duration: number;
-    loop: boolean;
+  name: string;
+  duration: number;
+  loop: boolean;
 }
 /**
  * Default animation clips
@@ -340,10 +371,10 @@ declare const DEFAULT_CLIPS: Record<AnimState, AnimationClip>;
  * State transition thresholds
  */
 declare const ANIM_THRESHOLDS: {
-    IDLE_SPEED: number;
-    WALK_SPEED: number;
-    FALL_VELOCITY: number;
-    JUMP_VELOCITY: number;
+  IDLE_SPEED: number;
+  WALK_SPEED: number;
+  FALL_VELOCITY: number;
+  JUMP_VELOCITY: number;
 };
 
 /**
@@ -351,25 +382,25 @@ declare const ANIM_THRESHOLDS: {
  */
 
 interface HFSM {
-    current: AnimState;
-    previous: AnimState;
-    transitionProgress: number;
-    transitionDuration: number;
-    blendWeights: Map<AnimState, number>;
-    stateTime: number;
+  current: AnimState;
+  previous: AnimState;
+  transitionProgress: number;
+  transitionDuration: number;
+  blendWeights: Map<AnimState, number>;
+  stateTime: number;
 }
 interface Transition {
-    from: AnimState;
-    to: AnimState;
-    condition: (data: TransitionData) => boolean;
-    duration: number;
+  from: AnimState;
+  to: AnimState;
+  condition: (data: TransitionData) => boolean;
+  duration: number;
 }
 interface TransitionData {
-    horizontalSpeed: number;
-    verticalVelocity: number;
-    isGrounded: boolean;
-    coyoteTimeRemaining: number;
-    attackRequested: boolean;
+  horizontalSpeed: number;
+  verticalVelocity: number;
+  isGrounded: boolean;
+  coyoteTimeRemaining: number;
+  attackRequested: boolean;
 }
 /**
  * Create a new HFSM
@@ -382,7 +413,12 @@ declare const DEFAULT_TRANSITIONS: Transition[];
 /**
  * Update HFSM
  */
-declare function updateHFSM(hfsm: HFSM, data: TransitionData, dt: number, transitions?: Transition[]): void;
+declare function updateHFSM(
+  hfsm: HFSM,
+  data: TransitionData,
+  dt: number,
+  transitions?: Transition[],
+): void;
 /**
  * Transition to a new state
  */
@@ -404,9 +440,9 @@ declare function getBlendWeight(hfsm: HFSM, state: AnimState): number;
  * Blend tree node
  */
 interface BlendNode {
-    state: AnimState;
-    weight: number;
-    time: number;
+  state: AnimState;
+  weight: number;
+  time: number;
 }
 /**
  * Cross-fade between two animations
@@ -437,20 +473,20 @@ declare function smoothStep(t: number): number;
  */
 
 interface Side2DAdapter {
-    clampZ: boolean;
-    orthoSize: number;
-    followTarget: EntityId | null;
-    followDamping: number;
-    cameraPosition: Vec3;
-    cameraOffset: Vec3;
+  clampZ: boolean;
+  orthoSize: number;
+  followTarget: EntityId | null;
+  followDamping: number;
+  cameraPosition: Vec3;
+  cameraOffset: Vec3;
 }
 interface OrthoCameraRig {
-    position: Vec3;
-    target: Vec3;
-    size: number;
-    aspect: number;
-    near: number;
-    far: number;
+  position: Vec3;
+  target: Vec3;
+  size: number;
+  aspect: number;
+  near: number;
+  far: number;
 }
 /**
  * Create a side-scroller adapter
@@ -459,7 +495,12 @@ declare function createSide2DAdapter(orthoSize?: number, followDamping?: number)
 /**
  * Create an orthographic camera rig
  */
-declare function createOrthoCamera(size: number, aspect: number, near?: number, far?: number): OrthoCameraRig;
+declare function createOrthoCamera(
+  size: number,
+  aspect: number,
+  near?: number,
+  far?: number,
+): OrthoCameraRig;
 /**
  * Constrain movement to 2D plane (clamp Z to 0)
  */
@@ -471,23 +512,40 @@ declare function constrainPosition(position: Vec3): Vec3;
 /**
  * Update camera to follow target with damping
  */
-declare function followTarget(camera: OrthoCameraRig, targetPos: Vec3, offset: Vec3, damping: number, dt: number): void;
+declare function followTarget(
+  camera: OrthoCameraRig,
+  targetPos: Vec3,
+  offset: Vec3,
+  damping: number,
+  dt: number,
+): void;
 /**
  * Convert world position to screen coordinates
  */
-declare function worldToScreen(pos: Vec3, camera: OrthoCameraRig, screenWidth: number, screenHeight: number): [number, number];
+declare function worldToScreen(
+  pos: Vec3,
+  camera: OrthoCameraRig,
+  screenWidth: number,
+  screenHeight: number,
+): [number, number];
 /**
  * Convert screen coordinates to world position
  */
-declare function screenToWorld(x: number, y: number, camera: OrthoCameraRig, screenWidth: number, screenHeight: number): Vec3;
+declare function screenToWorld(
+  x: number,
+  y: number,
+  camera: OrthoCameraRig,
+  screenWidth: number,
+  screenHeight: number,
+): Vec3;
 /**
  * Get camera bounds in world space
  */
 declare function getCameraBounds(camera: OrthoCameraRig): {
-    left: number;
-    right: number;
-    top: number;
-    bottom: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
 };
 /**
  * Check if a position is visible in camera
@@ -500,13 +558,13 @@ declare const CharacterComponent: _om_ecs.ComponentType<CharacterController>;
 declare const AnimationComponent: _om_ecs.ComponentType<HFSM>;
 declare const AvatarDataComponent: _om_ecs.ComponentType<any>;
 declare const PlayerComponent: _om_ecs.ComponentType<{
-    id: string;
+  id: string;
 }>;
 interface SpawnPlayerOptions {
-    position?: [number, number, number];
-    avatarConfig?: any;
-    speed?: number;
-    jumpForce?: number;
+  position?: [number, number, number];
+  avatarConfig?: any;
+  speed?: number;
+  jumpForce?: number;
 }
 /**
  * Spawn a player entity with all necessary components
@@ -515,7 +573,11 @@ declare function spawnPlayer(world: World, options?: SpawnPlayerOptions): Entity
 /**
  * Spawn a simple platform entity
  */
-declare function spawnPlatform(world: World, position: [number, number, number], size: [number, number, number]): EntityId;
+declare function spawnPlatform(
+  world: World,
+  position: [number, number, number],
+  size: [number, number, number],
+): EntityId;
 
 /**
  * Asset registry types and runtime loader
@@ -524,18 +586,18 @@ type AssetSlot = 'Head' | 'Torso' | 'Legs' | 'Accessory';
 type AssetHost = 'local' | 'cdn';
 type AssetCoverage = 'standard' | 'minimal' | 'full';
 interface AssetMeta {
-    id: string;
-    slot: AssetSlot;
-    nsfw: boolean;
-    url: string;
-    host: AssetHost;
-    hash: string;
-    coverage: AssetCoverage;
+  id: string;
+  slot: AssetSlot;
+  nsfw: boolean;
+  url: string;
+  host: AssetHost;
+  hash: string;
+  coverage: AssetCoverage;
 }
 interface AssetRegistry {
-    version: number;
-    assets: Record<string, AssetMeta>;
-    fallbacks: Record<AssetSlot, string>;
+  version: number;
+  assets: Record<string, AssetMeta>;
+  fallbacks: Record<AssetSlot, string>;
 }
 /**
  * Load asset registry from JSON
@@ -548,9 +610,13 @@ declare function getAsset(registry: AssetRegistry, id: string): AssetMeta | unde
 /**
  * List assets by slot
  */
-declare function listAssetsBySlot(registry: AssetRegistry, slot: AssetSlot, options?: {
+declare function listAssetsBySlot(
+  registry: AssetRegistry,
+  slot: AssetSlot,
+  options?: {
     nsfw?: boolean;
-}): AssetMeta[];
+  },
+): AssetMeta[];
 /**
  * Get fallback asset for a slot
  */
@@ -558,13 +624,118 @@ declare function getFallback(registry: AssetRegistry, slot: AssetSlot): AssetMet
 /**
  * Get safe alternative for an asset
  */
-declare function getSafeAlternative(registry: AssetRegistry, assetId: string): AssetMeta | undefined;
+declare function getSafeAlternative(
+  registry: AssetRegistry,
+  assetId: string,
+): AssetMeta | undefined;
 /**
  * Validate registry
  */
 declare function validateRegistry(registry: AssetRegistry): {
-    valid: boolean;
-    errors: string[];
+  valid: boolean;
+  errors: string[];
 };
 
-export { ANIM_THRESHOLDS, type ActionState, AnimState, type AnimationClip, AnimationComponent, type AssetCoverage, type AssetHost, type AssetMeta, type AssetRegistry, type AssetSlot, AvatarDataComponent, type BlendNode, CharacterComponent, type CharacterController, type Collider, DEFAULT_CLIPS, DEFAULT_INPUT_MAP, DEFAULT_TRANSITIONS, GameAction, type GamepadMapping, type HFSM, type InputMapping, type InputSystem, type KeyboardMapping, type OrthoCameraRig, type PhysicsWorld, PlayerComponent, type Quaternion, type RigidBody, RigidBodyType, type Side2DAdapter, type SpawnPlayerOptions, type TouchMapping, type Transform, TransformComponent, type Transition, type TransitionData, type Vec3, Vec3Math, type Velocity, VelocityComponent, applyImpulse, applyVelocity, blendAnimations, checkGroundContact, checkGrounded, constrainMovement, constrainPosition, createActionState, createBoxCollider, createCapsuleCollider, createCharacterController, createDynamicBody, createFixedBody, createHFSM, createInputSystem, createKinematicBody, createOrthoCamera, createRapierWorld, createSide2DAdapter, createSphereCollider, createTransform, createVelocity, crossFade, easeInOutCubic, easeInQuad, easeOutQuad, followTarget, getAsset, getBlendWeight, getBodyPosition, getBodyVelocity, getCameraBounds, getCurrentClip, getFallback, getHorizontalSpeed, getMovementDirection, getSafeAlternative, handleStepOffset, isVisible, justPressed, justReleased, lerp, listAssetsBySlot, loadRegistry, pollInput, remapAction, resolveSlopeCollision, screenToWorld, setBodyPosition, setBodyVelocity, setInputEnabled, smoothStep, spawnPlatform, spawnPlayer, stepPhysics, transitionTo, updateCharacter, updateHFSM, validateRegistry, worldToScreen };
+export {
+  ANIM_THRESHOLDS,
+  type ActionState,
+  AnimState,
+  type AnimationClip,
+  AnimationComponent,
+  type AssetCoverage,
+  type AssetHost,
+  type AssetMeta,
+  type AssetRegistry,
+  type AssetSlot,
+  AvatarDataComponent,
+  type BlendNode,
+  CharacterComponent,
+  type CharacterController,
+  type Collider,
+  DEFAULT_CLIPS,
+  DEFAULT_INPUT_MAP,
+  DEFAULT_TRANSITIONS,
+  GameAction,
+  type GamepadMapping,
+  type HFSM,
+  type InputMapping,
+  type InputSystem,
+  type KeyboardMapping,
+  type OrthoCameraRig,
+  type PhysicsWorld,
+  PlayerComponent,
+  type Quaternion,
+  type RigidBody,
+  RigidBodyType,
+  type Side2DAdapter,
+  type SpawnPlayerOptions,
+  type TouchMapping,
+  type Transform,
+  TransformComponent,
+  type Transition,
+  type TransitionData,
+  type Vec3,
+  Vec3Math,
+  type Velocity,
+  VelocityComponent,
+  applyImpulse,
+  applyVelocity,
+  blendAnimations,
+  checkGroundContact,
+  checkGrounded,
+  constrainMovement,
+  constrainPosition,
+  createActionState,
+  createBoxCollider,
+  createCapsuleCollider,
+  createCharacterController,
+  createDynamicBody,
+  createFixedBody,
+  createHFSM,
+  createInputSystem,
+  createKinematicBody,
+  createOrthoCamera,
+  createRapierWorld,
+  createSide2DAdapter,
+  createSphereCollider,
+  createTransform,
+  createVelocity,
+  crossFade,
+  easeInOutCubic,
+  easeInQuad,
+  easeOutQuad,
+  followTarget,
+  getAsset,
+  getBlendWeight,
+  getBodyPosition,
+  getBodyVelocity,
+  getCameraBounds,
+  getCurrentClip,
+  getFallback,
+  getHorizontalSpeed,
+  getMovementDirection,
+  getSafeAlternative,
+  handleStepOffset,
+  isVisible,
+  justPressed,
+  justReleased,
+  lerp,
+  listAssetsBySlot,
+  loadRegistry,
+  pollInput,
+  remapAction,
+  resolveSlopeCollision,
+  screenToWorld,
+  setBodyPosition,
+  setBodyVelocity,
+  setInputEnabled,
+  smoothStep,
+  spawnPlatform,
+  spawnPlayer,
+  stepPhysics,
+  transitionTo,
+  updateCharacter,
+  updateHFSM,
+  validateRegistry,
+  worldToScreen,
+};

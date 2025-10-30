@@ -26,26 +26,22 @@ export function AddToBottomlessBag({
   quantity = 1,
 }: Props) {
   const router = useRouter();
-  
+
   const href = useMemo(
     () => buildPrintifyCheckoutLink(productId, variantId),
-    [productId, variantId]
+    [productId, variantId],
   );
 
-  const label =
-    env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL || 'Add to Bottomless Bag';
+  const label = env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL || 'Add to Bottomless Bag';
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Store quantity in session storage for checkout page
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem(
-        `checkout-quantity-${productId}-${variantId}`,
-        quantity.toString()
-      );
+      sessionStorage.setItem(`checkout-quantity-${productId}-${variantId}`, quantity.toString());
     }
-    
+
     router.push(href);
   };
 
@@ -87,4 +83,3 @@ export function AddToBottomlessBagCompact({
     />
   );
 }
-

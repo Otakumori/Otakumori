@@ -53,9 +53,7 @@ export default function BubblePopGachaPage() {
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && popBubble()}
               aria-label="Pop bubble"
-            >
-              
-            </div>
+            ></div>
             <p className="text-cyan-200 mt-4">Click the bubble to pop it!</p>
           </div>
 

@@ -99,7 +99,7 @@ export function AvatarRenderer({
   return (
     <group
       ref={(group) => {
-        groupRef.current = group ? ((group as unknown) as THREE.Group) : null;
+        groupRef.current = group ? (group as unknown as THREE.Group) : null;
       }}
     >
       {baseScene && <primitive object={baseScene.clone()} />}

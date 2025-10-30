@@ -1,6 +1,6 @@
 /**
  * Centralized English Copy
- * 
+ *
  * Single source of truth for all user-facing text in the application.
  * All components must import from this file rather than using inline strings.
  */
@@ -9,7 +9,7 @@ export const en = {
   // Global Navigation
   nav: {
     home: 'Home',
-    shop: 'Shop', 
+    shop: 'Shop',
     miniGames: 'Mini-Games',
     blog: 'Blog',
     about: 'About',
@@ -43,7 +43,7 @@ export const en = {
         cta: 'Explore Shop',
       },
       blog: {
-        title: 'Community Chronicles', 
+        title: 'Community Chronicles',
         cta: 'Read More',
       },
       games: {
@@ -71,7 +71,7 @@ export const en = {
       },
       faces: {
         trade: 'Open Trade Center',
-        games: 'Browse Mini-Games', 
+        games: 'Browse Mini-Games',
         community: 'Open Avatar and Community Hub',
         music: 'Open Music and Extras',
       },
@@ -85,7 +85,7 @@ export const en = {
       'memory-match': 'Flip cards and match pairs. Perfect recall earns bonuses.',
       'bubble-girl': 'Spawn bubbles, float and score. Sandbox or challenge mode.',
       'bubble-ragdoll': 'Toss the ragdoll into bubbles. Survive the chaos.',
-      'blossomware': 'Chaotic micro-sessions—keep your petal streak alive.',
+      blossomware: 'Chaotic micro-sessions—keep your petal streak alive.',
       'dungeon-of-desire': 'Descend into the dungeon. Survive rooms and claim rewards.',
       'maid-cafe-manager': 'Manage shifts and keep guests smiling.',
       'thigh-coliseum': 'Enter the arena. Win rounds and advance the bracket.',
@@ -97,7 +97,7 @@ export const en = {
       unlock: 'Achievement Unlocked!',
       rarity: {
         common: 'Common',
-        rare: 'Rare', 
+        rare: 'Rare',
         legendary: 'Legendary',
       },
     },
@@ -150,9 +150,10 @@ export const en = {
     checkout: {
       title: 'Checkout',
       success: 'Order placed successfully!',
-      confirmation: 'Exquisite taste, Senpai, I knew you\'d choose wisely.',
+      confirmation: "Exquisite taste, Senpai, I knew you'd choose wisely.",
       couponApplied: 'My little gift to you, enjoy your reward.',
-      footer: '"Believe in yourself. Not in the you who believes in me. Not the me who believes in you. Believe in the you who believes in yourself." — Kamina',
+      footer:
+        '"Believe in yourself. Not in the you who believes in me. Not the me who believes in you. Believe in the you who believes in yourself." — Kamina',
     },
     wishlist: {
       title: 'Wishlist',
@@ -196,7 +197,7 @@ export const en = {
       send: 'Send Praise',
       stamps: {
         'cherry-bud': 'Cherry Bud',
-        'petal-favorite': 'Petal Favorite', 
+        'petal-favorite': 'Petal Favorite',
         'site-blossom': 'Site Blossom',
         'divine-bloom': 'Divine Bloom',
       },
@@ -220,14 +221,14 @@ export const en = {
     edit: {
       title: 'Shape your reflection.',
       displayName: 'Display Name',
-      bio: 'Insider\'s Tale...',
+      bio: "Insider's Tale...",
       avatar: 'Give form to your inner self, Hanamichi.',
       save: 'Save Changes',
       success: "You've never looked more like yourself.",
     },
     tabs: {
       overview: 'Overview',
-      achievements: 'Achievements', 
+      achievements: 'Achievements',
       orders: 'Orders',
       petals: 'Petals',
       settings: 'Settings',
@@ -263,7 +264,8 @@ export const en = {
   honorifics: {
     hanamichi: {
       term: 'Hanamichi',
-      tooltip: "Hanamichi (花道): the 'path of flowers'—a dramatic entrance. Think 'star of the show.'",
+      tooltip:
+        "Hanamichi (花道): the 'path of flowers'—a dramatic entrance. Think 'star of the show.'",
     },
     senpai: {
       term: 'Senpai',
@@ -280,13 +282,13 @@ export const en = {
     transactions: 'Petal Transactions',
   },
 
-  // Error States  
+  // Error States
   errors: {
     generic: 'Something went wrong. Please try again.',
     network: 'Network error. Please check your connection.',
     unauthorized: 'You need to be signed in to do that.',
-    forbidden: 'You don\'t have permission to do that.',
-    notFound: 'The page you\'re looking for doesn\'t exist.',
+    forbidden: "You don't have permission to do that.",
+    notFound: "The page you're looking for doesn't exist.",
     rateLimit: 'Too many requests. Please slow down.',
     validation: 'Please check your input and try again.',
   },
@@ -314,7 +316,7 @@ export const en = {
     },
     sections: {
       otakumori: 'Otaku-mori',
-      support: 'Support', 
+      support: 'Support',
       legal: 'Legal',
       connect: 'Connect',
     },
@@ -337,7 +339,7 @@ export const en = {
   time: {
     justNow: 'Just now',
     minutesAgo: '{minutes}m ago',
-    hoursAgo: '{hours}h ago', 
+    hoursAgo: '{hours}h ago',
     daysAgo: '{days}d ago',
     weeksAgo: '{weeks}w ago',
   },
@@ -371,24 +373,24 @@ export function t(key: string, values?: Record<string, string | number>): string
   // Simple dot notation key access
   const keys = key.split('.');
   let value: any = en;
-  
+
   for (const k of keys) {
     value = value?.[k];
     if (value === undefined) break;
   }
-  
+
   if (typeof value !== 'string') {
     console.warn(`Translation key not found: ${key}`);
     return key;
   }
-  
+
   // Simple interpolation
   if (values) {
     return value.replace(/\{(\w+)\}/g, (match, key) => {
       return values[key]?.toString() || match;
     });
   }
-  
+
   return value;
 }
 

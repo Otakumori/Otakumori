@@ -47,17 +47,17 @@ interface AudioStore {
   // Audio Context
   audioContext: AudioContext | null;
   masterGainNode: GainNode | null;
-  
+
   // Settings
   settings: AudioSettings;
-  
+
   // Sound Library
   sounds: Record<string, Sound>;
   loadedBuffers: Record<string, AudioBuffer>;
-  
+
   // Currently Playing
   playingSounds: Record<string, PlayingSound>;
-  
+
   // Music Layers
   musicLayers: {
     base: string | null;
@@ -65,12 +65,15 @@ interface AudioStore {
     drums: string | null;
     ambient: string | null;
   };
-  
+
   // Actions
   initAudioContext: () => void;
   registerSound: (sound: Sound) => void;
   loadSound: (soundId: string) => Promise<void>;
-  playSound: (soundId: string, options?: { volume?: number; loop?: boolean; position?: [number, number, number] }) => string;
+  playSound: (
+    soundId: string,
+    options?: { volume?: number; loop?: boolean; position?: [number, number, number] },
+  ) => string;
   stopSound: (playingId: string) => void;
   stopAllSounds: () => void;
   updateVolume: (category: SoundCategory | 'master', volume: number) => void;
@@ -109,7 +112,7 @@ export const useAudioStore = create<AudioStore>()(
 
       initAudioContext: () => {
         if (typeof window === 'undefined') return;
-        
+
         const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
         const masterGain = ctx.createGain();
         masterGain.connect(ctx.destination);
@@ -126,14 +129,14 @@ export const useAudioStore = create<AudioStore>()(
       loadSound: async (soundId) => {
         const { sounds, loadedBuffers, audioContext } = get();
         const sound = sounds[soundId];
-        
+
         if (!sound || !audioContext || loadedBuffers[soundId]) return;
 
         try {
           const response = await fetch(sound.url);
           const arrayBuffer = await response.arrayBuffer();
           const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-          
+
           set((state) => ({
             loadedBuffers: { ...state.loadedBuffers, [soundId]: audioBuffer },
           }));
@@ -143,9 +146,10 @@ export const useAudioStore = create<AudioStore>()(
       },
 
       playSound: (soundId, options = {}) => {
-        const { sounds, loadedBuffers, audioContext, masterGainNode, settings, playingSounds } = get();
+        const { sounds, loadedBuffers, audioContext, masterGainNode, settings, playingSounds } =
+          get();
         const sound = sounds[soundId];
-        
+
         if (!sound || !audioContext || !masterGainNode) {
           return '';
         }
@@ -158,18 +162,18 @@ export const useAudioStore = create<AudioStore>()(
 
         const playingId = `${soundId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const buffer = loadedBuffers[soundId];
-        
+
         // Create audio nodes
         const source = audioContext.createBufferSource();
         source.buffer = buffer;
-        
+
         const gainNode = audioContext.createGain();
         const categoryVolume = settings[`${sound.category}Volume` as keyof AudioSettings] as number;
         const soundVolume = options.volume ?? sound.volume;
         gainNode.gain.value = categoryVolume * soundVolume;
 
         let pannerNode: PannerNode | null = null;
-        
+
         if (sound.spatial && settings.spatialAudioEnabled && options.position) {
           pannerNode = audioContext.createPanner();
           pannerNode.panningModel = 'HRTF';
@@ -180,10 +184,10 @@ export const useAudioStore = create<AudioStore>()(
           pannerNode.coneInnerAngle = 360;
           pannerNode.coneOuterAngle = 0;
           pannerNode.coneOuterGain = 0;
-          
+
           const [x, y, z] = options.position;
           pannerNode.setPosition(x, y, z);
-          
+
           source.connect(gainNode);
           gainNode.connect(pannerNode);
           pannerNode.connect(masterGainNode);
@@ -226,7 +230,7 @@ export const useAudioStore = create<AudioStore>()(
       stopSound: (playingId) => {
         const { playingSounds } = get();
         const playing = playingSounds[playingId];
-        
+
         if (playing && playing.audioNode) {
           playing.audioNode.stop();
           set((state) => {
@@ -238,19 +242,19 @@ export const useAudioStore = create<AudioStore>()(
 
       stopAllSounds: () => {
         const { playingSounds } = get();
-        
+
         Object.values(playingSounds).forEach((playing) => {
           if (playing.audioNode) {
             playing.audioNode.stop();
           }
         });
-        
+
         set({ playingSounds: {} });
       },
 
       updateVolume: (category, volume) => {
         const { masterGainNode, playingSounds } = get();
-        
+
         if (category === 'master' && masterGainNode) {
           masterGainNode.gain.value = volume;
           set((state) => ({
@@ -260,7 +264,7 @@ export const useAudioStore = create<AudioStore>()(
           set((state) => ({
             settings: { ...state.settings, [`${category}Volume`]: volume },
           }));
-          
+
           // Update all playing sounds of this category
           Object.values(playingSounds).forEach((playing) => {
             const sound = get().sounds[playing.soundId];
@@ -273,11 +277,11 @@ export const useAudioStore = create<AudioStore>()(
 
       toggleMute: () => {
         const { masterGainNode, settings } = get();
-        
+
         if (masterGainNode) {
           const newMuted = !settings.muted;
           masterGainNode.gain.value = newMuted ? 0 : settings.masterVolume;
-          
+
           set((state) => ({
             settings: { ...state.settings, muted: newMuted },
           }));
@@ -287,7 +291,7 @@ export const useAudioStore = create<AudioStore>()(
       setMusicLayer: (layer, soundId) => {
         const { musicLayers } = get();
         const previousSoundId = musicLayers[layer];
-        
+
         // Stop previous layer if exists
         if (previousSoundId) {
           const playingIds = Object.keys(get().playingSounds).filter(
@@ -295,12 +299,12 @@ export const useAudioStore = create<AudioStore>()(
           );
           playingIds.forEach((id) => get().stopSound(id));
         }
-        
+
         // Play new layer
         if (soundId) {
           get().playSound(soundId, { loop: true });
         }
-        
+
         set((state) => ({
           musicLayers: { ...state.musicLayers, [layer]: soundId },
         }));
@@ -309,7 +313,7 @@ export const useAudioStore = create<AudioStore>()(
       updateSpatialPosition: (playingId, position) => {
         const { playingSounds } = get();
         const playing = playingSounds[playingId];
-        
+
         if (playing && playing.pannerNode) {
           const [x, y, z] = position;
           playing.pannerNode.setPosition(x, y, z);
@@ -324,4 +328,3 @@ export const useAudioStore = create<AudioStore>()(
     },
   ),
 );
-

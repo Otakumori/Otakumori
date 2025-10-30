@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Volume2, VolumeX, Vibrate } from "lucide-react";
-import { useSound } from "@/lib/hooks/useSound";
-import { useHaptic } from "@/lib/hooks/useHaptic";
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Volume2, VolumeX, Vibrate } from 'lucide-react';
+import { useSound } from '@/lib/hooks/useSound';
+import { useHaptic } from '@/lib/hooks/useHaptic';
 
 export function SoundSettings() {
   const { playSound } = useSound();
@@ -17,7 +17,7 @@ export function SoundSettings() {
     setIsMuted((prev) => {
       const next = !prev;
       if (!next) {
-        void playSound("/assets/sounds/ui-click.mp3");
+        void playSound('/assets/sounds/ui-click.mp3');
       }
       return next;
     });
@@ -33,7 +33,11 @@ export function SoundSettings() {
         aria-expanded={isOpen}
         aria-label="Sound settings"
       >
-        {isMuted ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
+        {isMuted ? (
+          <VolumeX className="h-5 w-5" aria-hidden="true" />
+        ) : (
+          <Volume2 className="h-5 w-5" aria-hidden="true" />
+        )}
       </motion.button>
 
       <AnimatePresence>
@@ -53,9 +57,13 @@ export function SoundSettings() {
                   onClick={toggleMute}
                   className="rounded-lg bg-white/10 p-2"
                   aria-pressed={isMuted}
-                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isMuted ? <VolumeX className="h-4 w-4" aria-hidden="true" /> : <Volume2 className="h-4 w-4" aria-hidden="true" />}
+                  {isMuted ? (
+                    <VolumeX className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" aria-hidden="true" />
+                  )}
                 </motion.button>
               </div>
 
@@ -64,7 +72,7 @@ export function SoundSettings() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => vibrate("light")}
+                  onClick={() => vibrate('light')}
                   className="rounded-lg bg-white/10 p-2"
                   aria-label="Trigger haptic feedback"
                 >

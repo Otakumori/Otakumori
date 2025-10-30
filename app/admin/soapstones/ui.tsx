@@ -49,7 +49,7 @@ export default function AdminSoapstones() {
               <td className="px-3">
                 {meLikes[m.id] && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-pink-500/20 px-2 py-1 text-xs text-pink-300">
-                     Liked
+                    Liked
                   </span>
                 )}
               </td>

@@ -25,9 +25,7 @@ class APIMonitor {
   async start(): Promise<void> {
     this.isRunning = true;
     // ' Starting API Monitoring...'
-    // 
-      ` Checking ${this.config.endpoints.length} endpoints every ${this.config.checkInterval / 1000}s`,
-    
+    // ` Checking ${this.config.endpoints.length} endpoints every ${this.config.checkInterval / 1000}s`
 
     while (this.isRunning) {
       await this.runHealthCheck();

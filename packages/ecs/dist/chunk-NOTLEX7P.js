@@ -55,7 +55,7 @@ function createGameLoop(options) {
     isPaused = false;
     lastTime = 0;
     accumulator = 0;
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     rafId = requestAnimationFrame(tick);
   };
   const pause = () => {
@@ -87,7 +87,7 @@ function createGameLoop(options) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
     lastTime = 0;
     accumulator = 0;
     currentTick = 0;
@@ -108,10 +108,8 @@ function createGameLoop(options) {
     },
     get fps() {
       return fps;
-    }
+    },
   };
 }
 
-export {
-  createGameLoop
-};
+export { createGameLoop };

@@ -137,11 +137,7 @@ export type AvatarSpecV15Type = z.infer<typeof AvatarSpecV15>;
 /**
  * Clamps a morph weight value to the defined min/max range
  */
-export function clampMorph(
-  spec: AvatarSpecV15Type,
-  morphId: string,
-  value: number,
-): number {
+export function clampMorph(spec: AvatarSpecV15Type, morphId: string, value: number): number {
   const morph = spec.morphs.find((m) => m.id === morphId);
   if (!morph) {
     // Unknown morph, clamp to 0-1

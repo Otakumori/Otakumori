@@ -66,19 +66,23 @@ export default function AboutMe() {
               },
               {
                 title: 'Community Features',
-                description: 'Connect with fellow otaku through discussions, trades, and shared experiences',
+                description:
+                  'Connect with fellow otaku through discussions, trades, and shared experiences',
               },
               {
                 title: 'Shop Collections',
-                description: 'Curated anime merchandise and gaming accessories from trusted creators',
+                description:
+                  'Curated anime merchandise and gaming accessories from trusted creators',
               },
               {
                 title: 'Digital Collectibles',
-                description: 'Unique items, achievements, and rewards to showcase your otaku journey',
+                description:
+                  'Unique items, achievements, and rewards to showcase your otaku journey',
               },
               {
                 title: 'Safe Environment',
-                description: 'Moderated community spaces ensuring positive interactions for all members',
+                description:
+                  'Moderated community spaces ensuring positive interactions for all members',
               },
               {
                 title: 'Cross-Platform',

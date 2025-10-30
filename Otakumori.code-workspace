@@ -1,7 +1,5 @@
 {
-  "folders": [
-    { "path": "." }
-  ],
+  "folders": [{ "path": "." }],
   "settings": {
     "files.watcherExclude": {
       "**/node_modules/**": true,
@@ -9,7 +7,7 @@
       "**/dist/**": true,
       "**/coverage/**": true,
       "**/.turbo/**": true,
-      "**/packages/**/dist/**": true
+      "**/packages/**/dist/**": true,
     },
     "search.exclude": {
       "**/node_modules/**": true,
@@ -17,8 +15,7 @@
       "**/dist/**": true,
       "**/coverage/**": true,
       "**/.turbo/**": true,
-      "**/packages/**/dist/**": true
-    }
-  }
+      "**/packages/**/dist/**": true,
+    },
+  },
 }
-

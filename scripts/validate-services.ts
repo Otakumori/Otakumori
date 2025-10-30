@@ -18,14 +18,11 @@ const results: ValidationResult[] = [];
 async function validateClerk() {
   console.log('🔐 Testing Clerk Authentication...');
   try {
-    const response = await fetch(
-      `https://api.clerk.com/v1/users?limit=1`,
-      {
-        headers: {
-          Authorization: `Bearer ${env.CLERK_SECRET_KEY}`,
-        },
-      }
-    );
+    const response = await fetch(`https://api.clerk.com/v1/users?limit=1`, {
+      headers: {
+        Authorization: `Bearer ${env.CLERK_SECRET_KEY}`,
+      },
+    });
 
     if (response.ok) {
       results.push({
@@ -100,14 +97,11 @@ async function validatePrintify() {
   }
 
   try {
-    const response = await fetch(
-      `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}.json`,
-      {
-        headers: {
-          Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
-        },
-      }
-    );
+    const response = await fetch(`https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}.json`, {
+      headers: {
+        Authorization: `Bearer ${env.PRINTIFY_API_KEY}`,
+      },
+    });
 
     if (response.ok) {
       const shop = await response.json();
@@ -142,7 +136,7 @@ async function validateDatabase() {
     const prisma = new PrismaClient();
 
     await prisma.$queryRaw`SELECT 1`;
-    
+
     const userCount = await prisma.user.count();
     results.push({
       service: 'Database (Neon)',
@@ -150,7 +144,7 @@ async function validateDatabase() {
       message: '✅ Database connection successful',
       details: `${userCount} users in database`,
     });
-    
+
     await prisma.$disconnect();
   } catch (error) {
     results.push({
@@ -174,14 +168,11 @@ async function validateRedis() {
   }
 
   try {
-    const response = await fetch(
-      `${env.UPSTASH_REDIS_REST_URL}/ping`,
-      {
-        headers: {
-          Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN}`,
-        },
-      }
-    );
+    const response = await fetch(`${env.UPSTASH_REDIS_REST_URL}/ping`, {
+      headers: {
+        Authorization: `Bearer ${env.UPSTASH_REDIS_REST_TOKEN}`,
+      },
+    });
 
     if (response.ok) {
       results.push({
@@ -277,7 +268,7 @@ async function main() {
 
   console.log('\n' + '='.repeat(80));
   console.log(
-    `✅ Passed: ${passed.length} | ❌ Failed: ${failed.length} | ⏭️  Skipped: ${skipped.length}`
+    `✅ Passed: ${passed.length} | ❌ Failed: ${failed.length} | ⏭️  Skipped: ${skipped.length}`,
   );
   console.log('='.repeat(80) + '\n');
 
@@ -302,4 +293,3 @@ main().catch((error) => {
   console.error('💥 Validation script crashed:', error);
   process.exit(1);
 });
-

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   // Get the body
   const payload = await request.text();
   const body = JSON.parse(payload);
-  
+
   // Log webhook event type for debugging
   console.warn('Clerk webhook payload type:', body.type || 'unknown');
 

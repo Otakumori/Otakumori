@@ -410,8 +410,7 @@ const InteractiveHeroSection: React.FC = () => {
           setTimeout(() => setShowTrailBonus(false), 2000);
         }
         if (next % 10 === 0) {
-          const line =
-            senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)] ?? '';
+          const line = senpaiTrailLines[Math.floor(Math.random() * senpaiTrailLines.length)] ?? '';
           if (line) {
             setSenpaiTrailTip(line);
             setTimeout(() => setSenpaiTrailTip(''), 3500);

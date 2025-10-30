@@ -197,9 +197,7 @@ class PerformanceAuditor {
 
       lighthouse.on('close', (code) => {
         if (code === 0) {
-          // 
-            ' Lighthouse is available. Run manually: lighthouse http://localhost:3000 --only-categories=performance',
-          
+          // ' Lighthouse is available. Run manually: lighthouse http://localhost:3000 --only-categories=performance'
         } else {
           // ' Lighthouse not installed. Install with: npm install -g lighthouse'
         }

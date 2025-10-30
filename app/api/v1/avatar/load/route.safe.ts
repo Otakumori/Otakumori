@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     // Log avatar load request
     console.warn('Avatar load requested from:', request.headers.get('user-agent'));
-    
+
     // Check authentication
     const { userId } = await auth();
     if (!userId) {

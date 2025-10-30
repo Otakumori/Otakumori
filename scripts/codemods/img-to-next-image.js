@@ -97,7 +97,6 @@ module.exports.parser = 'tsx';
 
 module.exports.postProcess = function () {
   if (skipped.length) {
-     
     console.log(
       '\n[img-to-next-image] Skipped files (missing width/height or using layout that needs manual sizing):',
     );

@@ -1,6 +1,6 @@
-import type { ChangeEventHandler, FC } from "react";
+import type { ChangeEventHandler, FC } from 'react';
 
-type SortOption = "name" | "date" | "category" | "progress";
+type SortOption = 'name' | 'date' | 'category' | 'progress';
 
 interface AchievementSortProps {
   sortBy: SortOption;
@@ -8,10 +8,10 @@ interface AchievementSortProps {
 }
 
 const OPTIONS: Array<{ value: SortOption; label: string }> = [
-  { value: "name", label: "Name" },
-  { value: "date", label: "Date" },
-  { value: "category", label: "Category" },
-  { value: "progress", label: "Progress" },
+  { value: 'name', label: 'Name' },
+  { value: 'date', label: 'Date' },
+  { value: 'category', label: 'Category' },
+  { value: 'progress', label: 'Progress' },
 ];
 
 export const AchievementSort: FC<AchievementSortProps> = ({ sortBy, onSortChange }) => {

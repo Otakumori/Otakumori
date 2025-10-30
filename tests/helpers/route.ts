@@ -1,9 +1,9 @@
 export async function callGET(mod: Record<string, unknown>, init?: RequestInit) {
-  const url = "http://localhost/test";
-  const req = new Request(url, { method: "GET", ...init });
+  const url = 'http://localhost/test';
+  const req = new Request(url, { method: 'GET', ...init });
   const handler = mod.GET as ((request: Request) => Promise<Response>) | undefined;
   if (!handler) {
-    throw new Error("Module does not export GET handler");
+    throw new Error('Module does not export GET handler');
   }
   const res = await handler(req);
   const json = await res.json();
@@ -11,15 +11,15 @@ export async function callGET(mod: Record<string, unknown>, init?: RequestInit) 
 }
 
 export async function callPOST(mod: Record<string, unknown>, body?: unknown, init?: RequestInit) {
-  const url = "http://localhost/test";
+  const url = 'http://localhost/test';
   const headers = new Headers(init?.headers);
-  if (body !== undefined && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
+  if (body !== undefined && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
   }
 
   const requestInit: RequestInit = {
     ...init,
-    method: "POST",
+    method: 'POST',
     headers,
   };
 
@@ -30,7 +30,7 @@ export async function callPOST(mod: Record<string, unknown>, body?: unknown, ini
   const req = new Request(url, requestInit);
   const handler = mod.POST as ((request: Request) => Promise<Response>) | undefined;
   if (!handler) {
-    throw new Error("Module does not export POST handler");
+    throw new Error('Module does not export POST handler');
   }
   const res = await handler(req);
   const json = await res.json();

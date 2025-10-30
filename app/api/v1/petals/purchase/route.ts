@@ -72,7 +72,7 @@ export async function POST(request: Request) {
         method: 'POST',
         path: '/api/v1/petals/purchase',
         userId: user.id,
-        response: '',  // Will be updated after transaction
+        response: '', // Will be updated after transaction
         purpose: 'petal_purchase',
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },

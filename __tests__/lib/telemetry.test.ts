@@ -32,11 +32,11 @@ describe('TelemetryService', () => {
       const config = { enabled: true, debug: false, vendor: 'console' as const };
       const service1 = new TelemetryService(config);
       const service2 = new TelemetryService(config);
-      
+
       // Access private sessionId through any method that uses it
       service1.track('test', {});
       service2.track('test', {});
-      
+
       // Should have been called twice (once for each service)
       expect(mockConsoleLog).toHaveBeenCalledTimes(2);
     });
@@ -59,7 +59,7 @@ describe('TelemetryService', () => {
           properties: { key: 'value' },
           sessionId: expect.any(String),
           timestamp: expect.any(Number),
-        })
+        }),
       );
     });
 
@@ -98,7 +98,7 @@ describe('TelemetryService', () => {
             normalData: 'safe data',
             password: '[REDACTED]',
           },
-        })
+        }),
       );
     });
 
@@ -118,7 +118,7 @@ describe('TelemetryService', () => {
           properties: {
             longString: 'a'.repeat(100) + '...',
           },
-        })
+        }),
       );
     });
   });
@@ -139,7 +139,7 @@ describe('TelemetryService', () => {
           event: 'user_identified',
           properties: { name: 'Test User', userId: 'user123' },
           userId: 'user123',
-        })
+        }),
       );
     });
   });
@@ -159,7 +159,7 @@ describe('TelemetryService', () => {
         expect.objectContaining({
           event: 'page_view',
           properties: { page: 'home', section: 'hero' },
-        })
+        }),
       );
     });
   });
@@ -184,7 +184,7 @@ describe('TelemetryService', () => {
             stack: expect.any(String),
             component: 'test',
           },
-        })
+        }),
       );
     });
   });
@@ -212,7 +212,7 @@ describe('TelemetryService', () => {
             source: 'live',
             duration: 150,
           },
-        })
+        }),
       );
     });
 
@@ -227,7 +227,7 @@ describe('TelemetryService', () => {
             variant: 'hero',
             position: { x: 50, y: 100 },
           },
-        })
+        }),
       );
     });
 
@@ -242,7 +242,7 @@ describe('TelemetryService', () => {
             success: true,
             textLength: 42,
           },
-        })
+        }),
       );
     });
 
@@ -258,7 +258,7 @@ describe('TelemetryService', () => {
             fps: 60,
             frameDrops: 2,
           },
-        })
+        }),
       );
     });
 
@@ -274,7 +274,7 @@ describe('TelemetryService', () => {
             element: 'button',
             id: 'test-btn',
           },
-        })
+        }),
       );
     });
   });

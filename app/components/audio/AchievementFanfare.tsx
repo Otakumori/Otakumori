@@ -57,7 +57,9 @@ export default function AchievementFanfare({
   const config = ACHIEVEMENT_CONFIG[type];
   const Icon = config.icon;
   const { play } = useSoundEffect(config.sound);
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
+  const [particles, setParticles] = useState<
+    Array<{ id: number; x: number; y: number; delay: number }>
+  >([]);
 
   useEffect(() => {
     if (show) {
@@ -92,11 +94,11 @@ export default function AchievementFanfare({
           {particles.map((particle) => (
             <motion.div
               key={particle.id}
-              initial={{ 
-                x: '50vw', 
-                y: '50vh', 
-                scale: 0, 
-                opacity: 1 
+              initial={{
+                x: '50vw',
+                y: '50vh',
+                scale: 0,
+                opacity: 1,
               }}
               animate={{
                 x: `${particle.x}vw`,
@@ -127,7 +129,9 @@ export default function AchievementFanfare({
             }}
             className="relative z-10"
           >
-            <div className={`rounded-3xl border-4 border-white/40 bg-gradient-to-br ${config.color} p-8 shadow-2xl`}>
+            <div
+              className={`rounded-3xl border-4 border-white/40 bg-gradient-to-br ${config.color} p-8 shadow-2xl`}
+            >
               {/* Icon */}
               <motion.div
                 initial={{ scale: 0 }}
@@ -180,8 +184,8 @@ export default function AchievementFanfare({
               <motion.div
                 key={i}
                 initial={{ scale: 0, rotate: 0 }}
-                animate={{ 
-                  scale: [0, 1, 0], 
+                animate={{
+                  scale: [0, 1, 0],
                   rotate: 360,
                 }}
                 transition={{
@@ -214,4 +218,3 @@ export default function AchievementFanfare({
     </AnimatePresence>
   );
 }
-

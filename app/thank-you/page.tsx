@@ -96,9 +96,7 @@ export default function ThankYouPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950">
         <div className="text-center">
           <div className="mb-4 text-6xl text-red-400">
-            <span role="img" aria-label="Warning">
-              
-            </span>
+            <span role="img" aria-label="Warning"></span>
           </div>
           <h1 className="mb-4 text-2xl font-bold text-white">Order Not Found</h1>
           <p className="mb-6 text-neutral-300">{error}</p>
@@ -135,9 +133,7 @@ export default function ThankYouPage() {
                 transition={{ duration: 1.5, ease: 'easeOut' }}
                 className="mb-4 text-8xl"
               >
-                <span role="img" aria-label="Cherry blossom">
-                  
-                </span>
+                <span role="img" aria-label="Cherry blossom"></span>
               </motion.div>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}

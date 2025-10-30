@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import Image from 'next/image';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 interface CanopyProps {
   windDirection?: number;
@@ -30,8 +30,8 @@ export default function Canopy({ windDirection = 45, windSpeed = 1, className }:
     };
 
     updateBounds();
-    window.addEventListener("resize", updateBounds);
-    return () => window.removeEventListener("resize", updateBounds);
+    window.addEventListener('resize', updateBounds);
+    return () => window.removeEventListener('resize', updateBounds);
   }, []);
 
   useEffect(() => {
@@ -51,22 +51,22 @@ export default function Canopy({ windDirection = 45, windSpeed = 1, className }:
   }, [windDirection, windSpeed]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     (window as Window & { canopyBounds?: typeof canopyBounds }).canopyBounds = canopyBounds;
   }, [canopyBounds]);
 
   const containerClassName = [
-    "fixed top-0 left-0 h-screen w-full pointer-events-none z-0 canopy-background",
+    'fixed top-0 left-0 h-screen w-full pointer-events-none z-0 canopy-background',
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   return (
     <div ref={containerRef} className={containerClassName}>
       <div
         className="absolute inset-0 canopy-rotation"
-        style={{ "--rotation": `${rotation}deg` } as CSSProperties}
+        style={{ '--rotation': `${rotation}deg` } as CSSProperties}
       >
         <Image
           src="/media/cherry-tree.png"

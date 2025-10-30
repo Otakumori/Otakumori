@@ -69,7 +69,10 @@ export default async function MiniGamesSection() {
             <p className="text-secondary mb-6">
               We're preparing exciting mini-games for you. Stay tuned!
             </p>
-            <Link href={paths.games()} className="btn-primary inline-block hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]">
+            <Link
+              href={paths.games()}
+              className="btn-primary inline-block hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
+            >
               Explore Games
             </Link>
           </div>
@@ -133,7 +136,10 @@ export default async function MiniGamesSection() {
             <p className="text-secondary mb-6">
               We're working on adding new games. Check back soon!
             </p>
-            <Link href={paths.games()} className="btn-primary inline-block hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]">
+            <Link
+              href={paths.games()}
+              className="btn-primary inline-block hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
+            >
               Explore Games
             </Link>
           </div>

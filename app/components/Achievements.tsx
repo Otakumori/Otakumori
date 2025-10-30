@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { Lock, Trophy } from "lucide-react";
+import { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
+import { Lock, Trophy } from 'lucide-react';
 
-import { AchievementProvider, useAchievements } from "./achievements/AchievementProvider";
-import { AchievementList } from "./achievements/AchievementList";
-import { AchievementSearch } from "./achievements/AchievementSearch";
+import { AchievementProvider, useAchievements } from './achievements/AchievementProvider';
+import { AchievementList } from './achievements/AchievementList';
+import { AchievementSearch } from './achievements/AchievementSearch';
 
 function AchievementsContent() {
   const { achievements, getUnlockedCount } = useAchievements();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   const filtered = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -30,7 +30,7 @@ function AchievementsContent() {
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Achievements</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {getUnlockedCount()} unlocked · {achievements.length} total goals
+              {getUnlockedCount()} unlocked ï¿½ {achievements.length} total goals
             </p>
           </div>
           <motion.div

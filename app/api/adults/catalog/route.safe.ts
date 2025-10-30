@@ -20,18 +20,14 @@ function getUserRegion(request: NextRequest): string {
   // Try to get from request headers first (Cloudflare/Vercel provide this)
   const cfCountry = request.headers.get('cf-ipcountry');
   if (cfCountry) return cfCountry.toLowerCase();
-  
+
   // Fallback to US if no region detected
   return 'us';
 }
 
 // Filter packs by region and user preferences
-function filterPacks(
-  packs: AdultPackType[],
-  userRegion: string,
-  gatedPrefs: any
-): AdultPackType[] {
-  return packs.filter(pack => {
+function filterPacks(packs: AdultPackType[], userRegion: string, gatedPrefs: any): AdultPackType[] {
+  return packs.filter((pack) => {
     // Region filtering
     if (pack.regionAllowlist && pack.regionAllowlist.length > 0) {
       if (!pack.regionAllowlist.includes(userRegion)) {
@@ -50,7 +46,7 @@ function filterPacks(
     }
 
     // Filter out packs with suggestive interactions if user doesn't want them
-    if (pack.interactions.some(i => i.gated) && !gatedPrefs.allowSuggestiveInteractions) {
+    if (pack.interactions.some((i) => i.gated) && !gatedPrefs.allowSuggestiveInteractions) {
       return false;
     }
 
@@ -62,19 +58,13 @@ export async function GET(request: NextRequest) {
   try {
     // Check feature flags
     if (!checkFeatureFlags()) {
-      return NextResponse.json(
-        { error: 'Feature not available' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Feature not available' }, { status: 503 });
     }
 
     // Check authentication
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Check adult verification (this would need to be implemented in Clerk)
@@ -89,10 +79,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch packs from storage index
     if (!env.ADULTS_STORAGE_INDEX_URL) {
-      return NextResponse.json(
-        { error: 'Storage not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Storage not configured' }, { status: 503 });
     }
 
     const response = await fetch(env.ADULTS_STORAGE_INDEX_URL);
@@ -123,20 +110,19 @@ export async function GET(request: NextRequest) {
       },
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
-
   } catch (error) {
     console.error('Catalog API error:', error);
     return NextResponse.json(
-      { 
-        ok: false, 
+      {
+        ok: false,
         error: {
           code: 'INTERNAL_ERROR',
           message: 'Failed to fetch catalog',
-          details: error instanceof Error ? error.message : 'Unknown error'
+          details: error instanceof Error ? error.message : 'Unknown error',
         },
         requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

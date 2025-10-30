@@ -4,13 +4,13 @@
  */
 export type EntityId = string;
 export interface ComponentType<_T> {
-    readonly __brand: symbol;
-    readonly name: string;
+  readonly __brand: symbol;
+  readonly name: string;
 }
 export interface World {
-    nextEntityId: string | number;
-    components: Map<ComponentType<any>, Map<EntityId, any>>;
-    entities: Set<EntityId>;
+  nextEntityId: string | number;
+  components: Map<ComponentType<any>, Map<EntityId, any>>;
+  entities: Set<EntityId>;
 }
 /**
  * Create a component type identifier
@@ -31,11 +31,20 @@ export declare function despawn(world: World, entity: EntityId): void;
 /**
  * Add a component to an entity
  */
-export declare function add<T>(world: World, component: ComponentType<T>, entity: EntityId, data: T): void;
+export declare function add<T>(
+  world: World,
+  component: ComponentType<T>,
+  entity: EntityId,
+  data: T,
+): void;
 /**
  * Get a component from an entity
  */
-export declare function get<T>(world: World, component: ComponentType<T>, entity: EntityId): T | undefined;
+export declare function get<T>(
+  world: World,
+  component: ComponentType<T>,
+  entity: EntityId,
+): T | undefined;
 /**
  * Check if an entity has a component
  */
@@ -51,15 +60,30 @@ export declare function query<T1>(world: World, c1: ComponentType<T1>): Iterable
 /**
  * Query entities with specific components (2 components)
  */
-export declare function query2<T1, T2>(world: World, c1: ComponentType<T1>, c2: ComponentType<T2>): Iterable<[EntityId, T1, T2]>;
+export declare function query2<T1, T2>(
+  world: World,
+  c1: ComponentType<T1>,
+  c2: ComponentType<T2>,
+): Iterable<[EntityId, T1, T2]>;
 /**
  * Query entities with specific components (3 components)
  */
-export declare function query3<T1, T2, T3>(world: World, c1: ComponentType<T1>, c2: ComponentType<T2>, c3: ComponentType<T3>): Iterable<[EntityId, T1, T2, T3]>;
+export declare function query3<T1, T2, T3>(
+  world: World,
+  c1: ComponentType<T1>,
+  c2: ComponentType<T2>,
+  c3: ComponentType<T3>,
+): Iterable<[EntityId, T1, T2, T3]>;
 /**
  * Query entities with specific components (4 components)
  */
-export declare function query4<T1, T2, T3, T4>(world: World, c1: ComponentType<T1>, c2: ComponentType<T2>, c3: ComponentType<T3>, c4: ComponentType<T4>): Iterable<[EntityId, T1, T2, T3, T4]>;
+export declare function query4<T1, T2, T3, T4>(
+  world: World,
+  c1: ComponentType<T1>,
+  c2: ComponentType<T2>,
+  c3: ComponentType<T3>,
+  c4: ComponentType<T4>,
+): Iterable<[EntityId, T1, T2, T3, T4]>;
 /**
  * Count entities in the world
  */

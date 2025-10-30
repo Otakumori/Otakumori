@@ -60,4 +60,3 @@ export function ShopGridSkeleton({ count = 6 }: { count?: number }) {
     </div>
   );
 }
-

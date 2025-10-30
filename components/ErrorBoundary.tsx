@@ -56,9 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
           >
             <div className="mb-4">
               <div className="w-16 h-16 mx-auto bg-red-500/20 rounded-full flex items-center justify-center mb-4">
-                <span className="text-2xl" role="img" aria-label="Warning">
-                  
-                </span>
+                <span className="text-2xl" role="img" aria-label="Warning"></span>
               </div>
               <h2 className="text-xl font-bold text-white mb-2">Something went wrong</h2>
               <p className="text-gray-400 text-sm">
@@ -75,7 +73,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <div className="mb-2">
                     <strong>Error:</strong> {this.state.error.message}
                   </div>
-                   {this.state.errorInfo && (
+                  {this.state.errorInfo && (
                     <div>
                       <strong>Stack:</strong>
                       <pre className="mt-1 text-xs overflow-x-auto">
@@ -95,9 +93,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Refresh Page
               </button>
               <button
-                onClick={() =>
-                  this.setState({ hasError: false, error: null, errorInfo: null })
-                }
+                onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
                 className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 Try Again

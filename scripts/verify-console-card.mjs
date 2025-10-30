@@ -76,4 +76,3 @@ try {
   console.error(String(err.message || err));
   process.exit(1);
 }
-

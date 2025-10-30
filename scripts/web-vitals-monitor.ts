@@ -532,9 +532,8 @@ export function trackUserJourney(journeyName: string, action: 'start' | 'complet
     }, []);
 
     // For user journeys:
-    import { trackUserJourney } from '@/lib/web-vitals';
-    
-    trackUserJourney('checkout', 'start');
+    // import { trackUserJourney } from '@/lib/web-vitals';
+    // trackUserJourney('checkout', 'start');
     // ... user completes checkout
     trackUserJourney('checkout', 'complete');
     `);

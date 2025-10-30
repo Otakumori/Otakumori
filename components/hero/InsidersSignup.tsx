@@ -134,9 +134,7 @@ export function InsidersSignup() {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm text-center">
                 <div className="mb-3 text-3xl">
-                  <span role="img" aria-label="Cherry blossom">
-                    
-                  </span>
+                  <span role="img" aria-label="Cherry blossom"></span>
                 </div>
                 <h4 className="mb-2 text-lg font-semibold text-white">Early Access</h4>
                 <p className="text-sm text-purple-200">Be first to discover new drops</p>
@@ -144,9 +142,7 @@ export function InsidersSignup() {
 
               <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm text-center">
                 <div className="mb-3 text-3xl">
-                  <span role="img" aria-label="Video game controller">
-                    
-                  </span>
+                  <span role="img" aria-label="Video game controller"></span>
                 </div>
                 <h4 className="mb-2 text-lg font-semibold text-white">Hidden Petals</h4>
                 <p className="text-sm text-purple-200">Exclusive content and rewards</p>
@@ -154,9 +150,7 @@ export function InsidersSignup() {
 
               <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm text-center">
                 <div className="mb-3 text-3xl">
-                  <span role="img" aria-label="Lightning bolt">
-                    
-                  </span>
+                  <span role="img" aria-label="Lightning bolt"></span>
                 </div>
                 <h4 className="mb-2 text-lg font-semibold text-white">Inner Circle</h4>
                 <p className="text-sm text-purple-200">Join the digital shrine elite</p>

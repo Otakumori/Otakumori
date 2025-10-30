@@ -1,7 +1,14 @@
 // components/sections/HomeBlogTeaser.tsx
 import Image from 'next/image';
 
-type Post = { id: string; slug: string; title: string; excerpt?: string; image?: string; date?: string };
+type Post = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  image?: string;
+  date?: string;
+};
 
 export default async function HomeBlogTeaser() {
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? '';
@@ -40,7 +47,11 @@ export default async function HomeBlogTeaser() {
           </div>
           <div className="p-4">
             <div className="font-semibold text-pink-100 line-clamp-2">{p.title}</div>
-            {p.date && <div className="mt-1 text-xs text-pink-200/60">{new Date(p.date).toLocaleDateString()}</div>}
+            {p.date && (
+              <div className="mt-1 text-xs text-pink-200/60">
+                {new Date(p.date).toLocaleDateString()}
+              </div>
+            )}
             {p.excerpt && <p className="mt-2 text-sm text-pink-200/80 line-clamp-2">{p.excerpt}</p>}
           </div>
         </a>

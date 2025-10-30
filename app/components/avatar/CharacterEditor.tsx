@@ -424,7 +424,7 @@ export default function CharacterEditor({
   // Comparison view
   const [showComparison, setShowComparison] = useState(false);
   const [comparisonConfig, setComparisonConfig] = useState<AvatarConfiguration | null>(null);
-  
+
   // Mobile and touch controls
   const [isMobile, setIsMobile] = useState(false);
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
@@ -526,7 +526,7 @@ export default function CharacterEditor({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -540,29 +540,32 @@ export default function CharacterEditor({
     }
   }, []);
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!touchStart || e.touches.length !== 1) return;
-    
-    const touch = e.touches[0];
-    const deltaX = touch.clientX - touchStart.x;
-    const deltaY = touch.clientY - touchStart.y;
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-    if (distance > 10) {
-      setIsDragging(true);
-      
-      // Handle camera rotation on touch
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe - rotate Y
-        const rotationY = (deltaX / window.innerWidth) * 180;
-        setCameraRotation(prev => ({ ...prev, y: prev.y + rotationY * 0.1 }));
-      } else {
-        // Vertical swipe - rotate X
-        const rotationX = (deltaY / window.innerHeight) * 180;
-        setCameraRotation(prev => ({ ...prev, x: prev.x + rotationX * 0.1 }));
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!touchStart || e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchStart.x;
+      const deltaY = touch.clientY - touchStart.y;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      if (distance > 10) {
+        setIsDragging(true);
+
+        // Handle camera rotation on touch
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          // Horizontal swipe - rotate Y
+          const rotationY = (deltaX / window.innerWidth) * 180;
+          setCameraRotation((prev) => ({ ...prev, y: prev.y + rotationY * 0.1 }));
+        } else {
+          // Vertical swipe - rotate X
+          const rotationX = (deltaY / window.innerHeight) * 180;
+          setCameraRotation((prev) => ({ ...prev, x: prev.x + rotationX * 0.1 }));
+        }
       }
-    }
-  }, [touchStart]);
+    },
+    [touchStart],
+  );
 
   const handleTouchEnd = useCallback(() => {
     setTouchStart(null);
@@ -570,91 +573,105 @@ export default function CharacterEditor({
   }, []);
 
   // Pinch to zoom
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    if (isMobile) {
-      e.preventDefault();
-      const zoomDelta = e.deltaY > 0 ? -0.1 : 0.1;
-      setCameraZoom(prev => Math.max(0.5, Math.min(3, prev + zoomDelta)));
-    }
-  }, [isMobile]);
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (isMobile) {
+        e.preventDefault();
+        const zoomDelta = e.deltaY > 0 ? -0.1 : 0.1;
+        setCameraZoom((prev) => Math.max(0.5, Math.min(3, prev + zoomDelta)));
+      }
+    },
+    [isMobile],
+  );
 
   // Keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Tab navigation between controls
-    if (e.key === 'Tab') {
-      // Let default tab behavior work
-      return;
-    }
-
-    // Camera controls
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      setCameraRotation(prev => ({ ...prev, y: prev.y - 15 }));
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      setCameraRotation(prev => ({ ...prev, y: prev.y + 15 }));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setCameraRotation(prev => ({ ...prev, x: prev.x - 15 }));
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setCameraRotation(prev => ({ ...prev, x: prev.x + 15 }));
-    }
-
-    // Zoom controls
-    if (e.key === '+' || e.key === '=') {
-      e.preventDefault();
-      setCameraZoom(prev => Math.min(3, prev + 0.1));
-    } else if (e.key === '-') {
-      e.preventDefault();
-      setCameraZoom(prev => Math.max(0.5, prev - 0.1));
-    }
-
-    // Reset controls
-    if (e.key === 'r' || e.key === 'R') {
-      e.preventDefault();
-      setCameraZoom(1);
-      setCameraRotation({ x: 0, y: 0 });
-    }
-
-    // Undo/Redo
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key === 'z' && !e.shiftKey) {
-        e.preventDefault();
-        undo();
-      } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
-        e.preventDefault();
-        redo();
-      } else if (e.key === 's') {
-        e.preventDefault();
-        handleSave();
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      // Tab navigation between controls
+      if (e.key === 'Tab') {
+        // Let default tab behavior work
+        return;
       }
-    }
 
-    // Tab switching
-    if (e.key >= '1' && e.key <= '7') {
-      e.preventDefault();
-      const tabIndex = parseInt(e.key) - 1;
-      const tabs = ['parts', 'morphing', 'materials', 'lighting', 'camera', 'poses', 'background'];
-      if (tabs[tabIndex]) {
-        setActiveTab(tabs[tabIndex] as any);
+      // Camera controls
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCameraRotation((prev) => ({ ...prev, y: prev.y - 15 }));
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCameraRotation((prev) => ({ ...prev, y: prev.y + 15 }));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setCameraRotation((prev) => ({ ...prev, x: prev.x - 15 }));
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setCameraRotation((prev) => ({ ...prev, x: prev.x + 15 }));
       }
-    }
 
-    // Screenshot
-    if (e.key === 'p' || e.key === 'P') {
-      e.preventDefault();
-      captureScreenshot();
-    }
-
-    // Toggle comparison
-    if (e.key === 'c' || e.key === 'C') {
-      e.preventDefault();
-      if (comparisonConfig) {
-        setShowComparison(!showComparison);
+      // Zoom controls
+      if (e.key === '+' || e.key === '=') {
+        e.preventDefault();
+        setCameraZoom((prev) => Math.min(3, prev + 0.1));
+      } else if (e.key === '-') {
+        e.preventDefault();
+        setCameraZoom((prev) => Math.max(0.5, prev - 0.1));
       }
-    }
-  }, [undo, redo, handleSave, captureScreenshot, comparisonConfig, showComparison]);
+
+      // Reset controls
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        setCameraZoom(1);
+        setCameraRotation({ x: 0, y: 0 });
+      }
+
+      // Undo/Redo
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          undo();
+        } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
+          e.preventDefault();
+          redo();
+        } else if (e.key === 's') {
+          e.preventDefault();
+          handleSave();
+        }
+      }
+
+      // Tab switching
+      if (e.key >= '1' && e.key <= '7') {
+        e.preventDefault();
+        const tabIndex = parseInt(e.key) - 1;
+        const tabs = [
+          'parts',
+          'morphing',
+          'materials',
+          'lighting',
+          'camera',
+          'poses',
+          'background',
+        ];
+        if (tabs[tabIndex]) {
+          setActiveTab(tabs[tabIndex] as any);
+        }
+      }
+
+      // Screenshot
+      if (e.key === 'p' || e.key === 'P') {
+        e.preventDefault();
+        captureScreenshot();
+      }
+
+      // Toggle comparison
+      if (e.key === 'c' || e.key === 'C') {
+        e.preventDefault();
+        if (comparisonConfig) {
+          setShowComparison(!showComparison);
+        }
+      }
+    },
+    [undo, redo, handleSave, captureScreenshot, comparisonConfig, showComparison],
+  );
 
   // GLB export
   const exportGLB = useCallback(async () => {
@@ -680,7 +697,7 @@ export default function CharacterEditor({
       };
 
       const shareUrl = `${window.location.origin}/character-editor?preset=${encodeURIComponent(JSON.stringify(presetData))}`;
-      
+
       if (navigator.share) {
         await navigator.share({
           title: 'My Avatar Preset',
@@ -756,13 +773,15 @@ export default function CharacterEditor({
       )}
 
       {/* Left Panel - Controls */}
-      <div className={`${
-        isMobile 
-          ? `fixed top-0 left-0 h-full w-80 z-40 transform transition-transform duration-300 ${
-              sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'
-            }`
-          : 'w-80'
-      } bg-black/20 backdrop-blur-lg border-r border-white/10 overflow-y-auto`}>
+      <div
+        className={`${
+          isMobile
+            ? `fixed top-0 left-0 h-full w-80 z-40 transform transition-transform duration-300 ${
+                sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'
+              }`
+            : 'w-80'
+        } bg-black/20 backdrop-blur-lg border-r border-white/10 overflow-y-auto`}
+      >
         <div className="p-6">
           {/* Header */}
           <div className="mb-6">

@@ -18,7 +18,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (typeof isFlagged === 'boolean') {
     updateData.status = isFlagged ? SoapstoneStatus.REPORTED : SoapstoneStatus.VISIBLE;
   }
-  
+
   const msg = await prisma.soapstoneMessage.update({
     where: { id: params.id },
     data: updateData,

@@ -1,51 +1,52 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, Flag, Shield, UserX, X } from "lucide-react";
-import GlassButton from "@/app/components/ui/GlassButton";
-import GlassCard from "@/app/components/ui/GlassCard";
-import {
-  type ApiEnvelope,
-  type UserReport,
-  type UserReportCreate,
-} from "@/app/lib/contracts";
-import { cn } from "@/lib/utils";
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertTriangle, Flag, Shield, UserX, X } from 'lucide-react';
+import GlassButton from '@/app/components/ui/GlassButton';
+import GlassCard from '@/app/components/ui/GlassCard';
+import { type ApiEnvelope, type UserReport, type UserReportCreate } from '@/app/lib/contracts';
+import { cn } from '@/lib/utils';
 
 const REPORT_REASONS: Array<{
-  value: UserReportCreate["reason"];
+  value: UserReportCreate['reason'];
   label: string;
   icon: typeof AlertTriangle;
   color: string;
 }> = [
-  { value: "spam", label: "Spam", icon: AlertTriangle, color: "text-yellow-400" },
-  { value: "harassment", label: "Harassment", icon: UserX, color: "text-red-400" },
-  { value: "inappropriate", label: "Inappropriate Content", icon: Shield, color: "text-orange-400" },
-  { value: "fake", label: "Fake Account", icon: UserX, color: "text-purple-400" },
-  { value: "underage", label: "Underage User", icon: AlertTriangle, color: "text-pink-400" },
-  { value: "other", label: "Other", icon: Flag, color: "text-gray-400" },
+  { value: 'spam', label: 'Spam', icon: AlertTriangle, color: 'text-yellow-400' },
+  { value: 'harassment', label: 'Harassment', icon: UserX, color: 'text-red-400' },
+  {
+    value: 'inappropriate',
+    label: 'Inappropriate Content',
+    icon: Shield,
+    color: 'text-orange-400',
+  },
+  { value: 'fake', label: 'Fake Account', icon: UserX, color: 'text-purple-400' },
+  { value: 'underage', label: 'Underage User', icon: AlertTriangle, color: 'text-pink-400' },
+  { value: 'other', label: 'Other', icon: Flag, color: 'text-gray-400' },
 ];
 
 async function getLogger() {
-  const { logger } = await import("@/app/lib/logger");
+  const { logger } = await import('@/app/lib/logger');
   return logger;
 }
 
 interface ReportButtonProps {
-  contentType: UserReportCreate["contentType"];
+  contentType: UserReportCreate['contentType'];
   contentId?: string;
   reportedUserId?: string;
   className?: string;
 }
 
 const createInitialReportData = (
-  contentType: UserReportCreate["contentType"],
+  contentType: UserReportCreate['contentType'],
   contentId?: string,
   reportedUserId?: string,
 ): UserReportCreate => ({
   contentType,
-  reason: "spam",
-  description: "",
+  reason: 'spam',
+  description: '',
   ...(contentId ? { contentId } : {}),
   ...(reportedUserId ? { reportedUserId } : {}),
 });
@@ -79,9 +80,9 @@ export default function ReportButton({
     try {
       setIsSubmitting(true);
 
-      const response = await fetch("/api/v1/moderation/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/v1/moderation/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reportData),
       });
 
@@ -97,7 +98,7 @@ export default function ReportButton({
       handleClose();
     } catch (error) {
       const logger = await getLogger();
-      logger.error("Failed to submit report", {
+      logger.error('Failed to submit report', {
         extra: { error: error instanceof Error ? error.message : String(error) },
       });
     } finally {
@@ -156,13 +157,13 @@ export default function ReportButton({
                             }))
                           }
                           className={cn(
-                            "rounded-lg border p-3 transition-colors",
+                            'rounded-lg border p-3 transition-colors',
                             reportData.reason === value
-                              ? "border-pink-500 bg-pink-500/10"
-                              : "border-white/20 bg-white/5 hover:bg-white/10",
+                              ? 'border-pink-500 bg-pink-500/10'
+                              : 'border-white/20 bg-white/5 hover:bg-white/10',
                           )}
                         >
-                          <Icon className={cn("mx-auto mb-1 h-5 w-5", color)} aria-hidden="true" />
+                          <Icon className={cn('mx-auto mb-1 h-5 w-5', color)} aria-hidden="true" />
                           <span className="text-xs text-white/80">{label}</span>
                         </button>
                       ))}
@@ -174,7 +175,7 @@ export default function ReportButton({
                       Additional details (optional)
                     </label>
                     <textarea
-                      value={reportData.description ?? ""}
+                      value={reportData.description ?? ''}
                       onChange={(event) =>
                         setReportData((prev) => ({
                           ...prev,
@@ -187,13 +188,13 @@ export default function ReportButton({
                       maxLength={1000}
                     />
                     <div className="mt-1 text-xs text-white/50">
-                      {(reportData.description?.length ?? 0)}/1000 characters
+                      {reportData.description?.length ?? 0}/1000 characters
                     </div>
                   </div>
 
                   <div className="flex gap-3">
                     <GlassButton onClick={submitReport} disabled={isSubmitting} className="flex-1">
-                      {isSubmitting ? "Submitting..." : "Submit Report"}
+                      {isSubmitting ? 'Submitting...' : 'Submit Report'}
                     </GlassButton>
                     <GlassButton variant="secondary" onClick={handleClose} className="flex-1">
                       Cancel

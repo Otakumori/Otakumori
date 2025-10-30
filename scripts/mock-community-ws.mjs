@@ -9,7 +9,9 @@ const server = http.createServer();
 const wss = new WebSocketServer({ noServer: true });
 
 function send(ws, obj) {
-  try { ws.send(JSON.stringify(obj)); } catch {}
+  try {
+    ws.send(JSON.stringify(obj));
+  } catch {}
 }
 
 wss.on('connection', (ws) => {
@@ -23,15 +25,29 @@ wss.on('connection', (ws) => {
         interval = setInterval(() => {
           const now = Date.now();
           const evs = [
-            { type: 'event', channel: 'training', eventId: 'evt_training_' + now, ts: now, payload: { npcId: 'maiden', emoteId: 'persistent_bow' } },
-            { type: 'event', channel: 'interact', eventId: 'evt_interact_' + now, ts: now, payload: { requestId: 'req_' + now } },
+            {
+              type: 'event',
+              channel: 'training',
+              eventId: 'evt_training_' + now,
+              ts: now,
+              payload: { npcId: 'maiden', emoteId: 'persistent_bow' },
+            },
+            {
+              type: 'event',
+              channel: 'interact',
+              eventId: 'evt_interact_' + now,
+              ts: now,
+              payload: { requestId: 'req_' + now },
+            },
           ];
           evs.forEach((e) => send(ws, e));
         }, 8000);
       }
     } catch {}
   });
-  ws.on('close', () => { if (interval) clearInterval(interval); });
+  ws.on('close', () => {
+    if (interval) clearInterval(interval);
+  });
 });
 
 server.on('upgrade', (req, socket, head) => {
@@ -45,5 +61,6 @@ server.on('upgrade', (req, socket, head) => {
 });
 
 const port = process.env.MOCK_COMMUNITY_WS_PORT ? Number(process.env.MOCK_COMMUNITY_WS_PORT) : 8787;
-server.listen(port, () => console.log(`Mock Community WS listening on ws://localhost:${port}/__mock_community_ws`));
-
+server.listen(port, () =>
+  console.log(`Mock Community WS listening on ws://localhost:${port}/__mock_community_ws`),
+);

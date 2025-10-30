@@ -648,11 +648,28 @@ export class AvatarPartManager {
         isPremium: true,
         customizable: true,
         materialSlots: [
-          { name: 'feathers', type: 'diffuse', customizable: true, colorable: true, patternable: false },
-          { name: 'bones', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+          {
+            name: 'feathers',
+            type: 'diffuse',
+            customizable: true,
+            colorable: true,
+            patternable: false,
+          },
+          {
+            name: 'bones',
+            type: 'diffuse',
+            customizable: true,
+            colorable: true,
+            patternable: false,
+          },
         ],
         attachmentPoints: [
-          { name: 'back_center', position: new THREE.Vector3(0, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+          {
+            name: 'back_center',
+            position: new THREE.Vector3(0, 0, 0),
+            rotation: new THREE.Euler(0, 0, 0),
+            scale: new THREE.Vector3(1, 1, 1),
+          },
         ],
         compatibleParts: ['body_001', 'body_002'],
         conflictsWith: ['wings_demon_001', 'wings_dragon_001'],
@@ -677,11 +694,28 @@ export class AvatarPartManager {
         isPremium: true,
         customizable: true,
         materialSlots: [
-          { name: 'membrane', type: 'diffuse', customizable: true, colorable: true, patternable: true },
-          { name: 'bones', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+          {
+            name: 'membrane',
+            type: 'diffuse',
+            customizable: true,
+            colorable: true,
+            patternable: true,
+          },
+          {
+            name: 'bones',
+            type: 'diffuse',
+            customizable: true,
+            colorable: true,
+            patternable: false,
+          },
         ],
         attachmentPoints: [
-          { name: 'back_center', position: new THREE.Vector3(0, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+          {
+            name: 'back_center',
+            position: new THREE.Vector3(0, 0, 0),
+            rotation: new THREE.Euler(0, 0, 0),
+            scale: new THREE.Vector3(1, 1, 1),
+          },
         ],
         compatibleParts: ['body_001', 'body_002'],
         conflictsWith: ['wings_angel_001', 'wings_dragon_001'],
@@ -714,7 +748,12 @@ export class AvatarPartManager {
           { name: 'fur', type: 'diffuse', customizable: true, colorable: true, patternable: true },
         ],
         attachmentPoints: [
-          { name: 'tail_base', position: new THREE.Vector3(0, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+          {
+            name: 'tail_base',
+            position: new THREE.Vector3(0, 0, 0),
+            rotation: new THREE.Euler(0, 0, 0),
+            scale: new THREE.Vector3(1, 1, 1),
+          },
         ],
         compatibleParts: ['body_001', 'body_002'],
         conflictsWith: ['tail_dog_001', 'tail_fox_001'],
@@ -744,10 +783,21 @@ export class AvatarPartManager {
         isPremium: true,
         customizable: true,
         materialSlots: [
-          { name: 'horn_material', type: 'diffuse', customizable: true, colorable: true, patternable: false },
+          {
+            name: 'horn_material',
+            type: 'diffuse',
+            customizable: true,
+            colorable: true,
+            patternable: false,
+          },
         ],
         attachmentPoints: [
-          { name: 'head_top', position: new THREE.Vector3(0, 0.1, 0), rotation: new THREE.Euler(0, 0, 0), scale: new THREE.Vector3(1, 1, 1) },
+          {
+            name: 'head_top',
+            position: new THREE.Vector3(0, 0.1, 0),
+            rotation: new THREE.Euler(0, 0, 0),
+            scale: new THREE.Vector3(1, 1, 1),
+          },
         ],
         compatibleParts: ['head_001', 'head_002'],
         conflictsWith: ['horns_unicorn_001'],

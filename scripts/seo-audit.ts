@@ -251,14 +251,10 @@ class SEOAuditor {
     this.results.forEach((result) => {
       // `\n ${result.route}`
       // `   Title: ${result.title.present ? '' : ''} (${result.title.length} chars`);
-      // 
-        `   Description: ${result.description.present ? '' : ''} (${result.description.length} chars`,
-      );
+      // `   Description: ${result.description.present ? '' : ''} (${result.description.length} chars`
       // `   H1: ${result.h1.valid ? '' : ''} (${result.h1.count} found`);
       // `   Canonical: ${result.canonical.present ? '' : ''}`
-      // 
-        `   Open Graph: ${Object.values(result.openGraph.filter(Boolean).length}/4 tags`,
-      );
+      // `   Open Graph: ${Object.values(result.openGraph.filter(Boolean).length}/4 tags`
       // 
         `   JSON-LD: ${result.jsonLd.present ? '' : ''} (${result.jsonLd.types.join(', '})`,
       );

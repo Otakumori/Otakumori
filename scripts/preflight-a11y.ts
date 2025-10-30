@@ -325,9 +325,7 @@ async function main() {
     if (criticalOrSerious.length > 0) {
       // '\n Critical or serious accessibility violations detected:'
       criticalOrSerious.forEach((result) => {
-        // 
-          `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`,
-        
+        // `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`
       });
       process.exit(1);
     }

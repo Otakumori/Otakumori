@@ -41,8 +41,7 @@ function computePolicy(
   adultVerified: boolean,
   region: string | null,
 ): ContentPolicy {
-  const overrideEnabled =
-    typeof process !== 'undefined' && process.env?.NSFW_GLOBAL === 'enabled';
+  const overrideEnabled = typeof process !== 'undefined' && process.env?.NSFW_GLOBAL === 'enabled';
 
   if (overrideEnabled) {
     return {
@@ -100,10 +99,7 @@ export function getPolicyFromHeaders(
   const cookieValue =
     readCookie(cookieHeader, NSFW_COOKIE) ?? readCookie(cookieHeader, LEGACY_COOKIE);
   const region =
-    options.region ??
-    headers.get('x-vercel-ip-country') ??
-    headers.get('cf-ipcountry') ??
-    null;
+    options.region ?? headers.get('x-vercel-ip-country') ?? headers.get('cf-ipcountry') ?? null;
 
   return computePolicy('server', cookieValue, options.adultVerified === true, region);
 }
@@ -128,7 +124,7 @@ export function getPolicyFromClient(): ContentPolicy {
 
   const locale =
     typeof navigator !== 'undefined' && navigator.language
-      ? navigator.language.split('-')[1]?.toUpperCase() ?? null
+      ? (navigator.language.split('-')[1]?.toUpperCase() ?? null)
       : null;
 
   return computePolicy('client', cookieValue, adultVerified, locale);

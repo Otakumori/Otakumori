@@ -52,7 +52,7 @@ export class PerformanceOptimizer {
   // Geometry optimization
   private geometryCache: Map<string, THREE.BufferGeometry> = new Map();
   private simplifiedGeometries: Map<string, THREE.BufferGeometry> = new Map();
-  
+
   // GPU instancing
   private instancedGroups: Map<string, THREE.InstancedMesh> = new Map();
   private materialBatches: Map<string, THREE.Material[]> = new Map();
@@ -181,7 +181,6 @@ export class PerformanceOptimizer {
 
     return simplified;
   }
-
 
   // Texture Optimization
   async compressTexture(texture: THREE.Texture): Promise<THREE.CompressedTexture> {
@@ -489,7 +488,12 @@ export class PerformanceOptimizer {
   }
 
   // GPU Instancing Methods
-  createInstancedMesh(geometry: THREE.BufferGeometry, material: THREE.Material, count: number, groupId: string): THREE.InstancedMesh {
+  createInstancedMesh(
+    geometry: THREE.BufferGeometry,
+    material: THREE.Material,
+    count: number,
+    groupId: string,
+  ): THREE.InstancedMesh {
     const instancedMesh = new THREE.InstancedMesh(geometry, material, count);
     this.instancedGroups.set(groupId, instancedMesh);
     return instancedMesh;
@@ -508,7 +512,7 @@ export class PerformanceOptimizer {
     if (instancedMesh) {
       instancedMesh.geometry.dispose();
       if (Array.isArray(instancedMesh.material)) {
-        instancedMesh.material.forEach(mat => mat.dispose());
+        instancedMesh.material.forEach((mat) => mat.dispose());
       } else {
         instancedMesh.material.dispose();
       }
@@ -524,8 +528,8 @@ export class PerformanceOptimizer {
 
     // Group similar materials together
     const materialGroups = new Map<string, THREE.Material[]>();
-    
-    materials.forEach(material => {
+
+    materials.forEach((material) => {
       const key = this.getMaterialKey(material);
       if (!materialGroups.has(key)) {
         materialGroups.set(key, []);
@@ -565,13 +569,13 @@ export class PerformanceOptimizer {
     // Create a material that can handle multiple textures/settings
     // This is a simplified version - in practice, you'd need more sophisticated batching
     const baseMaterial = materials[0].clone();
-    
+
     // Add texture arrays for batching
     if (baseMaterial instanceof THREE.MeshStandardMaterial) {
       // Add texture arrays for diffuse, normal, roughness, etc.
       // This would require custom shader modifications
     }
-    
+
     return baseMaterial;
   }
 
@@ -589,7 +593,7 @@ export class PerformanceOptimizer {
 
     let vertexOffset = 0;
 
-    geometries.forEach(geometry => {
+    geometries.forEach((geometry) => {
       const positionAttribute = geometry.getAttribute('position');
       const normalAttribute = geometry.getAttribute('normal');
       const uvAttribute = geometry.getAttribute('uv');
@@ -600,27 +604,20 @@ export class PerformanceOptimizer {
           positions.push(
             positionAttribute.getX(i),
             positionAttribute.getY(i),
-            positionAttribute.getZ(i)
+            positionAttribute.getZ(i),
           );
         }
       }
 
       if (normalAttribute) {
         for (let i = 0; i < normalAttribute.count; i++) {
-          normals.push(
-            normalAttribute.getX(i),
-            normalAttribute.getY(i),
-            normalAttribute.getZ(i)
-          );
+          normals.push(normalAttribute.getX(i), normalAttribute.getY(i), normalAttribute.getZ(i));
         }
       }
 
       if (uvAttribute) {
         for (let i = 0; i < uvAttribute.count; i++) {
-          uvs.push(
-            uvAttribute.getX(i),
-            uvAttribute.getY(i)
-          );
+          uvs.push(uvAttribute.getX(i), uvAttribute.getY(i));
         }
       }
 
@@ -649,7 +646,7 @@ export class PerformanceOptimizer {
   disposeMaterialBatch(batchId: string): void {
     const materials = this.materialBatches.get(batchId);
     if (materials) {
-      materials.forEach(material => material.dispose());
+      materials.forEach((material) => material.dispose());
       this.materialBatches.delete(batchId);
     }
   }
@@ -667,7 +664,7 @@ export class PerformanceOptimizer {
     let totalInstances = 0;
     let memoryUsage = 0;
 
-    this.instancedGroups.forEach(mesh => {
+    this.instancedGroups.forEach((mesh) => {
       totalInstances += mesh.count;
       memoryUsage += mesh.geometry.attributes.position?.count * 3 * 4 || 0; // Rough estimate
     });

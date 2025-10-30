@@ -73,9 +73,7 @@ export default function FeaturedCarousel() {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">
-          <span role="img" aria-label="Cherry blossom">
-            
-          </span>
+          <span role="img" aria-label="Cherry blossom"></span>
         </div>
         <h3 className="text-xl font-semibold text-white mb-2">Featured Collection</h3>
         <p className="text-neutral-400">Coming soon...</p>

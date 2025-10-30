@@ -85,7 +85,7 @@ export function getSeasonName(season: Season): string {
  */
 export function getSeasonalWindPattern(season: Season, time: number): WindField {
   const config = SEASONAL_CONFIGS[season];
-  
+
   // Different wind patterns per season
   const patterns: Record<Season, WindField> = {
     spring: {
@@ -129,7 +129,7 @@ export function getSeasonalWindPattern(season: Season, time: number): WindField 
       noiseOffset: time * 0.0001,
     },
   };
-  
+
   return patterns[season];
 }
 
@@ -144,7 +144,7 @@ export function createSeasonalPetal(
 ): PhysicsPetal {
   const config = SEASONAL_CONFIGS[season];
   const color = config.colorPalette[Math.floor(Math.random() * config.colorPalette.length)];
-  
+
   return {
     id,
     position: { x, y },
@@ -172,7 +172,11 @@ export class SeasonalPetalPhysicsEngine extends PetalPhysicsEngine {
   private currentSeason: Season;
   private seasonalConfig: SeasonalConfig;
 
-  constructor(season: Season = getCurrentSeason(), bounds: { width: number; height: number } = { width: 1920, height: 1080 }, maxPetals: number = 100) {
+  constructor(
+    season: Season = getCurrentSeason(),
+    bounds: { width: number; height: number } = { width: 1920, height: 1080 },
+    maxPetals: number = 100,
+  ) {
     super(bounds, maxPetals);
     this.currentSeason = season;
     this.seasonalConfig = SEASONAL_CONFIGS[season];
@@ -184,16 +188,17 @@ export class SeasonalPetalPhysicsEngine extends PetalPhysicsEngine {
   setSeason(season: Season) {
     this.currentSeason = season;
     this.seasonalConfig = SEASONAL_CONFIGS[season];
-    
+
     // Update existing petals with new seasonal properties
     const petals = this.getPetals();
     petals.forEach((petal) => {
       petal.acceleration.y = this.seasonalConfig.gravity;
       petal.drag = this.seasonalConfig.dragCoefficient;
       petal.bounce = this.seasonalConfig.bounce;
-      petal.color = this.seasonalConfig.colorPalette[
-        Math.floor(Math.random() * this.seasonalConfig.colorPalette.length)
-      ];
+      petal.color =
+        this.seasonalConfig.colorPalette[
+          Math.floor(Math.random() * this.seasonalConfig.colorPalette.length)
+        ];
     });
   }
 
@@ -223,11 +228,6 @@ export class SeasonalPetalPhysicsEngine extends PetalPhysicsEngine {
    */
   updateSeasonalWind(time: number) {
     const windField = getSeasonalWindPattern(this.currentSeason, time);
-    this.setWind(
-      windField.strength, 
-      windField.direction, 
-      windField.turbulence
-    );
+    this.setWind(windField.strength, windField.direction, windField.turbulence);
   }
 }
-

@@ -87,21 +87,24 @@ export class AssetManifestManager {
   private activeLoads: Set<string> = new Set();
   private options: AssetLoaderOptions;
 
-  constructor(manifest: AssetManifest, options: AssetLoaderOptions = {
-    quality: 'high',
-    enableCompression: true,
-    enableCaching: true,
-    maxConcurrent: 3,
-    timeout: 30000,
-    retryAttempts: 3,
-  }) {
+  constructor(
+    manifest: AssetManifest,
+    options: AssetLoaderOptions = {
+      quality: 'high',
+      enableCompression: true,
+      enableCaching: true,
+      maxConcurrent: 3,
+      timeout: 30000,
+      retryAttempts: 3,
+    },
+  ) {
     this.manifest = manifest;
     this.options = options;
     this.initializeLoadingStates();
   }
 
   private initializeLoadingStates() {
-    this.manifest.assets.forEach(asset => {
+    this.manifest.assets.forEach((asset) => {
       this.loadingStates.set(asset.id, {
         isLoaded: false,
         isLoading: false,
@@ -112,41 +115,45 @@ export class AssetManifestManager {
 
   // Get asset by ID
   getAsset(id: string): AssetEntry | undefined {
-    return this.manifest.assets.find(asset => asset.id === id);
+    return this.manifest.assets.find((asset) => asset.id === id);
   }
 
   // Get assets by category
   getAssetsByCategory(categoryId: string): AssetEntry[] {
-    return this.manifest.assets.filter(asset => asset.category === categoryId);
+    return this.manifest.assets.filter((asset) => asset.category === categoryId);
   }
 
   // Get assets by type
   getAssetsByType(type: AssetEntry['type']): AssetEntry[] {
-    return this.manifest.assets.filter(asset => asset.type === type);
+    return this.manifest.assets.filter((asset) => asset.type === type);
   }
 
   // Get assets by quality
   getAssetsByQuality(quality: AssetEntry['quality']): AssetEntry[] {
-    return this.manifest.assets.filter(asset => asset.quality === quality);
+    return this.manifest.assets.filter((asset) => asset.quality === quality);
   }
 
   // Search assets
-  searchAssets(query: string, filters?: {
-    type?: AssetEntry['type'];
-    category?: string;
-    quality?: AssetEntry['quality'];
-    tags?: string[];
-  }): AssetEntry[] {
-    return this.manifest.assets.filter(asset => {
-      const matchesQuery = query === '' || 
+  searchAssets(
+    query: string,
+    filters?: {
+      type?: AssetEntry['type'];
+      category?: string;
+      quality?: AssetEntry['quality'];
+      tags?: string[];
+    },
+  ): AssetEntry[] {
+    return this.manifest.assets.filter((asset) => {
+      const matchesQuery =
+        query === '' ||
         asset.name.toLowerCase().includes(query.toLowerCase()) ||
-        asset.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
+        asset.tags.some((tag) => tag.toLowerCase().includes(query.toLowerCase()));
 
       const matchesType = !filters?.type || asset.type === filters.type;
       const matchesCategory = !filters?.category || asset.category === filters.category;
       const matchesQuality = !filters?.quality || asset.quality === filters.quality;
-      const matchesTags = !filters?.tags || 
-        filters.tags.some(filterTag => asset.tags.includes(filterTag));
+      const matchesTags =
+        !filters?.tags || filters.tags.some((filterTag) => asset.tags.includes(filterTag));
 
       return matchesQuery && matchesType && matchesCategory && matchesQuality && matchesTags;
     });
@@ -218,10 +225,10 @@ export class AssetManifestManager {
       }
 
       const loadTime = performance.now() - startTime;
-      
+
       // Cache the loaded asset
       this.loadedAssets.set(id, loadedAsset);
-      
+
       // Update loading state
       this.updateLoadingState(id, {
         isLoaded: true,
@@ -230,7 +237,6 @@ export class AssetManifestManager {
         loadedAt: new Date().toISOString(),
         loadTime,
       });
-
     } catch (error) {
       this.updateLoadingState(id, {
         isLoaded: false,
@@ -260,7 +266,7 @@ export class AssetManifestManager {
           resolve(_texture);
         },
         undefined,
-        reject
+        reject,
       );
     });
   }
@@ -316,9 +322,9 @@ export class AssetManifestManager {
   // Get loading progress for all assets
   getLoadingProgress(): { loaded: number; total: number; progress: number } {
     const total = this.manifest.assets.length;
-    const loaded = Array.from(this.loadingStates.values()).filter(state => state.isLoaded).length;
+    const loaded = Array.from(this.loadingStates.values()).filter((state) => state.isLoaded).length;
     const progress = total > 0 ? (loaded / total) * 100 : 0;
-    
+
     return { loaded, total, progress };
   }
 
@@ -330,14 +336,14 @@ export class AssetManifestManager {
   // Preload assets by category
   async preloadCategory(categoryId: string): Promise<void> {
     const assets = this.getAssetsByCategory(categoryId);
-    const loadPromises = assets.map(asset => this.loadAsset(asset.id));
+    const loadPromises = assets.map((asset) => this.loadAsset(asset.id));
     await Promise.all(loadPromises);
   }
 
   // Preload assets by quality
   async preloadQuality(quality: AssetEntry['quality']): Promise<void> {
     const assets = this.getAssetsByQuality(quality);
-    const loadPromises = assets.map(asset => this.loadAsset(asset.id));
+    const loadPromises = assets.map((asset) => this.loadAsset(asset.id));
     await Promise.all(loadPromises);
   }
 
@@ -355,7 +361,7 @@ export class AssetManifestManager {
 
   // Dispose of loaded assets
   dispose(): void {
-    this.loadedAssets.forEach(asset => {
+    this.loadedAssets.forEach((asset) => {
       if (asset && typeof asset.dispose === 'function') {
         asset.dispose();
       }

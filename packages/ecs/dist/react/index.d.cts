@@ -5,21 +5,21 @@ import { W as World, S as System } from '../system-DWaf5ibd.cjs';
  */
 
 interface UseGameLoopOptions {
-    world: World;
-    systems: System[];
-    autoStart?: boolean;
-    fixedDt?: number;
-    maxAccumulator?: number;
+  world: World;
+  systems: System[];
+  autoStart?: boolean;
+  fixedDt?: number;
+  maxAccumulator?: number;
 }
 interface UseGameLoopResult {
-    start: () => void;
-    pause: () => void;
-    resume: () => void;
-    stop: () => void;
-    isRunning: boolean;
-    isPaused: boolean;
-    currentTick: number;
-    fps: number;
+  start: () => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+  isRunning: boolean;
+  isPaused: boolean;
+  currentTick: number;
+  fps: number;
 }
 /**
  * React hook for managing game loop lifecycle

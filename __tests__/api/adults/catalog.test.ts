@@ -27,11 +27,11 @@ describe('/api/adults/catalog', () => {
   it('should return 503 when feature flags are disabled', async () => {
     // Mock disabled feature flags
     vi.mocked(require('@/env').env).FEATURE_ADULT_ZONE = 'false';
-    
+
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(503);
     expect(data.error).toBe('Feature not available');
   });
@@ -39,11 +39,11 @@ describe('/api/adults/catalog', () => {
   it('should return 401 when user is not authenticated', async () => {
     // Mock no user
     vi.mocked(require('@clerk/nextjs/server').auth).mockResolvedValue({ userId: null });
-    
+
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(401);
     expect(data.error).toBe('Authentication required');
   });
@@ -51,11 +51,11 @@ describe('/api/adults/catalog', () => {
   it('should return 503 when storage is not configured', async () => {
     // Mock missing storage URL
     vi.mocked(require('@/env').env).ADULTS_STORAGE_INDEX_URL = '';
-    
+
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(503);
     expect(data.error).toBe('Storage not configured');
   });
@@ -86,16 +86,16 @@ describe('/api/adults/catalog', () => {
         sliders: [],
       },
     ];
-    
+
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockPacks),
     } as Response);
-    
+
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
     expect(data.ok).toBe(true);
     expect(data.data.packs).toHaveLength(1);
@@ -114,7 +114,11 @@ describe('/api/adults/catalog', () => {
         regionAllowlist: ['us'],
         pricePetals: 1000,
         priceUsdCents: 999,
-        physicsProfile: { id: 'standard', softBody: { enable: false }, clothSim: { enable: false } },
+        physicsProfile: {
+          id: 'standard',
+          softBody: { enable: false },
+          clothSim: { enable: false },
+        },
         interactions: [],
         materials: { shader: 'AnimeToon', params: { glossStrength: 0.6, rimStrength: 0.35 } },
         layers: ['outfit'],
@@ -129,7 +133,11 @@ describe('/api/adults/catalog', () => {
         isAdultOnly: true,
         pricePetals: 1000,
         priceUsdCents: 999,
-        physicsProfile: { id: 'standard', softBody: { enable: false }, clothSim: { enable: false } },
+        physicsProfile: {
+          id: 'standard',
+          softBody: { enable: false },
+          clothSim: { enable: false },
+        },
         interactions: [],
         materials: { shader: 'AnimeToon', params: { glossStrength: 0.6, rimStrength: 0.35 } },
         layers: ['outfit'],
@@ -137,20 +145,20 @@ describe('/api/adults/catalog', () => {
         sliders: [],
       },
     ];
-    
+
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockPacks),
     } as Response);
-    
+
     // Mock US region
     const request = new NextRequest('https://example.com/api/adults/catalog', {
       headers: { 'cf-ipcountry': 'US' },
     });
-    
+
     const response = await GET(request);
     const data = await response.json();
-    
+
     expect(response.status).toBe(200);
     expect(data.data.packs).toHaveLength(2); // Both packs should be visible in US
     expect(data.data.region).toBe('us');

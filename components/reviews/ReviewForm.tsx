@@ -92,7 +92,7 @@ export default function ReviewForm({ productId }: Props) {
         >
           {[5, 4, 3, 2, 1].map((r) => (
             <option key={r} value={r}>
-              {r} 
+              {r}
             </option>
           ))}
         </select>
@@ -153,9 +153,7 @@ export default function ReviewForm({ productId }: Props) {
                   className="absolute right-1 top-1 rounded bg-black/70 px-1 text-xs"
                   aria-label="Remove image"
                 >
-                  <span role="img" aria-label="Close">
-                    
-                  </span>
+                  <span role="img" aria-label="Close"></span>
                 </button>
               </div>
             ))}

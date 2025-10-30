@@ -235,9 +235,7 @@ export default async function CollectionPage({ params }: Props) {
                   {/* Product Image */}
                   <div className="aspect-square bg-slate-700 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
                     <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
-                      <span className="text-6xl text-slatey-300 group-hover:text-sakura-300 transition-colors">
-                        
-                      </span>
+                      <span className="text-6xl text-slatey-300 group-hover:text-sakura-300 transition-colors"></span>
                     </div>
                   </div>
 

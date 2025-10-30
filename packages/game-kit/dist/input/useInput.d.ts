@@ -4,14 +4,14 @@
 import { type InputSystem } from './system';
 import type { InputMapping, ActionState } from './actions';
 export interface UseInputOptions {
-    mapping?: InputMapping;
-    enabled?: boolean;
+  mapping?: InputMapping;
+  enabled?: boolean;
 }
 export interface UseInputResult {
-    state: ActionState;
-    system: InputSystem | null;
-    enabled: boolean;
-    setEnabled: (enabled: boolean) => void;
+  state: ActionState;
+  system: InputSystem | null;
+  enabled: boolean;
+  setEnabled: (enabled: boolean) => void;
 }
 /**
  * React hook for input polling

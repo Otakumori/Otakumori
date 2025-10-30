@@ -90,7 +90,7 @@ export default function PetalBreathingMode({ onExit }: PetalBreathingModeProps) 
   // Initialize petals
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const initialPetals: Petal[] = Array.from({ length: 30 }, (_, i) => ({
       id: `petal-${i}`,
       x: Math.random() * window.innerWidth,
@@ -243,15 +243,13 @@ export default function PetalBreathingMode({ onExit }: PetalBreathingModeProps) 
         {(Object.keys(MOOD_PRESETS) as MoodPreset[]).map((presetKey) => {
           const preset = MOOD_PRESETS[presetKey];
           const Icon = preset.icon;
-          
+
           return (
             <button
               key={presetKey}
               onClick={() => setMood(presetKey)}
               className={`rounded-full p-4 transition-all ${
-                mood === presetKey
-                  ? 'bg-white/30 scale-110'
-                  : 'bg-white/10 hover:bg-white/20'
+                mood === presetKey ? 'bg-white/30 scale-110' : 'bg-white/10 hover:bg-white/20'
               }`}
               aria-label={`Switch to ${preset.name} mode`}
             >
@@ -279,4 +277,3 @@ export default function PetalBreathingMode({ onExit }: PetalBreathingModeProps) 
     </div>
   );
 }
-

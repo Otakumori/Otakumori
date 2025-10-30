@@ -22,7 +22,7 @@ export function useAudioInit() {
       if (!initialized.current) {
         initAudioContext();
         initialized.current = true;
-        
+
         // Remove listeners after first interaction
         window.removeEventListener('click', initOnInteraction);
         window.removeEventListener('keydown', initOnInteraction);
@@ -62,7 +62,7 @@ export function useSoundEffect(soundId: string) {
       if (playingIdRef.current) {
         stopSound(playingIdRef.current);
       }
-      
+
       playingIdRef.current = playSound(soundId, options);
       return playingIdRef.current;
     },
@@ -95,7 +95,7 @@ export function useSpatialAudio(soundId: string) {
       if (playingIdRef.current) {
         stopSound(playingIdRef.current);
       }
-      
+
       playingIdRef.current = playSound(soundId, { ...options, position });
       return playingIdRef.current;
     },
@@ -235,20 +235,14 @@ export function useAudioControls() {
     [updateVolume],
   );
 
-  const setSFXVolume = useCallback(
-    (volume: number) => updateVolume('sfx', volume),
-    [updateVolume],
-  );
+  const setSFXVolume = useCallback((volume: number) => updateVolume('sfx', volume), [updateVolume]);
 
   const setMusicVolume = useCallback(
     (volume: number) => updateVolume('music', volume),
     [updateVolume],
   );
 
-  const setUIVolume = useCallback(
-    (volume: number) => updateVolume('ui', volume),
-    [updateVolume],
-  );
+  const setUIVolume = useCallback((volume: number) => updateVolume('ui', volume), [updateVolume]);
 
   return {
     settings,
@@ -259,4 +253,3 @@ export function useAudioControls() {
     toggleMute,
   };
 }
-

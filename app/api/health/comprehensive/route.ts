@@ -46,9 +46,9 @@ export async function GET() {
   // Stripe
   const stripeStart = performance.now();
   try {
-    const stripe = new Stripe(env.STRIPE_SECRET_KEY, { 
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
       apiVersion: '2025-10-29.clover',
-      typescript: true 
+      typescript: true,
     });
     await stripe.prices.list({ limit: 1 });
     checks.stripe = { ok: true, ms: ms(stripeStart) };

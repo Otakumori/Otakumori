@@ -111,7 +111,10 @@ export function NSFWCustomizer({ config, onChange, gender }: NSFWCustomizerProps
             </div>
 
             <div>
-              <label htmlFor="nsfw-interaction-level" className="block text-white text-sm font-medium mb-2">
+              <label
+                htmlFor="nsfw-interaction-level"
+                className="block text-white text-sm font-medium mb-2"
+              >
                 Interaction Level
               </label>
               <select
@@ -227,7 +230,10 @@ export function NSFWCustomizer({ config, onChange, gender }: NSFWCustomizerProps
               {config.customization?.pubicHair && (
                 <div className="ml-6 space-y-3">
                   <div>
-                    <label htmlFor="nsfw-hair-style" className="block text-white text-sm font-medium mb-2">
+                    <label
+                      htmlFor="nsfw-hair-style"
+                      className="block text-white text-sm font-medium mb-2"
+                    >
                       Hair Style
                     </label>
                     <select
@@ -260,7 +266,10 @@ export function NSFWCustomizer({ config, onChange, gender }: NSFWCustomizerProps
                   />
 
                   <div className="space-y-2">
-                    <label htmlFor="nsfw-hair-color" className="block text-white text-sm font-medium">
+                    <label
+                      htmlFor="nsfw-hair-color"
+                      className="block text-white text-sm font-medium"
+                    >
                       Hair Color
                     </label>
                     <input

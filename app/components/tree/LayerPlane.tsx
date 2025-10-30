@@ -159,9 +159,11 @@ export function LayerPlane({
   );
 
   useFrame((state) => {
-    const uniforms = matRef.current?.uniforms as {
-      uTime?: { value: number };
-    } | undefined;
+    const uniforms = matRef.current?.uniforms as
+      | {
+          uTime?: { value: number };
+        }
+      | undefined;
     if (!uniforms?.uTime) return;
     uniforms.uTime.value = state.clock.elapsedTime;
   });

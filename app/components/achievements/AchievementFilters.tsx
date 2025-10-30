@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { FC } from 'react';
 
 interface AchievementFiltersProps {
   showUnlocked: boolean;
@@ -10,7 +10,7 @@ interface AchievementFiltersProps {
 }
 
 const buttonClasses = (active: boolean) =>
-  ["rounded px-3 py-1", active ? "bg-pink-500 text-white" : "bg-gray-200 text-gray-700"].join(" ");
+  ['rounded px-3 py-1', active ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'].join(' ');
 
 export const AchievementFilters: FC<AchievementFiltersProps> = ({
   showUnlocked,

@@ -12,8 +12,8 @@ export type System = (world: World, dt: number) => void;
  * System scheduler for organizing system execution
  */
 export interface SystemScheduler {
-    systems: System[];
-    enabled: boolean;
+  systems: System[];
+  enabled: boolean;
 }
 /**
  * Create a system scheduler

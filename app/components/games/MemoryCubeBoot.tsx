@@ -1,5 +1,3 @@
- 
-
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -27,7 +25,7 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
   const router = useRouter();
   const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // Easter egg: Track secret phrase
   useEffect(() => {
     if (secretPhrase === 'konami') {

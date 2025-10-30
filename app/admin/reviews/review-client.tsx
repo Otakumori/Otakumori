@@ -1,5 +1,3 @@
- 
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -75,7 +73,6 @@ export default function AdminReviewsClient() {
                 {r.imageUrls?.length > 0 && (
                   <div className="mt-3 flex gap-3">
                     {r.imageUrls.map((u) => (
-                       
                       <img
                         key={u}
                         src={u}

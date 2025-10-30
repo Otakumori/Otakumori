@@ -58,7 +58,7 @@ export function usePetalCollection() {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         setState((prev) => ({
           ...prev,
           sessionTotal: prev.sessionTotal + totalValue,
@@ -89,7 +89,7 @@ export function usePetalCollection() {
       // Update UI immediately
       setState((prev) => {
         const isFirstCollection = !prev.hasCollectedAny;
-        
+
         if (isFirstCollection) {
           localStorage.setItem('otm-has-collected-petal', 'true');
         }
@@ -134,4 +134,3 @@ export function usePetalCollection() {
     dismissAchievement,
   };
 }
-

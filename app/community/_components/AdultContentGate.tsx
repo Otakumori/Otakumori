@@ -130,8 +130,8 @@ export function AdultContentGate() {
         <p className="text-zinc-300 mb-6">Access premium adult content and features (18+ only)</p>
         <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg max-w-md mx-auto">
           <p className="text-red-200 text-sm">
-             This content is for adults only. By accessing this area, you confirm you are 18+
-            years old.
+            This content is for adults only. By accessing this area, you confirm you are 18+ years
+            old.
           </p>
         </div>
       </div>

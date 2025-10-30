@@ -11,9 +11,9 @@ import { CheckoutRequest } from '@/app/lib/contracts';
 import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
 import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY, { 
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-10-29.clover',
-  typescript: true 
+  typescript: true,
 });
 
 // NOTE: This route should use the proper idempotency middleware instead of manual key creation

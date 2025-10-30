@@ -1,6 +1,6 @@
 /**
  * Canvas Rendering Optimizer
- * 
+ *
  * Implements dirty rectangle optimization to minimize canvas redraws
  * and improve rendering performance.
  */
@@ -32,7 +32,7 @@ export class CanvasRenderingOptimizer {
     // Merge with existing dirty regions if they overlap
     const mergedRect = this.mergeWithExisting(rect);
     this.dirtyRegions.add(mergedRect);
-    
+
     // Store priority for this region
     const key = this.rectToKey(mergedRect);
     this.regionPriorities.set(key, Math.max(this.regionPriorities.get(key) || 0, priority));
@@ -42,7 +42,7 @@ export class CanvasRenderingOptimizer {
    * Mark multiple regions as dirty
    */
   markDirtyMultiple(rects: Rectangle[], priority: number = 1): void {
-    rects.forEach(rect => this.markDirty(rect, priority));
+    rects.forEach((rect) => this.markDirty(rect, priority));
   }
 
   /**
@@ -50,7 +50,7 @@ export class CanvasRenderingOptimizer {
    */
   getDirtyRegions(): Rectangle[] {
     const regions = Array.from(this.dirtyRegions);
-    
+
     // Sort by priority (higher first)
     regions.sort((a, b) => {
       const priorityA = this.regionPriorities.get(this.rectToKey(a)) || 0;
@@ -117,7 +117,7 @@ export class CanvasRenderingOptimizer {
 
     for (const rect of regions) {
       let merged = false;
-      
+
       for (const existing of optimized) {
         if (this.rectsOverlap(rect, existing)) {
           // Merge with existing region
@@ -128,7 +128,7 @@ export class CanvasRenderingOptimizer {
           break;
         }
       }
-      
+
       if (!merged) {
         optimized.add(rect);
       }
@@ -141,8 +141,12 @@ export class CanvasRenderingOptimizer {
    * Check if two rectangles overlap
    */
   private rectsOverlap(a: Rectangle, b: Rectangle): boolean {
-    return !(a.x + a.width < b.x || b.x + b.width < a.x || 
-             a.y + a.height < b.y || b.y + b.height < a.y);
+    return !(
+      a.x + a.width < b.x ||
+      b.x + b.width < a.x ||
+      a.y + a.height < b.y ||
+      b.y + b.height < a.y
+    );
   }
 
   /**
@@ -153,7 +157,7 @@ export class CanvasRenderingOptimizer {
     const minY = Math.min(a.y, b.y);
     const maxX = Math.max(a.x + a.width, b.x + b.width);
     const maxY = Math.max(a.y + a.height, b.y + b.height);
-    
+
     return {
       x: minX,
       y: minY,
@@ -167,14 +171,14 @@ export class CanvasRenderingOptimizer {
    */
   private mergeWithExisting(rect: Rectangle): Rectangle {
     let merged = rect;
-    
+
     for (const existing of this.dirtyRegions) {
       if (this.rectsOverlap(merged, existing)) {
         merged = this.mergeRects(merged, existing);
         this.dirtyRegions.delete(existing);
       }
     }
-    
+
     return merged;
   }
 

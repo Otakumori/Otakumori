@@ -77,9 +77,7 @@ export default function GamesGrid({ games }: GamesGridProps) {
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gradient-to-br from-fuchsia-500/20 to-purple-500/20">
-                  <span className="text-4xl" role="img" aria-label="Game controller">
-                    
-                  </span>
+                  <span className="text-4xl" role="img" aria-label="Game controller"></span>
                 </div>
               )}
 
@@ -112,9 +110,7 @@ export default function GamesGrid({ games }: GamesGridProps) {
 
                 {game.rewards && (
                   <div className="flex items-center gap-1">
-                    <span role="img" aria-label="Cherry blossom">
-                      
-                    </span>
+                    <span role="img" aria-label="Cherry blossom"></span>
                     <span>+{game.rewards.petals}</span>
                   </div>
                 )}

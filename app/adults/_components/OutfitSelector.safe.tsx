@@ -11,7 +11,7 @@ interface OutfitSelectorProps {
 export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps) {
   // Log gender context for outfit recommendations
   console.warn('OutfitSelector initialized for gender:', gender);
-  
+
   const updateConfig = (path: string, value: any) => {
     const newConfig = { ...config };
     const keys = path.split('.');
@@ -137,7 +137,10 @@ export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps
         {config.secondary?.type && (
           <div className="space-y-3 ml-6">
             <div className="space-y-2">
-              <label htmlFor="outfit-secondary-color" className="block text-white text-sm font-medium">
+              <label
+                htmlFor="outfit-secondary-color"
+                className="block text-white text-sm font-medium"
+              >
                 Secondary Color
               </label>
               <input

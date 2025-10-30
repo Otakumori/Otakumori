@@ -3,25 +3,25 @@
  */
 import { AnimState } from './states';
 export interface HFSM {
-    current: AnimState;
-    previous: AnimState;
-    transitionProgress: number;
-    transitionDuration: number;
-    blendWeights: Map<AnimState, number>;
-    stateTime: number;
+  current: AnimState;
+  previous: AnimState;
+  transitionProgress: number;
+  transitionDuration: number;
+  blendWeights: Map<AnimState, number>;
+  stateTime: number;
 }
 export interface Transition {
-    from: AnimState;
-    to: AnimState;
-    condition: (data: TransitionData) => boolean;
-    duration: number;
+  from: AnimState;
+  to: AnimState;
+  condition: (data: TransitionData) => boolean;
+  duration: number;
 }
 export interface TransitionData {
-    horizontalSpeed: number;
-    verticalVelocity: number;
-    isGrounded: boolean;
-    coyoteTimeRemaining: number;
-    attackRequested: boolean;
+  horizontalSpeed: number;
+  verticalVelocity: number;
+  isGrounded: boolean;
+  coyoteTimeRemaining: number;
+  attackRequested: boolean;
 }
 /**
  * Create a new HFSM
@@ -34,7 +34,12 @@ export declare const DEFAULT_TRANSITIONS: Transition[];
 /**
  * Update HFSM
  */
-export declare function updateHFSM(hfsm: HFSM, data: TransitionData, dt: number, transitions?: Transition[]): void;
+export declare function updateHFSM(
+  hfsm: HFSM,
+  data: TransitionData,
+  dt: number,
+  transitions?: Transition[],
+): void;
 /**
  * Transition to a new state
  */

@@ -161,6 +161,6 @@ async function processFile(path: string) {
     const ok = await processFile(f);
     if (ok) edited++;
   }
-   
+
   // `[prefix-unused] Updated ${edited} file(s.`);
 })();

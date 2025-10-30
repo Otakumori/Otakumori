@@ -173,7 +173,7 @@ export const processPaymentWebhook = inngest.createFunction(
           // Send notification
           break;
         default:
-          // `Unhandled webhook type: ${webhook.type}`
+        // `Unhandled webhook type: ${webhook.type}`
       }
 
       return { success: true, webhookType: webhook.type };

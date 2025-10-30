@@ -1,10 +1,10 @@
-﻿export const runtime = "nodejs";
+﻿export const runtime = 'nodejs';
 
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { z } from 'zod';
 
-import { db } from "@/lib/db";
+import { db } from '@/lib/db';
 
 const HeartbeatSchema = z.object({
   status: z.string().min(1),
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   try {
     const { userId: clerkId } = await auth();
     if (!clerkId) {
-      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const payload = HeartbeatSchema.parse(await request.json());
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ ok: false, error: "User not found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
     const now = new Date();
@@ -37,7 +37,9 @@ export async function POST(request: Request) {
       update: {
         status: payload.status,
         activity: payload.activity ?? {},
-        ...(typeof payload.showActivity === "boolean" ? { showActivity: payload.showActivity } : {}),
+        ...(typeof payload.showActivity === 'boolean'
+          ? { showActivity: payload.showActivity }
+          : {}),
         lastSeen: now,
       },
       create: {
@@ -62,10 +64,10 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: "Invalid input data" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });
     }
 
-    console.error("Presence heartbeat error", error);
-    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+    console.error('Presence heartbeat error', error);
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

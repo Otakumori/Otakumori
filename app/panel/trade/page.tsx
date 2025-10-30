@@ -1,5 +1,4 @@
 // DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
- 
 
 'use client';
 
@@ -356,9 +355,7 @@ export default function TradeCenterPanel() {
           {/* Item Trading */}
           <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
-              <span role="img" aria-label="counterclockwise arrows">
-                
-              </span>
+              <span role="img" aria-label="counterclockwise arrows"></span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
               {
@@ -622,9 +619,7 @@ export default function TradeCenterPanel() {
           {/* Petal Exchange */}
           <div className="bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
-              <span role="img" aria-label="cherry blossom">
-                
-              </span>
+              <span role="img" aria-label="cherry blossom"></span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
               {
@@ -891,9 +886,7 @@ export default function TradeCenterPanel() {
           {/* Community Market */}
           <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
-              <span role="img" aria-label="convenience store">
-                
-              </span>
+              <span role="img" aria-label="convenience store"></span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
               {
@@ -1122,9 +1115,7 @@ export default function TradeCenterPanel() {
           {/* Trade History */}
           <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
-              <span role="img" aria-label="bar chart">
-                
-              </span>
+              <span role="img" aria-label="bar chart"></span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
               {
@@ -1335,9 +1326,7 @@ export default function TradeCenterPanel() {
           {/* Trade Chat */}
           <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 text-center hover:scale-105 transition-all duration-200">
             <div className="text-4xl mb-4">
-              <span role="img" aria-label="speech bubble">
-                
-              </span>
+              <span role="img" aria-label="speech bubble"></span>
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">
               {
@@ -1824,9 +1813,7 @@ export default function TradeCenterPanel() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="text-3xl mb-2">
-                  <span role="img" aria-label="counterclockwise arrows">
-                    
-                  </span>
+                  <span role="img" aria-label="counterclockwise arrows"></span>
                 </div>
                 <div className="text-2xl font-bold text-blue-400">
                   {
@@ -1895,9 +1882,7 @@ export default function TradeCenterPanel() {
                   <span role="img" aria-label="star">
                     {
                       <>
-                        <span role="img" aria-label="emoji">
-                          
-                        </span>
+                        <span role="img" aria-label="emoji"></span>
                       </>
                     }
                   </span>
@@ -1954,9 +1939,7 @@ export default function TradeCenterPanel() {
               </div>
               <div className="text-center">
                 <div className="text-3xl mb-2">
-                  <span role="img" aria-label="cherry blossom">
-                    
-                  </span>
+                  <span role="img" aria-label="cherry blossom"></span>
                 </div>
                 <div className="text-2xl font-bold text-pink-400">
                   {
@@ -2013,9 +1996,7 @@ export default function TradeCenterPanel() {
               </div>
               <div className="text-center">
                 <div className="text-3xl mb-2">
-                  <span role="img" aria-label="people">
-                    
-                  </span>
+                  <span role="img" aria-label="people"></span>
                 </div>
                 <div className="text-2xl font-bold text-green-400">
                   {
@@ -2080,9 +2061,7 @@ export default function TradeCenterPanel() {
         {/* Coming Soon Notice */}
         <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">
-            <span role="img" aria-label="construction">
-              
-            </span>
+            <span role="img" aria-label="construction"></span>
             {
               <>
                 ''' '

@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     // Log sync request for audit
     console.warn('External data sync triggered from:', request.headers.get('user-agent'));
-    
+
     const results = await syncAllExternalData();
 
     return NextResponse.json({

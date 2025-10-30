@@ -33,7 +33,7 @@ const filesToProcess = [
   'lib/analytics/session-tracker.ts',
   'lib/lighting/dynamic-lighting.ts',
   'lib/procedural/anime-style-filters.ts',
-  'lib/procedural/cel-shaded-assets.ts'
+  'lib/procedural/cel-shaded-assets.ts',
 ];
 
 // Simple patterns to fix
@@ -46,22 +46,30 @@ const fixes = [
         return match.replace(varName, `_${varName}`);
       }
       return match;
-    }
+    },
   },
   // Unused function parameters
   {
     pattern: /\(([^)]*)\)\s*=>/g,
     fix: (match, params) => {
-      const fixedParams = params.split(',').map(param => {
-        const trimmed = param.trim();
-        if (trimmed && !trimmed.startsWith('_') && !trimmed.includes('=') && !trimmed.includes(':')) {
-          return `_${trimmed}`;
-        }
-        return trimmed;
-      }).join(', ');
+      const fixedParams = params
+        .split(',')
+        .map((param) => {
+          const trimmed = param.trim();
+          if (
+            trimmed &&
+            !trimmed.startsWith('_') &&
+            !trimmed.includes('=') &&
+            !trimmed.includes(':')
+          ) {
+            return `_${trimmed}`;
+          }
+          return trimmed;
+        })
+        .join(', ');
       return match.replace(params, fixedParams);
-    }
-  }
+    },
+  },
 ];
 
 async function fixFile(filePath) {
@@ -76,15 +84,36 @@ async function fixFile(filePath) {
 
     // Apply simple prefix fixes for known unused variables
     const knownUnused = [
-      'isDragging', 'filteredParts', 'showShop', 'setShowShop', 'pickups', 
-      'enemySpawnTimer', 'saveOnExit', 'autoSave', 'projectilesRef', 'sessionId',
-      'achievements', 'setPlayerSlots', 'showError', 'playingSounds',
-      'earWiggle', 'setEarWiggle', 'tailSway', 'setTailSway', 'direction',
-      'setIsVisible', 'setDailyLimit', 'session', 'lightId', 'effectId',
-      'distance', 'rng', 'angle'
+      'isDragging',
+      'filteredParts',
+      'showShop',
+      'setShowShop',
+      'pickups',
+      'enemySpawnTimer',
+      'saveOnExit',
+      'autoSave',
+      'projectilesRef',
+      'sessionId',
+      'achievements',
+      'setPlayerSlots',
+      'showError',
+      'playingSounds',
+      'earWiggle',
+      'setEarWiggle',
+      'tailSway',
+      'setTailSway',
+      'direction',
+      'setIsVisible',
+      'setDailyLimit',
+      'session',
+      'lightId',
+      'effectId',
+      'distance',
+      'rng',
+      'angle',
     ];
 
-    knownUnused.forEach(varName => {
+    knownUnused.forEach((varName) => {
       const regex = new RegExp(`\\b${varName}\\b(?=\\s*[=:,)])`, 'g');
       const newContent = content.replace(regex, `_${varName}`);
       if (newContent !== content) {
@@ -109,14 +138,14 @@ async function fixFile(filePath) {
 
 async function main() {
   console.log('🔧 Fixing unused variables...\n');
-  
+
   let fixedCount = 0;
-  
+
   for (const file of filesToProcess) {
     const wasFixed = await fixFile(file);
     if (wasFixed) fixedCount++;
   }
-  
+
   console.log(`\n✨ Fixed ${fixedCount} files`);
   console.log('🔍 Run "npm run lint" to check remaining issues');
 }

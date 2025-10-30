@@ -119,14 +119,14 @@ async function main() {
       // `  → ${cmd}`
 
       const { stdout, stderr } = await execAsync(cmd, { cwd: process.cwd() });
-      if (stdout) // stdout
-      if (stderr) // stderr
+      // if (stdout) stdout
+      // if (stderr) stderr
 
       // ` ${className} generated successfully\n`
     } catch (error: any) {
       console.error(` Failed to generate ${className}:`, error.message);
-      if (error.stdout) // error.stdout
-      if (error.stderr) // error.stderr
+      // if (error.stdout) error.stdout
+      // if (error.stderr) error.stderr
       // ''
     }
   }

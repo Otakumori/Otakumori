@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 interface ToastMessage {
   title: string;
@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const toast = useCallback((message: ToastMessage) => {
     setCurrentToast(message);
     // eslint-disable-next-line no-console
-    console.log("Toast:", message.title, message.description);
+    console.log('Toast:', message.title, message.description);
   }, []);
 
   const clear = useCallback(() => setCurrentToast(null), []);
@@ -42,7 +42,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 export function useToast(): ToastContextValue {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
+    throw new Error('useToast must be used within a ToastProvider');
   }
 
   return context;

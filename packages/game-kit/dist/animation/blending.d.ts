@@ -6,9 +6,9 @@ import type { AnimState } from './states';
  * Blend tree node
  */
 export interface BlendNode {
-    state: AnimState;
-    weight: number;
-    time: number;
+  state: AnimState;
+  weight: number;
+  time: number;
 }
 /**
  * Cross-fade between two animations

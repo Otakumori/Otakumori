@@ -11,22 +11,22 @@ const SAMPLE_POSTS: Post[] = [
     slug: 'welcome-to-otaku-mori',
     title: 'Welcome to Otaku-mori: Your New Digital Haven',
     excerpt: 'Discover what makes our community special and how to get started on your journey.',
-    publishedAt: '2024-09-20'
+    publishedAt: '2024-09-20',
   },
   {
-    id: '2', 
+    id: '2',
     slug: 'mini-games-guide',
     title: 'Mini-Games Hub: Complete Guide for Beginners',
     excerpt: 'Learn the ins and outs of our GameCube-inspired gaming experience.',
-    publishedAt: '2024-09-18'
+    publishedAt: '2024-09-18',
   },
   {
     id: '3',
     slug: 'community-guidelines',
     title: 'Building a Positive Community Together',
     excerpt: 'Our approach to creating safe, welcoming spaces for all travelers.',
-    publishedAt: '2024-09-15'
-  }
+    publishedAt: '2024-09-15',
+  },
 ];
 
 export default async function BlogTeaser() {
@@ -51,22 +51,26 @@ export default async function BlogTeaser() {
           <GlassPanel key={post.id} className="group hover:scale-105 transition-all duration-300">
             <Link href={`/blog/${post.slug}`} className="block p-6">
               <div className="mb-4">
-                <time className="text-sm text-pink-400 font-medium">
-                  {post.publishedAt}
-                </time>
+                <time className="text-sm text-pink-400 font-medium">{post.publishedAt}</time>
               </div>
               <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2 group-hover:text-pink-300 transition-colors">
                 {post.title}
               </h3>
-              {post.excerpt && (
-                <p className="text-gray-300 line-clamp-3 mb-4">
-                  {post.excerpt}
-                </p>
-              )}
+              {post.excerpt && <p className="text-gray-300 line-clamp-3 mb-4">{post.excerpt}</p>}
               <div className="flex items-center text-pink-400 text-sm font-medium">
                 Read More
-                <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </div>
             </Link>

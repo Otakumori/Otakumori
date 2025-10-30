@@ -49,9 +49,7 @@ function toStripeProduct(product: Stripe.Product): StripeProduct {
 
   if (product.default_price) {
     normalized.default_price =
-      typeof product.default_price === 'string'
-        ? product.default_price
-        : product.default_price.id;
+      typeof product.default_price === 'string' ? product.default_price : product.default_price.id;
   }
 
   return normalized;

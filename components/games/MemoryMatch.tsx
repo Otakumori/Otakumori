@@ -18,10 +18,7 @@ export default function MemoryMatch({ gameDef }: MemoryMatchProps) {
         <h3 className="text-xl font-semibold text-gray-700 mb-2">{gameDef.name}</h3>
         <p className="text-gray-500 mb-4">{gameDef.howToPlay}</p>
         <div className="text-sm text-gray-400">
-          Coming Soon!{' '}
-          <span role="img" aria-label="Construction">
-            
-          </span>
+          Coming Soon! <span role="img" aria-label="Construction"></span>
         </div>
       </div>
     </div>

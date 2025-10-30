@@ -132,9 +132,9 @@ class APIHealthChecker {
       // ' FAILED TESTS:'
       failedTests.forEach((test) => {
         // `  • ${test.method} ${test.endpoint}`
-        if (test.statusCode) // `    Status: ${test.statusCode}`
-        if (test.error) // `    Error: ${test.error}`
-        if (test.responseTime) // `    Time: ${test.responseTime}ms`
+        // if (test.statusCode) `    Status: ${test.statusCode}`
+        // if (test.error) `    Error: ${test.error}`
+        // if (test.responseTime) `    Time: ${test.responseTime}ms`
       });
     }
 

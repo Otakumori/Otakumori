@@ -5,9 +5,7 @@ export default function TestPage() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>
-        <span role="img" aria-label="Test tube">
-          
-        </span>
+        <span role="img" aria-label="Test tube"></span>
         {
           <>
             ''' '

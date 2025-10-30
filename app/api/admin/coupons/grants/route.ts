@@ -25,7 +25,7 @@ export const runtime = 'nodejs';
 export async function GET(req: NextRequest) {
   const requireAdmin = await getRequireAdmin();
   const logger = await getLogger();
-  
+
   await requireAdmin();
   logger.request(req, 'GET /api/admin/coupons/grants');
   try {

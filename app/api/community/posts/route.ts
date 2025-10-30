@@ -19,8 +19,7 @@ const mockPosts = [
   {
     id: '2',
     image: '/assets/images/community/purchase-1.jpg',
-    caption:
-      'Just got my new Otaku-mori hoodie! The quality is amazing and the design is perfect ',
+    caption: 'Just got my new Otaku-mori hoodie! The quality is amazing and the design is perfect ',
     author: {
       name: 'AnimeLover',
       avatar: '/assets/images/avatars/anime-lover.jpg',

@@ -1,21 +1,23 @@
-"use strict";
+'use strict';
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name in all) __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
+  if ((from && typeof from === 'object') || typeof from === 'function') {
     for (let key of __getOwnPropNames(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+        __defProp(to, key, {
+          get: () => from[key],
+          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+        });
   }
   return to;
 };
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __toCommonJS = (mod) => __copyProps(__defProp({}, '__esModule', { value: true }), mod);
 
 // src/index.ts
 var index_exports = {};
@@ -39,7 +41,7 @@ __export(index_exports, {
   remove: () => remove,
   removeSystem: () => removeSystem,
   runSystems: () => runSystems,
-  spawn: () => spawn
+  spawn: () => spawn,
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -47,14 +49,14 @@ module.exports = __toCommonJS(index_exports);
 function defineComponent(name) {
   return {
     __brand: Symbol(name),
-    name
+    name,
   };
 }
 function createWorld() {
   return {
     nextEntityId: 0,
     components: /* @__PURE__ */ new Map(),
-    entities: /* @__PURE__ */ new Set()
+    entities: /* @__PURE__ */ new Set(),
   };
 }
 function spawn(world) {
@@ -182,7 +184,7 @@ function clear(world) {
 function createScheduler() {
   return {
     systems: [],
-    enabled: true
+    enabled: true,
   };
 }
 function addSystem(scheduler, system) {
@@ -263,7 +265,7 @@ function createGameLoop(options) {
     isPaused = false;
     lastTime = 0;
     accumulator = 0;
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     rafId = requestAnimationFrame(tick);
   };
   const pause = () => {
@@ -295,7 +297,7 @@ function createGameLoop(options) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
     lastTime = 0;
     accumulator = 0;
     currentTick = 0;
@@ -316,29 +318,30 @@ function createGameLoop(options) {
     },
     get fps() {
       return fps;
-    }
+    },
   };
 }
 // Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  add,
-  addSystem,
-  clear,
-  clearSystems,
-  createGameLoop,
-  createScheduler,
-  createWorld,
-  defineComponent,
-  despawn,
-  entityCount,
-  get,
-  has,
-  query,
-  query2,
-  query3,
-  query4,
-  remove,
-  removeSystem,
-  runSystems,
-  spawn
-});
+0 &&
+  (module.exports = {
+    add,
+    addSystem,
+    clear,
+    clearSystems,
+    createGameLoop,
+    createScheduler,
+    createWorld,
+    defineComponent,
+    despawn,
+    entityCount,
+    get,
+    has,
+    query,
+    query2,
+    query3,
+    query4,
+    remove,
+    removeSystem,
+    runSystems,
+    spawn,
+  });

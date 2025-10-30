@@ -265,10 +265,7 @@ export default function Profile() {
               ' '''
             </>
           }
-          <span role="img" aria-label="cherry blossom">
-            
-          </span>{' '}
-          {petals}
+          <span role="img" aria-label="cherry blossom"></span> {petals}
         </p>
         <button className="mt-4 rounded-lg bg-pink-500 px-4 py-2 transition hover:bg-pink-600">
           {

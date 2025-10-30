@@ -131,9 +131,7 @@ export default function SiteLayout({
         <div className="mx-auto max-w-6xl px-3 sm:px-6 py-4 flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-xl bg-pink-500/90 grid place-items-center shadow-lg select-none">
-              <span role="img" aria-label="Crossed swords">
-                
-              </span>
+              <span role="img" aria-label="Crossed swords"></span>
             </div>
             <a href="/" className="text-lg font-semibold tracking-wide hover:text-pink-200">
               Otaku-mori
@@ -212,7 +210,9 @@ export default function SiteLayout({
 
             <div className="relative group">
               <button
-                onClick={() => openAuthModal('sign-in', undefined, 'Log in to sync perks, petals, and progress.')}
+                onClick={() =>
+                  openAuthModal('sign-in', undefined, 'Log in to sync perks, petals, and progress.')
+                }
                 className="rounded-2xl border border-white/10 bg-neutral-900/70 px-3 py-2 text-sm hover:border-pink-400/50"
               >
                 Log in
@@ -243,9 +243,7 @@ export default function SiteLayout({
           <div>
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-lg bg-pink-500/90 grid place-items-center">
-                <span role="img" aria-label="Crossed swords">
-                  
-                </span>
+                <span role="img" aria-label="Crossed swords"></span>
               </div>
               <span className="font-semibold">Otaku-mori</span>
             </div>

@@ -1,6 +1,6 @@
 /**
  * Advanced Enterprise Feature Flag System
- * 
+ *
  * Comprehensive feature flag management with:
  * - A/B testing capabilities
  * - Gradual rollouts
@@ -29,22 +29,22 @@ export interface FeatureFlag {
   type: 'boolean' | 'string' | 'number' | 'json';
   defaultValue: any;
   enabled: boolean;
-  
+
   // Targeting rules
   rules: TargetingRule[];
-  
+
   // Rollout configuration
   rollout: RolloutConfig;
-  
+
   // A/B testing
   experiments?: ExperimentConfig[];
-  
+
   // Metadata
   tags: string[];
   owner: string;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Analytics
   trackingEvents?: string[];
 }
@@ -134,7 +134,7 @@ export class AdvancedFeatureFlagService {
   async evaluate(flagKey: string, user: User, defaultValue?: any): Promise<FlagEvaluation> {
     const cacheKey = `${flagKey}:${user.id}`;
     const cached = this.evaluationCache.get(cacheKey);
-    
+
     if (cached && cached.expiry > Date.now()) {
       return {
         flagKey,
@@ -174,7 +174,13 @@ export class AdvancedFeatureFlagService {
           const experimentResult = this.evaluateExperiment(experiment, user);
           if (experimentResult) {
             this.cacheEvaluation(cacheKey, experimentResult.value);
-            this.recordEvaluation(flagKey, user, experimentResult.value, 'experiment', experiment.id);
+            this.recordEvaluation(
+              flagKey,
+              user,
+              experimentResult.value,
+              'experiment',
+              experiment.id,
+            );
             return {
               flagKey,
               value: experimentResult.value,
@@ -229,21 +235,24 @@ export class AdvancedFeatureFlagService {
   /**
    * Evaluate experiment variant for user
    */
-  private evaluateExperiment(experiment: ExperimentConfig, user: User): { value: any; variant: string } | null {
+  private evaluateExperiment(
+    experiment: ExperimentConfig,
+    user: User,
+  ): { value: any; variant: string } | null {
     const hash = this.hashUserForExperiment(user.id, experiment.id);
     const bucket = hash % 100;
-    
+
     let cumulative = 0;
     for (const [variantId, percentage] of Object.entries(experiment.allocation)) {
       cumulative += percentage;
       if (bucket < cumulative) {
-        const variant = experiment.variants.find(v => v.id === variantId);
+        const variant = experiment.variants.find((v) => v.id === variantId);
         if (variant) {
           return { value: variant.value, variant: variant.id };
         }
       }
     }
-    
+
     return null;
   }
 
@@ -252,7 +261,7 @@ export class AdvancedFeatureFlagService {
    */
   private evaluateRules(rules: TargetingRule[], user: User): { value: any; ruleId: string } | null {
     const sortedRules = rules
-      .filter(rule => rule.enabled)
+      .filter((rule) => rule.enabled)
       .sort((a, b) => a.priority - b.priority);
 
     for (const rule of sortedRules) {
@@ -268,13 +277,11 @@ export class AdvancedFeatureFlagService {
    * Evaluate condition set
    */
   private evaluateConditionSet(conditionSet: ConditionSet, user: User): boolean {
-    const results = conditionSet.conditions.map(condition => 
-      this.evaluateCondition(condition, user)
+    const results = conditionSet.conditions.map((condition) =>
+      this.evaluateCondition(condition, user),
     );
 
-    return conditionSet.operator === 'AND' 
-      ? results.every(r => r)
-      : results.some(r => r);
+    return conditionSet.operator === 'AND' ? results.every((r) => r) : results.some((r) => r);
   }
 
   /**
@@ -317,27 +324,27 @@ export class AdvancedFeatureFlagService {
     switch (rollout.type) {
       case 'percentage':
         const hash = this.hashUser(user.id);
-        return { included: (hash % 100) < (rollout.percentage ?? 0) };
-        
+        return { included: hash % 100 < (rollout.percentage ?? 0) };
+
       case 'whitelist':
         return { included: rollout.whitelist?.includes(user.id) ?? false };
-        
+
       case 'gradual':
         if (!rollout.gradual) return { included: false };
-        
+
         const now = new Date();
         const elapsed = now.getTime() - rollout.gradual.startTime.getTime();
         const elapsedHours = elapsed / (1000 * 60 * 60);
         const steps = Math.floor(elapsedHours / rollout.gradual.stepDuration);
-        
+
         const currentPercentage = Math.min(
           rollout.gradual.endPercentage,
-          rollout.gradual.startPercentage + (steps * rollout.gradual.stepSize)
+          rollout.gradual.startPercentage + steps * rollout.gradual.stepSize,
         );
-        
+
         const userHash = this.hashUser(user.id);
-        return { included: (userHash % 100) < currentPercentage };
-        
+        return { included: userHash % 100 < currentPercentage };
+
       default:
         return { included: false };
     }
@@ -349,7 +356,7 @@ export class AdvancedFeatureFlagService {
   private getUserProperty(user: User, property: string): any {
     const parts = property.split('.');
     let value: any = user;
-    
+
     for (const part of parts) {
       if (value && typeof value === 'object' && part in value) {
         value = value[part];
@@ -357,7 +364,7 @@ export class AdvancedFeatureFlagService {
         return undefined;
       }
     }
-    
+
     return value;
   }
 
@@ -368,7 +375,7 @@ export class AdvancedFeatureFlagService {
     let hash = 0;
     for (let i = 0; i < userId.length; i++) {
       const char = userId.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash);
@@ -395,11 +402,11 @@ export class AdvancedFeatureFlagService {
    * Record evaluation for analytics
    */
   private recordEvaluation(
-    flagKey: string, 
-    user: User, 
-    value: any, 
-    reason: string, 
-    ruleId?: string
+    flagKey: string,
+    user: User,
+    value: any,
+    reason: string,
+    ruleId?: string,
   ): void {
     metricsCollector.recordMetric('feature_flag_evaluation', 1, {
       flag: flagKey,
@@ -429,7 +436,7 @@ export class AdvancedFeatureFlagService {
       createdAt: now,
       updatedAt: now,
     };
-    
+
     this.flags.set(flag.key, fullFlag);
     this.invalidateCache(flag.key);
   }
@@ -481,9 +488,10 @@ export class AdvancedFeatureFlagService {
    * Invalidate cache for specific flag
    */
   private invalidateCache(flagKey: string): void {
-    const keysToDelete = Array.from(this.evaluationCache.keys())
-      .filter(key => key.startsWith(`${flagKey}:`));
-    
+    const keysToDelete = Array.from(this.evaluationCache.keys()).filter((key) =>
+      key.startsWith(`${flagKey}:`),
+    );
+
     for (const key of keysToDelete) {
       this.evaluationCache.delete(key);
     }
@@ -507,14 +515,12 @@ export class AdvancedFeatureFlagService {
           name: 'Disable for mobile users',
           condition: {
             operator: 'AND',
-            conditions: [
-              { property: 'metadata.isMobile', operator: 'eq', value: true }
-            ]
+            conditions: [{ property: 'metadata.isMobile', operator: 'eq', value: true }],
           },
           value: false,
           priority: 1,
           enabled: true,
-        }
+        },
       ],
       rollout: {
         type: 'percentage',
@@ -522,7 +528,11 @@ export class AdvancedFeatureFlagService {
       },
       tags: ['ui', 'animation'],
       owner: 'frontend-team',
-      trackingEvents: ['boot_animation_started', 'boot_animation_completed', 'boot_animation_skipped'],
+      trackingEvents: [
+        'boot_animation_started',
+        'boot_animation_completed',
+        'boot_animation_skipped',
+      ],
     });
 
     // Petal click interactions
@@ -542,7 +552,7 @@ export class AdvancedFeatureFlagService {
           stepSize: 10,
           stepDuration: 24,
           startTime: new Date(),
-        }
+        },
       },
       tags: ['interaction', 'homepage'],
       owner: 'product-team',
@@ -563,14 +573,12 @@ export class AdvancedFeatureFlagService {
           name: 'Enable for premium users',
           condition: {
             operator: 'AND',
-            conditions: [
-              { property: 'isPremium', operator: 'eq', value: true }
-            ]
+            conditions: [{ property: 'isPremium', operator: 'eq', value: true }],
           },
           value: true,
           priority: 1,
           enabled: true,
-        }
+        },
       ],
       rollout: {
         type: 'percentage',
@@ -590,7 +598,7 @@ export class AdvancedFeatureFlagService {
           metrics: ['search_clicks', 'purchase_conversion', 'search_abandonment'],
           startDate: new Date(),
           status: 'running',
-        }
+        },
       ],
       tags: ['search', 'ai', 'experiment'],
       owner: 'search-team',
@@ -611,14 +619,12 @@ export class AdvancedFeatureFlagService {
           name: 'Full monitoring for admins',
           condition: {
             operator: 'AND',
-            conditions: [
-              { property: 'role', operator: 'eq', value: 'admin' }
-            ]
+            conditions: [{ property: 'role', operator: 'eq', value: 'admin' }],
           },
           value: 'detailed',
           priority: 1,
           enabled: true,
-        }
+        },
       ],
       rollout: {
         type: 'percentage',

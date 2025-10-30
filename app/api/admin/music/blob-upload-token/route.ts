@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
-import { requireAdmin } from "@/app/lib/authz";
-import { put } from "@vercel/blob";
+import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/app/lib/authz';
+import { put } from '@vercel/blob';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 
 function ensureBlobToken(): string {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (!token) {
-    throw new Error("Missing BLOB_READ_WRITE_TOKEN");
+    throw new Error('Missing BLOB_READ_WRITE_TOKEN');
   }
   return token;
 }
@@ -22,12 +22,12 @@ export async function POST(req: Request) {
 
   const { filename, contentType } = await req.json();
   if (!filename || !contentType) {
-    return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'Missing fields' }, { status: 400 });
   }
 
   const token = ensureBlobToken();
   const res = await put(filename, new Blob([], { type: contentType }), {
-    access: "public",
+    access: 'public',
     addRandomSuffix: true,
     token,
   });

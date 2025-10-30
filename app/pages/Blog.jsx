@@ -63,15 +63,11 @@ export default function Blog() {
               ' '''
             </>
           }
-          <span role="img" aria-label="cherry blossom">
-            
-          </span>
+          <span role="img" aria-label="cherry blossom"></span>
           <span role="img" aria-label="sparkles">
             {
               <>
-                <span role="img" aria-label="emoji">
-                  
-                </span>
+                <span role="img" aria-label="emoji"></span>
               </>
             }
           </span>
@@ -523,9 +519,7 @@ export default function Blog() {
                 .' '''
               </>
             }
-            <span role="img" aria-label="cherry blossom">
-              
-            </span>
+            <span role="img" aria-label="cherry blossom"></span>
           </p>
         </div>
       </div>

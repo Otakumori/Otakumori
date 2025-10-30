@@ -408,15 +408,17 @@ export const MATERIAL_PRESETS = {
 
 // Subsurface Scattering Material for Skin
 export class SubsurfaceScatteringMaterial extends ShaderMaterial {
-  constructor(options: {
-    skinTone?: THREE.Color;
-    subsurfaceStrength?: number;
-    subsurfaceColor?: THREE.Color;
-    thicknessScale?: number;
-    diffuseMap?: THREE.Texture;
-    thicknessMap?: THREE.Texture;
-    normalMap?: THREE.Texture;
-  } = {}) {
+  constructor(
+    options: {
+      skinTone?: THREE.Color;
+      subsurfaceStrength?: number;
+      subsurfaceColor?: THREE.Color;
+      thicknessScale?: number;
+      diffuseMap?: THREE.Texture;
+      thicknessMap?: THREE.Texture;
+      normalMap?: THREE.Texture;
+    } = {},
+  ) {
     super({
       vertexShader: animePbrVert,
       fragmentShader: subsurfaceScatteringFrag,
@@ -441,17 +443,19 @@ export class SubsurfaceScatteringMaterial extends ShaderMaterial {
 
 // Fabric/Cloth Material
 export class FabricClothMaterial extends ShaderMaterial {
-  constructor(options: {
-    fabricColor?: THREE.Color;
-    fabricRoughness?: number;
-    fabricMetallic?: number;
-    patternScale?: number;
-    patternIntensity?: number;
-    diffuseMap?: THREE.Texture;
-    normalMap?: THREE.Texture;
-    roughnessMap?: THREE.Texture;
-    fabricPatternMap?: THREE.Texture;
-  } = {}) {
+  constructor(
+    options: {
+      fabricColor?: THREE.Color;
+      fabricRoughness?: number;
+      fabricMetallic?: number;
+      patternScale?: number;
+      patternIntensity?: number;
+      diffuseMap?: THREE.Texture;
+      normalMap?: THREE.Texture;
+      roughnessMap?: THREE.Texture;
+      fabricPatternMap?: THREE.Texture;
+    } = {},
+  ) {
     super({
       vertexShader: animePbrVert,
       fragmentShader: fabricClothFrag,
@@ -476,17 +480,19 @@ export class FabricClothMaterial extends ShaderMaterial {
 
 // Metallic/Glossy Material
 export class MetallicGlossyMaterial extends ShaderMaterial {
-  constructor(options: {
-    metallicColor?: THREE.Color;
-    metallicRoughness?: number;
-    metallicMetallic?: number;
-    reflectionStrength?: number;
-    diffuseMap?: THREE.Texture;
-    normalMap?: THREE.Texture;
-    roughnessMap?: THREE.Texture;
-    metallicMap?: THREE.Texture;
-    environmentMap?: THREE.Texture;
-  } = {}) {
+  constructor(
+    options: {
+      metallicColor?: THREE.Color;
+      metallicRoughness?: number;
+      metallicMetallic?: number;
+      reflectionStrength?: number;
+      diffuseMap?: THREE.Texture;
+      normalMap?: THREE.Texture;
+      roughnessMap?: THREE.Texture;
+      metallicMap?: THREE.Texture;
+      environmentMap?: THREE.Texture;
+    } = {},
+  ) {
     super({
       vertexShader: animePbrVert,
       fragmentShader: metallicGlossyFrag,
@@ -511,17 +517,19 @@ export class MetallicGlossyMaterial extends ShaderMaterial {
 
 // Transparency/Glass Material
 export class TransparencyGlassMaterial extends ShaderMaterial {
-  constructor(options: {
-    glassColor?: THREE.Color;
-    glassRoughness?: number;
-    refractionIndex?: number;
-    transparency?: number;
-    fresnelPower?: number;
-    diffuseMap?: THREE.Texture;
-    normalMap?: THREE.Texture;
-    roughnessMap?: THREE.Texture;
-    environmentMap?: THREE.Texture;
-  } = {}) {
+  constructor(
+    options: {
+      glassColor?: THREE.Color;
+      glassRoughness?: number;
+      refractionIndex?: number;
+      transparency?: number;
+      fresnelPower?: number;
+      diffuseMap?: THREE.Texture;
+      normalMap?: THREE.Texture;
+      roughnessMap?: THREE.Texture;
+      environmentMap?: THREE.Texture;
+    } = {},
+  ) {
     super({
       vertexShader: animePbrVert,
       fragmentShader: transparencyGlassFrag,

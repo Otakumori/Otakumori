@@ -83,4 +83,3 @@ console.log(' Starting console.log cleanup...');
 const fixedCount = processDirectory('.');
 console.log(` Fixed ${fixedCount} files`);
 console.log(' Done! All console.log statements have been removed.');
-

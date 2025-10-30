@@ -22,13 +22,17 @@ async function fetchGames(): Promise<Game[]> {
 
 export default async function HomeMiniGames() {
   let games: Game[] = [];
-  try { games = await fetchGames(); } catch {}
+  try {
+    games = await fetchGames();
+  } catch {}
 
   if (!games.length) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-pink-200">
         Jump into the mini-games hub.
-        <a href="/mini-games" className="ml-2 underline decoration-pink-400 hover:opacity-90">Enter Mini-Games</a>
+        <a href="/mini-games" className="ml-2 underline decoration-pink-400 hover:opacity-90">
+          Enter Mini-Games
+        </a>
       </div>
     );
   }
@@ -43,9 +47,7 @@ export default async function HomeMiniGames() {
                      overflow-hidden focus:outline-none focus:ring-2 focus:ring-pink-500"
         >
           <div className="relative aspect-[4/3] bg-black/30">
-            {g.image ? (
-              <img src={g.image} alt="" className="h-full w-full object-cover" />
-            ) : null}
+            {g.image ? <img src={g.image} alt="" className="h-full w-full object-cover" /> : null}
           </div>
           <div className="p-4">
             <div className="font-semibold text-pink-100">{g.title}</div>

@@ -5,7 +5,7 @@ const path = require('path');
 const healthChecker = spawn('ts-node', [path.join(__dirname, 'check-health.ts')], {
   stdio: 'inherit',
   env: {
-    ...process.env,  
+    ...process.env,
     NODE_ENV: 'production',
   },
 });

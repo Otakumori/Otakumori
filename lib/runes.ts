@@ -381,9 +381,6 @@ export function getRuneDisplay(runeDef: RuneDef): {
   return {
     name: runeDef.displayName || defaults.name,
     glyph: runeDef.glyph || defaults.glyph,
-    lore:
-      runeDef.lore ||
-      DEFAULT_RUNE_LORE ||
-      'A mysterious rune with unknown properties.',
+    lore: runeDef.lore || DEFAULT_RUNE_LORE || 'A mysterious rune with unknown properties.',
   };
 }

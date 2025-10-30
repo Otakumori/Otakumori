@@ -221,12 +221,16 @@ class AssetVerifier {
 
     if (this.warnings.length > 0) {
       // '\n  Warnings:'
-      this.warnings.forEach((warning) => // warning);
+      this.warnings.forEach((warning) => {
+        // warning
+      });
     }
 
     if (this.errors.length > 0) {
       // '\n Errors:'
-      this.errors.forEach((error) => // error);
+      this.errors.forEach((error) => {
+        // error
+      });
       // `\n Asset verification failed with ${this.errors.length} errors!`
     } else {
       // '\n All assets verified successfully!'

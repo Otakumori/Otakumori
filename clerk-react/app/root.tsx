@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from 'react-router-dom';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router-dom';
 import './app.css';
 
 export const links = () => [

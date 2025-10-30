@@ -168,9 +168,22 @@ export class AnimationController {
   private setupFacialExpressions() {
     // Facial expression blend shapes (if available)
     const facialExpressions = [
-      'smile', 'frown', 'surprise', 'anger', 'fear', 'disgust', 'sadness',
-      'wink_left', 'wink_right', 'blink', 'eyebrow_raise', 'eyebrow_furrow',
-      'mouth_open', 'mouth_pucker', 'cheek_puff', 'nose_scrunch'
+      'smile',
+      'frown',
+      'surprise',
+      'anger',
+      'fear',
+      'disgust',
+      'sadness',
+      'wink_left',
+      'wink_right',
+      'blink',
+      'eyebrow_raise',
+      'eyebrow_furrow',
+      'mouth_open',
+      'mouth_pucker',
+      'cheek_puff',
+      'nose_scrunch',
     ];
 
     facialExpressions.forEach((name) => {

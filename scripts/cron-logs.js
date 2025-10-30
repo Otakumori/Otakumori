@@ -10,7 +10,7 @@ cron.schedule('0 0 * * *', () => {
   const rotateLogs = spawn('node', [path.join(__dirname, 'rotate-logs.js')], {
     stdio: 'inherit',
     env: {
-      ...process.env,  
+      ...process.env,
       NODE_ENV: 'production',
     },
   });

@@ -31,12 +31,7 @@ export interface Position {
 /**
  * Creates a new petal with randomized physics properties
  */
-export function createPetal(
-  id: number,
-  color: string,
-  isRare: boolean,
-  value: number,
-): Petal {
+export function createPetal(id: number, color: string, isRare: boolean, value: number): Petal {
   return {
     id,
     x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1920),
@@ -78,10 +73,7 @@ export function updatePetalPhysics(petal: Petal, time: number, deltaTime: number
   let newOpacity = petal.opacity;
   if (petal.y < 50) {
     newOpacity = Math.min(1, petal.opacity + 0.02);
-  } else if (
-    typeof window !== 'undefined' &&
-    petal.y > window.innerHeight - 100
-  ) {
+  } else if (typeof window !== 'undefined' && petal.y > window.innerHeight - 100) {
     newOpacity = Math.max(0, petal.opacity - 0.02);
   } else {
     newOpacity = Math.min(1, petal.opacity + 0.02);
@@ -104,11 +96,7 @@ export function updatePetalPhysics(petal: Petal, time: number, deltaTime: number
 export function shouldRemovePetal(petal: Petal): boolean {
   if (typeof window === 'undefined') return false;
 
-  return (
-    petal.y > window.innerHeight + 100 ||
-    petal.x < -100 ||
-    petal.x > window.innerWidth + 100
-  );
+  return petal.y > window.innerHeight + 100 || petal.x < -100 || petal.x > window.innerWidth + 100;
 }
 
 /**
@@ -146,11 +134,7 @@ export function easeInOutCubic(t: number): number {
 /**
  * Checks if point is within petal hitbox
  */
-export function isPointInPetal(
-  point: Position,
-  petal: Petal,
-  hitboxRadius = 30,
-): boolean {
+export function isPointInPetal(point: Position, petal: Petal, hitboxRadius = 30): boolean {
   const dx = point.x - petal.x;
   const dy = point.y - petal.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
@@ -212,4 +196,3 @@ export function generateSparkles(center: Position, count: number): Position[] {
 
   return sparkles;
 }
-

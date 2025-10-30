@@ -1,5 +1,4 @@
 // DEPRECATED: This component is a duplicate. Use components\SoundSettings.tsx instead.
- 
 
 'use client';
 
@@ -148,7 +147,7 @@ export const SoundSettings: React.FC = () => {
           gap: '8px',
         }}
       >
-         Sound Settings
+        Sound Settings
         <span style={{ fontSize: '12px' }}>{isOpen ? '▼' : '▶'}</span>
       </button>
 

@@ -3,10 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { Prisma } from '@prisma/client';
-import {
-  UserReportCreateSchema,
-  ReportListRequestSchema,
-} from '@/app/lib/contracts';
+import { UserReportCreateSchema, ReportListRequestSchema } from '@/app/lib/contracts';
 import { logger } from '@/app/lib/logger';
 
 export async function GET(request: NextRequest) {

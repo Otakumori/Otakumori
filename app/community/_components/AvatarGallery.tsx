@@ -139,7 +139,7 @@ export function AvatarGallery() {
             </button>
           ))}
         </div>
-        
+
         {/* View Mode Toggle */}
         <div className="flex space-x-1 bg-white/10 rounded-lg p-1">
           <button

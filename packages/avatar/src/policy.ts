@@ -51,4 +51,3 @@ export function resolvePolicy(ctx: PolicyContext): PolicyResult {
 export function isNSFWSlot(slot: string): boolean {
   return slot.startsWith('NSFW');
 }
-

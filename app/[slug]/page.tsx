@@ -20,13 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function StaticPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  
+
   // Don't handle API routes or other system routes
-  if (
-    slug.startsWith('api/') ||
-    slug.startsWith('_next/') ||
-    slug.startsWith('admin/')
-  ) {
+  if (slug.startsWith('api/') || slug.startsWith('_next/') || slug.startsWith('admin/')) {
     return notFound();
   }
 

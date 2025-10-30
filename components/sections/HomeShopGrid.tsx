@@ -40,14 +40,18 @@ export default async function HomeShopGrid() {
     items = await fetchPrintify();
     if (!items.length) items = await fetchInternal();
   } catch {
-    try { items = await fetchInternal(); } catch {}
+    try {
+      items = await fetchInternal();
+    } catch {}
   }
 
   if (!items.length) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-pink-200">
         No featured products yet.
-        <a href="/shop" className="ml-2 underline decoration-pink-400 hover:opacity-90">Explore Shop</a>
+        <a href="/shop" className="ml-2 underline decoration-pink-400 hover:opacity-90">
+          Explore Shop
+        </a>
       </div>
     );
   }
@@ -75,9 +79,7 @@ export default async function HomeShopGrid() {
           <div className="p-4">
             <div className="line-clamp-2 font-semibold text-pink-100">{it.title}</div>
             {typeof it.priceUsd === 'number' && (
-              <div className="mt-2 text-sm text-pink-200/80">
-                ${(it.priceUsd / 100).toFixed(2)}
-              </div>
+              <div className="mt-2 text-sm text-pink-200/80">${(it.priceUsd / 100).toFixed(2)}</div>
             )}
           </div>
         </a>

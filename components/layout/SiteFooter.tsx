@@ -9,24 +9,65 @@ export default function SiteFooter() {
         <div className="grid gap-8 lg:grid-cols-4">
           <div>
             <div className="text-pink-100 font-semibold">Otaku-mori</div>
-            <p className="mt-2 text-pink-200/70 text-sm">A living, dark-glass anime commerce experience.</p>
+            <p className="mt-2 text-pink-200/70 text-sm">
+              A living, dark-glass anime commerce experience.
+            </p>
           </div>
 
           <nav className="text-sm">
             <div className="text-pink-200 font-medium mb-2">Company</div>
             <ul className="space-y-2 text-pink-200/80">
-              <li><a href="/about" className="hover:underline">About</a></li>
-              <li><a href="/legal/privacy" className="hover:underline">Privacy</a></li>
-              <li><a href="/legal/terms" className="hover:underline">Terms</a></li>
+              <li>
+                <a href="/about" className="hover:underline">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="/legal/privacy" className="hover:underline">
+                  Privacy
+                </a>
+              </li>
+              <li>
+                <a href="/legal/terms" className="hover:underline">
+                  Terms
+                </a>
+              </li>
             </ul>
           </nav>
 
           <nav className="text-sm">
             <div className="text-pink-200 font-medium mb-2">Social</div>
             <ul className="space-y-2 text-pink-200/80">
-              <li><a href="https://x.com/..." target="_blank" rel="noreferrer" className="hover:underline">X</a></li>
-              <li><a href="https://instagram.com/..." target="_blank" rel="noreferrer" className="hover:underline">Instagram</a></li>
-              <li><a href="https://tiktok.com/@..." target="_blank" rel="noreferrer" className="hover:underline">TikTok</a></li>
+              <li>
+                <a
+                  href="https://x.com/..."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:underline"
+                >
+                  X
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com/..."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:underline"
+                >
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://tiktok.com/@..."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:underline"
+                >
+                  TikTok
+                </a>
+              </li>
             </ul>
           </nav>
 

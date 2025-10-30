@@ -2,14 +2,15 @@
 
 /* Canopy sway animation */
 @keyframes canopySway {
-  0%, 100% { 
-    transform: rotate(0deg) scaleX(2.0) scaleY(1.5); 
+  0%,
+  100% {
+    transform: rotate(0deg) scaleX(2) scaleY(1.5);
   }
-  25% { 
-    transform: rotate(1deg) scaleX(2.0) scaleY(1.5); 
+  25% {
+    transform: rotate(1deg) scaleX(2) scaleY(1.5);
   }
-  75% { 
-    transform: rotate(-1deg) scaleX(2.0) scaleY(1.5); 
+  75% {
+    transform: rotate(-1deg) scaleX(2) scaleY(1.5);
   }
 }
 
@@ -49,21 +50,21 @@
 
 /* Reward notification animation */
 @keyframes rewardFloat {
-  0% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.5); 
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
   }
-  20% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1.1); 
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
   }
-  80% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1); 
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
-  100% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.8) translateY(-20px); 
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) translateY(-20px);
   }
 }
 
@@ -90,7 +91,9 @@
 
 /* Interactive petal hover effect */
 .interactive-petal {
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
 }
 
 .interactive-petal:hover {
@@ -103,15 +106,15 @@
   .canopy-sway {
     animation: none;
   }
-  
+
   .petal-float {
     animation: none;
   }
-  
+
   .petal-collect {
     animation: none;
   }
-  
+
   .reward-float {
     animation: none;
   }
@@ -123,7 +126,7 @@
     transform: scale(0.8);
     transform-origin: top left;
   }
-  
+
   .petal {
     width: 16px;
     height: 16px;
@@ -135,7 +138,7 @@
     transform: scale(0.6);
     transform-origin: top left;
   }
-  
+
   .petal {
     width: 12px;
     height: 12px;

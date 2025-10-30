@@ -1,14 +1,14 @@
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-export const fetchCache = "force-no-store";
-export const runtime = "nodejs";
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { z } from 'zod';
 
-import { CharacterPresetRequestSchema } from "@/app/lib/contracts";
-import { db } from "@/lib/db";
+import { CharacterPresetRequestSchema } from '@/app/lib/contracts';
+import { db } from '@/lib/db';
 
 const QuerySchema = CharacterPresetRequestSchema.extend({
   category: CharacterPresetRequestSchema.shape.category.optional(),
@@ -22,16 +22,16 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
 
     const params = QuerySchema.parse({
-      category: searchParams.get("category") ?? undefined,
-      rarity: searchParams.get("rarity") ?? undefined,
+      category: searchParams.get('category') ?? undefined,
+      rarity: searchParams.get('rarity') ?? undefined,
       unlocked:
-        searchParams.get("unlocked") === null
+        searchParams.get('unlocked') === null
           ? undefined
-          : searchParams.get("unlocked") === "true"
-          ? true
-          : searchParams.get("unlocked") === "false"
-          ? false
-          : undefined,
+          : searchParams.get('unlocked') === 'true'
+            ? true
+            : searchParams.get('unlocked') === 'false'
+              ? false
+              : undefined,
     });
 
     const presets = await db.characterPreset.findMany({
@@ -39,11 +39,7 @@ export async function GET(request: Request) {
         ...(params.category ? { category: params.category } : {}),
         ...(params.rarity ? { rarity: params.rarity } : {}),
       },
-      orderBy: [
-        { rarity: "asc" },
-        { category: "asc" },
-        { name: "asc" },
-      ],
+      orderBy: [{ rarity: 'asc' }, { category: 'asc' }, { name: 'asc' }],
     });
 
     let unlockedIds: Set<string> | undefined;
@@ -84,17 +80,17 @@ export async function GET(request: Request) {
     });
 
     const filtered =
-      typeof params.unlocked === "boolean"
+      typeof params.unlocked === 'boolean'
         ? payload.filter((preset) => preset.isUnlocked === params.unlocked)
         : payload;
 
     return NextResponse.json({ ok: true, data: filtered });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: "Invalid query parameters" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });
     }
 
-    console.error("Character presets fetch error", error);
-    return NextResponse.json({ ok: false, error: "Internal server error" }, { status: 500 });
+    console.error('Character presets fetch error', error);
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

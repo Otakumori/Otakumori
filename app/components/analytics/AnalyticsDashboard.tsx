@@ -275,8 +275,8 @@ export default function AnalyticsDashboard() {
           <CardContent>
             <div className="flex h-64 items-end justify-between gap-1">
               {data.timeSeriesData.slice(-7).map((day, i) => (
-                <div 
-                  key={day.date} 
+                <div
+                  key={day.date}
                   className="flex flex-1 flex-col items-center"
                   title={`Day ${i + 1}: $${day.revenue.toFixed(2)}`}
                 >

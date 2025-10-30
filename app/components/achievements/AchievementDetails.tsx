@@ -1,13 +1,13 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
-import type { Achievement } from "./AchievementProvider";
-import { useAchievements } from "./AchievementProvider";
+import type { Achievement } from './AchievementProvider';
+import { useAchievements } from './AchievementProvider';
 
 interface AchievementDetailsProps {
   achievement: Achievement;
 }
 
-const isImageSource = (value: string) => value.startsWith("/") || value.startsWith("http");
+const isImageSource = (value: string) => value.startsWith('/') || value.startsWith('http');
 
 export function AchievementDetails({ achievement }: AchievementDetailsProps) {
   const { unlockAchievement } = useAchievements();
@@ -61,9 +61,11 @@ export function AchievementDetails({ achievement }: AchievementDetailsProps) {
         <div className="mt-6">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">Reward</h3>
           <div className="mt-2 flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
-            {achievement.reward.type === "points" && <span>{achievement.reward.value} Points</span>}
-            {achievement.reward.type === "discount" && <span>{achievement.reward.value}% Discount</span>}
-            {achievement.reward.type === "badge" && (
+            {achievement.reward.type === 'points' && <span>{achievement.reward.value} Points</span>}
+            {achievement.reward.type === 'discount' && (
+              <span>{achievement.reward.value}% Discount</span>
+            )}
+            {achievement.reward.type === 'badge' && (
               <span className="inline-flex items-center rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                 {achievement.reward.value}
               </span>

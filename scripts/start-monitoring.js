@@ -5,7 +5,7 @@ const path = require('path');
 const metricsCollector = spawn('node', [path.join(__dirname, 'start-metrics-collector.js')], {
   stdio: 'inherit',
   env: {
-    ...process.env,  
+    ...process.env,
     NODE_ENV: 'production',
   },
 });
@@ -14,7 +14,7 @@ const metricsCollector = spawn('node', [path.join(__dirname, 'start-metrics-coll
 const healthChecker = spawn('node', [path.join(__dirname, 'start-health-check.js')], {
   stdio: 'inherit',
   env: {
-    ...process.env,  
+    ...process.env,
     NODE_ENV: 'production',
   },
 });
@@ -23,7 +23,7 @@ const healthChecker = spawn('node', [path.join(__dirname, 'start-health-check.js
 const logScheduler = spawn('node', [path.join(__dirname, 'cron-logs.js')], {
   stdio: 'inherit',
   env: {
-    ...process.env,  
+    ...process.env,
     NODE_ENV: 'production',
   },
 });

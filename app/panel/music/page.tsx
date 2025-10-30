@@ -447,9 +447,7 @@ export default function MusicPanel() {
             <div className="w-64 h-64 mx-auto mb-6 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-full flex items-center justify-center">
               <Music className="h-24 w-24 text-purple-400" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
-              {currentTrackData.title}
-            </h3>
+            <h3 className="text-xl font-semibold text-white mb-2">{currentTrackData.title}</h3>
             <p className="text-neutral-300 mb-1">{currentTrackData.artist}</p>
             <p className="text-sm text-neutral-400">{currentTrackData.genre}</p>
           </div>
