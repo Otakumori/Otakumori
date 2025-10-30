@@ -320,8 +320,6 @@ async function main() {
 }
 
 // ES module entry point check
-// if (import.meta.url === `file://${process.argv[1]}`) {
-//   main().catch(console.error);
-// }
+// Run manually: node scripts/performance-audit.ts
 
 export { PerformanceAuditor, GameCubePerformanceChecker };
