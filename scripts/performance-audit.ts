@@ -320,8 +320,8 @@ async function main() {
 }
 
 // ES module entry point check
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(console.error);
-}
+// if (import.meta.url === `file://${process.argv[1]}`) {
+//   main().catch(console.error);
+// }
 
 export { PerformanceAuditor, GameCubePerformanceChecker };

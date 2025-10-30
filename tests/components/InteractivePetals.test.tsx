@@ -78,7 +78,7 @@ describe('InteractivePetals', () => {
     // Check that petals have proper attributes
     petals.forEach((petal) => {
       expect(petal).toHaveAttribute('data-petal-id');
-      expect(petal).toHaveAttribute('aria-label', {"'"}Collectible petal');
+      expect(petal).toHaveAttribute('aria-label', 'Collectible petal');
       expect(petal).toHaveAttribute('tabIndex', '0');
     });
   });

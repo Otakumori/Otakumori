@@ -423,7 +423,7 @@ async function main() {
   await fsp.writeFile(ASSET_CFG, JSON.stringify(assets, null, 2), 'utf8');
 
   // '\n Generated:'
-  for (const r of results) // ' •', r.publicPath
+  // for (const r of results) ' •', r.publicPath
   // `\n Next: run 'npm run assets:sync' to ensure the manifest includes these.`
 }
 
