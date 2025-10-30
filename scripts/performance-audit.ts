@@ -282,29 +282,28 @@ class GameCubePerformanceChecker {
   static checkFramePerformance(): void {
     // '\n GameCube Performance Check:'
     // 'Add this to your GameCube components for runtime monitoring:'
-    // `
+    //
     // Frame rate monitoring
-    let frameCount = 0;
-    let lastTime = performance.now();
-
-    const checkFPS = () => {
-      frameCount++;
-      const currentTime = performance.now();
-      
-      if (currentTime - lastTime >= 1000) {
-        const fps = frameCount;
-        if (fps < 50) {
-          console.warn(' GameCube FPS below target:', fps);
-        }
-        frameCount = 0;
-        lastTime = currentTime;
-      }
-      
-      requestAnimationFrame(checkFPS);
-    };
-    
-    requestAnimationFrame(checkFPS);
-    `);
+    // let frameCount = 0;
+    // let lastTime = performance.now();
+    //
+    // const checkFPS = () => {
+    //   frameCount++;
+    //   const currentTime = performance.now();
+    //   
+    //   if (currentTime - lastTime >= 1000) {
+    //     const fps = frameCount;
+    //     if (fps < 50) {
+    //       console.warn(' GameCube FPS below target:', fps);
+    //     }
+    //     frameCount = 0;
+    //     lastTime = currentTime;
+    //   }
+    //   
+    //   requestAnimationFrame(checkFPS);
+    // };
+    //
+    // requestAnimationFrame(checkFPS);
   }
 }
 

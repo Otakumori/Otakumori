@@ -98,7 +98,7 @@ describe('InteractivePetals', () => {
 
     // Mock document.elementFromPoint to return the petal element
     const mockElementFromPoint = jest.fn().mockReturnValue(petal);
-    Object.defineProperty(document, {"'"}elementFromPoint', {
+    Object.defineProperty(document, 'elementFromPoint', {
       value: mockElementFromPoint,
       writable: true,
     });
@@ -136,7 +136,7 @@ describe('InteractivePetals', () => {
 
     // Mock document.elementFromPoint to return a different element
     const mockElementFromPoint = jest.fn().mockReturnValue(document.body);
-    Object.defineProperty(document, {"'"}elementFromPoint', {
+    Object.defineProperty(document, 'elementFromPoint', {
       value: mockElementFromPoint,
       writable: true,
     });
@@ -166,7 +166,7 @@ describe('InteractivePetals', () => {
 
     // Mock document.elementFromPoint to return the petal element
     const mockElementFromPoint = jest.fn().mockReturnValue(petal);
-    Object.defineProperty(document, {"'"}elementFromPoint', {
+    Object.defineProperty(document, 'elementFromPoint', {
       value: mockElementFromPoint,
       writable: true,
     });

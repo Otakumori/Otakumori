@@ -520,23 +520,22 @@ export function trackUserJourney(journeyName: string, action: 'start' | 'complet
     // '   • Component-level performance'
 
     // '\n Usage Examples:'
-    // `
+    //
     // In GameCube components:
-    import { useGameCubePerformance } from '@/lib/web-vitals';
-    
-    const { startTracking, stopTracking } = useGameCubePerformance();
-
-    useEffect(() => {
-      startTracking();
-      return () => stopTracking();
-    }, []);
-
+    // import { useGameCubePerformance } from '@/lib/web-vitals';
+    //
+    // const { startTracking, stopTracking } = useGameCubePerformance();
+    //
+    // useEffect(() => {
+    //   startTracking();
+    //   return () => stopTracking();
+    // }, []);
+    //
     // For user journeys:
     // import { trackUserJourney } from '@/lib/web-vitals';
     // trackUserJourney('checkout', 'start');
     // ... user completes checkout
     // trackUserJourney('checkout', 'complete');
-    `);
 
     // '\n='.repeat(60);
   }
