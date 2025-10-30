@@ -2,6 +2,7 @@ import { env } from '@/env';
 
 // Clerk API sync
 export async function syncClerkUsers() {
+  if (!env.DATABASE_URL) return;
   try {
     const response = await fetch('https://api.clerk.com/v1/users', {
       headers: {
@@ -60,6 +61,7 @@ export async function syncClerkUsers() {
 
 // Stripe API sync
 export async function syncStripeCustomers() {
+  if (!env.DATABASE_URL) return;
   try {
     const response = await fetch('https://api.stripe.com/v1/customers?limit=100', {
       headers: {
@@ -112,6 +114,7 @@ export async function syncStripeCustomers() {
 }
 
 export async function syncStripeProducts() {
+  if (!env.DATABASE_URL) return;
   try {
     const response = await fetch('https://api.stripe.com/v1/products?limit=100', {
       headers: {
@@ -165,6 +168,7 @@ export async function syncStripeProducts() {
 
 // Printify API sync
 export async function syncPrintifyProducts() {
+  if (!env.DATABASE_URL) return;
   try {
     const response = await fetch(
       `https://api.printify.com/v1/shops/${env.PRINTIFY_SHOP_ID}/products.json`,

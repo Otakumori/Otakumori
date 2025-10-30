@@ -72,6 +72,15 @@ export const env = createEnv({
     SENTRY_ORG: z.string().optional(),
     SENTRY_PROJECT: z.string().optional(),
     ANALYZE: z.string().optional(),
+    // Feature flags (server-side)
+    FEATURE_ADULT_ZONE: z.string().optional(),
+    FEATURE_GATED_COSMETICS: z.string().optional(),
+    FEATURE_AVATARS: z.string().optional(),
+    FEATURE_AVATAR_STYLIZED_SHADERS: z.string().optional(),
+    // Internal
+    INTERNAL_AUTH_TOKEN: z.string().optional(),
+    // Adult content storage
+    ADULTS_STORAGE_INDEX_URL: z.string().url().optional(),
   },
   client: {
     // Clerk
@@ -199,6 +208,12 @@ export const env = createEnv({
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,
     ANALYZE: process.env.ANALYZE,
+    FEATURE_ADULT_ZONE: process.env.FEATURE_ADULT_ZONE,
+    FEATURE_GATED_COSMETICS: process.env.FEATURE_GATED_COSMETICS,
+    FEATURE_AVATARS: process.env.FEATURE_AVATARS,
+    FEATURE_AVATAR_STYLIZED_SHADERS: process.env.FEATURE_AVATAR_STYLIZED_SHADERS,
+    INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN,
+    ADULTS_STORAGE_INDEX_URL: process.env.ADULTS_STORAGE_INDEX_URL,
     // Client vars
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,

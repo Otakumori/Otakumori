@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         hero: env.NEXT_PUBLIC_FEATURE_HERO === '1',
         petals: env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1',
         shop: env.NEXT_PUBLIC_FEATURE_SHOP === '1',
-        minigames: env.NEXT_PUBLIC_FEATURE_MINIGAMES === '1',
+        minigames: env.NEXT_PUBLIC_FEATURE_MINIGAMES === 'on',
         blog: env.NEXT_PUBLIC_FEATURE_BLOG === '1',
         soapstones: env.NEXT_PUBLIC_FEATURE_SOAPSTONES === '1',
       },
