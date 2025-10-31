@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Flower, ShoppingBag, Settings, Sparkles, BarChart3 } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
-import { AdminLayout } from '@/components/admin/AdminNav';
+import { AdminLayout } from '../../components/admin/AdminNav';
 
 interface DashboardStats {
   totalUsers: number;

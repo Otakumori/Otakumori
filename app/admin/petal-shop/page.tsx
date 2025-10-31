@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { AdminLayout } from '@/components/admin/AdminNav';
+import { AdminLayout } from '../../../components/admin/AdminNav';
 
 type Item = {
   id?: string;
