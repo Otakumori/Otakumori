@@ -267,5 +267,5 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE,
     NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
   },
-  skipValidation: !!process.env.CI,
+  skipValidation: false,
 });
