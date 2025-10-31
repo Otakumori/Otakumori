@@ -6,7 +6,6 @@
  * Run this before deployments to catch issues early
  */
 
-
 interface TestResult {
   endpoint: string;
   method: string;

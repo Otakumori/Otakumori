@@ -290,7 +290,7 @@ class GameCubePerformanceChecker {
     // const checkFPS = () => {
     //   frameCount++;
     //   const currentTime = performance.now();
-    //   
+    //
     //   if (currentTime - lastTime >= 1000) {
     //     const fps = frameCount;
     //     if (fps < 50) {
@@ -299,7 +299,7 @@ class GameCubePerformanceChecker {
     //     frameCount = 0;
     //     lastTime = currentTime;
     //   }
-    //   
+    //
     //   requestAnimationFrame(checkFPS);
     // };
     //

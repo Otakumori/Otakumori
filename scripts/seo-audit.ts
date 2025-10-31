@@ -203,9 +203,7 @@ class SEOAuditor {
     if (!result.title.present) {
       this.errors.push(` ${route}: Missing title tag`);
     } else if (!result.title.valid) {
-      this.warnings.push(
-        `  ${route}: Title length ${result.title.length} chars (should be 40-60)`,
-      );
+      this.warnings.push(`  ${route}: Title length ${result.title.length} chars (should be 40-60)`);
     }
 
     // Description validation

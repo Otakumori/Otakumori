@@ -1,99 +1,96 @@
-import {
-  AvatarRenderer,
-  preloadAvatar
-} from "./chunk-ABXYW7BK.js";
+import { AvatarRenderer, preloadAvatar } from './chunk-ABXYW7BK.js';
 
 // src/spec.ts
-import { z } from "zod";
+import { z } from 'zod';
 var EquipmentSlot = z.enum([
   // Head & Face
-  "Head",
-  "Face",
-  "Eyes",
-  "Eyebrows",
-  "Nose",
-  "Mouth",
-  "Ears",
+  'Head',
+  'Face',
+  'Eyes',
+  'Eyebrows',
+  'Nose',
+  'Mouth',
+  'Ears',
   // Hair & Facial
-  "Hair",
-  "FacialHair",
-  "Eyelashes",
+  'Hair',
+  'FacialHair',
+  'Eyelashes',
   // Body Base
-  "Torso",
-  "Chest",
-  "Arms",
-  "Hands",
-  "Legs",
-  "Feet",
+  'Torso',
+  'Chest',
+  'Arms',
+  'Hands',
+  'Legs',
+  'Feet',
   // Clothing Layers
-  "Underwear",
-  "InnerWear",
-  "OuterWear",
-  "Pants",
-  "Shoes",
-  "Gloves",
+  'Underwear',
+  'InnerWear',
+  'OuterWear',
+  'Pants',
+  'Shoes',
+  'Gloves',
   // Accessories
-  "Headwear",
-  "Eyewear",
-  "Neckwear",
-  "Earrings",
-  "Bracelets",
-  "Rings",
+  'Headwear',
+  'Eyewear',
+  'Neckwear',
+  'Earrings',
+  'Bracelets',
+  'Rings',
   // Fantasy/Anime
-  "Horns",
-  "Tail",
-  "Wings",
-  "AnimalEars",
-  "Halo",
+  'Horns',
+  'Tail',
+  'Wings',
+  'AnimalEars',
+  'Halo',
   // Back & Weapons
-  "Back",
-  "WeaponPrimary",
-  "WeaponSecondary",
-  "Shield",
+  'Back',
+  'WeaponPrimary',
+  'WeaponSecondary',
+  'Shield',
   // NSFW (gated by policy)
-  "NSFWChest",
-  "NSFWGroin",
-  "NSFWAccessory"
+  'NSFWChest',
+  'NSFWGroin',
+  'NSFWAccessory',
 ]);
 var STANDARD_RIG_BONES = [
-  "Hips",
-  "Spine",
-  "Spine1",
-  "Spine2",
-  "Chest",
-  "Neck",
-  "Head",
-  "LeftShoulder",
-  "LeftArm",
-  "LeftForeArm",
-  "LeftHand",
-  "RightShoulder",
-  "RightArm",
-  "RightForeArm",
-  "RightHand",
-  "LeftUpLeg",
-  "LeftLeg",
-  "LeftFoot",
-  "LeftToeBase",
-  "RightUpLeg",
-  "RightLeg",
-  "RightFoot",
-  "RightToeBase"
+  'Hips',
+  'Spine',
+  'Spine1',
+  'Spine2',
+  'Chest',
+  'Neck',
+  'Head',
+  'LeftShoulder',
+  'LeftArm',
+  'LeftForeArm',
+  'LeftHand',
+  'RightShoulder',
+  'RightArm',
+  'RightForeArm',
+  'RightHand',
+  'LeftUpLeg',
+  'LeftLeg',
+  'LeftFoot',
+  'LeftToeBase',
+  'RightUpLeg',
+  'RightLeg',
+  'RightFoot',
+  'RightToeBase',
 ];
 var AvatarSpecV15 = z.object({
-  version: z.literal("1.5"),
+  version: z.literal('1.5'),
   baseMeshUrl: z.string().url(),
   rig: z.object({
     root: z.string(),
-    bones: z.array(z.string()).default([...STANDARD_RIG_BONES])
+    bones: z.array(z.string()).default([...STANDARD_RIG_BONES]),
   }),
   morphs: z.array(
     z.object({
       id: z.string(),
       label: z.string(),
       min: z.number().min(0).max(1).default(0),
-      max: z.number().min(0).max(1).default(1)
-    })
+      max: z.number().min(0).max(1).default(1),
+    }),
   ),
   morphWeights: z.record(z.string(), z.number().min(0).max(1)),
   // Equipment uses asset IDs, not URLs (resolved server-side)
@@ -101,10 +98,10 @@ var AvatarSpecV15 = z.object({
   palette: z.object({
     primary: z.string(),
     secondary: z.string(),
-    accent: z.string().optional()
+    accent: z.string().optional(),
   }),
   nsfwPolicy: z.object({
-    allowNudity: z.literal(false)
+    allowNudity: z.literal(false),
   }),
   animationMap: z.object({
     idle: z.string().optional(),
@@ -114,12 +111,14 @@ var AvatarSpecV15 = z.object({
     fall: z.string().optional(),
     land: z.string().optional(),
     attack: z.string().optional(),
-    emote: z.string().optional()
+    emote: z.string().optional(),
   }),
-  metadata: z.object({
-    name: z.string().optional(),
-    author: z.string().optional()
-  }).optional()
+  metadata: z
+    .object({
+      name: z.string().optional(),
+      author: z.string().optional(),
+    })
+    .optional(),
 });
 function clampMorph(spec, morphId, value) {
   const morph = spec.morphs.find((m) => m.id === morphId);
@@ -135,7 +134,7 @@ function clampAllMorphs(spec) {
   }
   return {
     ...spec,
-    morphWeights: clampedWeights
+    morphWeights: clampedWeights,
   };
 }
 
@@ -148,44 +147,44 @@ function deserializeAvatar(data) {
     const parsed = JSON.parse(data);
     const result = AvatarSpecV15.safeParse(parsed);
     if (!result.success) {
-      console.warn("Avatar deserialization failed:", result.error);
+      console.warn('Avatar deserialization failed:', result.error);
       return null;
     }
     return result.data;
   } catch (error) {
-    console.warn("Avatar deserialization JSON parse error:", error);
+    console.warn('Avatar deserialization JSON parse error:', error);
     return null;
   }
 }
 function createDefaultAvatarSpec() {
   return {
-    version: "1.5",
-    baseMeshUrl: "https://assets.otakumori.com/default-avatar.glb",
+    version: '1.5',
+    baseMeshUrl: 'https://assets.otakumori.com/default-avatar.glb',
     rig: {
-      root: "Hips",
+      root: 'Hips',
       bones: [
-        "Hips",
-        "Spine",
-        "Chest",
-        "Neck",
-        "Head",
-        "LeftArm",
-        "RightArm",
-        "LeftLeg",
-        "RightLeg"
-      ]
+        'Hips',
+        'Spine',
+        'Chest',
+        'Neck',
+        'Head',
+        'LeftArm',
+        'RightArm',
+        'LeftLeg',
+        'RightLeg',
+      ],
     },
     morphs: [],
     morphWeights: {},
     equipment: {},
     palette: {
-      primary: "#8b5cf6",
-      secondary: "#ec4899"
+      primary: '#8b5cf6',
+      secondary: '#ec4899',
     },
     nsfwPolicy: {
-      allowNudity: false
+      allowNudity: false,
     },
-    animationMap: {}
+    animationMap: {},
   };
 }
 
@@ -194,24 +193,23 @@ function resolvePolicy(ctx) {
   if (!ctx.cookieValue || !ctx.adultVerified) {
     return { nsfwAllowed: false };
   }
-  const cookieOptIn = ctx.cookieValue === "enabled";
+  const cookieOptIn = ctx.cookieValue === 'enabled';
   const verified = ctx.adultVerified === true;
   return {
-    nsfwAllowed: cookieOptIn && verified
+    nsfwAllowed: cookieOptIn && verified,
   };
 }
 function isNSFWSlot(slot) {
-  return slot.startsWith("NSFW");
+  return slot.startsWith('NSFW');
 }
 
 // src/renderer/index.ts
 function createRenderer(_props) {
   return {
     mount: (_el) => {
-      console.warn("Legacy createRenderer is deprecated. Use AvatarRenderer component instead.");
+      console.warn('Legacy createRenderer is deprecated. Use AvatarRenderer component instead.');
     },
-    dispose: () => {
-    }
+    dispose: () => {},
   };
 }
 
@@ -234,5 +232,5 @@ export {
   preloadAvatar,
   resolvePolicy,
   serializeAvatar,
-  validateAvatar
+  validateAvatar,
 };

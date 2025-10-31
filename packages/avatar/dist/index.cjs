@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -6,26 +6,33 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name in all) __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
+  if ((from && typeof from === 'object') || typeof from === 'function') {
     for (let key of __getOwnPropNames(from))
       if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+        __defProp(to, key, {
+          get: () => from[key],
+          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+        });
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __toESM = (mod, isNodeMode, target) => (
+  (target = mod != null ? __create(__getProtoOf(mod)) : {}),
+  __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule
+      ? __defProp(target, 'default', { value: mod, enumerable: true })
+      : target,
+    mod,
+  )
+);
+var __toCommonJS = (mod) => __copyProps(__defProp({}, '__esModule', { value: true }), mod);
 
 // src/index.ts
 var index_exports = {};
@@ -43,101 +50,101 @@ __export(index_exports, {
   preloadAvatar: () => preloadAvatar,
   resolvePolicy: () => resolvePolicy,
   serializeAvatar: () => serializeAvatar,
-  validateAvatar: () => validateAvatar
+  validateAvatar: () => validateAvatar,
 });
 module.exports = __toCommonJS(index_exports);
 
 // src/spec.ts
-var import_zod = require("zod");
+var import_zod = require('zod');
 var EquipmentSlot = import_zod.z.enum([
   // Head & Face
-  "Head",
-  "Face",
-  "Eyes",
-  "Eyebrows",
-  "Nose",
-  "Mouth",
-  "Ears",
+  'Head',
+  'Face',
+  'Eyes',
+  'Eyebrows',
+  'Nose',
+  'Mouth',
+  'Ears',
   // Hair & Facial
-  "Hair",
-  "FacialHair",
-  "Eyelashes",
+  'Hair',
+  'FacialHair',
+  'Eyelashes',
   // Body Base
-  "Torso",
-  "Chest",
-  "Arms",
-  "Hands",
-  "Legs",
-  "Feet",
+  'Torso',
+  'Chest',
+  'Arms',
+  'Hands',
+  'Legs',
+  'Feet',
   // Clothing Layers
-  "Underwear",
-  "InnerWear",
-  "OuterWear",
-  "Pants",
-  "Shoes",
-  "Gloves",
+  'Underwear',
+  'InnerWear',
+  'OuterWear',
+  'Pants',
+  'Shoes',
+  'Gloves',
   // Accessories
-  "Headwear",
-  "Eyewear",
-  "Neckwear",
-  "Earrings",
-  "Bracelets",
-  "Rings",
+  'Headwear',
+  'Eyewear',
+  'Neckwear',
+  'Earrings',
+  'Bracelets',
+  'Rings',
   // Fantasy/Anime
-  "Horns",
-  "Tail",
-  "Wings",
-  "AnimalEars",
-  "Halo",
+  'Horns',
+  'Tail',
+  'Wings',
+  'AnimalEars',
+  'Halo',
   // Back & Weapons
-  "Back",
-  "WeaponPrimary",
-  "WeaponSecondary",
-  "Shield",
+  'Back',
+  'WeaponPrimary',
+  'WeaponSecondary',
+  'Shield',
   // NSFW (gated by policy)
-  "NSFWChest",
-  "NSFWGroin",
-  "NSFWAccessory"
+  'NSFWChest',
+  'NSFWGroin',
+  'NSFWAccessory',
 ]);
 var STANDARD_RIG_BONES = [
-  "Hips",
-  "Spine",
-  "Spine1",
-  "Spine2",
-  "Chest",
-  "Neck",
-  "Head",
-  "LeftShoulder",
-  "LeftArm",
-  "LeftForeArm",
-  "LeftHand",
-  "RightShoulder",
-  "RightArm",
-  "RightForeArm",
-  "RightHand",
-  "LeftUpLeg",
-  "LeftLeg",
-  "LeftFoot",
-  "LeftToeBase",
-  "RightUpLeg",
-  "RightLeg",
-  "RightFoot",
-  "RightToeBase"
+  'Hips',
+  'Spine',
+  'Spine1',
+  'Spine2',
+  'Chest',
+  'Neck',
+  'Head',
+  'LeftShoulder',
+  'LeftArm',
+  'LeftForeArm',
+  'LeftHand',
+  'RightShoulder',
+  'RightArm',
+  'RightForeArm',
+  'RightHand',
+  'LeftUpLeg',
+  'LeftLeg',
+  'LeftFoot',
+  'LeftToeBase',
+  'RightUpLeg',
+  'RightLeg',
+  'RightFoot',
+  'RightToeBase',
 ];
 var AvatarSpecV15 = import_zod.z.object({
-  version: import_zod.z.literal("1.5"),
+  version: import_zod.z.literal('1.5'),
   baseMeshUrl: import_zod.z.string().url(),
   rig: import_zod.z.object({
     root: import_zod.z.string(),
-    bones: import_zod.z.array(import_zod.z.string()).default([...STANDARD_RIG_BONES])
+    bones: import_zod.z.array(import_zod.z.string()).default([...STANDARD_RIG_BONES]),
   }),
   morphs: import_zod.z.array(
     import_zod.z.object({
       id: import_zod.z.string(),
       label: import_zod.z.string(),
       min: import_zod.z.number().min(0).max(1).default(0),
-      max: import_zod.z.number().min(0).max(1).default(1)
-    })
+      max: import_zod.z.number().min(0).max(1).default(1),
+    }),
   ),
   morphWeights: import_zod.z.record(import_zod.z.string(), import_zod.z.number().min(0).max(1)),
   // Equipment uses asset IDs, not URLs (resolved server-side)
@@ -145,10 +152,10 @@ var AvatarSpecV15 = import_zod.z.object({
   palette: import_zod.z.object({
     primary: import_zod.z.string(),
     secondary: import_zod.z.string(),
-    accent: import_zod.z.string().optional()
+    accent: import_zod.z.string().optional(),
   }),
   nsfwPolicy: import_zod.z.object({
-    allowNudity: import_zod.z.literal(false)
+    allowNudity: import_zod.z.literal(false),
   }),
   animationMap: import_zod.z.object({
     idle: import_zod.z.string().optional(),
@@ -158,12 +165,14 @@ var AvatarSpecV15 = import_zod.z.object({
     fall: import_zod.z.string().optional(),
     land: import_zod.z.string().optional(),
     attack: import_zod.z.string().optional(),
-    emote: import_zod.z.string().optional()
+    emote: import_zod.z.string().optional(),
   }),
-  metadata: import_zod.z.object({
-    name: import_zod.z.string().optional(),
-    author: import_zod.z.string().optional()
-  }).optional()
+  metadata: import_zod.z
+    .object({
+      name: import_zod.z.string().optional(),
+      author: import_zod.z.string().optional(),
+    })
+    .optional(),
 });
 function clampMorph(spec, morphId, value) {
   const morph = spec.morphs.find((m) => m.id === morphId);
@@ -179,7 +188,7 @@ function clampAllMorphs(spec) {
   }
   return {
     ...spec,
-    morphWeights: clampedWeights
+    morphWeights: clampedWeights,
   };
 }
 
@@ -192,44 +201,44 @@ function deserializeAvatar(data) {
     const parsed = JSON.parse(data);
     const result = AvatarSpecV15.safeParse(parsed);
     if (!result.success) {
-      console.warn("Avatar deserialization failed:", result.error);
+      console.warn('Avatar deserialization failed:', result.error);
       return null;
     }
     return result.data;
   } catch (error) {
-    console.warn("Avatar deserialization JSON parse error:", error);
+    console.warn('Avatar deserialization JSON parse error:', error);
     return null;
   }
 }
 function createDefaultAvatarSpec() {
   return {
-    version: "1.5",
-    baseMeshUrl: "https://assets.otakumori.com/default-avatar.glb",
+    version: '1.5',
+    baseMeshUrl: 'https://assets.otakumori.com/default-avatar.glb',
     rig: {
-      root: "Hips",
+      root: 'Hips',
       bones: [
-        "Hips",
-        "Spine",
-        "Chest",
-        "Neck",
-        "Head",
-        "LeftArm",
-        "RightArm",
-        "LeftLeg",
-        "RightLeg"
-      ]
+        'Hips',
+        'Spine',
+        'Chest',
+        'Neck',
+        'Head',
+        'LeftArm',
+        'RightArm',
+        'LeftLeg',
+        'RightLeg',
+      ],
     },
     morphs: [],
     morphWeights: {},
     equipment: {},
     palette: {
-      primary: "#8b5cf6",
-      secondary: "#ec4899"
+      primary: '#8b5cf6',
+      secondary: '#ec4899',
     },
     nsfwPolicy: {
-      allowNudity: false
+      allowNudity: false,
     },
-    animationMap: {}
+    animationMap: {},
   };
 }
 
@@ -238,29 +247,23 @@ function resolvePolicy(ctx) {
   if (!ctx.cookieValue || !ctx.adultVerified) {
     return { nsfwAllowed: false };
   }
-  const cookieOptIn = ctx.cookieValue === "enabled";
+  const cookieOptIn = ctx.cookieValue === 'enabled';
   const verified = ctx.adultVerified === true;
   return {
-    nsfwAllowed: cookieOptIn && verified
+    nsfwAllowed: cookieOptIn && verified,
   };
 }
 function isNSFWSlot(slot) {
-  return slot.startsWith("NSFW");
+  return slot.startsWith('NSFW');
 }
 
 // src/renderer/AvatarRenderer.tsx
-var import_react = require("react");
-var import_drei = require("@react-three/drei");
-var import_fiber = require("@react-three/fiber");
-var THREE = __toESM(require("three"), 1);
-var import_jsx_runtime = require("react/jsx-runtime");
-function AvatarRenderer({
-  spec,
-  resolved,
-  reducedMotion = false,
-  onLoad,
-  onError
-}) {
+var import_react = require('react');
+var import_drei = require('@react-three/drei');
+var import_fiber = require('@react-three/fiber');
+var THREE = __toESM(require('three'), 1);
+var import_jsx_runtime = require('react/jsx-runtime');
+function AvatarRenderer({ spec, resolved, reducedMotion = false, onLoad, onError }) {
   const groupRef = (0, import_react.useRef)(null);
   const [isLoaded, setIsLoaded] = (0, import_react.useState)(false);
   const { scene: baseScene } = (0, import_drei.useGLTF)(spec.baseMeshUrl);
@@ -302,15 +305,14 @@ function AvatarRenderer({
     if (Object.keys(resolved).length > 0) {
     }
   }, [resolved]);
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-    "group",
-    {
-      ref: (group) => {
-        groupRef.current = group ? group : null;
-      },
-      children: baseScene && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("primitive", { object: baseScene.clone() })
-    }
-  );
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)('group', {
+    ref: (group) => {
+      groupRef.current = group ? group : null;
+    },
+    children:
+      baseScene &&
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)('primitive', { object: baseScene.clone() }),
+  });
 }
 function preloadAvatar(baseMeshUrl) {
   import_drei.useGLTF.preload(baseMeshUrl);
@@ -320,10 +322,9 @@ function preloadAvatar(baseMeshUrl) {
 function createRenderer(_props) {
   return {
     mount: (_el) => {
-      console.warn("Legacy createRenderer is deprecated. Use AvatarRenderer component instead.");
+      console.warn('Legacy createRenderer is deprecated. Use AvatarRenderer component instead.');
     },
-    dispose: () => {
-    }
+    dispose: () => {},
   };
 }
 
@@ -333,19 +334,20 @@ function validateAvatar(spec) {
   return result.success;
 }
 // Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  AvatarRenderer,
-  AvatarSpecV15,
-  EquipmentSlot,
-  STANDARD_RIG_BONES,
-  clampAllMorphs,
-  clampMorph,
-  createDefaultAvatarSpec,
-  createRenderer,
-  deserializeAvatar,
-  isNSFWSlot,
-  preloadAvatar,
-  resolvePolicy,
-  serializeAvatar,
-  validateAvatar
-});
+0 &&
+  (module.exports = {
+    AvatarRenderer,
+    AvatarSpecV15,
+    EquipmentSlot,
+    STANDARD_RIG_BONES,
+    clampAllMorphs,
+    clampMorph,
+    createDefaultAvatarSpec,
+    createRenderer,
+    deserializeAvatar,
+    isNSFWSlot,
+    preloadAvatar,
+    resolvePolicy,
+    serializeAvatar,
+    validateAvatar,
+  });

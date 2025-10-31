@@ -113,34 +113,43 @@ for (const file of files) {
     // Fix emojis - this is complex, so let's use a simpler approach
     // We'll wrap any emoji that's not already in a span
     const lines = content.split('\n');
-    const fixedLines = lines.map(line => {
+    const fixedLines = lines.map((line) => {
       // Skip lines that already have role="img"
       if (line.includes('role="img"')) return line;
-      
+
       // Find emojis in the line
       let fixedLine = line;
-      const emojiMatches = [...line.matchAll(/([🎮🎯🎨🎪🎭🎬🎤🎧🎸🎹🎺🎻🎲🎰🎳⏳👤👥⭐✨🔥💯🎉🎊🎁🎈🎀🎂🎄🎃🎆🎇🌸🌺🌻🌼🌷🌹💐🌾🍀🍁🍂🍃✅❌⚠️💪👍👎👏🙏💖💕💓💗💘💝💞💟🔒🔓🔑🔔🔕🔊🔇🚀🏆🥇🥈🥉🏅])/g)];
-      
-      for (const match of emojiMatches.reverse()) { // Reverse to maintain indices
+      const emojiMatches = [
+        ...line.matchAll(
+          /([🎮🎯🎨🎪🎭🎬🎤🎧🎸🎹🎺🎻🎲🎰🎳⏳👤👥⭐✨🔥💯🎉🎊🎁🎈🎀🎂🎄🎃🎆🎇🌸🌺🌻🌼🌷🌹💐🌾🍀🍁🍂🍃✅❌⚠️💪👍👎👏🙏💖💕💓💗💘💝💞💟🔒🔓🔑🔔🔕🔊🔇🚀🏆🥇🥈🥉🏅])/g,
+        ),
+      ];
+
+      for (const match of emojiMatches.reverse()) {
+        // Reverse to maintain indices
         const emoji = match[0];
         const index = match.index;
         const label = emojiLabels[emoji] || 'emoji';
-        
+
         // Check if this emoji is already wrapped
         const before = fixedLine.substring(Math.max(0, index - 50), index);
-        const after = fixedLine.substring(index + emoji.length, Math.min(fixedLine.length, index + emoji.length + 50));
-        
+        const after = fixedLine.substring(
+          index + emoji.length,
+          Math.min(fixedLine.length, index + emoji.length + 50),
+        );
+
         if (!before.includes('<span') || after.includes('</span>')) {
           // Not wrapped, wrap it
           const wrapped = `<span role="img" aria-label="${label}">${emoji}</span>`;
-          fixedLine = fixedLine.substring(0, index) + wrapped + fixedLine.substring(index + emoji.length);
+          fixedLine =
+            fixedLine.substring(0, index) + wrapped + fixedLine.substring(index + emoji.length);
           changes++;
         }
       }
-      
+
       return fixedLine;
     });
-    
+
     content = fixedLines.join('\n');
 
     // 2. Fix form labels - add htmlFor and id
@@ -149,28 +158,33 @@ for (const file of files) {
 
     // 3. Fix interactive elements - add keyboard handlers
     // Match: onClick without onKeyDown/onKeyPress
-    content = content.replace(
-      /(<div[^>]*onClick={[^}]+}[^>]*)(>)/g,
-      (match, before, after) => {
-        if (before.includes('onKeyDown') || before.includes('onKeyPress') || before.includes('role="button"')) {
-          return match;
-        }
-        changes++;
-        return `${before} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }}${after}`;
+    content = content.replace(/(<div[^>]*onClick={[^}]+}[^>]*)(>)/g, (match, before, after) => {
+      if (
+        before.includes('onKeyDown') ||
+        before.includes('onKeyPress') ||
+        before.includes('role="button"')
+      ) {
+        return match;
       }
-    );
+      changes++;
+      return `${before} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }}${after}`;
+    });
 
     // 4. Fix non-interactive elements with click handlers
     // Add role="button" and keyboard support
     content = content.replace(
       /(<(span|p|h[1-6])[^>]*onClick={[^}]+}[^>]*)(>)/g,
       (match, before, tag, after) => {
-        if (before.includes('role=') || before.includes('onKeyDown') || before.includes('onKeyPress')) {
+        if (
+          before.includes('role=') ||
+          before.includes('onKeyDown') ||
+          before.includes('onKeyPress')
+        ) {
           return match;
         }
         changes++;
         return `${before} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }}${after}`;
-      }
+      },
     );
 
     if (content !== originalContent) {
@@ -189,4 +203,3 @@ console.log(`✅ Files modified: ${filesModified}`);
 console.log(`🔄 Total fixes: ${totalFixed}`);
 console.log(`\n🔍 Run "npm run lint" to verify fixes`);
 console.log(`⚠️  Note: Form labels require manual review`);
-

@@ -1,16 +1,10 @@
 // src/renderer/AvatarRenderer.tsx
-import { useEffect, useRef, useState } from "react";
-import { useGLTF } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import * as THREE from "three";
-import { jsx } from "react/jsx-runtime";
-function AvatarRenderer({
-  spec,
-  resolved,
-  reducedMotion = false,
-  onLoad,
-  onError
-}) {
+import { useEffect, useRef, useState } from 'react';
+import { useGLTF } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { jsx } from 'react/jsx-runtime';
+function AvatarRenderer({ spec, resolved, reducedMotion = false, onLoad, onError }) {
   const groupRef = useRef(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const { scene: baseScene } = useGLTF(spec.baseMeshUrl);
@@ -52,21 +46,15 @@ function AvatarRenderer({
     if (Object.keys(resolved).length > 0) {
     }
   }, [resolved]);
-  return /* @__PURE__ */ jsx(
-    "group",
-    {
-      ref: (group) => {
-        groupRef.current = group ? group : null;
-      },
-      children: baseScene && /* @__PURE__ */ jsx("primitive", { object: baseScene.clone() })
-    }
-  );
+  return /* @__PURE__ */ jsx('group', {
+    ref: (group) => {
+      groupRef.current = group ? group : null;
+    },
+    children: baseScene && /* @__PURE__ */ jsx('primitive', { object: baseScene.clone() }),
+  });
 }
 function preloadAvatar(baseMeshUrl) {
   useGLTF.preload(baseMeshUrl);
 }
 
-export {
-  AvatarRenderer,
-  preloadAvatar
-};
+export { AvatarRenderer, preloadAvatar };

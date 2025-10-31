@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 // Preprocess: trim all env values to remove trailing whitespace/newlines
 const trimmedEnv = Object.fromEntries(
-  Object.entries(process.env).map(([key, value]) => [key, value?.trim()])
+  Object.entries(process.env).map(([key, value]) => [key, value?.trim()]),
 );
 // Assign back to process.env
 Object.assign(process.env, trimmedEnv);
