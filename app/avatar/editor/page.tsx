@@ -8,7 +8,7 @@
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import AvatarEditorPanel from '@/app/components/avatar/AvatarEditorPanel';
+import AvatarEditorPanel from '../../components/avatar/AvatarEditorPanel';
 
 // Dynamically import 3D renderer to avoid SSR issues
 const AvatarRenderer3D = dynamic(() => import('@/app/components/avatar/AvatarRenderer3D'), {

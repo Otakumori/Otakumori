@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { appUrl } from '@/lib/canonical';
+import { appUrl } from '../../../lib/canonical';
 
 type Review = {
   id: string;
