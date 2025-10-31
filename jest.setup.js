@@ -195,6 +195,6 @@ global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'; // eslint-disable-line no-restricted-syntax
-process.env.NEXTAUTH_SECRET = 'test-secret'; // eslint-disable-line no-restricted-syntax
-process.env.NEXTAUTH_URL = 'http://localhost:3000'; // eslint-disable-line no-restricted-syntax
+process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';  
+process.env.NEXTAUTH_SECRET = 'test-secret';  
+process.env.NEXTAUTH_URL = 'http://localhost:3000';  
