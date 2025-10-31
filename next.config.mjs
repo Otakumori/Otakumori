@@ -1,10 +1,9 @@
-import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 import { env } from './env.mjs';
 
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: env.ANALYZE === 'true',
-});
+// Bundle analyzer disabled for now - @next/bundle-analyzer is a dev dependency
+// To enable: move @next/bundle-analyzer to dependencies and uncomment the import
+const withBundleAnalyzer = (config) => config;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
