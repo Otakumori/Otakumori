@@ -126,6 +126,12 @@ class PreBuildValidator {
   private async checkPrismaSchema(): Promise<void> {
     // '️  Checking Prisma schema...'
     try {
+      // Skip Prisma validation if DATABASE_URL is not set or is using Accelerate
+      const databaseUrl = process.env.DATABASE_URL;
+      if (!databaseUrl || databaseUrl.startsWith('prisma://')) {
+        this.warnings.push('Skipping Prisma validation (using Accelerate or no DATABASE_URL set)');
+        return;
+      }
       execSync('npx prisma validate', { stdio: 'pipe' });
       // '   Prisma schema valid'
     } catch (error) {

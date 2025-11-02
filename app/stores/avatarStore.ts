@@ -5,6 +5,9 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import * as THREE from 'three';
+import type { BodyParameters } from '@/app/lib/3d/procedural-body';
+import type { HairParameters } from '@/app/lib/3d/procedural-hair';
 
 export type AvatarCategory = 'body' | 'face' | 'hair' | 'clothing' | 'accessories' | 'nsfw';
 
@@ -24,8 +27,25 @@ export interface AvatarPart {
 
 export type AvatarPartKey = 'body' | 'face' | 'hair' | 'clothing';
 
+export interface FaceParameters {
+  eyeSize: number; // 0.7 to 1.5
+  eyeShape: 'round' | 'almond' | 'sharp';
+  eyeSpacing: number; // 0.8 to 1.2
+  noseSize: number; // 0.5 to 1.2
+  mouthSize: number; // 0.7 to 1.3
+  jawShape: 'soft' | 'angular' | 'round';
+  cheekbones: number; // 0 to 1
+}
+
+export interface ProceduralAvatarConfig {
+  enabled: boolean; // If false, use traditional part-based system
+  body: BodyParameters;
+  face: FaceParameters;
+  hair: HairParameters;
+}
+
 export interface AvatarCustomization {
-  body: string | null; // Part ID
+  body: string | null; // Part ID (legacy/hybrid)
   face: string | null;
   hair: string | null;
   clothing: string | null;
@@ -43,6 +63,8 @@ export interface AvatarCustomization {
     enabled: boolean;
     currentContext: 'default' | 'game' | 'combat' | 'social';
   };
+  // NEW: Procedural configuration
+  procedural?: ProceduralAvatarConfig;
 }
 
 interface AvatarStore {
@@ -68,6 +90,19 @@ interface AvatarStore {
   ) => void;
   resetAvatar: () => void;
   loadPreset: (presetId: string) => void;
+
+  // NEW: Procedural avatar actions
+  setProceduralConfig: (config: ProceduralAvatarConfig) => void;
+  updateBodyParam: <K extends keyof BodyParameters>(
+    key: K,
+    value: BodyParameters[K]
+  ) => void;
+  updateHairParam: <K extends keyof HairParameters>(
+    key: K,
+    value: HairParameters[K]
+  ) => void;
+  enableProceduralMode: () => void;
+  disableProceduralMode: () => void;
 }
 
 const DEFAULT_AVATAR: AvatarCustomization = {
@@ -208,6 +243,100 @@ export const useAvatarStore = create<AvatarStore>()(
           set({ avatar: DEFAULT_AVATAR });
         }
       },
+
+      // NEW: Procedural avatar methods
+      setProceduralConfig: (config) =>
+        set((state) => ({
+          avatar: {
+            ...state.avatar,
+            procedural: config,
+          },
+        })),
+
+      updateBodyParam: (key, value) =>
+        set((state) => {
+          if (!state.avatar.procedural) return state;
+          return {
+            avatar: {
+              ...state.avatar,
+              procedural: {
+                ...state.avatar.procedural,
+                body: {
+                  ...state.avatar.procedural.body,
+                  [key]: value,
+                },
+              },
+            },
+          };
+        }),
+
+      updateHairParam: (key, value) =>
+        set((state) => {
+          if (!state.avatar.procedural) return state;
+          return {
+            avatar: {
+              ...state.avatar,
+              procedural: {
+                ...state.avatar.procedural,
+                hair: {
+                  ...state.avatar.procedural.hair,
+                  [key]: value,
+                },
+              },
+            },
+          };
+        }),
+
+      enableProceduralMode: () =>
+        set((state) => ({
+          avatar: {
+            ...state.avatar,
+            procedural: state.avatar.procedural || {
+              enabled: true,
+              body: {
+                height: 1.0,
+                build: 'athletic',
+                neckLength: 1.0,
+                shoulderWidth: 1.0,
+                chestSize: 1.0,
+                waistSize: 0.8,
+                hipWidth: 1.0,
+                armLength: 1.0,
+                legLength: 1.0,
+                thighThickness: 1.0,
+                muscleDefinition: 1.0,
+                anatomyDetail: 'basic',
+              },
+              face: {
+                eyeSize: 1.0,
+                eyeShape: 'almond',
+                eyeSpacing: 1.0,
+                noseSize: 1.0,
+                mouthSize: 1.0,
+                jawShape: 'soft',
+                cheekbones: 0.5,
+              },
+              hair: {
+                style: 'medium',
+                color: new THREE.Color(state.avatar.colors.hair),
+                length: 0.4,
+                volume: 1.0,
+                waviness: 0.2,
+                bangs: true,
+              },
+            },
+          },
+        })),
+
+      disableProceduralMode: () =>
+        set((state) => ({
+          avatar: {
+            ...state.avatar,
+            procedural: state.avatar.procedural
+              ? { ...state.avatar.procedural, enabled: false }
+              : undefined,
+          },
+        })),
     }),
     {
       name: 'otakumori-avatar-storage',

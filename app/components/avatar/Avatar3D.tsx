@@ -19,6 +19,11 @@ import type { AnimationController } from '@/app/lib/3d/animation-system';
 import { createAnimationController } from '@/app/lib/3d/animation-system';
 import { env } from '@/app/env';
 
+// Import procedural generation systems
+import { ProceduralBodyGenerator } from '@/app/lib/3d/procedural-body';
+import { ProceduralHairGenerator } from '@/app/lib/3d/procedural-hair';
+import type { ProceduralAvatarConfig } from '@/app/stores/avatarStore';
+
 export interface Avatar3DProps {
   configuration: AvatarConfiguration;
   lighting?: keyof typeof LIGHTING_PRESETS;
@@ -30,6 +35,9 @@ export interface Avatar3DProps {
   quality?: 'low' | 'medium' | 'high' | 'ultra';
   onLoad?: () => void;
   onError?: (error: Error) => void;
+  // NEW: Procedural avatar support
+  proceduralConfig?: ProceduralAvatarConfig;
+  useProcedural?: boolean;
 }
 
 interface AvatarPartMesh {
@@ -52,6 +60,8 @@ export default function Avatar3D({
   quality = 'high',
   onLoad,
   onError,
+  proceduralConfig,
+  useProcedural = false,
 }: Avatar3DProps) {
   const { scene, gl, camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
@@ -61,6 +71,9 @@ export default function Avatar3D({
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [error, setError] = useState<Error | null>(null);
+  
+  // Procedural avatar state
+  const [proceduralAvatar, setProceduralAvatar] = useState<THREE.Group | null>(null);
 
   // Quality settings
   const qualitySettings = useMemo(
@@ -91,8 +104,56 @@ export default function Avatar3D({
     };
   }, [scene, gl, camera, lighting]);
 
-  // Load avatar parts
+  // Generate procedural avatar
   useEffect(() => {
+    if (!useProcedural || !proceduralConfig || !proceduralConfig.enabled) {
+      setProceduralAvatar(null);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setLoadingProgress(25);
+
+      const avatar = new THREE.Group();
+      avatar.name = 'ProceduralAvatar';
+
+      // Generate body
+      const body = ProceduralBodyGenerator.generateBody(proceduralConfig.body);
+      body.position.y = 0;
+      avatar.add(body);
+      setLoadingProgress(60);
+
+      // Generate hair
+      const hair = ProceduralHairGenerator.generateHair(proceduralConfig.hair);
+      hair.position.y = 0;
+      avatar.add(hair);
+      setLoadingProgress(90);
+
+      setProceduralAvatar(avatar);
+      setIsLoading(false);
+      setLoadingProgress(100);
+
+      if (onLoad) {
+        onLoad();
+      }
+    } catch (err) {
+      console.error('Failed to generate procedural avatar:', err);
+      setError(err as Error);
+      setIsLoading(false);
+      if (onError) {
+        onError(err as Error);
+      }
+    }
+  }, [useProcedural, proceduralConfig, onLoad, onError]);
+
+  // Load avatar parts (traditional method)
+  useEffect(() => {
+    // Skip if using procedural mode
+    if (useProcedural && proceduralConfig?.enabled) {
+      return;
+    }
+
     const loadAvatarParts = async () => {
       try {
         setIsLoading(true);
@@ -229,7 +290,7 @@ export default function Avatar3D({
     };
 
     loadAvatarParts();
-  }, [configuration, quality, currentQuality, onLoad, onError]);
+  }, [configuration, quality, currentQuality, onLoad, onError, useProcedural, proceduralConfig]);
 
   // Create anime material for mesh
   const createAnimeMaterial = (
@@ -339,7 +400,22 @@ export default function Avatar3D({
     });
   }, [animationState, enableAnimations, loadedParts]);
 
-  // Render loaded parts
+  // Render procedural avatar
+  const renderProceduralAvatar = () => {
+    if (!proceduralAvatar) return null;
+
+    return (
+      <primitive
+        key="procedural-avatar"
+        object={proceduralAvatar}
+        position={[0, 0, 0]}
+        rotation={[0, 0, 0]}
+        scale={[1, 1, 1]}
+      />
+    );
+  };
+
+  // Render loaded parts (traditional method)
   const renderParts = () => {
     const partElements: React.ReactNode[] = [];
 
@@ -444,8 +520,8 @@ export default function Avatar3D({
         </group>
       )}
 
-      {/* Avatar parts */}
-      {renderParts()}
+      {/* Avatar parts - render procedural OR traditional */}
+      {useProcedural && proceduralConfig?.enabled ? renderProceduralAvatar() : renderParts()}
 
       {/* Debug info */}
       {env.NODE_ENV === 'development' && (
