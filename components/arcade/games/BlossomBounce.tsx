@@ -294,7 +294,7 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
           >
             <div className="bg-gradient-to-br from-pink-500 to-purple-600 text-white px-8 py-6 rounded-2xl shadow-2xl border-4 border-pink-300">
               <p className="text-4xl font-bold mb-2">PERFECT RHYTHM!</p>
-              <p className="text-xl">🌸 × 5 COLLECTED 🌸</p>
+              <p className="text-xl">Petals collected!</p>
               {combo > 5 && (
                 <p className="text-sm mt-2 text-pink-200">Combo Bonus: +{combo * 5} Petals!</p>
               )}
@@ -309,12 +309,12 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
           {!showElements
             ? 'Spring-loaded challenge...'
             : bounceCount < 15
-              ? '🌸 BOUNCE THE PETALS! 🌸'
+              ? 'Bounce the petals!'
               : 'Rhythmic perfection achieved!'}
         </p>
         {bounceCount < 15 && showElements && (
           <p className="text-pink-200/70 text-xs mt-1 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]">
-            Press SPACE or CLICK • Keep rhythm for combos!
+            Press SPACE or CLICK to keep rhythm for combos!
           </p>
         )}
       </div>
@@ -329,3 +329,4 @@ export default function BlossomBounce({ onComplete, _onFail, _duration }: GamePr
     </div>
   );
 }
+

@@ -30,8 +30,8 @@ describe('Game Kit Types', () => {
       velocity: { x: 0, y: 0 },
       acceleration: { x: 0, y: 0 },
       checkCollision: () => false,
-      applyForce: (_force: Vector2) => {
-        return undefined;
+      applyForce: (force: Vector2) => {
+        void force;
       },
     };
 
@@ -42,11 +42,11 @@ describe('Game Kit Types', () => {
     const mockHFSM: AnimationHFSM = {
       currentState: 'idle',
       transitions: [],
-      update: (_delta: number) => {
-        return undefined;
+      update: (delta: number) => {
+        void delta;
       },
-      transition: (_to: string) => {
-        return undefined;
+      transition: (to: string) => {
+        void to;
       },
     };
 
@@ -65,11 +65,11 @@ describe('Game Kit Types', () => {
       jump: () => {
         return undefined;
       },
-      move: (_direction: number) => {
-        return undefined;
+      move: (direction: number) => {
+        void direction;
       },
-      update: (_delta: number) => {
-        return undefined;
+      update: (delta: number) => {
+        void delta;
       },
     };
 

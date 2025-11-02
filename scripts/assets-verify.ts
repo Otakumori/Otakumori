@@ -157,7 +157,10 @@ class AssetVerifier {
       this.stats.validated++;
       // ` ${section}.${key} - ${this.formatBytes(stats.size}`);
     } catch (error) {
-      this.errors.push(` ${section}.${key}: File not found - ${asset.path}`);
+      const reason = error instanceof Error ? error.message : 'unknown error';
+      this.errors.push(
+        ` ${section}.${key}: File not found - ${asset.path} (${reason})`,
+      );
       this.stats.missingAssets++;
     }
   }
@@ -193,7 +196,8 @@ class AssetVerifier {
           this.stats.oversizedAssets++;
         }
       } catch (error) {
-        this.errors.push(` ${section}.${key}: File error - ${match}`);
+        const reason = error instanceof Error ? error.message : 'unknown error';
+        this.errors.push(` ${section}.${key}: File error - ${match} (${reason})`);
       }
     }
 
@@ -212,28 +216,29 @@ class AssetVerifier {
   }
 
   private printResults(): void {
-    // '\n Verification Results:'
-    // ` Total assets: ${this.stats.totalAssets}`
-    // ` Validated: ${this.stats.validated}`
-    // ` Missing: ${this.stats.missingAssets}`
-    // ` Oversized: ${this.stats.oversizedAssets}`
-    // `  Invalid formats: ${this.stats.invalidFormats}`
+    console.warn('\nAsset Verification Results');
+    console.warn('===========================');
+    console.warn(`Total assets: ${this.stats.totalAssets}`);
+    console.warn(`Validated: ${this.stats.validated}`);
+    console.warn(`Missing: ${this.stats.missingAssets}`);
+    console.warn(`Oversized: ${this.stats.oversizedAssets}`);
+    console.warn(`Invalid formats: ${this.stats.invalidFormats}`);
 
     if (this.warnings.length > 0) {
-      // '\n  Warnings:'
+      console.warn('\nWarnings:');
       this.warnings.forEach((warning) => {
-        // warning
+        console.warn(`  • ${warning}`);
       });
     }
 
     if (this.errors.length > 0) {
-      // '\n Errors:'
+      console.error('\nErrors:');
       this.errors.forEach((error) => {
-        // error
+        console.error(`  • ${error}`);
       });
-      // `\n Asset verification failed with ${this.errors.length} errors!`
+      console.error(`\nAsset verification failed with ${this.errors.length} error(s).`);
     } else {
-      // '\n All assets verified successfully!'
+      console.warn('\nAll assets verified successfully ✅');
     }
   }
 }

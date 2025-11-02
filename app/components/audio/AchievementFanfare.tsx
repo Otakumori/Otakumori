@@ -201,7 +201,9 @@ export default function AchievementFanfare({
                   right: i % 2 === 1 ? '-20px' : 'auto',
                 }}
               >
-                ✨
+                <span role="img" aria-label="Sparkle effect">
+                  {'✨'}
+                </span>
               </motion.div>
             ))}
           </motion.div>

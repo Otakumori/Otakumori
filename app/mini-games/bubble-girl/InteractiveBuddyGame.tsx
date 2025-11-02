@@ -88,7 +88,6 @@ export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: Game
   });
 
   const [selectedTool, setSelectedTool] = useState<Tool>(TOOLS[0]);
-  const [showShop, setShowShop] = useState(false);
 
   // Initialize physics engine
   useEffect(() => {

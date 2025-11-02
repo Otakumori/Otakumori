@@ -54,18 +54,29 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 relative"
       role="dialog"
       aria-modal="true"
       aria-labelledby="age-gate-title"
-      onClick={onClose}
     >
+      <button
+        type="button"
+        className="absolute inset-0 h-full w-full cursor-default bg-transparent"
+        aria-label="Dismiss age gate"
+        onClick={onClose}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onClose();
+          }
+        }}
+      />
       <div
         ref={dialogRef}
-        className={`w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-2xl ${
+        className={`relative z-10 w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-2xl ${
           reducedMotion ? '' : 'animate-in fade-in zoom-in-95 duration-200'
         }`}
-        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(event) => event.stopPropagation()}
       >
         {/* Warning icon */}
         <div className="mb-4 flex justify-center">
@@ -121,3 +132,4 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
     </div>
   );
 }
+

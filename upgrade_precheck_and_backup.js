@@ -98,6 +98,7 @@ async function main() {
         } catch (pgDumpError) {
           console.log(' pg_dump not available, skipping database backup');
           console.log('  Install PostgreSQL client tools to enable database backup');
+          console.warn('   Details:', pgDumpError instanceof Error ? pgDumpError.message : pgDumpError);
         }
       } else {
         console.log(' No DATABASE_URL found, skipping database backup');

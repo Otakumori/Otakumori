@@ -102,7 +102,7 @@ export default function SoapstoneWall({ messages, maxDisplay = 10 }: SoapstoneWa
                 {!isRevealed ? (
                   // Stone marker (collapsed state)
                   <div className="text-center py-8">
-                    <div className="text-6xl mb-3 opacity-60">📜</div>
+                    <div className="text-6xl mb-3 opacity-60" aria-hidden="true">Scroll</div>
                     <p className="text-pink-200/70 text-sm font-medium">Tap to reveal</p>
                     <div className="flex items-center justify-center space-x-2 mt-3">
                       <span className={`text-xs font-semibold ${getScoreColor(message.score)}`}>
@@ -169,3 +169,4 @@ export default function SoapstoneWall({ messages, maxDisplay = 10 }: SoapstoneWa
     </div>
   );
 }
+

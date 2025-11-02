@@ -7,6 +7,26 @@ export interface EnvValidationResult {
   details: Record<string, { value: string | undefined; status: 'valid' | 'missing' | 'warning' }>;
 }
 
+const REQUIRED_ENV_VARS = [
+  'NEXT_PUBLIC_SUPABASE_URL',
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  'PRINTIFY_API_KEY',
+  'PRINTIFY_SHOP_ID',
+  'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
+  'CLERK_SECRET_KEY',
+  'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
+  'STRIPE_SECRET_KEY',
+] as const;
+
+const RECOMMENDED_ENV_VARS = [
+  'STRIPE_WEBHOOK_SECRET',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'NEXT_PUBLIC_SITE_URL',
+] as const;
+
+const URL_ENV_VARS = ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SITE_URL'] as const;
+const API_KEY_ENV_VARS = ['PRINTIFY_API_KEY', 'CLERK_SECRET_KEY', 'STRIPE_SECRET_KEY'] as const;
+
 export function validateEnvironment(): EnvValidationResult {
   const result: EnvValidationResult = {
     isValid: true,
@@ -15,78 +35,53 @@ export function validateEnvironment(): EnvValidationResult {
     details: {},
   };
 
-  // Required environment variables
-  const required = [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    'PRINTIFY_API_KEY',
-    'PRINTIFY_SHOP_ID',
-    'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
-    'CLERK_SECRET_KEY',
-    'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
-    'STRIPE_SECRET_KEY',
-  ];
-
-  // Optional but recommended
-  const recommended = [
-    'STRIPE_WEBHOOK_SECRET',
-    'STRIPE_WEBHOOK_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'SUPABASE_STORAGE_BUCKET',
-    'NEXT_PUBLIC_SITE_URL',
-  ];
-
-  // Check required variables
-  required.forEach((key) => {
-    const value = env[key as keyof typeof env];
+  for (const key of REQUIRED_ENV_VARS) {
+    const value = env[key];
     if (!value) {
       result.isValid = false;
       result.missing.push(key);
       result.details[key] = { value: undefined, status: 'missing' };
-    } else {
-      result.details[key] = { value: String(value), status: 'valid' };
+      continue;
     }
-  });
 
-  // Check recommended variables
-  recommended.forEach((key) => {
-    const value = env[key as keyof typeof env];
+    result.details[key] = { value: String(value), status: 'valid' };
+  }
+
+  for (const key of RECOMMENDED_ENV_VARS) {
+    const value = env[key];
     if (!value) {
-      result.warnings.push(key);
+      result.warnings.push(`${key} is unset`);
       result.details[key] = { value: undefined, status: 'warning' };
-    } else {
-      result.details[key] = { value: String(value), status: 'valid' };
+      continue;
     }
-  });
 
-  // Special validation for URLs
-  const urlKeys = ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SITE_URL'];
-  urlKeys.forEach((key) => {
-    const value = env[key as keyof typeof env];
+    result.details[key] = { value: String(value), status: 'valid' };
+  }
+
+  for (const key of URL_ENV_VARS) {
+    const value = env[key];
     if (value && !isValidUrl(value)) {
-      result.warnings.push(`${key} (invalid URL format)`);
+      result.warnings.push(`${key} contains an invalid URL value`);
       result.details[key] = { value: String(value), status: 'warning' };
     }
-  });
+  }
 
-  // Special validation for API keys
-  const apiKeyKeys = ['PRINTIFY_API_KEY', 'CLERK_SECRET_KEY', 'STRIPE_SECRET_KEY'];
-  apiKeyKeys.forEach((key) => {
-    const value = env[key as keyof typeof env];
+  for (const key of API_KEY_ENV_VARS) {
+    const value = env[key];
     if (value && value.length < 10) {
-      result.warnings.push(`${key} (suspiciously short)`);
+      result.warnings.push(`${key} appears to be shorter than expected`);
       result.details[key] = { value: String(value), status: 'warning' };
     }
-  });
+  }
 
   return result;
 }
 
-function isValidUrl(string: string): boolean {
+function isValidUrl(candidate: string): boolean {
   try {
-    new URL(string);
+    new URL(candidate);
     return true;
-  } catch (_) {
+  } catch {
     return false;
   }
 }
@@ -94,31 +89,32 @@ function isValidUrl(string: string): boolean {
 export function logEnvironmentStatus(): void {
   const validation = validateEnvironment();
 
-  // '\n⌕ Environment Validation Report'
-  // '================================'
+  console.warn('\nEnvironment Validation Report');
+  console.warn('=============================');
 
   if (validation.isValid) {
-    // ' All required environment variables are set'
+    console.warn('All required environment variables are set ✅');
   } else {
-    // ' Missing required environment variables:'
-    validation.missing.forEach((key) => {
-      // `   - ${key}`
-    });
+    console.error('Missing required environment variables:');
+    validation.missing.forEach((key) => console.error(`  • ${key}`));
   }
 
   if (validation.warnings.length > 0) {
-    // '\n  Warnings:'
-    validation.warnings.forEach((warning) => {
-      // `   - ${warning}`
-    });
+    console.warn('\nWarnings:');
+    validation.warnings.forEach((warning) => console.warn(`  • ${warning}`));
   }
 
-  // '\n Environment Details:'
+  console.warn('\nEnvironment Details:');
   Object.entries(validation.details).forEach(([key, detail]) => {
-    const status = detail.status === 'valid' ? '' : detail.status === 'missing' ? '' : '';
-    const value = detail.value ? `${detail.value.substring(0, 20)}...` : 'undefined';
-    // `   ${status} ${key}: ${value}`
+    const statusLabel =
+      detail.status === 'valid'
+        ? '[OK]'
+        : detail.status === 'missing'
+          ? '[MISSING]'
+          : '[WARNING]';
+    const preview = detail.value ? detail.value.substring(0, 60) : 'undefined';
+    console.warn(`  ${statusLabel} ${key}: ${preview}`);
   });
 
-  // '\n'
+  console.warn('');
 }

@@ -25,6 +25,7 @@ export interface Avatar3DProps {
   cameraPosition?: [number, number, number];
   enableControls?: boolean;
   enableAnimations?: boolean;
+  animationState?: string;
   showOutline?: boolean;
   quality?: 'low' | 'medium' | 'high' | 'ultra';
   onLoad?: () => void;
@@ -46,6 +47,7 @@ export default function Avatar3D({
   cameraPosition = [0, 1.5, 3],
   enableControls = true,
   enableAnimations = true,
+  animationState = 'idle',
   showOutline = false,
   quality = 'high',
   onLoad,
@@ -324,6 +326,18 @@ export default function Avatar3D({
       lightingSystemRef.current.render();
     }
   });
+
+  useEffect(() => {
+    if (!enableAnimations) {
+      return;
+    }
+
+    loadedParts.forEach(({ animationController }) => {
+      if (animationController && typeof animationController.setState === 'function') {
+        animationController.setState(animationState);
+      }
+    });
+  }, [animationState, enableAnimations, loadedParts]);
 
   // Render loaded parts
   const renderParts = () => {

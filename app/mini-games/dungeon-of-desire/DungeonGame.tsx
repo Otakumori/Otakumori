@@ -24,15 +24,6 @@ interface Enemy {
   attackCooldown: number;
 }
 
-interface Pickup {
-  id: number;
-  x: number;
-  y: number;
-  type: 'health' | 'mana' | 'treasure';
-  value: number;
-  collected: boolean;
-}
-
 interface Spell {
   id: number;
   x: number;
@@ -87,17 +78,40 @@ export default function DungeonGame() {
 
   // Game objects
   const [enemies, setEnemies] = useState<Enemy[]>([]);
-  const [pickups, setPickups] = useState<Pickup[]>([]);
   const [spells, setSpells] = useState<Spell[]>([]);
   const [particles, setParticles] = useState<Particle[]>([]);
 
   // Game timing
   const [gameTime, setGameTime] = useState(0);
-  const [enemySpawnTimer, setEnemySpawnTimer] = useState(0);
+  const [, setEnemySpawnTimer] = useState(0);
   const [nextEnemyId, setNextEnemyId] = useState(1);
   const [nextParticleId, setNextParticleId] = useState(1);
 
   const { saveOnExit, autoSave } = useGameSave('dungeon-of-desire');
+
+  useEffect(() => {
+    void autoSave({
+      score,
+      level: floor,
+      stats: {
+        health: player.health,
+        mana: player.mana,
+      },
+    });
+  }, [autoSave, floor, player.health, player.mana, score]);
+
+  useEffect(() => {
+    return () => {
+      void saveOnExit({
+        score,
+        level: floor,
+        stats: {
+          health: player.health,
+          mana: player.mana,
+        },
+      });
+    };
+  }, [floor, player.health, player.mana, saveOnExit, score]);
 
   // Game constants
   const CANVAS_WIDTH = 800;
@@ -132,10 +146,8 @@ export default function DungeonGame() {
     });
     setCamera({ x: 0, y: 0 });
     setEnemies([]);
-    setPickups([]);
     setSpells([]);
     setParticles([]);
-    setEnemySpawnTimer(0);
     setNextEnemyId(1);
   }, []);
 

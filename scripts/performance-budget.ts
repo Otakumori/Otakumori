@@ -135,7 +135,8 @@ class PerformanceBudgetValidator {
 
     try {
       // Analyze Next.js build output
-      const buildManifest = await this.readBuildManifest();
+      const { pages: manifestPagesRaw = {} } = await this.readBuildManifest();
+      const manifestPages = manifestPagesRaw as Record<string, string[]>;
       const staticDir = join(this.buildDir, 'static');
 
       // Find all JS chunks
@@ -156,7 +157,14 @@ class PerformanceBudgetValidator {
 
         // Try to determine route for chunks
         if (analysis.type === 'chunk') {
-          analysis.route = this.extractRouteFromChunk(file);
+          const manifestEntry = Object.entries(manifestPages).find(([, assets]) =>
+            Array.isArray(assets) && assets.some((asset) => asset.includes(file)),
+          );
+          if (manifestEntry) {
+            analysis.route = manifestEntry[0];
+          } else {
+            analysis.route = this.extractRouteFromChunk(file);
+          }
         }
 
         this.bundleAnalysis.push(analysis);
@@ -426,26 +434,25 @@ class PerformanceBudgetValidator {
     // `   Vendor Bundle: ${(report.summary.vendorSize / 1024.toFixed(1)}KB`);
     // `   Route Chunks: ${report.summary.chunkCount}`
 
-    // Violations
     if (report.violations.length > 0) {
-      // `\n Violations (${report.violations.length}:`);
+      console.error(`\n Violations (${report.violations.length}):`);
       for (const violation of report.violations) {
         const icon =
-          violation.severity === 'critical' ? '●' : violation.severity === 'error' ? '🟠' : '🟡';
-        // `   ${icon} ${violation.description}`
+          violation.severity === 'critical' ? '🚨' : violation.severity === 'error' ? '⚠️' : 'ℹ️';
+        console.error(`  ${icon} ${violation.description}`);
         if (violation.file) {
-          // `      File: ${violation.file}`
+          console.error(`     File: ${violation.file}`);
         }
-        // `       ${violation.recommendation}`
-        // ''
+        if (violation.recommendation) {
+          console.error(`     ${violation.recommendation}`);
+        }
       }
     }
 
-    // Recommendations
     if (report.recommendations.length > 0) {
-      // `\n Recommendations:`
+      console.warn('\n Recommendations:');
       for (const recommendation of report.recommendations) {
-        // `   ${recommendation}`
+        console.warn(`  • ${recommendation}`);
       }
     }
 

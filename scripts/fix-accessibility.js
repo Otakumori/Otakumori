@@ -6,7 +6,7 @@ import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const scriptLabel = path.relative(process.cwd(), __filename);
 
 // Common emoji patterns and their accessible replacements
 const emojiReplacements = {
@@ -98,7 +98,7 @@ function findFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
 
 // Main execution
 function main() {
-  console.log(' Starting accessibility fixes...\n');
+  console.log(` Starting accessibility fixes via ${scriptLabel}...\n`);
 
   const appDir = path.join(process.cwd(), 'app');
   const componentsDir = path.join(process.cwd(), 'components');
@@ -129,7 +129,7 @@ function main() {
           shell: true,
         },
       );
-    } catch (error) {
+    } catch {
       console.log('Linter check completed with some issues remaining.');
     }
   }
@@ -141,3 +141,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { fixEmojisInFile, emojiReplacements };
+

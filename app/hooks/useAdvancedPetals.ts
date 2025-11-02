@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PetalPhysicsEngine, type Vector2D } from '@/lib/physics/petal-physics';
 
 interface UseAdvancedPetalsOptions {
@@ -85,14 +85,41 @@ export function useAdvancedPetals({
   }, [enableScrollWind, windStrength]);
 
   // API methods
-  const spawnPetal = (x?: number, y?: number) => {
+  const spawnPetal = useCallback((x?: number, y?: number) => {
     if (!engineRef.current) return;
 
     const spawnX = x ?? Math.random() * window.innerWidth;
     const spawnY = y ?? -20;
 
     engineRef.current.spawnPetal(spawnX, spawnY);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!engineRef.current || spawnRate <= 0) {
+      return;
+    }
+
+    let frameId: number;
+    let lastSpawn = performance.now();
+
+    const tick = (time: number) => {
+      if (!engineRef.current) {
+        return;
+      }
+
+      const interval = 1000 / spawnRate;
+      if (time - lastSpawn >= interval) {
+        spawnPetal();
+        lastSpawn = time;
+      }
+
+      frameId = requestAnimationFrame(tick);
+    };
+
+    frameId = requestAnimationFrame(tick);
+
+    return () => cancelAnimationFrame(frameId);
+  }, [spawnRate, spawnPetal]);
 
   const setWind = (strength: number, direction: Vector2D) => {
     if (engineRef.current) {

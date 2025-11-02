@@ -1,6 +1,6 @@
 import { inngest } from './client';
 import { db } from '@/lib/db';
-import { printifyService } from '@/app/lib/printify/client';
+import { getPrintifyService } from '@/app/lib/printify/service';
 import type { PrintifyOrderData, PrintifyShippingAddress } from '@/app/lib/printify';
 
 /**
@@ -46,6 +46,18 @@ export const fulfillOrder = inngest.createFunction(
         throw new Error(`Order not paid: ${orderId}, status: ${orderData.status}`);
       }
 
+      if (userId && orderData.userId !== userId) {
+        throw new Error(
+          `Order ${orderId} is associated with user ${orderData.userId}, but event user ${userId} was provided.`,
+        );
+      }
+
+      if (stripeSessionId && orderData.stripeId !== stripeSessionId) {
+        console.warn(
+          `Stripe session mismatch for order ${orderId}: expected ${orderData.stripeId}, received ${stripeSessionId}`,
+        );
+      }
+
       return orderData;
     });
 
@@ -80,9 +92,8 @@ export const fulfillOrder = inngest.createFunction(
         };
 
         // Create order in Printify
-        // TODO: Implement createOrder method in printifyService
-        const result = { id: `printify_${Date.now()}`, status: 'pending' }; // Placeholder
-        // const result = await printifyService.createOrder(printifyOrderData);
+        const printify = getPrintifyService();
+        const result = await printify.createOrder(printifyOrderData);
 
         // Update order with Printify ID
         await db.order.update({
@@ -118,6 +129,7 @@ export const fulfillOrder = inngest.createFunction(
           userId: order.userId,
           orderId: order.id,
           email: email || order.User.email,
+          stripeSessionId: stripeSessionId ?? order.stripeId,
           orderNumber: order.displayNumber,
           totalAmount: order.totalAmount,
           items: order.OrderItem.map((item) => ({
@@ -184,18 +196,20 @@ export const awardPurchasePetals = inngest.createFunction(
           _sum: { amount: true },
         });
 
-        console.log(`Awarded ${petalsToAward} petals to user ${userId} for order ${orderId}`);
+        console.warn(`Awarded ${petalsToAward} petals to user ${userId} for order ${orderId}`);
 
         return {
           success: true,
           awarded: petalsToAward,
           newBalance: balance._sum.amount || 0,
+          stripeSessionId: stripeSessionId ?? null,
         };
       } catch (error) {
         console.error('Failed to award purchase petals:', error);
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error',
+          stripeSessionId: stripeSessionId ?? null,
         };
       }
     });
@@ -269,13 +283,14 @@ export const sendOrderConfirmationEmail = inngest.createFunction(
   },
   { event: 'email/order-confirmation' },
   async ({ event, step }) => {
-    const { userId, orderId, email, orderNumber, totalAmount, items } = event.data;
+    const { orderId, email, orderNumber, totalAmount, items } = event.data;
 
     return await step.run('send-email', async () => {
       try {
         // TODO: Integrate with email service (Resend, SendGrid, etc.)
         console.log('Sending order confirmation email:', {
           to: email,
+          orderId,
           orderNumber,
           totalAmount,
           itemCount: items.length,
@@ -291,6 +306,7 @@ export const sendOrderConfirmationEmail = inngest.createFunction(
         return {
           success: true,
           email,
+          orderId,
           orderNumber,
         };
       } catch (error) {
@@ -315,7 +331,7 @@ export const sendPaymentFailedEmail = inngest.createFunction(
   },
   { event: 'email/payment-failed' },
   async ({ event, step }) => {
-    const { userId, orderId, email, reason } = event.data;
+    const { orderId, email, reason } = event.data;
 
     return await step.run('send-email', async () => {
       try {

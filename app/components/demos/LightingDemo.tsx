@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { THEME_LIGHTING } from '@/app/components/effects/DynamicLightingSystem';
 import {
   useDynamicLighting,
   LIGHTING_PRESETS,
   applyLightingPreset,
 } from '@/app/hooks/useDynamicLighting';
-import { type DynamicLightingEngine } from '@/lib/lighting/dynamic-lighting';
 
 export default function LightingDemo() {
   const [currentTheme, setCurrentTheme] = useState<keyof typeof THEME_LIGHTING>('all');
   const [preset, setPreset] = useState<keyof typeof LIGHTING_PRESETS>('gamecube');
   const [showControls, setShowControls] = useState(true);
-  const [lightingEngine, setLightingEngine] = useState<DynamicLightingEngine | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const presetSelectId = useId();
+  const themeOptionsLabelId = useId();
 
   const lighting = useDynamicLighting({
     enableMouseInteraction: true,
@@ -28,7 +28,6 @@ export default function LightingDemo() {
     if (canvasRef.current && !lighting.isInitialized) {
       const engine = lighting.initialize(canvasRef.current);
       if (engine) {
-        setLightingEngine(engine);
         lighting.start();
       }
     }
@@ -129,11 +128,22 @@ export default function LightingDemo() {
 
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
-      {/* Lighting Canvas */}
+      {/* Canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{
+          filter: 'blur(0.3px)',
+          opacity: 0.7,
+        }}
+      />
+
+      {/* Gradient overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 20% 20%, rgba(255, 152, 222, 0.3), transparent 40%), radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.4), transparent 35%), radial-gradient(circle at 50% 80%, rgba(244, 114, 182, 0.35), transparent 45%)',
           mixBlendMode: 'screen',
           opacity: 0.9,
         }}
@@ -143,10 +153,17 @@ export default function LightingDemo() {
       {showControls && (
         <div className="absolute top-4 right-4 bg-black/90 backdrop-blur-lg text-white p-6 rounded-xl max-w-sm z-50 border border-white/20">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold">💡 Lighting Demo</h3>
+            <h3 className="text-lg font-bold">
+              <span role="img" aria-label="Light bulb" className="mr-2 inline-block">
+                💡
+              </span>
+              Lighting Demo
+            </h3>
             <button
               onClick={() => setShowControls(false)}
               className="text-white/60 hover:text-white transition-colors"
+              type="button"
+              aria-label="Hide lighting controls"
             >
               ×
             </button>
@@ -154,10 +171,15 @@ export default function LightingDemo() {
 
           {/* Preset Controls */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Lighting Preset:</label>
+            <label className="block text-sm font-medium mb-2" htmlFor={presetSelectId}>
+              Lighting Preset:
+            </label>
             <select
+              id={presetSelectId}
               value={preset}
-              onChange={(e) => handlePresetChange(e.target.value as keyof typeof LIGHTING_PRESETS)}
+              onChange={(event) =>
+                handlePresetChange(event.target.value as keyof typeof LIGHTING_PRESETS)
+              }
               className="w-full p-2 bg-white/10 border border-white/20 rounded text-white"
             >
               {Object.keys(LIGHTING_PRESETS).map((key) => (
@@ -170,8 +192,14 @@ export default function LightingDemo() {
 
           {/* Theme Controls */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Game Theme:</label>
-            <div className="grid grid-cols-2 gap-2">
+            <p id={themeOptionsLabelId} className="block text-sm font-medium mb-2">
+              Game Theme:
+            </p>
+            <div
+              className="grid grid-cols-2 gap-2"
+              role="group"
+              aria-labelledby={themeOptionsLabelId}
+            >
               {Object.keys(THEME_LIGHTING).map((theme) => (
                 <button
                   key={theme}
@@ -181,6 +209,7 @@ export default function LightingDemo() {
                       ? 'bg-white/20 text-white'
                       : 'bg-white/5 text-white/70 hover:bg-white/10'
                   }`}
+                  type="button"
                 >
                   {theme.charAt(0).toUpperCase() + theme.slice(1)}
                 </button>
@@ -193,22 +222,34 @@ export default function LightingDemo() {
             <button
               onClick={createRandomBurst}
               className="w-full p-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 rounded text-white font-medium transition-all transform hover:scale-105"
+              type="button"
             >
-              ✨ Light Burst
+              <span role="img" aria-label="Sparkles" className="mr-2 inline-block">
+                ✨
+              </span>
+              Light Burst
             </button>
 
             <button
               onClick={addPulsingLights}
               className="w-full p-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded text-white font-medium transition-all transform hover:scale-105"
+              type="button"
             >
-              🌟 Pulsing Lights
+              <span role="img" aria-label="Glowing star" className="mr-2 inline-block">
+                🌟
+              </span>
+              Pulsing Lights
             </button>
 
             <button
               onClick={clearAllLights}
               className="w-full p-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded text-white font-medium transition-all transform hover:scale-105"
+              type="button"
             >
-              🧹 Reset Lights
+              <span role="img" aria-label="Broom" className="mr-2 inline-block">
+                🧹
+              </span>
+              Reset Lights
             </button>
           </div>
 
@@ -219,11 +260,20 @@ export default function LightingDemo() {
             <div>Theme: {currentTheme}</div>
             <div>Status: {lighting.isRunning ? 'Running' : 'Stopped'}</div>
             <div className="mt-2 text-white/40">
-              💡 Move mouse for dynamic lighting
+              <span role="img" aria-label="Light bulb" className="mr-2 inline-block">
+                💡
+              </span>
+              Move mouse for dynamic lighting
               <br />
-              🖱️ Click anywhere for light burst
+              <span role="img" aria-label="Computer mouse" className="mr-2 inline-block">
+                🖱️
+              </span>
+              Click anywhere for light burst
               <br />
-              🎨 Try different themes and presets
+              <span role="img" aria-label="Artist palette" className="mr-2 inline-block">
+                🎨
+              </span>
+              Try different themes and presets
             </div>
           </div>
         </div>
@@ -234,8 +284,12 @@ export default function LightingDemo() {
         <button
           onClick={() => setShowControls(true)}
           className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white p-3 rounded-full z-50 transition-all transform hover:scale-110"
+          type="button"
+          aria-label="Show lighting controls"
         >
-          💡
+          <span role="img" aria-label="Light bulb">
+            💡
+          </span>
         </button>
       )}
 
@@ -252,7 +306,11 @@ export default function LightingDemo() {
           {/* Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
-              <div className="text-4xl mb-3">🌟</div>
+              <div className="text-4xl mb-3">
+                <span role="img" aria-label="Glowing star">
+                  🌟
+                </span>
+              </div>
               <h3 className="text-lg font-semibold mb-2 text-yellow-300">Real-time Shadows</h3>
               <p className="text-sm text-white/70">
                 Dynamic shadow casting with realistic projection and soft edges
@@ -260,7 +318,11 @@ export default function LightingDemo() {
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
-              <div className="text-4xl mb-3">🌫️</div>
+              <div className="text-4xl mb-3">
+                <span role="img" aria-label="Foggy weather">
+                  🌫️
+                </span>
+              </div>
               <h3 className="text-lg font-semibold mb-2 text-blue-300">Volumetric Effects</h3>
               <p className="text-sm text-white/70">
                 Atmospheric fog, light rays, and particle effects for immersion
@@ -268,7 +330,11 @@ export default function LightingDemo() {
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
-              <div className="text-4xl mb-3">🎨</div>
+              <div className="text-4xl mb-3">
+                <span role="img" aria-label="Artist palette">
+                  🎨
+                </span>
+              </div>
               <h3 className="text-lg font-semibold mb-2 text-purple-300">Theme Integration</h3>
               <p className="text-sm text-white/70">
                 Adaptive lighting that responds to game themes and user interactions
@@ -276,7 +342,11 @@ export default function LightingDemo() {
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
-              <div className="text-4xl mb-3">⚡</div>
+              <div className="text-4xl mb-3">
+                <span role="img" aria-label="High voltage">
+                  ⚡
+                </span>
+              </div>
               <h3 className="text-lg font-semibold mb-2 text-green-300">Performance</h3>
               <p className="text-sm text-white/70">
                 Hardware-accelerated rendering with 60fps smooth animations
@@ -286,29 +356,44 @@ export default function LightingDemo() {
 
           {/* Interactive Elements */}
           <div className="grid grid-cols-3 gap-8">
-            <div
-              className="bg-gradient-to-br from-red-500/20 to-red-700/20 backdrop-blur-lg rounded-3xl p-8 border border-red-500/30 cursor-pointer transform hover:scale-110 transition-all shadow-2xl"
+            <button
+              type="button"
+              className="bg-gradient-to-br from-red-500/20 to-red-700/20 backdrop-blur-lg rounded-3xl p-8 border border-red-500/30 cursor-pointer transform hover:scale-110 transition-all shadow-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
               onClick={() => handleThemeChange('action')}
             >
-              <div className="text-6xl mb-4">⚔️</div>
+              <div className="text-6xl mb-4">
+                <span role="img" aria-label="Crossed swords">
+                  ⚔️
+                </span>
+              </div>
               <h3 className="text-xl font-bold text-red-300">Action</h3>
-            </div>
+            </button>
 
-            <div
-              className="bg-gradient-to-br from-blue-500/20 to-blue-700/20 backdrop-blur-lg rounded-3xl p-8 border border-blue-500/30 cursor-pointer transform hover:scale-110 transition-all shadow-2xl"
+            <button
+              type="button"
+              className="bg-gradient-to-br from-blue-500/20 to-blue-700/20 backdrop-blur-lg rounded-3xl p-8 border border-blue-500/30 cursor-pointer transform hover:scale-110 transition-all shadow-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               onClick={() => handleThemeChange('puzzle')}
             >
-              <div className="text-6xl mb-4">🧩</div>
+              <div className="text-6xl mb-4">
+                <span role="img" aria-label="Puzzle piece">
+                  🧩
+                </span>
+              </div>
               <h3 className="text-xl font-bold text-blue-300">Puzzle</h3>
-            </div>
+            </button>
 
-            <div
-              className="bg-gradient-to-br from-green-500/20 to-green-700/20 backdrop-blur-lg rounded-3xl p-8 border border-green-500/30 cursor-pointer transform hover:scale-110 transition-all shadow-2xl"
+            <button
+              type="button"
+              className="bg-gradient-to-br from-green-500/20 to-green-700/20 backdrop-blur-lg rounded-3xl p-8 border border-green-500/30 cursor-pointer transform hover:scale-110 transition-all shadow-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green-300"
               onClick={() => handleThemeChange('strategy')}
             >
-              <div className="text-6xl mb-4">🎯</div>
+              <div className="text-6xl mb-4">
+                <span role="img" aria-label="Bullseye">
+                  🎯
+                </span>
+              </div>
               <h3 className="text-xl font-bold text-green-300">Strategy</h3>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -316,12 +401,24 @@ export default function LightingDemo() {
       {/* Click handler for light bursts */}
       <div
         className="absolute inset-0 z-10"
-        onClick={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
+        onClick={(event) => {
+          const rect = event.currentTarget.getBoundingClientRect();
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
           lighting.createLightBurst(x, y, { r: 1, g: 1, b: 1 }, 1500);
         }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            const rect = event.currentTarget.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            lighting.createLightBurst(centerX, centerY, { r: 1, g: 1, b: 1 }, 1500);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Create a light burst"
       />
     </div>
   );

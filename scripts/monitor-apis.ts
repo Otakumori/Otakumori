@@ -40,7 +40,7 @@ class APIMonitor {
 
   private async runHealthCheck(): Promise<void> {
     const timestamp = new Date().toISOString();
-    // `\n⌕ [${timestamp}] Running health check...`
+    console.log(`[monitor] ${timestamp} Running health check...`);
 
     for (const endpoint of this.config.endpoints) {
       try {
@@ -153,3 +153,4 @@ if (require.main === module) {
 }
 
 export type { APIMonitor, MonitoringConfig };
+

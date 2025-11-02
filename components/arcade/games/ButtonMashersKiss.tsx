@@ -59,6 +59,7 @@ function HeartParticle({ delay, x, y }: { delay: number; x: number; y: number })
   return (
     <motion.div
       className="absolute text-2xl"
+      aria-hidden="true"
       initial={{ scale: 0, opacity: 0, x, y, rotate: 0 }}
       animate={{
         scale: [0, 1, 1, 0],
@@ -72,7 +73,7 @@ function HeartParticle({ delay, x, y }: { delay: number; x: number; y: number })
         ease: 'easeOut',
       }}
     >
-      💗
+      Heart
     </motion.div>
   );
 }
@@ -147,7 +148,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
         {Array.from({ length: 15 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-4xl"
+            className="absolute text-4xl" aria-hidden="true"
             style={{
               left: `${(i * 7) % 90}%`,
               top: `${(i * 13) % 90}%`,
@@ -162,7 +163,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               delay: i * 0.2,
             }}
           >
-            💕
+            HeartHeart
           </motion.div>
         ))}
       </div>
@@ -210,7 +211,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
       <div className="absolute top-4 left-4 right-4 max-w-md">
         <div className="bg-white/20 backdrop-blur-lg rounded-lg p-4 border-2 border-pink-300 shadow-2xl">
           <div className="flex justify-between text-white text-sm mb-2 font-bold drop-shadow-lg">
-            <span>💗 ROMANTIC TENSION 💗</span>
+            <span>ROMANTIC TENSION</span>
             <span>{kissProgress}%</span>
           </div>
           <div className="w-full bg-white/30 rounded-full h-4 border-2 border-pink-300 overflow-hidden shadow-inner">
@@ -236,7 +237,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               animate={{ scale: 1 }}
               className="mt-2 text-center text-yellow-300 text-xs font-bold drop-shadow-lg"
             >
-              ⚡ SPEED BONUS x{mashSpeed} ⚡
+              Speed bonus x{mashSpeed}
             </motion.div>
           )}
         </div>
@@ -258,7 +259,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
               transition={{ duration: 0.8, repeat: Infinity }}
               className="bg-gradient-to-br from-pink-500 to-red-600 text-white px-10 py-8 rounded-3xl shadow-2xl border-4 border-pink-300"
             >
-              <p className="text-5xl mb-3">💋</p>
+              <p className="text-5xl mb-3">KISS</p>
               <p className="text-3xl font-bold mb-2">TRUE LOVE!</p>
               <p className="text-xl">Connection Complete</p>
               {mashSpeed > 5 && (
@@ -272,7 +273,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
             {Array.from({ length: 20 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute text-3xl"
+                className="absolute text-3xl" aria-hidden="true"
                 initial={{ scale: 0, x: 0, y: 0 }}
                 animate={{
                   scale: [0, 1, 0],
@@ -281,7 +282,7 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
                 }}
                 transition={{ duration: 1, delay: i * 0.05 }}
               >
-                💗
+                Heart
               </motion.div>
             ))}
           </motion.div>
@@ -294,12 +295,12 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
           {!showSilhouettes
             ? 'Hearts align...'
             : kissProgress < 100
-              ? '💗 MASH TO BUILD TENSION! 💗'
+              ? 'Mash to build tension!'
               : 'Love blossoms!'}
         </p>
         {kissProgress < 100 && showSilhouettes && (
           <p className="text-white/90 text-xs mt-1 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]">
-            Press SPACE or CLICK rapidly • Speed = Bonus Petals!
+            Press SPACE or CLICK rapidly - Speed = Bonus Petals!
           </p>
         )}
       </div>

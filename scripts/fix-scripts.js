@@ -25,7 +25,7 @@ function findScriptFiles(dir) {
 }
 
 // Function to fix script files
-function fixScriptFile(content, filePath) {
+function fixScriptFile(content) {
   // Only fix files that have shebang lines
   if (content.includes('#!/usr/bin/env')) {
     // Remove ESLint disable comments
@@ -47,7 +47,7 @@ function main() {
     for (const file of files) {
       try {
         const content = fs.readFileSync(file, 'utf8');
-        const result = fixScriptFile(content, file);
+        const result = fixScriptFile(content);
 
         if (result.modified) {
           fs.writeFileSync(file, result.content, 'utf8');
@@ -67,3 +67,4 @@ function main() {
 }
 
 main();
+

@@ -254,6 +254,16 @@ export default function RetroSoundVisualizer({
     if (particlesRef.current.length > 500) {
       particlesRef.current = particlesRef.current.slice(-500);
     }
+
+    // Draw subtle glow based on average volume to visualize audio energy
+    if (Number.isFinite(avgVolume) && avgVolume > 0) {
+      const normalized = Math.min(avgVolume / 255, 1);
+      ctx.save();
+      ctx.globalAlpha = Math.min(0.35, normalized);
+      ctx.fillStyle = '#ec4899';
+      ctx.fillRect(0, ctx.canvas.height - 4, ctx.canvas.width, 4);
+      ctx.restore();
+    }
   };
 
   return (

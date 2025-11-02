@@ -18,13 +18,19 @@ export interface AvatarRendererLegacy {
 /**
  * @deprecated Use AvatarRenderer component instead
  */
-export function createRenderer(_props: RendererProps): AvatarRendererLegacy {
+export function createRenderer({ spec, reducedMotion }: RendererProps): AvatarRendererLegacy {
   return {
-    mount: (_el: HTMLElement) => {
-      console.warn('Legacy createRenderer is deprecated. Use AvatarRenderer component instead.');
+    mount: (el: HTMLElement) => {
+      console.warn('Legacy createRenderer is deprecated. Use AvatarRenderer component instead.', {
+        target: el.tagName,
+        reducedMotion: Boolean(reducedMotion),
+        specKeys: Object.keys(spec ?? {}),
+      });
     },
     dispose: () => {
-      // No-op
+      console.warn('Legacy renderer dispose() called. Nothing to clean up.', {
+        specKeys: Object.keys(spec ?? {}),
+      });
     },
   };
 }

@@ -52,6 +52,8 @@ async function seedPrintifyFallback() {
         category: p.category,
         isNSFW: p.isNSFW,
         integrationRef: p.integrationRef,
+        createdAt: now,
+        updatedAt: now,
         ProductVariant: {
           create: [
             {
@@ -64,6 +66,8 @@ async function seedPrintifyFallback() {
               currency: 'USD',
               previewImageUrl: p.primaryImageUrl,
               printProviderName: 'seed-provider',
+              createdAt: now,
+              updatedAt: now,
             },
           ],
         },

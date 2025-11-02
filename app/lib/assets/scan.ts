@@ -35,7 +35,8 @@ async function scanAssets(): Promise<ScanResults> {
   console.warn('🔍 Scanning assets...');
 
   // Find all supported files
-  const pattern = `${ASSET_ROOT}/**/*.{glb,gltf,ktx2,png,jpg,jpeg}`;
+  const extensionPattern = SUPPORTED_EXTENSIONS.map((ext) => ext.slice(1)).join(',');
+  const pattern = `${ASSET_ROOT}/**/*.{${extensionPattern}}`;
   const files = await glob(pattern, { nodir: true });
 
   console.warn(`Found ${files.length} asset files`);

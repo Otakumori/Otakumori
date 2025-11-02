@@ -49,17 +49,6 @@ interface Enemy {
   animationFrame: number;
 }
 
-interface Projectile {
-  id: string;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  type: 'fireball' | 'shuriken' | 'energy';
-  damage: number;
-  fromPlayer: boolean;
-}
-
 interface BeatIndicator {
   id: number;
   x: number;
@@ -106,7 +95,6 @@ export default function BeatEmUpGame({ mode }: Props) {
   });
 
   const enemiesRef = useRef<Enemy[]>([]);
-  const projectilesRef = useRef<Projectile[]>([]);
   const keysRef = useRef<Set<string>>(new Set());
   const lastBeatTimeRef = useRef<number>(0);
   const beatIndicatorsRef = useRef<BeatIndicator[]>([]);

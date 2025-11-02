@@ -35,7 +35,9 @@ describe('AvatarRenderer Props', () => {
       resolved,
       reducedMotion: false,
       onLoad: () => {},
-      onError: (_error: Error) => {},
+      onError: (error: Error) => {
+        console.warn('AvatarRenderer onError handler invoked during test', error.message);
+      },
     };
 
     expect(props.spec.version).toBe('1.5');

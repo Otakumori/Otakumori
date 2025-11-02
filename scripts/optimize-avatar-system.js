@@ -99,7 +99,7 @@ filesToCheck.forEach((dir) => {
             hasProcessEnv = true;
           }
         } catch (error) {
-          // Skip files that can't be read
+          console.warn(`Skipping unreadable file: ${filePath}`, error);
         }
       }
     });
@@ -129,7 +129,7 @@ filesToCheck.forEach((dir) => {
             hasConsoleLog = true;
           }
         } catch (error) {
-          // Skip files that can't be read
+          console.warn(`Skipping unreadable file: ${filePath}`, error);
         }
       }
     });

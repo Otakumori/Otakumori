@@ -24,17 +24,16 @@ export default function GameControls({
   showOnMount = true,
   autoHideDelay = 5000,
 }: GameControlsProps) {
-  const [isVisible, setIsVisible] = useState(showOnMount);
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    if (autoHideDelay > 0 && isVisible) {
+    if (autoHideDelay > 0 && isExpanded) {
       const timer = setTimeout(() => {
         setIsExpanded(false);
       }, autoHideDelay);
       return () => clearTimeout(timer);
     }
-  }, [autoHideDelay, isVisible]);
+  }, [autoHideDelay, isExpanded]);
 
   // Auto-expand on mount
   useEffect(() => {
@@ -50,8 +49,6 @@ export default function GameControls({
     'bottom-right': 'bottom-4 right-4',
   };
 
-  if (!isVisible) return null;
-
   return (
     <div className={`fixed ${positionClasses[position]} z-40`}>
       <AnimatePresence>
@@ -65,7 +62,7 @@ export default function GameControls({
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-pink-200 font-semibold text-sm flex items-center gap-2">
-                <span className="text-pink-400">🎮</span>
+                <span className="text-pink-400">CTRL</span>
                 {game} Controls
               </h3>
               <button
@@ -73,7 +70,7 @@ export default function GameControls({
                 className="text-white/50 hover:text-white/80 transition-colors text-xs"
                 aria-label="Minimize controls"
               >
-                ✕
+                Hide
               </button>
             </div>
 
@@ -105,7 +102,7 @@ export default function GameControls({
             className="bg-black/60 backdrop-blur-sm border border-pink-500/30 rounded-full p-3 shadow-lg hover:bg-black/80 hover:scale-110 transition-all"
             aria-label="Show controls"
           >
-            <span className="text-2xl">🎮</span>
+            <span className="text-2xl font-semibold">CTRL</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -116,13 +113,13 @@ export default function GameControls({
 // Preset control configurations for common games
 export const CONTROL_PRESETS = {
   'petal-samurai': [
-    { key: 'Mouse', action: 'Slash Petals', icon: '🖱️' },
+    { key: 'Mouse', action: 'Slash Petals', icon: 'Mouse' },
     { key: 'Click + Drag', action: 'Draw Slash Trail' },
     { key: 'ESC', action: 'Pause Game' },
   ],
   'memory-match': [
-    { key: 'Click', action: 'Flip Card', icon: '🖱️' },
-    { key: 'Arrow Keys', action: 'Navigate Cards', icon: '⬆️⬇️⬅️➡️' },
+    { key: 'Click', action: 'Flip Card', icon: 'Mouse' },
+    { key: 'Arrow Keys', action: 'Navigate Cards', icon: 'Arrow Keys' },
     { key: 'SPACE', action: 'Select Card' },
     { key: 'ESC', action: 'Return to Menu' },
   ],
@@ -133,10 +130,10 @@ export const CONTROL_PRESETS = {
     { key: 'R', action: 'Reset Character' },
   ],
   'dungeon-of-desire': [
-    { key: '← →', action: 'Move Left/Right', icon: '⬅️➡️' },
+    { key: 'A / D', action: 'Move Left/Right', icon: 'Arrow Keys' },
     { key: 'SPACE', action: 'Jump' },
-    { key: '↑', action: 'Enter Door', icon: '⬆️' },
-    { key: '↓', action: 'Crouch', icon: '⬇️' },
+    { key: 'E', action: 'Enter Door', icon: 'Enter' },
+    { key: 'CTRL', action: 'Crouch', icon: 'Ctrl' },
     { key: 'ESC', action: 'Pause' },
   ],
   'petal-storm-rhythm': [
@@ -145,17 +142,22 @@ export const CONTROL_PRESETS = {
     { key: 'ESC', action: 'Pause' },
   ],
   'puzzle-reveal': [
-    { key: 'Click', action: 'Reveal Tile', icon: '🖱️' },
-    { key: 'Fast Clicks', action: 'Build Combo (10x max)', icon: '⚡' },
+    { key: 'Click', action: 'Reveal Tile', icon: 'Mouse' },
+    { key: 'Fast Clicks', action: 'Build Combo (10x max)', icon: 'Combo' },
     { key: 'ESC', action: 'Pause Game' },
   ],
   'thigh-coliseum': [
-    { key: 'Click', action: 'Select Option', icon: '🖱️' },
+    { key: 'Click', action: 'Select Option', icon: 'Mouse' },
     { key: '1-4', action: 'Quick Select' },
     { key: 'SPACE', action: 'Continue' },
   ],
   blossomware: [
-    { key: 'Varies', action: 'Each Micro-Game', icon: '🎮' },
+    { key: 'Varies', action: 'Each Micro-Game', icon: 'CTRL' },
     { key: 'ESC', action: 'Skip Game' },
   ],
-} as const;
+} as const;;
+
+
+
+
+

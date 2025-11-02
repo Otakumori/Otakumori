@@ -142,10 +142,10 @@ export default function ReportButton({
 
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-white/80">
+                    <p className="mb-2 block text-sm font-medium text-white/80">
                       Reason for reporting
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
+                    </p>
+                    <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Report reason">
                       {REPORT_REASONS.map(({ value, label, icon: Icon, color }) => (
                         <button
                           key={value}
@@ -162,6 +162,8 @@ export default function ReportButton({
                               ? 'border-pink-500 bg-pink-500/10'
                               : 'border-white/20 bg-white/5 hover:bg-white/10',
                           )}
+                          role="radio"
+                          aria-checked={reportData.reason === value}
                         >
                           <Icon className={cn('mx-auto mb-1 h-5 w-5', color)} aria-hidden="true" />
                           <span className="text-xs text-white/80">{label}</span>
@@ -171,10 +173,14 @@ export default function ReportButton({
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-white/80">
+                    <label
+                      className="mb-2 block text-sm font-medium text-white/80"
+                      htmlFor="report-details"
+                    >
                       Additional details (optional)
                     </label>
                     <textarea
+                      id="report-details"
                       value={reportData.description ?? ''}
                       onChange={(event) =>
                         setReportData((prev) => ({

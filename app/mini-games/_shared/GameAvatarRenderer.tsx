@@ -74,7 +74,7 @@ function GameAvatar3D({
     });
   }, [quality]);
 
-  useFrame((state, delta) => {
+  useFrame((state, _delta) => {
     if (performanceOptimizer.current) {
       performanceOptimizer.current.updateMetrics(state.gl);
     }
@@ -89,6 +89,7 @@ function GameAvatar3D({
           lighting="studio"
           quality={quality}
           enableAnimations={enableAnimations}
+          animationState={animationState}
           enableControls={false}
           showOutline={false}
           onLoad={onLoad}
@@ -126,7 +127,7 @@ function GameAvatar2D({
         }}
       >
         <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-          <span className="text-white text-2xl">👤</span>
+          <span className="text-white text-2xl font-semibold" aria-hidden="true">AV</span>
         </div>
       </div>
     );
@@ -277,7 +278,7 @@ export default function GameAvatarRenderer({
     return (
       <div className={`flex items-center justify-center ${className}`}>
         <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-          <span className="text-white text-2xl">⏳</span>
+          <span className="text-white text-2xl font-semibold" aria-hidden="true">AV</span>
         </div>
       </div>
     );
@@ -419,3 +420,5 @@ export function drawGameAvatar(
   };
   img.src = avatarData.fallbackSpriteUrl;
 }
+
+

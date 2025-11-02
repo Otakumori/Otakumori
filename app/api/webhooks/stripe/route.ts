@@ -1,4 +1,4 @@
-import { headers } from 'next/headers';
+﻿import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db as prisma } from '@/lib/db';
@@ -105,7 +105,8 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
-  } catch (_err) {
+  } catch (err) {
+    console.error('Invalid Stripe signature', err);
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
@@ -228,7 +229,7 @@ export async function POST(req: Request) {
 
     case 'charge.refunded':
     case 'charge.dispute.funds_withdrawn': {
-      // Handle refunds / disputes → negative ledger + status update
+      // Handle refunds / disputes â†’ negative ledger + status update
       const obj: any = event.data.object;
       const paymentIntentId = obj.payment_intent ?? obj.id ?? null;
       if (!paymentIntentId) return NextResponse.json({ ok: true });

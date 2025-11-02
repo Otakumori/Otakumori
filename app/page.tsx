@@ -54,7 +54,7 @@ export default async function HomePage() {
               {/* Interactive petals in hero only */}
               {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
                 <div className="relative mt-8 h-48">
-                  <InteractivePetals variant="hero" />
+                  <InteractivePetals />
                 </div>
               )}
             </div>

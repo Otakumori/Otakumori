@@ -54,12 +54,29 @@ export function GameAvatarIntegration({
   scale = [1, 1, 1],
 }: GameAvatarIntegrationProps) {
   const { data: avatarData, isLoading, error } = useGameAvatar(gameId, gameMode);
+  const [posX, posY, posZ] = position;
+  const [scaleX, scaleY, scaleZ] = scale;
+  const containerClassName = `flex items-center justify-center ${className}`.trim();
+  const sharedAttributes = {
+    'data-quality': quality,
+    'data-enable-3d': enable3D,
+    'data-enable-animations': enableAnimations,
+    'data-animation-state': animationState,
+  } as const;
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center ${className}`} style={style}>
+      <div
+        className={containerClassName}
+        style={style}
+        aria-busy="true"
+        aria-live="polite"
+        {...sharedAttributes}
+      >
         <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-          <span className="text-white text-lg">⏳</span>
+          <span role="img" aria-label="Loading avatar" className="text-white text-lg">
+            ⏳
+          </span>
         </div>
       </div>
     );
@@ -67,9 +84,17 @@ export function GameAvatarIntegration({
 
   if (error || !avatarData) {
     return (
-      <div className={`flex items-center justify-center ${className}`} style={style}>
+      <div
+        className={containerClassName}
+        style={style}
+        role="alert"
+        aria-live="assertive"
+        {...sharedAttributes}
+      >
         <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-          <span className="text-white text-lg">👤</span>
+          <span role="img" aria-label="Avatar unavailable" className="text-white text-lg">
+            🚫
+          </span>
         </div>
       </div>
     );
@@ -78,13 +103,15 @@ export function GameAvatarIntegration({
   // For now, render a simple 2D avatar
   // In the future, this could render a 3D avatar based on enable3D prop
   return (
-    <div className={`flex items-center justify-center ${className}`} style={style}>
+    <div className={containerClassName} style={style} {...sharedAttributes}>
       <div
         className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg"
         style={{
-          transform: `scale(${scale[0]}) translate(${position[0]}px, ${position[1]}px)`,
+          transform: `translate3d(${posX}px, ${posY}px, ${posZ}px) scale3d(${scaleX}, ${scaleY}, ${scaleZ})`,
           transformOrigin: 'center center',
         }}
+        data-enable-3d={enable3D}
+        data-enable-animations={enableAnimations}
       >
         {avatarData.fallbackSpriteUrl ? (
           <img
@@ -92,9 +119,12 @@ export function GameAvatarIntegration({
             alt="Avatar"
             className="w-10 h-10 object-cover rounded-full"
             style={{ imageRendering: 'pixelated' }}
+            data-animation-state={animationState}
           />
         ) : (
-          <span className="text-white text-lg">👤</span>
+          <span role="img" aria-label="Avatar placeholder" className="text-white text-lg">
+            🎮
+          </span>
         )}
       </div>
     </div>
@@ -106,21 +136,28 @@ export const GameAvatarUtils = {
   // Get avatar configuration for a specific game
   getAvatarConfig: async (gameId: string, gameMode?: string, userId?: string) => {
     try {
-      const response = await fetch(
-        `/api/v1/character/config?gameId=${gameId}&mode=${gameMode || 'default'}`,
-      );
+      const params = new URLSearchParams({
+        gameId,
+        mode: gameMode || 'default',
+      });
+
+      if (userId) {
+        params.set('userId', userId);
+      }
+
+      const response = await fetch(`/api/v1/character/config?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         return data.ok ? data.data : null;
       }
-    } catch (error) {
-      console.error('Failed to fetch avatar config:', error);
+    } catch (fetchError) {
+      console.error('Failed to fetch avatar config:', fetchError);
     }
     return null;
   },
 
   // Save avatar configuration
-  saveAvatarConfig: async (config: any) => {
+  saveAvatarConfig: async (config: Record<string, unknown>) => {
     try {
       const response = await fetch('/api/v1/character/config', {
         method: 'POST',
@@ -134,20 +171,29 @@ export const GameAvatarUtils = {
         const data = await response.json();
         return data.ok ? data.data : null;
       }
-    } catch (error) {
-      console.error('Failed to save avatar config:', error);
+    } catch (saveError) {
+      console.error('Failed to save avatar config:', saveError);
     }
     return null;
   },
 
   // Generate sprite from 3D model (placeholder for future implementation)
   generateSpriteFrom3D: async (
-    config: any,
+    config: Record<string, unknown>,
     options: { width: number; height: number; angle?: number },
   ) => {
     // This would use the 3D avatar system to render a sprite
-    // For now, return a default sprite URL
-    return '/assets/default-avatar.png';
+    // For now, return a default sprite URL with the requested parameters encoded
+    const { width, height, angle = 0 } = options;
+    const configSignature = JSON.stringify(config ?? {});
+    const params = new URLSearchParams({
+      width: String(width),
+      height: String(height),
+      angle: String(angle),
+      signature: String(configSignature.length),
+    });
+
+    return `/assets/default-avatar.png?${params.toString()}`;
   },
 
   // Get performance settings based on device capabilities

@@ -122,40 +122,32 @@ class BundleAnalyzer {
   logResults(metrics: PerformanceMetrics, budgetCheck: ReturnType<typeof this.checkBudget>): void {
     console.group(' Bundle Analysis Results');
 
-    // 'Bundle Sizes:'
-    // `  Main: ${(metrics.bundleSize.main / 1024.toFixed(1)}KB`);
-    // `  Total: ${(metrics.bundleSize.total / 1024.toFixed(1)}KB`);
-    // `  Gzipped: ${(metrics.bundleSize.gzipped / 1024.toFixed(1)}KB`);
+    console.warn('Bundle Sizes:');
+    console.warn(`  Main: ${(metrics.bundleSize.main / 1024).toFixed(1)} KB`);
+    console.warn(`  Total: ${(metrics.bundleSize.total / 1024).toFixed(1)} KB`);
+    console.warn(`  Gzipped: ${(metrics.bundleSize.gzipped / 1024).toFixed(1)} KB`);
 
-    // '\nPerformance Budget:'
-    // `  Score: ${budgetCheck.score}/100`
-    // `  Status: ${budgetCheck.passed ? ' PASSED' : ' FAILED'}`
+    console.warn('\nPerformance Budget:');
+    console.warn(`  Score: ${budgetCheck.score}/100`);
+    console.warn(`  Status: ${budgetCheck.passed ? 'PASSED ✅' : 'FAILED ❌'}`);
 
     if (budgetCheck.violations.length > 0) {
-      // '\nBudget Violations:'
+      console.error('\nBudget Violations:');
       budgetCheck.violations.forEach((violation) => {
-        // `   ${violation}`
+        console.error(`  • ${violation}`);
       });
     }
 
     const recommendations = this.generateRecommendations(metrics);
     if (recommendations.length > 0) {
-      // '\nRecommendations:'
+      console.warn('\nRecommendations:');
       recommendations.forEach((rec) => {
-        // `   ${rec}`
+        console.warn(`  • ${rec}`);
       });
     }
 
     console.groupEnd();
   }
-}
-
-interface NextJsStats {
-  bundles: Array<{
-    name: string;
-    size: number;
-    isMain?: boolean;
-  }>;
 }
 
 /**
@@ -165,11 +157,16 @@ function parseBuildStats(): PerformanceMetrics {
   const buildDir = '.next';
   const statsFile = path.join(buildDir, 'static', 'chunks', 'webpack-runtime.js');
 
-  // In a real implementation, this would parse actual build stats
-  // For now, simulate realistic bundle sizes
+  // In a real implementation, this would parse actual build stats.
+  // For now, simulate realistic bundle sizes but incorporate runtime file size if present.
+  let runtimeSize = 215 * 1024;
+  if (fs.existsSync(statsFile)) {
+    runtimeSize = fs.statSync(statsFile).size;
+  }
+
   const bundleMetrics: PerformanceMetrics = {
     bundleSize: {
-      main: 215 * 1024, // 215KB main bundle
+      main: runtimeSize,
       chunks: {
         'pages/_app': 45 * 1024,
         'pages/mini-games': 120 * 1024,

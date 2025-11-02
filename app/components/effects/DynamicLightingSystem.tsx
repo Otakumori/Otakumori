@@ -14,7 +14,18 @@ interface DynamicLightingSystemProps {
   enableVolumetricEffects?: boolean;
   ambientIntensity?: number;
   gameTheme?: 'action' | 'puzzle' | 'strategy' | 'all' | null;
-  onLightingReady?: (engine: DynamicLightingEngine) => void;
+  onLightingReady?: (
+    engine: DynamicLightingEngine,
+    controls: {
+      addLight: (light: LightSource) => void;
+      removeLight: (id: string) => void;
+      addBurst: (
+        x: number,
+        y: number,
+        color?: { r: number; g: number; b: number },
+      ) => void;
+    },
+  ) => void;
 }
 
 // Theme-based lighting configurations
@@ -55,6 +66,53 @@ export default function DynamicLightingSystem({
   const lastTimeRef = useRef<number>(0);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const addCustomLight = useCallback((light: LightSource) => {
+    if (engineRef.current) {
+      engineRef.current.addLight(light);
+    }
+  }, []);
+
+  const removeCustomLight = useCallback((id: string) => {
+    if (engineRef.current) {
+      engineRef.current.removeLight(id);
+    }
+  }, []);
+
+  const addLightBurst = useCallback(
+    (x: number, y: number, color: { r: number; g: number; b: number } = { r: 1, g: 1, b: 1 }) => {
+      if (!engineRef.current) return;
+
+      const burstLight: LightSource = {
+        id: `burst-${Date.now()}`,
+        type: 'point',
+        position: { x, y, z: 50 },
+        color,
+        intensity: 1.5,
+        range: 200,
+        falloff: 3,
+        castsShadows: true,
+        animated: false,
+      };
+
+      engineRef.current.addLight(burstLight);
+
+      // Animate burst fade out
+      let intensity = 1.5;
+      const fadeInterval = setInterval(() => {
+        intensity *= 0.9;
+        if (intensity < 0.1) {
+          clearInterval(fadeInterval);
+          if (engineRef.current) {
+            engineRef.current.removeLight(burstLight.id);
+          }
+        } else if (engineRef.current) {
+          engineRef.current.updateLight(burstLight.id, { intensity });
+        }
+      }, 16);
+    },
+    [],
+  );
+
   // Initialize lighting engine
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -78,7 +136,11 @@ export default function DynamicLightingSystem({
           engineRef.current = new DynamicLightingEngine(canvas);
           setupDefaultLighting();
           setIsInitialized(true);
-          onLightingReady?.(engineRef.current);
+          onLightingReady?.(engineRef.current, {
+            addLight: addCustomLight,
+            removeLight: removeCustomLight,
+            addBurst: addLightBurst,
+          });
         } catch (error) {
           console.error('Failed to initialize lighting engine:', error);
         }
@@ -302,55 +364,6 @@ export default function DynamicLightingSystem({
   }, [isInitialized]);
 
   // Public API for external control
-  const addCustomLight = useCallback((light: LightSource) => {
-    if (engineRef.current) {
-      engineRef.current.addLight(light);
-    }
-  }, []);
-
-  const removeCustomLight = useCallback((id: string) => {
-    if (engineRef.current) {
-      engineRef.current.removeLight(id);
-    }
-  }, []);
-
-  const addLightBurst = useCallback(
-    (x: number, y: number, color: { r: number; g: number; b: number } = { r: 1, g: 1, b: 1 }) => {
-      if (!engineRef.current) return;
-
-      const burstLight: LightSource = {
-        id: `burst-${Date.now()}`,
-        type: 'point',
-        position: { x, y, z: 50 },
-        color,
-        intensity: 1.5,
-        range: 200,
-        falloff: 3,
-        castsShadows: true,
-        animated: false,
-      };
-
-      engineRef.current.addLight(burstLight);
-
-      // Animate burst fade out
-      let intensity = 1.5;
-      const fadeInterval = setInterval(() => {
-        intensity *= 0.9;
-        if (intensity < 0.1) {
-          clearInterval(fadeInterval);
-          if (engineRef.current) {
-            engineRef.current.removeLight(burstLight.id);
-          }
-        } else {
-          if (engineRef.current) {
-            engineRef.current.updateLight(burstLight.id, { intensity });
-          }
-        }
-      }, 16);
-    },
-    [],
-  );
-
   // Expose methods via ref callback
   useEffect(() => {
     if (isInitialized && engineRef.current) {

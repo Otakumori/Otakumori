@@ -539,7 +539,7 @@ export class PerformanceOptimizer {
 
     // Create batched materials
     const batchedMaterials: THREE.Material[] = [];
-    materialGroups.forEach((group, key) => {
+    materialGroups.forEach((group, _key) => {
       if (group.length > 1) {
         // Create a single material for the batch
         const batchedMaterial = this.createBatchedMaterial(group);

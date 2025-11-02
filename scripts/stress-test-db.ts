@@ -71,6 +71,7 @@ class DatabaseStressTester {
         latencies.push(performance.now() - start);
       } catch (error) {
         errorCount++;
+        void error;
         // Expected: some will fail due to constraints
       }
     });
@@ -135,6 +136,7 @@ class DatabaseStressTester {
         latencies.push(performance.now() - start);
       } catch (error) {
         errorCount++;
+        void error;
       }
     });
 
@@ -201,6 +203,7 @@ class DatabaseStressTester {
         latencies.push(performance.now() - start);
       } catch (error) {
         errorCount++;
+        void error;
       }
     });
 
@@ -261,6 +264,7 @@ class DatabaseStressTester {
         latencies.push(performance.now() - start);
       } catch (error) {
         errorCount++;
+        void error;
       }
     });
 
@@ -318,6 +322,7 @@ class DatabaseStressTester {
         latencies.push(performance.now() - start);
       } catch (error) {
         errorCount++;
+        void error;
       }
     });
 

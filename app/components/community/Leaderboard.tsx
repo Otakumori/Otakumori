@@ -18,22 +18,49 @@ interface LeaderboardProps {
   className?: string;
 }
 
+function renderRankBadge(rank: number) {
+  if (rank > 3) {
+    return <span aria-label={`Rank ${rank}`}>{rank}</span>;
+  }
+
+  const rankLabels: Record<number, string> = {
+    1: 'first place',
+    2: 'second place',
+    3: 'third place',
+  };
+
+  const rankText: Record<number, string> = {
+    1: '1st',
+    2: '2nd',
+    3: '3rd',
+  };
+
+  return (
+    <span aria-label={`${rankLabels[rank]} badge`} className="font-semibold">
+      {rankText[rank]}
+    </span>
+  );
+}
+
 export default function Leaderboard({ gameId, maxEntries = 10, className = '' }: LeaderboardProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Subscribe to leaderboard updates via WebSocket
-    const handleLeaderboardUpdate = (message: any) => {
-      if (message.type === 'leaderboard' && Array.isArray(message.data)) {
-        setEntries(message.data.slice(0, maxEntries));
+    const handleLeaderboardUpdate = (message: unknown) => {
+      if (
+        typeof message === 'object' &&
+        message !== null &&
+        (message as { type?: string }).type === 'leaderboard' &&
+        Array.isArray((message as { data?: unknown }).data)
+      ) {
+        const mappedEntries = (message as { data: LeaderboardEntry[] }).data.slice(0, maxEntries);
+        setEntries(mappedEntries);
         setLoading(false);
       }
     };
 
     communityWS.on('leaderboard', handleLeaderboardUpdate);
-
-    // Initial load
     setLoading(false);
 
     return () => {
@@ -43,11 +70,11 @@ export default function Leaderboard({ gameId, maxEntries = 10, className = '' }:
 
   if (loading) {
     return (
-      <div className={`bg-black/30 backdrop-blur-sm rounded-xl p-6 ${className}`}>
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-white/10 rounded w-1/3" />
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-12 bg-white/5 rounded" />
+      <div className={`rounded-xl bg-black/30 p-6 backdrop-blur-sm ${className}`}>
+        <div className="space-y-4 animate-pulse">
+          <div className="h-6 w-1/3 rounded bg-white/10" />
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="h-12 rounded bg-white/5" />
           ))}
         </div>
       </div>
@@ -55,14 +82,16 @@ export default function Leaderboard({ gameId, maxEntries = 10, className = '' }:
   }
 
   return (
-    <div className={`bg-black/30 backdrop-blur-sm rounded-xl p-6 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-white flex items-center gap-2">
-          <span className="text-2xl">🏆</span>
+    <div className={`rounded-xl bg-black/30 p-6 backdrop-blur-sm ${className}`}>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-xl font-bold text-white">
+          <span className="text-2xl" role="img" aria-label="trophy">
+            🏆
+          </span>
           Top Players
         </h3>
         {gameId && (
-          <span className="text-xs text-white/60 px-2 py-1 bg-white/10 rounded">{gameId}</span>
+          <span className="rounded bg-white/10 px-2 py-1 text-xs text-white/60">{gameId}</span>
         )}
       </div>
 
@@ -72,7 +101,7 @@ export default function Leaderboard({ gameId, maxEntries = 10, className = '' }:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center py-8 text-white/60"
+            className="py-8 text-center text-white/60"
           >
             <p>No players yet. Be the first!</p>
           </motion.div>
@@ -80,20 +109,19 @@ export default function Leaderboard({ gameId, maxEntries = 10, className = '' }:
           <div className="space-y-2">
             {entries.map((entry, index) => (
               <motion.div
-                key={entry.username}
+                key={`${entry.username}-${entry.rank}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ delay: index * 0.05 }}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 rounded-lg p-3 transition-colors ${
                   entry.isCurrentUser
-                    ? 'bg-pink-500/20 border border-pink-500/40'
+                    ? 'border border-pink-500/40 bg-pink-500/20'
                     : 'bg-white/5 hover:bg-white/10'
                 }`}
               >
-                {/* Rank */}
                 <div
-                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full font-bold ${
                     entry.rank === 1
                       ? 'bg-yellow-500/30 text-yellow-300'
                       : entry.rank === 2
@@ -103,25 +131,24 @@ export default function Leaderboard({ gameId, maxEntries = 10, className = '' }:
                           : 'bg-white/10 text-white/60'
                   }`}
                 >
-                  {entry.rank <= 3 ? ['🥇', '🥈', '🥉'][entry.rank - 1] : entry.rank}
+                  {renderRankBadge(entry.rank)}
                 </div>
 
-                {/* Avatar */}
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white font-bold">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-500 text-white font-bold">
                   {entry.avatar || entry.username.charAt(0).toUpperCase()}
                 </div>
 
-                {/* Username */}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <p
-                    className={`font-medium truncate ${entry.isCurrentUser ? 'text-pink-300' : 'text-white'}`}
+                    className={`truncate font-medium ${
+                      entry.isCurrentUser ? 'text-pink-300' : 'text-white'
+                    }`}
                   >
                     {entry.username}
                     {entry.isCurrentUser && <span className="ml-2 text-xs">(You)</span>}
                   </p>
                 </div>
 
-                {/* Score */}
                 <div className="flex-shrink-0 text-right">
                   <p className="text-lg font-bold text-white">{entry.score.toLocaleString()}</p>
                   <p className="text-xs text-white/60">points</p>

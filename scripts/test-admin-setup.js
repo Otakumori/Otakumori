@@ -106,4 +106,21 @@ console.log('3. Set your Clerk user role to "admin"');
 console.log('4. Test the admin dashboard at /admin');
 console.log('5. Test email sending with a Stripe webhook');
 
+// Check CLI tooling availability
+console.log('\n6. Checking CLI tooling...');
+const cliTools = [
+  { name: 'stripe', command: 'stripe --version' },
+  { name: 'supabase', command: 'supabase --version' },
+];
+
+cliTools.forEach(({ name, command }) => {
+  try {
+    const output = execSync(command, { stdio: 'pipe' }).toString().trim();
+    const version = output.split('\n').shift();
+    console.log(` ${name} CLI detected (${version})`);
+  } catch {
+    console.log(` ${name} CLI not found`);
+  }
+});
+
 console.log('\n See ADMIN_SETUP.md for detailed instructions');

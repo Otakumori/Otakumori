@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import AdvancedPetalSystem from '@/app/components/effects/AdvancedPetalSystem';
 import { useAdvancedPetals, SEASONAL_WINDS, PETAL_PRESETS } from '@/app/hooks/useAdvancedPetals';
 import { type PhysicsPetal } from '@/lib/physics/petal-physics';
@@ -9,6 +9,8 @@ export default function PetalPhysicsDemo() {
   const [preset, setPreset] = useState<keyof typeof PETAL_PRESETS>('normal');
   const [season, setSeason] = useState<keyof typeof SEASONAL_WINDS>('spring');
   const [showControls, setShowControls] = useState(true);
+  const presetSelectId = useId();
+  const seasonSelectId = useId();
 
   const { spawnPetal, setWind, clearPetals, createWindBurst, addCollisionBox, getPetals } =
     useAdvancedPetals(PETAL_PRESETS[preset]);
@@ -62,10 +64,17 @@ export default function PetalPhysicsDemo() {
       {showControls && (
         <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-lg text-white p-6 rounded-xl max-w-sm z-50">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold">🌸 Physics Demo</h3>
+            <h3 className="text-lg font-bold">
+              <span role="img" aria-label="Cherry blossom" className="mr-2 inline-block">
+                🌸
+              </span>
+              Physics Demo
+            </h3>
             <button
               onClick={() => setShowControls(false)}
               className="text-white/60 hover:text-white"
+              type="button"
+              aria-label="Hide petal controls"
             >
               ×
             </button>
@@ -73,10 +82,13 @@ export default function PetalPhysicsDemo() {
 
           {/* Preset Controls */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Intensity Preset:</label>
+            <label className="block text-sm font-medium mb-2" htmlFor={presetSelectId}>
+              Intensity Preset:
+            </label>
             <select
+              id={presetSelectId}
               value={preset}
-              onChange={(e) => handlePresetChange(e.target.value as keyof typeof PETAL_PRESETS)}
+              onChange={(event) => handlePresetChange(event.target.value as keyof typeof PETAL_PRESETS)}
               className="w-full p-2 bg-white/10 border border-white/20 rounded text-white"
             >
               {Object.keys(PETAL_PRESETS).map((key) => (
@@ -89,10 +101,13 @@ export default function PetalPhysicsDemo() {
 
           {/* Season Controls */}
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Seasonal Wind:</label>
+            <label className="block text-sm font-medium mb-2" htmlFor={seasonSelectId}>
+              Seasonal Wind:
+            </label>
             <select
+              id={seasonSelectId}
               value={season}
-              onChange={(e) => handleSeasonChange(e.target.value as keyof typeof SEASONAL_WINDS)}
+              onChange={(event) => handleSeasonChange(event.target.value as keyof typeof SEASONAL_WINDS)}
               className="w-full p-2 bg-white/10 border border-white/20 rounded text-white"
             >
               {Object.keys(SEASONAL_WINDS).map((key) => (
@@ -108,22 +123,34 @@ export default function PetalPhysicsDemo() {
             <button
               onClick={spawnBurst}
               className="w-full p-2 bg-pink-600 hover:bg-pink-700 rounded text-white font-medium transition-colors"
+              type="button"
             >
-              🌸 Spawn Burst
+              <span role="img" aria-label="Cherry blossom" className="mr-2 inline-block">
+                🌸
+              </span>
+              Spawn Burst
             </button>
 
             <button
               onClick={addObstacle}
               className="w-full p-2 bg-purple-600 hover:bg-purple-700 rounded text-white font-medium transition-colors"
+              type="button"
             >
-              📦 Add Obstacle
+              <span role="img" aria-label="Box" className="mr-2 inline-block">
+                📦
+              </span>
+              Add Obstacle
             </button>
 
             <button
               onClick={clearPetals}
               className="w-full p-2 bg-red-600 hover:bg-red-700 rounded text-white font-medium transition-colors"
+              type="button"
             >
-              🧹 Clear All
+              <span role="img" aria-label="Broom" className="mr-2 inline-block">
+                🧹
+              </span>
+              Clear All
             </button>
           </div>
 
@@ -133,13 +160,25 @@ export default function PetalPhysicsDemo() {
             <div>Preset: {preset}</div>
             <div>Season: {season}</div>
             <div className="mt-2 text-white/40">
-              💡 Move mouse to create wind
+              <span role="img" aria-label="Light bulb" className="mr-2 inline-block">
+                💡
+              </span>
+              Move mouse to create wind
               <br />
-              🖱️ Click petals for wind burst
+              <span role="img" aria-label="Computer mouse" className="mr-2 inline-block">
+                🖱️
+              </span>
+              Click petals for wind burst
               <br />
-              📜 Scroll for wind effects
+              <span role="img" aria-label="Scroll" className="mr-2 inline-block">
+                📜
+              </span>
+              Scroll for wind effects
               <br />
-              ⌨️ Ctrl+D for debug mode
+              <span role="img" aria-label="Keyboard" className="mr-2 inline-block">
+                ⌨️
+              </span>
+              Ctrl+D for debug mode
             </div>
           </div>
         </div>
@@ -150,8 +189,12 @@ export default function PetalPhysicsDemo() {
         <button
           onClick={() => setShowControls(true)}
           className="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white p-3 rounded-full z-50 transition-colors"
+          type="button"
+          aria-label="Show petal controls"
         >
-          ⚙️
+          <span role="img" aria-label="Settings gear">
+            ⚙️
+          </span>
         </button>
       )}
 
@@ -167,21 +210,36 @@ export default function PetalPhysicsDemo() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
             <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-              <h3 className="text-lg font-semibold mb-2 text-pink-300">🌪️ Wind Physics</h3>
+              <h3 className="text-lg font-semibold mb-2 text-pink-300">
+                <span role="img" aria-label="Tornado" className="mr-2 inline-block">
+                  🌪️
+                </span>
+                Wind Physics
+              </h3>
               <p className="text-sm text-white/70">
                 Perlin noise-based wind patterns with turbulence, gusts, and mouse interaction
               </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-              <h3 className="text-lg font-semibold mb-2 text-purple-300">💥 Collisions</h3>
+              <h3 className="text-lg font-semibold mb-2 text-purple-300">
+                <span role="img" aria-label="Collision" className="mr-2 inline-block">
+                  💥
+                </span>
+                Collisions
+              </h3>
               <p className="text-sm text-white/70">
                 Realistic particle-to-particle interactions and boundary collisions with bounce
               </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
-              <h3 className="text-lg font-semibold mb-2 text-blue-300">✨ Visual Effects</h3>
+              <h3 className="text-lg font-semibold mb-2 text-blue-300">
+                <span role="img" aria-label="Sparkles" className="mr-2 inline-block">
+                  ✨
+                </span>
+                Visual Effects
+              </h3>
               <p className="text-sm text-white/70">
                 Particle trails, collision highlighting, and seasonal color variations
               </p>

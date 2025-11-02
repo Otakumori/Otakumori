@@ -146,8 +146,7 @@ export const useAudioStore = create<AudioStore>()(
       },
 
       playSound: (soundId, options = {}) => {
-        const { sounds, loadedBuffers, audioContext, masterGainNode, settings, playingSounds } =
-          get();
+        const { sounds, loadedBuffers, audioContext, masterGainNode, settings } = get();
         const sound = sounds[soundId];
 
         if (!sound || !audioContext || !masterGainNode) {

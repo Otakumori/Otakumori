@@ -281,7 +281,7 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
           >
             <div className="bg-gradient-to-br from-green-600 to-blue-600 text-white px-8 py-6 rounded-2xl shadow-2xl border-4 border-green-400">
               <p className="text-4xl font-bold mb-2 font-mono">CLEAN!</p>
-              <p className="text-xl">🎮 READY TO PLAY 🎮</p>
+              <p className="text-xl">Ready to play!</p>
               <motion.div
                 className="mt-4 text-sm opacity-70"
                 animate={{ opacity: [0.5, 1, 0.5] }}
@@ -300,12 +300,12 @@ export default function BlowTheCartridge({ onComplete, _onFail, _duration }: Gam
           {!showCartridge
             ? 'LOADING CARTRIDGE...'
             : cleanliness < 100
-              ? '💨 BLOW ON THE PINS! 💨'
+              ? 'Blow on the pins!'
               : 'CARTRIDGE READY'}
         </p>
         {cleanliness < 100 && showCartridge && (
           <p className="text-gray-400 text-xs mt-1 drop-shadow-[0_0_4px_rgba(0,0,0,0.8)]">
-            Press SPACE or CLICK to blow • {5 - Math.floor(cleanliness / 20)} blows remaining
+            Press SPACE or CLICK to blow - {5 - Math.floor(cleanliness / 20)} blows remaining
           </p>
         )}
       </div>

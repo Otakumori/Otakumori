@@ -26,7 +26,7 @@ function findFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
 }
 
 // Function to add comprehensive ESLint disable comments
-function addESLintDisables(content, filePath) {
+function addESLintDisables(content) {
   let modified = false;
 
   // Add file-level disable comments for common warnings
@@ -63,7 +63,7 @@ function main() {
           continue;
         }
 
-        const result = addESLintDisables(content, file);
+        const result = addESLintDisables(content);
 
         if (result.modified) {
           fs.writeFileSync(file, result.content, 'utf8');

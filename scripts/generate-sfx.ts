@@ -69,11 +69,6 @@ const PUBLIC_DIR = path.join(ROOT, 'public');
 const OUTDIR = path.join(PUBLIC_DIR, 'assets/sfx');
 const CONFIG_PATH = path.join(ROOT, 'app/lib/assets/assets.config.json');
 
-function argvValue(key: string, fallback?: string) {
-  const i = process.argv.indexOf(`--${key}`);
-  return i >= 0 ? process.argv[i + 1] : fallback;
-}
-
 async function main() {
   // Parse arguments: npm run gen:sfx -- --avatar yumi --vibe spicy-female --count 3
   // The -- separates npm args from script args, so we need to look after the --
@@ -114,13 +109,13 @@ async function main() {
   const presets = vibePresets(vibe);
   const itemsToAppend: any[] = [];
 
+  await fsp.mkdir(OUTDIR, { recursive: true });
+
   for (let i = 0; i < count; i++) {
     const presetString = presets[i % presets.length];
-    let samples: Float32Array;
-
-    // Use sine wave generation as fallback
-    // `   Generated SFX ${i + 1} with sine wave fallback`
-    samples = generateSineWave(400 + i * 100, 0.1 + i * 0.05);
+    const baseFrequency = 320 + (presetString.length % 7) * 45 + i * 35;
+    const duration = 0.12 + (i % 3) * 0.04;
+    const samples = generateSineWave(baseFrequency, duration);
 
     const id = `${vibe}-${avatar}-sfx${i + 1}`;
     const relFile = `assets/sfx/${id}.wav`;
@@ -135,6 +130,7 @@ async function main() {
       file: relFile, // <-- local file; assets:sync will pick it up
       license: 'GENERATED',
       dest: 'sfx/',
+      preset: presetString,
     });
   }
 

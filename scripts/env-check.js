@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const scriptLabel = path.relative(process.cwd(), __filename);
 
 const argv = process.argv.slice(2);
 let envFile = '.env.local';
@@ -19,7 +19,7 @@ for (let i = 0; i < argv.length; i++) {
 
 const envPath = path.resolve(process.cwd(), envFile);
 if (!fs.existsSync(envPath)) {
-  console.warn(`[env:check] Warning: ${envFile} not found at ${envPath}`);
+  console.warn(`[env:check] (${scriptLabel}) Warning: ${envFile} not found at ${envPath}`);
 } else {
   const content = fs.readFileSync(envPath, 'utf-8');
   const parsed = dotenv.parse(content);
@@ -55,3 +55,4 @@ if (missing.length > 0) {
   console.log('All required environment variables present (checked ' + envFile + ').');
   process.exit(0);
 }
+

@@ -45,6 +45,7 @@ export function createToonShader(_uniforms?: Partial<ToonShaderUniforms>): ToonS
       lightDirection: [0, 1, 0],
       baseColor: [1, 1, 1],
       steps: 3,
+      ...(_uniforms ?? {}),
     },
   };
 }
@@ -57,6 +58,7 @@ export function createRimLightShader(_uniforms?: Partial<RimLightShaderUniforms>
       rimColor: [1, 1, 1],
       rimPower: 2,
       rimIntensity: 1,
+      ...(_uniforms ?? {}),
     },
   };
 }
@@ -68,6 +70,7 @@ export function createOutlineShader(_uniforms?: Partial<OutlineShaderUniforms>):
     uniforms: {
       outlineColor: [0, 0, 0],
       outlineThickness: 0.01,
+      ...(_uniforms ?? {}),
     },
   };
 }

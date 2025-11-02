@@ -582,7 +582,7 @@ export class AnimationManager {
   }
 
   update() {
-    const deltaTime = this.clock.getDelta();
+    const _deltaTime = this.clock.getDelta();
 
     this.controllers.forEach((controller) => {
       controller.update();

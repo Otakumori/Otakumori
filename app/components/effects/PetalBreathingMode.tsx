@@ -60,10 +60,9 @@ interface PetalBreathingModeProps {
 export default function PetalBreathingMode({ onExit }: PetalBreathingModeProps) {
   const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
   const [mood, setMood] = useState<MoodPreset>('calm');
-  const [petals, setPetals] = useState<Petal[]>([]);
+  const [, setPetals] = useState<Petal[]>([]);
   const [showInstructions, setShowInstructions] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number | undefined>(undefined);
 
   const currentMood = MOOD_PRESETS[mood];
 

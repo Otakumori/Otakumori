@@ -119,7 +119,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       expect(ageCookie).toBeDefined();
     });
 
-    test.skip('should require confirmation again in new session', async ({ browser }) => {
+    test.skip('should require confirmation again in new session', async () => {
       // Note: Requires Clerk auth setup
       // const context = await browser.newContext();
       // const page = await context.newPage();
@@ -167,7 +167,7 @@ test.describe('Age Gate - Session-Only R18 Protection', () => {
       expect(ageCookie).toBeUndefined();
     });
 
-    test.skip('should continue to bypass in new session (persistent)', async ({ browser }) => {
+    test.skip('should continue to bypass in new session (persistent)', async () => {
       // Note: Requires Clerk auth setup
       // const context1 = await browser.newContext();
       // const page1 = await context1.newPage();

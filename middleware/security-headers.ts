@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   // Security headers
@@ -29,6 +29,10 @@ export function middleware(_request: NextRequest) {
   ].join('; ');
 
   response.headers.set('Content-Security-Policy', csp);
+
+  if (request.nextUrl.protocol === 'https:') {
+    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  }
 
   return response;
 }

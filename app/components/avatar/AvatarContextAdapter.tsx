@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Avatar Context Adapter
  * Dynamically modifies avatar appearance based on game environment
  */
@@ -167,13 +167,13 @@ export default function AvatarContextAdapter({
           {modifiers.effects.includes('sparkles') && (
             <div className="absolute inset-0">
               <div className="absolute animate-sparkle-1" style={{ top: '10%', left: '20%' }}>
-                ✨
+                <span role="img" aria-label="sparkle">✨</span>
               </div>
               <div className="absolute animate-sparkle-2" style={{ top: '60%', left: '70%' }}>
-                ✨
+                <span role="img" aria-label="sparkle">✨</span>
               </div>
               <div className="absolute animate-sparkle-3" style={{ top: '30%', left: '90%' }}>
-                ✨
+                <span role="img" aria-label="sparkle">✨</span>
               </div>
             </div>
           )}
@@ -181,13 +181,13 @@ export default function AvatarContextAdapter({
           {modifiers.effects.includes('petal-trail') && (
             <div className="absolute inset-0 opacity-50">
               <div className="absolute animate-petal-float" style={{ top: '10%', left: '30%' }}>
-                🌸
+                <span role="img" aria-label="floating petal">🌸</span>
               </div>
               <div
                 className="absolute animate-petal-float-delayed"
                 style={{ top: '50%', left: '60%' }}
               >
-                🌸
+                <span role="img" aria-label="floating petal">🌸</span>
               </div>
             </div>
           )}
@@ -254,3 +254,7 @@ export default function AvatarContextAdapter({
   animation-delay: 0.5s;
 }
 */
+
+
+
+

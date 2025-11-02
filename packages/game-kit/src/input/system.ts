@@ -199,11 +199,36 @@ function pollGamepad(system: InputSystem, state: ActionState): void {
 }
 
 /**
- * Poll touch input (stub for now - can be extended with virtual controls)
+ * Poll touch input and translate it into simple movement vectors.
+ * Consumers can provide normalized touch coordinates via `system.touchState`.
  */
-function pollTouch(_system: InputSystem, _state: ActionState): void {
-  // Touch input would be handled by virtual on-screen controls
-  // This is a placeholder for future implementation
+function pollTouch(system: InputSystem, state: ActionState): void {
+  if (system.touchState.size === 0) {
+    system.touchActive = false;
+    return;
+  }
+
+  let avgX = 0;
+  let avgY = 0;
+
+  system.touchState.forEach(({ x, y }) => {
+    avgX += x;
+    avgY += y;
+  });
+
+  avgX /= system.touchState.size;
+  avgY /= system.touchState.size;
+
+  // Expect touch coordinates to be normalized between 0 and 1.
+  const moveX = Math.max(-1, Math.min(1, (avgX - 0.5) * 2));
+  const moveY = Math.max(-1, Math.min(1, (0.5 - avgY) * 2));
+
+  state[GameAction.MoveX] = Math.abs(state[GameAction.MoveX]) > Math.abs(moveX)
+    ? state[GameAction.MoveX]
+    : moveX;
+  state[GameAction.MoveY] = Math.abs(state[GameAction.MoveY]) > Math.abs(moveY)
+    ? state[GameAction.MoveY]
+    : moveY;
 }
 
 /**

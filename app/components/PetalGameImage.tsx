@@ -14,7 +14,7 @@ export default function PetalGameImage() {
   const [userPetals, setUserPetals] = useState(0);
   const [globalPetals, setGlobalPetals] = useState(0);
   const [dailyCollectors, setDailyCollectors] = useState(0);
-  const [lastCollectDate, setLastCollectDate] = useState('');
+  const [lastCollectDate, setLastCollectDate] = useState<string | null>(null);
   const [particleTrigger, setParticleTrigger] = useState(0);
 
   // Calculate user limit based on auth status (guest vs authenticated)
@@ -27,13 +27,14 @@ export default function PetalGameImage() {
     const local = localStorage.getItem(USER_PETAL_KEY);
     const date = localStorage.getItem(USER_PETAL_DATE_KEY);
     if (local) setUserPetals(Number(local));
-    if (date) setLastCollectDate(date);
     const today = new Date().toISOString().slice(0, 10);
     if (date !== today) {
       localStorage.setItem(USER_PETAL_KEY, '0');
       localStorage.setItem(USER_PETAL_DATE_KEY, today);
       setUserPetals(0);
       setLastCollectDate(today);
+    } else if (date) {
+      setLastCollectDate(date);
     }
   }, []);
 
@@ -163,6 +164,11 @@ export default function PetalGameImage() {
         {dailyCollectors > 0 && (
           <div className="animate-pulse rounded-full bg-pink-600/70 px-3 py-0.5 text-sm text-white shadow-md">
             {dailyCollectors.toLocaleString()} travelers collected today
+          </div>
+        )}
+        {lastCollectDate && (
+          <div className="rounded-full bg-pink-500/70 px-3 py-0.5 text-xs text-white shadow-md">
+            Last collected: {lastCollectDate}
           </div>
         )}
       </div>

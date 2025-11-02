@@ -129,6 +129,48 @@ export function useDynamicLighting({
     }
   }, []);
 
+  useEffect(() => {
+    if (!engineRef.current) return;
+    if (!enableVolumetricEffects) {
+      engineRef.current.clearVolumetricEffects();
+    }
+  }, [enableVolumetricEffects, isInitialized]);
+
+  useEffect(() => {
+    if (!engineRef.current) return;
+    const clamped = Math.max(0, Math.min(1, ambientIntensity));
+    engineRef.current.setAmbientLight(clamped, clamped, clamped, clamped);
+  }, [ambientIntensity, isInitialized]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !engineRef.current) return;
+
+    if (!enableMouseInteraction) {
+      const rect = canvas.getBoundingClientRect();
+      engineRef.current.setMousePosition(rect.width / 2, rect.height / 2);
+      return;
+    }
+
+    const handleMove = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      setMousePosition(event.clientX - rect.left, event.clientY - rect.top);
+    };
+
+    const handleLeave = () => {
+      const rect = canvas.getBoundingClientRect();
+      setMousePosition(rect.width / 2, rect.height / 2);
+    };
+
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('mouseleave', handleLeave);
+
+    return () => {
+      canvas.removeEventListener('mousemove', handleMove);
+      canvas.removeEventListener('mouseleave', handleLeave);
+    };
+  }, [enableMouseInteraction, isInitialized, setMousePosition]);
+
   const clearLights = useCallback(() => {
     if (engineRef.current) {
       engineRef.current.clearLights();

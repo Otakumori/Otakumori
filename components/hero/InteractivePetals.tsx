@@ -17,13 +17,11 @@ interface Petal {
 }
 
 interface InteractivePetalsProps {
-  variant: 'hero' | 'spacer';
   maxPetals?: number;
   className?: string;
 }
 
 export default function InteractivePetals({
-  variant,
   maxPetals = 30,
   className = '',
 }: InteractivePetalsProps) {
@@ -34,7 +32,7 @@ export default function InteractivePetals({
   const [combo, setCombo] = useState(0);
   const [lastCollectTime, setLastCollectTime] = useState(0);
   const [showComboText, setShowComboText] = useState(false);
-  const [dailyLimit, setDailyLimit] = useState(100);
+  const dailyLimit = 100;
   const [reducedMotion, setReducedMotion] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const petalIdCounter = useRef(0);
@@ -276,3 +274,4 @@ export default function InteractivePetals({
     </div>
   );
 }
+

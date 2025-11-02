@@ -92,6 +92,10 @@ export default function GameShellV2({
     Array.from({ length: maxPlayers }, (_, i) => i + 1),
   );
 
+  useEffect(() => {
+    setPlayerSlots(Array.from({ length: maxPlayers }, (_, i) => i + 1));
+  }, [maxPlayers]);
+
   // V2 Systems
   const saveSystem = useGameSaveV2(gameKey);
   const telemetry = useGameTelemetry(gameKey);
@@ -296,6 +300,9 @@ export default function GameShellV2({
                   <div className="flex items-center space-x-4 text-white/80">
                     <span>Score: {gameState.currentScore.toLocaleString()}</span>
                     <span>Level: {gameState.currentLevel}</span>
+                    {enableAchievements && (
+                      <span>Achievements: {achievements.length}</span>
+                    )}
                   </div>
                 )}
               </div>
@@ -307,9 +314,7 @@ export default function GameShellV2({
                     className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
                     aria-label="Pause game"
                   >
-                    <span role="img" aria-label="Pause">
-                      ⏸
-                    </span>
+                    <span aria-hidden="true">Pause</span>
                   </button>
                 )}
 
@@ -318,7 +323,7 @@ export default function GameShellV2({
                   className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
                   aria-label="Back to games"
                 >
-                  ← Back
+                  Back
                 </button>
               </div>
             </div>
@@ -389,7 +394,7 @@ export default function GameShellV2({
                 </button>
 
                 <div className="mt-8 text-sm text-white/60">
-                  <p>Press SPACE to pause • ESC for menu • Ctrl+R to restart</p>
+                  <p>Press SPACE to pause - ESC for menu - Ctrl+R to restart</p>
                 </div>
               </div>
             </motion.div>
@@ -455,7 +460,9 @@ export default function GameShellV2({
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl">🏆</div>
+                  <div className="text-3xl font-semibold text-white/80" aria-hidden="true">
+                    ACH
+                  </div>
                   <div>
                     <h4 className="font-bold text-white">Achievement Unlocked!</h4>
                     <p className="text-white font-medium">{latestAchievement.title}</p>
@@ -484,7 +491,7 @@ export default function GameShellV2({
                   }`}
                 >
                   <div className="text-xs font-medium">Player {slot}</div>
-                  <div className="text-lg font-bold">{slot === 1 ? '👤' : '💤'}</div>
+                  <div className="text-lg font-bold">{`P${slot}`}</div>
                 </div>
               ))}
             </div>
@@ -494,3 +501,5 @@ export default function GameShellV2({
     </div>
   );
 }
+
+

@@ -33,8 +33,6 @@ export default function NekoLapDance({ onComplete, _onFail, _duration }: GamePro
 
   // Character animation states
   const [eyeExpression, setEyeExpression] = useState<'normal' | 'happy' | 'blush'>('normal');
-  const [earWiggle, setEarWiggle] = useState(0);
-  const [tailSway, setTailSway] = useState(0);
 
   useEffect(() => {
     const showTimer = setTimeout(() => setShowNeko(true), 500);

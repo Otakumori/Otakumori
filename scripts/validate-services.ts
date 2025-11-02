@@ -16,7 +16,7 @@ interface ValidationResult {
 const results: ValidationResult[] = [];
 
 async function validateClerk() {
-  console.log('🔐 Testing Clerk Authentication...');
+  console.log('[Auth] Testing Clerk Authentication...');
   try {
     const response = await fetch(`https://api.clerk.com/v1/users?limit=1`, {
       headers: {
@@ -28,14 +28,14 @@ async function validateClerk() {
       results.push({
         service: 'Clerk',
         status: 'pass',
-        message: '✅ Clerk API key is valid',
+        message: 'Success Clerk API key is valid',
       });
     } else {
       const error = await response.text();
       results.push({
         service: 'Clerk',
         status: 'fail',
-        message: '❌ Clerk API key is invalid',
+        message: 'Failed Clerk API key is invalid',
         details: `HTTP ${response.status}: ${error.substring(0, 100)}`,
       });
     }
@@ -43,14 +43,14 @@ async function validateClerk() {
     results.push({
       service: 'Clerk',
       status: 'fail',
-      message: '❌ Failed to connect to Clerk',
+      message: 'Failed Failed to connect to Clerk',
       details: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
 async function validateStripe() {
-  console.log('💳 Testing Stripe...');
+  console.log('[Stripe] Testing Stripe...');
   try {
     const response = await fetch('https://api.stripe.com/v1/balance', {
       headers: {
@@ -59,39 +59,50 @@ async function validateStripe() {
     });
 
     if (response.ok) {
-      const data = await response.json();
+      const balance = (await response.json()) as {
+        available?: Array<{ amount: number; currency: string }>;
+        pending?: Array<{ amount: number; currency: string }>;
+      };
+      const primaryAvailable = balance.available?.[0];
       results.push({
         service: 'Stripe',
         status: 'pass',
-        message: '✅ Stripe API key is valid',
-        details: `Mode: ${env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'LIVE' : 'TEST'}`,
+        message: 'Stripe API key is valid',
+        details: [
+          `Mode: ${env.STRIPE_SECRET_KEY?.startsWith('sk_live') ? 'LIVE' : 'TEST'}`,
+          primaryAvailable
+            ? `Available balance: ${primaryAvailable.amount} ${primaryAvailable.currency}`
+            : undefined,
+        ]
+          .filter(Boolean)
+          .join(' | '),
       });
     } else {
-      const error = await response.text();
+      const errorText = await response.text();
       results.push({
         service: 'Stripe',
         status: 'fail',
-        message: '❌ Stripe API key is invalid',
-        details: `HTTP ${response.status}`,
+        message: 'Stripe API key is invalid',
+        details: `HTTP ${response.status}: ${errorText.substring(0, 120)}`,
       });
     }
   } catch (error) {
     results.push({
       service: 'Stripe',
       status: 'fail',
-      message: '❌ Failed to connect to Stripe',
+      message: 'Failed to connect to Stripe',
       details: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
 async function validatePrintify() {
-  console.log('🖨️  Testing Printify...');
+  console.log('[Printify] Testing Printify...');
   if (!env.PRINTIFY_API_KEY) {
     results.push({
       service: 'Printify',
       status: 'skip',
-      message: '⏭️  Printify API key not configured',
+      message: 'Printify API key not configured',
     });
     return;
   }
@@ -104,18 +115,18 @@ async function validatePrintify() {
     });
 
     if (response.ok) {
-      const shop = await response.json();
+      const shop = (await response.json()) as { title?: string; id?: string };
       results.push({
         service: 'Printify',
         status: 'pass',
-        message: '✅ Printify API key is valid',
-        details: `Shop: ${shop.title || 'Unknown'}`,
+        message: 'Printify API key is valid',
+        details: `Shop: ${shop.title || shop.id || 'Unknown'}`,
       });
     } else {
       results.push({
         service: 'Printify',
         status: 'fail',
-        message: '❌ Printify API key is invalid',
+        message: 'Printify API key is invalid',
         details: `HTTP ${response.status}`,
       });
     }
@@ -123,14 +134,14 @@ async function validatePrintify() {
     results.push({
       service: 'Printify',
       status: 'fail',
-      message: '❌ Failed to connect to Printify',
+      message: 'Failed to connect to Printify',
       details: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
 async function validateDatabase() {
-  console.log('🗄️  Testing Database Connection...');
+  console.log('[Database] Testing Database Connection...');
   try {
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
@@ -141,7 +152,7 @@ async function validateDatabase() {
     results.push({
       service: 'Database (Neon)',
       status: 'pass',
-      message: '✅ Database connection successful',
+      message: 'Database connection successful',
       details: `${userCount} users in database`,
     });
 
@@ -150,19 +161,19 @@ async function validateDatabase() {
     results.push({
       service: 'Database (Neon)',
       status: 'fail',
-      message: '❌ Database connection failed',
+      message: 'Database connection failed',
       details: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
 async function validateRedis() {
-  console.log('⚡ Testing Redis (Upstash)...');
+  console.log('[Redis] Testing Redis (Upstash)...');
   if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) {
     results.push({
       service: 'Redis (Upstash)',
       status: 'skip',
-      message: '⏭️  Redis not configured',
+      message: 'Redis not configured',
     });
     return;
   }
@@ -178,13 +189,13 @@ async function validateRedis() {
       results.push({
         service: 'Redis (Upstash)',
         status: 'pass',
-        message: '✅ Redis connection successful',
+        message: 'Redis connection successful',
       });
     } else {
       results.push({
         service: 'Redis (Upstash)',
         status: 'fail',
-        message: '❌ Redis connection failed',
+        message: 'Redis connection failed',
         details: `HTTP ${response.status}`,
       });
     }
@@ -192,19 +203,19 @@ async function validateRedis() {
     results.push({
       service: 'Redis (Upstash)',
       status: 'fail',
-      message: '❌ Failed to connect to Redis',
+      message: 'Failed to connect to Redis',
       details: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
 async function validateResend() {
-  console.log('📧 Testing Resend Email...');
+  console.log('[Resend] Testing Resend Email...');
   if (!env.RESEND_API_KEY) {
     results.push({
       service: 'Resend Email',
       status: 'skip',
-      message: '⏭️  Resend not configured',
+      message: 'Resend not configured',
     });
     return;
   }
@@ -221,13 +232,13 @@ async function validateResend() {
       results.push({
         service: 'Resend Email',
         status: 'pass',
-        message: '✅ Resend API key is valid',
+        message: 'Resend API key is valid',
       });
     } else {
       results.push({
         service: 'Resend Email',
         status: 'fail',
-        message: '❌ Resend API key is invalid',
+        message: 'Resend API key is invalid',
         details: `HTTP ${response.status}`,
       });
     }
@@ -235,14 +246,14 @@ async function validateResend() {
     results.push({
       service: 'Resend Email',
       status: 'fail',
-      message: '❌ Failed to connect to Resend',
+      message: 'Failed to connect to Resend',
       details: error instanceof Error ? error.message : String(error),
     });
   }
 }
 
 async function main() {
-  console.log('🚀 Validating Service Connections...\n');
+  console.log('[Services] Validating connections...\n');
 
   await validateDatabase();
   await validateClerk();
@@ -252,7 +263,7 @@ async function main() {
   await validateResend();
 
   console.log('\n' + '='.repeat(80));
-  console.log('📊 VALIDATION RESULTS');
+  console.log('[Results] Validation Results');
   console.log('='.repeat(80) + '\n');
 
   const passed = results.filter((r) => r.status === 'pass');
@@ -268,14 +279,14 @@ async function main() {
 
   console.log('\n' + '='.repeat(80));
   console.log(
-    `✅ Passed: ${passed.length} | ❌ Failed: ${failed.length} | ⏭️  Skipped: ${skipped.length}`,
+    `Passed: ${passed.length} | Failed: ${failed.length} | Skipped: ${skipped.length}`,
   );
   console.log('='.repeat(80) + '\n');
 
   if (failed.length > 0) {
-    console.log('⚠️  ISSUES FOUND:');
+    console.log('[Warning] Issues Found:');
     failed.forEach((result) => {
-      console.log(`\n❌ ${result.service}:`);
+      console.log(`\nFailed ${result.service}:`);
       console.log(`   Problem: ${result.message}`);
       if (result.details) {
         console.log(`   Details: ${result.details}`);
@@ -284,12 +295,12 @@ async function main() {
     });
     process.exit(1);
   } else {
-    console.log('🎉 All configured services are working correctly!');
+    console.log('All configured services are working correctly!');
     process.exit(0);
   }
 }
 
 main().catch((error) => {
-  console.error('💥 Validation script crashed:', error);
+  console.error('Validation script crashed:', error);
   process.exit(1);
 });

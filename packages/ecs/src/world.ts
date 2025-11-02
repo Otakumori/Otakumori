@@ -5,9 +5,10 @@
 
 export type EntityId = string;
 
-export interface ComponentType<_T> {
+export interface ComponentType<T> {
   readonly __brand: symbol;
   readonly name: string;
+  readonly __type?: (data: T) => T;
 }
 
 export interface World {

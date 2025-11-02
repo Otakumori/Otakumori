@@ -163,6 +163,7 @@ async function testPageA11y(browser: any, page: string): Promise<A11yResult> {
       summary,
     };
   } catch (error) {
+    console.error(`Accessibility preflight failed for ${BASE_URL}${page}:`, error);
     await pageInstance.close();
     return {
       url: `${BASE_URL}${page}`,
@@ -309,13 +310,13 @@ async function main() {
     const results = await runA11yPreflight();
     const report = await generateA11yReport(results);
 
-    // `\n Accessibility Summary:`
-    // `   Total pages: ${report.summary.totalPages}`
-    // `   Total violations: ${report.summary.totalViolations}`
-    // `   Critical: ${report.summary.criticalViolations}`
-    // `   Serious: ${report.summary.seriousViolations}`
-    // `   Moderate: ${report.summary.moderateViolations}`
-    // `   Minor: ${report.summary.minorViolations}`
+    console.log('\n Accessibility Summary:');
+    console.log(`   Total pages: ${report.summary.totalPages}`);
+    console.log(`   Total violations: ${report.summary.totalViolations}`);
+    console.log(`   Critical: ${report.summary.criticalViolations}`);
+    console.log(`   Serious: ${report.summary.seriousViolations}`);
+    console.log(`   Moderate: ${report.summary.moderateViolations}`);
+    console.log(`   Minor: ${report.summary.minorViolations}`);
 
     // Check if any critical or serious violations exist
     const criticalOrSerious = results.filter(
@@ -323,15 +324,16 @@ async function main() {
     );
 
     if (criticalOrSerious.length > 0) {
-      // '\n Critical or serious accessibility violations detected:'
+      console.error('\n Critical or serious accessibility violations detected:');
       criticalOrSerious.forEach((result) => {
-        // `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`
+        console.error(
+          `   ${result.url}: ${result.summary.critical} critical, ${result.summary.serious} serious`,
+        );
       });
       process.exit(1);
     }
 
-    // '\n All accessibility checks passed!'
-    // ` Reports saved to: ${ARTIFACTS_DIR}`
+    console.log(`Reports saved to: ${ARTIFACTS_DIR}`);
   } catch (error) {
     console.error(' Accessibility preflight failed:', error);
     process.exit(1);

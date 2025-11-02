@@ -16,6 +16,7 @@ export default [
       'out/',
       'coverage/',
       'dist/',
+      '**/dist/**',
       // assets & third-party stuff
       'public/',
       'public/**',

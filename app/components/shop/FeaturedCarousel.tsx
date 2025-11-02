@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -19,6 +19,7 @@ export function FeaturedCarousel({
 }: FeaturedCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((current) => (current + 1) % products.length);
@@ -40,6 +41,32 @@ export function FeaturedCarousel({
     return () => clearInterval(timer);
   }, [autoplay, interval, isHovering, nextSlide, products.length]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handlePointerEnter = () => setIsHovering(true);
+    const handlePointerLeave = () => setIsHovering(false);
+    const handleFocusIn = () => setIsHovering(true);
+    const handleFocusOut = (event: FocusEvent) => {
+      if (container && !container.contains(event.relatedTarget as Node)) {
+        setIsHovering(false);
+      }
+    };
+
+    container.addEventListener('pointerenter', handlePointerEnter);
+    container.addEventListener('pointerleave', handlePointerLeave);
+    container.addEventListener('focusin', handleFocusIn);
+    container.addEventListener('focusout', handleFocusOut);
+
+    return () => {
+      container.removeEventListener('pointerenter', handlePointerEnter);
+      container.removeEventListener('pointerleave', handlePointerLeave);
+      container.removeEventListener('focusin', handleFocusIn);
+      container.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+
   if (products.length === 0) {
     return null;
   }
@@ -57,11 +84,7 @@ export function FeaturedCarousel({
       : `From $${(minPrice / 100).toFixed(2)}`;
 
   return (
-    <div
-      className="relative w-full overflow-hidden rounded-2xl"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-    >
+    <div ref={containerRef} className="relative w-full overflow-hidden rounded-2xl">
       {/* Main Carousel Container */}
       <div className="relative aspect-[21/9] md:aspect-[21/7] bg-gradient-to-br from-purple-900/50 to-pink-900/50 backdrop-blur-lg border border-white/20">
         {/* Background Image with Overlay */}

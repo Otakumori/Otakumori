@@ -286,7 +286,8 @@ export function applySpeedLines(
         b = 0;
 
       for (let s = 0; s < samples; s++) {
-        const offset = (s * strength * 5) / samples;
+        const normalizedDistance = Math.min(distance / Math.max(width, height), 1);
+        const offset = (s * strength * 5 * (1 + normalizedDistance)) / samples;
         const sx = Math.round(x - Math.cos(angle) * offset);
         const sy = Math.round(y - Math.sin(angle) * offset);
 

@@ -5,9 +5,6 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 console.log(' Fixing warnings automatically...');
 
 // Function to recursively find all TypeScript/JavaScript files
@@ -30,7 +27,7 @@ function findFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
 }
 
 // Function to fix React Hooks warnings
-function fixHooksWarnings(content, filePath) {
+function fixHooksWarnings(content) {
   let modified = false;
 
   // Fix useEffect missing dependencies

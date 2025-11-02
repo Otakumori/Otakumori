@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const scriptName = path.basename(__filename);
 
 function fixQuotesInFile(filePath) {
   try {
@@ -55,6 +55,7 @@ function processDirectory(dir) {
   return fixedCount;
 }
 
-console.log('Starting quote fix process...');
+console.log(`Starting quote fix process via ${scriptName}...`);
 const totalFixed = processDirectory('.');
 console.log(`Fixed quotes in ${totalFixed} files.`);
+

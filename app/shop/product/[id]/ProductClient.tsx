@@ -90,6 +90,7 @@ export default function ProductClient({ productId }: { productId: string }) {
           err instanceof Error ? err.message : 'An error occurred while fetching the product',
         );
         console.error('Error fetching product:', err);
+        showError('Failed to fetch product details. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -280,3 +281,6 @@ export default function ProductClient({ productId }: { productId: string }) {
     </div>
   );
 }
+
+
+

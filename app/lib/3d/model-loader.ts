@@ -132,7 +132,7 @@ export class ModelLoader {
   }
 
   // Load GLTF file with options
-  private async loadGLTF(url: string, options: ModelLoadOptions): Promise<GLTF> {
+  private async loadGLTF(url: string, _options: ModelLoadOptions): Promise<GLTF> {
     return new Promise((resolve, reject) => {
       this.loader.load(
         url,

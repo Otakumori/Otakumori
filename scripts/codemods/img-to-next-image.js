@@ -4,7 +4,6 @@
  * - Injects `import Image from "next/image"` if missing.
  * - Skips nodes without explicit width+height; prints a summary you can fix manually.
  */
-const { parse, print, types: t } = require('recast');
 const jsc = require('jscodeshift');
 
 const skipped = [];

@@ -219,7 +219,16 @@ async function main() {
       }
 
       vibe = getVibeForAvatar(avatar);
-      if (!vibe) throw new Error(`Unknown vibe for avatar: ${avatar}`);
+      if (!vibe) {
+        const availableVibes = Array.isArray(avatarVibes)
+          ? avatarVibes.join(', ')
+          : Object.keys(avatarVibes ?? {}).join(', ');
+        throw new Error(
+          `Unknown vibe for avatar: ${avatar}${
+            availableVibes ? `. Available vibes: ${availableVibes}` : ''
+          }`,
+        );
+      }
 
       // ` Avatar "${avatar}" resolved to vibe: ${vibe}`
     } catch (error) {
@@ -324,6 +333,35 @@ async function main() {
     }
   };
 
+  const applyGenerationOverrides = (wf: any) => {
+    const nodes = Object.values(wf) as Array<Record<string, any>>;
+    for (const node of nodes) {
+      if (!node || typeof node !== 'object') continue;
+      const inputs = node.inputs as Record<string, unknown> | undefined;
+      if (!inputs) continue;
+
+      if ('seed' in inputs) {
+        inputs.seed = seed;
+      }
+      if ('width' in inputs) {
+        inputs.width = width;
+      }
+      if ('height' in inputs) {
+        inputs.height = height;
+      }
+      if ('steps' in inputs) {
+        inputs.steps = steps;
+      }
+      if ('cfg' in inputs || 'cfg_scale' in inputs) {
+        if ('cfg' in inputs) inputs.cfg = cfg;
+        if ('cfg_scale' in inputs) inputs.cfg_scale = cfg;
+      }
+      if ('sampler_name' in inputs) {
+        inputs.sampler_name = sampler;
+      }
+    }
+  };
+
   const results: { file: string; id: string; bytes: number; sha256: string; publicPath: string }[] =
     [];
 
@@ -336,6 +374,7 @@ async function main() {
     const positive = `${preset.positive}\nLabel: ${name}`;
     const negative = preset.negative || '';
     patchTexts(wf, positive, negative);
+    applyGenerationOverrides(wf);
 
     // Send full graph to ComfyUI
     const res = await fetch(`${endpoint}/prompt`, {

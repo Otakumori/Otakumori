@@ -115,46 +115,45 @@ class APIHealthChecker {
   }
 
   private printResults(): void {
-    // '\n API Health Check Results:\n'
-
     const passed = this.results.filter((r) => r.status === 'PASS').length;
     const failed = this.results.filter((r) => r.status === 'FAIL').length;
     const total = this.results.length;
+    const successRate = total === 0 ? 0 : (passed / total) * 100;
 
-    // ` PASSED: ${passed}/${total}`
-    // ` FAILED: ${failed}/${total}`
-    // ` SUCCESS RATE: ${((passed / total * 100).toFixed(1)}%\n`);
+    console.warn('\nAPI Health Check Results');
+    console.warn('==========================');
+    console.warn(`Passed: ${passed}/${total}`);
+    console.warn(`Failed: ${failed}/${total}`);
+    console.warn(`Success Rate: ${successRate.toFixed(1)}%`);
 
-    // Show failed tests
     const failedTests = this.results.filter((r) => r.status === 'FAIL');
     if (failedTests.length > 0) {
-      // ' FAILED TESTS:'
+      console.error('\nFailed Tests:');
       failedTests.forEach((test) => {
-        // `  • ${test.method} ${test.endpoint}`
-        // if (test.statusCode) `    Status: ${test.statusCode}`
-        // if (test.error) `    Error: ${test.error}`
-        // if (test.responseTime) `    Time: ${test.responseTime}ms`
+        console.error(`  • ${test.method} ${test.endpoint}`);
+        if (test.statusCode) console.error(`    Status: ${test.statusCode}`);
+        if (test.error) console.error(`    Error: ${test.error}`);
+        if (test.responseTime) console.error(`    Time: ${test.responseTime}ms`);
       });
     }
 
-    // Show passed tests
     const passedTests = this.results.filter((r) => r.status === 'PASS');
     if (passedTests.length > 0) {
-      // '\n PASSED TESTS:'
+      console.warn('\nPassed Tests:');
       passedTests.forEach((test) => {
-        // `  • ${test.method} ${test.endpoint} (${test.statusCode} - ${test.responseTime}ms`
+        console.warn(
+          `  • ${test.method} ${test.endpoint} (${test.statusCode} – ${test.responseTime}ms)`,
+        );
       });
     }
 
-    // Recommendations
     if (failed > 0) {
-      // '\n RECOMMENDATIONS:'
-      // '  • Fix failed endpoints before deployment'
-      // '  • Check database connections'
-      // '  • Verify environment variables'
-      // '  • Check Clerk authentication setup'
+      console.error('\nRecommendations:');
+      console.error('  • Fix failing endpoints before deployment.');
+      console.error('  • Verify database connections and credentials.');
+      console.error('  • Confirm environment variables (Clerk, Supabase, Stripe).');
     } else {
-      // '\n ALL TESTS PASSED! Ready for deployment.'
+      console.warn('\nAll tests passed. API looks healthy ✅');
     }
   }
 }

@@ -285,20 +285,26 @@ class SessionTracker {
     // Keep only the 100 most recent sessions
     if (allSessions.length > 100) {
       const toDelete = allSessions.slice(0, allSessions.length - 100);
-      let deletedCount = 0;
+      if (toDelete.length > 0) {
+        const tx = this.db.transaction('sessions', 'readwrite');
+        const store = tx.objectStore('sessions');
+        let deletedCount = 0;
 
-      for (const session of toDelete) {
-        try {
-          // Delete specific session by ID using clear method as workaround
-          await this.db.clear('sessions');
-          deletedCount = toDelete.length;
-          break; // Clear all and exit loop
-        } catch (error) {
-          console.error(`Failed to delete sessions:`, error);
+        for (const session of toDelete) {
+          try {
+            await store.delete(session.id);
+            deletedCount += 1;
+          } catch (error) {
+            console.error(`Failed to delete session ${session.id}:`, error);
+          }
+        }
+
+        await tx.done;
+
+        if (deletedCount > 0) {
+          console.warn(`Session cleanup: deleted ${deletedCount} old sessions`);
         }
       }
-
-      console.warn(`Session cleanup: deleted ${deletedCount} old sessions`);
     }
   }
 }

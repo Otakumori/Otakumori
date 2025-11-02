@@ -8,18 +8,12 @@ export const syncPrintifyProducts = inngest.createFunction(
   async ({ event, step }) => {
     return await step.run('sync-products', async () => {
       try {
-        // 'Starting scheduled Printify sync...'
-
         const products = await getPrintifyService().getAllProducts();
-
-        // `Sync completed: ${products.length} products fetched`
-
-        // Here you would save to your database
-        // await saveProductsToDatabase(products);
 
         return {
           success: true,
           productCount: products.length,
+          triggeredBy: { eventId: event.id, eventName: event.name },
           timestamp: new Date().toISOString(),
         };
       } catch (error) {
@@ -37,18 +31,12 @@ export const manualPrintifySync = inngest.createFunction(
   async ({ event, step }) => {
     return await step.run('manual-sync', async () => {
       try {
-        // 'Starting manual Printify sync...'
-
         const products = await getPrintifyService().getAllProducts();
-
-        // `Manual sync completed: ${products.length} products fetched`
-
-        // Here you would save to your database
-        // await saveProductsToDatabase(products);
 
         return {
           success: true,
           productCount: products.length,
+          triggeredBy: { eventId: event.id, eventName: event.name },
           timestamp: new Date().toISOString(),
         };
       } catch (error) {
@@ -67,17 +55,13 @@ export const syncOnProductChange = inngest.createFunction(
     return await step.run('sync-changed-product', async () => {
       try {
         const { productId } = event.data;
-
-        // `Syncing changed product: ${productId}`
-
         const product = await getPrintifyService().getProduct(productId);
-
-        // Here you would update the specific product in your database
-        // await updateProductInDatabase(product);
 
         return {
           success: true,
           productId,
+          productTitle: product?.title ?? null,
+          triggeredBy: { eventId: event.id, eventName: event.name },
           timestamp: new Date().toISOString(),
         };
       } catch (error) {

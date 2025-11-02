@@ -94,23 +94,19 @@ class PreBuildValidator {
     const success = this.errors.length === 0;
 
     if (this.warnings.length > 0) {
-      // '\n  Warnings:'
+      console.warn('\nWarnings:');
       this.warnings.forEach((warning) => {
-        // `  - ${warning}`
+        console.warn(`  • ${warning}`);
       });
     }
 
     if (this.errors.length > 0) {
-      // '\n Errors:'
+      console.error('\nErrors:');
       this.errors.forEach((error) => {
-        // `  - ${error}`
+        console.error(`  • ${error}`);
       });
-    }
-
-    if (success) {
-      // '\n All validations passed! Ready to build.'
-    } else {
-      // '\n Validation failed. Fix errors before building.'
+    } else if (this.warnings.length === 0) {
+      console.log('All validations passed! Ready to build.');
     }
 
     return { success, errors: this.errors, warnings: this.warnings };

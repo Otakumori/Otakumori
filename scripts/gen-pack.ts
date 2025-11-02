@@ -59,7 +59,7 @@ async function main() {
     // await access(workflow);
     // ` Workflow file found: ${workflow}`
   } catch (error) {
-    console.error(` Workflow file not found: ${workflow}`);
+    console.error(`Workflow file not found: ${workflow}`, error);
     console.error('Please check the path and ensure the file exists');
     process.exit(1);
   }
@@ -94,7 +94,7 @@ async function main() {
     // }
     // ' Using default vibe: neutral'
   } catch (error) {
-    console.warn(" Could not determine avatar vibe, using 'neutral'");
+    console.warn("Could not determine avatar vibe, using 'neutral'", error);
   }
 
   // ` Avatar vibe detected: ${vibe}`
@@ -119,8 +119,12 @@ async function main() {
       // `  → ${cmd}`
 
       const { stdout, stderr } = await execAsync(cmd, { cwd: process.cwd() });
-      // if (stdout) stdout
-      // if (stderr) stderr
+      if (stdout?.trim()) {
+        console.warn(`Command output (${className}):\n${stdout}`);
+      }
+      if (stderr?.trim()) {
+        console.error(`Command warnings (${className}):\n${stderr}`);
+      }
 
       // ` ${className} generated successfully\n`
     } catch (error: any) {
@@ -138,8 +142,12 @@ async function main() {
     // `  → ${cmd}`
 
     const { stdout, stderr } = await execAsync(cmd, { cwd: process.cwd() });
-    // if (stdout) stdout
-    // if (stderr) stderr
+    if (stdout?.trim()) {
+      console.warn(`Command output (sfx):\n${stdout}`);
+    }
+    if (stderr?.trim()) {
+      console.error(`Command warnings (sfx):\n${stderr}`);
+    }
 
     // ` SFX generated successfully\n`
   } catch (error: any) {

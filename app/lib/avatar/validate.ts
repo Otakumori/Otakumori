@@ -119,12 +119,12 @@ export async function assertRenderable(
   const clampedSpec = clampAllMorphs(spec);
 
   // If no equipment, return empty result
-  if (!spec.equipment || Object.keys(spec.equipment).length === 0) {
+  if (!clampedSpec.equipment || Object.keys(clampedSpec.equipment).length === 0) {
     return { resolved: {}, hadNSFWSwaps: false };
   }
 
   // Collect all equipment IDs
-  const equipmentEntries = Object.entries(spec.equipment).filter(
+  const equipmentEntries = Object.entries(clampedSpec.equipment).filter(
     ([_slot, id]) => id !== null && id !== undefined,
   ) as [EquipmentSlotType, string][];
 

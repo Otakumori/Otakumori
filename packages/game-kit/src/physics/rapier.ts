@@ -59,7 +59,10 @@ export async function createRapierWorld(
 /**
  * Step the physics simulation
  */
-export function stepPhysics(world: PhysicsWorld, _dt: number): void {
+export function stepPhysics(world: PhysicsWorld, dt: number): void {
+  if (dt > 0) {
+    world.rapierWorld.timestep = dt;
+  }
   world.rapierWorld.step();
 }
 

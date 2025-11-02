@@ -75,35 +75,35 @@ async function runSmokeTests() {
     const result = await testRoute(route);
     results.push(result);
 
-    const statusIcon = result.status >= 200 && result.status < 300 ? '' : '';
-    // `  ${statusIcon} ${result.status} (${result.responseTime}ms`);
+    const statusIcon = result.status >= 200 && result.status < 300 ? '✅' : '❌';
+    console.log(`  ${statusIcon} ${result.status} ${result.route} (${result.responseTime}ms)`);
 
     if (result.error) {
-      // `  Error: ${result.error}`
+      console.error(`    Error: ${result.error}`);
     }
 
     // Add delay between requests to be respectful
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  // '\n Test Results Summary:'
-  // '========================'
+  console.log('\n Test Results Summary:');
+  console.log('========================');
 
   const successful = results.filter((r) => r.status >= 200 && r.status < 300);
   const failed = results.filter((r) => r.status < 200 || r.status >= 300);
 
-  // ` Successful: ${successful.length}/${results.length}`
-  // ` Failed: ${failed.length}/${results.length}`
+  console.log(` Successful: ${successful.length}/${results.length}`);
+  console.log(` Failed: ${failed.length}/${results.length}`);
 
   if (failed.length > 0) {
-    // '\n Failed Routes:'
+    console.log('\n Failed Routes:');
     failed.forEach((result) => {
-      // `  ${result.route}: ${result.status} - ${result.error || 'HTTP Error'}`
+      console.log(`  ${result.route}: ${result.status} - ${result.error || 'HTTP Error'}`);
     });
   }
 
   const avgResponseTime = results.reduce((sum, r) => sum + r.responseTime, 0) / results.length;
-  // `\n⏱️  Average Response Time: ${avgResponseTime.toFixed(0}ms`);
+  console.log(`\n Average Response Time: ${avgResponseTime.toFixed(0)}ms`);
 
   // Check specific API responses
   const printifyResult = results.find((r) => r.route === '/api/v1/printify/products');

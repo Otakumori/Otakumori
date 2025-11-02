@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
@@ -31,7 +32,32 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
     };
   }, [isSlapped]);
 
-  const handleSlap = (e: React.MouseEvent) => {
+  const triggerSuccess = useCallback(() => {
+    setIsSlapped(true);
+    const newParticles = Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      x: oniPosition.x,
+      y: oniPosition.y,
+    }));
+    setParticles(newParticles);
+    onComplete(100, 20);
+  }, [oniPosition, onComplete]);
+
+  const handleKeyDown = useCallback(
+    (event: ReactKeyboardEvent<HTMLDivElement>) => {
+      if (!showTarget || isSlapped) {
+        return;
+      }
+
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        triggerSuccess();
+      }
+    },
+    [isSlapped, showTarget, triggerSuccess],
+  );
+
+  const handleSlap = (e: ReactMouseEvent) => {
     if (!showTarget || isSlapped) return;
 
     // Check if click was near the oni
@@ -46,15 +72,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
     );
 
     if (distance < 10) {
-      setIsSlapped(true);
-      // Create particle burst
-      const newParticles = Array.from({ length: 12 }, (_, i) => ({
-        id: i,
-        x: oniPosition.x,
-        y: oniPosition.y,
-      }));
-      setParticles(newParticles);
-      onComplete(100, 20);
+      triggerSuccess();
     } else {
       onFail();
     }
@@ -65,6 +83,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
       ref={gameRef}
       className="w-full h-full relative bg-gradient-to-br from-red-950 via-purple-950 to-black cursor-crosshair overflow-hidden"
       onClick={handleSlap}
+      onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
       aria-label="Click the oni demon when it appears"

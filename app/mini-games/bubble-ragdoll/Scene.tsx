@@ -53,6 +53,7 @@ export default function BubbleRagdoll() {
   // avatar integration
   const { data: avatarData } = useGameAvatar('bubble-ragdoll', 'default');
   const { enabled: avatarEnabled, avatar } = useAvatarForGame(true);
+  const avatarSpriteUrl = avatar?.spriteUrl ?? avatarData?.fallbackSpriteUrl ?? null;
 
   useEffect(() => {
     const host = hostRef.current!,
@@ -299,7 +300,7 @@ export default function BubbleRagdoll() {
       ctx.stroke();
 
       // sprite billboard on torso if available
-      if (avatarEnabled && avatar?.spriteUrl) {
+      if (avatarEnabled && avatarSpriteUrl) {
         const dx = ptBot.x - ptTop.x;
         const dy = ptBot.y - ptTop.y;
         const ang = Math.atan2(dy, dx) + Math.PI / 2;
@@ -310,7 +311,7 @@ export default function BubbleRagdoll() {
         ctx.translate(ptTop.x, ptTop.y);
         ctx.rotate(ang);
         const img = new Image();
-        img.src = avatar.spriteUrl!;
+        img.src = avatarSpriteUrl;
         ctx.globalAlpha = 0.95;
         ctx.drawImage(img, -w / 2, -h * 0.1, w, h);
         ctx.restore();
@@ -394,7 +395,7 @@ export default function BubbleRagdoll() {
       window.removeEventListener('resize', resize);
       c.removeEventListener('pointerdown', onPointerDown);
     };
-  }, [avatarEnabled, avatar?.spriteUrl, bgUrl, bubbleSprite, sPop, sBoing, sThud]);
+  }, [avatarEnabled, avatarSpriteUrl, bgUrl, bubbleSprite, sPop, sBoing, sThud]);
 
   return (
     <div ref={hostRef} className="absolute inset-0">

@@ -47,7 +47,7 @@ function ThighTrapVisual({ progress }: { progress: number }) {
         <div className="w-12 h-16 bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg relative shadow-lg">
           {/* Face (panicking) */}
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-xs">
-            {progress > 80 ? '😱' : progress > 50 ? '😰' : '😅'}
+            {progress > 80 ? 'D:' : progress > 50 ? ':O' : ':)'}
           </div>
         </div>
       </motion.div>
@@ -59,7 +59,7 @@ function ThighTrapVisual({ progress }: { progress: number }) {
           animate={{ opacity: [0.5, 1, 0.5], scale: [0.9, 1, 0.9] }}
           transition={{ duration: 0.5, repeat: Infinity }}
         >
-          ⚠️ DANGER! ⚠️
+          DANGER!
         </motion.div>
       )}
 
@@ -134,7 +134,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
       {/* Pressure indicator */}
       <div className="absolute top-4 left-4 right-4 max-w-md bg-black/70 backdrop-blur-lg rounded-lg p-3 border-2 border-red-500">
         <div className="flex justify-between text-white text-sm mb-2 font-bold">
-          <span>⚠️ TRAP PRESSURE</span>
+          <span>TRAP PRESSURE</span>
           <span className="text-red-300">{Math.floor(trapPressure)}%</span>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden border border-red-500">
@@ -148,7 +148,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
       {/* Escape progress */}
       <div className="absolute top-20 left-4 right-4 max-w-md bg-black/70 backdrop-blur-lg rounded-lg p-3 border-2 border-green-500">
         <div className="flex justify-between text-white text-sm mb-2 font-bold">
-          <span>🏃 ESCAPE PROGRESS</span>
+          <span>ESCAPE PROGRESS</span>
           <span className="text-green-300">{Math.floor(escapeProgress)}%</span>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden border border-green-500">
@@ -179,7 +179,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
           animate={{ scale: 1 }}
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-600 text-white px-8 py-6 rounded-2xl text-center border-4 border-green-400 z-20"
         >
-          <p className="text-5xl mb-2">💪</p>
+          <p className="text-5xl mb-2">SUCCESS!</p>
           <p className="text-3xl font-bold">ESCAPED!</p>
           <p className="text-sm mt-2">You broke free!</p>
         </motion.div>
@@ -192,7 +192,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
           animate={{ scale: 1 }}
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-8 py-6 rounded-2xl text-center border-4 border-red-400 z-20"
         >
-          <p className="text-5xl mb-2">💀</p>
+          <p className="text-5xl mb-2">FAILED!</p>
           <p className="text-3xl font-bold">TRAPPED!</p>
         </motion.div>
       )}
@@ -201,7 +201,7 @@ export default function ThighTrap({ onComplete, onFail, _duration }: GameProps) 
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center px-4">
         <p className="text-pink-200 text-base font-bold drop-shadow-[0_0_8px_rgba(0,0,0,0.8)]">
           {escapeProgress < 100 && trapPressure < 100
-            ? '⚠️ MASH TO ESCAPE THE THIGH TRAP! ⚠️'
+            ? 'Mash to escape the thigh trap!'
             : escapeProgress >= 100
               ? 'Freedom achieved!'
               : 'Trapped!'}

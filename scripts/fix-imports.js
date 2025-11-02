@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 // Files to fix
 const filesToFix = [
@@ -73,3 +72,4 @@ function fixImports(filePath) {
 filesToFix.forEach(fixImports);
 
 console.log('Import fixing complete!');
+

@@ -21,7 +21,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isAuthenticated = !!user;
 
-  const login = async (email: string, _password: string) => {
+  const login = async (email: string, password: string) => {
+    if (!password || password.length < 6) {
+      throw new Error('Password must be at least 6 characters long.');
+    }
+
     // Mock login
     setUser({
       id: '1',
@@ -48,6 +52,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (email: string, password: string, username: string) => {
+    if (!password || password.length < 8) {
+      throw new Error('Password must be at least 8 characters long.');
+    }
+
     // Mock register
     setUser({
       id: '1',
@@ -69,13 +77,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const verifyAge = async (_verification: AgeVerification) => {
-    // Mock age verification
+  const verifyAge = async (verification: AgeVerification) => {
+    setUser((prev) => {
+      if (!prev) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        ageVerified: verification.status === 'verified',
+        updatedAt: verification.verifiedAt ?? new Date().toISOString(),
+      };
+    });
   };
 
   useEffect(() => {
     setIsLoading(false);
-  }, [false]);
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -103,3 +121,4 @@ export const useAuth = () => {
 };
 
 export { AuthContext };
+

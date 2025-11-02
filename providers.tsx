@@ -114,9 +114,22 @@ const usePetalStore = create<
   },
   resetDailyLimit: () => set({ petals: 0 }),
   syncPetals: async (userId: string) => {
-    // TODO: Fetch petals from Supabase for logged-in user (disabled for deployment)
-    // syncPetals called for userId: ${userId}
-    // For now, do nothing - use localStorage only
+    if (typeof window === 'undefined' || !userId) {
+      return;
+    }
+
+    const storageKey = `otakumori:petals:${userId}`;
+    const stored = window.localStorage.getItem(storageKey);
+
+    if (stored) {
+      const parsed = Number.parseInt(stored, 10);
+      if (!Number.isNaN(parsed)) {
+        set({ petals: parsed });
+        return;
+      }
+    }
+
+    window.localStorage.setItem(storageKey, String(get().petals));
   },
 }));
 
@@ -141,7 +154,7 @@ export function PetalProvider({ children }: { children: React.ReactNode }) {
   const store = useRef(usePetalStore);
   // const user = useUserStore(state => state.user);
   const [localPetals, setLocalPetals] = useLocalStorage('totalPetals', 0);
-  const [localRewards, setLocalRewards] = useLocalStorage('petalRewards', PETAL_REWARDS);
+  const [, setLocalRewards] = useLocalStorage('petalRewards', PETAL_REWARDS);
 
   // Use localStorage only for now (no user/Supabase integration)
   useEffect(() => {

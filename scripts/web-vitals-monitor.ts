@@ -1,14 +1,17 @@
 #!/usr/bin/env tsx
 
 /**
- * Web Vitals Performance Monitor for Otaku-mori v0
- * Real-time monitoring of Core Web Vitals and custom GameCube performance metrics
+ * Web Vitals Performance Monitor for Otaku-mori
  *
- * Usage: npm run performance:monitor
+ * Generates:
+ *  - public/web-vitals-monitor.js (client-side collector)
+ *  - app/lib/web-vitals.ts (Next.js integration helper)
+ *
+ * Usage: pnpm tsx scripts/web-vitals-monitor.ts
  */
 
-import { promises as fs } from 'fs';
-import path from 'path';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
 
 interface WebVitalsMetric {
   name: 'LCP' | 'FID' | 'CLS' | 'FCP' | 'TTFB' | 'GameCube_FPS' | 'Animation_Smoothness';
@@ -20,540 +23,241 @@ interface WebVitalsMetric {
 }
 
 interface PerformanceBudgets {
-  LCP: { good: 2500; poor: 4000 }; // Largest Contentful Paint (ms)
-  FID: { good: 100; poor: 300 }; // First Input Delay (ms)
-  CLS: { good: 0.1; poor: 0.25 }; // Cumulative Layout Shift
-  FCP: { good: 1800; poor: 3000 }; // First Contentful Paint (ms)
-  TTFB: { good: 800; poor: 1800 }; // Time to First Byte (ms)
-  GameCube_FPS: { good: 58; poor: 45 }; // GameCube interface FPS
-  Animation_Smoothness: { good: 95; poor: 80 }; // Animation frame consistency %
+  [metric: string]: { good: number; poor: number };
 }
 
-class WebVitalsMonitor {
-  private budgets: PerformanceBudgets = {
-    LCP: { good: 2500, poor: 4000 },
-    FID: { good: 100, poor: 300 },
-    CLS: { good: 0.1, poor: 0.25 },
-    FCP: { good: 1800, poor: 3000 },
-    TTFB: { good: 800, poor: 1800 },
-    GameCube_FPS: { good: 58, poor: 45 },
-    Animation_Smoothness: { good: 95, poor: 80 },
-  };
-
-  async generateMonitoringScript(): Promise<void> {
-    // '⌕ Generating Web Vitals monitoring script...\n'
-
-    const monitoringScript = this.createClientMonitoringScript();
-    const hookScript = this.createNextJSHook();
-
-    // Ensure directories exist
-    try {
-      await fs.mkdir('public', { recursive: true });
-      await fs.mkdir(path.join('app', 'lib'), { recursive: true });
-    } catch (error) {
-      // 'Directories already exist'
-    }
-
-    // Write client-side monitoring script
-    const publicPath = path.join('public', 'web-vitals-monitor.js');
-    // `Writing client monitoring script to: ${publicPath}`
-    await fs.writeFile(publicPath, monitoringScript);
-
-    // Write Next.js integration hook
-    const libPath = path.join('app', 'lib', 'web-vitals.ts');
-    // `Writing Next.js integration to: ${libPath}`
-    await fs.writeFile(libPath, hookScript);
-
-    // ' Web Vitals monitoring files generated:'
-    // '    public/web-vitals-monitor.js - Client-side monitoring'
-    // '    app/lib/web-vitals.ts - Next.js integration'
-
-    // '\n Integration Steps:'
-    // '1. Add to app/layout.tsx:'
-    // '   import { reportWebVitals } from "@/lib/web-vitals"'
-    // '   useEffect(( => { reportWebVitals(); }, []);');
-    // '\n2. Include script in production build:'
-    // '   <script src="/web-vitals-monitor.js" defer />'
-
-    this.generatePerformanceDashboard();
-  }
-
-  private createClientMonitoringScript(): string {
-    return `
-/**
- * Otaku-mori Web Vitals Monitor
- * Real-time performance tracking with GameCube-specific metrics
- */
-
-(function() {
-  'use strict';
-
-  // Performance budgets aligned with v0 specifications
-  const BUDGETS = ${JSON.stringify(this.budgets, null, 2)};
-
-  // Metric collection
-  const metrics = [];
-  let gameCubeMetrics = {
-    frameCount: 0,
-    droppedFrames: 0,
-    lastFrameTime: performance.now(),
-    animationStartTime: null
-  };
-
-  // Utility functions
-  function getRating(name, value) {
-    const budget = BUDGETS[name];
-    if (!budget) return 'unknown';
-    
-    if (value <= budget.good) return 'good';
-    if (value <= budget.poor) return 'needs-improvement';
-    return 'poor';
-  }
-
-  function getDeviceType() {
-    const width = window.innerWidth;
-    if (width < 768) return 'mobile';
-    if (width < 1024) return 'tablet';
-    return 'desktop';
-  }
-
-  function recordMetric(name, value, customData = {}) {
-    const metric = {
-      name,
-      value: Math.round(value * 100) / 100,
-      rating: getRating(name, value),
-      timestamp: Date.now(),
-      url: window.location.pathname,
-      deviceType: getDeviceType(),
-      ...customData
-    };
-
-    metrics.push(metric);
-
-    // Console logging for development
-    if (metric.rating === 'poor') {
-      console.warn(' Poor performance detected:', metric);
-    } else if (metric.rating === 'good') {
-      // ' Good performance:', metric
-    }
-
-    // Send to analytics (replace with your analytics endpoint)
-    sendToAnalytics(metric);
-
-    return metric;
-  }
-
-  function sendToAnalytics(metric) {
-    // Send to your analytics service
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'web_vitals', {
-        event_category: 'performance',
-        event_label: metric.name,
-        value: Math.round(metric.value),
-        custom_parameter_rating: metric.rating,
-        custom_parameter_device: metric.deviceType
-      });
-    }
-
-    // You can also send to your own API endpoint
-    // fetch('/api/v1/analytics/web-vitals', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(metric)
-    // }).catch(console.error);
-  }
-
-  // Core Web Vitals measurement
-  function measureWebVitals() {
-    // LCP (Largest Contentful Paint)
-    new PerformanceObserver((entryList) => {
-      const entries = entryList.getEntries();
-      const lastEntry = entries[entries.length - 1];
-      recordMetric('LCP', lastEntry.startTime);
-    }).observe({ entryTypes: ['largest-contentful-paint'] });
-
-    // FID (First Input Delay) 
-    new PerformanceObserver((entryList) => {
-      for (const entry of entryList.getEntries()) {
-        recordMetric('FID', entry.processingStart - entry.startTime);
-      }
-    }).observe({ entryTypes: ['first-input'] });
-
-    // CLS (Cumulative Layout Shift)
-    let clsValue = 0;
-    new PerformanceObserver((entryList) => {
-      for (const entry of entryList.getEntries()) {
-        if (!entry.hadRecentInput) {
-          clsValue += entry.value;
-          recordMetric('CLS', clsValue);
-        }
-      }
-    }).observe({ entryTypes: ['layout-shift'] });
-
-    // FCP (First Contentful Paint)
-    new PerformanceObserver((entryList) => {
-      for (const entry of entryList.getEntries()) {
-        if (entry.name === 'first-contentful-paint') {
-          recordMetric('FCP', entry.startTime);
-        }
-      }
-    }).observe({ entryTypes: ['paint'] });
-
-    // TTFB (Time to First Byte)
-    const navigationEntry = performance.getEntriesByType('navigation')[0];
-    if (navigationEntry) {
-      recordMetric('TTFB', navigationEntry.responseStart);
-    }
-  }
-
-  // GameCube-specific performance monitoring
-  function initGameCubeMonitoring() {
-    let frameCount = 0;
-    let droppedFrames = 0;
-    let lastTime = performance.now();
-    let fpsHistory = [];
-
-    function checkFrame() {
-      const currentTime = performance.now();
-      const deltaTime = currentTime - lastTime;
-      
-      frameCount++;
-      
-      // Expected frame time for 60fps is ~16.67ms
-      if (deltaTime > 20) { // Allow small tolerance
-        droppedFrames++;
-      }
-
-      // Calculate FPS every second
-      if (currentTime - gameCubeMetrics.lastFrameTime >= 1000) {
-        const fps = frameCount;
-        fpsHistory.push(fps);
-        
-        // Keep last 10 seconds of FPS data
-        if (fpsHistory.length > 10) {
-          fpsHistory.shift();
-        }
-
-        const avgFps = fpsHistory.reduce((a, b) => a + b, 0) / fpsHistory.length;
-        const smoothness = Math.max(0, 100 - (droppedFrames / frameCount * 100));
-
-        recordMetric('GameCube_FPS', avgFps, {
-          droppedFrames,
-          totalFrames: frameCount,
-          smoothness
-        });
-
-        recordMetric('Animation_Smoothness', smoothness, {
-          avgFps,
-          droppedFrames
-        });
-
-        // Reset counters
-        frameCount = 0;
-        droppedFrames = 0;
-        gameCubeMetrics.lastFrameTime = currentTime;
-      }
-
-      lastTime = currentTime;
-      
-      // Continue monitoring if GameCube interface is active
-      if (document.querySelector('[data-gamecube-active]')) {
-        requestAnimationFrame(checkFrame);
-      }
-    }
-
-    // Start monitoring when GameCube interface becomes active
-    const observer = new MutationObserver(() => {
-      if (document.querySelector('[data-gamecube-active]')) {
-        gameCubeMetrics.animationStartTime = performance.now();
-        requestAnimationFrame(checkFrame);
-      }
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['data-gamecube-active']
-    });
-  }
-
-  // Performance budget alerts
-  function setupBudgetAlerts() {
-    // Alert on budget violations
-    window.addEventListener('beforeunload', () => {
-      const violations = metrics.filter(m => m.rating === 'poor');
-      if (violations.length > 0) {
-        console.warn('Performance budget violations detected:', violations);
-      }
-    });
-
-    // Periodic performance summary
-    setInterval(() => {
-      const recentMetrics = metrics.filter(m => Date.now() - m.timestamp < 30000);
-      const poorMetrics = recentMetrics.filter(m => m.rating === 'poor');
-      
-      if (poorMetrics.length > 0) {
-        console.warn(\` \${poorMetrics.length} performance issues in last 30s\`, poorMetrics);
-      }
-    }, 30000);
-  }
-
-  // Initialize monitoring
-  function init() {
-    if (typeof PerformanceObserver === 'undefined') {
-      console.warn('PerformanceObserver not supported');
-      return;
-    }
-
-    measureWebVitals();
-    initGameCubeMonitoring();
-    setupBudgetAlerts();
-
-    // '⌕ Web Vitals monitoring initialized'
-  }
-
-  // Start monitoring when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  // Export for debugging
-  window.otakumoriPerf = {
-    metrics: () => metrics,
-    budgets: BUDGETS,
-    record: recordMetric
-  };
-
-})();
-`;
-  }
-
-  private createNextJSHook(): string {
-    return `
-/**
- * Next.js Web Vitals Integration for Otaku-mori v0
- * Integrates with Next.js reportWebVitals API
- */
-
-import { Metric } from 'web-vitals';
-
-interface ExtendedMetric extends Metric {
-  label?: string;
-  attribution?: any;
-}
-
-const BUDGETS = {
+const PERFORMANCE_BUDGETS: PerformanceBudgets = {
   LCP: { good: 2500, poor: 4000 },
   FID: { good: 100, poor: 300 },
   CLS: { good: 0.1, poor: 0.25 },
   FCP: { good: 1800, poor: 3000 },
   TTFB: { good: 800, poor: 1800 },
-} as const;
+  GameCube_FPS: { good: 58, poor: 45 },
+  Animation_Smoothness: { good: 95, poor: 80 },
+};
 
-function getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
-  const budget = BUDGETS[name as keyof typeof BUDGETS];
-  if (!budget) return 'good';
-  
-  if (value <= budget.good) return 'good';
-  if (value <= budget.poor) return 'needs-improvement';
-  return 'poor';
-}
-
-export function reportWebVitals(metric: ExtendedMetric) {
-  const rating = getRating(metric.name, metric.value);
-  
-  // Log performance metrics
-  if (env.NODE_ENV === 'development') {
-    const emoji = rating === 'good' ? '' : rating === 'needs-improvement' ? '' : '';
-    // \`\${emoji} \${metric.name}: \${Math.round(metric.value}ms (\${rating})\`);
+class WebVitalsMonitor {
+  async run(): Promise<void> {
+    await this.ensureDirectories();
+    await this.writeMonitoringScript();
+    await this.writeNextIntegration();
+    await this.printDashboardSummary();
   }
 
-  // Send to analytics
-  if (typeof window !== 'undefined') {
-    // Google Analytics 4
-    if ('gtag' in window) {
-      (window as any).gtag('event', metric.name, {
-        event_category: 'Web Vitals',
-        event_label: metric.label,
-        value: Math.round(metric.value),
-        custom_parameter_rating: rating,
-        non_interaction: true,
-      });
+  private async ensureDirectories(): Promise<void> {
+    try {
+      await fs.mkdir('public', { recursive: true });
+      await fs.mkdir(path.join('app', 'lib'), { recursive: true });
+    } catch (error) {
+      console.warn('Directory creation skipped:', error);
     }
+  }
 
-    // Custom analytics endpoint
-    const data = {
-      name: metric.name,
-      value: metric.value,
-      rating,
-      label: metric.label,
+  private async writeMonitoringScript(): Promise<void> {
+    const monitoringScript = `(function () {
+  'use strict';
+
+  var budgets = ${JSON.stringify(PERFORMANCE_BUDGETS, null, 2)};
+  var sessionMetrics = [];
+
+  function getDeviceType() {
+    var width = window.innerWidth;
+    if (width < 768) return 'mobile';
+    if (width < 1024) return 'tablet';
+    return 'desktop';
+  }
+
+  function rateMetric(name, value) {
+    var budget = budgets[name];
+    if (!budget) return 'unknown';
+    if (value <= budget.good) return 'good';
+    if (value <= budget.poor) return 'needs-improvement';
+    return 'poor';
+  }
+
+  function pushMetric(metric) {
+    var enriched = Object.assign({}, metric, {
+      rating: rateMetric(metric.name, metric.value),
       timestamp: Date.now(),
-      url: window.location.pathname,
-      userAgent: navigator.userAgent,
-    };
-
-    // Uncomment to send to your analytics API
-    // fetch('/api/v1/analytics/web-vitals', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(data),
-    // }).catch(console.error);
-  }
-}
-
-// GameCube performance utilities
-export class GameCubePerformanceTracker {
-  private static instance: GameCubePerformanceTracker;
-  private frameCount = 0;
-  private startTime = 0;
-  private isTracking = false;
-
-  static getInstance(): GameCubePerformanceTracker {
-    if (!this.instance) {
-      this.instance = new GameCubePerformanceTracker();
-    }
-    return this.instance;
-  }
-
-  startTracking(): void {
-    if (this.isTracking) return;
-    
-    this.isTracking = true;
-    this.frameCount = 0;
-    this.startTime = performance.now();
-    
-    this.trackFrame();
-  }
-
-  stopTracking(): void {
-    this.isTracking = false;
-    
-    const duration = performance.now() - this.startTime;
-    const fps = (this.frameCount / duration) * 1000;
-    
-    // Report GameCube FPS as a custom metric
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      (window as any).gtag('event', 'GameCube_FPS', {
-        event_category: 'GameCube Performance',
-        value: Math.round(fps),
-        custom_parameter_rating: fps >= 58 ? 'good' : fps >= 45 ? 'needs-improvement' : 'poor',
-      });
-    }
-
-    // \` GameCube FPS: \${Math.round(fps} (\${fps >= 58 ? 'good' : 'poor'})\`);
-  }
-
-  private trackFrame(): void {
-    if (!this.isTracking) return;
-    
-    this.frameCount++;
-    requestAnimationFrame(() => this.trackFrame());
-  }
-}
-
-// Hook for GameCube components
-export function useGameCubePerformance() {
-  const tracker = GameCubePerformanceTracker.getInstance();
-  
-  return {
-    startTracking: () => tracker.startTracking(),
-    stopTracking: () => tracker.stopTracking(),
-  };
-}
-
-// Performance monitoring for critical user journeys
-export function trackUserJourney(journeyName: string, action: 'start' | 'complete') {
-  if (typeof window === 'undefined') return;
-  
-  const timestamp = performance.now();
-  
-  if (action === 'start') {
-    sessionStorage.setItem(\`journey_\${journeyName}\`, timestamp.toString());
-  } else {
-    const startTime = sessionStorage.getItem(\`journey_\${journeyName}\`);
-    if (startTime) {
-      const duration = timestamp - parseFloat(startTime);
-      
-      if ('gtag' in window) {
-        (window as any).gtag('event', 'user_journey', {
-          event_category: 'Performance',
-          event_label: journeyName,
-          value: Math.round(duration),
-        });
-      }
-      
-      sessionStorage.removeItem(\`journey_\${journeyName}\`);
-    }
-  }
-}
-`;
-  }
-
-  private generatePerformanceDashboard(): void {
-    // '\n Performance Monitoring Dashboard Setup:'
-    // '='.repeat(60);
-
-    // '\n Performance Budgets:'
-    Object.entries(this.budgets).forEach(([metric, budget]) => {
-      // `   ${metric}: Good ≤ ${budget.good}, Poor > ${budget.poor}`
+      deviceType: getDeviceType(),
     });
 
-    // '\n Development Monitoring:'
-    // '   • Console logs for poor performance'
-    // '   • Real-time FPS tracking for GameCube'
-    // '   • Automatic budget violation alerts'
+    sessionMetrics.push(enriched);
 
-    // '\n Production Analytics:'
-    // '   • Google Analytics 4 integration'
-    // '   • Custom API endpoint support'
-    // '   • User journey performance tracking'
+    try {
+      localStorage.setItem('web-vitals-metrics', JSON.stringify(sessionMetrics));
+    } catch (error) {
+      console.warn('Unable to persist web vitals metrics', error);
+    }
 
-    // '\n GameCube Specific Metrics:'
-    // '   • 60fps target monitoring'
-    // '   • Animation smoothness tracking'
-    // '   • Frame drop detection'
-    // '   • Component-level performance'
+    if (enriched.rating !== 'good') {
+      console.warn('[WebVitals]', enriched.name, enriched.value, enriched.rating, enriched.url);
+    }
+  }
 
-    // '\n Usage Examples:'
-    //
-    // In GameCube components:
-    // import { useGameCubePerformance } from '@/lib/web-vitals';
-    //
-    // const { startTracking, stopTracking } = useGameCubePerformance();
-    //
-    // useEffect(() => {
-    //   startTracking();
-    //   return () => stopTracking();
-    // }, []);
-    //
-    // For user journeys:
-    // import { trackUserJourney } from '@/lib/web-vitals';
-    // trackUserJourney('checkout', 'start');
-    // ... user completes checkout
-    // trackUserJourney('checkout', 'complete');
+  function loadWebVitals(callback) {
+    if (window.webVitals) {
+      callback(window.webVitals);
+      return;
+    }
 
-    // '\n='.repeat(60);
+    var script = document.createElement('script');
+    script.src = 'https://unpkg.com/web-vitals@3/dist/web-vitals.iife.js';
+    script.async = true;
+    script.onload = function () {
+      callback(window.webVitals);
+    };
+    document.head.appendChild(script);
+  }
+
+  loadWebVitals(function (webVitals) {
+    var handlers = [webVitals.onCLS, webVitals.onFID, webVitals.onLCP, webVitals.onFCP, webVitals.onTTFB];
+    handlers.forEach(function (handler) {
+      handler(pushMetric, { reportAllChanges: true });
+    });
+  });
+
+  // Optional GameCube FPS tracking
+  var frameTimes = [];
+  function trackFrames() {
+    var now = performance.now();
+    frameTimes.push(now);
+    frameTimes = frameTimes.filter(function (time) { return now - time <= 1000; });
+    requestAnimationFrame(trackFrames);
+  }
+
+  requestAnimationFrame(trackFrames);
+  setInterval(function () {
+    var fps = frameTimes.length;
+    pushMetric({
+      name: 'GameCube_FPS',
+      value: fps,
+      url: window.location.pathname,
+    });
+  }, 2000);
+})();`;
+
+    await fs.writeFile(path.join('public', 'web-vitals-monitor.js'), monitoringScript, 'utf-8');
+    console.warn('✔ Generated public/web-vitals-monitor.js');
+  }
+
+  private async writeNextIntegration(): Promise<void> {
+    const hookScript = `import type { NextWebVitalsMetric } from 'next/app';
+
+export function reportWebVitals(metric: NextWebVitalsMetric): void {
+  try {
+    const stored = JSON.parse(localStorage.getItem('web-vitals-metrics') ?? '[]');
+    stored.push({
+      name: metric.name,
+      value: metric.value,
+      delta: metric.delta,
+      id: metric.id,
+      rating: metric.rating,
+      url: metric.path,
+      timestamp: Date.now(),
+    });
+    localStorage.setItem('web-vitals-metrics', JSON.stringify(stored));
+  } catch (error) {
+    console.warn('Unable to store web vitals metric', error);
   }
 }
 
-async function main() {
-  const monitor = new WebVitalsMonitor();
-  await monitor.generateMonitoringScript();
+export function useGameCubePerformance(): {
+  startTracking: () => void;
+  stopTracking: () => void;
+} {
+  let frameId: number | null = null;
+  let lastTime = performance.now();
+  let frameCount = 0;
 
-  // '\n Web Vitals monitoring system ready!'
-  // ' Next steps:'
-  // '1. Integrate monitoring scripts into your app'
-  // '2. Run performance audit: npm run performance:audit'
-  // '3. Monitor GameCube interface performance'
-  // '4. Set up production analytics endpoints'
+  const tick = () => {
+    frameCount += 1;
+    const now = performance.now();
+    if (now - lastTime >= 1000) {
+      const fps = frameCount;
+      const metrics = JSON.parse(localStorage.getItem('web-vitals-metrics') ?? '[]');
+      metrics.push({
+        name: 'GameCube_FPS',
+        value: fps,
+        rating: fps >= ${PERFORMANCE_BUDGETS.GameCube_FPS.good} ? 'good' : fps >= ${PERFORMANCE_BUDGETS.GameCube_FPS.poor} ? 'needs-improvement' : 'poor',
+        timestamp: Date.now(),
+        url: window.location.pathname,
+        deviceType: window.innerWidth < 768 ? 'mobile' : 'desktop',
+      });
+      localStorage.setItem('web-vitals-metrics', JSON.stringify(metrics.slice(-200)));
+      frameCount = 0;
+      lastTime = now;
+    }
+    frameId = requestAnimationFrame(tick);
+  };
+
+  return {
+    startTracking() {
+      if (frameId == null) {
+        frameId = requestAnimationFrame(tick);
+      }
+    },
+    stopTracking() {
+      if (frameId != null) {
+        cancelAnimationFrame(frameId);
+        frameId = null;
+      }
+    },
+  };
+}
+`;
+
+    await fs.writeFile(path.join('app', 'lib', 'web-vitals.ts'), hookScript, 'utf-8');
+    console.warn('✔ Generated app/lib/web-vitals.ts');
+  }
+
+  private async printDashboardSummary(): Promise<void> {
+    console.warn('\nPerformance Budgets');
+    console.warn('===================');
+    Object.entries(PERFORMANCE_BUDGETS).forEach(([metric, budget]) => {
+      console.warn(`  ${metric}: good ≤ ${budget.good}, poor > ${budget.poor}`);
+    });
+
+    const metrics = await this.readStoredMetrics();
+    if (metrics.length === 0) {
+      console.warn('\nNo recorded metrics yet. Load the app with the monitoring script enabled to capture data.');
+      return;
+    }
+
+    const recent = metrics.slice(-5);
+    console.warn('\nRecent Metric Samples:');
+    recent.forEach((metric) => {
+      console.warn(
+        `  ${metric.name} ${metric.value} (${metric.rating}) on ${metric.deviceType} @ ${new Date(metric.timestamp).toISOString()}`,
+      );
+    });
+  }
+
+  private async readStoredMetrics(): Promise<WebVitalsMetric[]> {
+    try {
+      const raw = await fs.readFile(path.join('public', 'web-vitals-metrics.json'), 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed as WebVitalsMetric[];
+      }
+      return [parsed as WebVitalsMetric];
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException)?.code !== 'ENOENT') {
+        console.error('Failed to read existing metrics:', error);
+      }
+      return [];
+    }
+  }
 }
 
-// ES module entry point check
-// Run manually: node scripts/web-vitals-monitor.ts
+async function main(): Promise<void> {
+  const monitor = new WebVitalsMonitor();
+  await monitor.run();
+}
+
+void main().catch((error) => {
+  console.error('Failed to generate web vitals monitor assets:', error);
+  process.exit(1);
+});
 
 export { WebVitalsMonitor };

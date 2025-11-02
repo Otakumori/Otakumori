@@ -107,7 +107,7 @@ export class DynamicLightingEngine {
   private calculateShadows(): void {
     this.shadows = [];
 
-    for (const [lightId, light] of this.lightSources) {
+    for (const light of this.lightSources.values()) {
       if (!light.castsShadows) continue;
 
       for (const caster of this.shadowCasters) {
@@ -176,7 +176,7 @@ export class DynamicLightingEngine {
 
   // Render volumetric effects (fog, light rays)
   private renderVolumetricEffects(): void {
-    for (const [effectId, effect] of this.volumetricEffects) {
+    for (const effect of this.volumetricEffects.values()) {
       switch (effect.type) {
         case 'fog':
           this.renderFog(effect);
@@ -232,7 +232,7 @@ export class DynamicLightingEngine {
     const { color, density, animated } = effect;
 
     // Render light rays from each light source
-    for (const [lightId, light] of this.lightSources) {
+    for (const light of this.lightSources.values()) {
       if (light.type === 'directional' || light.type === 'spot') {
         const numRays = 12;
         const rayLength = light.range * 1.5;
@@ -297,7 +297,7 @@ export class DynamicLightingEngine {
 
   // Render individual light sources
   private renderLights(): void {
-    for (const [lightId, light] of this.lightSources) {
+    for (const light of this.lightSources.values()) {
       this.renderLight(light);
     }
   }

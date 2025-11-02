@@ -79,7 +79,7 @@ export default function AdvancedPetalSystem({
     updateCanvasSize();
 
     // Handle resize
-    const resizeObserver = new ResizeObserver((entries) => {
+    const resizeObserver = new ResizeObserver(() => {
       updateCanvasSize();
     });
     resizeObserver.observe(canvas);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -8,6 +8,7 @@ export function QuickSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSearch = useCallback(
     (e: React.FormEvent) => {
@@ -38,6 +39,14 @@ export function QuickSearch() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    inputRef.current?.focus();
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -59,7 +68,7 @@ export function QuickSearch() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for treasures..."
             className="w-full bg-transparent border-0 pl-16 pr-16 py-6 text-white placeholder-zinc-400 text-lg focus:outline-none"
-            autoFocus
+            ref={inputRef}
           />
           <button
             type="button"

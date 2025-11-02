@@ -80,6 +80,11 @@ export default function ConsoleCard({
     }
   }, [isReducedMotion]);
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+    containerRef.current.dataset.audioEnabled = audioOn ? 'true' : 'false';
+  }, [audioOn]);
+
   // Boot gate once per session
   useEffect(() => {
     const key = 'om_gc_boot_seen';
@@ -215,7 +220,12 @@ export default function ConsoleCard({
         if (gp) {
           const buttons = gp.buttons.map((b: any) => (b && b.pressed ? 1 : 0));
           const axes = gp.axes || [0, 0];
-          // TODO: Add analog stick support using axes for smooth cube rotation
+          if (mode === 'cube' && Array.isArray(axes)) {
+            const [ax = 0, ay = 0] = axes;
+            if (Math.abs(ax) > 0.2 || Math.abs(ay) > 0.2) {
+              setRotation({ rx: ay * 20, ry: ax * 20 });
+            }
+          }
           // D-pad
           if (mode === 'cube') {
             if (press(buttons[14], 14)) {
@@ -547,7 +557,7 @@ export default function ConsoleCard({
                   'group-hover:opacity-100',
                   infoOpen === g.slug ? 'opacity-100 pointer-events-auto' : '',
                 ].join(' ')}
-                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
               >
                 <div className="mb-1 text-sm font-semibold text-zinc-100">{g.name}</div>
                 <p className="text-xs text-zinc-300">{g.desc}</p>
@@ -599,6 +609,14 @@ export default function ConsoleCard({
         body: JSON.stringify({ prefs: { CRT: crt, VHS: vhs, AUDIO: audio, AUDIO_LEVEL: vol } }),
       });
     };
+
+    if (loading) {
+      return (
+        <div className="p-4 text-xs text-zinc-300" data-testid="music-face-loading">
+          Loading preferences…
+        </div>
+      );
+    }
 
     return (
       <div className="p-4 space-y-3">
@@ -878,7 +896,6 @@ export default function ConsoleCard({
   return (
     <section
       ref={containerRef}
-      tabIndex={0}
       className="mx-auto max-w-5xl rounded-2xl border border-white/15 bg-black/50 p-4 outline-none"
       aria-label="Mini-Games Console"
     >

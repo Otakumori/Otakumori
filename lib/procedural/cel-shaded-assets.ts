@@ -188,9 +188,14 @@ export function generateCelShadedSprite(
       }
 
       if (inShape) {
-        // Calculate shading based on distance and angle
+        // Calculate shading based on distance, light direction, and subtle random variation
         const normalizedDist = distance / radius;
-        const shading = 1 - normalizedDist * 0.6;
+        const directionalLight = (Math.cos(angle - Math.PI / 6) + 1) / 2;
+        const randomOffset = (rng() - 0.5) * 0.05;
+        const shading = Math.min(
+          1,
+          Math.max(0, 1 - normalizedDist * 0.6 + directionalLight * 0.2 + randomOffset),
+        );
 
         // Quantize to cel-shading steps
         const step = Math.floor(shading * shadeSteps) / shadeSteps;

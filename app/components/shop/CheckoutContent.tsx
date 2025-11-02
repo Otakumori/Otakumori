@@ -153,7 +153,7 @@ export default function CheckoutContent() {
       {preview && (
         <div className="lg:col-span-2 bg-amber-500/20 border border-amber-500/40 rounded-xl p-4 flex items-center gap-3">
           <div className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/30 flex items-center justify-center">
-            <span className="text-amber-400 text-sm">👁️</span>
+            <span className="text-amber-400 text-sm font-semibold">PM</span>
           </div>
           <div className="flex-1">
             <p className="text-amber-200 font-medium">Preview Mode</p>
@@ -409,3 +409,5 @@ export default function CheckoutContent() {
     </div>
   );
 }
+
+

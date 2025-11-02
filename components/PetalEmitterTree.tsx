@@ -50,7 +50,6 @@ export default function PetalEmitterTree({
     let running = true;
     let last = performance.now();
     let spawnAcc = 0;
-    let pointerDown = false;
     let px = 0,
       py = 0;
 
@@ -198,7 +197,6 @@ export default function PetalEmitterTree({
 
     // pointer events
     const onPointerDown = (e: PointerEvent) => {
-      pointerDown = true;
       const rect = c.getBoundingClientRect();
       px = e.clientX - rect.left;
       py = e.clientY - rect.top;
@@ -207,7 +205,6 @@ export default function PetalEmitterTree({
     };
 
     const onPointerUp = () => {
-      pointerDown = false;
     };
 
     c.addEventListener('pointerdown', onPointerDown);
@@ -331,3 +328,4 @@ export default function PetalEmitterTree({
     </div>
   );
 }
+

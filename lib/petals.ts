@@ -439,5 +439,8 @@ export async function creditPetals(
 ): Promise<{ success: boolean; newBalance: number }> {
   // This should use the petal-wallet service
   // For now, providing a stub that other code can import
-  throw new Error('creditPetals should use petal-wallet service. Use lib/petal-wallet.ts instead.');
+  const context = JSON.stringify({ userId, amount, reason, metadata }, null, 2);
+  throw new Error(
+    `creditPetals stub invoked. Use lib/petal-wallet.ts instead. Context: ${context}`,
+  );
 }

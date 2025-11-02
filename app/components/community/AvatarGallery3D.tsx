@@ -51,12 +51,14 @@ export default function AvatarGallery3D({
         style={{ gridTemplateColumns: `repeat(${maxColumns}, minmax(120px, 1fr))` }}
       >
         {avatars.map((avatar) => (
-          <div
+          <button
             key={avatar.id}
-            className={`group cursor-pointer transition-all duration-200 ${
+            type="button"
+            onClick={() => handleAvatarClick(avatar)}
+            className={`group transition-all duration-200 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-lg ${
               selectedAvatar === avatar.id ? 'ring-2 ring-pink-500 ring-opacity-50' : ''
             }`}
-            onClick={() => handleAvatarClick(avatar)}
+            aria-pressed={selectedAvatar === avatar.id}
           >
             {/* 3D Avatar Thumbnail */}
             <div className="relative">
@@ -82,7 +84,7 @@ export default function AvatarGallery3D({
                 </p>
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
 
@@ -134,10 +136,12 @@ export function AvatarList3D({
   return (
     <div className={`space-y-3 ${className}`}>
       {avatars.map((avatar) => (
-        <div
+        <button
           key={avatar.id}
-          className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+          type="button"
+          className="flex items-center space-x-3 rounded-lg p-2 transition-colors hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           onClick={() => setSelectedAvatar(avatar.id)}
+          aria-pressed={selectedAvatar === avatar.id}
         >
           {/* Small 3D Avatar */}
           <div className="flex-shrink-0">
@@ -153,7 +157,7 @@ export function AvatarList3D({
             <p className="text-sm font-medium text-white truncate">{avatar.name}</p>
             <p className="text-xs text-gray-400">Click to view</p>
           </div>
-        </div>
+        </button>
       ))}
 
       {/* Fullscreen for selected avatar */}

@@ -240,6 +240,8 @@ export default function EnhancedGameCubeHub({
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      role="presentation"
+      aria-hidden="true"
     >
       {/* Lighting Canvas */}
       <canvas

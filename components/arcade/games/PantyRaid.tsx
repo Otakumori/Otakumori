@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { type GameProps } from '../types';
 
@@ -132,6 +133,18 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
   const [gameStarted, setGameStarted] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
 
+  const checkForCatch = useCallback(
+    (x: number, y: number) => {
+      if (isCaught) return;
+      if (y > 75 && x > 35 && x < 65) {
+        setIsDragging(false);
+        setIsCaught(true);
+        onComplete(100, 25);
+      }
+    },
+    [isCaught, onComplete],
+  );
+
   useEffect(() => {
     const startTimer = setTimeout(() => setGameStarted(true), 300);
     const showTimer = setTimeout(() => setShowPanty(true), 800);
@@ -144,37 +157,80 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
     };
   }, []);
 
-  const handleMouseDown = useCallback(
-    (_e: React.MouseEvent) => {
+  const handlePointerDown = useCallback(
+    (_event: ReactPointerEvent) => {
       if (!showPanty || isCaught) return;
       setIsDragging(true);
     },
     [showPanty, isCaught],
   );
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
+  const handlePointerMove = useCallback(
+    (event: ReactPointerEvent) => {
       if (!isDragging || !gameRef.current) return;
 
       const rect = gameRef.current.getBoundingClientRect();
-      const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-      const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+      const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
 
       setPantyPosition({ x, y });
-
-      // Check if reached basket (bottom-center area)
-      if (y > 75 && x > 35 && x < 65) {
-        setIsDragging(false);
-        setIsCaught(true);
-        onComplete(100, 25);
-      }
+      checkForCatch(x, y);
     },
-    [isDragging, onComplete],
+    [isDragging, checkForCatch],
   );
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback(() => {
     setIsDragging(false);
   }, []);
+
+  const handleKeyboardControl = useCallback(
+    (event: KeyboardEvent) => {
+      if (!showPanty || isCaught) {
+        return;
+      }
+
+      const step = event.shiftKey ? 10 : 5;
+      let deltaX = 0;
+      let deltaY = 0;
+
+      switch (event.key) {
+        case 'ArrowUp':
+          deltaY = -step;
+          break;
+        case 'ArrowDown':
+          deltaY = step;
+          break;
+        case 'ArrowLeft':
+          deltaX = -step;
+          break;
+        case 'ArrowRight':
+          deltaX = step;
+          break;
+        default:
+          return;
+      }
+
+      event.preventDefault();
+
+      setPantyPosition((prev) => {
+        const nextX = Math.max(0, Math.min(100, prev.x + deltaX));
+        const nextY = Math.max(0, Math.min(100, prev.y + deltaY));
+
+        if (nextX === prev.x && nextY === prev.y) {
+          return prev;
+        }
+
+        checkForCatch(nextX, nextY);
+        return { x: nextX, y: nextY };
+      });
+    },
+    [checkForCatch, showPanty, isCaught],
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyboardControl);
+    return () => window.removeEventListener('keydown', handleKeyboardControl);
+  }, [handleKeyboardControl]);
 
   useEffect(() => {
     if (crowsApproaching && !isCaught) {
@@ -189,9 +245,9 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
     <div
       ref={gameRef}
       className="w-full h-full relative bg-gradient-to-b from-sky-300 via-sky-200 to-green-100 cursor-grab overflow-hidden"
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
       role="application"
       aria-label="Drag the panty to the basket before crows arrive"
     >
@@ -265,7 +321,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
               cursor: isDragging ? 'grabbing' : 'grab',
               filter: isDragging ? 'drop-shadow(0 0 8px rgba(255, 20, 147, 0.8))' : 'none',
             }}
-            onMouseDown={handleMouseDown}
+            onPointerDown={handlePointerDown}
           >
             <PixelPanty isDragging={isDragging} />
           </motion.div>
@@ -293,9 +349,9 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
             className="absolute bottom-24 left-1/2 transform -translate-x-1/2"
           >
             <div className="bg-pink-500 text-white px-6 py-3 rounded-lg text-lg font-bold shadow-2xl border-2 border-pink-300">
-              <span className="text-2xl mr-2">✨</span>
+              <span className="text-2xl mr-2" aria-hidden="true">*</span>
               LAUNDRY SECURED!
-              <span className="text-2xl ml-2">✨</span>
+              <span className="text-2xl ml-2" aria-hidden="true">*</span>
             </div>
           </motion.div>
         )}
@@ -308,7 +364,7 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
             ? 'Laundry day incoming...'
             : !isCaught
               ? crowsApproaching
-                ? '⚠️ CROWS INCOMING! HURRY!'
+                ? 'Crows incoming! Hurry!'
                 : 'Drag to basket before crows arrive!'
               : 'Mission complete!'}
         </p>

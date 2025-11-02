@@ -98,6 +98,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
         showError(result.error || 'Failed to place sign');
       }
     } catch (err) {
+      console.error('Failed to place sign', err);
       showError('Failed to place sign');
     } finally {
       setSubmitting(false);
@@ -171,7 +172,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
       {composing && (
         <form onSubmit={handleSubmit} className="space-y-4 border-t border-white/10 pt-4">
           <div>
-            <label className="block text-sm text-zinc-300 mb-2">Choose a template</label>
+            <p className="block text-sm text-zinc-300 mb-2">Choose a template</p>
             <div className="grid grid-cols-2 gap-2">
               {DARK_SOULS_TEMPLATES.map((template) => (
                 <button

@@ -44,6 +44,8 @@ export const updatePrintifyProducts = inngest.createFunction(
   },
   { event: 'printify/products.update' },
   async ({ event, step }: { event: any; step: any }) => {
+    const triggeredAt = event?.timestamp ?? new Date().toISOString();
+
     return await step.run('fetch-printify-products', async () => {
       // 'Fetching products from Printify'
 
@@ -54,7 +56,7 @@ export const updatePrintifyProducts = inngest.createFunction(
         throw new Error(`Failed to update products: ${response.statusText}`);
       }
 
-      return { success: true, timestamp: new Date().toISOString() };
+      return { success: true, timestamp: triggeredAt };
     });
   },
 );
@@ -66,7 +68,7 @@ export const syncInventory = inngest.createFunction(
     id: 'sync-inventory',
   },
   { event: 'inventory/sync' },
-  async ({ event, step }) => {
+  async ({ step }) => {
     return await step.run('sync-inventory', async () => {
       // 'Syncing inventory levels'
 

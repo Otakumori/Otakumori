@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -59,24 +59,26 @@ function CustomizationPanel({
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
 
   return (
-    <div className="bg-white/5 backdrop-blur-lg border border-white/20 rounded-xl p-4 mb-4">
-      <div
-        className={`flex items-center justify-between mb-3 ${collapsible ? 'cursor-pointer' : ''}`}
-        onClick={() => collapsible && setIsCollapsed(!isCollapsed)}
-        onKeyDown={(e) => {
-          if (collapsible && (e.key === 'Enter' || e.key === ' ')) {
-            e.preventDefault();
-            setIsCollapsed(!isCollapsed);
-          }
-        }}
-        role={collapsible ? 'button' : undefined}
-        tabIndex={collapsible ? 0 : undefined}
-      >
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-        {collapsible && <span className="text-white/60 text-xl">{isCollapsed ? '▼' : '▲'}</span>}
-      </div>
+    <section className="mb-4 rounded-xl border border-white/20 bg-white/5 p-4 backdrop-blur-lg">
+      {collapsible ? (
+        <button
+          type="button"
+          onClick={() => setIsCollapsed((prev) => !prev)}
+          className="mb-3 flex w-full items-center justify-between text-left"
+          aria-expanded={!isCollapsed}
+        >
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          <span className="text-xl text-white/60" aria-hidden="true">
+            {isCollapsed ? 'â–¼' : 'â–²'}
+          </span>
+        </button>
+      ) : (
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-white">{title}</h3>
+        </div>
+      )}
       {!isCollapsed && <div className="space-y-3">{children}</div>}
-    </div>
+    </section>
   );
 }
 
@@ -167,8 +169,16 @@ function PartSelector({
   showNsfwContent,
   searchQuery = '',
   selectedCategory = 'all',
-}: PartSelectorProps & { searchQuery?: string; selectedCategory?: string }) {
+  resolveParts,
+}: PartSelectorProps & {
+  searchQuery?: string;
+  selectedCategory?: string;
+  resolveParts?: (type: AvatarPartType) => ReturnType<typeof avatarPartManager.getPartsByType>;
+}) {
   const parts = useMemo(() => {
+    if (resolveParts) {
+      return resolveParts(partType);
+    }
     const allParts = avatarPartManager.getPartsByType(partType);
     return allParts.filter((part) => {
       const matchesSearch =
@@ -188,7 +198,7 @@ function PartSelector({
 
       return matchesSearch && matchesCategory && matchesContent;
     });
-  }, [partType, showNsfwContent, searchQuery, selectedCategory]);
+  }, [partType, resolveParts, showNsfwContent, searchQuery, selectedCategory]);
 
   return (
     <div className="space-y-2">
@@ -586,62 +596,73 @@ export default function CharacterEditor({
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      // Tab navigation between controls
-      if (e.key === 'Tab') {
-        // Let default tab behavior work
+    (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const tagName = target.tagName;
+        if (
+          tagName === 'INPUT' ||
+          tagName === 'TEXTAREA' ||
+          tagName === 'SELECT' ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+      }
+
+      if (event.key === 'Tab') {
         return;
       }
 
       // Camera controls
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
         setCameraRotation((prev) => ({ ...prev, y: prev.y - 15 }));
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
         setCameraRotation((prev) => ({ ...prev, y: prev.y + 15 }));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
         setCameraRotation((prev) => ({ ...prev, x: prev.x - 15 }));
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
         setCameraRotation((prev) => ({ ...prev, x: prev.x + 15 }));
       }
 
       // Zoom controls
-      if (e.key === '+' || e.key === '=') {
-        e.preventDefault();
+      if (event.key === '+' || event.key === '=') {
+        event.preventDefault();
         setCameraZoom((prev) => Math.min(3, prev + 0.1));
-      } else if (e.key === '-') {
-        e.preventDefault();
+      } else if (event.key === '-') {
+        event.preventDefault();
         setCameraZoom((prev) => Math.max(0.5, prev - 0.1));
       }
 
       // Reset controls
-      if (e.key === 'r' || e.key === 'R') {
-        e.preventDefault();
+      if (event.key === 'r' || event.key === 'R') {
+        event.preventDefault();
         setCameraZoom(1);
         setCameraRotation({ x: 0, y: 0 });
       }
 
       // Undo/Redo
-      if (e.ctrlKey || e.metaKey) {
-        if (e.key === 'z' && !e.shiftKey) {
-          e.preventDefault();
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key === 'z' && !event.shiftKey) {
+          event.preventDefault();
           undo();
-        } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
-          e.preventDefault();
+        } else if (event.key === 'y' || (event.key === 'z' && event.shiftKey)) {
+          event.preventDefault();
           redo();
-        } else if (e.key === 's') {
-          e.preventDefault();
+        } else if (event.key === 's') {
+          event.preventDefault();
           handleSave();
         }
       }
 
       // Tab switching
-      if (e.key >= '1' && e.key <= '7') {
-        e.preventDefault();
-        const tabIndex = parseInt(e.key) - 1;
+      if (event.key >= '1' && event.key <= '7') {
+        event.preventDefault();
+        const tabIndex = parseInt(event.key, 10) - 1;
         const tabs = [
           'parts',
           'morphing',
@@ -657,14 +678,14 @@ export default function CharacterEditor({
       }
 
       // Screenshot
-      if (e.key === 'p' || e.key === 'P') {
-        e.preventDefault();
+      if (event.key === 'p' || event.key === 'P') {
+        event.preventDefault();
         captureScreenshot();
       }
 
       // Toggle comparison
-      if (e.key === 'c' || e.key === 'C') {
-        e.preventDefault();
+      if (event.key === 'c' || event.key === 'C') {
+        event.preventDefault();
         if (comparisonConfig) {
           setShowComparison(!showComparison);
         }
@@ -672,6 +693,12 @@ export default function CharacterEditor({
     },
     [undo, redo, handleSave, captureScreenshot, comparisonConfig, showComparison],
   );
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => handleKeyDown(event);
+    window.addEventListener('keydown', listener);
+    return () => window.removeEventListener('keydown', listener);
+  }, [handleKeyDown]);
 
   // GLB export
   const exportGLB = useCallback(async () => {
@@ -755,9 +782,7 @@ export default function CharacterEditor({
 
   return (
     <div
-      className={`flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black ${className}`}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
+      className={`flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black ${isDragging ? 'cursor-grabbing touch-manipulation' : ''} ${className}`}
       role="main"
       aria-label="Character Editor"
     >
@@ -768,7 +793,7 @@ export default function CharacterEditor({
           className="fixed top-4 left-4 z-50 bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-lg shadow-lg"
           aria-label="Toggle menu"
         >
-          {sidebarCollapsed ? '☰' : '✕'}
+          {sidebarCollapsed ? 'â˜°' : 'âœ•'}
         </button>
       )}
 
@@ -803,7 +828,7 @@ export default function CharacterEditor({
                     onClick={() => setSearchQuery('')}
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white"
                   >
-                    ×
+                    Ã—
                   </button>
                 )}
               </div>
@@ -858,7 +883,11 @@ export default function CharacterEditor({
           </CustomizationPanel>
 
           {/* Tab Navigation */}
-          <div className="grid grid-cols-2 gap-1 mb-4 bg-white/10 rounded-lg p-1">
+          <div
+            className="mb-4 grid grid-cols-2 gap-1 rounded-lg bg-white/10 p-1"
+            role="tablist"
+            aria-label="Character editor sections"
+          >
             {[
               { id: 'parts', label: 'Parts', shortcut: '1' },
               { id: 'morphing', label: 'Morphing', shortcut: '2' },
@@ -871,14 +900,17 @@ export default function CharacterEditor({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-2 px-3 rounded-md text-sm font-medium transition-all ${
+                type="button"
+                className={`rounded-md py-2 px-3 text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-pink-500 text-white'
                     : 'text-white/60 hover:text-white hover:bg-white/10'
                 }`}
                 aria-label={`${tab.label} tab (${tab.shortcut})`}
-                aria-pressed={activeTab === tab.id}
+                aria-selected={activeTab === tab.id}
                 role="tab"
+                id={`tab-${tab.id}`}
+                aria-controls={`panel-${tab.id}`}
               >
                 {tab.label}
                 <span className="ml-1 text-xs opacity-60">({tab.shortcut})</span>
@@ -888,7 +920,12 @@ export default function CharacterEditor({
 
           {/* Tab Content */}
           {activeTab === 'parts' && (
-            <div className="space-y-4">
+            <div
+              id="panel-parts"
+              role="tabpanel"
+              aria-labelledby="tab-parts"
+              className="space-y-4"
+            >
               <CustomizationPanel title="Base Model">
                 <div className="space-y-2">
                   {(['male', 'female'] as const).map((model) => (
@@ -918,6 +955,7 @@ export default function CharacterEditor({
                   showNsfwContent={showNsfwContent}
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
+                  resolveParts={filteredParts}
                 />
                 <PartSelector
                   label="Hair"
@@ -927,6 +965,7 @@ export default function CharacterEditor({
                   showNsfwContent={showNsfwContent}
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
+                  resolveParts={filteredParts}
                 />
               </CustomizationPanel>
 
@@ -939,6 +978,7 @@ export default function CharacterEditor({
                   showNsfwContent={showNsfwContent}
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
+                  resolveParts={filteredParts}
                 />
               </CustomizationPanel>
 
@@ -951,6 +991,7 @@ export default function CharacterEditor({
                   showNsfwContent={showNsfwContent}
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
+                  resolveParts={filteredParts}
                 />
                 {showNsfwContent && (
                   <PartSelector
@@ -961,6 +1002,7 @@ export default function CharacterEditor({
                     showNsfwContent={showNsfwContent}
                     searchQuery={searchQuery}
                     selectedCategory={selectedCategory}
+                    resolveParts={filteredParts}
                   />
                 )}
               </CustomizationPanel>
@@ -974,6 +1016,7 @@ export default function CharacterEditor({
                   showNsfwContent={showNsfwContent}
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
+                  resolveParts={filteredParts}
                 />
                 {showNsfwContent && (
                   <PartSelector
@@ -984,6 +1027,7 @@ export default function CharacterEditor({
                     showNsfwContent={showNsfwContent}
                     searchQuery={searchQuery}
                     selectedCategory={selectedCategory}
+                    resolveParts={filteredParts}
                   />
                 )}
               </CustomizationPanel>
@@ -991,7 +1035,12 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'morphing' && (
-            <div className="space-y-4">
+            <div
+              id="panel-morphing"
+              role="tabpanel"
+              aria-labelledby="tab-morphing"
+              className="space-y-4"
+            >
               {visibleMorphTargets.map(([targetName, morphTarget]) => (
                 <CustomizationPanel key={targetName} title={morphTarget.name} collapsible>
                   <SliderControl
@@ -1009,7 +1058,12 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'materials' && (
-            <div className="space-y-4">
+            <div
+              id="panel-materials"
+              role="tabpanel"
+              aria-labelledby="tab-materials"
+              className="space-y-4"
+            >
               <CustomizationPanel title="Skin Material">
                 <ColorPicker
                   label="Skin Tone"
@@ -1089,7 +1143,12 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'lighting' && (
-            <div className="space-y-4">
+            <div
+              id="panel-lighting"
+              role="tabpanel"
+              aria-labelledby="tab-lighting"
+              className="space-y-4"
+            >
               <CustomizationPanel title="Lighting Preset">
                 <div className="space-y-2">
                   {['studio', 'dramatic', 'soft', 'anime', 'intimate'].map((preset) => (
@@ -1128,7 +1187,12 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'camera' && (
-            <div className="space-y-4">
+            <div
+              id="panel-camera"
+              role="tabpanel"
+              aria-labelledby="tab-camera"
+              className="space-y-4"
+            >
               <CustomizationPanel title="Camera Presets">
                 <div className="grid grid-cols-2 gap-2">
                   {CAMERA_PRESETS.map((preset) => (
@@ -1164,7 +1228,7 @@ export default function CharacterEditor({
                   max={180}
                   step={1}
                   onChange={(value) => setCameraRotation((prev) => ({ ...prev, x: value }))}
-                  format={(value) => `${value.toFixed(0)}°`}
+                  format={(value) => `${value.toFixed(0)}Â°`}
                 />
                 <SliderControl
                   label="Rotation Y"
@@ -1173,7 +1237,7 @@ export default function CharacterEditor({
                   max={180}
                   step={1}
                   onChange={(value) => setCameraRotation((prev) => ({ ...prev, y: value }))}
-                  format={(value) => `${value.toFixed(0)}°`}
+                  format={(value) => `${value.toFixed(0)}Â°`}
                 />
               </CustomizationPanel>
 
@@ -1197,7 +1261,12 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'poses' && (
-            <div className="space-y-4">
+            <div
+              id="panel-poses"
+              role="tabpanel"
+              aria-labelledby="tab-poses"
+              className="space-y-4"
+            >
               <CustomizationPanel title="Pose Categories">
                 <div className="flex flex-wrap gap-2">
                   {['idle', 'action', 'emote', 'dance', ...(showNsfwContent ? ['nsfw'] : [])].map(
@@ -1277,7 +1346,12 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'background' && (
-            <div className="space-y-4">
+            <div
+              id="panel-background"
+              role="tabpanel"
+              aria-labelledby="tab-background"
+              className="space-y-4"
+            >
               <CustomizationPanel title="Background Presets">
                 <div className="grid grid-cols-2 gap-2">
                   {BACKGROUND_PRESETS.map((preset) => (
@@ -1308,9 +1382,12 @@ export default function CharacterEditor({
                   format={(value) => `${(value * 100).toFixed(0)}%`}
                 />
                 <div className="space-y-2">
-                  <label className="text-sm text-white/80">Custom Color</label>
+                  <label className="text-sm text-white/80" htmlFor="background-custom-color">
+                    Custom Color
+                  </label>
                   <input
                     type="color"
+                    id="background-custom-color"
                     value={currentBackground.type === 'color' ? currentBackground.value : '#FFFFFF'}
                     onChange={(e) =>
                       setCurrentBackground({
@@ -1334,14 +1411,14 @@ export default function CharacterEditor({
               disabled={historyIndex <= 0}
               className="flex-1 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:text-white/40 text-white py-2 px-3 rounded-lg transition-colors text-sm disabled:cursor-not-allowed"
             >
-              ↶ Undo
+              â†¶ Undo
             </button>
             <button
               onClick={redo}
               disabled={historyIndex >= history.length - 1}
               className="flex-1 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:text-white/40 text-white py-2 px-3 rounded-lg transition-colors text-sm disabled:cursor-not-allowed"
             >
-              ↷ Redo
+              â†· Redo
             </button>
           </div>
 
@@ -1351,7 +1428,7 @@ export default function CharacterEditor({
               onClick={saveForComparison}
               className="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 px-3 rounded-lg transition-colors text-sm"
             >
-              📸 Save for Compare
+              ðŸ“¸ Save for Compare
             </button>
             <button
               onClick={() => setShowComparison(!showComparison)}
@@ -1370,14 +1447,14 @@ export default function CharacterEditor({
                 className="bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded-lg transition-colors text-sm"
                 title="Capture screenshot"
               >
-                📸 Screenshot
+                ðŸ“¸ Screenshot
               </button>
               <button
                 onClick={exportGLB}
                 className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg transition-colors text-sm"
                 title="Export as GLB"
               >
-                📦 Export GLB
+                ðŸ“¦ Export GLB
               </button>
             </div>
             <button
@@ -1385,7 +1462,7 @@ export default function CharacterEditor({
               className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-3 rounded-lg transition-colors text-sm"
               title="Share preset"
             >
-              🔗 Share Preset
+              ðŸ”— Share Preset
             </button>
           </div>
 
@@ -1395,7 +1472,7 @@ export default function CharacterEditor({
               onClick={handleSave}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
             >
-              {isDirty ? '💾 Save Character*' : '💾 Save Character'}
+              {isDirty ? 'ðŸ’¾ Save Character*' : 'ðŸ’¾ Save Character'}
             </button>
             <button
               onClick={() => {
@@ -1408,7 +1485,7 @@ export default function CharacterEditor({
               }}
               className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-4 rounded-lg transition-colors border border-white/20"
             >
-              🔄 Reset to Default
+              ðŸ”„ Reset to Default
             </button>
           </div>
         </div>
@@ -1471,9 +1548,9 @@ export default function CharacterEditor({
           {isMobile && (
             <div className="absolute bottom-4 left-4 right-4 bg-black/50 backdrop-blur-lg rounded-lg px-3 py-2 text-white text-xs text-center">
               <div className="flex justify-center space-x-4">
-                <span>👆 Tap to select</span>
-                <span>👋 Swipe to rotate</span>
-                <span>🔍 Pinch to zoom</span>
+                <span>ðŸ‘† Tap to select</span>
+                <span>ðŸ‘‹ Swipe to rotate</span>
+                <span>ðŸ” Pinch to zoom</span>
               </div>
             </div>
           )}
@@ -1541,7 +1618,7 @@ export default function CharacterEditor({
               onClick={() => setShowComparison(false)}
               className="absolute top-4 right-4 bg-red-500/80 hover:bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm"
             >
-              ×
+              Ã—
             </button>
           </div>
         )}
@@ -1559,3 +1636,5 @@ export default function CharacterEditor({
     </div>
   );
 }
+
+

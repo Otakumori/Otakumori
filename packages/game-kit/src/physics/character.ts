@@ -73,10 +73,10 @@ export function updateCharacter(
 export function checkGroundContact(
   position: Vec3,
   velocity: Vec3,
-  _rayDistance: number = 0.15,
+  rayDistance: number = 0.15,
 ): boolean {
   // Simplified ground check - in real implementation, use Rapier raycast
-  return position.y <= 0 && velocity.y <= 0;
+  return position.y <= rayDistance && velocity.y <= 0;
 }
 
 /**

@@ -1,12 +1,11 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
+const scriptPath = path.relative(process.cwd(), __filename);
+
 async function applyMigrations() {
   try {
-    console.log('Starting migration process using Supabase CLI...');
-
-    // Get the migrations directory path
-    const migrationsDir = path.join(__dirname, '..', 'supabase', 'migrations');
+    console.log(`Starting migration process using Supabase CLI (${scriptPath})...`);
 
     // Run the Supabase migration command
     const command = `supabase db push`;

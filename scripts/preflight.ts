@@ -141,7 +141,7 @@ async function testPage(browser: any, page: string): Promise<PreflightResult> {
         try {
           await pageInstance.click('[class*="petal"], [class*="interactive"]');
         } catch (e) {
-          warnings.push('Could not click petal element');
+          warnings.push(`Could not click petal element: ${String(e)}`);
         }
       }
 
@@ -282,11 +282,11 @@ async function main() {
     const results = await runPreflight();
     const report = await generateReport(results);
 
-    // `\n Preflight Summary:`
-    // `   Total pages: ${report.summary.totalPages}`
-    // `   Passed: ${report.summary.passed}`
-    // `   Failed: ${report.summary.failed}`
-    // `   Warnings: ${report.summary.warnings}`
+    console.log('\n Preflight Summary:');
+    console.log(`   Total pages: ${report.summary.totalPages}`);
+    console.log(`   Passed: ${report.summary.passed}`);
+    console.log(`   Failed: ${report.summary.failed}`);
+    console.log(`   Warnings: ${report.summary.warnings}`);
 
     // Check if any critical assertions failed
     const criticalFailures = results.filter(
@@ -299,15 +299,14 @@ async function main() {
     );
 
     if (criticalFailures.length > 0) {
-      // '\n Critical failures detected:'
+      console.error('\n Critical failures detected:');
       criticalFailures.forEach((failure) => {
-        // `   ${failure.url}: ${failure.errors.join(', '}`);
+        console.error(`   ${failure.url}: ${failure.errors.join(', ') || 'Unknown error'}`);
       });
       process.exit(1);
     }
 
-    // '\n All preflight checks passed!'
-    // ` Reports saved to: ${ARTIFACTS_DIR}`
+    console.log(`Reports saved to: ${ARTIFACTS_DIR}`);
   } catch (error) {
     console.error(' Preflight failed:', error);
     process.exit(1);

@@ -136,7 +136,7 @@ export default function AvatarSystem({
     if (!hairSystemRef.current) return;
 
     try {
-      const strands: any[] = [];
+      const strands: HairStrand[] = [];
       const hairCount =
         config.hair.style === 'very-long' ? 200 : config.hair.style === 'long' ? 150 : 100;
 
@@ -148,12 +148,6 @@ export default function AvatarSystem({
           1.6,
           Math.sin(angle) * radius,
         );
-
-        const direction = new THREE.Vector3(
-          Math.cos(angle) * 0.1,
-          -1,
-          Math.sin(angle) * 0.1,
-        ).normalize();
 
         const length =
           config.hair.style === 'very-long' ? 0.8 : config.hair.style === 'long' ? 0.6 : 0.4;

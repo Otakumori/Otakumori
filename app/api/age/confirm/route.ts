@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { env } from '@/env';
 
@@ -48,11 +48,12 @@ export async function POST(req: Request) {
       sameSite: 'lax',
       path: '/',
       secure: isProduction,
-      // No maxAge or expires → session-only cookie
+      // No maxAge or expires -> session-only cookie
     });
 
     return response;
-  } catch (_error) {
+  } catch (error) {
+    console.error('Failed to confirm age', error);
     return NextResponse.json(
       {
         ok: false,

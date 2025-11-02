@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock @clerk/nextjs/server
@@ -84,43 +84,43 @@ describe('Age Gate Middleware', () => {
 
   describe('Bypass Logic - Clerk Adult Verification', () => {
     it('should bypass age gate when publicMetadata.adultVerified is true', () => {
-      const sessionClaims = {
+      const sessionClaims: any = {
         publicMetadata: {
           adultVerified: true,
         },
       };
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
 
       expect(adultVerified).toBe(true);
     });
 
     it('should not bypass when publicMetadata.adultVerified is false', () => {
-      const sessionClaims = {
+      const sessionClaims: any = {
         publicMetadata: {
           adultVerified: false,
         },
       };
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
 
       expect(adultVerified).toBe(false);
     });
 
     it('should not bypass when publicMetadata is missing', () => {
-      const sessionClaims = {};
+      const sessionClaims: any = {};
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
 
       expect(adultVerified).toBe(false);
     });
 
     it('should not bypass when adultVerified is undefined', () => {
-      const sessionClaims = {
+      const sessionClaims: any = {
         publicMetadata: {},
       };
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
 
       expect(adultVerified).toBe(false);
     });
@@ -151,10 +151,10 @@ describe('Age Gate Middleware', () => {
 
   describe('Gate Logic Priority', () => {
     it('should allow access with Clerk verification, no cookie', () => {
-      const sessionClaims = { publicMetadata: { adultVerified: true } };
+      const sessionClaims: any = { publicMetadata: { adultVerified: true } };
       const cookie = undefined;
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = cookie && cookie.value === '1';
 
       const shouldAllow = adultVerified || hasCookie;
@@ -163,10 +163,10 @@ describe('Age Gate Middleware', () => {
     });
 
     it('should allow access with cookie, no Clerk verification', () => {
-      const sessionClaims = {};
+      const sessionClaims: any = {};
       const cookie = { name: 'om_age_ok', value: '1' };
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = cookie && cookie.value === '1';
 
       const shouldAllow = adultVerified || hasCookie;
@@ -175,10 +175,10 @@ describe('Age Gate Middleware', () => {
     });
 
     it('should allow access with both Clerk and cookie', () => {
-      const sessionClaims = { publicMetadata: { adultVerified: true } };
+      const sessionClaims: any = { publicMetadata: { adultVerified: true } };
       const cookie = { name: 'om_age_ok', value: '1' };
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = cookie && cookie.value === '1';
 
       const shouldAllow = adultVerified || hasCookie;
@@ -187,10 +187,10 @@ describe('Age Gate Middleware', () => {
     });
 
     it('should block access without Clerk or cookie', () => {
-      const sessionClaims = {};
+      const sessionClaims: any = {};
       const cookie = undefined;
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = Boolean(cookie && cookie.value === '1');
 
       const shouldAllow = adultVerified || hasCookie;
@@ -234,17 +234,17 @@ describe('Age Gate Middleware', () => {
 
   describe('Edge Cases', () => {
     it('should handle malformed session claims gracefully', () => {
-      const sessionClaims = null;
+      const sessionClaims: any = null;
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
 
       expect(adultVerified).toBe(false);
     });
 
     it('should handle sessionClaims as non-object', () => {
-      const sessionClaims = 'invalid';
+      const sessionClaims: any = 'invalid';
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
 
       expect(adultVerified).toBe(false);
     });
@@ -278,7 +278,7 @@ describe('Age Gate Middleware', () => {
   describe('Integration Scenarios', () => {
     it('should simulate anonymous user first visit', () => {
       const pathname = '/mini-games';
-      const sessionClaims = {};
+      const sessionClaims: any = {};
       const cookie = undefined;
 
       // Check if path is age-gated
@@ -288,7 +288,7 @@ describe('Age Gate Middleware', () => {
         pathname.startsWith('/products/nsfw');
 
       // Check bypass conditions
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = Boolean(cookie && cookie.value === '1');
 
       // Should gate
@@ -298,7 +298,7 @@ describe('Age Gate Middleware', () => {
 
     it('should simulate anonymous user with session cookie', () => {
       const pathname = '/arcade';
-      const sessionClaims = {};
+      const sessionClaims: any = {};
       const cookie = { name: 'om_age_ok', value: '1' };
 
       const isAgeGated =
@@ -306,7 +306,7 @@ describe('Age Gate Middleware', () => {
         pathname.startsWith('/arcade') ||
         pathname.startsWith('/products/nsfw');
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = cookie && cookie.value === '1';
 
       // Should allow
@@ -316,7 +316,7 @@ describe('Age Gate Middleware', () => {
 
     it('should simulate signed-in verified user', () => {
       const pathname = '/mini-games';
-      const sessionClaims = { publicMetadata: { adultVerified: true } };
+      const sessionClaims: any = { publicMetadata: { adultVerified: true } };
       const cookie = undefined;
 
       const isAgeGated =
@@ -324,7 +324,7 @@ describe('Age Gate Middleware', () => {
         pathname.startsWith('/arcade') ||
         pathname.startsWith('/products/nsfw');
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = cookie && cookie.value === '1';
 
       // Should allow without cookie
@@ -334,7 +334,7 @@ describe('Age Gate Middleware', () => {
 
     it('should simulate signed-in unverified user without cookie', () => {
       const pathname = '/products/nsfw/item';
-      const sessionClaims = { publicMetadata: { adultVerified: false } };
+      const sessionClaims: any = { publicMetadata: { adultVerified: false } };
       const cookie = undefined;
 
       const isAgeGated =
@@ -342,7 +342,7 @@ describe('Age Gate Middleware', () => {
         pathname.startsWith('/arcade') ||
         pathname.startsWith('/products/nsfw');
 
-      const adultVerified = Boolean((sessionClaims as any)?.publicMetadata?.adultVerified);
+      const adultVerified = Boolean(sessionClaims?.publicMetadata?.adultVerified);
       const hasCookie = Boolean(cookie && cookie.value === '1');
 
       // Should gate
@@ -352,7 +352,7 @@ describe('Age Gate Middleware', () => {
 
     it('should allow non-gated paths without checks', () => {
       const pathname = '/shop';
-      const sessionClaims = {};
+      const sessionClaims: any = {};
       const cookie = undefined;
 
       const isAgeGated =
@@ -362,6 +362,8 @@ describe('Age Gate Middleware', () => {
 
       // Should not gate at all
       expect(isAgeGated).toBe(false);
+      expect(sessionClaims).toEqual({});
+      expect(cookie).toBeUndefined();
     });
   });
 
