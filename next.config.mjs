@@ -19,6 +19,7 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion', '@radix-ui/react-icons'],
+    tsconfigPaths: true,
   },
 
   // Image optimization for Printify and CDN assets
