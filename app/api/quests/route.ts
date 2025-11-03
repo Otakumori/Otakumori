@@ -6,7 +6,7 @@ import { DAILY_QUESTS } from '@/app/lib/quests';
 const db = new PrismaClient();
 
 function startOfDay(d = new Date()) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().split('T')[0];
 }
 
 export async function GET() {
@@ -14,15 +14,14 @@ export async function GET() {
   if (!userId) return NextResponse.json({ quests: DAILY_QUESTS, progress: {}, claimed: [] });
 
   const today = startOfDay();
-  const progress = await db.questProgress
-    .findMany({ where: { userId, date: today } })
+  const assignments = await db.questAssignment
+    .findMany({ where: { userId, day: today } })
     .catch(() => []);
-  const claimed = await db.questClaim.findMany({ where: { userId, date: today } }).catch(() => []);
 
   const progressMap: Record<string, number> = Object.fromEntries(
-    progress.map((p: { questId: string; count: number }) => [p.questId, p.count]),
+    assignments.map((a) => [a.questId, a.progress]),
   );
-  const claimedIds: string[] = claimed.map((c: { questId: string }) => c.questId);
+  const claimedIds: string[] = assignments.filter((a) => a.claimedAt).map((a) => a.questId);
   return NextResponse.json({ quests: DAILY_QUESTS, progress: progressMap, claimed: claimedIds });
 }
 
@@ -35,25 +34,28 @@ export async function POST(req: Request) {
 
   const today = startOfDay();
 
-  const prog: { count: number } | null = await db.questProgress
-    .findUnique({ where: { userId_date_questId: { userId, date: today, questId } } })
+  const assignment = await db.questAssignment
+    .findUnique({ where: { userId_questId_day: { userId, questId, day: today } } })
     .catch(() => null);
-  const count = prog?.count ?? 0;
 
-  if (count < q.target) return new NextResponse('Not complete', { status: 400 });
+  if (!assignment || assignment.progress < q.target) {
+    return new NextResponse('Not complete', { status: 400 });
+  }
 
-  const already: { id: string } | null = await db.questClaim
-    .findUnique({ where: { userId_date_questId: { userId, date: today, questId } } })
-    .catch(() => null);
-  if (already) return new NextResponse('Already claimed', { status: 409 });
+  if (assignment.claimedAt) {
+    return new NextResponse('Already claimed', { status: 409 });
+  }
 
   // reward petals
   await db.$transaction([
-    db.questClaim.create({ data: { userId, date: today, questId } }),
+    db.questAssignment.update({
+      where: { id: assignment.id },
+      data: { claimedAt: new Date() },
+    }),
     db.userPetals.upsert({
       where: { userId },
-      update: { total: { increment: q.reward } },
-      create: { userId, total: q.reward },
+      update: { amount: { increment: q.reward } },
+      create: { userId, amount: q.reward },
     }),
   ]);
 

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             status: true,
           },
         },
-        participants: {
+        CoopSessionParticipant: {
           include: {
             User: {
               select: {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Check if user is a participant
-    const isParticipant = session.participants.some((p) => p.userId === userId);
+    const isParticipant = session.CoopSessionParticipant.some((p) => p.userId === userId);
     if (!isParticipant) {
       return NextResponse.json({ ok: false, error: 'Access denied' }, { status: 403 });
     }
@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const session = await db.coopSession.findUnique({
       where: { id: params.id },
       include: {
-        participants: true,
+        CoopSessionParticipant: true,
       },
     });
 
@@ -89,7 +89,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ ok: false, error: 'Session not found' }, { status: 404 });
     }
 
-    const participant = session.participants.find((p) => p.userId === userId);
+    const participant = session.CoopSessionParticipant.find((p) => p.userId === userId);
     if (!participant) {
       return NextResponse.json({ ok: false, error: 'Access denied' }, { status: 403 });
     }
@@ -123,7 +123,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             status: true,
           },
         },
-        participants: {
+        CoopSessionParticipant: {
           include: {
             User: {
               select: {
@@ -187,7 +187,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const session = await db.coopSession.findUnique({
       where: { id: params.id },
       include: {
-        participants: true,
+        CoopSessionParticipant: true,
       },
     });
 
@@ -195,7 +195,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ ok: false, error: 'Session not found' }, { status: 404 });
     }
 
-    const participant = session.participants.find((p) => p.userId === userId);
+    const participant = session.CoopSessionParticipant.find((p) => p.userId === userId);
     if (!participant || participant.role !== 'moderator') {
       return NextResponse.json(
         { ok: false, error: 'Only moderators can delete sessions' },

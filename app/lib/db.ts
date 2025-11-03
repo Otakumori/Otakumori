@@ -46,7 +46,7 @@ export class DatabaseAccess {
         clerkId: true,
         email: true,
         username: true,
-        display_name: true,
+        displayName: true,
         avatarUrl: true,
         petalBalance: true,
         level: true,

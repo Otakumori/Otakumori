@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
         where: {
           AND: [
             {
-              followers: {
+              Follow_Follow_followeeIdToUser: {
                 some: { followerId: currentUser.id },
               },
             },
             {
-              following: {
+              Follow_Follow_followerIdToUser: {
                 some: { followeeId: currentUser.id },
               },
             },
@@ -119,10 +119,10 @@ export async function GET(request: NextRequest) {
         visibility: activity.visibility,
         createdAt: activity.createdAt.toISOString(),
         User: {
-          id: activity.profile.id,
-          username: activity.profile.username,
-          displayName: activity.profile.displayName,
-          avatarUrl: activity.profile.avatarUrl,
+          id: activity.User.id,
+          username: activity.User.username,
+          displayName: activity.User.displayName,
+          avatarUrl: activity.User.avatarUrl,
         },
       })),
       nextCursor: hasMore

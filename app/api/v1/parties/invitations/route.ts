@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Party not found' }, { status: 404 });
     }
 
-    const isMember = party.members.some((member) => member.userId === userId);
+    const isMember = party.PartyMember.some((member) => member.userId === userId);
     if (!isMember) {
       return NextResponse.json(
         { ok: false, error: 'Only party members can send invitations' },
@@ -36,12 +36,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if party is full
-    if (party.members.length >= party.maxMembers) {
+    if (party.PartyMember.length >= party.maxMembers) {
       return NextResponse.json({ ok: false, error: 'Party is full' }, { status: 400 });
     }
 
     // Check if user is already a member
-    const isAlreadyMember = party.members.some(
+    const isAlreadyMember = party.PartyMember.some(
       (member) => member.userId === validatedData.inviteeId,
     );
     if (isAlreadyMember) {
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
             gameMode: true,
           },
         },
-        inviter: {
+        User_PartyInvitation_inviterIdToUser: {
           select: {
             id: true,
             username: true,
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
             avatarUrl: true,
           },
         },
-        invitee: {
+        User_PartyInvitation_inviteeIdToUser: {
           select: {
             id: true,
             username: true,
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        inviter: {
+        User_PartyInvitation_inviterIdToUser: {
           select: {
             id: true,
             username: true,
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
             avatarUrl: true,
           },
         },
-        invitee: {
+        User_PartyInvitation_inviteeIdToUser: {
           select: {
             id: true,
             username: true,
@@ -193,15 +193,17 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    const transformedInvitations = invitations.map((invitation) => ({
+    const transformedInvitations = invitations.map((invitation: any) => ({
       ...invitation,
       expiresAt: invitation.expiresAt.toISOString(),
       createdAt: invitation.createdAt.toISOString(),
       respondedAt: invitation.respondedAt?.toISOString(),
       party: {
-        ...invitation.party,
-        memberCount: invitation.party.members.length,
+        ...invitation.Party,
+        memberCount: invitation.Party.PartyMember.length,
       },
+      inviter: invitation.User_PartyInvitation_inviterIdToUser,
+      invitee: invitation.User_PartyInvitation_inviteeIdToUser,
     }));
 
     return NextResponse.json({

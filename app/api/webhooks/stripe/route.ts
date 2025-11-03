@@ -178,7 +178,7 @@ export async function POST(req: Request) {
           for (const c of coupons) {
             await prisma.couponRedemption.updateMany({
               where: { couponId: c.id, status: 'PENDING' },
-              data: { status: 'SUCCEEDED', orderId: order.id },
+              data: { status: 'SUCCEEDED', clientReferenceId: order.id },
             });
           }
         }

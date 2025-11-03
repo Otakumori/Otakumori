@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         },
         PartyMember: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,
@@ -35,12 +35,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             },
           },
         },
-        sessions: {
+        CoopSession: {
           where: { status: 'active' },
           include: {
             CoopSessionParticipant: {
               include: {
-                user: {
+                User: {
                   select: {
                     id: true,
                     username: true,
@@ -60,17 +60,17 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Check if user is a member or if party is public
-    const isMember = party.members.some((member) => member.userId === userId);
+    const isMember = party.PartyMember.some((member) => member.userId === userId);
     if (!isMember && !party.isPublic) {
       return NextResponse.json({ ok: false, error: 'Access denied' }, { status: 403 });
     }
 
     const transformedParty = {
       ...party,
-      memberCount: party.members.length,
+      memberCount: party.PartyMember.length,
       createdAt: party.createdAt.toISOString(),
       updatedAt: party.updatedAt.toISOString(),
-      sessions: party.sessions.map((session) => ({
+      sessions: party.CoopSession.map((session) => ({
         ...session,
         startedAt: session.startedAt.toISOString(),
         endedAt: session.endedAt?.toISOString(),
@@ -139,7 +139,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         },
         PartyMember: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,
@@ -154,7 +154,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const transformedParty = {
       ...updatedParty,
-      memberCount: updatedParty.members.length,
+      memberCount: updatedParty.PartyMember.length,
       createdAt: updatedParty.createdAt.toISOString(),
       updatedAt: updatedParty.updatedAt.toISOString(),
     };

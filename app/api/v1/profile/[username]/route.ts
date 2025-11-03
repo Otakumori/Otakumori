@@ -19,18 +19,18 @@ export async function GET(request: NextRequest, { params }: { params: { username
     const profileUser = await db.user.findUnique({
       where: { username },
       include: {
-        profileSections: {
+        ProfileSection: {
           orderBy: { orderIdx: 'asc' },
         },
-        profileLinks: {
+        ProfileLink: {
           orderBy: { orderIdx: 'asc' },
         },
-        profileTheme: true,
-        presence: true,
+        ProfileTheme: true,
+        Presence: true,
         _count: {
           select: {
-            followers: true,
-            following: true,
+            Follow_Follow_followeeIdToUser: true,
+            Follow_Follow_followerIdToUser: true,
           },
         },
       },
@@ -82,40 +82,57 @@ export async function GET(request: NextRequest, { params }: { params: { username
       if (!userId) {
         canView = false;
       } else {
-        // Check if they're mutual followers (friends)
-        const mutualFollow = await db.follow.findUnique({
-          where: {
-            followerId_followeeId: {
-              followerId: userId,
-              followeeId: profileUser.id,
-            },
-          },
+        // Get current user's ID from Clerk ID
+        const currentUser = await db.user.findUnique({
+          where: { clerkId: userId },
+          select: { id: true },
         });
 
-        const mutualFollowBack = await db.follow.findUnique({
-          where: {
-            followerId_followeeId: {
-              followerId: profileUser.id,
-              followeeId: userId,
+        if (!currentUser) {
+          canView = false;
+        } else {
+          // Check if they're mutual followers (friends)
+          const mutualFollow = await db.follow.findUnique({
+            where: {
+              followerId_followeeId: {
+                followerId: currentUser.id,
+                followeeId: profileUser.id,
+              },
             },
-          },
-        });
+          });
 
-        canView = !!(mutualFollow && mutualFollowBack);
-        isFollowing = !!mutualFollow;
+          const mutualFollowBack = await db.follow.findUnique({
+            where: {
+              followerId_followeeId: {
+                followerId: profileUser.id,
+                followeeId: currentUser.id,
+              },
+            },
+          });
+
+          canView = !!(mutualFollow && mutualFollowBack);
+          isFollowing = !!mutualFollow;
+        }
       }
     } else {
       // Public profile
       if (userId) {
-        const follow = await db.follow.findUnique({
-          where: {
-            followerId_followeeId: {
-              followerId: userId,
-              followeeId: profileUser.id,
-            },
-          },
+        const currentUser = await db.user.findUnique({
+          where: { clerkId: userId },
+          select: { id: true },
         });
-        isFollowing = !!follow;
+        
+        if (currentUser) {
+          const follow = await db.follow.findUnique({
+            where: {
+              followerId_followeeId: {
+                followerId: currentUser.id,
+                followeeId: profileUser.id,
+              },
+            },
+          });
+          isFollowing = !!follow;
+        }
       }
     }
 
@@ -136,33 +153,33 @@ export async function GET(request: NextRequest, { params }: { params: { username
       visibility: profileUser.visibility,
       isFollowing,
       isBlocked: false, // We already checked blocks above
-      followerCount: profileUser._count.followers,
-      followingCount: profileUser._count.following,
-      sections: profileUser.profileSections.map((section) => ({
+      followerCount: profileUser._count.Follow_Follow_followeeIdToUser,
+      followingCount: profileUser._count.Follow_Follow_followerIdToUser,
+      sections: profileUser.ProfileSection.map((section: any) => ({
         id: section.id,
         code: section.code,
         orderIdx: section.orderIdx,
         visible: section.visible,
       })),
-      links: profileUser.profileLinks.map((link) => ({
+      links: profileUser.ProfileLink.map((link: any) => ({
         id: link.id,
         label: link.label,
         url: link.url,
         orderIdx: link.orderIdx,
       })),
-      theme: profileUser.profileTheme
+      theme: profileUser.ProfileTheme
         ? {
-            themeCode: profileUser.profileTheme.themeCode,
-            accentHex: profileUser.profileTheme.accentHex,
+            themeCode: profileUser.ProfileTheme.themeCode,
+            accentHex: profileUser.ProfileTheme.accentHex,
           }
         : undefined,
-      presence: profileUser.presence
+      presence: profileUser.Presence
         ? {
-            profileId: profileUser.presence.profileId,
-            status: profileUser.presence.status,
-            lastSeen: profileUser.presence.lastSeen.toISOString(),
-            activity: profileUser.presence.activity as any,
-            showActivity: profileUser.presence.showActivity,
+            profileId: profileUser.Presence.profileId,
+            status: profileUser.Presence.status,
+            lastSeen: profileUser.Presence.lastSeen.toISOString(),
+            activity: profileUser.Presence.activity as any,
+            showActivity: profileUser.Presence.showActivity,
           }
         : undefined,
       createdAt: profileUser.createdAt.toISOString(),

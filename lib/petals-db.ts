@@ -14,7 +14,12 @@ export async function ensureUserByClerkId(clerkId: string) {
   const user = await db.user.upsert({
     where: { clerkId },
     update: {},
-    create: { clerkId, email, username },
+    create: { 
+      id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      clerkId, 
+      email, 
+      username 
+    },
     select: { id: true, petalBalance: true },
   });
   return user;

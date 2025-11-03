@@ -50,14 +50,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Check if party is still open and not full
-    if (invitation.party.status !== 'open') {
+    if (invitation.Party.status !== 'open') {
       return NextResponse.json(
         { ok: false, error: 'Party is no longer accepting members' },
         { status: 400 },
       );
     }
 
-    if (invitation.party.members.length >= invitation.party.maxMembers) {
+    if (invitation.Party.PartyMember.length >= invitation.Party.maxMembers) {
       return NextResponse.json({ ok: false, error: 'Party is full' }, { status: 400 });
     }
 
@@ -86,8 +86,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       });
 
       // Update party member count and status if needed
-      const newMemberCount = invitation.party.members.length + 1;
-      const newStatus = newMemberCount >= invitation.party.maxMembers ? 'full' : 'open';
+      const newMemberCount = invitation.Party.PartyMember.length + 1;
+      const newStatus = newMemberCount >= invitation.Party.maxMembers ? 'full' : 'open';
 
       await db.party.update({
         where: { id: invitation.partyId },

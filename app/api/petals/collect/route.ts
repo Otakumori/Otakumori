@@ -56,6 +56,7 @@ export async function POST(request: Request) {
           },
         },
         create: {
+          id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
           clerkId: userId,
           email: `${userId}@temp.com`, // Required field
           username: `user_${userId.slice(0, 8)}`, // Required field

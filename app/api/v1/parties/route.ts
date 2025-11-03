@@ -59,7 +59,7 @@ export async function GET(request: Request) {
           User: { select: memberSelect },
           PartyMember: {
             include: {
-              user: { select: memberSelect },
+              User: { select: memberSelect },
             },
           },
         },
@@ -79,7 +79,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       ok: true,
       data: {
-        parties: parties.map((party) => ({
+        parties: parties.map((party: any) => ({
           id: party.id,
           name: party.name,
           description: party.description,
@@ -90,15 +90,15 @@ export async function GET(request: Request) {
           settings: party.settings,
           createdAt: party.createdAt.toISOString(),
           updatedAt: party.updatedAt.toISOString(),
-          leader: party.leader,
-          members: party.members.map((member) => ({
+          leader: party.User,
+          members: party.PartyMember.map((member: any) => ({
             id: member.id,
             role: member.role,
             joinedAt: member.joinedAt.toISOString(),
             lastActiveAt: member.lastActiveAt.toISOString(),
-            user: member.user,
+            user: member.User,
           })),
-          memberCount: party.members.length,
+          memberCount: party.PartyMember.length,
         })),
         totalCount,
         hasMore: params.offset + params.limit < totalCount,
@@ -150,10 +150,10 @@ export async function POST(request: Request) {
     const party = await db.party.create({
       data: partyData,
       include: {
-        leader: { select: memberSelect },
-        members: {
+        User: { select: memberSelect },
+        PartyMember: {
           include: {
-            user: { select: memberSelect },
+            User: { select: memberSelect },
           },
         },
       },
@@ -175,15 +175,15 @@ export async function POST(request: Request) {
           settings: party.settings,
           createdAt: party.createdAt.toISOString(),
           updatedAt: party.updatedAt.toISOString(),
-          leader: party.leader,
-          members: party.members.map((member) => ({
+          leader: party.User,
+          members: party.PartyMember.map((member: any) => ({
             id: member.id,
             role: member.role,
             joinedAt: member.joinedAt.toISOString(),
             lastActiveAt: member.lastActiveAt.toISOString(),
-            user: member.user,
+            user: member.User,
           })),
-          memberCount: party.members.length,
+          memberCount: party.PartyMember.length,
         },
       },
       { status: 201 },

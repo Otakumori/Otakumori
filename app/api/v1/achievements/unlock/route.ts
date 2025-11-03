@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
         purpose: 'achievement_unlock',
         method: 'POST',
         response: JSON.stringify({ pending: true }),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 

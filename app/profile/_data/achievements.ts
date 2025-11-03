@@ -10,12 +10,12 @@ export async function loadAchievementsForProfile() {
     ? await db.userAchievement
         .findMany({
           where: { userId },
-          include: { achievement: { select: { code: true, points: true } } },
+          include: { Achievement: { select: { code: true, points: true } } },
         })
         .catch(() => [])
     : [];
-  const ownedSet = new Set(owned.map((o) => o.achievement.code));
+  const ownedSet = new Set(owned.map((o) => o.Achievement.code));
   const totalPoints = catalog.reduce((s, a) => s + (a.points ?? 0), 0);
-  const earnedPoints = owned.reduce((s, o) => s + (o.achievement.points ?? 0), 0);
+  const earnedPoints = owned.reduce((s, o) => s + (o.Achievement.points ?? 0), 0);
   return { catalog, ownedSet, earnedPoints, totalPoints };
 }

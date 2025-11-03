@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
               avatarUrl: true,
             },
           },
-          likes: currentUser
+          CommentLike: currentUser
             ? {
                 where: { userId: currentUser.id },
                 select: { id: true },
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       replyCount: newComment.replyCount,
       createdAt: newComment.createdAt.toISOString(),
       updatedAt: newComment.updatedAt.toISOString(),
-      author: newComment.Author,
+      author: newComment.User,
       isLiked: false,
     };
 

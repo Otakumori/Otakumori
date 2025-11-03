@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
     // Update user profile
     const updateData: any = {};
-    if (validatedData.displayName !== undefined)
-      updateData.displayName = validatedData.displayName;
+    if (validatedData.display_name !== undefined)
+      updateData.displayName = validatedData.display_name;
     if (validatedData.bio !== undefined) updateData.bio = validatedData.bio;
     if (validatedData.location !== undefined) updateData.location = validatedData.location;
     if (validatedData.website !== undefined) updateData.website = validatedData.website;

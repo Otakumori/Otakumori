@@ -121,7 +121,7 @@ export async function grantPetalsForOrder({
     // Return existing result
     const userRunes = await db.userRune.findMany({
       where: { orderId: existingOrder.id },
-      include: { rune: true },
+      include: { RuneDef: true },
     });
 
     return {
@@ -137,7 +137,7 @@ export async function grantPetalsForOrder({
         amountGrantedNow: 0,
       },
       newTotal: 0, // Will be calculated below
-      runes: userRunes.map((ur) => ur.rune.canonicalId as CanonicalRuneId),
+      runes: userRunes.map((ur) => ur.RuneDef.canonicalId as CanonicalRuneId),
       combos: [],
     };
   }
@@ -348,10 +348,10 @@ async function checkComboCompletions(
     // Get user's existing runes
     const userRunes = await db.userRune.findMany({
       where: { userId },
-      include: { rune: true },
+      include: { RuneDef: true },
     });
 
-    const userRuneIds = userRunes.map((ur) => ur.rune.canonicalId);
+    const userRuneIds = userRunes.map((ur) => ur.RuneDef.canonicalId);
     const allUserRunes = [...userRuneIds, ...newRunes];
 
     // Check if combo is completed

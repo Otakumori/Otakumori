@@ -25,13 +25,9 @@ export async function GET(request: NextRequest) {
           isPublic: true, // Only get public configurations for games
         },
         include: {
-          parts: {
-            include: {
-              part: true,
-            },
-          },
-          morphTargets: true,
-          materialOverrides: true,
+          AvatarConfigurationPart: true,
+          AvatarMorphTarget: true,
+          AvatarMaterialOverride: true,
         },
         orderBy: {
           updatedAt: 'desc',
@@ -103,30 +99,26 @@ export async function GET(request: NextRequest) {
         thumbnailUrl: avatarConfig.thumbnailUrl,
         createdAt: avatarConfig.createdAt,
         updatedAt: avatarConfig.updatedAt,
-        parts: avatarConfig.parts.map((p) => ({
+        parts: avatarConfig.AvatarConfigurationPart.map((p) => ({
           id: p.id,
           configurationId: p.configurationId,
           partId: p.partId,
           partType: p.partType,
           attachmentOrder: p.attachmentOrder,
-          createdAt: p.createdAt,
         })),
-        morphTargets: avatarConfig.morphTargets.reduce(
+        morphTargets: avatarConfig.AvatarMorphTarget.reduce(
           (acc, mt) => {
             acc[mt.targetName] = mt.value;
             return acc;
           },
           {} as Record<string, number>,
         ),
-        materialOverrides: avatarConfig.materialOverrides.reduce(
+        materialOverrides: avatarConfig.AvatarMaterialOverride.reduce(
           (acc, mo) => {
             acc[mo.slot] = {
               type: mo.type,
               value: mo.value,
               opacity: mo.opacity,
-              metallic: mo.metallic,
-              roughness: mo.roughness,
-              normalStrength: mo.normalStrength,
             };
             return acc;
           },
@@ -218,6 +210,7 @@ export async function POST(request: NextRequest) {
           idleAnimations,
           allowExport,
           exportFormat,
+          configurationData: {},
         },
       });
 

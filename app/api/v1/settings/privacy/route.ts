@@ -99,7 +99,7 @@ function buildCreateData(
   updates: z.infer<typeof PrivacySettingsUpdateSchema>,
 ): Prisma.PrivacySettingsCreateInput {
   return {
-    user: { connect: { id: userId } },
+    User: { connect: { id: userId } },
     showOnlineStatus: updates.showOnlineStatus ?? true,
     showLastSeen: updates.showLastSeen ?? true,
     showActivity: updates.showActivity ?? true,

@@ -24,23 +24,17 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         status: 'VISIBLE',
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             username: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
         _count: {
           select: {
             ProductSoapstonePraise: true,
-          },
-        },
-        User: {
-          select: {
-            id: true,
-            displayName: true,
-            avatarUrl: true,
           },
         },
       },

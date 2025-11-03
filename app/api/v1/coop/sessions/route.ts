@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     const party = await db.party.findUnique({
       where: { id: validatedData.partyId },
       include: {
-        members: true,
-        sessions: {
+        PartyMember: true,
+        CoopSession: {
           where: { status: 'active' },
         },
       },
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Party not found' }, { status: 404 });
     }
 
-    const isMember = party.members.some((member) => member.userId === userId);
+    const isMember = party.PartyMember.some((member) => member.userId === userId);
     if (!isMember) {
       return NextResponse.json(
         { ok: false, error: 'Only party members can start coop sessions' },
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if there's already an active session
-    if (party.sessions.length > 0) {
+    if (party.CoopSession.length > 0) {
       return NextResponse.json(
         { ok: false, error: 'Party already has an active session' },
         { status: 400 },
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
             gameMode: true,
           },
         },
-        participants: {
+        CoopSessionParticipant: {
           include: {
             User: {
               select: {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Add all party members as participants
     const participants = await Promise.all(
-      party.members.map((member) =>
+      party.PartyMember.map((member) =>
         db.coopSessionParticipant.create({
           data: {
             sessionId: session.id,
@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
     const sessions = await db.coopSession.findMany({
       where: {
         ...where,
-        participants: {
+        CoopSessionParticipant: {
           some: { userId },
         },
       },
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
             gameMode: true,
           },
         },
-        participants: {
+        CoopSessionParticipant: {
           include: {
             User: {
               select: {

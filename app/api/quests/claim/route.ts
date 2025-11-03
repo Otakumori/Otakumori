@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, already: true, message: 'Already claimed' });
     }
 
-    const quest = assignment.quest;
+    const quest = assignment.Quest;
     if (!quest) {
       return NextResponse.json({ error: 'quest_not_found' }, { status: 404 });
     }

@@ -70,10 +70,8 @@ export async function POST(request: Request) {
       data: {
         key: payload.idempotencyKey,
         method: 'POST',
-        userId: user.id,
         response: '', // Will be updated after transaction
         purpose: 'petal_purchase',
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 

@@ -39,17 +39,17 @@ export async function GET() {
 
     const friends = await db.user.findMany({
       where: {
-        followers: { some: { followerId: user.id } },
-        following: { some: { followeeId: user.id } },
+        Follow_Follow_followeeIdToUser: { some: { followerId: user.id } },
+        Follow_Follow_followerIdToUser: { some: { followeeId: user.id } },
       },
       select: {
-        presence: true,
+        Presence: true,
       },
     });
 
     const payload = FriendsPresenceSchema.parse({
       friends: friends
-        .map((friend) => friend.presence)
+        .map((friend) => friend.Presence)
         .filter((presence): presence is NonNullable<typeof presence> => Boolean(presence))
         .map((presence) => ({
           profileId: presence.profileId,

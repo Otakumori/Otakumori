@@ -148,7 +148,7 @@ function buildCreateData(
   updates: z.infer<typeof UserSettingsUpdateSchema>,
 ): Prisma.UserSettingsCreateInput {
   return {
-    user: { connect: { id: userId } },
+    User: { connect: { id: userId } },
     profileVisibility: updates.profileVisibility ?? 'public',
     allowFriendRequests: updates.allowFriendRequests ?? true,
     allowPartyInvites: updates.allowPartyInvites ?? true,

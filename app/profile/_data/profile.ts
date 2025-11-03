@@ -25,7 +25,7 @@ export async function getProfileData() {
   const achievements = await prisma.userAchievement.findMany({
     where: { userId },
     include: {
-      achievement: {
+      Achievement: {
         select: {
           code: true,
           points: true,
@@ -36,7 +36,7 @@ export async function getProfileData() {
     },
   });
 
-  const ownedCodes = new Set(achievements.map((a) => a.achievement.code));
+  const ownedCodes = new Set(achievements.map((a) => a.Achievement.code));
 
   // Calculate cooldown for gamertag changes
   const canRenameAt = profile?.gamertagChangedAt

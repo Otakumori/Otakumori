@@ -109,10 +109,10 @@ export async function POST(req: Request) {
 
     // Merge prefs into UserSettings.notificationPreferences JSON under .card
     if (input.prefs) {
-      const current = await db.UserSettings.findUnique({ where: { userId: user.id } });
+      const current = await db.userSettings.findUnique({ where: { userId: user.id } });
       const existing = (current?.notificationPreferences as any) ?? {};
       const merged = mergeCardPrefs(existing, input.prefs);
-      await db.UserSettings.upsert({
+      await db.userSettings.upsert({
         where: { userId: user.id },
         update: {
           notificationPreferences: merged,
@@ -129,7 +129,7 @@ export async function POST(req: Request) {
     }
 
     // Return GET payload shape
-    const settings = await db.UserSettings.findUnique({ where: { userId: user.id } });
+    const settings = await db.userSettings.findUnique({ where: { userId: user.id } });
     const prefs = extractPrefsFromSettings(settings?.notificationPreferences as any);
     const avatarUser = await db.user.findUnique({
       where: { id: user.id },

@@ -31,7 +31,7 @@ export const fulfillOrder = inngest.createFunction(
             select: {
               id: true,
               email: true,
-              display_name: true,
+              displayName: true,
               username: true,
             },
           },
@@ -67,7 +67,7 @@ export const fulfillOrder = inngest.createFunction(
         // Parse shipping address
         const address = shippingDetails?.address || {};
         const shippingAddress: PrintifyShippingAddress = {
-          first_name: shippingDetails?.name?.split(' ')[0] || order.User.display_name || 'Customer',
+          first_name: shippingDetails?.name?.split(' ')[0] || order.User.displayName || 'Customer',
           last_name: shippingDetails?.name?.split(' ').slice(1).join(' ') || 'Name',
           email: email || order.User.email || 'customer@example.com',
           country: address.country || 'US',
@@ -144,7 +144,7 @@ export const fulfillOrder = inngest.createFunction(
     // Step 4: Clear user's cart
     await step.run('clear-cart', async () => {
       await db.cartItem.deleteMany({
-        where: { cart: { userId: order.userId } },
+        where: { Cart: { userId: order.userId } },
       });
     });
 
