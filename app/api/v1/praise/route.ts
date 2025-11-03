@@ -78,10 +78,6 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // Generate day key for uniqueness constraint
-      const today = new Date();
-      const dayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
       try {
         // Create praise (will fail if duplicate due to unique constraint)
         const praise = await db.praise.create({

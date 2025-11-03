@@ -77,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
 
-    const { message, template } = validation.data;
+    const { message, template: _template } = validation.data;
 
     // Cost: 5 petals to place a sign
     const SOAPSTONE_COST = 5;
