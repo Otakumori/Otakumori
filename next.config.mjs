@@ -1,4 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import path from 'node:path';
 import { env } from './env.mjs';
 
 // Bundle analyzer disabled for now - @next/bundle-analyzer is a dev dependency
@@ -19,7 +20,8 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'date-fns', 'framer-motion', '@radix-ui/react-icons'],
-    tsconfigPaths: true,
+    // tsconfigPaths removed - deprecated in Next.js 15
+    // Alias resolution now handled in webpack config below
   },
 
   // Image optimization for Printify and CDN assets
@@ -202,6 +204,12 @@ const nextConfig = {
       compression: false,
       store: 'pack',
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    };
+
+    // Configure path aliases for @ imports (replaces deprecated experimental.tsconfigPaths)
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(process.cwd()),
     };
 
     if (!isServer) {
