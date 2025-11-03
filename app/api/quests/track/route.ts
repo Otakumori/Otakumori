@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
       where: {
         userId: user.id,
         day,
-        quest: { key: { in: questKeys } },
+        Quest: { key: { in: questKeys } },
       },
-      include: { quest: true },
+      include: { Quest: true },
     });
 
     if (!assignments.length) {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
       if (assignment.completedAt) {
         return {
-          key: assignment.quest?.key ?? '',
+          key: assignment.Quest?.key ?? '',
           progress: currentProgress,
           target,
           completed: true,
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       );
 
       return {
-        key: assignment.quest?.key ?? '',
+        key: assignment.Quest?.key ?? '',
         progress: nextProgress,
         target,
         completed,

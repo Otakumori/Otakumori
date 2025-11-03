@@ -107,7 +107,7 @@ async function searchUsers(
   const whereClause: any = {
     OR: [
       { username: { contains: query, mode: 'insensitive' } },
-      { display_name: { contains: query, mode: 'insensitive' } },
+      { displayName: { contains: query, mode: 'insensitive' } },
       { bio: { contains: query, mode: 'insensitive' } },
     ],
     // Exclude blocked users and private profiles
@@ -127,7 +127,7 @@ async function searchUsers(
     select: {
       id: true,
       username: true,
-      display_name: true,
+      displayName: true,
       avatarUrl: true,
       bio: true,
       visibility: true,
@@ -138,7 +138,7 @@ async function searchUsers(
   return users.map((user) => ({
     id: user.id,
     type: 'user' as const,
-    title: user.display_name || user.username,
+    title: user.displayName || user.username,
     description: user.bio || `@${user.username}`,
     url: `/profile/${user.username}`,
     relevanceScore: calculateUserRelevanceScore(user, query),
@@ -211,7 +211,7 @@ async function searchContent(
   const comments = await db.comment.findMany({
     where: {
       content: { contains: query, mode: 'insensitive' },
-      author: {
+      Author: {
         visibility: { not: 'PRIVATE' },
       },
     },
@@ -221,11 +221,11 @@ async function searchContent(
       contentType: true,
       contentId: true,
       createdAt: true,
-      author: {
+      Author: {
         select: {
           id: true,
           username: true,
-          display_name: true,
+          displayName: true,
           avatarUrl: true,
         },
       },
@@ -237,12 +237,12 @@ async function searchContent(
     ...comments.map((comment) => ({
       id: comment.id,
       type: 'comment' as const,
-      title: `Comment by ${comment.author.display_name || comment.author.username}`,
+      title: `Comment by ${comment.Author.displayName || comment.Author.username}`,
       description: comment.content.substring(0, 100) + (comment.content.length > 100 ? '...' : ''),
       url: getCommentUrl(comment),
       relevanceScore: calculateContentRelevanceScore(comment.content, query),
       metadata: {
-        author: comment.author,
+        author: comment.Author,
         contentType: comment.contentType,
         contentId: comment.contentId,
         createdAt: comment.createdAt.toISOString(),
@@ -257,7 +257,7 @@ async function searchContent(
         { type: { contains: query, mode: 'insensitive' } },
         { payload: { path: ['description'], string_contains: query } },
       ],
-      profile: {
+      Profile: {
         visibility: { not: 'PRIVATE' },
       },
     },
@@ -266,11 +266,11 @@ async function searchContent(
       type: true,
       payload: true,
       createdAt: true,
-      profile: {
+      Profile: {
         select: {
           id: true,
           username: true,
-          display_name: true,
+          displayName: true,
           avatarUrl: true,
         },
       },
@@ -282,12 +282,12 @@ async function searchContent(
     ...activities.map((activity) => ({
       id: activity.id,
       type: 'activity' as const,
-      title: `${activity.profile.display_name || activity.profile.username} - ${activity.type}`,
+      title: `${activity.Profile.displayName || activity.Profile.username} - ${activity.type}`,
       description: (activity.payload as any)?.description || activity.type,
-      url: `/profile/${activity.profile.username}`,
+      url: `/profile/${activity.Profile.username}`,
       relevanceScore: calculateContentRelevanceScore(activity.type, query),
       metadata: {
-        user: activity.profile,
+        user: activity.Profile,
         activityType: activity.type,
         createdAt: activity.createdAt.toISOString(),
       },
@@ -311,8 +311,8 @@ function calculateUserRelevanceScore(user: any, query: string): number {
   }
 
   // Display name matches
-  if (user.display_name) {
-    if (user.display_name.toLowerCase().includes(lowerQuery)) {
+  if (user.displayName) {
+    if (user.displayName.toLowerCase().includes(lowerQuery)) {
       score += 40;
     }
   }

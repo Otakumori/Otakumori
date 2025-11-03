@@ -120,7 +120,6 @@ export async function POST(request: NextRequest) {
         key: idempotencyKey,
         purpose: `game_start_${gameKey}_${userId}`,
         method: 'POST',
-        path: '/api/v1/games/start',
         response: JSON.stringify({ pending: true }),
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },

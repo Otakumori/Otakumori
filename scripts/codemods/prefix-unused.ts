@@ -164,4 +164,3 @@ async function processFile(path: string) {
 
   console.log(`[prefix-unused] Updated ${edited} file(s).`);
 })();
-

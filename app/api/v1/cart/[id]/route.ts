@@ -15,13 +15,13 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     const cart = await prisma.cart.findUnique({
       where: { userId },
       include: {
-        items: {
+        CartItem: {
           where: { id: params.id },
         },
       },
     });
 
-    if (!cart || cart.items.length === 0) {
+    if (!cart || cart.CartItem.length === 0) {
       return NextResponse.json({ ok: false, error: 'Cart item not found' }, { status: 404 });
     }
 

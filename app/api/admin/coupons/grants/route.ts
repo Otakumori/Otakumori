@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
         take,
         skip,
-        include: { user: { select: { id: true, username: true } } },
+        include: { User: { select: { id: true, username: true } } },
       }),
     ]);
 

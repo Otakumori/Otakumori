@@ -113,7 +113,7 @@ export class ProceduralBodyGenerator {
       neckRadius * 1.1,
       neckHeight,
       16,
-      8
+      8,
     );
 
     const material = this.createSkinMaterial();
@@ -132,43 +132,24 @@ export class ProceduralBodyGenerator {
     const bottomRadius = params.waistSize * 0.12;
 
     // Create torso from modified cylinder
-    const geometry = new THREE.CylinderGeometry(
-      topRadius,
-      bottomRadius,
-      baseHeight,
-      32,
-      16,
-      true
-    );
+    const geometry = new THREE.CylinderGeometry(topRadius, bottomRadius, baseHeight, 32, 16, true);
 
     // Apply build-specific deformations
     this.applyBuildDeformation(geometry, params);
 
     // Deform vertices for breast shape if NSFW enabled
-    if (
-      params.breastSize &&
-      params.breastSize > 0.5 &&
-      params.anatomyDetail !== 'basic'
-    ) {
+    if (params.breastSize && params.breastSize > 0.5 && params.anatomyDetail !== 'basic') {
       this.deformForBreasts(
         geometry,
         params.breastSize,
         params.breastSeparation || 0,
-        params.breastShape || 0.5
+        params.breastShape || 0.5,
       );
     }
 
     // Apply buttock deformation if NSFW enabled
-    if (
-      params.buttockSize &&
-      params.buttockSize > 0.5 &&
-      params.anatomyDetail !== 'basic'
-    ) {
-      this.deformForButtocks(
-        geometry,
-        params.buttockSize,
-        params.buttockShape || 0
-      );
+    if (params.buttockSize && params.buttockSize > 0.5 && params.anatomyDetail !== 'basic') {
+      this.deformForButtocks(geometry, params.buttockSize, params.buttockShape || 0);
     }
 
     // Apply muscle definition
@@ -188,7 +169,7 @@ export class ProceduralBodyGenerator {
    */
   private static applyBuildDeformation(
     geometry: THREE.BufferGeometry,
-    params: BodyParameters
+    params: BodyParameters,
   ): void {
     const positions = geometry.attributes.position;
 
@@ -229,7 +210,7 @@ export class ProceduralBodyGenerator {
     geometry: THREE.BufferGeometry,
     size: number,
     separation: number,
-    shape: number
+    shape: number,
   ): void {
     const positions = geometry.attributes.position;
 
@@ -241,18 +222,8 @@ export class ProceduralBodyGenerator {
       // Only affect upper torso front vertices
       if (y > 0 && z > 0) {
         // Apply breast deformation using displacement
-        const leftBreast = this.breastDisplacement(
-          x + separation,
-          y,
-          size,
-          shape
-        );
-        const rightBreast = this.breastDisplacement(
-          x - separation,
-          y,
-          size,
-          shape
-        );
+        const leftBreast = this.breastDisplacement(x + separation, y, size, shape);
+        const rightBreast = this.breastDisplacement(x - separation, y, size, shape);
         const totalDisplacement = Math.max(leftBreast, rightBreast);
 
         positions.setZ(i, z + totalDisplacement);
@@ -266,12 +237,7 @@ export class ProceduralBodyGenerator {
   /**
    * Calculate breast displacement for a given position
    */
-  private static breastDisplacement(
-    x: number,
-    y: number,
-    size: number,
-    shape: number
-  ): number {
+  private static breastDisplacement(x: number, y: number, size: number, shape: number): number {
     // Gaussian-like curve for natural breast shape
     const horizontalFalloff = Math.exp(-(x * x) / (0.05 * size));
     const verticalCenter = 0.15 - shape * 0.05; // Shape affects vertical position
@@ -286,7 +252,7 @@ export class ProceduralBodyGenerator {
   private static deformForButtocks(
     geometry: THREE.BufferGeometry,
     size: number,
-    shape: number
+    shape: number,
   ): void {
     const positions = geometry.attributes.position;
 
@@ -309,12 +275,7 @@ export class ProceduralBodyGenerator {
   /**
    * Calculate buttock displacement
    */
-  private static buttockDisplacement(
-    x: number,
-    y: number,
-    size: number,
-    shape: number
-  ): number {
+  private static buttockDisplacement(x: number, y: number, size: number, shape: number): number {
     const horizontalFalloff = Math.exp(-(x * x) / 0.04);
     const verticalCenter = -0.2 + shape * 0.05;
     const verticalFalloff = Math.exp(-((y - verticalCenter) ** 2) / 0.06);
@@ -325,10 +286,7 @@ export class ProceduralBodyGenerator {
   /**
    * Apply muscle definition
    */
-  private static applyMuscleDefinition(
-    geometry: THREE.BufferGeometry,
-    definition: number
-  ): void {
+  private static applyMuscleDefinition(geometry: THREE.BufferGeometry, definition: number): void {
     const positions = geometry.attributes.position;
 
     for (let i = 0; i < positions.count; i++) {
@@ -361,25 +319,13 @@ export class ProceduralBodyGenerator {
     const armRadius = 0.025 * params.height;
 
     // Left arm
-    const leftArmGeom = new THREE.CylinderGeometry(
-      armRadius,
-      armRadius * 0.8,
-      armLength,
-      16,
-      8
-    );
+    const leftArmGeom = new THREE.CylinderGeometry(armRadius, armRadius * 0.8, armLength, 16, 8);
     const leftArm = new THREE.Mesh(leftArmGeom, this.createSkinMaterial());
     leftArm.position.x = -0.18 * params.shoulderWidth;
     leftArm.rotation.z = Math.PI / 8;
 
     // Right arm
-    const rightArmGeom = new THREE.CylinderGeometry(
-      armRadius,
-      armRadius * 0.8,
-      armLength,
-      16,
-      8
-    );
+    const rightArmGeom = new THREE.CylinderGeometry(armRadius, armRadius * 0.8, armLength, 16, 8);
     const rightArm = new THREE.Mesh(rightArmGeom, this.createSkinMaterial());
     rightArm.position.x = 0.18 * params.shoulderWidth;
     rightArm.rotation.z = -Math.PI / 8;
@@ -400,24 +346,12 @@ export class ProceduralBodyGenerator {
     const calfRadius = 0.04;
 
     // Left leg
-    const leftLegGeom = new THREE.CylinderGeometry(
-      thighRadius,
-      calfRadius,
-      legLength,
-      16,
-      8
-    );
+    const leftLegGeom = new THREE.CylinderGeometry(thighRadius, calfRadius, legLength, 16, 8);
     const leftLeg = new THREE.Mesh(leftLegGeom, this.createSkinMaterial());
     leftLeg.position.x = -0.08 * params.hipWidth;
 
     // Right leg
-    const rightLegGeom = new THREE.CylinderGeometry(
-      thighRadius,
-      calfRadius,
-      legLength,
-      16,
-      8
-    );
+    const rightLegGeom = new THREE.CylinderGeometry(thighRadius, calfRadius, legLength, 16, 8);
     const rightLeg = new THREE.Mesh(rightLegGeom, this.createSkinMaterial());
     rightLeg.position.x = 0.08 * params.hipWidth;
 
@@ -436,14 +370,14 @@ export class ProceduralBodyGenerator {
 
     const leftHand = new THREE.Mesh(
       new THREE.SphereGeometry(handSize, 12, 12),
-      this.createSkinMaterial()
+      this.createSkinMaterial(),
     );
     leftHand.position.x = -0.2 * params.shoulderWidth;
     leftHand.scale.set(0.6, 1, 0.4); // Flatten to hand shape
 
     const rightHand = new THREE.Mesh(
       new THREE.SphereGeometry(handSize, 12, 12),
-      this.createSkinMaterial()
+      this.createSkinMaterial(),
     );
     rightHand.position.x = 0.2 * params.shoulderWidth;
     rightHand.scale.set(0.6, 1, 0.4);
@@ -463,13 +397,13 @@ export class ProceduralBodyGenerator {
 
     const leftFoot = new THREE.Mesh(
       new THREE.BoxGeometry(footSize * 0.6, footSize * 0.4, footSize * 1.2),
-      this.createSkinMaterial()
+      this.createSkinMaterial(),
     );
     leftFoot.position.set(-0.08 * params.hipWidth, 0, footSize * 0.3);
 
     const rightFoot = new THREE.Mesh(
       new THREE.BoxGeometry(footSize * 0.6, footSize * 0.4, footSize * 1.2),
-      this.createSkinMaterial()
+      this.createSkinMaterial(),
     );
     rightFoot.position.set(0.08 * params.hipWidth, 0, footSize * 0.3);
 
@@ -489,4 +423,3 @@ export class ProceduralBodyGenerator {
     });
   }
 }
-

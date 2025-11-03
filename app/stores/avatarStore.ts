@@ -93,14 +93,8 @@ interface AvatarStore {
 
   // NEW: Procedural avatar actions
   setProceduralConfig: (config: ProceduralAvatarConfig) => void;
-  updateBodyParam: <K extends keyof BodyParameters>(
-    key: K,
-    value: BodyParameters[K]
-  ) => void;
-  updateHairParam: <K extends keyof HairParameters>(
-    key: K,
-    value: HairParameters[K]
-  ) => void;
+  updateBodyParam: <K extends keyof BodyParameters>(key: K, value: BodyParameters[K]) => void;
+  updateHairParam: <K extends keyof HairParameters>(key: K, value: HairParameters[K]) => void;
   enableProceduralMode: () => void;
   disableProceduralMode: () => void;
 }

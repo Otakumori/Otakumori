@@ -19,14 +19,14 @@ export async function GET(req: NextRequest) {
     let cart = await prisma.cart.findUnique({
       where: { userId },
       include: {
-        items: {
+        CartItem: {
           include: {
-            product: {
+            Product: {
               include: {
                 ProductVariant: true,
               },
             },
-            productVariant: true,
+            ProductVariant: true,
           },
         },
       },
@@ -36,26 +36,26 @@ export async function GET(req: NextRequest) {
       cart = await prisma.cart.create({
         data: { userId },
         include: {
-          items: {
+          CartItem: {
             include: {
-              product: {
+              Product: {
                 include: {
                   ProductVariant: true,
                 },
               },
-              productVariant: true,
+              ProductVariant: true,
             },
           },
         },
       });
     }
 
-    const response = cart.items.map((item) => ({
+    const response = cart.CartItem.map((item) => ({
       id: item.id,
       productId: item.productId,
       variantId: item.productVariantId,
       quantity: item.quantity,
-      product: item.product,
+      product: item.Product,
     }));
 
     return NextResponse.json({ ok: true, data: response });
@@ -122,12 +122,12 @@ export async function POST(req: NextRequest) {
         quantity,
       },
       include: {
-        product: {
+        Product: {
           include: {
             ProductVariant: true,
           },
         },
-        productVariant: true,
+        ProductVariant: true,
       },
     });
 
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
       productId: cartItem.productId,
       variantId: cartItem.productVariantId,
       quantity: cartItem.quantity,
-      product: cartItem.product,
+      product: cartItem.Product,
     };
 
     return NextResponse.json({ ok: true, data: response });

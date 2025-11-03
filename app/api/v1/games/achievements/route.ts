@@ -28,14 +28,14 @@ export async function GET(request: NextRequest) {
 
     // Get all achievements
     const allAchievements = await db.achievement.findMany({
-      include: { reward: true },
+      include: { Reward: true },
       orderBy: { points: 'desc' },
     });
 
     // Get user's unlocked achievements
     const userAchievements = await db.userAchievement.findMany({
       where: { userId: user.id },
-      include: { achievement: { include: { reward: true } } },
+      include: { Achievement: { include: { Reward: true } } },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -59,11 +59,11 @@ export async function GET(request: NextRequest) {
         points: achievement.points,
         isUnlocked,
         unlockedAt,
-        reward: achievement.reward
+        reward: achievement.Reward
           ? {
-              kind: achievement.reward.kind,
-              value: achievement.reward.value,
-              sku: achievement.reward.sku,
+              kind: achievement.Reward.kind,
+              value: achievement.Reward.value,
+              sku: achievement.Reward.sku,
             }
           : null,
       };
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 
     // Calculate user's achievement stats
     const unlockedCount = unlockedAchievementIds.size;
-    const totalPoints = userAchievements.reduce((sum, ua) => sum + ua.achievement.points, 0);
+    const totalPoints = userAchievements.reduce((sum, ua) => sum + ua.Achievement.points, 0);
     const completionPercentage = Math.round((unlockedCount / allAchievements.length) * 100);
 
     return NextResponse.json({

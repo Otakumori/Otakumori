@@ -920,12 +920,7 @@ export default function CharacterEditor({
 
           {/* Tab Content */}
           {activeTab === 'parts' && (
-            <div
-              id="panel-parts"
-              role="tabpanel"
-              aria-labelledby="tab-parts"
-              className="space-y-4"
-            >
+            <div id="panel-parts" role="tabpanel" aria-labelledby="tab-parts" className="space-y-4">
               <CustomizationPanel title="Base Model">
                 <div className="space-y-2">
                   {(['male', 'female'] as const).map((model) => (
@@ -1261,12 +1256,7 @@ export default function CharacterEditor({
           )}
 
           {activeTab === 'poses' && (
-            <div
-              id="panel-poses"
-              role="tabpanel"
-              aria-labelledby="tab-poses"
-              className="space-y-4"
-            >
+            <div id="panel-poses" role="tabpanel" aria-labelledby="tab-poses" className="space-y-4">
               <CustomizationPanel title="Pose Categories">
                 <div className="flex flex-wrap gap-2">
                   {['idle', 'action', 'emote', 'dance', ...(showNsfwContent ? ['nsfw'] : [])].map(
@@ -1636,5 +1626,3 @@ export default function CharacterEditor({
     </div>
   );
 }
-
-

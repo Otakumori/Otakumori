@@ -10,7 +10,7 @@ export async function GET() {
 
   const me = await prisma.user.findUnique({
     where: { id: u.id },
-    select: { id: true, username: true, display_name: true, avatarUrl: true, petalBalance: true },
+    select: { id: true, username: true, displayName: true, avatarUrl: true, petalBalance: true },
   });
   if (!me) return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
 
@@ -19,7 +19,7 @@ export async function GET() {
     data: {
       id: me.id,
       username: me.username,
-      displayName: me.display_name,
+      displayName: me.displayName,
       legalName: null, // Not in current schema
       avatarUrl: me.avatarUrl,
       petalBalance: me.petalBalance,

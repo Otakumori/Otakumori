@@ -148,7 +148,8 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
         {Array.from({ length: 15 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-4xl" aria-hidden="true"
+            className="absolute text-4xl"
+            aria-hidden="true"
             style={{
               left: `${(i * 7) % 90}%`,
               top: `${(i * 13) % 90}%`,
@@ -273,7 +274,8 @@ export default function ButtonMashersKiss({ onComplete, _onFail, _duration }: Ga
             {Array.from({ length: 20 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute text-3xl" aria-hidden="true"
+                className="absolute text-3xl"
+                aria-hidden="true"
                 initial={{ scale: 0, x: 0, y: 0 }}
                 animate={{
                   scale: [0, 1, 0],

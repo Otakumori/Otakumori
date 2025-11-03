@@ -281,6 +281,3 @@ export default function ProductClient({ productId }: { productId: string }) {
     </div>
   );
 }
-
-
-

@@ -35,9 +35,7 @@ export class ProceduralHairGenerator {
 
     // Normalize color inputs
     const baseColor =
-      params.color instanceof THREE.Color
-        ? params.color
-        : new THREE.Color(params.color);
+      params.color instanceof THREE.Color ? params.color : new THREE.Color(params.color);
 
     // Generate hair strands based on style
     switch (params.style) {
@@ -81,7 +79,7 @@ export class ProceduralHairGenerator {
   private static generateShortHair(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     const strandCount = Math.floor(300 * params.volume);
     const maxLength = 0.15 * params.length;
@@ -98,7 +96,7 @@ export class ProceduralHairGenerator {
   private static generateMediumHair(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     const strandCount = Math.floor(500 * params.volume);
     const maxLength = 0.4 * params.length;
@@ -115,7 +113,7 @@ export class ProceduralHairGenerator {
   private static generateLongHair(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     const strandCount = Math.floor(800 * params.volume);
     const maxLength = 0.8 * params.length;
@@ -132,7 +130,7 @@ export class ProceduralHairGenerator {
   private static generateTwintails(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     // Base scalp coverage
     this.generateShortHair(group, { ...params, length: 0.3 }, color);
@@ -152,7 +150,7 @@ export class ProceduralHairGenerator {
   private static generatePonytail(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     // Base scalp coverage
     this.generateShortHair(group, { ...params, length: 0.3 }, color);
@@ -168,7 +166,7 @@ export class ProceduralHairGenerator {
   private static generateBobCut(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     const strandCount = Math.floor(600 * params.volume);
 
@@ -186,7 +184,7 @@ export class ProceduralHairGenerator {
         params,
         color,
         0.2 * params.length,
-        i
+        i,
       );
       group.add(strand);
     }
@@ -198,7 +196,7 @@ export class ProceduralHairGenerator {
   private static generatePixieCut(
     group: THREE.Group,
     params: HairParameters,
-    color: THREE.Color
+    color: THREE.Color,
   ): void {
     const strandCount = Math.floor(250 * params.volume);
     const maxLength = 0.08 * params.length;
@@ -215,7 +213,7 @@ export class ProceduralHairGenerator {
   private static createTail(
     params: HairParameters,
     color: THREE.Color,
-    origin: THREE.Vector3
+    origin: THREE.Vector3,
   ): THREE.Group {
     const tail = new THREE.Group();
     const strandCount = Math.floor(200 * params.volume);
@@ -228,16 +226,10 @@ export class ProceduralHairGenerator {
       const startPoint = new THREE.Vector3(
         origin.x + Math.cos(angle) * spread,
         origin.y,
-        origin.z + Math.sin(angle) * spread
+        origin.z + Math.sin(angle) * spread,
       );
 
-      const strand = this.createStrandFromPoint(
-        startPoint,
-        params,
-        color,
-        tailLength,
-        i
-      );
+      const strand = this.createStrandFromPoint(startPoint, params, color, tailLength, i);
       tail.add(strand);
     }
 
@@ -247,10 +239,7 @@ export class ProceduralHairGenerator {
   /**
    * Generate bangs
    */
-  private static generateBangs(
-    params: HairParameters,
-    color: THREE.Color
-  ): THREE.Group {
+  private static generateBangs(params: HairParameters, color: THREE.Color): THREE.Group {
     const bangs = new THREE.Group();
     bangs.name = 'Bangs';
 
@@ -270,7 +259,7 @@ export class ProceduralHairGenerator {
         params,
         color,
         bangLength,
-        i
+        i,
       );
       bangs.add(strand);
     }
@@ -286,7 +275,7 @@ export class ProceduralHairGenerator {
     color: THREE.Color,
     index: number,
     totalStrands: number,
-    maxLength: number
+    maxLength: number,
   ): THREE.Mesh {
     // Start point on scalp
     const theta = (index / totalStrands) * Math.PI * 2;
@@ -308,7 +297,7 @@ export class ProceduralHairGenerator {
     params: HairParameters,
     color: THREE.Color,
     maxLength: number,
-    seed: number
+    seed: number,
   ): THREE.Mesh {
     const points: THREE.Vector3[] = [];
     const segments = 10;
@@ -333,8 +322,8 @@ export class ProceduralHairGenerator {
         new THREE.Vector3(
           startPoint.x + waveX + Math.sign(startPoint.x) * outward,
           startPoint.y + gravity - maxLength * t,
-          startPoint.z + waveZ + Math.sign(startPoint.z) * outward
-        )
+          startPoint.z + waveZ + Math.sign(startPoint.z) * outward,
+        ),
       );
     }
 
@@ -366,4 +355,3 @@ export class ProceduralHairGenerator {
     return new THREE.Mesh(geometry, material);
   }
 }
-

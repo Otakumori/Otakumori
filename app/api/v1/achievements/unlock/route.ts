@@ -45,7 +45,6 @@ export async function POST(request: NextRequest) {
         key: validatedData.idempotencyKey,
         purpose: 'achievement_unlock',
         method: 'POST',
-        path: '/api/v1/achievements/unlock',
         response: JSON.stringify({ pending: true }),
         expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
@@ -54,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Get user
     const user = await db.user.findUnique({
       where: { clerkId: userId },
-      include: { achievements: { include: { achievement: true } } },
+      include: { UserAchievement: { include: { Achievement: { include: { Reward: true } } } } },
     });
 
     if (!user) {
@@ -62,8 +61,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if achievement already unlocked
-    const alreadyUnlocked = user.achievements.some(
-      (ua) => ua.achievement.code === validatedData.achievementCode,
+    const alreadyUnlocked = user.UserAchievement.some(
+      (ua) => ua.Achievement.code === validatedData.achievementCode,
     );
 
     if (alreadyUnlocked) {
@@ -76,7 +75,7 @@ export async function POST(request: NextRequest) {
     // Get achievement details
     const achievement = await db.achievement.findUnique({
       where: { code: validatedData.achievementCode },
-      include: { reward: true },
+      include: { Reward: true },
     });
 
     if (!achievement) {
@@ -95,12 +94,12 @@ export async function POST(request: NextRequest) {
     let rewardGranted = false;
     let rewardDetails = null;
 
-    if (achievement.reward) {
+    if (achievement.Reward) {
       rewardGranted = true;
 
-      switch (achievement.reward.kind) {
+      switch (achievement.Reward.kind) {
         case 'PETALS_BONUS':
-          const petalAmount = achievement.reward.value || 0;
+          const petalAmount = achievement.Reward.value || 0;
           await db.petalLedger.create({
             data: {
               userId: user.id,
@@ -124,19 +123,19 @@ export async function POST(request: NextRequest) {
           await db.inventoryItem.create({
             data: {
               userId: user.id,
-              sku: achievement.reward.sku || `achievement_${achievement.code}`,
-              kind: achievement.reward.kind === 'COSMETIC' ? 'COSMETIC' : 'OVERLAY',
+              sku: achievement.Reward.sku || `achievement_${achievement.code}`,
+              kind: achievement.Reward.kind === 'COSMETIC' ? 'COSMETIC' : 'OVERLAY',
               metadata: { source: 'achievement', achievementCode: achievement.code },
             },
           });
 
-          rewardDetails = { type: 'item', sku: achievement.reward.sku };
+          rewardDetails = { type: 'item', sku: achievement.Reward.sku };
           break;
 
         case 'COUPON_PERCENT':
         case 'COUPON_AMOUNT':
           const couponCode = `ACH_${achievement.code}_${Date.now()}`;
-          const isPercent = achievement.reward.kind === 'COUPON_PERCENT';
+          const isPercent = achievement.Reward.kind === 'COUPON_PERCENT';
           const couponData: any = {
             userId: user.id,
             code: couponCode,
@@ -145,17 +144,17 @@ export async function POST(request: NextRequest) {
           };
           if (
             isPercent &&
-            achievement.reward.value !== null &&
-            achievement.reward.value !== undefined
+            achievement.Reward.value !== null &&
+            achievement.Reward.value !== undefined
           ) {
-            couponData.percentOff = achievement.reward.value as number;
+            couponData.percentOff = achievement.Reward.value as number;
           }
           if (
             !isPercent &&
-            achievement.reward.value !== null &&
-            achievement.reward.value !== undefined
+            achievement.Reward.value !== null &&
+            achievement.Reward.value !== undefined
           ) {
-            couponData.amountOff = achievement.reward.value as number;
+            couponData.amountOff = achievement.Reward.value as number;
           }
           await db.couponGrant.create({ data: couponData });
 

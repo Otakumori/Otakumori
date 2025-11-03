@@ -12,7 +12,7 @@ export async function GET() {
     const pl = await prisma.musicPlaylist.findFirst({
       where: { isPublic: true },
       orderBy: { createdAt: 'desc' },
-      include: { tracks: { orderBy: { sort: 'asc' } } },
+      include: { MusicTrack: { orderBy: { sort: 'asc' } } },
     });
 
     return NextResponse.json({ ok: true, playlist: pl ?? null });

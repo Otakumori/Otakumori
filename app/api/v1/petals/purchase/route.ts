@@ -70,7 +70,6 @@ export async function POST(request: Request) {
       data: {
         key: payload.idempotencyKey,
         method: 'POST',
-        path: '/api/v1/petals/purchase',
         userId: user.id,
         response: '', // Will be updated after transaction
         purpose: 'petal_purchase',

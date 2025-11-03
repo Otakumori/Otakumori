@@ -157,8 +157,8 @@ class PerformanceBudgetValidator {
 
         // Try to determine route for chunks
         if (analysis.type === 'chunk') {
-          const manifestEntry = Object.entries(manifestPages).find(([, assets]) =>
-            Array.isArray(assets) && assets.some((asset) => asset.includes(file)),
+          const manifestEntry = Object.entries(manifestPages).find(
+            ([, assets]) => Array.isArray(assets) && assets.some((asset) => asset.includes(file)),
           );
           if (manifestEntry) {
             analysis.route = manifestEntry[0];

@@ -71,7 +71,7 @@ export default function Avatar3D({
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // Procedural avatar state
   const [proceduralAvatar, setProceduralAvatar] = useState<THREE.Group | null>(null);
 

@@ -10,7 +10,7 @@ export async function GET() {
 
   try {
     const row = await db.userPetals.findUnique({ where: { userId } });
-    return NextResponse.json({ total: row?.total ?? 0 });
+    return NextResponse.json({ total: row?.amount ?? 0 });
   } catch (error) {
     console.error('Error fetching user petals:', error);
     return NextResponse.json({ total: 0 });
@@ -24,8 +24,8 @@ export async function POST() {
   try {
     const row = await db.userPetals.upsert({
       where: { userId },
-      update: { total: { increment: 1 } },
-      create: { userId, total: 1 },
+      update: { amount: { increment: 1 } },
+      create: { userId, amount: 1 },
     });
 
     // Also increment global if active
@@ -37,7 +37,7 @@ export async function POST() {
       });
     }
 
-    return NextResponse.json({ total: row.total });
+    return NextResponse.json({ total: row.amount });
   } catch (error) {
     console.error('Error incrementing user petals:', error);
     return NextResponse.json({ error: 'Failed to increment petals' }, { status: 500 });

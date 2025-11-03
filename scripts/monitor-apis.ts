@@ -153,4 +153,3 @@ if (require.main === module) {
 }
 
 export type { APIMonitor, MonitoringConfig };
-

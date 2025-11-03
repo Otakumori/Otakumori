@@ -19,11 +19,7 @@ interface DynamicLightingSystemProps {
     controls: {
       addLight: (light: LightSource) => void;
       removeLight: (id: string) => void;
-      addBurst: (
-        x: number,
-        y: number,
-        color?: { r: number; g: number; b: number },
-      ) => void;
+      addBurst: (x: number, y: number, color?: { r: number; g: number; b: number }) => void;
     },
   ) => void;
 }

@@ -86,15 +86,14 @@ export async function POST(req: NextRequest) {
         // Create praise (will fail if duplicate due to unique constraint)
         const praise = await db.praise.create({
           data: {
-            senderId: userId,
-            receiverId,
-            dayKey,
+            userId: userId,
+            targetId: receiverId,
           },
           include: {
-            sender: {
+            User: {
               select: {
                 id: true,
-                display_name: true,
+                displayName: true,
                 avatarUrl: true,
               },
             },
@@ -104,13 +103,13 @@ export async function POST(req: NextRequest) {
         const response = createApiSuccess(
           {
             id: praise.id,
-            senderId: praise.senderId,
-            receiverId: praise.receiverId,
+            senderId: praise.userId,
+            receiverId: praise.targetId,
             createdAt: praise.createdAt,
             sender: {
-              id: praise.sender.id,
-              display_name: praise.sender.display_name,
-              avatarUrl: praise.sender.avatarUrl,
+              id: praise.User.id,
+              displayName: praise.User.displayName,
+              avatarUrl: praise.User.avatarUrl,
             },
           },
           requestId,
@@ -171,7 +170,7 @@ export async function GET(req: NextRequest) {
 
     const praises = await db.praise.findMany({
       where: {
-        receiverId: userId,
+        targetId: userId,
       },
       orderBy: {
         createdAt: 'desc',
@@ -182,10 +181,10 @@ export async function GET(req: NextRequest) {
         skip: 1,
       }),
       include: {
-        sender: {
+        User: {
           select: {
             id: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -201,13 +200,13 @@ export async function GET(req: NextRequest) {
         {
           items: items.map((praise) => ({
             id: praise.id,
-            senderId: praise.senderId,
-            receiverId: praise.receiverId,
+            senderId: praise.userId,
+            receiverId: praise.targetId,
             createdAt: praise.createdAt,
             sender: {
-              id: praise.sender.id,
-              display_name: praise.sender.display_name,
-              avatarUrl: praise.sender.avatarUrl,
+              id: praise.User.id,
+              displayName: praise.User.displayName,
+              avatarUrl: praise.User.avatarUrl,
             },
           })),
           nextCursor,

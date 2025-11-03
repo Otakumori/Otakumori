@@ -20,5 +20,3 @@ export default function Scene({ mapUrl }: SceneProps) {
     </div>
   );
 }
-
-

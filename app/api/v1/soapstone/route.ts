@@ -35,10 +35,10 @@ export async function GET(req: NextRequest) {
         skip: 1,
       }),
       include: {
-        user: {
+        User: {
           select: {
             id: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -56,11 +56,11 @@ export async function GET(req: NextRequest) {
             id: msg.id,
             body: msg.text,
             createdAt: msg.createdAt,
-            user: msg.user
+            user: msg.User
               ? {
-                  id: msg.user.id,
-                  display_name: msg.user.display_name,
-                  avatarUrl: msg.user.avatarUrl,
+                  id: msg.User.id,
+                  displayName: msg.User.displayName,
+                  avatarUrl: msg.User.avatarUrl,
                 }
               : null,
           })),
@@ -133,10 +133,10 @@ export async function POST(req: NextRequest) {
           status: SoapstoneStatus.VISIBLE,
         },
         include: {
-          user: {
+          User: {
             select: {
               id: true,
-              display_name: true,
+              displayName: true,
               avatarUrl: true,
             },
           },
@@ -149,9 +149,9 @@ export async function POST(req: NextRequest) {
           body: message.text,
           createdAt: message.createdAt,
           user: {
-            id: message.user!.id,
-            display_name: message.user!.display_name,
-            avatarUrl: message.user!.avatarUrl,
+            id: message.User!.id,
+            displayName: message.User!.displayName,
+            avatarUrl: message.User!.avatarUrl,
           },
         },
         requestId,

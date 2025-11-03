@@ -155,9 +155,4 @@ export const CONTROL_PRESETS = {
     { key: 'Varies', action: 'Each Micro-Game', icon: 'CTRL' },
     { key: 'ESC', action: 'Skip Game' },
   ],
-} as const;;
-
-
-
-
-
+} as const;

@@ -349,9 +349,13 @@ export default function PantyRaid({ onComplete, onFail, _duration }: GameProps) 
             className="absolute bottom-24 left-1/2 transform -translate-x-1/2"
           >
             <div className="bg-pink-500 text-white px-6 py-3 rounded-lg text-lg font-bold shadow-2xl border-2 border-pink-300">
-              <span className="text-2xl mr-2" aria-hidden="true">*</span>
+              <span className="text-2xl mr-2" aria-hidden="true">
+                *
+              </span>
               LAUNDRY SECURED!
-              <span className="text-2xl ml-2" aria-hidden="true">*</span>
+              <span className="text-2xl ml-2" aria-hidden="true">
+                *
+              </span>
             </div>
           </motion.div>
         )}

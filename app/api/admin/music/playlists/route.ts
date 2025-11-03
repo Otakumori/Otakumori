@@ -18,7 +18,7 @@ export async function GET() {
 
   const data = await db.musicPlaylist.findMany({
     orderBy: { createdAt: 'desc' },
-    include: { tracks: { orderBy: { sort: 'asc' } } },
+    include: { MusicTrack: { orderBy: { sort: 'asc' } } },
   });
   return NextResponse.json({ ok: true, data });
 }

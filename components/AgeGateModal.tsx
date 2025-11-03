@@ -132,4 +132,3 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
     </div>
   );
 }
-

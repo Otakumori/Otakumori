@@ -29,22 +29,22 @@ export async function GET(_req: NextRequest) {
     // Fetch user's runes and aggregate by canonicalId
     const owned = await db.userRune.findMany({
       where: { userId },
-      include: { rune: true },
+      include: { RuneDef: true },
     });
 
     const map = new Map<string, Item>();
     for (const ur of owned) {
-      const key = ur.rune.canonicalId;
+      const key = ur.RuneDef.canonicalId;
       const prev = map.get(key);
       if (prev) {
         prev.quantity += 1;
       } else {
         map.set(key, {
-          id: ur.rune.id,
-          canonicalId: ur.rune.canonicalId,
-          displayName: ur.rune.displayName,
-          glyph: ur.rune.glyph,
-          lore: ur.rune.lore,
+          id: ur.RuneDef.id,
+          canonicalId: ur.RuneDef.canonicalId,
+          displayName: ur.RuneDef.displayName,
+          glyph: ur.RuneDef.glyph,
+          lore: ur.RuneDef.lore,
           quantity: 1,
         });
       }

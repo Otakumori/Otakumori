@@ -72,4 +72,3 @@ const getAttr = (o: JsxOpeningElement, name: string) => {
 
   console.log(`Added aria-label to ${edits} <select> elements.`);
 })();
-

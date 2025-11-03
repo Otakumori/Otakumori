@@ -88,7 +88,9 @@ export default function PetalPhysicsDemo() {
             <select
               id={presetSelectId}
               value={preset}
-              onChange={(event) => handlePresetChange(event.target.value as keyof typeof PETAL_PRESETS)}
+              onChange={(event) =>
+                handlePresetChange(event.target.value as keyof typeof PETAL_PRESETS)
+              }
               className="w-full p-2 bg-white/10 border border-white/20 rounded text-white"
             >
               {Object.keys(PETAL_PRESETS).map((key) => (
@@ -107,7 +109,9 @@ export default function PetalPhysicsDemo() {
             <select
               id={seasonSelectId}
               value={season}
-              onChange={(event) => handleSeasonChange(event.target.value as keyof typeof SEASONAL_WINDS)}
+              onChange={(event) =>
+                handleSeasonChange(event.target.value as keyof typeof SEASONAL_WINDS)
+              }
               className="w-full p-2 bg-white/10 border border-white/20 rounded text-white"
             >
               {Object.keys(SEASONAL_WINDS).map((key) => (

@@ -36,7 +36,7 @@ export async function GET() {
   const ach = await prisma.userAchievement.findMany({
     where: { userId: u.id },
     orderBy: { createdAt: 'desc' },
-    include: { achievement: true },
+    include: { Achievement: true },
   });
 
   // simple counts
@@ -53,7 +53,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     profile: {
-      displayName: u.display_name ?? 'You',
+      displayName: u.displayName ?? 'You',
       activeCosmetic: u.activeCosmetic ?? null,
       activeOverlay: u.activeOverlay ?? null,
     },
@@ -63,9 +63,9 @@ export async function GET() {
     badges,
     titles,
     achievements: ach.map((a) => ({
-      code: a.achievement.code,
-      name: a.achievement.name,
-      desc: a.achievement.description,
+      code: a.Achievement.code,
+      name: a.Achievement.name,
+      desc: a.Achievement.description,
       when: a.createdAt,
     })),
   });

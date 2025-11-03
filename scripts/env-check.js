@@ -55,4 +55,3 @@ if (missing.length > 0) {
   console.log('All required environment variables present (checked ' + envFile + ').');
   process.exit(0);
 }
-

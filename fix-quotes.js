@@ -58,4 +58,3 @@ function processDirectory(dir) {
 console.log(`Starting quote fix process via ${scriptName}...`);
 const totalFixed = processDirectory('.');
 console.log(`Fixed quotes in ${totalFixed} files.`);
-

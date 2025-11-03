@@ -81,7 +81,11 @@ async function writeSvgPng(
       const buf = await sharp(Buffer.from(badgeSvg)).resize(96, 96).png().toBuffer();
       fs.writeFileSync(pngPath, buf);
     } catch (e) {
-      console.warn('[gen] PNG export skipped for', filenameBase, e instanceof Error ? e.message : e);
+      console.warn(
+        '[gen] PNG export skipped for',
+        filenameBase,
+        e instanceof Error ? e.message : e,
+      );
     }
 
     // Framed PNG if tier provided and frames requested
@@ -99,7 +103,11 @@ async function writeSvgPng(
         const buf = await sharp(Buffer.from(framedSvg)).resize(96, 96).png().toBuffer();
         fs.writeFileSync(framedPngPath, buf);
       } catch (e) {
-        console.warn('[gen] Framed PNG export skipped for', filenameBase, e instanceof Error ? e.message : e);
+        console.warn(
+          '[gen] Framed PNG export skipped for',
+          filenameBase,
+          e instanceof Error ? e.message : e,
+        );
       }
     }
   }

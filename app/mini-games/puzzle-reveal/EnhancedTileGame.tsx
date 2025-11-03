@@ -472,7 +472,10 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
             animate={{ scale: 1, opacity: 1 }}
             className="bg-gradient-to-r from-pink-500/40 to-purple-500/40 backdrop-blur-lg px-4 py-2 rounded-xl border border-pink-400/50 text-white font-bold"
           >
-            <span className="text-yellow-300 font-semibold" aria-hidden="true">Combo</span> {gameState.combo}x COMBO!
+            <span className="text-yellow-300 font-semibold" aria-hidden="true">
+              Combo
+            </span>{' '}
+            {gameState.combo}x COMBO!
           </motion.div>
         )}
       </div>
@@ -532,7 +535,10 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
 
               <div className="bg-pink-500/10 border border-pink-500/30 rounded-lg p-4 mb-6">
                 <p className="text-pink-100 text-lg">
-                  <span className="text-2xl font-semibold" aria-hidden="true">Petal</span> Petals Earned:{' '}
+                  <span className="text-2xl font-semibold" aria-hidden="true">
+                    Petal
+                  </span>{' '}
+                  Petals Earned:{' '}
                   <span className="font-bold text-pink-400">
                     {Math.floor(gameState.score / 100)}
                   </span>
@@ -554,5 +560,3 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
     </div>
   );
 }
-
-

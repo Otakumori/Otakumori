@@ -92,10 +92,9 @@ export function createAnimeShaderMaterial(
     rimPower: number;
     smoothness: number;
     toonSteps: number;
-  }> = {}
+  }> = {},
 ): THREE.ShaderMaterial {
-  const color =
-    baseColor instanceof THREE.Color ? baseColor : new THREE.Color(baseColor);
+  const color = baseColor instanceof THREE.Color ? baseColor : new THREE.Color(baseColor);
 
   const rimColor =
     options.rimColor instanceof THREE.Color
@@ -105,7 +104,7 @@ export function createAnimeShaderMaterial(
   // Generate toon ramp texture
   const toonRamp = ProceduralTextureGenerator.generateToonRamp(
     options.toonSteps || 4,
-    options.smoothness || 0.1
+    options.smoothness || 0.1,
   );
 
   const uniforms: { [key: string]: THREE.IUniform } = {
@@ -132,9 +131,7 @@ export class AnimeMaterialFactory {
   /**
    * Create skin material with toon shading
    */
-  static createSkinMaterial(
-    skinTone: THREE.Color | string | number = 0xffdbac
-  ): THREE.Material {
+  static createSkinMaterial(skinTone: THREE.Color | string | number = 0xffdbac): THREE.Material {
     return createAnimeShaderMaterial(skinTone, {
       rimColor: new THREE.Color(0xffe0cc),
       rimPower: 2.5,
@@ -146,13 +143,8 @@ export class AnimeMaterialFactory {
   /**
    * Create hair material with specular highlights
    */
-  static createHairMaterial(
-    hairColor: THREE.Color | string | number = 0x3d2817
-  ): THREE.Material {
-    const color =
-      hairColor instanceof THREE.Color
-        ? hairColor
-        : new THREE.Color(hairColor);
+  static createHairMaterial(hairColor: THREE.Color | string | number = 0x3d2817): THREE.Material {
+    const color = hairColor instanceof THREE.Color ? hairColor : new THREE.Color(hairColor);
 
     // Hair uses standard material with anisotropic-like settings
     return new THREE.MeshStandardMaterial({
@@ -168,7 +160,7 @@ export class AnimeMaterialFactory {
    */
   static createClothingMaterial(
     clothColor: THREE.Color | string | number = 0x666666,
-    _type: 'casual' | 'formal' | 'fabric' = 'casual'
+    _type: 'casual' | 'formal' | 'fabric' = 'casual',
   ): THREE.Material {
     // Note: type parameter reserved for future shader customization
     return createAnimeShaderMaterial(clothColor, {
@@ -182,13 +174,8 @@ export class AnimeMaterialFactory {
   /**
    * Create metal/accessory material
    */
-  static createMetalMaterial(
-    metalColor: THREE.Color | string | number = 0xc0c0c0
-  ): THREE.Material {
-    const color =
-      metalColor instanceof THREE.Color
-        ? metalColor
-        : new THREE.Color(metalColor);
+  static createMetalMaterial(metalColor: THREE.Color | string | number = 0xc0c0c0): THREE.Material {
+    const color = metalColor instanceof THREE.Color ? metalColor : new THREE.Color(metalColor);
 
     return new THREE.MeshStandardMaterial({
       color: color,
@@ -203,12 +190,10 @@ export class AnimeMaterialFactory {
   static createOutlineMaterial(
     outlineColor: THREE.Color | string | number = 0x000000,
     thickness: number = 0.02,
-    opacity: number = 1.0
+    opacity: number = 1.0,
   ): THREE.ShaderMaterial {
     const color =
-      outlineColor instanceof THREE.Color
-        ? outlineColor
-        : new THREE.Color(outlineColor);
+      outlineColor instanceof THREE.Color ? outlineColor : new THREE.Color(outlineColor);
 
     const outlineVertexShader = `
       uniform float uThickness;
@@ -246,10 +231,9 @@ export class AnimeMaterialFactory {
    */
   static createGlowMaterial(
     glowColor: THREE.Color | string | number = 0xff69b4,
-    intensity: number = 1.0
+    intensity: number = 1.0,
   ): THREE.Material {
-    const color =
-      glowColor instanceof THREE.Color ? glowColor : new THREE.Color(glowColor);
+    const color = glowColor instanceof THREE.Color ? glowColor : new THREE.Color(glowColor);
 
     return new THREE.MeshBasicMaterial({
       color: color,
@@ -259,4 +243,3 @@ export class AnimeMaterialFactory {
     });
   }
 }
-

@@ -58,8 +58,8 @@ export async function GET() {
           take: 10,
           orderBy: { createdAt: 'desc' },
           include: {
-            user: {
-              select: { username: true, display_name: true },
+            User: {
+              select: { username: true, displayName: true },
             },
           },
         }),
@@ -69,7 +69,7 @@ export async function GET() {
     const formattedActivity = recentActivity.map((event) => ({
       id: event.id,
       type: event.type,
-      description: `${event.user?.username || 'User'} ${event.type === 'earn' ? 'earned' : 'spent'} ${event.amount} petals`,
+      description: `${event.User?.username || 'User'} ${event.type === 'earn' ? 'earned' : 'spent'} ${event.amount} petals`,
       timestamp: event.createdAt,
     }));
 

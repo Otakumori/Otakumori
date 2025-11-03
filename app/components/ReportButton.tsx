@@ -145,7 +145,11 @@ export default function ReportButton({
                     <p className="mb-2 block text-sm font-medium text-white/80">
                       Reason for reporting
                     </p>
-                    <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Report reason">
+                    <div
+                      className="grid grid-cols-2 gap-2"
+                      role="radiogroup"
+                      aria-label="Report reason"
+                    >
                       {REPORT_REASONS.map(({ value, label, icon: Icon, color }) => (
                         <button
                           key={value}

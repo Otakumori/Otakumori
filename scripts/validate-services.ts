@@ -278,9 +278,7 @@ async function main() {
   });
 
   console.log('\n' + '='.repeat(80));
-  console.log(
-    `Passed: ${passed.length} | Failed: ${failed.length} | Skipped: ${skipped.length}`,
-  );
+  console.log(`Passed: ${passed.length} | Failed: ${failed.length} | Skipped: ${skipped.length}`);
   console.log('='.repeat(80) + '\n');
 
   if (failed.length > 0) {

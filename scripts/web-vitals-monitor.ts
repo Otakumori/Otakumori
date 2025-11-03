@@ -220,7 +220,9 @@ export function useGameCubePerformance(): {
 
     const metrics = await this.readStoredMetrics();
     if (metrics.length === 0) {
-      console.warn('\nNo recorded metrics yet. Load the app with the monitoring script enabled to capture data.');
+      console.warn(
+        '\nNo recorded metrics yet. Load the app with the monitoring script enabled to capture data.',
+      );
       return;
     }
 

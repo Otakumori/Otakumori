@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     const assignment = await db.questAssignment.findUnique({
       where: { id: body.assignmentId },
-      include: { quest: true },
+      include: { Quest: true },
     });
 
     if (!assignment) {

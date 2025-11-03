@@ -122,7 +122,9 @@ export default function ProductDetailPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
           <div className="text-center py-12">
             <div className="glass-card p-8 max-w-md mx-auto">
-              <div className="text-6xl mb-4 font-bold text-primary" aria-hidden="true">404</div>
+              <div className="text-6xl mb-4 font-bold text-primary" aria-hidden="true">
+                404
+              </div>
               <h3 className="text-xl font-semibold text-primary mb-2">Product not found</h3>
               <p className="text-secondary mb-4">
                 {error || 'The product you are looking for does not exist.'}
@@ -277,5 +279,3 @@ export default function ProductDetailPage() {
     </div>
   );
 }
-
-

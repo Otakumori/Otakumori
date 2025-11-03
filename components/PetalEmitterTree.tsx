@@ -204,8 +204,7 @@ export default function PetalEmitterTree({
       if (idx !== null) collect(idx);
     };
 
-    const onPointerUp = () => {
-    };
+    const onPointerUp = () => {};
 
     c.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointerup', onPointerUp);
@@ -328,4 +327,3 @@ export default function PetalEmitterTree({
     </div>
   );
 }
-

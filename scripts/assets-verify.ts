@@ -158,9 +158,7 @@ class AssetVerifier {
       // ` ${section}.${key} - ${this.formatBytes(stats.size}`);
     } catch (error) {
       const reason = error instanceof Error ? error.message : 'unknown error';
-      this.errors.push(
-        ` ${section}.${key}: File not found - ${asset.path} (${reason})`,
-      );
+      this.errors.push(` ${section}.${key}: File not found - ${asset.path} (${reason})`);
       this.stats.missingAssets++;
     }
   }

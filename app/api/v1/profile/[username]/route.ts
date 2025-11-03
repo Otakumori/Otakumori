@@ -127,7 +127,7 @@ export async function GET(request: NextRequest, { params }: { params: { username
     const profileData = {
       id: profileUser.id,
       username: profileUser.username,
-      display_name: profileUser.display_name,
+      displayName: profileUser.displayName,
       bio: profileUser.bio,
       location: profileUser.location,
       website: profileUser.website,

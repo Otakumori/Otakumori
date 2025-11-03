@@ -107,11 +107,7 @@ export function logEnvironmentStatus(): void {
   console.warn('\nEnvironment Details:');
   Object.entries(validation.details).forEach(([key, detail]) => {
     const statusLabel =
-      detail.status === 'valid'
-        ? '[OK]'
-        : detail.status === 'missing'
-          ? '[MISSING]'
-          : '[WARNING]';
+      detail.status === 'valid' ? '[OK]' : detail.status === 'missing' ? '[MISSING]' : '[WARNING]';
     const preview = detail.value ? detail.value.substring(0, 60) : 'undefined';
     console.warn(`  ${statusLabel} ${key}: ${preview}`);
   });

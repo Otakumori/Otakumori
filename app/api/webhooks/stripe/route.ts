@@ -27,9 +27,9 @@ async function resolveUser(session: Stripe.Checkout.Session) {
   if (session.customer && typeof session.customer === 'string') {
     const sc = await prisma.stripeCustomer.findUnique({
       where: { customerId: session.customer },
-      include: { user: true },
+      include: { User: true },
     });
-    if (sc?.user) return sc.user;
+    if (sc?.User) return sc.User;
   }
   // 2) Fallback: you should pass Clerk's userId into client_reference_id when creating the session
   if (session.client_reference_id) {

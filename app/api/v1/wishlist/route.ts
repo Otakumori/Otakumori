@@ -172,7 +172,7 @@ export async function GET(req: NextRequest) {
         skip: 1,
       }),
       include: {
-        product: {
+        Product: {
           select: {
             id: true,
             name: true,
@@ -194,10 +194,10 @@ export async function GET(req: NextRequest) {
             productId: item.productId,
             createdAt: item.createdAt,
             product: {
-              id: item.product.id,
-              name: item.product.name,
+              id: item.Product.id,
+              name: item.Product.name,
               price: 0, // Placeholder - would need to get from ProductVariant
-              imageUrl: item.product.primaryImageUrl,
+              imageUrl: item.Product.primaryImageUrl,
             },
           })),
           nextCursor,

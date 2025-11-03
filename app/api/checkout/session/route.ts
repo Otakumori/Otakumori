@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
           currency: 'USD',
           status: 'pending',
           primaryItemName: items[0]?.name || 'Order',
-          label: `Order for ${shippingInfo?.firstName || user.display_name || user.username}`,
+          label: `Order for ${shippingInfo?.firstName || user.displayName || user.username}`,
           updatedAt: new Date(),
         },
       });
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
                 amount: 500, // $5.00
                 currency: 'usd',
               },
-              display_name: 'Standard shipping',
+              displayName: 'Standard shipping',
               delivery_estimate: {
                 minimum: {
                   unit: 'business_day',

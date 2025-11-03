@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             username: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
           select: {
             id: true,
             username: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             username: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             username: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },

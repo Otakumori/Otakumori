@@ -83,15 +83,21 @@ export default function PuzzleRevealPage() {
               <h4 className="font-medium text-pink-300 mb-3 text-lg">Objective</h4>
               <ul className="text-sm text-zinc-300 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-pink-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-pink-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Click tiles to reveal the hidden artwork beneath</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-pink-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-pink-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Reveal all tiles to complete the puzzle</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-pink-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-pink-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Higher difficulties have more tiles and better rewards</span>
                 </li>
               </ul>
@@ -100,21 +106,29 @@ export default function PuzzleRevealPage() {
               <h4 className="font-medium text-purple-300 mb-3 text-lg">Combo System</h4>
               <ul className="text-sm text-zinc-300 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>
                     Click tiles quickly (within 0.5s) to build a <strong>combo multiplier</strong>
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Each combo level adds +50 bonus points per tile</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Max combo: 10x for massive score boosts!</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-purple-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-purple-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Combo resets if you wait too long between clicks</span>
                 </li>
               </ul>
@@ -123,15 +137,21 @@ export default function PuzzleRevealPage() {
               <h4 className="font-medium text-blue-300 mb-3 text-lg">Scoring</h4>
               <ul className="text-sm text-zinc-300 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-blue-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Base score: 100 points per tile</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-blue-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Combo bonus: Up to +500 points per tile (10x combo)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-blue-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Speed bonus: Complete faster for extra points</span>
                 </li>
               </ul>
@@ -140,15 +160,21 @@ export default function PuzzleRevealPage() {
               <h4 className="font-medium text-green-300 mb-3 text-lg">Rewards</h4>
               <ul className="text-sm text-zinc-300 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-green-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Earn petals based on your final score</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-green-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Higher difficulties mean more petals per point</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-400 mt-0.5" aria-hidden="true">*</span>
+                  <span className="text-green-400 mt-0.5" aria-hidden="true">
+                    *
+                  </span>
                   <span>Finish quickly with high combos to maximize rewards</span>
                 </li>
               </ul>
@@ -159,5 +185,3 @@ export default function PuzzleRevealPage() {
     </main>
   );
 }
-
-

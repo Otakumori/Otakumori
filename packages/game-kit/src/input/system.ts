@@ -223,12 +223,10 @@ function pollTouch(system: InputSystem, state: ActionState): void {
   const moveX = Math.max(-1, Math.min(1, (avgX - 0.5) * 2));
   const moveY = Math.max(-1, Math.min(1, (0.5 - avgY) * 2));
 
-  state[GameAction.MoveX] = Math.abs(state[GameAction.MoveX]) > Math.abs(moveX)
-    ? state[GameAction.MoveX]
-    : moveX;
-  state[GameAction.MoveY] = Math.abs(state[GameAction.MoveY]) > Math.abs(moveY)
-    ? state[GameAction.MoveY]
-    : moveY;
+  state[GameAction.MoveX] =
+    Math.abs(state[GameAction.MoveX]) > Math.abs(moveX) ? state[GameAction.MoveX] : moveX;
+  state[GameAction.MoveY] =
+    Math.abs(state[GameAction.MoveY]) > Math.abs(moveY) ? state[GameAction.MoveY] : moveY;
 }
 
 /**

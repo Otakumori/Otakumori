@@ -1,0 +1,19 @@
+# MTL Exporter v1.0 by Seungwoo Oh at CLO - Virtual Fashion Inc.
+newmtl Cotton_Twill_Copy_1_FRONT_1465233
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.075000 0.075000 0.075000
+Ns 28.763239
+illum 2
+map_Ka Women's Pleats Skirt OBJ_diffuse_1001.png
+map_Kd Women's Pleats Skirt OBJ_diffuse_1001.png
+map_bump Women's Pleats Skirt OBJ_normal_1001.png
+newmtl Cotton_Twill_FRONT_1465223
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.075000 0.075000 0.075000
+Ns 28.763239
+illum 2
+map_Ka Women's Pleats Skirt OBJ_diffuse_1001.png
+map_Kd Women's Pleats Skirt OBJ_diffuse_1001.png
+map_bump Women's Pleats Skirt OBJ_normal_1001.png

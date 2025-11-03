@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
 import { z } from 'zod';
 
-const schema = z.object({ status: z.enum(['PUBLIC', 'HIDDEN', 'REMOVED']) });
+const schema = z.object({ status: z.enum(['PUBLIC', 'HIDDEN', 'REMOVED', 'VISIBLE', 'REPORTED']) });
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   await requireAdmin();
@@ -12,13 +12,17 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
 
-  const { SoapstoneStatus } = await import('@prisma/client');
+  const { Visibility } = await import('@prisma/client');
   const newStatus =
     parsed.data.status === 'PUBLIC'
-      ? SoapstoneStatus.VISIBLE
+      ? Visibility.PUBLIC
       : parsed.data.status === 'HIDDEN'
-        ? SoapstoneStatus.REPORTED
-        : SoapstoneStatus.REMOVED;
+        ? Visibility.HIDDEN
+        : parsed.data.status === 'VISIBLE'
+          ? Visibility.VISIBLE
+          : parsed.data.status === 'REPORTED'
+            ? Visibility.REPORTED
+            : Visibility.REMOVED;
 
   const message = await db.soapstoneMessage.update({
     where: { id: params.id },

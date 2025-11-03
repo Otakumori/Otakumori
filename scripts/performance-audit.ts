@@ -121,7 +121,10 @@ class PerformanceAuditor {
         });
       }
     } catch (error) {
-      console.warn(`Skipping ${type.toUpperCase()} chunk analysis. Directory missing: ${directory}`, error);
+      console.warn(
+        `Skipping ${type.toUpperCase()} chunk analysis. Directory missing: ${directory}`,
+        error,
+      );
     }
   }
 
@@ -162,10 +165,14 @@ class PerformanceAuditor {
 
   private async runLighthouseAudit(): Promise<void> {
     try {
-      const lighthouse = spawn('lighthouse', ['http://localhost:3000', '--only-categories=performance'], {
-        stdio: 'ignore',
-        shell: true,
-      });
+      const lighthouse = spawn(
+        'lighthouse',
+        ['http://localhost:3000', '--only-categories=performance'],
+        {
+          stdio: 'ignore',
+          shell: true,
+        },
+      );
 
       lighthouse.on('close', (code) => {
         if (code === 0) {
@@ -201,7 +208,9 @@ class PerformanceAuditor {
     lines.push(
       `  Max Chunk Size : ${this.formatBytes(result.budget.maxChunkSize)} (gzip compressed)`,
     );
-    lines.push(`  Total JS Budget: ${this.formatBytes(result.budget.maxTotalJS)} (gzip compressed)`);
+    lines.push(
+      `  Total JS Budget: ${this.formatBytes(result.budget.maxTotalJS)} (gzip compressed)`,
+    );
     lines.push(`  Target LCP      : ${result.budget.lcp} ms`);
     lines.push(`  Target FPS      : ${result.budget.targetFps} fps (GameCube UI)`);
     lines.push('');

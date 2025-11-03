@@ -67,4 +67,3 @@ DIRECT_URL="postgresql://postgres.ydbhokoxqwqbtqqeibef:te8ZdCF5oFh2mbDc@aws-1-us
 Then run: `npx prisma generate && npm run build`
 
 Done! 🎉
-

@@ -36,7 +36,8 @@ function MenacingText() {
       {Array.from({ length: 8 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute text-4xl font-bold text-purple-500" aria-hidden="true"
+          className="absolute text-4xl font-bold text-purple-500"
+          aria-hidden="true"
           style={{
             left: `${10 + (i % 4) * 25}%`,
             top: `${10 + Math.floor(i / 4) * 40}%`,
@@ -178,7 +179,8 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
               {Array.from({ length: 12 }).map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute text-5xl" aria-hidden="true"
+                  className="absolute text-5xl"
+                  aria-hidden="true"
                   initial={{ scale: 0, x: 0, y: 0 }}
                   animate={{
                     scale: [0, 1, 0],
@@ -224,5 +226,3 @@ export default function JoJoThrust({ onComplete, _onFail, _duration }: GameProps
     </div>
   );
 }
-
-

@@ -37,9 +37,7 @@ export default function AvatarDemoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black text-white">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-2 text-pink-400">
-          Procedural Avatar Demo
-        </h1>
+        <h1 className="text-4xl font-bold mb-2 text-pink-400">Procedural Avatar Demo</h1>
         <p className="text-zinc-300 mb-8">
           Real-time 3D avatar generation - no asset files needed!
         </p>
@@ -146,10 +144,18 @@ export default function AvatarDemoPage() {
 
               {/* Build preset */}
               <div className="mt-4">
-                <label htmlFor="build-preset" className="block text-sm font-medium text-zinc-300 mb-2">
+                <label
+                  htmlFor="build-preset"
+                  className="block text-sm font-medium text-zinc-300 mb-2"
+                >
                   Build Preset
                 </label>
-                <div id="build-preset" className="grid grid-cols-2 gap-2" role="group" aria-label="Build preset options">
+                <div
+                  id="build-preset"
+                  className="grid grid-cols-2 gap-2"
+                  role="group"
+                  aria-label="Build preset options"
+                >
                   {['slim', 'athletic', 'curvy', 'muscular'].map((build) => (
                     <button
                       key={build}
@@ -175,10 +181,18 @@ export default function AvatarDemoPage() {
             {/* Hair */}
             <Section title="Hair">
               <div className="mb-4">
-                <label htmlFor="hair-style" className="block text-sm font-medium text-zinc-300 mb-2">
+                <label
+                  htmlFor="hair-style"
+                  className="block text-sm font-medium text-zinc-300 mb-2"
+                >
                   Hair Style
                 </label>
-                <div id="hair-style" className="grid grid-cols-2 gap-2" role="group" aria-label="Hair style options">
+                <div
+                  id="hair-style"
+                  className="grid grid-cols-2 gap-2"
+                  role="group"
+                  aria-label="Hair style options"
+                >
                   {['short', 'medium', 'long', 'twintails', 'ponytail', 'bob', 'pixie'].map(
                     (style) => (
                       <button
@@ -197,7 +211,7 @@ export default function AvatarDemoPage() {
                       >
                         {style.charAt(0).toUpperCase() + style.slice(1)}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -232,9 +246,7 @@ export default function AvatarDemoPage() {
                   <input
                     type="checkbox"
                     checked={hairParams.bangs}
-                    onChange={(e) =>
-                      setHairParams({ ...hairParams, bangs: e.target.checked })
-                    }
+                    onChange={(e) => setHairParams({ ...hairParams, bangs: e.target.checked })}
                     className="w-4 h-4 rounded border-white/20 bg-white/5"
                   />
                   <span className="text-sm text-zinc-300">Bangs</span>
@@ -243,7 +255,10 @@ export default function AvatarDemoPage() {
 
               {/* Hair Color Picker */}
               <div className="mt-4">
-                <label htmlFor="hair-color" className="block text-sm font-medium text-zinc-300 mb-2">
+                <label
+                  htmlFor="hair-color"
+                  className="block text-sm font-medium text-zinc-300 mb-2"
+                >
                   Hair Color
                 </label>
                 <input
@@ -253,8 +268,8 @@ export default function AvatarDemoPage() {
                     hairParams.color instanceof THREE.Color
                       ? `#${hairParams.color.getHexString()}`
                       : typeof hairParams.color === 'string'
-                      ? hairParams.color
-                      : '#3D2817'
+                        ? hairParams.color
+                        : '#3D2817'
                   }
                   onChange={(e) =>
                     setHairParams({
@@ -407,4 +422,3 @@ function Slider({
     </div>
   );
 }
-

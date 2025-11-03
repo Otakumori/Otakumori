@@ -81,7 +81,11 @@ class SEOAuditor {
       '/privacy': 'privacy.html',
     };
 
-    return path.join(process.cwd(), '.next/server/app', routeMap[route] ?? `${route.slice(1)}.html`);
+    return path.join(
+      process.cwd(),
+      '.next/server/app',
+      routeMap[route] ?? `${route.slice(1)}.html`,
+    );
   }
 
   private async getHtmlContent(htmlPath: string): Promise<string> {
@@ -245,7 +249,10 @@ class SEOAuditor {
 
     const totalChecks = Math.max(this.results.length * 6, 1);
     const totalIssues = this.errors.length + this.warnings.length;
-    const scorePercentage = Math.max(0, Math.round(((totalChecks - totalIssues) / totalChecks) * 100));
+    const scorePercentage = Math.max(
+      0,
+      Math.round(((totalChecks - totalIssues) / totalChecks) * 100),
+    );
 
     console.warn(
       `\nSEO Score: ${scorePercentage}% (${totalIssues} issues across ${this.results.length} routes)`,

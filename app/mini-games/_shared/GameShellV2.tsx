@@ -300,9 +300,7 @@ export default function GameShellV2({
                   <div className="flex items-center space-x-4 text-white/80">
                     <span>Score: {gameState.currentScore.toLocaleString()}</span>
                     <span>Level: {gameState.currentLevel}</span>
-                    {enableAchievements && (
-                      <span>Achievements: {achievements.length}</span>
-                    )}
+                    {enableAchievements && <span>Achievements: {achievements.length}</span>}
                   </div>
                 )}
               </div>
@@ -501,5 +499,3 @@ export default function GameShellV2({
     </div>
   );
 }
-
-

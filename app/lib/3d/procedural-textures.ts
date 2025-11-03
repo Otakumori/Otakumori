@@ -13,15 +13,14 @@ export class ProceduralTextureGenerator {
     width: number = 1024,
     height: number = 1024,
     baseColor: THREE.Color | string | number = 0xffdbac,
-    variation: number = 0.1
+    variation: number = 0.1,
   ): THREE.Texture {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d')!;
 
-    const color =
-      baseColor instanceof THREE.Color ? baseColor : new THREE.Color(baseColor);
+    const color = baseColor instanceof THREE.Color ? baseColor : new THREE.Color(baseColor);
 
     const imageData = ctx.createImageData(width, height);
     const data = imageData.data;
@@ -58,10 +57,7 @@ export class ProceduralTextureGenerator {
   /**
    * Generate toon ramp texture for cel shading
    */
-  static generateToonRamp(
-    steps: number = 4,
-    smoothness: number = 0.1
-  ): THREE.Texture {
+  static generateToonRamp(steps: number = 4, smoothness: number = 0.1): THREE.Texture {
     const width = 256;
     const height = 1;
 
@@ -79,11 +75,7 @@ export class ProceduralTextureGenerator {
 
       // Create stepped ramp
       const step = Math.floor(t * steps) / steps;
-      const smoothStep = this.smoothstep(
-        step - smoothness,
-        step + smoothness,
-        t
-      );
+      const smoothStep = this.smoothstep(step - smoothness, step + smoothness, t);
 
       const value = Math.floor(smoothStep * 255);
 
@@ -110,7 +102,7 @@ export class ProceduralTextureGenerator {
   static generateNormalMap(
     width: number = 512,
     height: number = 512,
-    strength: number = 1.0
+    strength: number = 1.0,
   ): THREE.Texture {
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -159,15 +151,14 @@ export class ProceduralTextureGenerator {
     width: number = 512,
     height: number = 512,
     baseColor: THREE.Color | string | number = 0x666666,
-    weaveSize: number = 8
+    weaveSize: number = 8,
   ): THREE.Texture {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d')!;
 
-    const color =
-      baseColor instanceof THREE.Color ? baseColor : new THREE.Color(baseColor);
+    const color = baseColor instanceof THREE.Color ? baseColor : new THREE.Color(baseColor);
 
     const imageData = ctx.createImageData(width, height);
     const data = imageData.data;

@@ -33,11 +33,11 @@ export async function POST(req: NextRequest) {
 
     const owned = await db.userRune.findMany({
       where: { userId },
-      include: { rune: true },
+      include: { RuneDef: true },
     });
 
     for (const [canon, need] of counts.entries()) {
-      const have = owned.filter((ur) => ur.rune.canonicalId === canon).length;
+      const have = owned.filter((ur) => ur.RuneDef.canonicalId === canon).length;
       if (have < need) {
         return NextResponse.json(
           { ok: false, code: 'INSUFFICIENT', message: `You do not own enough of ${canon}` },

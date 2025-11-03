@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const soapstone = await db.productSoapstone.findUnique({
       where: { id: soapstoneId },
       include: {
-        user: { select: { id: true } },
+        User: { select: { id: true } },
       },
     });
 
@@ -46,8 +46,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     // Check if already praised
     const existing = await db.productSoapstonePraise.findUnique({
       where: {
-        soapstoneId_userId: {
-          soapstoneId,
+        productSoapstoneId_userId: {
+          productSoapstoneId: soapstoneId,
           userId: user.id,
         },
       },
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         }),
         db.productSoapstone.update({
           where: { id: soapstoneId },
-          data: { praiseCount: { decrement: 1 } },
+          data: { appraises: { decrement: 1 } },
         }),
         // Author loses 1 petal when praise is removed
         db.user.update({
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
       return NextResponse.json({
         ok: true,
-        data: { praised: false, praiseCount: soapstone.praiseCount - 1 },
+        data: { praised: false, praiseCount: soapstone.appraises - 1 },
       });
     }
 
@@ -80,13 +80,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     await db.$transaction([
       db.productSoapstonePraise.create({
         data: {
-          soapstoneId,
+          productSoapstoneId: soapstoneId,
           userId: user.id,
         },
       }),
       db.productSoapstone.update({
         where: { id: soapstoneId },
-        data: { praiseCount: { increment: 1 } },
+        data: { appraises: { increment: 1 } },
       }),
       // Author earns 1 petal per praise
       db.user.update({
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     return NextResponse.json({
       ok: true,
-      data: { praised: true, praiseCount: soapstone.praiseCount + 1 },
+      data: { praised: true, praiseCount: soapstone.appraises + 1 },
     });
   } catch (error) {
     console.error('Failed to praise soapstone:', error);

@@ -13,6 +13,7 @@
 The `.env` file is in the **root folder** of your project (same level as `package.json`).
 
 If it doesn't exist, create it:
+
 ```bash
 # In project root (C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\)
 New-Item -Path .env -ItemType File
@@ -34,6 +35,7 @@ DIRECT_URL="postgresql://otakumori_owner:npg_xxxxxxxxxxxxx@ep-project-name.us-ea
 ### Step 3: Find Your Actual Neon Connection String
 
 **Option A: From Neon Dashboard**
+
 1. Go to https://console.neon.tech/
 2. Click on your **Otakumori** project
 3. Click **"Connection Details"** or **"Quickstart"**
@@ -43,15 +45,18 @@ DIRECT_URL="postgresql://otakumori_owner:npg_xxxxxxxxxxxxx@ep-project-name.us-ea
    ```
 
 **Option B: From Vercel Environment Variables**
+
 1. Go to https://vercel.com/
 2. Find your Otakumori project
 3. Go to **Settings → Environment Variables**
 4. Look for `DATABASE_URL` - copy the value
 
 **Option C: Check Vercel CLI**
+
 ```bash
 vercel env pull .env
 ```
+
 This will download all your environment variables into `.env`
 
 ## 🎯 Quick Fix Right Now
@@ -65,6 +70,7 @@ DIRECT_URL="postgresql://postgres:postgres@localhost:5432/otakumori_dev"
 ```
 
 Then run:
+
 ```bash
 # Generate Prisma client
 npx prisma generate
@@ -95,11 +101,12 @@ npx prisma migrate deploy
 ✅ Updated `prisma/schema.prisma` to support both `url` and `directUrl`  
 ✅ Updated `scripts/pre-build-validation.ts` to skip Prisma validation for Accelerate  
 ✅ Fixed all 5 ESLint warnings  
-✅ TypeScript compiles cleanly (0 errors)  
+✅ TypeScript compiles cleanly (0 errors)
 
 ## 🚀 Once DATABASE_URL is Added
 
 The build will work! Then you can:
+
 - Test the procedural avatar at `/avatar/demo`
 - Deploy to Vercel
 - All database operations will work
@@ -107,4 +114,3 @@ The build will work! Then you can:
 ---
 
 **TL;DR**: Add your Neon connection string from https://console.neon.tech/ to `.env` as `DATABASE_URL` and you're good to go! 🎉
-

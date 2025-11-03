@@ -24,7 +24,6 @@ export async function POST(req: Request) {
           key: idem,
           purpose: 'petals/spend',
           method: 'POST',
-          path: '/api/v1/petals/spend',
           response: JSON.stringify({ pending: true }),
           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
         },

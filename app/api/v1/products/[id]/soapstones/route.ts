@@ -33,11 +33,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         },
         _count: {
           select: {
-            praises: true,
+            ProductSoapstonePraise: true,
+          },
+        },
+        User: {
+          select: {
+            id: true,
+            displayName: true,
+            avatarUrl: true,
           },
         },
       },
-      orderBy: sortBy === 'praise' ? { praiseCount: 'desc' } : { createdAt: 'desc' },
+      orderBy: sortBy === 'praise' ? { appraises: 'desc' } : { createdAt: 'desc' },
       take: limit,
     });
 
@@ -46,11 +53,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       data: {
         soapstones: soapstones.map((s) => ({
           id: s.id,
-          message: s.message,
-          template: s.template,
-          praiseCount: s.praiseCount,
+          message: s.text,
+          praiseCount: s.appraises,
           createdAt: s.createdAt,
-          author: s.user,
+          author: s.User,
         })),
         total: soapstones.length,
       },
@@ -108,11 +114,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         data: {
           productId,
           userId: user.id,
-          message,
-          template,
+          text: message,
         },
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               username: true,
@@ -128,10 +133,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       data: {
         soapstone: {
           id: soapstone.id,
-          message: soapstone.message,
+          message: soapstone.text,
           praiseCount: 0,
           createdAt: soapstone.createdAt,
-          author: soapstone.user,
+          author: soapstone.User,
         },
       },
     });

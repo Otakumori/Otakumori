@@ -30,7 +30,7 @@ export async function GET() {
         day: { lt: day },
         completedAt: null,
       },
-      include: { quest: true },
+      include: { Quest: true },
       take: 20,
       orderBy: { day: 'desc' },
     });

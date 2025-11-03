@@ -31,14 +31,14 @@ export async function POST() {
   const { db } = await import('@/lib/db');
 
   const u = await db.userPetals.findUnique({ where: { userId } });
-  const total = u?.total ?? 0;
+  const total = u?.amount ?? 0;
   if (total < COST) return new NextResponse('Not enough petals', { status: 400 });
 
   const reward = pick();
 
   await db.$transaction([
-    db.userPetals.update({ where: { userId }, data: { total: total - COST } }),
-    db.userInventory.upsert({
+    db.userPetals.update({ where: { userId }, data: { amount: total - COST } }),
+    db.userInventoryItem.upsert({
       where: { userId_itemKey: { userId, itemKey: reward } },
       update: { count: { increment: 1 } },
       create: { userId, itemKey: reward, count: 1 },

@@ -59,11 +59,11 @@ export async function GET(request: NextRequest) {
       db.comment.findMany({
         where: whereClause,
         include: {
-          author: {
+          Author: {
             select: {
               id: true,
               username: true,
-              display_name: true,
+              displayName: true,
               avatarUrl: true,
             },
           },
@@ -96,8 +96,8 @@ export async function GET(request: NextRequest) {
       replyCount: comment.replyCount,
       createdAt: comment.createdAt.toISOString(),
       updatedAt: comment.updatedAt.toISOString(),
-      author: comment.author,
-      isLiked: currentUser ? comment.likes && comment.likes.length > 0 : false,
+      author: comment.Author,
+      isLiked: false, // Likes relation not included in schema anymore
     }));
 
     const responseData = {
@@ -171,11 +171,11 @@ export async function POST(request: NextRequest) {
     const newComment = await db.comment.create({
       data: commentData,
       include: {
-        author: {
+        Author: {
           select: {
             id: true,
             username: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       replyCount: newComment.replyCount,
       createdAt: newComment.createdAt.toISOString(),
       updatedAt: newComment.updatedAt.toISOString(),
-      author: newComment.author,
+      author: newComment.Author,
       isLiked: false,
     };
 

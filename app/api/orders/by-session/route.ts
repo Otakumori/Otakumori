@@ -44,8 +44,8 @@ export async function GET(request: NextRequest) {
       where: { stripeId: sessionId },
       include: {
         OrderItem: true,
-        UserRunes: {
-          include: { rune: true },
+        UserRune: {
+          include: { RuneDef: true },
         },
       },
     });
@@ -58,23 +58,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Access denied' }, { status: 403 });
     }
 
-    const runes = order.UserRunes.map((userRune) => ({
-      id: userRune.rune.id,
-      canonicalId: userRune.rune.canonicalId,
-      displayName: userRune.rune.displayName,
-      glyph: userRune.rune.glyph,
-      lore: userRune.rune.lore,
+    const runes = order.UserRune.map((userRune) => ({
+      id: userRune.RuneDef.id,
+      canonicalId: userRune.RuneDef.canonicalId,
+      displayName: userRune.RuneDef.displayName,
+      glyph: userRune.RuneDef.glyph,
+      lore: userRune.RuneDef.lore,
     }));
 
     const [siteConfig, allUserRunes] = await Promise.all([
       db.siteConfig.findUnique({ where: { id: 'singleton' } }),
       db.userRune.findMany({
         where: { userId: user.id },
-        include: { rune: true },
+        include: { RuneDef: true },
       }),
     ]);
 
-    const userRuneIds = new Set(allUserRunes.map((userRune) => userRune.rune.canonicalId));
+    const userRuneIds = new Set(allUserRunes.map((userRune) => userRune.RuneDef.canonicalId));
     const combos = resolveCompletedCombos(siteConfig?.runes, userRuneIds);
 
     return NextResponse.json({
