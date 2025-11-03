@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const party = await db.party.findUnique({
       where: { id: validatedData.partyId },
       include: {
-        members: true,
+        PartyMember: true,
       },
     });
 
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     const invitation = await db.partyInvitation.create({
       data: inviteData,
       include: {
-        party: {
+        Party: {
           select: {
             id: true,
             name: true,
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
     const invitations = await db.partyInvitation.findMany({
       where,
       include: {
-        party: {
+        Party: {
           select: {
             id: true,
             name: true,
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
             gameMode: true,
             status: true,
             maxMembers: true,
-            members: {
+            PartyMember: {
               select: {
                 id: true,
               },

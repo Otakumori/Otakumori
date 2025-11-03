@@ -56,8 +56,8 @@ export async function GET(request: Request) {
           ...(typeof params.isPublic === 'boolean' ? { isPublic: params.isPublic } : {}),
         },
         include: {
-          leader: { select: memberSelect },
-          members: {
+          User: { select: memberSelect },
+          PartyMember: {
             include: {
               user: { select: memberSelect },
             },

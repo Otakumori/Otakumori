@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
                 amount: 500, // $5.00
                 currency: 'usd',
               },
-              displayName: 'Standard shipping',
+              display_name: 'Standard shipping',
               delivery_estimate: {
                 minimum: {
                   unit: 'business_day',

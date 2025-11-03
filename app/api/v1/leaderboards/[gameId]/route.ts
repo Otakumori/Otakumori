@@ -206,7 +206,7 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
           ...scopeFilter,
         },
         include: {
-          profile: {
+          User: {
             select: {
               id: true,
               username: true,

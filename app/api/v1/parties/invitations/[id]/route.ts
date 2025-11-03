@@ -19,9 +19,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const invitation = await db.partyInvitation.findUnique({
       where: { id: params.id },
       include: {
-        party: {
+        Party: {
           include: {
-            members: true,
+            PartyMember: true,
           },
         },
       },

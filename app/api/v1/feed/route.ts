@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     const activities = await db.activity.findMany({
       where: whereClause,
       include: {
-        profile: {
+        User: {
           select: {
             id: true,
             username: true,
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
         payload: activity.payload as any,
         visibility: activity.visibility,
         createdAt: activity.createdAt.toISOString(),
-        profile: {
+        User: {
           id: activity.profile.id,
           username: activity.profile.username,
           displayName: activity.profile.displayName,

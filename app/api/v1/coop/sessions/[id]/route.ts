@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const session = await db.coopSession.findUnique({
       where: { id: params.id },
       include: {
-        party: {
+        Party: {
           select: {
             id: true,
             name: true,
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         },
         participants: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,
@@ -115,7 +115,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       where: { id: params.id },
       data: updateData,
       include: {
-        party: {
+        Party: {
           select: {
             id: true,
             name: true,
@@ -125,7 +125,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         },
         participants: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,

@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       db.comment.findMany({
         where: whereClause,
         include: {
-          Author: {
+          User: {
             select: {
               id: true,
               username: true,
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       replyCount: comment.replyCount,
       createdAt: comment.createdAt.toISOString(),
       updatedAt: comment.updatedAt.toISOString(),
-      author: comment.Author,
+      author: comment.User,
       isLiked: false, // Likes relation not included in schema anymore
     }));
 
@@ -170,16 +170,16 @@ export async function POST(request: NextRequest) {
     }
     const newComment = await db.comment.create({
       data: commentData,
-      include: {
-        Author: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            avatarUrl: true,
+        include: {
+          User: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatarUrl: true,
+            },
           },
         },
-      },
     });
 
     // Create activity for the comment

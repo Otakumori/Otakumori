@@ -211,7 +211,7 @@ async function searchContent(
   const comments = await db.comment.findMany({
     where: {
       content: { contains: query, mode: 'insensitive' },
-      Author: {
+      User: {
         visibility: { not: 'PRIVATE' },
       },
     },
@@ -221,7 +221,7 @@ async function searchContent(
       contentType: true,
       contentId: true,
       createdAt: true,
-      Author: {
+      User: {
         select: {
           id: true,
           username: true,
@@ -237,12 +237,12 @@ async function searchContent(
     ...comments.map((comment) => ({
       id: comment.id,
       type: 'comment' as const,
-      title: `Comment by ${comment.Author.displayName || comment.Author.username}`,
+      title: `Comment by ${comment.User.displayName || comment.User.username}`,
       description: comment.content.substring(0, 100) + (comment.content.length > 100 ? '...' : ''),
       url: getCommentUrl(comment),
       relevanceScore: calculateContentRelevanceScore(comment.content, query),
       metadata: {
-        author: comment.Author,
+        author: comment.User,
         contentType: comment.contentType,
         contentId: comment.contentId,
         createdAt: comment.createdAt.toISOString(),
@@ -257,7 +257,7 @@ async function searchContent(
         { type: { contains: query, mode: 'insensitive' } },
         { payload: { path: ['description'], string_contains: query } },
       ],
-      Profile: {
+      User: {
         visibility: { not: 'PRIVATE' },
       },
     },
@@ -266,7 +266,7 @@ async function searchContent(
       type: true,
       payload: true,
       createdAt: true,
-      Profile: {
+      User: {
         select: {
           id: true,
           username: true,
@@ -282,12 +282,12 @@ async function searchContent(
     ...activities.map((activity) => ({
       id: activity.id,
       type: 'activity' as const,
-      title: `${activity.Profile.displayName || activity.Profile.username} - ${activity.type}`,
+      title: `${activity.User.displayName || activity.User.username} - ${activity.type}`,
       description: (activity.payload as any)?.description || activity.type,
-      url: `/profile/${activity.Profile.username}`,
+      url: `/profile/${activity.User.username}`,
       relevanceScore: calculateContentRelevanceScore(activity.type, query),
       metadata: {
-        user: activity.Profile,
+        user: activity.User,
         activityType: activity.type,
         createdAt: activity.createdAt.toISOString(),
       },

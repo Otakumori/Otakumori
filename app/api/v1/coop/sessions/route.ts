@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const session = await db.coopSession.create({
       data: sessionData,
       include: {
-        party: {
+        Party: {
           select: {
             id: true,
             name: true,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         },
         participants: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
             role: member.role === 'leader' ? 'moderator' : 'player',
           },
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
         },
       },
       include: {
-        party: {
+        Party: {
           select: {
             id: true,
             name: true,
@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
         },
         participants: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 username: true,

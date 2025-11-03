@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const party = await db.party.findUnique({
       where: { id: params.id },
       include: {
-        leader: {
+        User: {
           select: {
             id: true,
             username: true,
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             avatarUrl: true,
           },
         },
-        members: {
+        PartyMember: {
           include: {
             user: {
               select: {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         sessions: {
           where: { status: 'active' },
           include: {
-            participants: {
+            CoopSessionParticipant: {
               include: {
                 user: {
                   select: {
@@ -129,7 +129,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       where: { id: params.id },
       data: updateData,
       include: {
-        leader: {
+        User: {
           select: {
             id: true,
             username: true,
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             avatarUrl: true,
           },
         },
-        members: {
+        PartyMember: {
           include: {
             user: {
               select: {

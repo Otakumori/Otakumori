@@ -92,7 +92,7 @@ export async function ensureDailyAssignments(userId: string, day = userDayNY(), 
 
   return prisma.questAssignment.findMany({
     where: { userId, day },
-    include: { quest: true },
+    include: { Quest: true },
   });
 }
 
@@ -102,7 +102,7 @@ export async function ensureDailyAssignments(userId: string, day = userDayNY(), 
 export async function getUserQuests(userId: string, day = userDayNY()) {
   return prisma.questAssignment.findMany({
     where: { userId, day },
-    include: { quest: true },
+    include: { Quest: true },
     orderBy: { day: 'asc' },
   });
 }
@@ -117,7 +117,7 @@ export async function getUserBacklog(userId: string, limit = 20) {
       day: { lt: userDayNY() },
       completedAt: null,
     },
-    include: { quest: true },
+    include: { Quest: true },
     take: limit,
     orderBy: { day: 'desc' },
   });

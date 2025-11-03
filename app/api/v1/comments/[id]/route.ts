@@ -62,7 +62,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         updatedAt: new Date(),
       },
       include: {
-        Author: {
+        User: {
           select: {
             id: true,
             username: true,
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       replyCount: updatedComment.replyCount,
       createdAt: updatedComment.createdAt.toISOString(),
       updatedAt: updatedComment.updatedAt.toISOString(),
-      author: updatedComment.Author,
+      author: updatedComment.User,
     };
 
     return NextResponse.json({ ok: true, data: response });
