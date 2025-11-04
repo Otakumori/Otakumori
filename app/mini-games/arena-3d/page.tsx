@@ -17,7 +17,7 @@ import {
   spawnPlayer,
 } from '@om/game-kit';
 import { getPolicyFromClient } from '@/app/lib/policy/fromRequest';
-import { resolveEquipmentForGame } from '@/lib/avatar/resolve-equipment';
+import { resolveEquipmentForGame } from '@/app/lib/avatar/resolve-equipment';
 import { InputHints } from '@/app/components/games/InputHints';
 import { prefersReducedMotion } from '@/app/lib/device-profile';
 

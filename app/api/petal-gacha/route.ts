@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireUserId } from '@/lib/auth';
+import { requireUserId } from '@/app/lib/auth';
 
 const COST = 50; // petals per pull
 const TABLE: ReadonlyArray<{ key: string; weight: number }> = [

@@ -7,8 +7,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { resolvePolicy, validateAvatar } from '@om/avatar';
 import type { AvatarSpecV15Type } from '@om/avatar';
-import { assertRenderable } from '@/lib/avatar/validate';
-import type { ResolvedEquipment } from '@/lib/avatar/validate';
+import { assertRenderable } from '@/app/lib/avatar/validate';
+import type { ResolvedEquipment } from '@/app/lib/avatar/validate';
 import { db } from '@/lib/db';
 import { newRequestId } from '@/lib/requestId';
 

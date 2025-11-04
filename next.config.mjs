@@ -210,11 +210,14 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(process.cwd()),
+      // Workspace packages
       '@om/avatar': path.resolve(process.cwd(), 'packages/avatar/src'),
       '@om/game-kit': path.resolve(process.cwd(), 'packages/game-kit/src'),
       '@om/ecs': path.resolve(process.cwd(), 'packages/ecs/src'),
       '@om/ecs/react': path.resolve(process.cwd(), 'packages/ecs/src/react'),
       '@om/shaders': path.resolve(process.cwd(), 'packages/shaders/src'),
+      // @/lib points to root lib (for shared utilities)
+      '@/lib': path.resolve(process.cwd(), 'lib'),
     };
 
     if (!isServer) {

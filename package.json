@@ -280,7 +280,8 @@
     "prisma": "^6.18.0",
     "tailwindcss": "^3.4.18",
     "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6"
+    "postcss": "^8.5.6",
+    "clsx": "^2.1.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
@@ -359,7 +360,6 @@
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "axe-core": "^4.10.3",
-    "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "eslint": "^9.36.0",
     "eslint-config-next": "15.5.4",
