@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Achievement {
-  id              String            @id @default(cuid())
+  id              String            @id
   code            String            @unique
   name            String
   description     String
@@ -22,7 +22,7 @@ model Achievement {
 }
 
 model Activity {
-  id         String   @id @default(cuid())
+  id         String   @id
   profileId  String
   type       String
   payload    Json
@@ -37,7 +37,7 @@ model Activity {
 }
 
 model Appraisal {
-  id          String         @id @default(cuid())
+  id          String         @id
   commentId   String
   voterId     String
   value       AppraisalValue
@@ -47,6 +47,57 @@ model Appraisal {
 
   @@unique([commentId, voterId])
   @@index([voterId])
+}
+
+model AvatarConfiguration {
+  id                      String                    @id
+  userId                  String
+  configurationData       Json
+  exportFormat            String?
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @default(now())
+  User                    User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  AvatarConfigurationPart AvatarConfigurationPart[]
+  AvatarMaterialOverride  AvatarMaterialOverride[]
+  AvatarMorphTarget       AvatarMorphTarget[]
+
+  @@index([userId])
+}
+
+model AvatarConfigurationPart {
+  id                  String              @id
+  configurationId     String
+  partId              String
+  partType            String
+  attachmentOrder     Int
+  AvatarConfiguration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  @@unique([configurationId, attachmentOrder])
+  @@index([configurationId])
+}
+
+model AvatarMaterialOverride {
+  id                  String              @id
+  configurationId     String
+  slot                String
+  type                String
+  value               Json
+  opacity             Float?
+  AvatarConfiguration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  @@unique([configurationId, slot])
+  @@index([configurationId])
+}
+
+model AvatarMorphTarget {
+  id                  String              @id
+  configurationId     String
+  targetName          String
+  value               Float
+  AvatarConfiguration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+
+  @@unique([configurationId, targetName])
+  @@index([configurationId])
 }
 
 model Block {
@@ -62,7 +113,7 @@ model Block {
 }
 
 model Cart {
-  id        String     @id @default(cuid())
+  id        String     @id
   userId    String     @unique
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now())
@@ -73,7 +124,7 @@ model Cart {
 }
 
 model CartItem {
-  id               String         @id @default(cuid())
+  id               String         @id
   cartId           String
   productId        String
   productVariantId String
@@ -99,7 +150,7 @@ model CharacterConfig {
   meshData          Json
   textureData       Json
   createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  updatedAt         DateTime
   User              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   CharacterReaction CharacterReaction[]
 
@@ -120,7 +171,7 @@ model CharacterPreset {
   unlockCondition     Json?
   isDefault           Boolean               @default(false)
   createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
+  updatedAt           DateTime
   UserCharacterPreset UserCharacterPreset[]
 
   @@index([category])
@@ -154,7 +205,7 @@ model Comment {
   likeCount        Int             @default(0)
   replyCount       Int             @default(0)
   createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  updatedAt        DateTime
   User             User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
   Comment          Comment?        @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
   other_Comment    Comment[]       @relation("CommentToComment")
@@ -170,7 +221,7 @@ model Comment {
 }
 
 model CommentFragment {
-  id          String      @id @default(cuid())
+  id          String      @id
   commentId   String
   phraseId    String
   position    Int
@@ -182,7 +233,7 @@ model CommentFragment {
 }
 
 model CommentLike {
-  id        String   @id @default(cuid())
+  id        String   @id
   commentId String
   userId    String
   createdAt DateTime @default(now())
@@ -195,7 +246,7 @@ model CommentLike {
 }
 
 model CommentMark {
-  id                String              @id @default(cuid())
+  id                String              @id
   postId            String?
   parentId          String?
   authorId          String
@@ -207,7 +258,7 @@ model CommentMark {
   status            CommentStatus       @default(ACTIVE)
   metadata          Json?
   createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  updatedAt         DateTime
   Appraisal         Appraisal[]
   CommentFragment   CommentFragment[]
   User              User                @relation(fields: [authorId], references: [id])
@@ -222,7 +273,7 @@ model CommentMark {
 }
 
 model CommentModeration {
-  id          String      @id @default(cuid())
+  id          String      @id
   commentId   String
   moderatorId String?
   action      String
@@ -235,7 +286,7 @@ model CommentModeration {
 }
 
 model CommentReport {
-  id                                   String    @id @default(cuid())
+  id                                   String    @id
   commentId                            String
   reporterId                           String
   reason                               String
@@ -256,7 +307,7 @@ model CommentReport {
 }
 
 model ContactMessage {
-  id        String   @id @default(cuid())
+  id        String   @id
   name      String
   email     String
   message   String
@@ -264,12 +315,12 @@ model ContactMessage {
   userId    String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   User      User?    @relation(fields: [userId], references: [id])
 }
 
 model ContentModeration {
-  id                                       String    @id @default(cuid())
+  id                                       String    @id
   contentType                              String
   contentId                                String
   content                                  String
@@ -293,18 +344,18 @@ model ContentModeration {
 }
 
 model ContentPage {
-  id        String   @id @default(cuid())
+  id        String   @id
   slug      String   @unique
   title     String
   excerpt   String?
   body      String?
   published Boolean  @default(true)
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   createdAt DateTime @default(now())
 }
 
 model CoopSession {
-  id                     String                   @id @default(cuid())
+  id                     String                   @id
   partyId                String
   gameType               String
   gameId                 String?
@@ -324,7 +375,7 @@ model CoopSession {
 }
 
 model CoopSessionParticipant {
-  id          String      @id @default(cuid())
+  id          String      @id
   sessionId   String
   userId      String
   role        String      @default("player")
@@ -339,8 +390,33 @@ model CoopSessionParticipant {
   @@index([userId])
 }
 
+model Coupon {
+  id                    String             @id
+  code                  String             @unique
+  type                  String
+  valueCents            Int
+  enabled               Boolean            @default(true)
+  startsAt              DateTime?
+  endsAt                DateTime?
+  maxRedemptions        Int?
+  maxRedemptionsPerUser Int?
+  minSubtotalCents      Int?
+  allowedProductIds     String[]
+  excludedProductIds    String[]
+  allowedCollections    String[]
+  excludedCollections   String[]
+  stackable             Boolean            @default(false)
+  oneTimeCode           Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @default(now())
+  CouponRedemption      CouponRedemption[]
+
+  @@index([code])
+  @@index([enabled])
+}
+
 model CouponGrant {
-  id           String       @id @default(cuid())
+  id           String       @id
   userId       String
   code         String       @unique
   discountType DiscountType
@@ -352,8 +428,23 @@ model CouponGrant {
   User         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model CouponRedemption {
+  id                String   @id
+  couponId          String
+  clientReferenceId String
+  status            String   @default("PENDING")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
+  Coupon            Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, clientReferenceId])
+  @@index([clientReferenceId])
+  @@index([couponId])
+  @@index([status])
+}
+
 model EmailLog {
-  id        String    @id @default(cuid())
+  id        String    @id
   userId    String?
   orderId   String?
   to        String
@@ -385,7 +476,7 @@ model Follow {
 }
 
 model GameRun {
-  id           String    @id @default(cuid())
+  id           String    @id
   userId       String
   gameKey      String
   score        Int
@@ -398,8 +489,41 @@ model GameRun {
   @@index([userId, gameKey])
 }
 
+model GameSave {
+  id        String   @id
+  userId    String
+  gameId    String
+  slot      Int      @default(1)
+  payload   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId, slot])
+  @@index([gameId])
+  @@index([userId])
+}
+
+model GameSession {
+  id        String    @id
+  gameId    String
+  userId    String
+  startTime DateTime
+  endTime   DateTime?
+  score     Int?
+  highScore Int?
+  actions   Json?
+  metadata  Json?
+  createdAt DateTime  @default(now())
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([gameId])
+  @@index([startTime])
+  @@index([userId])
+}
+
 model GameSettings {
-  id             String   @id @default(cuid())
+  id             String   @id
   userId         String
   gameCode       String
   difficulty     String   @default("normal")
@@ -409,7 +533,7 @@ model GameSettings {
   autoSave       Boolean  @default(true)
   customSettings Json?
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime
   User           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, gameCode])
@@ -417,7 +541,7 @@ model GameSettings {
 }
 
 model GuestSession {
-  id          String        @id @default(cuid())
+  id          String        @id
   createdAt   DateTime      @default(now())
   lastSeenAt  DateTime      @default(now())
   MergeLog    MergeLog[]
@@ -428,29 +552,27 @@ model GuestSession {
 }
 
 model HomeRail {
-  id           String    @id @default(cuid())
-  key          String    @unique
-  title        String
-  productSlugs String[]  @default([])
-  startsAt     DateTime?
-  endsAt       DateTime?
-  updatedAt    DateTime  @updatedAt
+  id            String    @id
+  key           String    @unique
+  title         String
+  product_slugs String[]  @default([])
+  starts_at     DateTime?
+  ends_at       DateTime?
+  updated_at    DateTime
 
   @@index([key])
-  @@index([startsAt, endsAt])
+  @@index([starts_at, ends_at])
 }
 
 model IdempotencyKey {
   key       String   @id
   purpose   String
-  method    String?
-  response  Json?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 }
 
 model InventoryItem {
-  id         String        @id @default(cuid())
+  id         String        @id
   userId     String
   sku        String
   kind       InventoryKind
@@ -462,7 +584,7 @@ model InventoryItem {
 }
 
 model Leaderboard {
-  id               String             @id @default(cuid())
+  id               String             @id
   gameCode         String
   scope            String             @default("global")
   period           String             @default("daily")
@@ -476,14 +598,14 @@ model Leaderboard {
 }
 
 model LeaderboardScore {
-  id          String       @id @default(cuid())
+  id          String       @id
   userId      String
   game        String
   diff        String?
   score       Int
   statsJson   Json?
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime
   boardId     String?
   meta        Json?
   profileId   String?
@@ -499,7 +621,7 @@ model LeaderboardScore {
 }
 
 model MergeLog {
-  id                     String       @id @default(cuid())
+  id                     String       @id
   guestSessionId         String
   userId                 String
   mergedAt               DateTime     @default(now())
@@ -515,7 +637,7 @@ model MergeLog {
 }
 
 model MessageTemplate {
-  id                  String                @id @default(cuid())
+  id                  String                @id
   name                String                @unique
   pattern             String
   isActive            Boolean               @default(true)
@@ -524,7 +646,7 @@ model MessageTemplate {
 }
 
 model MessageTemplateSlot {
-  id              String          @id @default(cuid())
+  id              String          @id
   templateId      String
   position        Int
   optional        Boolean         @default(false)
@@ -535,7 +657,7 @@ model MessageTemplateSlot {
 }
 
 model ModerationAction {
-  id                                      String             @id @default(cuid())
+  id                                      String             @id
   userId                                  String
   moderatorId                             String
   actionType                              String
@@ -561,7 +683,7 @@ model ModerationAction {
 }
 
 model ModerationAppeal {
-  id                                     String           @id @default(cuid())
+  id                                     String           @id
   actionId                               String
   userId                                 String
   reason                                 String
@@ -582,7 +704,7 @@ model ModerationAppeal {
 }
 
 model ModeratorRole {
-  id                                  String    @id @default(cuid())
+  id                                  String    @id
   userId                              String
   role                                String
   permissions                         Json
@@ -600,17 +722,17 @@ model ModeratorRole {
 }
 
 model MusicPlaylist {
-  id         String       @id @default(cuid())
+  id         String       @id
   name       String
   isPublic   Boolean      @default(true)
   createdBy  String
   createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  updatedAt  DateTime
   MusicTrack MusicTrack[]
 }
 
 model MusicTrack {
-  id            String        @id @default(cuid())
+  id            String        @id
   playlistId    String
   title         String
   artist        String
@@ -623,7 +745,7 @@ model MusicTrack {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String   @id
   profileId String
   type      String
   payload   Json
@@ -638,36 +760,34 @@ model Notification {
 }
 
 model Order {
-  id                   String         @id @default(cuid())
-  userId               String
-  stripeId             String         @unique
-  paymentIntentId      String?
-  chargeId             String?
-  status               OrderStatus    @default(pending)
-  totalAmount          Int
-  currency             String         @default("USD")
-  shippedAt            DateTime?
-  trackingUrl          String?
-  carrier              String?
-  trackingNumber       String?
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  paidAt               DateTime?
-  petalsAwarded        Int            @default(0)
-  printifyId           String?
-  memoryCardKey        String?
-  displayNumber        Int            @unique @default(autoincrement())
-  primaryItemName      String?        @default("")
-  label                String?        @default("")
-  subtotalCents        Int            @default(0)
-  appliedCouponCodes   String[]       @default([])
-  discountTotalCents   Int            @default(0)
-  EmailLog             EmailLog[]
-  User                 User           @relation(fields: [userId], references: [id])
-  OrderItem            OrderItem[]
-  RewardLedger         RewardLedger[]
-  UserRune             UserRune[]
-  PrintifyOrderSync    PrintifyOrderSync[]
+  id                String             @id
+  userId            String
+  stripeId          String             @unique
+  paymentIntentId   String?
+  chargeId          String?
+  status            OrderStatus        @default(pending)
+  totalAmount       Int
+  currency          String             @default("USD")
+  shippedAt         DateTime?
+  trackingUrl       String?
+  carrier           String?
+  trackingNumber    String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime
+  paidAt            DateTime?
+  petalsAwarded     Int                @default(0)
+  printifyId        String?
+  memoryCardKey     String?
+  displayNumber     Int                @unique @default(autoincrement())
+  primaryItemName   String?            @default("")
+  label             String?            @default("")
+  subtotalCents     Int                @default(0)
+  EmailLog          EmailLog[]
+  User              User               @relation(fields: [userId], references: [id])
+  OrderItem         OrderItem[]
+  PrintifyOrderSync PrintifyOrderSync?
+  RewardLedger      RewardLedger[]
+  UserRune          UserRune[]
 }
 
 model OrderItem {
@@ -702,7 +822,7 @@ model Party {
   status          String            @default("open")
   settings        Json?
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  updatedAt       DateTime
   CoopSession     CoopSession[]
   User            User              @relation(fields: [leaderId], references: [id], onDelete: Cascade)
   PartyInvitation PartyInvitation[]
@@ -717,7 +837,7 @@ model Party {
 }
 
 model PartyInvitation {
-  id                                   String    @id @default(cuid())
+  id                                   String    @id
   partyId                              String
   inviterId                            String
   inviteeId                            String
@@ -739,7 +859,7 @@ model PartyInvitation {
 }
 
 model PartyMember {
-  id           String   @id @default(cuid())
+  id           String   @id
   partyId      String
   userId       String
   role         String   @default("member")
@@ -756,7 +876,7 @@ model PartyMember {
 }
 
 model PartyMessage {
-  id          String   @id @default(cuid())
+  id          String   @id
   partyId     String
   authorId    String
   content     String
@@ -772,7 +892,7 @@ model PartyMessage {
 }
 
 model PetalCollection {
-  id              String   @id @default(cuid())
+  id              String   @id
   userId          String?
   count           Int
   positionX       Float
@@ -786,7 +906,7 @@ model PetalCollection {
 }
 
 model PetalLedger {
-  id             String        @id @default(cuid())
+  id             String        @id
   userId         String?
   type           LedgerType
   amount         Int
@@ -802,8 +922,55 @@ model PetalLedger {
   @@index([userId, type, createdAt])
 }
 
+model PetalShopItem {
+  id          String    @id
+  sku         String    @unique
+  name        String
+  kind        String
+  priceRunes  Int?
+  pricePetals Int?
+  eventTag    String?
+  visibleFrom DateTime?
+  visibleTo   DateTime?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+
+  @@index([eventTag])
+  @@index([kind])
+  @@index([visibleFrom, visibleTo])
+}
+
+model PetalTransaction {
+  id          String   @id
+  userId      String
+  amount      Int
+  source      String
+  description String?
+  createdAt   DateTime @default(now())
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([source])
+  @@index([userId])
+}
+
+model PetalWallet {
+  id              String    @id
+  userId          String    @unique
+  balance         Int       @default(0)
+  lifetimeEarned  Int       @default(0)
+  currentStreak   Int       @default(0)
+  lastCollectedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now())
+  User            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model Phrase {
-  id              String            @id @default(cuid())
+  id              String            @id
   category        PhraseCategory
   text            String
   locale          String?           @default("en")
@@ -815,11 +982,11 @@ model Phrase {
 }
 
 model Post {
-  id          String        @id @default(cuid())
+  id          String        @id
   title       String
   slug        String        @unique
   createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  updatedAt   DateTime
   CommentMark CommentMark[]
 }
 
@@ -830,15 +997,30 @@ model Presence {
   activity     Json     @default("{}")
   showActivity Boolean  @default(true)
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  updatedAt    DateTime
   User         User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([lastSeen])
   @@index([status])
 }
 
+model PrintifyOrderSync {
+  id              String    @id
+  localOrderId    String    @unique
+  printifyOrderId String
+  status          String
+  lastSyncAt      DateTime?
+  error           String?   @db.VarChar(500)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now())
+  Order           Order     @relation(fields: [localOrderId], references: [id], onDelete: Cascade)
+
+  @@index([localOrderId])
+  @@index([status])
+}
+
 model PrivacySettings {
-  id                    String   @id @default(cuid())
+  id                    String   @id
   userId                String   @unique
   showOnlineStatus      Boolean  @default(true)
   showLastSeen          Boolean  @default(true)
@@ -849,12 +1031,12 @@ model PrivacySettings {
   showPurchaseHistory   Boolean  @default(false)
   allowSearchIndexing   Boolean  @default(true)
   createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  updatedAt             DateTime
   User                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
-  id                String           @id @default(cuid())
+  id                String           @id
   name              String
   description       String?
   primaryImageUrl   String?
@@ -863,26 +1045,25 @@ model Product {
   active            Boolean          @default(true)
   category          String?
   isNSFW            Boolean          @default(false)
-  categorySlug      String?
-  integrationRef    String?          @unique
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  category_slug     String?
+  integration_ref   String?          @unique
+  created_at        DateTime         @default(now())
+  updated_at        DateTime
   CartItem          CartItem[]
   OrderItem         OrderItem[]
   ProductVariant    ProductVariant[]
   Review            Review[]
   Wishlist          Wishlist[]
-  ProductSoapstone  ProductSoapstone[]
 
-  @@index([active, categorySlug])
-  @@index([categorySlug])
-  @@index([createdAt])
-  @@index([integrationRef])
-  @@index([updatedAt])
+  @@index([active, category_slug])
+  @@index([category_slug])
+  @@index([created_at])
+  @@index([integration_ref])
+  @@index([updated_at])
 }
 
 model ProductReview {
-  id         String   @id @default(cuid())
+  id         String   @id
   productId  String
   userId     String
   rating     Int
@@ -891,14 +1072,14 @@ model ProductReview {
   imageUrls  String[]
   isApproved Boolean  @default(false)
   createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt  DateTime
 
   @@index([isApproved, createdAt])
   @@index([productId, createdAt])
 }
 
 model ProductVariant {
-  id                String      @id @default(cuid())
+  id                String      @id
   productId         String
   previewImageUrl   String?
   printifyVariantId Int
@@ -920,7 +1101,7 @@ model ProductVariant {
 }
 
 model ProductView {
-  id        String   @id @default(cuid())
+  id        String   @id
   productId String
   userId    String?
   ipAddress String?
@@ -932,19 +1113,19 @@ model ProductView {
 }
 
 model Profile {
-  id     String @id @default(cuid())
+  id     String @id
   userId String @unique
   User   User   @relation(fields: [userId], references: [id])
 }
 
 model ProfileLink {
-  id        String   @id @default(cuid())
+  id        String   @id
   profileId String
   label     String
   url       String
   orderIdx  Int      @default(0)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   User      User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([orderIdx])
@@ -952,13 +1133,13 @@ model ProfileLink {
 }
 
 model ProfileSection {
-  id        String   @id @default(cuid())
+  id        String   @id
   profileId String
   code      String
   orderIdx  Int
   visible   Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   User      User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@index([orderIdx])
@@ -970,12 +1151,12 @@ model ProfileTheme {
   themeCode String   @default("glass_pink")
   accentHex String   @default("#ec4899")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   User      User     @relation(fields: [profileId], references: [id], onDelete: Cascade)
 }
 
 model Quest {
-  id              String            @id @default(cuid())
+  id              String            @id
   key             String            @unique
   title           String
   description     String
@@ -987,7 +1168,7 @@ model Quest {
 }
 
 model QuestAssignment {
-  id            String    @id @default(cuid())
+  id            String    @id
   userId        String
   questId       String
   day           String
@@ -1005,7 +1186,7 @@ model QuestAssignment {
 }
 
 model Reaction {
-  id               String           @id @default(cuid())
+  id               String           @id
   messageId        String
   userId           String
   type             ReactionType
@@ -1016,26 +1197,26 @@ model Reaction {
 }
 
 model Review {
-  id         String   @id @default(cuid())
-  productId  String
-  userId     String
-  rating     Int
-  title      String?
-  body       String?
-  images     Json     @default("[]")
-  isApproved Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id          String   @id
+  productId   String
+  userId      String
+  rating      Int
+  title       String?
+  body        String?
+  images      Json     @default("[]")
+  is_approved Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@index([createdAt])
-  @@index([isApproved])
+  @@index([created_at])
+  @@index([is_approved])
   @@index([productId])
   @@index([userId])
 }
 
 model Reward {
-  id          String        @id @default(cuid())
+  id          String        @id
   kind        RewardKind
   sku         String?
   value       Int?
@@ -1048,7 +1229,7 @@ model Reward {
 }
 
 model RewardLedger {
-  id           String   @id @default(cuid())
+  id           String   @id
   userId       String?
   orderId      String?
   type         String
@@ -1064,13 +1245,13 @@ model RewardLedger {
 }
 
 model Rune {
-  id          String       @id @default(cuid())
+  id          String       @id
   slug        String       @unique
   name        String
   description String
   power       Int          @default(50)
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime
   RuneUnlock  RuneUnlock[]
 
   @@index([power])
@@ -1078,14 +1259,14 @@ model Rune {
 }
 
 model RuneCombo {
-  id              String            @id @default(cuid())
+  id              String            @id
   comboId         String            @unique
   members         String[]
   revealCopy      String?
   cosmeticBurst   String?
   isActive        Boolean           @default(true)
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  updatedAt       DateTime
   RuneComboMember RuneComboMember[]
 
   @@index([comboId])
@@ -1093,7 +1274,7 @@ model RuneCombo {
 }
 
 model RuneComboMember {
-  id        String    @id @default(cuid())
+  id        String    @id
   comboId   String
   runeId    String
   RuneCombo RuneCombo @relation(fields: [comboId], references: [id], onDelete: Cascade)
@@ -1105,7 +1286,7 @@ model RuneComboMember {
 }
 
 model RuneDef {
-  id              String            @id @default(cuid())
+  id              String            @id
   canonicalId     String            @unique
   displayName     String?
   glyph           String?
@@ -1113,7 +1294,7 @@ model RuneDef {
   printifyUPCs    String[]
   isActive        Boolean           @default(true)
   createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  updatedAt       DateTime
   RuneComboMember RuneComboMember[]
   UserRune        UserRune[]
 
@@ -1122,7 +1303,7 @@ model RuneDef {
 }
 
 model RuneUnlock {
-  id         String   @id @default(cuid())
+  id         String   @id
   userId     String
   slug       String
   unlockedAt DateTime @default(now())
@@ -1135,7 +1316,7 @@ model RuneUnlock {
 }
 
 model SearchAnalytics {
-  id                String   @id @default(cuid())
+  id                String   @id
   query             String
   searchType        String
   resultCount       Int
@@ -1153,14 +1334,14 @@ model SearchAnalytics {
 }
 
 model SearchHistory {
-  id          String   @id @default(cuid())
+  id          String   @id
   userId      String
   query       String
   searchType  String
   filters     Json?
   resultCount Int?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime
   User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([createdAt])
@@ -1170,7 +1351,7 @@ model SearchHistory {
 }
 
 model SearchSuggestion {
-  id             String    @id @default(cuid())
+  id             String    @id
   query          String
   suggestionType String
   targetId       String?
@@ -1178,7 +1359,7 @@ model SearchSuggestion {
   popularity     Int       @default(0)
   lastUsed       DateTime?
   createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  updatedAt      DateTime
 
   @@unique([query, suggestionType, targetId])
   @@index([lastUsed])
@@ -1188,7 +1369,7 @@ model SearchSuggestion {
 }
 
 model ShopItem {
-  id          String    @id @default(cuid())
+  id          String    @id
   sku         String    @unique
   name        String
   kind        String
@@ -1199,26 +1380,7 @@ model ShopItem {
   visibleTo   DateTime?
   metadata    Json?
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([eventTag])
-  @@index([kind])
-  @@index([visibleFrom, visibleTo])
-}
-
-model PetalShopItem {
-  id          String    @id @default(cuid())
-  sku         String    @unique
-  name        String
-  kind        String
-  priceRunes  Int?
-  pricePetals Int?
-  eventTag    String?
-  visibleFrom DateTime?
-  visibleTo   DateTime?
-  metadata    Json?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime
 
   @@index([eventTag])
   @@index([kind])
@@ -1234,12 +1396,12 @@ model SiteConfig {
   seasonal  Json     @default("{\"autumnMode\": false, \"springMode\": false, \"sakuraBoost\": false}")
   rewards   Json     @default("{\"daily\": {\"hardCap\": 400, \"softCap\": 200, \"postSoftRatePct\": 0.5}, \"streak\": {\"maxPct\": 0.25, \"enabled\": true, \"dailyBonusPct\": 0.05}, \"seasonal\": {\"multiplier\": 1.0}, \"maxPerOrder\": 120, \"minPerOrder\": 5, \"baseRateCents\": 300, \"firstPurchaseBonus\": 20}")
   runes     Json     @default("{\"defs\": [], \"gacha\": {\"enabled\": false}, \"combos\": []}")
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   updatedBy String?
 }
 
 model SlotAccepts {
-  id                  String              @id @default(cuid())
+  id                  String              @id
   slotId              String
   category            PhraseCategory
   MessageTemplateSlot MessageTemplateSlot @relation(fields: [slotId], references: [id])
@@ -1248,8 +1410,22 @@ model SlotAccepts {
   @@index([category])
 }
 
+model Soapstone {
+  id            String          @id
+  userId        String
+  text          String
+  score         Int             @default(0)
+  createdAt     DateTime        @default(now())
+  User          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  SoapstoneVote SoapstoneVote[]
+
+  @@index([createdAt])
+  @@index([score])
+  @@index([userId])
+}
+
 model SoapstoneMessage {
-  id         String     @id @default(cuid())
+  id         String     @id
   createdAt  DateTime   @default(now())
   appraises  Int        @default(0)
   authorId   String
@@ -1258,7 +1434,7 @@ model SoapstoneMessage {
   reports    Int        @default(0)
   status     Visibility @default(PUBLIC)
   text       String
-  updatedAt  DateTime   @updatedAt
+  updatedAt  DateTime
   x          Int?
   y          Int?
   Reaction   Reaction[]
@@ -1268,8 +1444,22 @@ model SoapstoneMessage {
   @@index([postId])
 }
 
+model SoapstoneVote {
+  id          String    @id
+  userId      String
+  soapstoneId String
+  vote        String
+  createdAt   DateTime  @default(now())
+  Soapstone   Soapstone @relation(fields: [soapstoneId], references: [id], onDelete: Cascade)
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, soapstoneId])
+  @@index([soapstoneId])
+  @@index([userId])
+}
+
 model StreakShard {
-  id        String   @id @default(cuid())
+  id        String   @id
   userId    String
   day       String
   createdAt DateTime @default(now())
@@ -1280,7 +1470,7 @@ model StreakShard {
 }
 
 model StripeCustomer {
-  id         String @id @default(cuid())
+  id         String @id
   userId     String @unique
   customerId String @unique
   User       User   @relation(fields: [userId], references: [id])
@@ -1290,7 +1480,7 @@ model User {
   id                                                    String                   @id
   email                                                 String                   @unique
   username                                              String                   @unique
-  displayName                                           String?
+  display_name                                          String?
   avatarUrl                                             String?
   createdAt                                             DateTime                 @default(now())
   petalBalance                                          Int                      @default(0)
@@ -1311,12 +1501,13 @@ model User {
   location                                              String?
   visibility                                            String                   @default("public")
   website                                               String?
-  avatarConfig                                          Json?
   avatarBundle                                          Json?
+  avatarConfig                                          Json?
   avatarRendering                                       Json?
-  updatedAt                                             DateTime                 @updatedAt
+  updatedAt                                             DateTime                 @default(now())
   Activity                                              Activity[]
   Appraisal                                             Appraisal[]
+  AvatarConfiguration                                   AvatarConfiguration[]
   Block_Block_blockedIdToUser                           Block[]                  @relation("Block_blockedIdToUser")
   Block_Block_blockerIdToUser                           Block[]                  @relation("Block_blockerIdToUser")
   Cart                                                  Cart?
@@ -1336,6 +1527,8 @@ model User {
   Follow_Follow_followeeIdToUser                        Follow[]                 @relation("Follow_followeeIdToUser")
   Follow_Follow_followerIdToUser                        Follow[]                 @relation("Follow_followerIdToUser")
   GameRun                                               GameRun[]
+  GameSave                                              GameSave[]
+  GameSession                                           GameSession[]
   GameSettings                                          GameSettings[]
   InventoryItem                                         InventoryItem[]
   LeaderboardScore                                      LeaderboardScore[]
@@ -1354,6 +1547,8 @@ model User {
   PartyMember                                           PartyMember[]
   PartyMessage                                          PartyMessage[]
   PetalLedger                                           PetalLedger[]
+  PetalTransaction                                      PetalTransaction[]
+  PetalWallet                                           PetalWallet?
   Presence                                              Presence?
   PrivacySettings                                       PrivacySettings?
   Profile                                               Profile?
@@ -1364,12 +1559,15 @@ model User {
   RewardLedger                                          RewardLedger[]
   SearchAnalytics                                       SearchAnalytics[]
   SearchHistory                                         SearchHistory[]
+  Soapstone                                             Soapstone[]
   SoapstoneMessage                                      SoapstoneMessage[]
+  SoapstoneVote                                         SoapstoneVote[]
   StreakShard                                           StreakShard[]
   StripeCustomer                                        StripeCustomer?
   UserAchievement                                       UserAchievement[]
   UserCharacterPreset                                   UserCharacterPreset[]
   UserFile                                              UserFile[]
+  UserProfile                                           UserProfile?
   UserReport_UserReport_assignedModeratorIdToUser       UserReport[]             @relation("UserReport_assignedModeratorIdToUser")
   UserReport_UserReport_reportedUserIdToUser            UserReport[]             @relation("UserReport_reportedUserIdToUser")
   UserReport_UserReport_reporterIdToUser                UserReport[]             @relation("UserReport_reporterIdToUser")
@@ -1379,25 +1577,12 @@ model User {
   UserTitle                                             UserTitle[]
   Wallet                                                Wallet?
   Wishlist                                              Wishlist[]
-  PetalWallet                                           PetalWallet?
-  GameSave                                              GameSave[]
-  AvatarConfiguration                                   AvatarConfiguration[]
-  GameSession                                           GameSession[]
-  Soapstone                                             Soapstone[]
-  SoapstoneVote                                         SoapstoneVote[]
-  UserProfile                                           UserProfile?
-  PetalTransaction                                      PetalTransaction[]
-  Praise                                                Praise[]
-  UserPetals                                            UserPetals?
-  ProductSoapstone                                      ProductSoapstone[]
-  ProductSoapstonePraise                                ProductSoapstonePraise[]
-  UserInventoryItem                                     UserInventoryItem[]
 
   @@index([clerkId])
 }
 
 model UserAchievement {
-  id            String      @id @default(cuid())
+  id            String      @id
   userId        String
   achievementId String
   createdAt     DateTime    @default(now())
@@ -1408,7 +1593,7 @@ model UserAchievement {
 }
 
 model UserCharacterPreset {
-  id              String          @id @default(cuid())
+  id              String          @id
   userId          String
   presetId        String
   unlockedAt      DateTime        @default(now())
@@ -1421,7 +1606,7 @@ model UserCharacterPreset {
 }
 
 model UserFile {
-  id        String   @id @default(cuid())
+  id        String   @id
   userId    String
   key       String   @unique
   url       String
@@ -1434,8 +1619,21 @@ model UserFile {
   @@index([userId])
 }
 
+model UserProfile {
+  id                String    @id
+  userId            String    @unique
+  gamertag          String?
+  gamertagChangedAt DateTime?
+  bannerKey         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now())
+  User              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
 model UserReport {
-  id                                        String             @id @default(cuid())
+  id                                        String             @id
   reporterId                                String
   reportedUserId                            String?
   contentType                               String
@@ -1466,7 +1664,7 @@ model UserReport {
 }
 
 model UserRune {
-  id         String   @id @default(cuid())
+  id         String   @id
   userId     String
   runeId     String
   orderId    String?
@@ -1482,7 +1680,7 @@ model UserRune {
 }
 
 model UserSafetySettings {
-  id                      String   @id @default(cuid())
+  id                      String   @id
   userId                  String   @unique
   allowFriendRequests     Boolean  @default(true)
   allowPartyInvites       Boolean  @default(true)
@@ -1492,12 +1690,12 @@ model UserSafetySettings {
   reportNotifications     Boolean  @default(true)
   moderationNotifications Boolean  @default(true)
   createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  updatedAt               DateTime
   User                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserSettings {
-  id                      String   @id @default(cuid())
+  id                      String   @id
   userId                  String   @unique
   profileVisibility       String   @default("public")
   allowFriendRequests     Boolean  @default(true)
@@ -1514,7 +1712,7 @@ model UserSettings {
   soundEnabled            Boolean  @default(true)
   musicEnabled            Boolean  @default(true)
   createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  updatedAt               DateTime
   User                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([activityVisibility])
@@ -1522,7 +1720,7 @@ model UserSettings {
 }
 
 model UserTitle {
-  id        String   @id @default(cuid())
+  id        String   @id
   userId    String
   title     String
   awardedAt DateTime @default(now())
@@ -1533,327 +1731,31 @@ model UserTitle {
 }
 
 model Wallet {
-  id        String   @id @default(cuid())
+  id        String   @id
   userId    String   @unique
   petals    Int      @default(0)
   runes     Int      @default(0)
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
   User      User     @relation(fields: [userId], references: [id])
 }
 
 model WebhookEvent {
-  id        String   @id @default(cuid())
+  id        String   @id
   type      String
   payload   Json
   createdAt DateTime @default(now())
 }
 
-// Missing tables from Supabase introspection
 model Wishlist {
-  id        String   @id @default(cuid())
+  id        String   @id
   userId    String
   productId String
   createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   Product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
-  @@index([userId])
   @@index([productId])
-}
-
-model Coupon {
-  id                      String   @id @default(cuid())
-  code                    String   @unique
-  type                    String   // 'PERCENT' | 'FIXED'
-  valueCents              Int
-  enabled                 Boolean  @default(true)
-  startsAt                DateTime?
-  endsAt                  DateTime?
-  maxRedemptions           Int?
-  maxRedemptionsPerUser    Int?
-  minSubtotalCents         Int?
-  allowedProductIds        String[]
-  excludedProductIds       String[]
-  allowedCollections       String[]
-  excludedCollections      String[]
-  stackable                Boolean  @default(false)
-  oneTimeCode              Boolean  @default(false)
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-  CouponRedemption        CouponRedemption[]
-
-  @@index([code])
-  @@index([enabled])
-}
-
-model CouponRedemption {
-  id                 String   @id @default(cuid())
-  couponId           String
-  clientReferenceId  String   // Order ID or checkout session ID
-  status             String   @default("PENDING") // 'PENDING' | 'SUCCEEDED' | 'FAILED'
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  Coupon             Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
-
-  @@unique([couponId, clientReferenceId])
-  @@index([couponId])
-  @@index([status])
-  @@index([clientReferenceId])
-}
-
-model PetalWallet {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  balance        Int      @default(0)
-  lifetimeEarned Int      @default(0)
-  currentStreak  Int      @default(0)
-  lastCollectedAt DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  User           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model PetalTransaction {
-  id          String   @id @default(cuid())
-  userId      String
-  amount      Int
-  source      String   // 'homepage_collection', 'game_reward', etc.
-  description String?
-  createdAt   DateTime @default(now())
-  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([source])
-  @@index([createdAt])
-}
-
-model GameSave {
-  id        String   @id @default(cuid())
-  userId    String
-  gameId    String
-  slot      Int      @default(1)
-  payload   Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, gameId, slot])
-  @@index([userId])
-  @@index([gameId])
-}
-
-model PrintifyOrderSync {
-  id              String   @id @default(cuid())
-  localOrderId    String   @unique
-  printifyOrderId String
-  status          String   // 'synced' | 'failed'
-  lastSyncAt      DateTime?
-  error           String?  @db.VarChar(500)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  Order           Order    @relation(fields: [localOrderId], references: [id], onDelete: Cascade)
-
-  @@index([localOrderId])
-  @@index([status])
-}
-
-model AvatarConfiguration {
-  id               String                     @id @default(cuid())
-  userId           String
-  name             String?
-  baseModel        String?
-  baseModelUrl     String?
-  contentRating    String?
-  showNsfwContent  Boolean                    @default(false)
-  ageVerified      Boolean                    @default(false)
-  defaultAnimation String?
-  idleAnimations   String[]                   @default([])
-  allowExport      Boolean                    @default(true)
-  version          Int                        @default(1)
-  isPublic         Boolean                    @default(false)
-  thumbnailUrl     String?
-  configurationData Json
-  exportFormat     String?
-  createdAt        DateTime                   @default(now())
-  updatedAt        DateTime                   @updatedAt
-  User             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  AvatarConfigurationPart AvatarConfigurationPart[]
-  AvatarMorphTarget AvatarMorphTarget[]
-  AvatarMaterialOverride AvatarMaterialOverride[]
-
-  @@index([userId])
-}
-
-model AvatarConfigurationPart {
-  id              String              @id @default(cuid())
-  configurationId String
-  partId          String
-  partType        String
-  attachmentOrder Int
-  AvatarConfiguration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
-
-  @@unique([configurationId, attachmentOrder])
-  @@index([configurationId])
-}
-
-model AvatarMorphTarget {
-  id              String              @id @default(cuid())
-  configurationId String
-  targetName      String
-  value           Float
-  AvatarConfiguration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
-
-  @@unique([configurationId, targetName])
-  @@index([configurationId])
-}
-
-model AvatarMaterialOverride {
-  id              String              @id @default(cuid())
-  configurationId String
-  slot            String
-  type            String
-  value           Json
-  opacity         Float?
-  AvatarConfiguration AvatarConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
-
-  @@unique([configurationId, slot])
-  @@index([configurationId])
-}
-
-model GameSession {
-  id        String    @id @default(cuid())
-  gameId    String
-  userId    String
-  startTime DateTime
-  endTime   DateTime?
-  score     Int?
-  highScore Int?
-  actions   Json?
-  metadata  Json?
-  createdAt DateTime  @default(now())
-  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([gameId])
-  @@index([startTime])
-}
-
-model Soapstone {
-  id        String   @id @default(cuid())
-  userId    String
-  text      String
-  score     Int      @default(0)
-  createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  SoapstoneVote SoapstoneVote[]
-
-  @@index([userId])
-  @@index([score])
-  @@index([createdAt])
-}
-
-model SoapstoneVote {
-  id         String     @id @default(cuid())
-  userId     String
-  soapstoneId String
-  vote       String     // 'up' | 'down'
-  createdAt  DateTime   @default(now())
-  User       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Soapstone  Soapstone  @relation(fields: [soapstoneId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, soapstoneId])
-  @@index([userId])
-  @@index([soapstoneId])
-}
-
-model UserProfile {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  gamertag         String?
-  gamertagChangedAt DateTime?
-  bannerKey        String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  User             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model Praise {
-  id        String   @id @default(cuid())
-  userId    String
-  targetId  String
-  createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, targetId])
-  @@index([targetId])
-  @@index([userId])
-}
-
-model UserPetals {
-  userId    String   @id
-  amount    Int      @default(0)
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// Alias for backwards compatibility
-// TODO: Migrate all code to use 'amount' instead of 'total'
-
-model GlobalPetals {
-  id        String   @id @default(cuid())
-  total     BigInt   @default(0)
-  active    Boolean  @default(false)
-  goal      BigInt   @default(0)
-  eventName String?
-  updatedAt DateTime @updatedAt
-}
-
-model UserInventoryItem {
-  userId    String
-  itemKey   String
-  count     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, itemKey])
-  @@unique([userId, itemKey])
-  @@index([userId])
-}
-
-model ProductSoapstone {
-  id         String   @id @default(cuid())
-  productId  String
-  userId     String
-  text       String
-  status     Visibility @default(VISIBLE)
-  appraises  Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  User       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ProductSoapstonePraise ProductSoapstonePraise[]
-
-  @@index([productId])
-  @@index([userId])
-  @@index([status])
-}
-
-model ProductSoapstonePraise {
-  id                  String            @id @default(cuid())
-  productSoapstoneId  String
-  userId              String
-  createdAt           DateTime          @default(now())
-  ProductSoapstone    ProductSoapstone  @relation(fields: [productSoapstoneId], references: [id], onDelete: Cascade)
-  User                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([productSoapstoneId, userId])
-  @@index([productSoapstoneId])
   @@index([userId])
 }
 
@@ -1944,18 +1846,15 @@ enum RewardKind {
   TRACK_UNLOCK
 }
 
-enum Visibility {
-  PUBLIC
-  HIDDEN
-  REMOVED
-  VISIBLE
-  REPORTED
-}
-
 enum SoapstoneStatus {
   PENDING
   APPROVED
   REJECTED
   FLAGGED
-  VISIBLE
+}
+
+enum Visibility {
+  PUBLIC
+  HIDDEN
+  REMOVED
 }
