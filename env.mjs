@@ -9,6 +9,11 @@ const trimmedEnv = Object.fromEntries(
 Object.assign(process.env, trimmedEnv);
 
 export const env = createEnv({
+  /**
+   * Server-side environment validation.
+   * Required vars become optional to prevent client-side validation errors when imported in client components.
+   * Server code should always check for undefined before use.
+   */
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     DATABASE_URL: z.string().url().optional(),
@@ -267,5 +272,6 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE,
     NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
   },
-  skipValidation: false,
+  // Skip validation on client-side to prevent errors when env is imported in client components
+  skipValidation: typeof window !== 'undefined',
 });
