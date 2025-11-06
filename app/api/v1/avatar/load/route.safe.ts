@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         username: true,
-        displayName: true,
+        display_name: true,
         avatarConfig: true,
         avatarBundle: true,
         avatarRendering: true,
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         user: {
           id: user.id,
           username: user.username,
-          displayName: user.displayName,
+          display_name: user.display_name,
           avatarConfig: user.avatarConfig,
           avatarBundle: user.avatarBundle,
           avatarRendering: user.avatarRendering,

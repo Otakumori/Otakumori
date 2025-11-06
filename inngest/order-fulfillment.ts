@@ -31,7 +31,7 @@ export const fulfillOrder = inngest.createFunction(
             select: {
               id: true,
               email: true,
-              displayName: true,
+              display_name: true,
               username: true,
             },
           },
@@ -67,7 +67,7 @@ export const fulfillOrder = inngest.createFunction(
         // Parse shipping address
         const address = shippingDetails?.address || {};
         const shippingAddress: PrintifyShippingAddress = {
-          first_name: shippingDetails?.name?.split(' ')[0] || order.User.displayName || 'Customer',
+          first_name: shippingDetails?.name?.split(' ')[0] || order.User.display_name || 'Customer',
           last_name: shippingDetails?.name?.split(' ').slice(1).join(' ') || 'Name',
           email: email || order.User.email || 'customer@example.com',
           country: address.country || 'US',

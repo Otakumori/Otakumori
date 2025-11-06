@@ -88,21 +88,21 @@ async function generateDynamicSuggestions(query: string, searchType: string, lim
         where: {
           OR: [
             { username: { contains: query, mode: 'insensitive' } },
-            { displayName: { contains: query, mode: 'insensitive' } },
+            { display_name: { contains: query, mode: 'insensitive' } },
           ],
           visibility: { not: 'PRIVATE' },
         },
         select: {
           id: true,
           username: true,
-          displayName: true,
+          display_name: true,
         },
         take: Math.ceil(limit / 2),
       });
 
       suggestions.push(
         ...userSuggestions.map((user) => ({
-          query: user.displayName || user.username,
+          query: user.display_name || user.username,
           suggestionType: 'user',
           targetId: user.id,
           targetType: 'user',

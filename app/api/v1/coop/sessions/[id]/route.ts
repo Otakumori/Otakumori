@@ -29,7 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
               select: {
                 id: true,
                 username: true,
-                displayName: true,
+                display_name: true,
                 avatarUrl: true,
               },
             },
@@ -129,7 +129,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
               select: {
                 id: true,
                 username: true,
-                displayName: true,
+                display_name: true,
                 avatarUrl: true,
               },
             },

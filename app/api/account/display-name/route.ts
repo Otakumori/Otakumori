@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
   await db.user.update({
     where: { id: userId },
-    data: { displayName: displayName ?? null },
+    data: { display_name: displayName ?? null },
   });
 
   return NextResponse.json({ ok: true });

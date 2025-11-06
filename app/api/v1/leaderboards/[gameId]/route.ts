@@ -210,7 +210,7 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
             select: {
               id: true,
               username: true,
-              displayName: true,
+              display_name: true,
               avatarUrl: true,
               // country: true, // Not in User schema
             },
@@ -226,7 +226,7 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
         rank: offset + index + 1,
         userId: entry.profile?.id || entry.userId,
         username: entry.profile?.username || 'User',
-        displayName: entry.profile?.displayName || entry.profile?.username || 'User',
+        displayName: entry.profile?.display_name || entry.profile?.username || 'User',
         avatarUrl: entry.profile?.avatarUrl || null,
         country: null, // Not available in current schema
         score: entry.score,

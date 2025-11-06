@@ -59,7 +59,7 @@ export async function GET() {
           orderBy: { createdAt: 'desc' },
           include: {
             User: {
-              select: { username: true, displayName: true },
+              select: { username: true, display_name: true },
             },
           },
         }),
@@ -97,3 +97,4 @@ export async function GET() {
     );
   }
 }
+

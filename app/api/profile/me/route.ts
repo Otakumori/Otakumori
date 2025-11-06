@@ -53,7 +53,7 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     profile: {
-      displayName: u.displayName ?? 'You',
+      displayName: u.display_name ?? 'You',
       activeCosmetic: u.activeCosmetic ?? null,
       activeOverlay: u.activeOverlay ?? null,
     },

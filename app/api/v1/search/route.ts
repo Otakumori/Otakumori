@@ -127,7 +127,7 @@ async function searchUsers(
     select: {
       id: true,
       username: true,
-      displayName: true,
+      display_name: true,
       avatarUrl: true,
       bio: true,
       visibility: true,
@@ -138,7 +138,7 @@ async function searchUsers(
   return users.map((user) => ({
     id: user.id,
     type: 'user' as const,
-    title: user.displayName || user.username,
+    title: user.display_name || user.username,
     description: user.bio || `@${user.username}`,
     url: `/profile/${user.username}`,
     relevanceScore: calculateUserRelevanceScore(user, query),
@@ -225,7 +225,7 @@ async function searchContent(
         select: {
           id: true,
           username: true,
-          displayName: true,
+          display_name: true,
           avatarUrl: true,
         },
       },
@@ -237,7 +237,7 @@ async function searchContent(
     ...comments.map((comment) => ({
       id: comment.id,
       type: 'comment' as const,
-      title: `Comment by ${comment.User.displayName || comment.User.username}`,
+      title: `Comment by ${comment.User.display_name || comment.User.username}`,
       description: comment.content.substring(0, 100) + (comment.content.length > 100 ? '...' : ''),
       url: getCommentUrl(comment),
       relevanceScore: calculateContentRelevanceScore(comment.content, query),
@@ -270,7 +270,7 @@ async function searchContent(
         select: {
           id: true,
           username: true,
-          displayName: true,
+          display_name: true,
           avatarUrl: true,
         },
       },
@@ -282,7 +282,7 @@ async function searchContent(
     ...activities.map((activity) => ({
       id: activity.id,
       type: 'activity' as const,
-      title: `${activity.User.displayName || activity.User.username} - ${activity.type}`,
+      title: `${activity.User.display_name || activity.User.username} - ${activity.type}`,
       description: (activity.payload as any)?.description || activity.type,
       url: `/profile/${activity.User.username}`,
       relevanceScore: calculateContentRelevanceScore(activity.type, query),
@@ -311,8 +311,8 @@ function calculateUserRelevanceScore(user: any, query: string): number {
   }
 
   // Display name matches
-  if (user.displayName) {
-    if (user.displayName.toLowerCase().includes(lowerQuery)) {
+  if (user.display_name) {
+    if (user.display_name.toLowerCase().includes(lowerQuery)) {
       score += 40;
     }
   }

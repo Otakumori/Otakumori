@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
             User: {
               select: {
                 id: true,
-                displayName: true,
+                display_name: true,
                 avatarUrl: true,
               },
             },
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
             createdAt: praise.createdAt,
             sender: {
               id: praise.User.id,
-              displayName: praise.User.displayName,
+              displayName: praise.User.display_name,
               avatarUrl: praise.User.avatarUrl,
             },
           },
@@ -180,7 +180,7 @@ export async function GET(req: NextRequest) {
         User: {
           select: {
             id: true,
-            displayName: true,
+            display_name: true,
             avatarUrl: true,
           },
         },
@@ -201,7 +201,7 @@ export async function GET(req: NextRequest) {
             createdAt: praise.createdAt,
             sender: {
               id: praise.User.id,
-              displayName: praise.User.displayName,
+              displayName: praise.User.display_name,
               avatarUrl: praise.User.avatarUrl,
             },
           })),

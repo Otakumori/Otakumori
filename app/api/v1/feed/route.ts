@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             username: true,
-            displayName: true,
+            display_name: true,
             avatarUrl: true,
           },
         },
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
         User: {
           id: activity.User.id,
           username: activity.User.username,
-          displayName: activity.User.displayName,
+          displayName: activity.User.display_name,
           avatarUrl: activity.User.avatarUrl,
         },
       })),

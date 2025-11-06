@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
         currency: 'USD',
         status: 'pending',
         primaryItemName: items[0]?.name ?? 'Order',
-        label: `Order for ${shippingInfo?.firstName ?? user.displayName ?? user.username}`,
+        label: `Order for ${shippingInfo?.firstName ?? user.display_name ?? user.username}`,
         updatedAt: new Date(),
         appliedCouponCodes: appliedCodes,
       },

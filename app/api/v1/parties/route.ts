@@ -28,7 +28,7 @@ const CreateSchema = z.object({
 const memberSelect = {
   id: true,
   username: true,
-  displayName: true,
+  display_name: true,
   avatarUrl: true,
 } as const;
 

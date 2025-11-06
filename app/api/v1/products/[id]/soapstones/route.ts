@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
           select: {
             id: true,
             username: true,
-            displayName: true,
+            display_name: true,
             avatarUrl: true,
           },
         },

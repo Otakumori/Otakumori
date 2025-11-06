@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     // Update user profile
     const updateData: any = {};
     if (validatedData.display_name !== undefined)
-      updateData.displayName = validatedData.display_name;
+      updateData.display_name = validatedData.display_name;
     if (validatedData.bio !== undefined) updateData.bio = validatedData.bio;
     if (validatedData.location !== undefined) updateData.location = validatedData.location;
     if (validatedData.website !== undefined) updateData.website = validatedData.website;
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         username: true,
-        displayName: true,
+        display_name: true,
         bio: true,
         location: true,
         website: true,

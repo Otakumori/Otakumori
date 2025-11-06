@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
         User: {
           select: {
             id: true,
-            displayName: true,
+            display_name: true,
             avatarUrl: true,
           },
         },
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
             user: msg.User
               ? {
                   id: msg.User.id,
-                  displayName: msg.User.displayName,
+                  displayName: msg.User.display_name,
                   avatarUrl: msg.User.avatarUrl,
                 }
               : null,
@@ -136,7 +136,7 @@ export async function POST(req: NextRequest) {
           User: {
             select: {
               id: true,
-              displayName: true,
+              display_name: true,
               avatarUrl: true,
             },
           },
@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
           createdAt: message.createdAt,
           user: {
             id: message.User!.id,
-            displayName: message.User!.displayName,
+            displayName: message.User!.display_name,
             avatarUrl: message.User!.avatarUrl,
           },
         },
