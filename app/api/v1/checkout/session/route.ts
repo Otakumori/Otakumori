@@ -131,6 +131,7 @@ export async function POST(req: NextRequest) {
         status: 'pending',
         primaryItemName: items[0]?.name ?? 'Order',
         label: `Order for ${shippingInfo?.firstName ?? user.displayName ?? user.username}`,
+        appliedCouponCodes: appliedCodes,
       },
     });
 
@@ -228,7 +229,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.order.update({
       where: { id: order.id },
-      data: { stripeId: session.id, updatedAt: new Date() },
+      data: { stripeId: session.id },
     });
 
     return NextResponse.json({

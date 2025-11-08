@@ -222,18 +222,21 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
       });
 
       // Add rankings and format response
-      const leaderboard = entries.map((entry: any, index: number) => ({
-        rank: offset + index + 1,
-        userId: entry.profile?.id || entry.userId,
-        username: entry.profile?.username || 'User',
-        displayName: entry.profile?.display_name || entry.profile?.username || 'User',
-        avatarUrl: entry.profile?.avatarUrl || null,
-        country: null, // Not available in current schema
-        score: entry.score,
-        metadata: entry.statsJson || {},
-        submittedAt: entry.createdAt,
-        verified: true, // Assume verified for now
-      }));
+      const leaderboard = entries.map((entry, index) => {
+        const user = entry.User;
+        return {
+          rank: offset + index + 1,
+          userId: user?.id ?? entry.userId,
+          username: user?.username ?? 'User',
+          displayName: user?.displayName ?? user?.username ?? 'User',
+          avatarUrl: user?.avatarUrl ?? null,
+          country: null, // Not available in current schema
+          score: entry.score,
+          metadata: entry.statsJson || {},
+          submittedAt: entry.createdAt,
+          verified: true, // Assume verified for now
+        };
+      });
 
       // Get total count for pagination
       const totalCount = await db.leaderboardScore.count({

@@ -47,8 +47,7 @@ export async function POST(req: NextRequest) {
       // Create order in database first
       const order = await db.order.create({
         data: {
-          id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          userId: user.id,
+          User: { connect: { id: user.id } },
           stripeId: `temp_${Date.now()}`, // Temporary ID, will be updated
           totalAmount,
           subtotalCents,
@@ -56,7 +55,6 @@ export async function POST(req: NextRequest) {
           status: 'pending',
           primaryItemName: items[0]?.name || 'Order',
           label: `Order for ${shippingInfo?.firstName || user.displayName || user.username}`,
-          updatedAt: new Date(),
         },
       });
 
@@ -64,10 +62,9 @@ export async function POST(req: NextRequest) {
       for (const item of items) {
         await db.orderItem.create({
           data: {
-            id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            orderId: order.id,
-            productId: item.productId,
-            productVariantId: item.variantId,
+            Order: { connect: { id: order.id } },
+            Product: { connect: { id: item.productId } },
+            ProductVariant: { connect: { id: item.variantId } },
             sku: item.sku || `SKU-${item.productId}`,
             name: item.name,
             quantity: item.quantity,

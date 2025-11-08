@@ -800,34 +800,35 @@ model Notification {
 }
 
 model Order {
-  id                String             @id @default(cuid())
-  userId            String
-  stripeId          String             @unique
-  paymentIntentId   String?
-  chargeId          String?
-  status            OrderStatus        @default(pending)
-  totalAmount       Int
-  currency          String             @default("USD")
-  shippedAt         DateTime?
-  trackingUrl       String?
-  carrier           String?
-  trackingNumber    String?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  paidAt            DateTime?
-  petalsAwarded     Int                @default(0)
-  printifyId        String?
-  memoryCardKey     String?
-  displayNumber     Int                @unique @default(autoincrement())
-  primaryItemName   String?            @default("")
-  label             String?            @default("")
-  subtotalCents     Int                @default(0)
-  EmailLog          EmailLog[]
-  User              User               @relation(fields: [userId], references: [id])
-  OrderItem         OrderItem[]
-  PrintifyOrderSync PrintifyOrderSync?
-  RewardLedger      RewardLedger[]
-  UserRune          UserRune[]
+  id                 String             @id @default(cuid())
+  userId             String
+  stripeId           String             @unique
+  paymentIntentId    String?
+  chargeId           String?
+  status             OrderStatus        @default(pending)
+  totalAmount        Int
+  currency           String             @default("USD")
+  shippedAt          DateTime?
+  trackingUrl        String?
+  carrier            String?
+  trackingNumber     String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  paidAt             DateTime?
+  petalsAwarded      Int                @default(0)
+  printifyId         String?
+  memoryCardKey      String?
+  displayNumber      Int                @unique @default(autoincrement())
+  primaryItemName    String?            @default("")
+  label              String?            @default("")
+  subtotalCents      Int                @default(0)
+  appliedCouponCodes String[]           @default([])
+  EmailLog           EmailLog[]
+  User               User               @relation(fields: [userId], references: [id])
+  OrderItem          OrderItem[]
+  PrintifyOrderSync  PrintifyOrderSync?
+  RewardLedger       RewardLedger[]
+  UserRune           UserRune[]
 }
 
 model OrderItem {

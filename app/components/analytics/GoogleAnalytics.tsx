@@ -3,7 +3,7 @@
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 const GA_TRACKING_ID = 'G-GEKT6PWNXL';
 
@@ -12,8 +12,8 @@ export default function GoogleAnalytics() {
   const searchParams = useSearchParams();
 
   // Only enable GA in production environment using client-safe variables
-  const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
-  const isGAEnabled = isProduction && env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true';
+  const isProduction = clientEnv.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
+  const isGAEnabled = isProduction && clientEnv.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true';
 
   useEffect(() => {
     if (!isGAEnabled) return;
@@ -68,12 +68,12 @@ export default function GoogleAnalytics() {
 // GA4 Event tracking functions with production check
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
   // Use client-safe environment check
-  const isProduction = env.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
+  const isProduction = clientEnv.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
   if (
     typeof window !== 'undefined' &&
     window.gtag &&
     isProduction &&
-    env.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true'
+    clientEnv.NEXT_PUBLIC_FEATURE_GA_ENABLED === 'true'
   ) {
     window.gtag('event', eventName, parameters);
   }

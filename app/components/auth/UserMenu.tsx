@@ -3,7 +3,7 @@
 import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 export default function UserMenu() {
   const { isSignedIn } = useUser();
@@ -20,12 +20,12 @@ export default function UserMenu() {
   console.warn('UserMenu rendered, isSignedIn:', isSignedIn);
 
   const signInUrl = useMemo(() => {
-    const base = env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in';
+    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_IN_URL || '/sign-in';
     return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
   }, [redirectParam]);
 
   const signUpUrl = useMemo(() => {
-    const base = env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up';
+    const base = clientEnv.NEXT_PUBLIC_CLERK_SIGN_UP_URL || '/sign-up';
     return redirectParam ? `${base}${base.includes('?') ? '&' : '?'}${redirectParam}` : base;
   }, [redirectParam]);
 

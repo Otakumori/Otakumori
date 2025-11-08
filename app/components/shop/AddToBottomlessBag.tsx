@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildPrintifyCheckoutLink } from '@/lib/printify/buildCheckoutLink';
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 interface Props {
   productId: string;
@@ -32,7 +32,7 @@ export function AddToBottomlessBag({
     [productId, variantId],
   );
 
-  const label = env.NEXT_PUBLIC_CHECKOUT_LINK_LABEL || 'Add to Bottomless Bag';
+  const label = clientEnv.NEXT_PUBLIC_CHECKOUT_LINK_LABEL || 'Add to Bottomless Bag';
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
