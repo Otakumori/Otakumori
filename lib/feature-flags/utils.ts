@@ -16,7 +16,7 @@ import {
   isPerformanceMonitoringLevel,
 } from './types';
 import { evaluateFeatureFlag, isFeatureEnabled, getFeatureFlagValue } from './provider';
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 /**
  * Performance monitoring utilities based on feature flags
@@ -258,7 +258,7 @@ export class FeatureFlagDebugger {
   }
 
   static logFlags() {
-    if (typeof window === 'undefined' || env.NODE_ENV !== 'development') {
+    if (typeof window === 'undefined' || clientEnv.NODE_ENV !== 'development') {
       return;
     }
 
@@ -306,7 +306,7 @@ export async function initializeFeatureFlags() {
   await PerformanceMonitor.initialize();
 
   // Log flags in development
-  if (env.NODE_ENV === 'development') {
+  if (clientEnv.NODE_ENV === 'development') {
     FeatureFlagDebugger.logFlags();
   }
 
@@ -317,7 +317,7 @@ export async function initializeFeatureFlags() {
     if (typeof window !== 'undefined' && 'gtag' in window) {
       (window as any).gtag('event', 'feature_flags_initialized', {
         flag_count: Object.keys(flags).length,
-        environment: env.NODE_ENV,
+        environment: clientEnv.NODE_ENV,
       });
     }
   }
@@ -330,7 +330,7 @@ export async function warmFeatureFlagCache(userId?: string, userRole?: string) {
   const context = {
     userId,
     userRole: userRole as 'user' | 'moderator' | 'admin',
-    environment: env.NODE_ENV || 'development',
+    environment: clientEnv.NODE_ENV || 'development',
     timestamp: Date.now(),
   };
 

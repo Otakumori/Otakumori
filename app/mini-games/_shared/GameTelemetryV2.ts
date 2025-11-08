@@ -13,7 +13,7 @@
 
 'use client';
 
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 export interface GameEvent {
   eventType: string;
@@ -140,7 +140,7 @@ export class GameTelemetryV2 {
       flushInterval: 10000, // 10 seconds
       maxRetries: 3,
       consentRequired: true,
-      debugMode: env.NODE_ENV === 'development',
+      debugMode: clientEnv.NODE_ENV === 'development',
       includeUserId: true,
       anonymizeData: false,
       dataRetentionDays: 90,
@@ -250,7 +250,7 @@ export class GameTelemetryV2 {
         ...gameData,
       },
       metadata: {
-        buildVersion: env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+        buildVersion: clientEnv.NEXT_PUBLIC_APP_VERSION || '1.0.0',
         featureFlags: this.getActiveFeatureFlags(),
         experimentGroups: this.getExperimentGroups(),
         consentLevel: this.getConsentLevel(),

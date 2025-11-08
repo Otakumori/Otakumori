@@ -3,11 +3,11 @@
  * Pluggable design allows easy vendor swapping later
  */
 
-import { env } from '@/env';
+import { clientEnv } from '@/env/client';
 
 // Environment variables for telemetry configuration
-const isDevelopment = env.NODE_ENV === 'development';
-const isTelemetryEnabled = (env as any).NEXT_PUBLIC_TELEMETRY_ENABLED === '1';
+const isDevelopment = clientEnv.NODE_ENV === 'development';
+const isTelemetryEnabled = clientEnv.NEXT_PUBLIC_TELEMETRY_ENABLED === '1';
 
 interface TelemetryEvent {
   event: string;
@@ -92,7 +92,7 @@ class TelemetryService {
 
   private logToConsole(event: TelemetryEvent): void {
     // Console logging for debugging (warn level to pass linting)
-    if (env.NODE_ENV === 'development') {
+    if (clientEnv.NODE_ENV === 'development') {
       console.warn(`[Telemetry: ${event.event}]`, event.properties);
     }
   }

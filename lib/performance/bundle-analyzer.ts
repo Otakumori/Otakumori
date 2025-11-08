@@ -5,9 +5,7 @@
  * capabilities for the Otaku-mori application.
  */
 
-import { env } from '@/env.mjs';
-
-// Note: Using env object for environment checks to follow project standards
+import { clientEnv } from '@/env/client';
 
 export interface BundleAnalysisConfig {
   enabled: boolean;
@@ -358,9 +356,10 @@ export class CoreWebVitalsMonitor {
  */
 export function initializeBundleAnalysis(): BundleAnalyzer {
   const config: BundleAnalysisConfig = {
-    enabled: env.NODE_ENV === 'development' || env.NODE_ENV === 'production',
+    enabled:
+      clientEnv.NODE_ENV === 'development' || clientEnv.NODE_ENV === 'production',
     outputPath: '.next/analyze',
-    openAnalyzer: env.NODE_ENV === 'development',
+    openAnalyzer: clientEnv.NODE_ENV === 'development',
     analyzeBrowser: true,
     analyzeServer: false,
     generateStatsFile: true,

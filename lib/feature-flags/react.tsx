@@ -25,7 +25,7 @@ import {
   type FeatureFlagEvaluationContext,
 } from './types';
 import { getFeatureFlagProvider } from './provider';
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 // Create the React context
 const FeatureFlagCtx = createContext<FeatureFlagContext | null>(null);
@@ -54,7 +54,7 @@ export function FeatureFlagProvider({
 
   // Create evaluation context
   const evaluationContext: FeatureFlagEvaluationContext = {
-    environment: env.NODE_ENV || 'development',
+    environment: clientEnv.NODE_ENV || 'development',
     timestamp: Date.now(),
     userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
     locale: typeof navigator !== 'undefined' ? navigator.language : undefined,
@@ -262,7 +262,7 @@ export function useABTest(testKey: string): string | null {
 export function FeatureFlagDebugger() {
   const { flags, isLoading, error, refresh } = useFeatureFlags();
 
-  if (env.NODE_ENV !== 'development') {
+  if (clientEnv.NODE_ENV !== 'development') {
     return null;
   }
 

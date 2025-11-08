@@ -3,7 +3,7 @@
  * Centralized event system for unlocking and tracking achievements
  */
 
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
@@ -57,7 +57,7 @@ class AchievementEventBus {
     });
 
     // Log to console in development
-    if (typeof window !== 'undefined' && env.NODE_ENV === 'development') {
+    if (typeof window !== 'undefined' && clientEnv.NODE_ENV === 'development') {
       console.warn(`🏆 Achievement Unlocked: ${achievement.title} [${achievement.rarity}]`);
     }
 

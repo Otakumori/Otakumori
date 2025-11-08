@@ -3,7 +3,7 @@
  * Integrates with Next.js reportWebVitals API
  */
 
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 interface WebVitalMetric {
   id: string;
@@ -41,7 +41,7 @@ export function reportWebVitals(metric: ExtendedMetric) {
   const rating = getRating(metric.name, metric.value);
 
   // Log performance metrics
-  if (env.NODE_ENV === 'development') {
+  if (clientEnv.NODE_ENV === 'development') {
     const _emoji = rating === 'good' ? '' : rating === 'needs-improvement' ? '' : '';
     // Web Vitals metric logged
   }

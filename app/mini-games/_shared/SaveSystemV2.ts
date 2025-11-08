@@ -11,7 +11,7 @@
  * - Analytics tracking
  */
 
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 export interface GameSaveDataV2 {
   gameId: string;
@@ -335,7 +335,7 @@ export class GameSaveSystemV2 {
       unlocks: [],
       timestamp: Date.now(),
       saveVersion: CURRENT_SAVE_VERSION,
-      buildVersion: env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
+      buildVersion: clientEnv.NEXT_PUBLIC_APP_VERSION || '1.0.0',
       platform: this.getPlatform(),
       checksum: '',
       compressed: false,

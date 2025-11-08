@@ -3,7 +3,7 @@
  * Handles live petal counts, leaderboards, and community progress
  */
 
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 export type WebSocketMessage =
   | { type: 'global-petals'; count: number; dailyCollectors: number }
@@ -31,7 +31,7 @@ class CommunityWebSocketClient {
 
   constructor() {
     // Check if we should use mock mode
-    this.isMockMode = env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === 'true';
+    this.isMockMode = clientEnv.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS === 'true';
   }
 
   /**
@@ -44,7 +44,7 @@ class CommunityWebSocketClient {
       return;
     }
 
-    const wsUrl = env.NEXT_PUBLIC_COMMUNITY_WS_URL;
+    const wsUrl = clientEnv.NEXT_PUBLIC_COMMUNITY_WS_URL;
     if (!wsUrl) {
       console.warn('WebSocket URL not configured, falling back to mock mode');
       this.startMockMode();

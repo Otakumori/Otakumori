@@ -1,9 +1,9 @@
-import { env } from '@/env.mjs';
+import { clientEnv } from '@/env/client';
 
 export const monitor = {
   log: (...args: any[]) => {
     // Development logging with args
-    if (env.NODE_ENV === 'development') {
+    if (clientEnv.NODE_ENV === 'development') {
       console.warn('[Monitor]', ...args);
     }
   },

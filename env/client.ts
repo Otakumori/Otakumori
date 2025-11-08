@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-const clientSchema = z.object({
+const clientSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z
     .string()
     .min(1, 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required'),
@@ -18,9 +20,31 @@ const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().optional(),
   NEXT_PUBLIC_SITE_URL: z.string().optional(),
   NEXT_PUBLIC_CANONICAL_ORIGIN: z.string().optional(),
-});
+    NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: z.string().optional(),
+    NEXT_PUBLIC_COMMUNITY_WS_URL: z.string().optional(),
+    NEXT_PUBLIC_APP_VERSION: z.string().optional(),
+    NEXT_PUBLIC_LIVE_DATA: z.string().optional(),
+    NEXT_PUBLIC_PROBE_MODE: z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+    NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().optional(),
+    NEXT_PUBLIC_ALGOLIA_SEARCH_KEY: z.string().optional(),
+    NEXT_PUBLIC_FLAGS_PUBLIC_KEY: z.string().optional(),
+    NEXT_PUBLIC_DAILY_PETAL_LIMIT: z.string().optional(),
+    NEXT_PUBLIC_EVENT_CODE: z.string().optional(),
+    NEXT_PUBLIC_GA_ID: z.string().optional(),
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_HERO: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_SHOP: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_MINIGAMES: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_BLOG: z.string().optional(),
+    NEXT_PUBLIC_TELEMETRY_ENABLED: z.string().optional(),
+  })
+  .passthrough();
 
 export const clientEnv = clientSchema.parse({
+  NODE_ENV: process.env.NODE_ENV as 'development' | 'test' | 'production' | undefined,
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
@@ -34,6 +58,26 @@ export const clientEnv = clientSchema.parse({
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_CANONICAL_ORIGIN: process.env.NEXT_PUBLIC_CANONICAL_ORIGIN,
+  NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS: process.env.NEXT_PUBLIC_ENABLE_MOCK_COMMUNITY_WS,
+  NEXT_PUBLIC_COMMUNITY_WS_URL: process.env.NEXT_PUBLIC_COMMUNITY_WS_URL,
+  NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
+  NEXT_PUBLIC_LIVE_DATA: process.env.NEXT_PUBLIC_LIVE_DATA,
+  NEXT_PUBLIC_PROBE_MODE: process.env.NEXT_PUBLIC_PROBE_MODE,
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  NEXT_PUBLIC_ALGOLIA_APP_ID: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID,
+  NEXT_PUBLIC_ALGOLIA_SEARCH_KEY: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY,
+  NEXT_PUBLIC_FLAGS_PUBLIC_KEY: process.env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
+  NEXT_PUBLIC_DAILY_PETAL_LIMIT: process.env.NEXT_PUBLIC_DAILY_PETAL_LIMIT,
+  NEXT_PUBLIC_EVENT_CODE: process.env.NEXT_PUBLIC_EVENT_CODE,
+  NEXT_PUBLIC_FEATURE_HERO: process.env.NEXT_PUBLIC_FEATURE_HERO,
+  NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE: process.env.NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
+  NEXT_PUBLIC_FEATURE_SHOP: process.env.NEXT_PUBLIC_FEATURE_SHOP,
+  NEXT_PUBLIC_FEATURE_MINIGAMES: process.env.NEXT_PUBLIC_FEATURE_MINIGAMES,
+  NEXT_PUBLIC_FEATURE_BLOG: process.env.NEXT_PUBLIC_FEATURE_BLOG,
+  NEXT_PUBLIC_TELEMETRY_ENABLED: process.env.NEXT_PUBLIC_TELEMETRY_ENABLED,
+  NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
+  NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
 });
 
 export type ClientEnv = typeof clientEnv;

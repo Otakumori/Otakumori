@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { clientEnv } from '@/env/client';
 
 export interface SafeFetchOptions {
   allowLive?: boolean;
@@ -33,8 +33,8 @@ export async function safeFetch<T = any>(
 ): Promise<SafeFetchResult<T>> {
   const { allowLive = false, probeOnly = false, timeout = 5000, revalidate = 60 } = options;
 
-  const isLiveDataEnabled = env.NEXT_PUBLIC_LIVE_DATA === '1';
-  const isProbeModeEnabled = env.NEXT_PUBLIC_PROBE_MODE === '1';
+  const isLiveDataEnabled = clientEnv.NEXT_PUBLIC_LIVE_DATA === '1';
+  const isProbeModeEnabled = clientEnv.NEXT_PUBLIC_PROBE_MODE === '1';
 
   // If live data is disabled and not in probe mode, return blocked result
   if (!isLiveDataEnabled && !probeOnly) {

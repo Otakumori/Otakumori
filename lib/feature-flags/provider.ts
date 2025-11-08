@@ -17,8 +17,7 @@ import {
   type ABTestVariant,
 } from './types';
 import { FEATURE_FLAG_CONFIG, getEnvironmentOverrides, AB_TESTS } from './config';
-import { env } from '@/env';
-
+import { clientEnv } from '@/env/client';
 export class FeatureFlagProvider {
   private cache = new Map<string, { value: FeatureFlagValue; timestamp: number }>();
   private config: FeatureFlagProviderConfig;
@@ -338,7 +337,7 @@ export async function evaluateFeatureFlag(
   const provider = getFeatureFlagProvider();
 
   const fullContext: FeatureFlagEvaluationContext = {
-    environment: env.NODE_ENV || 'development',
+    environment: clientEnv.NODE_ENV || 'development',
     timestamp: Date.now(),
     ...context,
   };
@@ -356,7 +355,7 @@ export async function isFeatureEnabled(
   const provider = getFeatureFlagProvider();
 
   const fullContext: FeatureFlagEvaluationContext = {
-    environment: env.NODE_ENV || 'development',
+    environment: clientEnv.NODE_ENV || 'development',
     timestamp: Date.now(),
     ...context,
   };
@@ -375,7 +374,7 @@ export async function getFeatureFlagValue<T extends FeatureFlagValue>(
   const provider = getFeatureFlagProvider();
 
   const fullContext: FeatureFlagEvaluationContext = {
-    environment: env.NODE_ENV || 'development',
+    environment: clientEnv.NODE_ENV || 'development',
     timestamp: Date.now(),
     ...context,
   };

@@ -1,6 +1,6 @@
-import { env } from '@/env';
+import { clientEnv } from '@/env/client';
 
-export const GA_ID = env.NEXT_PUBLIC_GA_ID || '';
+export const GA_ID = clientEnv.NEXT_PUBLIC_GA_ID || '';
 
 export const pageview = (path: string) => {
   if (typeof window !== 'undefined' && window.gtag) {
