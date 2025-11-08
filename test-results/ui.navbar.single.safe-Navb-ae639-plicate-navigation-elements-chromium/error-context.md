@@ -1,0 +1,160 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - link "Skip to main content" [ref=e5]:
+        - /url: "#main-content"
+      - navigation [ref=e6]:
+        - link "Otaku-mori" [ref=e7]:
+          - /url: /
+          - img "Otaku-mori" [ref=e9]
+        - generic [ref=e10]:
+          - link "Home" [ref=e11]:
+            - /url: /
+          - button "Shop" [ref=e13]:
+            - text: Shop
+            - img [ref=e14]
+          - button "Mini-Games" [ref=e17]:
+            - text: Mini-Games
+            - img [ref=e18]
+          - button "Blog" [ref=e21]:
+            - text: Blog
+            - img [ref=e22]
+          - link "About" [ref=e24]:
+            - /url: /about
+        - generic [ref=e25]:
+          - generic [ref=e27]:
+            - textbox "What're ya buyin' ?" [ref=e28]
+            - button [ref=e29]:
+              - img [ref=e30]
+          - button "Sign In" [ref=e32]
+    - main [ref=e33]:
+      - main [ref=e35]:
+        - generic [ref=e37]:
+          - heading "Welcome Home, Traveler" [level=1] [ref=e38]
+          - generic [ref=e40]:
+            - generic:
+              - generic: Collected Today
+              - generic: 0 / 100
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - heading "Shop" [level=2] [ref=e45]
+            - paragraph [ref=e46]: Discover unique anime-inspired merchandise
+          - generic [ref=e48]:
+            - heading "No Products Available" [level=3] [ref=e49]
+            - paragraph [ref=e50]: We're working on adding new products. Check back soon!
+            - link "Explore Shop" [ref=e51]:
+              - /url: /shop
+              - button "Explore Shop" [ref=e52]
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - heading "Blog" [level=2] [ref=e56]
+            - paragraph [ref=e57]: Latest news, updates, and anime culture insights
+          - generic [ref=e59]:
+            - heading "No Posts Available" [level=3] [ref=e60]
+            - paragraph [ref=e61]: We're working on creating amazing content. Check back soon!
+            - link "Explore Blog" [ref=e62]:
+              - /url: /blog
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - heading "Mini-Games" [level=2] [ref=e66]
+            - paragraph [ref=e67]: Play fun anime-inspired games and earn rewards
+          - generic [ref=e69]:
+            - heading "Games Coming Soon" [level=3] [ref=e70]
+            - paragraph [ref=e71]: We're preparing exciting mini-games for you. Stay tuned!
+            - link "Explore Games" [ref=e72]:
+              - /url: /mini-games
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - heading "Shop" [level=2] [ref=e77]
+            - paragraph [ref=e78]: Discover exclusive anime merchandise and gaming accessories
+          - generic [ref=e79]:
+            - heading "Shop Coming Soon" [level=3] [ref=e81]
+            - paragraph [ref=e82]: Featured products will appear here
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - heading "Latest Stories" [level=2] [ref=e87]
+            - paragraph [ref=e88]: Insights, guides, and stories from the otaku community
+          - generic [ref=e89]:
+            - 'link "2024-09-20 Welcome to Otaku-mori: Your New Digital Haven Discover what makes our community special and how to get started on your journey. Read More" [ref=e91]':
+              - /url: /blog/welcome-to-otaku-mori
+              - time [ref=e93]: 2024-09-20
+              - 'heading "Welcome to Otaku-mori: Your New Digital Haven" [level=3] [ref=e94]'
+              - paragraph [ref=e95]: Discover what makes our community special and how to get started on your journey.
+              - generic [ref=e96]:
+                - text: Read More
+                - img [ref=e97]
+            - 'link "2024-09-18 Mini-Games Hub: Complete Guide for Beginners Learn the ins and outs of our GameCube-inspired gaming experience. Read More" [ref=e100]':
+              - /url: /blog/mini-games-guide
+              - time [ref=e102]: 2024-09-18
+              - 'heading "Mini-Games Hub: Complete Guide for Beginners" [level=3] [ref=e103]'
+              - paragraph [ref=e104]: Learn the ins and outs of our GameCube-inspired gaming experience.
+              - generic [ref=e105]:
+                - text: Read More
+                - img [ref=e106]
+            - link "2024-09-15 Building a Positive Community Together Our approach to creating safe, welcoming spaces for all travelers. Read More" [ref=e109]:
+              - /url: /blog/community-guidelines
+              - time [ref=e111]: 2024-09-15
+              - heading "Building a Positive Community Together" [level=3] [ref=e112]
+              - paragraph [ref=e113]: Our approach to creating safe, welcoming spaces for all travelers.
+              - generic [ref=e114]:
+                - text: Read More
+                - img [ref=e115]
+          - link "View All Posts" [ref=e118]:
+            - /url: /blog
+            - text: View All Posts
+            - img [ref=e119]
+    - contentinfo [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e126]:
+          - textbox "Leave a sign for fellow travelers..." [ref=e127]
+          - button "Carve Sign" [disabled] [ref=e128]
+        - generic [ref=e129]:
+          - generic [ref=e130]:
+            - heading "Otaku-mori" [level=3] [ref=e131]
+            - paragraph [ref=e132]: Anime x gaming — curated treasures
+          - generic [ref=e133]:
+            - heading "Explore" [level=4] [ref=e134]
+            - list [ref=e135]:
+              - listitem [ref=e136]:
+                - link "Shop" [ref=e137]:
+                  - /url: /shop
+              - listitem [ref=e138]:
+                - link "Mini-Games" [ref=e139]:
+                  - /url: /mini-games
+              - listitem [ref=e140]:
+                - 'link "Blog: Read the lore" [ref=e141]':
+                  - /url: /blog
+          - generic [ref=e142]:
+            - heading "Support" [level=4] [ref=e143]
+            - list [ref=e144]:
+              - listitem [ref=e145]:
+                - link "Help Center" [ref=e146]:
+                  - /url: /help
+              - listitem [ref=e147]:
+                - link "Privacy Policy" [ref=e148]:
+                  - /url: /privacy
+              - listitem [ref=e149]:
+                - link "Terms of Service" [ref=e150]:
+                  - /url: /terms
+          - generic [ref=e151]:
+            - heading "Connect" [level=4] [ref=e152]
+            - list [ref=e153]:
+              - listitem [ref=e154]:
+                - link "Community" [ref=e155]:
+                  - /url: /community
+              - listitem [ref=e156]:
+                - link "View All Signs" [ref=e157]:
+                  - /url: /community/soapstones
+              - listitem [ref=e158]:
+                - link "Cookie Settings" [ref=e159]:
+                  - /url: /cookies
+        - generic [ref=e161]:
+          - paragraph [ref=e162]: Otaku-mori ™ made with ♡
+          - paragraph [ref=e163]: © 2025 Otaku-mori. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e169] [cursor=pointer]:
+    - img [ref=e170] [cursor=pointer]
+  - alert [ref=e173]
+```

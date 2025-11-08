@@ -11,23 +11,23 @@ export const RUNTIME_FLAGS = {
   isDev: clientEnv.NODE_ENV === 'development',
   isProd: clientEnv.NODE_ENV === 'production',
   appEnv,
-};
+} as const;
 
 export const FEATURE_FLAGS = {
   performanceMonitorEnabled: truthy(clientEnv.NEXT_PUBLIC_FEATURE_PERF_MODULE, true),
   audioEnabled: truthy(clientEnv.NEXT_PUBLIC_ENABLE_AUDIO, true),
-};
+} as const;
 
 export const PUBLIC_KEYS = {
   apiKey: clientEnv.NEXT_PUBLIC_API_KEY ?? '',
   adminApiKey: clientEnv.NEXT_PUBLIC_ADMIN_API_KEY ?? '',
   flagsPublicKey: clientEnv.NEXT_PUBLIC_FLAGS_PUBLIC_KEY,
-};
+} as const;
 
-export const CLERK_PUBLIC_PATHS = {
+export const CLERK_PUBLIC_PATHS = Object.freeze({
   signInUrl: clientEnv.NEXT_PUBLIC_CLERK_SIGN_IN_URL ?? '/sign-in',
   signUpUrl: clientEnv.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? '/sign-up',
-};
+});
 
 export const PETAL_COLOR_OVERRIDE = clientEnv.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE;
 

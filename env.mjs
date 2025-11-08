@@ -1,6 +1,11 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
+const DEFAULT_PRINTIFY_API_URL = 'https://api.printify.com/v1';
+const isBrowser = typeof window !== 'undefined';
+const shouldSkipValidation =
+  isBrowser || process.env.SKIP_ENV_VALIDATION === '1' || process.env.VERCEL === '1';
+
 // Preprocess: trim all env values to remove trailing whitespace/newlines
 const trimmedEnv = Object.fromEntries(
   Object.entries(process.env).map(([key, value]) => [key, value?.trim()]),
@@ -27,7 +32,7 @@ export const env = createEnv({
     CLERK_ENCRYPTION_KEY: z.string().optional(),
     PRINTIFY_API_KEY: z.string(),
     PRINTIFY_SHOP_ID: z.string(),
-    PRINTIFY_API_URL: z.string().url(),
+    PRINTIFY_API_URL: z.string().url().default(DEFAULT_PRINTIFY_API_URL),
     PRINTIFY_WEBHOOK_SECRET: z.string().optional(),
     UPSTASH_REDIS_REST_URL: z.string().url(),
     UPSTASH_REDIS_REST_TOKEN: z.string(),
@@ -280,5 +285,10 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
   },
   // Skip validation on client-side to prevent errors when env is imported in client components
-  skipValidation: typeof window !== 'undefined',
+  skipValidation: shouldSkipValidation,
+  emptyStringAsUndefined: true,
+});
+
+export const ENV_DEFAULTS = Object.freeze({
+  PRINTIFY_API_URL: DEFAULT_PRINTIFY_API_URL,
 });

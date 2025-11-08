@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { env } from '@/env.mjs';
+import { getServerEnv } from '@/env/server';
 
 // Environment schema for production validation
 export const envSchema = z.object({
@@ -36,35 +36,36 @@ export type EnvSchema = z.infer<typeof envSchema>;
 
 // Validate environment at runtime
 export function validateEnv(): EnvSchema {
+  const runtimeEnv = getServerEnv();
   try {
-    return envSchema.parse(env);
+    return envSchema.parse(runtimeEnv);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.issues.map((e) => e.path.join('.')).join(', ');
       console.error(` Environment validation failed. Missing or invalid: ${missingVars}`);
 
       // In production, throw to prevent app from starting with invalid config
-      if (env.NODE_ENV === 'production') {
+      if (runtimeEnv.NODE_ENV === 'production') {
         throw new Error(`Environment validation failed: ${missingVars}`);
       }
     }
 
     // In development, return partial config and log warnings
     console.warn(' Environment validation failed, continuing with partial config');
-    return env as any;
+    return runtimeEnv as any;
   }
 }
 
 // Health check for environment variables
 export function getEnvHealth() {
   try {
-    const env = validateEnv();
+    const runtimeEnv = validateEnv();
     return {
       status: 'healthy' as const,
-      clerk: !!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !!env.CLERK_SECRET_KEY,
-      database: !!env.DATABASE_URL,
-      printify: !!env.PRINTIFY_API_KEY && !!env.PRINTIFY_SHOP_ID,
-      stripe: !!env.STRIPE_SECRET_KEY,
+      clerk: !!runtimeEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && !!runtimeEnv.CLERK_SECRET_KEY,
+      database: !!runtimeEnv.DATABASE_URL,
+      printify: !!runtimeEnv.PRINTIFY_API_KEY && !!runtimeEnv.PRINTIFY_SHOP_ID,
+      stripe: !!runtimeEnv.STRIPE_SECRET_KEY,
       timestamp: new Date().toISOString(),
     };
   } catch (error) {

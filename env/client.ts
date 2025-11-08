@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { env } from '@/env.mjs';
 
 const optionalStringKeys = [
   'NEXT_PUBLIC_ADMIN_API_KEY',
@@ -78,6 +79,9 @@ const optionalStringKeys = [
 ] as const;
 
 type OptionalKey = (typeof optionalStringKeys)[number];
+type RuntimeEnv = typeof env & Record<OptionalKey, string | undefined>;
+const runtimeEnv = env as RuntimeEnv;
+const envRecord = runtimeEnv as Record<string, string | undefined>;
 
 const optionalShape: Record<OptionalKey, z.ZodOptional<z.ZodString>> = optionalStringKeys.reduce(
   (shape, key) => {
@@ -106,26 +110,28 @@ const clientSchema = z
 
 const optionalEnvValues = optionalStringKeys.reduce(
   (envMap, key) => {
-    envMap[key] = process.env[key];
+    envMap[key] = runtimeEnv[key];
     return envMap;
   },
   {} as Record<OptionalKey, string | undefined>,
 );
 
-export const clientEnv = clientSchema.parse({
-  NODE_ENV: process.env.NODE_ENV as 'development' | 'test' | 'production' | undefined,
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-  NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,
-  NEXT_PUBLIC_RUNE_GLYPH_STYLE: process.env.NEXT_PUBLIC_RUNE_GLYPH_STYLE as
+export const clientEnv = Object.freeze(
+  clientSchema.parse({
+    NODE_ENV: runtimeEnv.NODE_ENV as 'development' | 'test' | 'production' | undefined,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: runtimeEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: runtimeEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PROXY_URL: runtimeEnv.NEXT_PUBLIC_CLERK_PROXY_URL,
+    NEXT_PUBLIC_RUNE_GLYPH_STYLE: envRecord['NEXT_PUBLIC_RUNE_GLYPH_STYLE'] as
     | 'emoji'
     | 'material'
     | 'auto'
     | undefined,
-  NEXT_PUBLIC_VERCEL_ENVIRONMENT: process.env.NEXT_PUBLIC_VERCEL_ENVIRONMENT,
-  NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
-  ...optionalEnvValues,
-});
+    NEXT_PUBLIC_VERCEL_ENVIRONMENT: envRecord['NEXT_PUBLIC_VERCEL_ENVIRONMENT'],
+    NEXT_PUBLIC_VERCEL_ENV: envRecord['NEXT_PUBLIC_VERCEL_ENV'],
+    ...optionalEnvValues,
+  }),
+);
 
 export type ClientEnv = typeof clientEnv;
 

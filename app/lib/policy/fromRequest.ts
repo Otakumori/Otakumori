@@ -1,5 +1,5 @@
 import { resolvePolicy } from '@om/avatar';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 
 type PolicySource = 'client' | 'server';
 
