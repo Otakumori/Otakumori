@@ -13,15 +13,15 @@ for (const f of files) {
   let s = await fs.readFile(f, 'utf8');
   if (!s.includes('process.env')) continue;
 
-  if (!s.includes("from '@/env'") && !s.includes('from "@/env"')) {
+  if (!s.includes("from '@/env/server'") && !s.includes('from "@/env/server"')) {
     // add import only if file is ESM/TS module (skip .cjs)
     if (!f.endsWith('.cjs')) {
       s = s.replace(/^(?!.*import\s+\{\s*env\s*\}\s+from\s+['"]@\/env['"]).*/m, (line, i, full) => {
         // Insert after first import or at top
         if (full.startsWith('import ')) {
-          return `import { env } from '@/env';\n${full}`;
+          return `import { env } from '@/env/server';\n${full}`;
         }
-        return `import { env } from '@/env';\n${line}`;
+        return `import { env } from '@/env/server';\n${line}`;
       });
     }
   }
@@ -29,3 +29,4 @@ for (const f of files) {
   await fs.writeFile(f, s, 'utf8');
   console.log('fixed', f);
 }
+

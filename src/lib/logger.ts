@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export interface LogContext {
   requestId?: string;
@@ -117,3 +117,4 @@ export function createRequestLogger(requestId: string): Logger {
 
   return requestLogger;
 }
+

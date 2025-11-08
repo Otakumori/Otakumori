@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/adults/purchase/route.safe.ts';
 
 // Mock environment variables
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     FEATURE_ADULT_ZONE: 'true',
     FEATURE_GATED_COSMETICS: 'true',
@@ -68,7 +68,7 @@ describe('/api/adults/purchase', () => {
   });
 
   it('should return 503 when feature flags are disabled', async () => {
-    vi.mocked(require('@/env').env).FEATURE_ADULT_ZONE = 'false';
+    vi.mocked(require('@/env/server').env).FEATURE_ADULT_ZONE = 'false';
 
     const request = new NextRequest('https://example.com/api/adults/purchase', {
       method: 'POST',
@@ -413,3 +413,4 @@ describe('/api/adults/purchase', () => {
     expect(data2).toEqual(cachedResponse);
   });
 });
+

@@ -7,7 +7,7 @@
  */
 
 import 'server-only';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 type Access = 'public' | 'private';
 
@@ -112,3 +112,4 @@ export async function headBlob(opts: {
   const size = Number(res.headers.get('content-length') ?? '0');
   return { exists: true, size: isNaN(size) ? 0 : size };
 }
+

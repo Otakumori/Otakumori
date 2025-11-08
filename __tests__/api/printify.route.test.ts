@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { callGET } from './helpers/route';
 
 // Mock the env module
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     PRINTIFY_API_URL: 'https://api.printify.com/v1',
     PRINTIFY_API_KEY: 'pk_test_xxx',
@@ -35,3 +35,4 @@ describe('Printify products API', () => {
     expect(Array.isArray(arr)).toBe(true);
   });
 });
+

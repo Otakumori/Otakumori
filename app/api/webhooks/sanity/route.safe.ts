@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function POST(req: Request) {
   const secret = (env as any).SANITY_WEBHOOK_SECRET;
@@ -11,3 +11,4 @@ export async function POST(req: Request) {
   // Owner will later add: revalidate, Algolia indexing
   return new Response('ok');
 }
+

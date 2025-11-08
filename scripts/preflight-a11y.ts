@@ -32,7 +32,7 @@ interface A11yResult {
   };
 }
 
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const ARTIFACTS_DIR = path.join(process.cwd(), 'artifacts', 'a11y');
 const BASE_URL = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -343,3 +343,4 @@ async function main() {
 if (require.main === module) {
   main();
 }
+

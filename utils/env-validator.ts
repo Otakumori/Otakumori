@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export interface EnvValidationResult {
   isValid: boolean;
@@ -114,3 +114,4 @@ export function logEnvironmentStatus(): void {
 
   console.warn('');
 }
+

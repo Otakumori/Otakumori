@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { prisma } from '@/app/lib/prisma';
 import { CheckoutRequest } from '@/app/lib/contracts';
@@ -238,3 +238,4 @@ export async function POST(req: NextRequest) {
     });
   });
 }
+

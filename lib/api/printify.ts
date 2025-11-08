@@ -1,7 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\abyss\shop\api\printify.js instead.
 import { z } from 'zod';
 import { http } from './http';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const PRINTIFY_BASE = 'https://api.printify.com/v1';
 
@@ -192,3 +192,4 @@ export async function checkPrintifyHealth() {
     };
   }
 }
+

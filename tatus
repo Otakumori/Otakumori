@@ -13,7 +13,7 @@
 [33m44a24e2[m test(printify): make test accept either array response or production shape with data.products/items
 [33m7ccb286[m fix(printify): lazy-init PrintifyService to avoid env checks at import time; route uses getPrintifyService() inside handler
 [33md4d1409[m test(printify): update route test to expect production shape { ok, data: { products, pagination } } and keep auth header assertion
-[33mbd40f0e[m chore(env,printify): standardize to import env from '@/env' across codebase; consolidate Printify route to use app/lib/printify/service; ensure route returns array for test compatibility
+[33mbd40f0e[m chore(env,printify): standardize to import env from '@/env/server' across codebase; consolidate Printify route to use app/lib/printify/service; ensure route returns array for test compatibility
 [33m80b30ee[m fix(printify route): return raw array and fetch inline using env.ts to match tests; avoid env.mjs validation and logger coupling
 [33mfc634dd[m feat(petals): add wallet API; harden v1/petals/collect with Zod, RL, daily caps, and atomic ledger+balance updates; add basic logger util
 [33m7a703e6[m feat(mini-games hub): add BootScreen, GameCubeHub, InputController, FaceLabel; gate /mini-games via boot; add stub game routes (petal-run/memory/rhythm) with dynamic clients
@@ -40,3 +40,4 @@
 [33m8b381ac[m Mini-games,Gamecube update
 [33m629f9d7[m Fixes
 [33mebcae91[m Implement Rune System: Add new rune definitions, configurations, and admin routes for managing runes and rewards; enhance API with Clerk webhook handling and petal collection logic.
+

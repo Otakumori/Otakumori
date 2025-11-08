@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const isDev = env.NODE_ENV !== 'production';
 
@@ -32,3 +32,4 @@ export const contentSecurityPolicy = isDev
         'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
       },
     };
+

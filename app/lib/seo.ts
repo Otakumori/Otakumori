@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 interface SEOProps {
   title: string;
@@ -89,3 +89,4 @@ export const defaultSEO: Metadata = generateSEO({
   title: 'Welcome Home, Traveler',
   description: 'Anime x gaming shop + play — petals, runes, rewards.',
 });
+

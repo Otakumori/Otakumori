@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/authz';
 import { put } from '@vercel/blob';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs';
 
@@ -35,3 +35,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true, url: res.url });
 }
+

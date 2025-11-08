@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 import type { Result } from './types';
 import { safeAsync } from './types';
 import Stripe from 'stripe';
@@ -147,3 +147,4 @@ export async function createStripeCheckoutSession(
     'Failed to create Stripe checkout session',
   );
 }
+

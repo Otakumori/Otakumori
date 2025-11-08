@@ -1,5 +1,5 @@
 // Temporarily disabled to fix DATABASE_URL validation issue
-// import { env } from '@/env';
+// import { env } from '@/env/server';
 
 export async function register() {
   // Temporarily disabled to fix DATABASE_URL validation issue
@@ -11,3 +11,4 @@ export async function register() {
   //   await import('./sentry.edge.config');
   // }
 }
+

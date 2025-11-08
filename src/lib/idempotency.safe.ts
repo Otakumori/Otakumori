@@ -1,5 +1,5 @@
 import { redis } from './redis.safe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function claimIdempotency(
   key: string,
@@ -7,3 +7,4 @@ export async function claimIdempotency(
 ) {
   return redis.setNX(`idemp:${key}`, '1', ttlSeconds);
 }
+

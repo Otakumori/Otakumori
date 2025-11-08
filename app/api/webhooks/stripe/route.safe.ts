@@ -10,7 +10,7 @@
 
 import { type NextRequest } from 'next/server';
 import { stripe, type StripeEvent } from '@/src/lib/stripe.safe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,3 +39,4 @@ export async function POST(req: NextRequest) {
   }
   return new Response('ok');
 }
+

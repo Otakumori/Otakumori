@@ -9,7 +9,7 @@
  */
 import { NextResponse } from 'next/server';
 import { inngest } from '../../../inngest/client';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function GET() {
   try {
@@ -89,3 +89,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

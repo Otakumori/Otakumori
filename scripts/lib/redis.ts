@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use lib\redis.ts instead.
 import { createClient } from 'redis';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const redis = createClient({
   url: env.UPSTASH_REDIS_REST_URL,
@@ -14,3 +14,4 @@ redis.on('error', (err) => console.error('Redis Client Error', err));
     await redis.connect();
   }
 })();
+

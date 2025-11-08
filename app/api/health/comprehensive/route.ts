@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { prisma } from '@/app/lib/prisma';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import Stripe from 'stripe';
@@ -83,3 +83,4 @@ export async function GET() {
     checks,
   });
 }
+

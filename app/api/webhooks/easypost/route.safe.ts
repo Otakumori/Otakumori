@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function POST(req: Request) {
   const raw = await req.text();
@@ -14,3 +14,4 @@ export async function POST(req: Request) {
   // TODO owner: update order/tracker statuses here
   return new Response('ok');
 }
+

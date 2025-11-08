@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 // Clerk API sync
 export async function syncClerkUsers() {
@@ -232,3 +232,4 @@ export async function syncAllExternalData() {
 
   return results;
 }
+

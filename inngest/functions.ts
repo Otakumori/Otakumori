@@ -1,5 +1,5 @@
 import { inngest } from './client';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { syncPrintifyProducts, manualPrintifySync, syncOnProductChange } from './printify-sync';
 
 // ============================================================================
@@ -275,3 +275,4 @@ export const cleanupOldData = inngest.createFunction(
 
 // Export Printify sync functions
 export { syncPrintifyProducts, manualPrintifySync, syncOnProductChange };
+

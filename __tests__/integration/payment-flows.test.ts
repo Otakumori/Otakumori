@@ -7,7 +7,7 @@ vi.mock('@clerk/nextjs/server', () => ({
   currentUser: vi.fn(),
 }));
 
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     FEATURE_ADULT_ZONE: 'true',
     FEATURE_GATED_COSMETICS: 'true',
@@ -532,3 +532,4 @@ describe('End-to-End Payment Flows', () => {
     });
   });
 });
+

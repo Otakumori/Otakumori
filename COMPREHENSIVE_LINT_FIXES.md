@@ -4,8 +4,8 @@
 
 ### 1. Process.env Usage → env.mjs
 
-- ✅ `lib/flags.ts` - Converted to use `env` from '@/env'
-- ✅ `lib/inngestHealth.ts` - Converted to use `env` from '@/env'
+- ✅ `lib/flags.ts` - Converted to use `env` from '@/env/server'
+- ✅ `lib/inngestHealth.ts` - Converted to use `env` from '@/env/server'
 - 🔄 Remaining: `app/api/health/inngest/route.ts`, `lib/no-mocks.ts`
 
 ### 2. Console.log Statements
@@ -34,3 +34,4 @@
 ## Status: 20% Complete
 
 **Time Estimate**: 30-45 minutes remaining
+

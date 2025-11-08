@@ -8,7 +8,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { getPolicyFromRequestSync } from '@/app/lib/policy/fromRequest';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs';
 
@@ -125,3 +125,4 @@ export async function GET(req: NextRequest) {
 
   return res;
 }
+

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { safeFetch, probeEndpoint, fetchLiveData, isBlocked, isSuccess } from '@/lib/safeFetch';
 
 // Mock the env module
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     NEXT_PUBLIC_LIVE_DATA: '0',
     NEXT_PUBLIC_PROBE_MODE: '1',
@@ -17,8 +17,8 @@ describe('safeFetch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset env mock to default values
-    vi.mocked(require('@/env').env).NEXT_PUBLIC_LIVE_DATA = '0';
-    vi.mocked(require('@/env').env).NEXT_PUBLIC_PROBE_MODE = '1';
+    vi.mocked(require('@/env/server').env).NEXT_PUBLIC_LIVE_DATA = '0';
+    vi.mocked(require('@/env/server').env).NEXT_PUBLIC_PROBE_MODE = '1';
   });
 
   afterEach(() => {
@@ -113,7 +113,7 @@ describe('safeFetch', () => {
 
   describe('when live data is enabled', () => {
     beforeEach(() => {
-      vi.mocked(require('@/env').env).NEXT_PUBLIC_LIVE_DATA = '1';
+      vi.mocked(require('@/env/server').env).NEXT_PUBLIC_LIVE_DATA = '1';
     });
 
     it('should make live request when allowLive is true', async () => {
@@ -211,7 +211,7 @@ describe('safeFetch', () => {
     });
 
     it('fetchLiveData should call safeFetch with allowLive=true', async () => {
-      vi.mocked(require('@/env').env).NEXT_PUBLIC_LIVE_DATA = '1';
+      vi.mocked(require('@/env/server').env).NEXT_PUBLIC_LIVE_DATA = '1';
       const mockData = { data: 'test' };
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -272,8 +272,8 @@ describe('safeFetch', () => {
 
     testCases.forEach(({ name, env: envVars, options, expected }) => {
       it(`should handle ${name}`, async () => {
-        vi.mocked(require('@/env').env).NEXT_PUBLIC_LIVE_DATA = envVars.NEXT_PUBLIC_LIVE_DATA;
-        vi.mocked(require('@/env').env).NEXT_PUBLIC_PROBE_MODE = envVars.NEXT_PUBLIC_PROBE_MODE;
+        vi.mocked(require('@/env/server').env).NEXT_PUBLIC_LIVE_DATA = envVars.NEXT_PUBLIC_LIVE_DATA;
+        vi.mocked(require('@/env/server').env).NEXT_PUBLIC_PROBE_MODE = envVars.NEXT_PUBLIC_PROBE_MODE;
 
         if (expected.source === 'probe' || expected.source === 'live') {
           mockFetch.mockResolvedValueOnce({
@@ -292,3 +292,4 @@ describe('safeFetch', () => {
     });
   });
 });
+

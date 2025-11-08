@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const URL_ = (env as any).UPSTASH_REDIS_REST_URL;
 const TOKEN = (env as any).UPSTASH_REDIS_REST_TOKEN;
@@ -16,3 +16,4 @@ export const redis = {
     return j?.result === 'OK';
   },
 };
+

@@ -8612,7 +8612,7 @@ Let me start with the quick wins:
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
@@ -8716,7 +8716,7 @@ export async function POST(request: NextRequest) {
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { db, DatabaseAccess } from '@/app/lib/db';
 import { withRateLimit, rateLimitConfigs } from '@/app/lib/rateLimit';
@@ -20251,4 +20251,5 @@ Great! Still at 127 errors. Let me see what's remaining:
 **Cursor**
 
 Let me get the actual errors to see what needs fixing:
+
 

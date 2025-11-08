@@ -12,7 +12,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { z } from 'zod';
 import { redis } from '@/app/lib/redis-rest';
 import { generateRequestId } from '@/app/lib/request-id';
@@ -342,3 +342,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

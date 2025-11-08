@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { POST } from '@/app/api/v1/avatar/save/route.safe.ts';
 
 // Mock environment variables
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     FEATURE_ADULT_ZONE: 'true',
     FEATURE_AVATAR_NSFW: 'true',
@@ -491,3 +491,4 @@ describe('/api/v1/avatar/save', () => {
     expect(data1.requestId).not.toBe(data2.requestId);
   });
 });
+

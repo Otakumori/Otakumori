@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs';
 
@@ -37,3 +37,4 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: message }, { status: code });
   }
 }
+

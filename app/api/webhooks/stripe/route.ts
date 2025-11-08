@@ -1,8 +1,8 @@
-﻿import { headers } from 'next/headers';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db as prisma } from '@/lib/db';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs'; // needed for crypto, raw body
 export const dynamic = 'force-dynamic';
@@ -229,7 +229,7 @@ export async function POST(req: Request) {
 
     case 'charge.refunded':
     case 'charge.dispute.funds_withdrawn': {
-      // Handle refunds / disputes â†’ negative ledger + status update
+      // Handle refunds / disputes → negative ledger + status update
       const obj: any = event.data.object;
       const paymentIntentId = obj.payment_intent ?? obj.id ?? null;
       if (!paymentIntentId) return NextResponse.json({ ok: true });
@@ -270,3 +270,4 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, ignored: event.type });
   }
 }
+

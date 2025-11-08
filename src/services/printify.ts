@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 import type { Result } from './types';
 import { safeAsync } from './types';
 
@@ -117,3 +117,4 @@ export async function checkPrintifyHealth(): Promise<Result<boolean>> {
     'Failed to check Printify service health',
   );
 }
+

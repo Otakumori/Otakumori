@@ -1,5 +1,5 @@
 import { algoliasearch } from 'algoliasearch';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export function getAlgolia() {
   const appId = (env as any).NEXT_PUBLIC_ALGOLIA_APP_ID;
@@ -13,3 +13,4 @@ export function getAlgolia() {
     pages: client.initIndex((env as any).ALGOLIA_INDEX_PAGES || 'om_pages'),
   };
 }
+

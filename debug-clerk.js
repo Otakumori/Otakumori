@@ -1,5 +1,5 @@
 // Simple script to test Clerk configuration
-const { env } = require('@/env');
+const { env } = require('@/env/server');
 
 console.log('=== Clerk Environment Check ===');
 console.log(
@@ -30,3 +30,4 @@ if (secretKey) {
 }
 
 console.log('=== End Check ===');
+

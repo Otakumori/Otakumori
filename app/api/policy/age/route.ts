@@ -7,7 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs';
 
@@ -49,3 +49,4 @@ export async function DELETE() {
 
   return NextResponse.json({ ok: true, message: 'Age verification cleared' });
 }
+

@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/adults/catalog/route.safe';
 
 // Mock environment variables
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     FEATURE_ADULT_ZONE: 'true',
     FEATURE_GATED_COSMETICS: 'true',
@@ -26,7 +26,7 @@ describe('/api/adults/catalog', () => {
 
   it('should return 503 when feature flags are disabled', async () => {
     // Mock disabled feature flags
-    vi.mocked(require('@/env').env).FEATURE_ADULT_ZONE = 'false';
+    vi.mocked(require('@/env/server').env).FEATURE_ADULT_ZONE = 'false';
 
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
@@ -50,7 +50,7 @@ describe('/api/adults/catalog', () => {
 
   it('should return 503 when storage is not configured', async () => {
     // Mock missing storage URL
-    vi.mocked(require('@/env').env).ADULTS_STORAGE_INDEX_URL = '';
+    vi.mocked(require('@/env/server').env).ADULTS_STORAGE_INDEX_URL = '';
 
     const request = new NextRequest('https://example.com/api/adults/catalog');
     const response = await GET(request);
@@ -164,3 +164,4 @@ describe('/api/adults/catalog', () => {
     expect(data.data.region).toBe('us');
   });
 });
+

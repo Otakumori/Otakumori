@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import { z } from 'zod';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 // Initialize Stripe client
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
@@ -151,3 +151,4 @@ export async function checkStripeHealth() {
 }
 
 export { stripe };
+

@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
@@ -98,3 +98,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }
+

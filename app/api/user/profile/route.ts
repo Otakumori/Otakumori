@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function GET() {
   try {
@@ -91,3 +91,4 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

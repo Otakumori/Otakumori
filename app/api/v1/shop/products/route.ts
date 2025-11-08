@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -74,3 +74,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
+

@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const enabled = (env as any).FEATURE_EASYPOST === 'true';
 export async function POST(req: Request) {
@@ -12,3 +12,4 @@ export async function POST(req: Request) {
     tracking_code: data.tracking_code,
   });
 }
+

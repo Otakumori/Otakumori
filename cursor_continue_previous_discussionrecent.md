@@ -3703,7 +3703,7 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db as prisma } from '@/lib/db';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs'; // needed for crypto, raw body
 export const dynamic = 'force-dynamic';
@@ -8950,4 +8950,5 @@ export async function GET(request: NextRequest) {
 Perfect! Now let's run the typecheck to see if all errors are resolved:
 
 Great progress! We're down from **127 errors to 43 errors** - that's **84 errors fixed (66% complete)**! Let me continue fixing the remaining errors. Many are the same pattern - relation naming issues. Let me batch fix several at once:
+
 

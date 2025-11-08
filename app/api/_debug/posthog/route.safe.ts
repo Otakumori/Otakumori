@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PostHog } from 'posthog-node';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function GET() {
   const key = (env as any).NEXT_PUBLIC_POSTHOG_KEY;
@@ -20,3 +20,4 @@ export async function GET() {
   await ph.shutdown();
   return NextResponse.json({ ok: true });
 }
+

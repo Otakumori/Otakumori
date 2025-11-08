@@ -3,7 +3,7 @@ import { type NextRequest } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 import { type WebhookEvent } from '@clerk/nextjs/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -111,3 +111,4 @@ export async function POST(req: NextRequest) {
 
   return new Response('', { status: 200 });
 }
+

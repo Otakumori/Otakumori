@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\abyss\shop\api\printify.js instead.
 import { log } from '@/lib/logger';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export interface PrintifyOrderItem {
   printify_product_id: string;
@@ -208,3 +208,4 @@ export class PrintifyService {
 
 // Export singleton instance
 export const printifyService = new PrintifyService();
+

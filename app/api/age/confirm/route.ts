@@ -1,6 +1,6 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const confirmSchema = z.object({
   returnTo: z.string().min(1),
@@ -63,3 +63,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

@@ -9,7 +9,7 @@
  * - Resource optimization
  */
 
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export interface MetricPoint {
   timestamp: number;
@@ -505,3 +505,4 @@ export function initializeDefaultAlerts(): void {
 
 // Export singleton instance
 export const metricsCollector = AdvancedMetricsCollector.getInstance();
+

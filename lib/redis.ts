@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 // Create Redis client for caching and rate limiting
 export const redis = new Redis({
@@ -128,3 +128,4 @@ export const rateLimiters = {
   checkout: null,
   api: null,
 };
+

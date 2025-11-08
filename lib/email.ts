@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { OrderConfirmationEmail } from '@/app/emails/OrderConfirmation';
 
 const resend = new Resend(env.RESEND_API_KEY);
@@ -57,3 +57,4 @@ export async function sendOrderConfirmation(data: OrderConfirmationData) {
     throw error;
   }
 }
+

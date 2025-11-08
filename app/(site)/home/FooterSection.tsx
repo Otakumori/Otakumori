@@ -1,5 +1,5 @@
 import { safeFetch, isSuccess } from '@/lib/safeFetch';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import SoapstoneComposer from '@/components/soapstone/SoapstoneComposer';
 import SoapstoneWall from '@/components/soapstone/SoapstoneWall';
 
@@ -229,3 +229,4 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
     </footer>
   );
 }
+

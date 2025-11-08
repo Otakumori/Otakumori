@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { createPrintifyOrder } from '@/lib/printify/printifyClient';
 import type { PrintifyOrderPayload } from '@/lib/printify/types';
 import { z } from 'zod';
@@ -184,3 +184,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

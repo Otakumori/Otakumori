@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs';
 
@@ -29,3 +29,4 @@ export async function GET() {
     );
   }
 }
+

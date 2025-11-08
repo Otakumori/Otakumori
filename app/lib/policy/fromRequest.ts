@@ -1,5 +1,5 @@
 import { resolvePolicy } from '@om/avatar';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 type PolicySource = 'client' | 'server';
 
@@ -133,3 +133,4 @@ export function getPolicyFromClient(): ContentPolicy {
 
 // Alias for backwards compatibility
 export const getPolicyFromRequestSync = getPolicyFromRequest;
+

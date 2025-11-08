@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export class EmailDisabledError extends Error {}
 export async function sendEmail(to: string, subject: string, html: string) {
@@ -13,3 +13,4 @@ export async function sendEmail(to: string, subject: string, html: string) {
   if (!r.ok) throw new Error('Email send failed');
   return r.json();
 }
+

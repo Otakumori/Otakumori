@@ -4,7 +4,7 @@
  *  -d '{"to":{"name":"Test","street1":"1 Main St","city":"New York","state":"NY","zip":"10001","country":"US"},"parcels":[{"length":8,"width":6,"height":2,"weight_oz":10}]}'
  */
 
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const enabled = (env as any).FEATURE_EASYPOST === 'true';
 export async function POST(req: Request) {
@@ -42,3 +42,4 @@ export async function POST(req: Request) {
     }));
   return Response.json({ shipment_id: data.id, rates });
 }
+

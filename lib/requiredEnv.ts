@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export function requiredEnv(name: string): string {
   const v = env[name as keyof typeof env];
@@ -9,3 +9,4 @@ export function requiredEnv(name: string): string {
   }
   return v!;
 }
+

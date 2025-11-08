@@ -1,5 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const key = env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -10,3 +10,4 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     </ClerkProvider>
   );
 }
+

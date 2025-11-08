@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const HOST = (env as any).NEXT_PUBLIC_POSTHOG_HOST || 'https://us.posthog.com';
 
@@ -23,3 +23,4 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({ ok: true });
 }
+

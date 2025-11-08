@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 function authHeader() {
   const key = (env as any).EASYPOST_API_KEY;
@@ -23,3 +23,4 @@ export async function epBuyShipment(id: string, rateId: string) {
   if (!r.ok) throw new Error('EasyPost buyShipment failed');
   return r.json();
 }
+

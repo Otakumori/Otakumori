@@ -13,7 +13,7 @@ import {
   type PrintifyOrderData,
   type PrintifyShippingAddress,
 } from '@/app/lib/printify';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { petalService } from '@/app/lib/petals';
 
 export const runtime = 'nodejs';
@@ -253,3 +253,4 @@ async function createPrintifyOrder(order: any) {
     throw error;
   }
 }
+

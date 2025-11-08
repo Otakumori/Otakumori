@@ -16,7 +16,7 @@ async function getOrders() {
     const { getToken } = await auth();
     const token = await getToken({ template: 'otakumori-jwt' });
 
-    const { env } = await import('@/env');
+    const { env } = await import('@/env/server');
     const siteUrl = env.NEXT_PUBLIC_SITE_URL || '';
 
     const response = await fetch(`${siteUrl}/api/v1/shop/orders`, {
@@ -57,3 +57,4 @@ export default async function OrdersPage() {
     </>
   );
 }
+

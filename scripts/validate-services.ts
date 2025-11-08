@@ -4,7 +4,7 @@
  * Tests that your API keys actually work
  */
 
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 interface ValidationResult {
   service: string;
@@ -302,3 +302,4 @@ main().catch((error) => {
   console.error('Validation script crashed:', error);
   process.exit(1);
 });
+

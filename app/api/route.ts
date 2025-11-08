@@ -1,6 +1,6 @@
 // DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { NextResponse } from 'next/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 export async function GET() {
   return NextResponse.json({
@@ -19,3 +19,4 @@ export async function GET() {
     },
   });
 }
+

@@ -1,6 +1,6 @@
 // lib/email/mailer.ts
 import { Resend } from 'resend';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 let resend: Resend | null = null;
 let FROM: string | null = null;
@@ -69,3 +69,4 @@ function escapeHtml(s: string) {
     (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!,
   );
 }
+

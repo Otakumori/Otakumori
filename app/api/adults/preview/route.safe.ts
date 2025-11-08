@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { z } from 'zod';
 import { generateRequestId } from '@/app/lib/request-id';
 
@@ -334,3 +334,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

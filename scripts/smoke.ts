@@ -5,7 +5,7 @@
  * Tests critical routes and APIs to ensure production readiness
  */
 
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 const BASE_URL = env.BASE_URL || 'http://localhost:3000';
 
@@ -152,3 +152,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { runSmokeTests };
+

@@ -109,7 +109,7 @@ vi.mock('@om/avatar', () => ({
 }));
 
 // Mock environment
-vi.mock('@/env', () => ({
+vi.mock('@/env/server', () => ({
   env: {
     FEATURE_ADULT_ZONE: 'true',
     FEATURE_AVATAR_NSFW: 'true',
@@ -117,3 +117,4 @@ vi.mock('@/env', () => ({
     NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
   },
 }));
+

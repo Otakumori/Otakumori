@@ -145,7 +145,7 @@ Use the logging system to track all webhook requests and responses.
 
 ## Common Issues and Solutions
 
-### Issue: "Module not found: @/env"
+### Issue: "Module not found: @/env/server"
 
 **Solution**: The `env.mjs` file should be in your project root, not in `app/lib/`.
 
@@ -187,3 +187,4 @@ If you continue to have issues:
 3. Verify all environment variables are set correctly
 4. Test individual service connections
 5. Use the structured logging to track down specific failures
+

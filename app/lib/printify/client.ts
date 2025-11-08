@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { PrintifyProducts, PrintifyError } from './schema';
 
 const RETRY_ATTEMPTS = 3;
@@ -92,3 +92,4 @@ export const printifyService = {
   getProducts,
   getProductVariants,
 };
+

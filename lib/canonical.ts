@@ -1,5 +1,5 @@
 // Client-safe canonical URL functions
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { getRuntimeOrigin } from './runtimeOrigin';
 
 const PROD_ORIGIN = 'https://www.otaku-mori.com';
@@ -34,3 +34,4 @@ export function hostedSignUpUrl(pathAfterSignUp: string = '/onboarding') {
   const redirect = encodeURIComponent(appUrl(pathAfterSignUp));
   return `https://accounts.www.otaku-mori.com/sign-up?redirect_url=${redirect}`;
 }
+

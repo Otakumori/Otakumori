@@ -1,4 +1,4 @@
-import { env } from '@/env';
+import { env } from '@/env/server';
 import type { Result } from './types';
 import { safeAsync } from './types';
 
@@ -56,3 +56,4 @@ export async function getClerkUser(userId: string): Promise<Result<ClerkUser>> {
     `Failed to fetch user ${userId} from Clerk`,
   );
 }
+

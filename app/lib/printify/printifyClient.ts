@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import type { PrintifyOrder, PrintifyOrderPayload } from './types';
 
 const client = axios.create({
@@ -30,3 +30,4 @@ export async function getShops(): Promise<unknown> {
 }
 
 export * from './types';
+

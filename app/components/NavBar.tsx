@@ -3,7 +3,7 @@ import Link from 'next/link';
 import GlassPanel from './GlassPanel';
 import { auth } from '@clerk/nextjs/server';
 import { t } from '@/lib/microcopy';
-import { env } from '@/env';
+import { env } from '@/env/server';
 
 async function getCartCount() {
   try {
@@ -66,3 +66,4 @@ export default async function NavBar() {
     </header>
   );
 }
+

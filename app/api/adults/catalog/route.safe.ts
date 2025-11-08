@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { AdultPacks, type AdultPackType } from '@/app/adults/_schema/pack.safe';
 
 // Feature flag checks
@@ -126,3 +126,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

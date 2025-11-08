@@ -2,7 +2,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import { env } from '@/env';
+import { env } from '@/env/server';
 import { getRuntimeOrigin } from '@/lib/runtimeOrigin';
 import { db, DatabaseAccess } from '@/app/lib/db';
 import { withRateLimit, rateLimitConfigs } from '@/app/lib/rateLimit';
@@ -151,3 +151,4 @@ export async function POST(req: NextRequest) {
     }
   });
 }
+
