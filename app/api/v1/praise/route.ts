@@ -82,14 +82,14 @@ export async function POST(req: NextRequest) {
         // Create praise (will fail if duplicate due to unique constraint)
         const praise = await db.praise.create({
           data: {
-            userId: userId,
-            targetId: receiverId,
+            User: { connect: { id: userId } },
+            Target: { connect: { id: receiverId } },
           },
           include: {
             User: {
               select: {
                 id: true,
-                display_name: true,
+                displayName: true,
                 avatarUrl: true,
               },
             },
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
             createdAt: praise.createdAt,
             sender: {
               id: praise.User.id,
-              displayName: praise.User.display_name,
+              displayName: praise.User.displayName,
               avatarUrl: praise.User.avatarUrl,
             },
           },
@@ -180,7 +180,7 @@ export async function GET(req: NextRequest) {
         User: {
           select: {
             id: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -201,7 +201,7 @@ export async function GET(req: NextRequest) {
             createdAt: praise.createdAt,
             sender: {
               id: praise.User.id,
-              displayName: praise.User.display_name,
+              displayName: praise.User.displayName,
               avatarUrl: praise.User.avatarUrl,
             },
           })),

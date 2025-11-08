@@ -44,8 +44,6 @@ export async function POST(request: NextRequest) {
       data: {
         key: validatedData.idempotencyKey,
         purpose: 'achievement_unlock',
-        method: 'POST',
-        response: JSON.stringify({ pending: true }),
       },
     });
 

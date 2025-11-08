@@ -30,20 +30,32 @@ export async function POST() {
   const userId = await requireUserId();
   const { db } = await import('@/lib/db');
 
-  const u = await db.userPetals.findUnique({ where: { userId } });
-  const total = u?.amount ?? 0;
+  const u = await db.petalWallet.findUnique({ where: { userId } });
+  const total = u?.balance ?? 0;
   if (total < COST) return new NextResponse('Not enough petals', { status: 400 });
 
   const reward = pick();
 
-  await db.$transaction([
-    db.userPetals.update({ where: { userId }, data: { amount: total - COST } }),
-    db.userInventoryItem.upsert({
-      where: { userId_itemKey: { userId, itemKey: reward } },
-      update: { count: { increment: 1 } },
-      create: { userId, itemKey: reward, count: 1 },
-    }),
-  ]);
+  await db.$transaction(async (tx) => {
+    await tx.petalWallet.update({ where: { userId }, data: { balance: total - COST } });
+    
+    const existing = await tx.inventoryItem.findFirst({
+      where: { userId, sku: reward },
+    });
+    
+    if (existing) {
+      // Already have this item - could increment count in metadata if needed
+      const currentMeta = existing.metadata as any;
+      await tx.inventoryItem.update({
+        where: { id: existing.id },
+        data: { metadata: { ...currentMeta, count: (currentMeta?.count || 1) + 1 } },
+      });
+    } else {
+      await tx.inventoryItem.create({
+        data: { User: { connect: { id: userId } }, sku: reward, kind: 'COSMETIC' },
+      });
+    }
+  });
 
   return NextResponse.json({ ok: true, reward, remaining: total - COST });
 }

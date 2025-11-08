@@ -46,7 +46,7 @@ export class DatabaseAccess {
         clerkId: true,
         email: true,
         username: true,
-        display_name: true,
+        displayName: true,
         avatarUrl: true,
         petalBalance: true,
         level: true,
@@ -123,15 +123,13 @@ export class DatabaseAccess {
     // Create order
     const order = await db.order.create({
       data: {
-        id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        userId: user.id,
+        User: { connect: { id: user.id } },
         stripeId: stripeSessionId,
         totalAmount,
         subtotalCents,
         currency: 'USD',
         status: 'pending',
         primaryItemName: items[0]?.name || 'Order',
-        updatedAt: new Date(),
       },
     });
 
@@ -139,10 +137,9 @@ export class DatabaseAccess {
     for (const item of items) {
       await db.orderItem.create({
         data: {
-          id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          orderId: order.id,
-          productId: item.productId,
-          productVariantId: item.variantId,
+          Order: { connect: { id: order.id } },
+          Product: { connect: { id: item.productId } },
+          ProductVariant: { connect: { id: item.variantId } },
           sku: item.sku || `SKU-${item.productId}`,
           name: item.name,
           quantity: item.quantity,

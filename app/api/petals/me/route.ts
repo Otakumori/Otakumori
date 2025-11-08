@@ -9,8 +9,8 @@ export async function GET() {
   if (!userId) return NextResponse.json({ total: 0 });
 
   try {
-    const row = await db.userPetals.findUnique({ where: { userId } });
-    return NextResponse.json({ total: row?.amount ?? 0 });
+    const row = await db.petalWallet.findUnique({ where: { userId } });
+    return NextResponse.json({ total: row?.balance ?? 0 });
   } catch (error) {
     console.error('Error fetching user petals:', error);
     return NextResponse.json({ total: 0 });
@@ -22,22 +22,22 @@ export async function POST() {
   if (!userId) return new NextResponse('Unauthorized', { status: 401 });
 
   try {
-    const row = await db.userPetals.upsert({
+    const row = await db.petalWallet.upsert({
       where: { userId },
-      update: { amount: { increment: 1 } },
-      create: { userId, amount: 1 },
+      update: { balance: { increment: 1 } },
+      create: { User: { connect: { id: userId } }, balance: 1 },
     });
 
-    // Also increment global if active
-    const global = await db.globalPetals.findUnique({ where: { id: 'current' } });
-    if (global?.active) {
-      await db.globalPetals.update({
-        where: { id: 'current' },
-        data: { total: { increment: 1 } },
-      });
-    }
+    // Note: globalPetals model doesn't exist in schema, commenting out
+    // const global = await db.globalPetals.findUnique({ where: { id: 'current' } });
+    // if (global?.active) {
+    //   await db.globalPetals.update({
+    //     where: { id: 'current' },
+    //     data: { total: { increment: 1 } },
+    //   });
+    // }
 
-    return NextResponse.json({ total: row.amount });
+    return NextResponse.json({ total: row.balance });
   } catch (error) {
     console.error('Error incrementing user petals:', error);
     return NextResponse.json({ error: 'Failed to increment petals' }, { status: 500 });

@@ -1,21 +1,40 @@
 # Otaku-mori Pre-Commit Quality Gates
 echo "🌸 Running Otaku-mori quality checks..."
 
-# 1. TypeScript Typecheck (BLOCKING)
+# 1. Prisma Format & Generate
+echo "🔧 Formatting Prisma schema..."
+pnpm prisma format || {
+  echo "⚠️  Prisma format failed. Check schema syntax."
+}
+
+echo "🔧 Generating Prisma client..."
+pnpm prisma generate || {
+  echo "❌ Prisma generation failed. Fix schema errors."
+  exit 1
+}
+
+# 2. TypeScript Typecheck (BLOCKING)
 echo "📝 TypeScript typecheck..."
 npm run typecheck || {
   echo "❌ TypeScript errors found. Fix them before committing."
   exit 1
 }
 
-# 2. ESLint (WARNING ONLY - pre-existing errors need cleanup)
+# 3. Prisma Audit (BLOCKING)
+echo "🔍 Running Prisma audit..."
+npm run prisma:audit || {
+  echo "❌ Prisma audit failed. Check schema/code consistency."
+  exit 1
+}
+
+# 4. ESLint (WARNING ONLY - pre-existing errors need cleanup)
 echo "🔍 Linting..."
 npm run lint --max-warnings=999 || {
   echo "⚠️  ESLint errors found. Please fix when possible."
   echo "Continuing with commit (TypeScript is clean)..."
 }
 
-# 3. Prettier format check
+# 5. Prettier format check
 echo "✨ Checking code formatting..."
 npm run format:check || {
   echo "⚠️  Code formatting issues detected. Run 'npm run format' to fix."

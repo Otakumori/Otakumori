@@ -69,8 +69,6 @@ export async function POST(request: Request) {
     await db.idempotencyKey.create({
       data: {
         key: payload.idempotencyKey,
-        method: 'POST',
-        response: '', // Will be updated after transaction
         purpose: 'petal_purchase',
       },
     });

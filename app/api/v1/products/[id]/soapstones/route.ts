@@ -21,14 +21,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const soapstones = await db.productSoapstone.findMany({
       where: {
         productId,
-        status: 'VISIBLE',
+        status: 'PUBLIC',
       },
       include: {
         User: {
           select: {
             id: true,
             username: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -106,8 +106,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       // Create soapstone
       return tx.productSoapstone.create({
         data: {
-          productId,
-          userId: user.id,
+          Product: { connect: { id: productId } },
+          User: { connect: { id: user.id } },
           text: message,
         },
         include: {

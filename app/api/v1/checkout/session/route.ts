@@ -123,27 +123,23 @@ export async function POST(req: NextRequest) {
     // Create order skeleton
     const order = await prisma.order.create({
       data: {
-        id: `order_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-        userId: user.id,
+        User: { connect: { id: user.id } },
         stripeId: `temp_${Date.now()}`,
         totalAmount: subtotalCents,
         subtotalCents,
         currency: 'USD',
         status: 'pending',
         primaryItemName: items[0]?.name ?? 'Order',
-        label: `Order for ${shippingInfo?.firstName ?? user.display_name ?? user.username}`,
-        updatedAt: new Date(),
-        appliedCouponCodes: appliedCodes,
+        label: `Order for ${shippingInfo?.firstName ?? user.displayName ?? user.username}`,
       },
     });
 
     for (const item of items) {
       await prisma.orderItem.create({
         data: {
-          id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
-          orderId: order.id,
-          productId: item.productId,
-          productVariantId: item.variantId,
+          Order: { connect: { id: order.id } },
+          Product: { connect: { id: item.productId } },
+          ProductVariant: { connect: { id: item.variantId } },
           sku: item.sku ?? `SKU-${item.productId}`,
           name: item.name,
           quantity: item.quantity,

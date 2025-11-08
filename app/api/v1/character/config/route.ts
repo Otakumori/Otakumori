@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       const avatarConfig = await db.avatarConfiguration.findFirst({
         where: {
           userId,
-          isPublic: true, // Only get public configurations for games
         },
         include: {
           AvatarConfigurationPart: true,
@@ -80,23 +79,26 @@ export async function GET(request: NextRequest) {
         });
       }
 
+      // Extract configuration data from JSON
+      const cfg = avatarConfig.configurationData as any;
+      
       // Transform database result to API format
       const transformedConfig = {
         id: avatarConfig.id,
         userId: avatarConfig.userId,
-        name: avatarConfig.name,
-        baseModel: avatarConfig.baseModel,
-        baseModelUrl: avatarConfig.baseModelUrl,
-        contentRating: avatarConfig.contentRating,
-        showNsfwContent: avatarConfig.showNsfwContent,
-        ageVerified: avatarConfig.ageVerified,
-        defaultAnimation: avatarConfig.defaultAnimation,
-        idleAnimations: avatarConfig.idleAnimations,
-        allowExport: avatarConfig.allowExport,
+        name: cfg?.name,
+        baseModel: cfg?.baseModel,
+        baseModelUrl: cfg?.baseModelUrl,
+        contentRating: cfg?.contentRating,
+        showNsfwContent: cfg?.showNsfwContent,
+        ageVerified: cfg?.ageVerified,
+        defaultAnimation: cfg?.defaultAnimation,
+        idleAnimations: cfg?.idleAnimations,
+        allowExport: cfg?.allowExport,
         exportFormat: avatarConfig.exportFormat,
-        version: avatarConfig.version,
-        isPublic: avatarConfig.isPublic,
-        thumbnailUrl: avatarConfig.thumbnailUrl,
+        version: cfg?.version,
+        isPublic: cfg?.isPublic,
+        thumbnailUrl: cfg?.thumbnailUrl,
         createdAt: avatarConfig.createdAt,
         updatedAt: avatarConfig.updatedAt,
         parts: avatarConfig.AvatarConfigurationPart.map((p) => ({
@@ -131,7 +133,7 @@ export async function GET(request: NextRequest) {
         data: transformedConfig,
         isCustom: true,
         fallbackSpriteUrl: '/assets/default-avatar.png', // TODO: Generate sprite from 3D model
-        defaultCharacterId: avatarConfig.baseModel,
+        defaultCharacterId: cfg?.baseModel,
       });
     } catch (error) {
       console.error('Failed to fetch character config:', error);
@@ -180,37 +182,35 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // Create configuration data object
+      const configData = {
+        name,
+        baseModel,
+        baseModelUrl,
+        contentRating,
+        showNsfwContent,
+        ageVerified,
+        defaultAnimation,
+        idleAnimations,
+        allowExport,
+        version: body.version || '1.0',
+        isPublic: body.isPublic !== undefined ? body.isPublic : true,
+        thumbnailUrl: body.thumbnailUrl,
+      };
+
       // Create or update configuration
       const avatarConfig = await db.avatarConfiguration.upsert({
         where: {
           userId,
         } as any, // TODO: Fix Prisma schema to allow userId as unique field
         update: {
-          name,
-          baseModel,
-          baseModelUrl,
-          contentRating,
-          showNsfwContent,
-          ageVerified,
-          defaultAnimation,
-          idleAnimations,
-          allowExport,
+          configurationData: configData,
           exportFormat,
-          updatedAt: new Date(),
         },
         create: {
-          userId,
-          name,
-          baseModel,
-          baseModelUrl,
-          contentRating,
-          showNsfwContent,
-          ageVerified,
-          defaultAnimation,
-          idleAnimations,
-          allowExport,
+          User: { connect: { id: userId } },
+          configurationData: configData,
           exportFormat,
-          configurationData: {},
         },
       });
 
@@ -277,22 +277,25 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Extract config data for response
+      const savedCfg = avatarConfig.configurationData as any;
+      
       return NextResponse.json({
         ok: true,
         data: {
           id: avatarConfig.id,
           userId: avatarConfig.userId,
-          name: avatarConfig.name,
-          baseModel: avatarConfig.baseModel,
-          contentRating: avatarConfig.contentRating,
-          showNsfwContent: avatarConfig.showNsfwContent,
-          ageVerified: avatarConfig.ageVerified,
-          defaultAnimation: avatarConfig.defaultAnimation,
-          idleAnimations: avatarConfig.idleAnimations,
-          allowExport: avatarConfig.allowExport,
+          name: savedCfg?.name,
+          baseModel: savedCfg?.baseModel,
+          contentRating: savedCfg?.contentRating,
+          showNsfwContent: savedCfg?.showNsfwContent,
+          ageVerified: savedCfg?.ageVerified,
+          defaultAnimation: savedCfg?.defaultAnimation,
+          idleAnimations: savedCfg?.idleAnimations,
+          allowExport: savedCfg?.allowExport,
           exportFormat: avatarConfig.exportFormat,
-          version: avatarConfig.version,
-          isPublic: avatarConfig.isPublic,
+          version: savedCfg?.version,
+          isPublic: savedCfg?.isPublic,
           createdAt: avatarConfig.createdAt,
           updatedAt: avatarConfig.updatedAt,
         },

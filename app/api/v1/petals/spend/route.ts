@@ -23,8 +23,6 @@ export async function POST(req: Request) {
         data: {
           key: idem,
           purpose: 'petals/spend',
-          method: 'POST',
-          response: JSON.stringify({ pending: true }),
         },
       });
 

@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     // Cannot praise your own soapstone
-    if (soapstone.userId === user.id) {
+    if (soapstone.authorId === user.id) {
       return NextResponse.json(
         { ok: false, error: 'Cannot praise your own sign' },
         { status: 400 },
@@ -46,8 +46,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     // Check if already praised
     const existing = await db.productSoapstonePraise.findUnique({
       where: {
-        productSoapstoneId_userId: {
-          productSoapstoneId: soapstoneId,
+        userId_soapstoneId: {
+          soapstoneId: soapstoneId,
           userId: user.id,
         },
       },
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         }),
         // Author loses 1 petal when praise is removed
         db.user.update({
-          where: { id: soapstone.userId },
+          where: { id: soapstone.authorId },
           data: { petalBalance: { decrement: 1 } },
         }),
       ]);
@@ -80,8 +80,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     await db.$transaction([
       db.productSoapstonePraise.create({
         data: {
-          productSoapstoneId: soapstoneId,
-          userId: user.id,
+          ProductSoapstone: { connect: { id: soapstoneId } },
+          User: { connect: { id: user.id } },
         },
       }),
       db.productSoapstone.update({
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       }),
       // Author earns 1 petal per praise
       db.user.update({
-        where: { id: soapstone.userId },
+        where: { id: soapstone.authorId },
         data: { petalBalance: { increment: 1 } },
       }),
     ]);

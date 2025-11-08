@@ -119,8 +119,6 @@ export async function POST(request: NextRequest) {
       data: {
         key: idempotencyKey,
         purpose: `game_start_${gameKey}_${userId}`,
-        method: 'POST',
-        response: JSON.stringify({ pending: true }),
       },
     });
 

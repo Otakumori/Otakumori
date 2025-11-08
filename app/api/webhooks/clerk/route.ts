@@ -61,14 +61,12 @@ export async function POST(request: NextRequest) {
       // Create user profile in database
       await db.user.create({
         data: {
-          id: id,
           email: email_addresses[0]?.email_address || '',
           username: `user_${id.slice(0, 8)}`,
-          display_name: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
+          displayName: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
           avatarUrl: image_url || null,
           clerkId: id,
           visibility: 'PUBLIC',
-          createdAt: new Date(),
         },
       });
 
@@ -88,7 +86,7 @@ export async function POST(request: NextRequest) {
         where: { id },
         data: {
           email: email_addresses[0]?.email_address || '',
-          display_name: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
+          displayName: `${first_name || ''} ${last_name || ''}`.trim() || 'Anonymous',
           avatarUrl: image_url || null,
         },
       });

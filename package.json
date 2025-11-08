@@ -54,6 +54,7 @@
     "lint:fix": "next lint --no-inline-config --fix",
     "lint:a11y": "next lint --no-inline-config --dir app --dir components --dir lib --ext .ts,.tsx,.js,.jsx",
     "typecheck": "tsc -b",
+    "prisma:audit": "tsx scripts/prisma-audit.ts",
     "type-check": "tsc --noEmit",
     "ts-prune": "ts-prune",
     "e2e": "playwright test",

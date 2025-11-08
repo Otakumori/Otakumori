@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
 import { z } from 'zod';
 
-const schema = z.object({ status: z.enum(['PUBLIC', 'HIDDEN', 'REMOVED', 'VISIBLE', 'REPORTED']) });
+const schema = z.object({ status: z.enum(['PUBLIC', 'HIDDEN', 'REMOVED']) });
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   await requireAdmin();
@@ -18,11 +18,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       ? Visibility.PUBLIC
       : parsed.data.status === 'HIDDEN'
         ? Visibility.HIDDEN
-        : parsed.data.status === 'VISIBLE'
-          ? Visibility.VISIBLE
-          : parsed.data.status === 'REPORTED'
-            ? Visibility.REPORTED
-            : Visibility.REMOVED;
+        : Visibility.REMOVED;
 
   const message = await db.soapstoneMessage.update({
     where: { id: params.id },

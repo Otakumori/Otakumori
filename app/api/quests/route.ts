@@ -52,10 +52,10 @@ export async function POST(req: Request) {
       where: { id: assignment.id },
       data: { claimedAt: new Date() },
     }),
-    db.userPetals.upsert({
+    db.petalWallet.upsert({
       where: { userId },
-      update: { amount: { increment: q.reward } },
-      create: { userId, amount: q.reward },
+      update: { balance: { increment: q.reward } },
+      create: { User: { connect: { id: userId } }, balance: q.reward },
     }),
   ]);
 

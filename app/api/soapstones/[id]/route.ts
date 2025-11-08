@@ -13,10 +13,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const { Visibility } = await import('@prisma/client');
   const updateData: any = {};
   if (typeof isHidden === 'boolean') {
-    updateData.status = isHidden ? Visibility.REPORTED : Visibility.VISIBLE;
+    updateData.status = isHidden ? Visibility.HIDDEN : Visibility.PUBLIC;
   }
   if (typeof isFlagged === 'boolean') {
-    updateData.status = isFlagged ? Visibility.REPORTED : Visibility.VISIBLE;
+    updateData.status = isFlagged ? Visibility.HIDDEN : Visibility.PUBLIC;
+    if (isFlagged) {
+      updateData.reports = { increment: 1 };
+    }
   }
 
   const msg = await prisma.soapstoneMessage.update({

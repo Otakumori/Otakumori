@@ -210,7 +210,7 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
             select: {
               id: true,
               username: true,
-              display_name: true,
+              displayName: true,
               avatarUrl: true,
               // country: true, // Not in User schema
             },

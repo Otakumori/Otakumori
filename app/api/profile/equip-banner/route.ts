@@ -12,8 +12,8 @@ export async function POST(req: Request) {
     if (!bannerKey) return new NextResponse('Missing bannerKey', { status: 400 });
 
     // verify ownership (replace with your real checks)
-    const owns = await db.userInventoryItem.findFirst({
-      where: { userId, itemKey: bannerKey },
+    const owns = await db.inventoryItem.findFirst({
+      where: { userId, sku: bannerKey },
     });
     if (!owns) return new NextResponse('Forbidden', { status: 403 });
 

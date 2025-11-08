@@ -129,7 +129,7 @@ export async function getUserProfileWithStats(userId: string) {
         clerkId: true,
         email: true,
         username: true,
-        display_name: true,
+        displayName: true,
         avatarUrl: true,
         petalBalance: true,
         level: true,

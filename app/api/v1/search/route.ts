@@ -127,7 +127,7 @@ async function searchUsers(
     select: {
       id: true,
       username: true,
-      display_name: true,
+      displayName: true,
       avatarUrl: true,
       bio: true,
       visibility: true,
@@ -138,7 +138,7 @@ async function searchUsers(
   return users.map((user) => ({
     id: user.id,
     type: 'user' as const,
-    title: user.display_name || user.username,
+    title: user.displayName || user.username,
     description: user.bio || `@${user.username}`,
     url: `/profile/${user.username}`,
     relevanceScore: calculateUserRelevanceScore(user, query),
@@ -215,17 +215,12 @@ async function searchContent(
         visibility: { not: 'PRIVATE' },
       },
     },
-    select: {
-      id: true,
-      content: true,
-      contentType: true,
-      contentId: true,
-      createdAt: true,
+    include: {
       User: {
         select: {
           id: true,
           username: true,
-          display_name: true,
+          displayName: true,
           avatarUrl: true,
         },
       },
@@ -237,7 +232,7 @@ async function searchContent(
     ...comments.map((comment) => ({
       id: comment.id,
       type: 'comment' as const,
-      title: `Comment by ${comment.User.display_name || comment.User.username}`,
+      title: `Comment by ${comment.User.displayName || comment.User.username}`,
       description: comment.content.substring(0, 100) + (comment.content.length > 100 ? '...' : ''),
       url: getCommentUrl(comment),
       relevanceScore: calculateContentRelevanceScore(comment.content, query),
@@ -261,16 +256,12 @@ async function searchContent(
         visibility: { not: 'PRIVATE' },
       },
     },
-    select: {
-      id: true,
-      type: true,
-      payload: true,
-      createdAt: true,
+    include: {
       User: {
         select: {
           id: true,
           username: true,
-          display_name: true,
+          displayName: true,
           avatarUrl: true,
         },
       },
@@ -282,7 +273,7 @@ async function searchContent(
     ...activities.map((activity) => ({
       id: activity.id,
       type: 'activity' as const,
-      title: `${activity.User.display_name || activity.User.username} - ${activity.type}`,
+      title: `${activity.User.displayName || activity.User.username} - ${activity.type}`,
       description: (activity.payload as any)?.description || activity.type,
       url: `/profile/${activity.User.username}`,
       relevanceScore: calculateContentRelevanceScore(activity.type, query),

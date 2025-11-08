@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { SoapstoneStatus } from '@prisma/client';
 import {
   SoapstoneCreateSchema,
   createApiSuccess,
@@ -22,9 +21,11 @@ export async function GET(req: NextRequest) {
     const cursor = searchParams.get('cursor');
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50);
 
+    const { Visibility } = await import('@prisma/client');
+    
     const messages = await db.soapstoneMessage.findMany({
       where: {
-        status: SoapstoneStatus.VISIBLE,
+        status: Visibility.PUBLIC,
       },
       orderBy: {
         createdAt: 'desc',
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
         User: {
           select: {
             id: true,
-            display_name: true,
+            displayName: true,
             avatarUrl: true,
           },
         },
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
             user: msg.User
               ? {
                   id: msg.User.id,
-                  displayName: msg.User.display_name,
+                  displayName: msg.User.displayName,
                   avatarUrl: msg.User.avatarUrl,
                 }
               : null,
@@ -125,18 +126,20 @@ export async function POST(req: NextRequest) {
 
       const { body: messageBody } = validation.data;
 
+      const { Visibility } = await import('@prisma/client');
+      
       // Create soapstone message
       const message = await db.soapstoneMessage.create({
         data: {
           text: messageBody,
-          authorId: userId,
-          status: SoapstoneStatus.VISIBLE,
+          User: { connect: { id: userId } },
+          status: Visibility.PUBLIC,
         },
         include: {
           User: {
             select: {
               id: true,
-              display_name: true,
+              displayName: true,
               avatarUrl: true,
             },
           },
@@ -150,7 +153,7 @@ export async function POST(req: NextRequest) {
           createdAt: message.createdAt,
           user: {
             id: message.User!.id,
-            displayName: message.User!.display_name,
+            displayName: message.User!.displayName,
             avatarUrl: message.User!.avatarUrl,
           },
         },

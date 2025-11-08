@@ -26,7 +26,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   const track = await db.musicTrack.create({
     data: {
-      playlistId: params.id,
+      MusicPlaylist: { connect: { id: params.id } },
       title,
       artist: artist ?? '',
       url,

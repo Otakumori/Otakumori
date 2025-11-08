@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         username: true,
-        display_name: true,
+        displayName: true,
         bio: true,
         location: true,
         website: true,

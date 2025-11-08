@@ -11,16 +11,18 @@ export async function POST(_: NextRequest, { params }: { params: { id: string } 
 
   const id = params.id;
 
+  const { Visibility } = await import('@prisma/client');
+  
   const msg = await db.$transaction(async (tx) => {
     const updated = await tx.soapstoneMessage.update({
       where: { id },
       data: { reports: { increment: 1 } },
     });
 
-    if (updated.reports + 1 >= AUTO_HIDE_AFTER && updated.status === ('VISIBLE' as const)) {
+    if (updated.reports + 1 >= AUTO_HIDE_AFTER && updated.status === Visibility.PUBLIC) {
       return tx.soapstoneMessage.update({
         where: { id },
-        data: { status: 'REPORTED' as const },
+        data: { status: Visibility.HIDDEN },
       });
     }
     return updated;
