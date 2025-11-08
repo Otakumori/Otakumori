@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
-import { env } from '@/app/env';
+import { RUNTIME_FLAGS } from '@/constants.client';
 
 interface Customer {
   id: number;
@@ -436,7 +436,7 @@ export default function MaidCafeGame() {
           <div>Money: ${money}</div>
           <div>Level: {level}</div>
           <div>Time: {formatTime(gameTime)}</div>
-          {env.NODE_ENV === 'development' && (
+          {RUNTIME_FLAGS.isDev && (
             <>
               <div className="text-gray-400">Speed: {gameSpeed.toFixed(1)}x</div>
               <div className="text-gray-400">

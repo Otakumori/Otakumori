@@ -1,4 +1,4 @@
-import { env } from '@/app/env';
+import { env } from '@/env/server';
 
 let started = false;
 

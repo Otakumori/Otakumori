@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { env } from '@/app/env';
+import { env } from '@/env/server';
 
 const SERVE_URL = env.INNGEST_SERVE_URL || 'http://localhost:8288/api/inngest';
 

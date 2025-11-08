@@ -1,20 +1,20 @@
 // lib/flags.ts
-import { env } from '@/app/env';
+import { FEATURE_FLAG_PROVIDER, PUBLIC_KEYS, RUNTIME_FLAGS } from '@/constants.client';
 
 export function initFlags() {
   // Only run in production
-  if (env.NEXT_PUBLIC_APP_ENV !== 'production') return;
+  if (RUNTIME_FLAGS.appEnv !== 'production') return;
 
   // Use a BROWSER/PUBLIC key only
-  const publicKey = env.NEXT_PUBLIC_FLAGS_PUBLIC_KEY;
+  const publicKey = PUBLIC_KEYS.flagsPublicKey;
   if (!publicKey) {
-    if (env.NODE_ENV !== 'production') {
+    if (!RUNTIME_FLAGS.isProd) {
       console.warn('[Flags] Missing NEXT_PUBLIC_FLAGS_PUBLIC_KEY; skipping init');
     }
     return;
   }
 
-  const provider = env.FEATURE_FLAG_PROVIDER || 'local';
+  const provider = FEATURE_FLAG_PROVIDER || 'local';
 
   try {
     switch (provider) {

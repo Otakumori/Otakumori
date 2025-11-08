@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
-import { env } from '@/app/env';
+import { RUNTIME_FLAGS } from '@/constants.client';
 
 interface Obstacle {
   id: number;
@@ -546,7 +546,7 @@ export default function ThighChaseGame() {
     ctx.fillText(`Lives: ${lives}`, 10, 105);
 
     // Debug info: spawn timers (development mode only)
-    if (env.NODE_ENV === 'development') {
+    if (RUNTIME_FLAGS.isDev) {
       ctx.fillStyle = '#888888';
       ctx.font = '12px monospace';
       ctx.fillText(`Obstacle: ${Math.max(0, Math.floor(obstacleSpawnTimer / 100))}`, 10, 125);

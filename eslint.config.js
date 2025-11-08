@@ -101,7 +101,8 @@ export default [
         'error',
         {
           selector: "MemberExpression[object.name='process'][property.name='env']",
-          message: " Do not use `process.env` directly. Use `env` from '@/env' instead.",
+          message:
+            " Do not use `process.env` directly. Use '@/env/server' on the server or '@/env/client' in client code.",
         },
       ],
       'drizzle/enforce-delete-with-where': ['error', { drizzleObjectName: ['db', 'ctx.db'] }],
@@ -144,8 +145,8 @@ export default [
     },
   },
   {
-    // Allow process.env in env.ts file
-    files: ['env.ts', 'app/env.ts', '**/env.ts', 'app/lib/env.ts'],
+    // Allow process.env in env definition files
+    files: ['env/server.ts', 'env/client.ts', 'env.mjs', 'app/lib/env.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },
@@ -235,3 +236,4 @@ export default [
     },
   },
 ];
+

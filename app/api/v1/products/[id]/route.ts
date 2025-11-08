@@ -1,14 +1,14 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { env } from '@/env/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { slug } = await params;
+    const { id } = params;
 
-    // Get all products from Printify and find the one with matching ID
-    const baseUrl = 'http://localhost:3000';
+    const baseUrl = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/printify/products`, {
       cache: 'no-store',
     });
@@ -23,14 +23,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       throw new Error(data.error || 'Failed to fetch products');
     }
 
-    // Find the product with matching ID
-    const product = data.data.products.find((p: any) => p.id === slug);
+    const product = data.data.products.find((p: any) => p.id === id);
 
     if (!product) {
       return NextResponse.json({ ok: false, error: 'Product not found' }, { status: 404 });
     }
 
-    // Transform to our format
     const productData = {
       id: product.id,
       title: product.title,

@@ -7,5 +7,34 @@
         "allow": ["warn", "error"]
       }
     ]
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "app/components/**/*.{ts,tsx}",
+        "components/**/*.{ts,tsx}",
+        "app/mini-games/**/*.{ts,tsx}",
+        "app/providers/**/*.{ts,tsx}",
+        "lib/feature-flags/**/*.{ts,tsx}",
+        "providers.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@/env/server",
+                "message": "Client components must import from '@/env/client' or '@/constants.client'."
+              },
+              {
+                "name": "@/constants.server",
+                "message": "Server-only constants are not available in client components."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

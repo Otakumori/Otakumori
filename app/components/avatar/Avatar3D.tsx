@@ -17,7 +17,7 @@ import {
 import { AnimeMaterialFactory } from '@/app/lib/3d/anime-materials';
 import type { AnimationController } from '@/app/lib/3d/animation-system';
 import { createAnimationController } from '@/app/lib/3d/animation-system';
-import { env } from '@/app/env';
+import { RUNTIME_FLAGS } from '@/constants.client';
 
 // Import procedural generation systems
 import { ProceduralBodyGenerator } from '@/app/lib/3d/procedural-body';
@@ -524,7 +524,7 @@ export default function Avatar3D({
       {useProcedural && proceduralConfig?.enabled ? renderProceduralAvatar() : renderParts()}
 
       {/* Debug info */}
-      {env.NODE_ENV === 'development' && (
+      {RUNTIME_FLAGS.isDev && (
         <mesh position={[0, -2, 0]}>
           <planeGeometry args={[2, 0.5]} />
           <meshBasicMaterial color="black" transparent opacity={0.7} />

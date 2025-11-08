@@ -1,14 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { env } from '@/app/env';
+import { FEATURE_FLAGS } from '@/constants.client';
 
 export default function PerformanceMonitor() {
   useEffect(() => {
     // Feature flag to control performance monitoring
-    const FEATURE_PERF_MODULE = (env.NEXT_PUBLIC_FEATURE_PERF_MODULE ?? 'true') !== 'false';
-
-    if (!FEATURE_PERF_MODULE) {
+    if (!FEATURE_FLAGS.performanceMonitorEnabled) {
       return;
     }
 

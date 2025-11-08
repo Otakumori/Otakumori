@@ -1,5 +1,5 @@
 // lib/no-mocks.ts
-import { env } from '@/app/env';
+import { env } from '@/env/server';
 
 export function enforceNoMocks() {
   // Only enforce in production builds

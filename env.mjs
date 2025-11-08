@@ -22,6 +22,7 @@ export const env = createEnv({
     STRIPE_SECRET_KEY: z.string(),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
     CLERK_SECRET_KEY: z.string(),
+    CLERK_PROXY_URL: z.string().url().optional(),
     CLERK_WEBHOOK_SECRET: z.string().optional(),
     CLERK_ENCRYPTION_KEY: z.string().optional(),
     PRINTIFY_API_KEY: z.string(),
@@ -86,6 +87,9 @@ export const env = createEnv({
     INTERNAL_AUTH_TOKEN: z.string().optional(),
     // Adult content storage
     ADULTS_STORAGE_INDEX_URL: z.string().url().optional(),
+    // Next.js phases/runtime
+    NEXT_PHASE: z.string().optional(),
+    NEXT_RUNTIME: z.string().optional(),
   },
   client: {
     // Clerk
@@ -163,6 +167,7 @@ export const env = createEnv({
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    CLERK_PROXY_URL: process.env.CLERK_PROXY_URL,
     CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
     CLERK_ENCRYPTION_KEY: process.env.CLERK_ENCRYPTION_KEY,
     PRINTIFY_API_KEY: process.env.PRINTIFY_API_KEY,
@@ -219,6 +224,8 @@ export const env = createEnv({
     FEATURE_AVATAR_STYLIZED_SHADERS: process.env.FEATURE_AVATAR_STYLIZED_SHADERS,
     INTERNAL_AUTH_TOKEN: process.env.INTERNAL_AUTH_TOKEN,
     ADULTS_STORAGE_INDEX_URL: process.env.ADULTS_STORAGE_INDEX_URL,
+    NEXT_PHASE: process.env.NEXT_PHASE,
+    NEXT_RUNTIME: process.env.NEXT_RUNTIME,
     // Client vars
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,

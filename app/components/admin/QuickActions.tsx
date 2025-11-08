@@ -1,8 +1,8 @@
 // DEPRECATED: This component is a duplicate. Use app\components\components\admin\QuickActions.tsx instead.
 import React, { useEffect, useState } from 'react';
-import { env } from '@/app/env';
+import { PUBLIC_KEYS } from '@/constants.client';
 
-const API_KEY = env.NEXT_PUBLIC_ADMIN_API_KEY;
+const API_KEY = PUBLIC_KEYS.adminApiKey;
 
 const QuickActions: React.FC = () => {
   const [maintenance, setMaintenance] = useState(false);

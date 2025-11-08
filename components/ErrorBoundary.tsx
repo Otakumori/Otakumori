@@ -2,7 +2,7 @@
 'use client';
 
 import React, { Component, type ErrorInfo, type ReactNode } from 'react';
-import { env } from '@/env';
+import { RUNTIME_FLAGS } from '@/constants.client';
 import { motion } from 'framer-motion';
 
 interface Props {
@@ -33,7 +33,7 @@ export class ErrorBoundary extends Component<Props, State> {
     });
 
     // Log error to console in development
-    if (env.NODE_ENV === 'development') {
+    if (RUNTIME_FLAGS.isDev) {
       console.error('Error caught by boundary:', error, errorInfo);
     }
 
@@ -135,3 +135,4 @@ export function withErrorBoundary<P extends object>(
     );
   };
 }
+
