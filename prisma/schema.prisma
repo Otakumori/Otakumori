@@ -1112,12 +1112,20 @@ model Product {
   isNSFW            Boolean            @default(false)
   categorySlug      String?            @map("category_slug")
   integrationRef    String?            @unique @map("integration_ref")
+  visible           Boolean            @default(true)
+  blueprintId       Int?
+  printProviderId   Int?
+  tags              String[]           @default([])
+  options           Json?
+  specs             Json?
+  lastSyncedAt      DateTime?          @map("last_synced_at")
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @updatedAt @map("updated_at")
   CartItem          CartItem[]
   OrderItem         OrderItem[]
   ProductSoapstone  ProductSoapstone[]
   ProductVariant    ProductVariant[]
+  ProductImage      ProductImage[]
   Review            Review[]
   Wishlist          Wishlist[]
 
@@ -1126,6 +1134,7 @@ model Product {
   @@index([createdAt])
   @@index([integrationRef])
   @@index([updatedAt])
+  @@index([printifyProductId])
 }
 
 model ProductReview {
@@ -1185,6 +1194,9 @@ model ProductVariant {
   previewImageUrl   String?
   printifyVariantId Int
   printProviderName String?
+  title             String?
+  sku               String?
+  grams             Int?
   leadMinDays       Int?
   leadMaxDays       Int?
   isEnabled         Boolean     @default(true)
@@ -1192,6 +1204,10 @@ model ProductVariant {
   priceCents        Int?
   currency          String?     @default("USD")
   stripePriceId     String?     @unique
+  isDefaultVariant  Boolean     @default(false)
+  optionValues      Json?
+  costCents         Int?
+  lastSyncedAt      DateTime?   @map("last_synced_at")
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   CartItem          CartItem[]
@@ -1201,6 +1217,22 @@ model ProductVariant {
   @@unique([productId, printifyVariantId])
   @@index([printifyVariantId])
   @@index([stripePriceId])
+  @@index([productId, isDefaultVariant])
+}
+
+model ProductImage {
+  id               String   @id @default(uuid())
+  productId        String
+  url              String
+  position         Int      @default(0)
+  variantIds       Int[]
+  isDefault        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  Product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, url])
+  @@index([productId, position])
 }
 
 model ProductView {

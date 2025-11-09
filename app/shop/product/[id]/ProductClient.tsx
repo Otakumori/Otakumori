@@ -7,38 +7,19 @@ import Link from 'next/link';
 import NSFWAffirmNote from '@/components/NSFWAffirmNote';
 import { t } from '@/lib/microcopy';
 import { paths } from '@/lib/paths';
+import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { ShareButtons } from '@/app/components/shop/ShareButtons';
 import { useRecentlyViewed } from '@/app/hooks/useRecentlyViewed';
 import { useToastContext } from '@/app/contexts/ToastContext';
 import { ProductSoapstoneWall } from '@/app/components/shop/ProductSoapstoneWall';
 
-interface ProductVariant {
-  id: string;
-  title: string;
-  price: number;
-  is_enabled: boolean;
-  is_default: boolean;
-  sku: string;
-}
-
-interface Product {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string;
-  price: number;
-  currency: string;
-  isNSFW?: boolean;
-  variants?: ProductVariant[];
-  category?: string;
-  tags?: string[];
-}
+type CatalogVariant = CatalogProduct['variants'][number];
 
 export default function ProductClient({ productId }: { productId: string }) {
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<CatalogVariant | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addProduct } = useRecentlyViewed();
   const { success, error: showError } = useToastContext();
@@ -52,38 +33,27 @@ export default function ProductClient({ productId }: { productId: string }) {
           throw new Error(`Failed to fetch product: ${response.statusText}`);
         }
         const json = await response.json();
-        const p = json?.data;
-        if (!p) {
+        const catalogProduct = json?.data as CatalogProduct | undefined;
+        if (!catalogProduct) {
           setError('Product not found');
           return;
         }
-        const shaped: Product = {
-          id: p.id,
-          title: p.title,
-          description: p.description,
-          image_url: p.images?.[0],
-          price: p.price,
-          currency: 'USD',
-          variants: (p.variants ?? []).map((v: any) => ({
-            id: v.id,
-            title: String(v.printifyVariantId ?? 'Variant'),
-            price: (v.priceCents ?? 0) / 100,
-            is_enabled: v.isEnabled,
-            is_default: false,
-            sku: String(v.printifyVariantId ?? v.id),
-          })),
-        };
-        setProduct(shaped);
-        if (shaped.variants && shaped.variants.length > 0) {
-          setSelectedVariant(shaped.variants[0]);
-        }
+        setProduct(catalogProduct);
 
-        // Add to recently viewed
+        const defaultVariant = catalogProduct.variants.find((variant) => variant.isEnabled && variant.inStock);
+        setSelectedVariant(defaultVariant ?? catalogProduct.variants[0] ?? null);
+
+        const displayPrice =
+          catalogProduct.price ??
+          (catalogProduct.priceRange.min != null
+            ? Math.round(catalogProduct.priceRange.min) / 100
+            : 0);
+
         addProduct({
-          id: shaped.id,
-          title: shaped.title,
-          image: shaped.image_url,
-          price: shaped.price,
+          id: catalogProduct.id,
+          title: catalogProduct.title,
+          image: catalogProduct.image ?? catalogProduct.images[0] ?? '/assets/placeholder-product.jpg',
+          price: displayPrice,
         });
       } catch (err) {
         setError(
@@ -135,9 +105,16 @@ export default function ProductClient({ productId }: { productId: string }) {
     );
   }
 
-  const imageUrl = product.image_url || '/images/products/placeholder.svg';
-  const currentPrice = selectedVariant?.price || product.price;
-  const currency = product.currency || 'USD';
+  const imageUrl = product.image ?? product.images?.[0] ?? '/images/products/placeholder.svg';
+  const currentPriceCents =
+    selectedVariant?.priceCents ??
+    (product.priceRange.min != null ? Math.round(product.priceRange.min) : product.priceCents ?? null);
+  const currentPrice =
+    currentPriceCents != null
+      ? currentPriceCents / 100
+      : product.price ?? 0;
+  const currency = 'USD';
+  const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
@@ -156,7 +133,7 @@ export default function ProductClient({ productId }: { productId: string }) {
         </nav>
 
         {/* NSFW Affirmation Note */}
-        {product.isNSFW && <NSFWAffirmNote />}
+        {isNSFW && <NSFWAffirmNote />}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Image */}
@@ -216,11 +193,12 @@ export default function ProductClient({ productId }: { productId: string }) {
                     <option
                       key={variant.id}
                       value={variant.id}
-                      disabled={!variant.is_enabled}
+                      disabled={!variant.isEnabled}
                       className="bg-purple-900"
                     >
-                      {variant.title} - ${variant.price.toFixed(2)}
-                      {!variant.is_enabled ? ' (Out of Stock)' : ''}
+                      {variant.title ?? `Variant ${variant.printifyVariantId}`} - $
+                      {((variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100).toFixed(2)}
+                      {!variant.isEnabled ? ' (Out of Stock)' : ''}
                     </option>
                   ))}
                 </select>
@@ -246,7 +224,7 @@ export default function ProductClient({ productId }: { productId: string }) {
             {/* Add to Cart */}
             <button
               onClick={handleAddToCart}
-              disabled={!selectedVariant?.is_enabled}
+              disabled={!selectedVariant || !selectedVariant.isEnabled}
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Add to Cart
@@ -257,7 +235,7 @@ export default function ProductClient({ productId }: { productId: string }) {
               <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>
               <div className="space-y-2 text-sm text-zinc-300">
                 <p>
-                  <span className="font-medium">SKU:</span> {selectedVariant?.sku || product.id}
+                  <span className="font-medium">SKU:</span> {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}
                 </p>
                 {product.category && (
                   <p>
@@ -266,7 +244,7 @@ export default function ProductClient({ productId }: { productId: string }) {
                 )}
                 <p>
                   <span className="font-medium">Availability:</span>{' '}
-                  {selectedVariant?.is_enabled ? 'In Stock' : 'Out of Stock'}
+                  {selectedVariant?.isEnabled ? 'In Stock' : 'Out of Stock'}
                 </p>
               </div>
             </div>

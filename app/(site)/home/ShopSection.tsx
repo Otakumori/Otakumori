@@ -11,6 +11,7 @@ interface Product {
   price: number;
   image: string;
   available: boolean;
+  slug?: string;
 }
 
 interface ShopData {
@@ -32,18 +33,14 @@ export default async function ShopSection() {
       allowLive: true,
     });
 
-    const fallbackResult = await safeFetch<{ products: Product[] }>('/api/products?limit=12', {
-      allowLive: true,
-    });
+    const data = isSuccess(featuredResult) ? featuredResult.data : null;
 
-    const data = isSuccess(featuredResult)
-      ? featuredResult.data
-      : isSuccess(fallbackResult)
-        ? fallbackResult.data
-        : null;
-
-    products = data?.products || [];
-    isBlockedData = isBlocked(featuredResult) && isBlocked(fallbackResult);
+    products = data?.products?.map((product) => ({
+      ...product,
+      image: product.image || '/assets/placeholder-product.jpg',
+      slug: product.slug,
+    })) || [];
+    isBlockedData = isBlocked(featuredResult);
   } catch (error) {
     // Fallback to empty products if API calls fail during SSR
     console.warn('ShopSection: API calls failed during SSR:', error);
@@ -77,7 +74,11 @@ export default async function ShopSection() {
       ) : products.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.slice(0, 6).map((product) => (
-            <Link key={product.id} href={paths.product(product.id)} className="group block">
+            <Link
+              key={product.id}
+              href={paths.product(product.slug ?? product.id)}
+              className="group block"
+            >
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(255,160,200,0.18)]">
                 <div className="aspect-square relative overflow-hidden">
                   <Image

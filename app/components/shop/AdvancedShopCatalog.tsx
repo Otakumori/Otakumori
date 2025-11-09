@@ -3,139 +3,120 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
-import type { PrintifyProduct } from '@/app/lib/printify/service';
+import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { FeaturedCarousel } from './FeaturedCarousel';
 import { RecentlyViewed } from './RecentlyViewed';
+import Link from 'next/link';
+import { paths } from '@/lib/paths';
 
-// Enterprise-grade Product Card for Real Printify Products
-function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
-  const [selectedVariant, _setSelectedVariant] = useState(product.variants[0] || null);
-  const [_selectedImage, _setSelectedImage] = useState(product.images[0] || null);
+// Catalog Product Card
+function CatalogProductCard({ product }: { product: CatalogProduct }) {
+  const displayImage = product.image ?? product.images[0] ?? '/assets/placeholder-product.jpg';
 
-  // Get available colors and sizes from product options
-  const colorOptions = product.options?.find((opt) => opt.name.toLowerCase().includes('color'));
-  const sizeOptions = product.options?.find((opt) => opt.name.toLowerCase().includes('size'));
-
-  // Get variant-specific image
-  const variantImages = selectedVariant
-    ? product.images.filter(
-        (img) => img.variant_ids.length === 0 || img.variant_ids.includes(selectedVariant.id),
-      )
-    : product.images;
-
-  const displayImage = variantImages[0] || product.images[0];
-
-  // Calculate price range
-  const prices = product.variants.map((v) => v.price).filter((p) => p > 0);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  const minPriceCents = product.priceRange.min ?? product.priceCents ?? null;
+  const maxPriceCents = product.priceRange.max ?? product.priceCents ?? null;
   const priceDisplay =
-    minPrice === maxPrice
-      ? `$${(minPrice / 100).toFixed(2)}`
-      : `$${(minPrice / 100).toFixed(2)} - $${(maxPrice / 100).toFixed(2)}`;
+    minPriceCents != null && maxPriceCents != null
+      ? minPriceCents === maxPriceCents
+        ? `$${(minPriceCents / 100).toFixed(2)}`
+        : `$${(minPriceCents / 100).toFixed(2)} - $${(maxPriceCents / 100).toFixed(2)}`
+      : product.price != null
+        ? `$${product.price.toFixed(2)}`
+        : '$0.00';
 
-  // Get available variants for current color
-  const availableVariants = product.variants.filter((v) => v.is_enabled && v.is_available);
+  const colorOptions = Array.from(
+    new Map(
+      product.variants
+        .flatMap((variant) => variant.optionValues ?? [])
+        .filter((value) => value.option?.toLowerCase().includes('color'))
+        .map((value) => [value?.value ?? '', value]),
+    ).values(),
+  );
+
+  const sizeOptions = Array.from(
+    new Map(
+      product.variants
+        .flatMap((variant) => variant.optionValues ?? [])
+        .filter((value) => value.option?.toLowerCase().includes('size'))
+        .map((value) => [value?.value ?? '', value]),
+    ).values(),
+  );
 
   return (
     <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden hover:border-pink-500/50 hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-300 hover:-translate-y-1">
-      {/* Product Image */}
       <div className="relative aspect-square bg-white/5 overflow-hidden">
-        {displayImage ? (
-          <Image
-            src={displayImage.src}
-            alt={product.title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            loading="lazy"
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvc3ZnPg=="
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-            <div className="text-white/60 text-lg font-medium">No Image</div>
-          </div>
-        )}
-
-        {/* Badge for stock status */}
-        {availableVariants.length === 0 && (
+        <Image
+          src={displayImage}
+          alt={product.title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw"
+          loading="lazy"
+        />
+        {!product.available && (
           <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
             Out of Stock
           </div>
         )}
-
-        {/* Express eligible badge */}
-        {product.is_printify_express_eligible && (
-          <div className="absolute top-2 left-2 bg-green-500/80 text-white text-xs px-2 py-1 rounded-lg">
-            Express
-          </div>
-        )}
       </div>
 
-      {/* Product Info */}
       <div className="p-4 space-y-3">
-        {/* Title and Price */}
         <div>
-          <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 group-hover:text-pink-300 transition-colors">
-            {product.title}
-          </h3>
+          <Link href={paths.product(product.id)} className="block">
+            <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 group-hover:text-pink-300 transition-colors">
+              {product.title}
+            </h3>
+          </Link>
           <div className="text-pink-400 font-bold text-xl">{priceDisplay}</div>
         </div>
 
-        {/* Description */}
         <p className="text-zinc-300 text-sm line-clamp-2 leading-relaxed">
           {product.description || 'High-quality print-on-demand product'}
         </p>
 
-        {/* Color Variants */}
-        {colorOptions && colorOptions.values.length > 1 && (
+        {colorOptions.length > 1 && (
           <div>
             <div className="text-white text-xs font-medium mb-2">Colors:</div>
             <div className="flex flex-wrap gap-1">
-              {colorOptions.values.slice(0, 6).map((colorValue) => (
-                <div key={colorValue.id} className="group/color relative" title={colorValue.title}>
-                  {colorValue.colors && colorValue.colors.length > 0 ? (
-                    <div
-                      className="w-6 h-6 rounded-full border-2 border-white/30 cursor-pointer hover:border-pink-400 transition-colors"
-                      style={{ backgroundColor: colorValue.colors[0] }}
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 border-2 border-white/30 cursor-pointer hover:border-pink-400 transition-colors" />
-                  )}
-                </div>
+              {colorOptions.slice(0, 6).map((option) => (
+                <div
+                  key={`${option?.option}-${option?.value}`}
+                  title={option?.value ?? ''}
+                  className="w-6 h-6 rounded-full border-2 border-white/30 cursor-default"
+                  style={{ backgroundColor: option?.colors?.[0] ?? '#fff' }}
+                />
               ))}
-              {colorOptions.values.length > 6 && (
+              {colorOptions.length > 6 && (
                 <div className="text-zinc-400 text-xs self-center">
-                  +{colorOptions.values.length - 6} more
+                  +{colorOptions.length - 6} more
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* Size Options */}
-        {sizeOptions && sizeOptions.values.length > 1 && (
+        {sizeOptions.length > 1 && (
           <div>
-            <div className="text-white text-xs font-medium mb-2">Sizes Available:</div>
+            <div className="text-white text-xs font-medium mb-2">Sizes:</div>
             <div className="flex flex-wrap gap-1">
-              {sizeOptions.values.slice(0, 4).map((sizeValue) => (
+              {sizeOptions.slice(0, 6).map((option) => (
                 <span
-                  key={sizeValue.id}
+                  key={`${option?.option}-${option?.value}`}
                   className="text-xs bg-white/10 text-zinc-300 px-2 py-1 rounded-lg"
                 >
-                  {sizeValue.title}
+                  {option?.value}
                 </span>
               ))}
-              {sizeOptions.values.length > 4 && (
-                <span className="text-xs text-zinc-400">+{sizeOptions.values.length - 4} more</span>
+              {sizeOptions.length > 6 && (
+                <span className="text-xs text-zinc-400">
+                  +{sizeOptions.length - 6} more
+                </span>
               )}
             </div>
           </div>
         )}
 
-        {/* Tags */}
-        {product.tags && product.tags.length > 0 && (
+        {product.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {product.tags.slice(0, 3).map((tag) => (
               <span
@@ -148,20 +129,19 @@ function RealPrintifyProductCard({ product }: { product: PrintifyProduct }) {
           </div>
         )}
 
-        {/* Action Button */}
-        <button
-          className="w-full bg-gradient-to-r from-pink-500/80 to-purple-500/80 hover:from-pink-500 hover:to-purple-500 text-white font-semibold py-3 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-pink-500/40 hover:scale-105 active:scale-95"
-          disabled={availableVariants.length === 0}
+        <Link
+          href={paths.product(product.id)}
+          className="block w-full bg-gradient-to-r from-pink-500/80 to-purple-500/80 hover:from-pink-500 hover:to-purple-500 text-center text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-pink-500/40 hover:scale-105 active:scale-95"
         >
-          {availableVariants.length > 0 ? 'View Details' : 'Out of Stock'}
-        </button>
+          View Details
+        </Link>
       </div>
     </div>
   );
 }
 
 interface ProductSearchResult {
-  products: PrintifyProduct[];
+  products: CatalogProduct[];
   total: number;
   page: number;
   totalPages: number;
@@ -204,10 +184,10 @@ function ProductSort({
         <option value="relevance-desc">Relevance</option>
         <option value="price-asc">Price: Low to High</option>
         <option value="price-desc">Price: High to Low</option>
-        <option value="name-asc">Name: A to Z</option>
-        <option value="name-desc">Name: Z to A</option>
-        <option value="created-desc">Newest First</option>
-        <option value="created-asc">Oldest First</option>
+        <option value="title-asc">Name: A to Z</option>
+        <option value="title-desc">Name: Z to A</option>
+        <option value="created_at-desc">Newest First</option>
+        <option value="created_at-asc">Oldest First</option>
       </select>
     </div>
   );
@@ -253,11 +233,11 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
   const pathname = usePathname();
   const currentSearchParams = useSearchParams();
 
-  const [products, setProducts] = useState<PrintifyProduct[]>([]);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchResult, setSearchResult] = useState<ProductSearchResult | null>(null);
-  const [featuredProducts, setFeaturedProducts] = useState<PrintifyProduct[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<CatalogProduct[]>([]);
 
   // Parse search parameters
   const filters = useMemo(
@@ -266,15 +246,11 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
       category: (searchParams.category as string) || '',
       minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
       maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
-      colors: searchParams.colors ? String(searchParams.colors).split(',') : [],
-      sizes: searchParams.sizes ? String(searchParams.sizes).split(',') : [],
       inStock: searchParams.inStock === 'true',
-      expressEligible: searchParams.expressEligible === 'true',
       sortBy: (searchParams.sortBy as string) || 'relevance',
       sortOrder: (searchParams.sortOrder as string) || 'desc',
       page: Number(searchParams.page) || 1,
       limit: Number(searchParams.limit) || 20,
-      productId: (searchParams.productId as string) || undefined, // Handle direct product linking from homepage
     }),
     [searchParams],
   );
@@ -283,14 +259,14 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
   useEffect(() => {
     async function fetchFeatured() {
       try {
-        const response = await fetch('/api/v1/printify/search?limit=5&sortBy=relevance', {
+        const response = await fetch('/api/v1/products/featured?limit=5', {
           credentials: 'same-origin',
         });
 
         if (response.ok) {
           const result = await response.json();
           const data = result.data || result;
-          const featured = (data.products || []).slice(0, 5);
+          const featured = (data.products || []).slice(0, 5) as CatalogProduct[];
           setFeaturedProducts(featured);
         }
       } catch (err) {
@@ -314,11 +290,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         if (filters.category) params.append('category', filters.category);
         if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
         if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
-        if (filters.colors.length > 0) params.append('colors', filters.colors.join(','));
-        if (filters.sizes.length > 0) params.append('sizes', filters.sizes.join(','));
         if (filters.inStock) params.append('inStock', 'true');
-        if (filters.expressEligible) params.append('expressEligible', 'true');
-        if (filters.productId) params.append('productId', filters.productId); // Handle direct product linking
         params.append('sortBy', filters.sortBy);
         params.append('sortOrder', filters.sortOrder);
         params.append('page', filters.page.toString());
@@ -355,10 +327,20 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         const result = await response.json();
 
         if (result.ok || result.products) {
-          // Handle both envelope and direct response formats
           const data = result.data || result;
-          setSearchResult(data);
-          setProducts(data.products || []);
+          setSearchResult({
+            products: (data.products || []) as CatalogProduct[],
+            total: data.pagination?.total ?? data.total ?? 0,
+            page: data.pagination?.page ?? data.page ?? 1,
+            totalPages: data.pagination?.totalPages ?? data.totalPages ?? 0,
+            filters: data.filters ?? {
+              availableCategories: [],
+              priceRange: { min: 0, max: 0 },
+              availableColors: [],
+              availableSizes: [],
+            },
+          });
+          setProducts((data.products || []) as CatalogProduct[]);
           setError(null);
         } else {
           setSearchResult({
@@ -614,9 +596,9 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
             {/* Products Grid */}
             {products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                {products.map((product) => (
-                  <RealPrintifyProductCard key={product.id} product={product} />
-                ))}
+            {products.map((product) => (
+                <CatalogProductCard key={product.id} product={product} />
+              ))}
               </div>
             ) : (
               <div className="text-center py-12">
@@ -632,10 +614,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                         category: '',
                         minPrice: undefined,
                         maxPrice: undefined,
-                        colors: [],
-                        sizes: [],
                         inStock: false,
-                        expressEligible: false,
                       })
                     }
                     className="bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 px-6 py-3 rounded-xl transition-colors"

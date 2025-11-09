@@ -1,47 +1,53 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env/server';
+import { db } from '@/app/lib/db';
+import { serializeProduct } from '@/lib/catalog/serialize';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
+
   try {
-    const { id } = params;
-
-    const baseUrl = env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/printify/products`, {
-      cache: 'no-store',
+    const product = await db.product.findFirst({
+      where: {
+        OR: [
+          { id },
+          { printifyProductId: id },
+          { integrationRef: id },
+        ],
+        active: true,
+      },
+      include: {
+        ProductVariant: true,
+        ProductImage: true,
+      },
     });
-
-    if (!response.ok) {
-      throw new Error(`Printify API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.ok) {
-      throw new Error(data.error || 'Failed to fetch products');
-    }
-
-    const product = data.data.products.find((p: any) => p.id === id);
 
     if (!product) {
       return NextResponse.json({ ok: false, error: 'Product not found' }, { status: 404 });
     }
 
-    const productData = {
-      id: product.id,
-      title: product.title,
-      description: product.description,
-      images: product.image ? [{ src: product.image }] : [],
-      price: product.price || 0,
-      category: product.tags || undefined,
-      variants: product.variants || [],
-      available: product.available !== false,
-      visible: product.visible !== false,
-    };
+    const dto = serializeProduct(product);
 
-    return NextResponse.json({ ok: true, data: productData });
+    return NextResponse.json({
+      ok: true,
+      data: {
+        id: dto.id,
+        title: dto.title,
+        description: dto.description,
+        images: dto.images.map((src) => ({ src })),
+        price: dto.price ?? 0,
+        priceCents: dto.priceCents ?? null,
+        category: dto.categorySlug ?? dto.category ?? undefined,
+        variants: dto.variants,
+        available: dto.available,
+        visible: product.visible,
+        slug: dto.slug,
+        tags: dto.tags,
+        integrationRef: dto.integrationRef,
+      },
+    });
   } catch (error) {
     console.error('Error fetching product:', error);
     return NextResponse.json({ ok: false, error: 'Failed to fetch product' }, { status: 500 });

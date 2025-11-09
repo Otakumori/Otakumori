@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getPrintifyService } from '@/app/lib/printify/service';
 import { z } from 'zod';
+import { db } from '@/app/lib/db';
+import { serializeProduct } from '@/lib/catalog/serialize';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,10 @@ const QuerySchema = z.object({
   limit: z
     .string()
     .optional()
-    .transform((val) => (val ? parseInt(val, 10) : 6)),
+    .transform((val) => {
+      const parsed = val ? parseInt(val, 10) : 6;
+      return Number.isNaN(parsed) ? 6 : Math.max(1, Math.min(parsed, 12));
+    }),
 });
 
 export async function GET(request: NextRequest) {
@@ -17,43 +21,62 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = QuerySchema.parse(Object.fromEntries(searchParams));
 
-    // Get products from Printify
-    const result = await getPrintifyService().getProducts(1, query.limit);
+    const products = await db.product.findMany({
+      where: {
+        active: true,
+        visible: true,
+        ProductVariant: {
+          some: {
+            isEnabled: true,
+          },
+        },
+      },
+      include: {
+        ProductVariant: true,
+        ProductImage: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      take: query.limit,
+    });
 
-    // Transform products to normalized format
-    const products = result.data
-      .filter((product: any) => product.visible) // Only visible products
-      .map((product: any) => ({
-        id: product.id,
-        title: product.title,
-        description: stripHtml(product.description || ''),
-        price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0, // Convert cents to dollars
-        image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
-        images: product.images?.map((img: any) => img.src) || [],
-        tags: product.tags || [],
-        variants:
-          product.variants?.map((v: any) => ({
-            id: v.id,
-            title: v.title,
-            price: v.price / 100, // Convert cents to dollars
-            is_enabled: v.is_enabled,
-            in_stock: v.in_stock,
-          })) || [],
-        available: product.variants?.some((v: any) => v.is_enabled && v.in_stock) || false,
-        category: product.tags?.[0] || 'apparel',
-        slug: product.id, // Using ID as slug for now
-      }));
+    const normalized = products.map((product) => {
+      const dto = serializeProduct(product);
+      return {
+        id: dto.id,
+        title: dto.title,
+        description: dto.description,
+        price: dto.price ?? 0,
+        image: dto.image ?? '/assets/placeholder-product.jpg',
+        images: dto.images,
+        tags: dto.tags,
+        variants: dto.variants.map((variant) => ({
+          id: variant.id,
+          title: variant.title,
+          price: variant.price ?? 0,
+          priceCents: variant.priceCents ?? null,
+          is_enabled: variant.isEnabled,
+          in_stock: variant.inStock,
+          printifyVariantId: variant.printifyVariantId,
+          optionValues: variant.optionValues,
+          previewImageUrl: variant.previewImageUrl,
+        })),
+        available: dto.available,
+        category: dto.category ?? undefined,
+        slug: dto.slug,
+        integrationRef: dto.integrationRef,
+      };
+    });
 
     return NextResponse.json({
       ok: true,
-      data: { products },
-      source: 'live-api',
+      data: { products: normalized },
+      source: 'catalog',
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Featured products API error:', error);
-
-    // Fallback to empty state
     return NextResponse.json(
       {
         ok: true,
@@ -64,18 +87,4 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   }
-}
-
-// Helper function to strip HTML tags from descriptions
-function stripHtml(html: string): string {
-  if (!html) return '';
-  return html
-    .replace(/<[^>]*>/g, '') // Remove all HTML tags
-    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
-    .replace(/&amp;/g, '&') // Replace &amp; with &
-    .replace(/&lt;/g, '<') // Replace &lt; with <
-    .replace(/&gt;/g, '>') // Replace &gt; with >
-    .replace(/&quot;/g, '"') // Replace &quot; with "
-    .replace(/&#039;/g, "'") // Replace &#039; with '
-    .trim();
 }

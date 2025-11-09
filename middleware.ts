@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { handleCorsPreflight, withCors } from '@/app/lib/http/cors';
 
 // Avoid throwing in middleware for missing env at Edge runtime; Clerk SDK handles configuration
 
@@ -110,15 +111,18 @@ export default clerkMiddleware(async (auth, req) => {
       req.headers.get('x-correlation-id') ||
       `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // API routes: pass through, set headers
+    // API routes: CORS + diagnostics headers
     if (isApi || isIngest) {
+      if (req.method === 'OPTIONS') {
+        return handleCorsPreflight(req);
+      }
+
       const res = NextResponse.next();
       res.headers.set('X-Request-ID', reqId);
-      res.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-      res.headers.set('Access-Control-Allow-Origin', '*');
-      res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Request-ID');
-      return res;
+
+      return withCors(res, req.headers.get('origin'), {
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+      });
     }
 
     // Canonical redirect (avoid redirect loops and subdomains)

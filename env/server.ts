@@ -1,12 +1,6 @@
 import 'server-only';
 import { env as validatedEnv } from '../env.mjs';
-
-const REQUIRED_SERVER_KEYS = [
-  'CLERK_SECRET_KEY',
-  'STRIPE_SECRET_KEY',
-  'PRINTIFY_API_KEY',
-  'PRINTIFY_SHOP_ID',
-] as const;
+import { REQUIRED_SERVER_KEYS } from '@/app/lib/env-schema';
 
 type RequiredServerKey = (typeof REQUIRED_SERVER_KEYS)[number];
 type RawServerEnv = typeof validatedEnv;

@@ -3,6 +3,7 @@
  * Handles category mapping and integration reference generation
  */
 
+import type { PrintifyProduct } from '@/app/lib/printify/service';
 import { isCategory } from '@/lib/categories';
 
 /**
@@ -164,4 +165,46 @@ export function getCategoryMappingStats(
   });
 
   return stats;
+}
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
+    .slice(0, 80);
+}
+
+/**
+ * Generate a stable slug for a product using its title and ID suffix
+ */
+export function createProductSlug(title: string, productId: string): string {
+  const base = slugify(title || 'product') || 'product';
+  const suffix = productId.slice(-6).toLowerCase();
+  return `${base}-${suffix}`;
+}
+
+/**
+ * Map Printify product payload into a normalized catalog DTO
+ */
+export function mapPrintifyProduct(product: PrintifyProduct, shopId: string) {
+  const categorySlug = normalizeCategorySlug(product);
+  const image = product.images?.find((img) => img.is_default)?.src ?? product.images?.[0]?.src ?? null;
+  const prices = (product.variants ?? []).map((variant) => variant.price).filter((price) => typeof price === 'number' && price > 0);
+  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+
+  return {
+    id: String(product.id),
+    slug: createProductSlug(product.title, String(product.id)),
+    title: product.title,
+    description: product.description ?? '',
+    categorySlug,
+    tags: product.tags ?? [],
+    image,
+    priceRange: minPrice !== null ? { min: minPrice, max: maxPrice ?? minPrice } : null,
+    visible: product.visible ?? true,
+    integrationRef: integrationRef(shopId, String(product.id)),
+  };
 }

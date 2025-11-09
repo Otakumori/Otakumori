@@ -107,6 +107,7 @@
     "test:e2e:perf": "playwright test --grep @perf",
     "test:e2e:ui": "playwright test --ui",
     "validate:env": "npx tsx scripts/validate-env.ts",
+    "env:verify": "tsx scripts/verify-env.ts",
     "env:check": "node scripts/env-check.js --env-file .env.test",
     "validate:security": "npm audit --audit-level moderate",
     "validate:full": "npm run validate && npm run test:unit && npm run seo:audit",

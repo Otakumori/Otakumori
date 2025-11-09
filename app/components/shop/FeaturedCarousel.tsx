@@ -4,10 +4,22 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import type { PrintifyProduct } from '@/app/lib/printify/service';
+import { paths } from '@/lib/paths';
+
+type FeaturedProduct = {
+  id: string;
+  title: string;
+  description: string;
+  image: string | null;
+  images: string[];
+  price: number | null;
+  priceCents: number | null;
+  priceRange: { min: number | null; max: number | null };
+  tags: string[];
+};
 
 interface FeaturedCarouselProps {
-  products: PrintifyProduct[];
+  products: FeaturedProduct[];
   autoplay?: boolean;
   interval?: number;
 }
@@ -72,16 +84,18 @@ export function FeaturedCarousel({
   }
 
   const currentProduct = products[currentIndex];
-  const displayImage = currentProduct.images[0];
+  const displayImage = currentProduct.image ?? currentProduct.images[0] ?? null;
 
-  // Calculate price range
-  const prices = currentProduct.variants.map((v) => v.price).filter((p) => p > 0);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  const minPriceCents = currentProduct.priceRange.min ?? currentProduct.priceCents ?? null;
+  const maxPriceCents = currentProduct.priceRange.max ?? currentProduct.priceCents ?? null;
   const priceDisplay =
-    minPrice === maxPrice
-      ? `$${(minPrice / 100).toFixed(2)}`
-      : `From $${(minPrice / 100).toFixed(2)}`;
+    minPriceCents != null && maxPriceCents != null
+      ? minPriceCents === maxPriceCents
+        ? `$${(minPriceCents / 100).toFixed(2)}`
+        : `From $${(minPriceCents / 100).toFixed(2)}`
+      : currentProduct.price != null
+        ? `$${currentProduct.price.toFixed(2)}`
+        : '$0.00';
 
   return (
     <div ref={containerRef} className="relative w-full overflow-hidden rounded-2xl">
@@ -91,7 +105,7 @@ export function FeaturedCarousel({
         <div className="absolute inset-0">
           {displayImage && (
             <Image
-              src={displayImage.src}
+              src={displayImage}
               alt={currentProduct.title}
               fill
               className="object-cover opacity-40"
@@ -110,7 +124,7 @@ export function FeaturedCarousel({
               <span className="bg-pink-500/90 text-white text-xs md:text-sm font-bold px-4 py-1.5 rounded-full">
                 FEATURED
               </span>
-              {currentProduct.is_printify_express_eligible && (
+              {currentProduct.tags && currentProduct.tags.includes('express_shipping') && (
                 <span className="bg-green-500/90 text-white text-xs md:text-sm font-bold px-4 py-1.5 rounded-full">
                   EXPRESS SHIPPING
                 </span>
@@ -131,7 +145,7 @@ export function FeaturedCarousel({
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="text-2xl md:text-4xl font-bold text-pink-400">{priceDisplay}</div>
               <Link
-                href={`/shop/product/${currentProduct.id}`}
+                href={paths.product(currentProduct.id)}
                 className="group bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-pink-500/50 flex items-center gap-2"
               >
                 Shop Now

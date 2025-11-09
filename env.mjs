@@ -21,11 +21,11 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-    DATABASE_URL: z.string().url().optional(),
+    DATABASE_URL: z.string().url(),
     DIRECT_URL: z.string().url().optional(),
     PRISMA_ACCELERATE_API_KEY: z.string().optional(),
     STRIPE_SECRET_KEY: z.string(),
-    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
     CLERK_SECRET_KEY: z.string(),
     CLERK_PROXY_URL: z.string().url().optional(),
     CLERK_WEBHOOK_SECRET: z.string().optional(),
@@ -95,6 +95,8 @@ export const env = createEnv({
     // Next.js phases/runtime
     NEXT_PHASE: z.string().optional(),
     NEXT_RUNTIME: z.string().optional(),
+    // CORS
+    API_CORS_ALLOW_ORIGINS: z.string().optional(),
   },
   client: {
     // Clerk
@@ -231,6 +233,7 @@ export const env = createEnv({
     ADULTS_STORAGE_INDEX_URL: process.env.ADULTS_STORAGE_INDEX_URL,
     NEXT_PHASE: process.env.NEXT_PHASE,
     NEXT_RUNTIME: process.env.NEXT_RUNTIME,
+    API_CORS_ALLOW_ORIGINS: process.env.API_CORS_ALLOW_ORIGINS,
     // Client vars
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_CLERK_PROXY_URL: process.env.NEXT_PUBLIC_CLERK_PROXY_URL,

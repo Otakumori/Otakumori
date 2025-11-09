@@ -1,87 +1,72 @@
 import { safeFetch, isSuccess } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getEnabledGames } from '@/app/lib/games';
 import { paths } from '@/lib/paths';
 
-interface Game {
+type ApiGame = {
   id: string;
+  slug: string;
   title: string;
   description?: string;
   image?: string;
-  slug: string;
   category?: string;
   enabled?: boolean;
-}
+};
 
-interface GamesData {
-  games?: Game[];
-  data?: Game[];
+type GamesData = {
+  games?: ApiGame[];
+  data?: ApiGame[];
+};
+
+function mapGame(game: {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string;
+  image?: string;
+  category?: string;
+}): ApiGame {
+  return {
+    ...game,
+    image: game.image ?? '/assets/placeholder-game.jpg',
+    enabled: true,
+  };
 }
 
 export default async function MiniGamesSection() {
-  let games: Game[] = [];
-  let isBlockedData = true;
+  const registryGames = getEnabledGames().map((game) =>
+    mapGame({
+      id: game.key,
+      slug: game.key,
+      title: game.name,
+      description: game.tagline,
+      image: `/assets/games/${game.thumbKey}.jpg`,
+      category: game.difficulty,
+    }),
+  );
+
+  let games: ApiGame[] = registryGames;
 
   try {
-    // Try games API first, then fallback endpoints
     const gamesResult = await safeFetch<GamesData>('/api/v1/games', { allowLive: true });
 
     if (isSuccess(gamesResult)) {
-      games = gamesResult.data?.games || [];
-      isBlockedData = false;
+      games = (gamesResult.data?.games || []).map(mapGame);
     } else {
-      // Fallback to other endpoints
       const endpoints = ['/api/games', '/api/mini-games', '/api/games/featured'];
-
       for (const endpoint of endpoints) {
         const result = await safeFetch<GamesData>(endpoint, { allowLive: true });
-
-        if (isSuccess(result)) {
-          games = result.data?.games || result.data?.data || [];
-          isBlockedData = false;
+        if (isSuccess(result) && (result.data?.games?.length || result.data?.data?.length)) {
+          games = (result.data?.games || result.data?.data || []).map(mapGame);
           break;
         }
       }
     }
   } catch (error) {
-    // Fallback to empty games if API calls fail during SSR
     console.warn('MiniGamesSection: API calls failed during SSR:', error);
-    games = [];
-    isBlockedData = true;
   }
 
-  // If all endpoints are blocked, show CTA
-  if (isBlockedData) {
-    return (
-      <div className="rounded-2xl p-8">
-        <header className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
-            Mini-Games
-          </h2>
-          <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
-            Play fun anime-inspired games and earn rewards
-          </p>
-        </header>
-
-        <div className="text-center py-12">
-          <div className="p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-primary mb-4">Games Coming Soon</h3>
-            <p className="text-secondary mb-6">
-              We're preparing exciting mini-games for you. Stay tuned!
-            </p>
-            <Link
-              href={paths.games()}
-              className="btn-primary inline-block hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
-            >
-              Explore Games
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Filter enabled games and limit to 6
   const enabledGames = games.filter((game) => game.enabled !== false).slice(0, 6);
 
   return (
@@ -102,7 +87,7 @@ export default async function MiniGamesSection() {
               <div className="overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up hover:shadow-[0_0_30px_rgba(255,160,200,0.18)]">
                 <div className="aspect-video relative overflow-hidden">
                   <Image
-                    src={game.image || '/assets/placeholder-game.jpg'}
+                    src={game.image ?? '/assets/placeholder-game.jpg'}
                     alt={game.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-300"

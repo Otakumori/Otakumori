@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '@/inngest/client';
 import { getPrintifyService } from '@/app/lib/printify/service';
+import { syncPrintifyProducts } from '@/lib/catalog/printifySync';
 
 export const runtime = 'nodejs';
 
@@ -36,12 +37,15 @@ export async function POST(request: NextRequest) {
       case 'products':
         // Sync products immediately
         const products = await getPrintifyService().getAllProducts();
+        const syncResult = await syncPrintifyProducts(products, { hideMissing: true });
         return NextResponse.json({
           ok: true,
           data: {
             type: 'products',
-            productCount: products.length,
-            timestamp: new Date().toISOString(),
+            productCount: syncResult.upserted,
+            hiddenCount: syncResult.hidden,
+            timestamp: syncResult.lastSync,
+            errors: syncResult.errors,
           },
         });
 
