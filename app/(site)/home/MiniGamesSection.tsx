@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getEnabledGames } from '@/app/lib/games';
 import { paths } from '@/lib/paths';
+import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
+import { HeaderButton } from '@/components/ui/header-button';
 
 type ApiGame = {
   id: string;
@@ -81,36 +83,40 @@ export default async function MiniGamesSection() {
       </header>
 
       {enabledGames.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {enabledGames.map((game) => (
-            <Link key={game.id} href={paths.game(game.slug)} className="group block">
-              <div className="overflow-hidden hover:scale-105 transition-transform duration-300 animate-fade-in-up hover:shadow-[0_0_30px_rgba(255,160,200,0.18)]">
-                <div className="aspect-video relative overflow-hidden">
+            <Link
+              key={game.id}
+              href={paths.game(game.slug)}
+              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            >
+              <GlassCard className="flex h-full flex-col">
+                <div className="relative aspect-video overflow-hidden">
                   <Image
                     src={game.image ?? '/assets/placeholder-game.jpg'}
                     alt={game.title}
                     fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="font-semibold text-primary group-hover:text-accent-pink transition-colors">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity duration-300 group-hover:opacity-95" />
+                  <div className="absolute left-4 right-4 bottom-4 flex flex-col gap-2">
+                    <h3 className="font-semibold text-white transition-colors group-hover:text-pink-300">
                       {game.title}
                     </h3>
                     {game.category && (
-                      <span className="text-xs text-accent-pink/70 bg-accent-pink/20 px-2 py-1 rounded-full">
+                      <span className="self-start rounded-full bg-pink-500/20 px-2 py-1 text-xs font-medium text-pink-200 backdrop-blur">
                         {game.category}
                       </span>
                     )}
                   </div>
                 </div>
                 {game.description && (
-                  <div className="p-4">
-                    <p className="text-secondary text-sm line-clamp-2">{game.description}</p>
-                  </div>
+                  <GlassCardContent>
+                    <p className="text-sm text-white/70 line-clamp-2">{game.description}</p>
+                  </GlassCardContent>
                 )}
-              </div>
+              </GlassCard>
             </Link>
           ))}
         </div>
@@ -121,21 +127,14 @@ export default async function MiniGamesSection() {
             <p className="text-secondary mb-6">
               We're working on adding new games. Check back soon!
             </p>
-            <Link
-              href={paths.games()}
-              className="btn-primary inline-block hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
-            >
-              Explore Games
-            </Link>
+            <HeaderButton href={paths.games()}>Explore Games</HeaderButton>
           </div>
         </div>
       )}
 
       {enabledGames.length > 0 && (
         <div className="text-center mt-8">
-          <Link href={paths.games()} className="btn-secondary inline-block">
-            View All Games
-          </Link>
+          <HeaderButton href={paths.games()}>View All Games</HeaderButton>
         </div>
       )}
     </div>

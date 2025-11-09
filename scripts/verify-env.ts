@@ -2,7 +2,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import dotenv from 'dotenv';
-import { envSchema, REQUIRED_SERVER_KEYS } from '../app/lib/env-schema';
+
+process.env.OTM_SKIP_SERVER_ONLY = '1';
+
+const { envSchema, REQUIRED_SERVER_KEYS } = await import('../app/lib/env-schema');
 
 type EnvValues = Record<string, string>;
 
@@ -220,6 +223,21 @@ function reportMismatchedValues(sources: EnvSource[]) {
   }
 }
 
+function reportSanityStatus(sources: EnvSource[]) {
+  const SANITY_KEYS = ['SANITY_PROJECT_ID', 'SANITY_DATASET', 'SANITY_READ_TOKEN'] as const;
+  const missing = SANITY_KEYS.filter(
+    (key) => !sources.some((source) => typeof source.values[key] === 'string'),
+  );
+
+  if (missing.length > 0) {
+    console.warn(
+      `[sanity] Missing keys detected (${missing.join(
+        ', ',
+      )}). Sanity-backed blog/community content will fall back to mock data.`,
+    );
+  }
+}
+
 async function main() {
   const sources = collectSources();
 
@@ -227,6 +245,7 @@ async function main() {
   const schemaValid = reportSchemaViolations(sources);
 
   reportMismatchedValues(sources);
+  reportSanityStatus(sources);
 
   if (!hasAllKeys || !schemaValid) {
     process.exitCode = 1;

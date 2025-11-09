@@ -9,6 +9,7 @@ import { SignInButton, UserButton } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
 import gamesRegistry from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
+import { HeaderButton } from '@/components/ui/header-button';
 
 // Get featured games from registry
 const FEATURED_GAMES = gamesRegistry.games
@@ -42,6 +43,52 @@ const EASTER_EGGS: Record<string, string> = {
   stranger: 'Ah, a fellow RE4 fan! Welcome!',
   gamecube: 'Ready for some nostalgic gaming?',
 };
+
+const SHOP_CATEGORY_LINKS = [
+  {
+    label: 'Pins & Badges',
+    href: '/shop?category=pins',
+    description: 'Limited-run enamel drops and badge sets.',
+  },
+  {
+    label: 'Apparel',
+    href: '/shop?category=apparel',
+    description: 'Tees, hoodies, and jackets with otaku flair.',
+  },
+  {
+    label: 'Accessories',
+    href: '/shop?category=accessories',
+    description: 'Keychains, charms, and everyday carry.',
+  },
+  {
+    label: 'Wall Art',
+    href: '/shop?category=prints',
+    description: 'Poster prints and canvas collabs.',
+  },
+];
+
+const GAME_FACE_LINKS = [
+  {
+    label: 'Action',
+    href: '/mini-games?face=action',
+    description: 'High-energy battles & slashers.',
+  },
+  {
+    label: 'Puzzle',
+    href: '/mini-games?face=puzzle',
+    description: 'Logic trials and rhythm riddles.',
+  },
+  {
+    label: 'Strategy',
+    href: '/mini-games?face=strategy',
+    description: 'Plan, adapt, and outsmart rivals.',
+  },
+  {
+    label: 'All Games',
+    href: paths.games(),
+    description: 'Browse every cube face and challenge.',
+  },
+];
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -248,7 +295,7 @@ export default function Navbar() {
             </button>
 
             {/* Shop Mega Menu */}
-            {activeDropdown === 'shop' && productsLoaded && realProducts.length > 0 && (
+            {activeDropdown === 'shop' && (
               <div
                 className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg p-6 z-50"
                 onMouseLeave={() => setActiveDropdown(null)}
@@ -258,42 +305,66 @@ export default function Navbar() {
                 role="menu"
                 aria-label="Shop menu"
               >
-                <h3 className="text-white font-semibold mb-4">Featured Products</h3>
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  {realProducts.slice(0, 4).map((product) => (
-                    <Link
-                      key={product.id}
-                      href={`/shop/product/${product.id}`}
-                      className="flex items-center space-x-3 p-2 rounded hover:bg-white/10 transition-colors"
-                    >
-                      <div className="w-12 h-12 bg-white/10 rounded flex items-center justify-center overflow-hidden">
-                        {product.image ? (
-                          <Image
-                            src={product.image}
-                            alt={product.title}
-                            width={48}
-                            height={48}
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="text-xs text-white">IMG</span>
-                        )}
+                <div className="space-y-5">
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Featured Products</h3>
+                    {productsLoaded && realProducts.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-3">
+                        {realProducts.slice(0, 4).map((product) => (
+                          <Link
+                            key={product.id}
+                            href={`/shop/product/${product.id}`}
+                            className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-white/10"
+                          >
+                            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-white/15 bg-white/5">
+                              {product.image ? (
+                                <Image
+                                  src={product.image}
+                                  alt={product.title}
+                                  width={48}
+                                  height={48}
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <span className="text-xs text-white/70">IMG</span>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-medium text-white">{product.title}</p>
+                              <p className="text-xs text-pink-300">${product.price.toFixed(2)}</p>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
-                      <div>
-                        <p className="text-white text-sm font-medium line-clamp-2">
-                          {product.title}
-                        </p>
-                        <p className="text-pink-400 text-sm">${product.price.toFixed(2)}</p>
-                      </div>
-                    </Link>
-                  ))}
+                    ) : (
+                      <p className="text-sm text-white/60">
+                        Live products are syncing. Browse categories to start exploring merch.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="border-t border-white/10 pt-4">
+                    <h4 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+                      Shop by Category
+                    </h4>
+                    <div className="mt-3 grid gap-2">
+                      {SHOP_CATEGORY_LINKS.map((category) => (
+                        <Link
+                          key={category.href}
+                          href={category.href}
+                          className="rounded-lg p-3 transition-colors hover:bg-white/10"
+                        >
+                          <span className="block text-sm font-medium text-white">{category.label}</span>
+                          <span className="mt-1 block text-xs text-white/60">{category.description}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <HeaderButton href={paths.shop()} className="w-full justify-center">
+                    View All Products
+                  </HeaderButton>
                 </div>
-                <Link
-                  href={paths.shop()}
-                  className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
-                >
-                  View All Products →
-                </Link>
               </div>
             )}
           </div>
@@ -329,39 +400,56 @@ export default function Navbar() {
                 role="menu"
                 aria-label="Mini-games menu"
               >
-                <h3 className="text-white font-semibold mb-4">Featured Games</h3>
-                <div className="space-y-3 mb-4">
-                  {FEATURED_GAMES.slice(0, 4).map((game) => (
-                    <Link
-                      key={game.id}
-                      href={`/mini-games/${game.id}`}
-                      className="flex items-center space-x-3 p-2 rounded hover:bg-white/10 transition-colors"
-                    >
-                      <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded flex items-center justify-center">
-                        <span
-                          className="text-white text-lg"
-                          role="img"
-                          aria-label="Game controller"
-                        ></span>
+                <div className="space-y-5">
+                  <div>
+                    <h3 className="text-white font-semibold mb-3">Featured Games</h3>
+                    {FEATURED_GAMES.length > 0 ? (
+                      <div className="space-y-3">
+                        {FEATURED_GAMES.slice(0, 4).map((game) => (
+                          <Link
+                            key={game.id}
+                            href={`/mini-games/${game.id}`}
+                            className="flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-white/10"
+                          >
+                            <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-pink-500 to-purple-600 text-white">
+                              <span className="text-xs uppercase tracking-wide">{game.status}</span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-white">{game.title}</p>
+                              <p className="text-xs text-white/60 line-clamp-2">{game.summary}</p>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
-                      <div>
-                        <p className="text-white text-sm font-medium">{game.title}</p>
-                        <p className="text-gray-400 text-xs italic">{game.summary}</p>
-                        {game.status === 'beta' && (
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-yellow-500/20 text-yellow-300 text-xs rounded">
-                            BETA
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  ))}
+                    ) : (
+                      <p className="text-sm text-white/60">
+                        The GameCube hub is loading quests. Choose a face to jump right in.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="border-t border-white/10 pt-4">
+                    <h4 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+                      Navigate Faces
+                    </h4>
+                    <div className="mt-3 grid gap-2">
+                      {GAME_FACE_LINKS.map((face) => (
+                        <Link
+                          key={face.href}
+                          href={face.href}
+                          className="rounded-lg p-3 transition-colors hover:bg-white/10"
+                        >
+                          <span className="block text-sm font-medium text-white">{face.label}</span>
+                          <span className="mt-1 block text-xs text-white/60">{face.description}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  <HeaderButton href={paths.games()} className="w-full justify-center">
+                    Enter GameCube Hub
+                  </HeaderButton>
                 </div>
-                <Link
-                  href="/mini-games"
-                  className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
-                >
-                  Enter GameCube Hub →
-                </Link>
               </div>
             )}
           </div>

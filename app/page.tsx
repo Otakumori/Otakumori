@@ -3,7 +3,6 @@ import { Suspense } from 'react';
 import { env } from '@/env.mjs';
 
 // Legacy components for fallback sections
-import ShopTeaser from './components/ShopTeaser';
 import BlogTeaser from './components/BlogTeaser';
 import MiniGameTeaser from './components/MiniGameTeaser';
 import SoapstoneHomeDrift from './components/soapstone/SoapstoneHomeDrift';
@@ -40,6 +39,15 @@ export default async function HomePage() {
       <PetalSystem />
 
       <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
+        {/* SHOP */}
+        {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+            <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
+              <ShopSection />
+            </Suspense>
+          </section>
+        )}
+
         {/* HERO */}
         {NEXT_PUBLIC_FEATURE_HERO === '1' && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
@@ -58,15 +66,6 @@ export default async function HomePage() {
                 </div>
               )}
             </div>
-          </section>
-        )}
-
-        {/* SHOP */}
-        {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
-          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
-              <ShopSection />
-            </Suspense>
           </section>
         )}
 
@@ -89,14 +88,6 @@ export default async function HomePage() {
         )}
 
         {/* Fallback sections when feature flags are off */}
-        {NEXT_PUBLIC_FEATURE_SHOP !== 'on' && (
-          <section className="bg-gradient-to-b from-transparent via-black/10 to-black/30 py-24">
-            <div className="mx-auto w-full max-w-7xl px-4">
-              <ShopTeaser />
-            </div>
-          </section>
-        )}
-
         {NEXT_PUBLIC_FEATURE_BLOG !== 'on' && (
           <section className="bg-gradient-to-b from-black/30 via-black/20 to-transparent py-24">
             <div className="mx-auto w-full max-w-7xl px-4">

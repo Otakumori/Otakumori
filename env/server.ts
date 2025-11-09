@@ -1,6 +1,10 @@
-import 'server-only';
+const shouldSkipServerOnly = process.env.OTM_SKIP_SERVER_ONLY === '1';
+
+if (!shouldSkipServerOnly) {
+  void import('server-only');
+}
 import { env as validatedEnv } from '../env.mjs';
-import { REQUIRED_SERVER_KEYS } from '@/app/lib/env-schema';
+import { REQUIRED_SERVER_KEYS } from '@/app/lib/env-keys';
 
 type RequiredServerKey = (typeof REQUIRED_SERVER_KEYS)[number];
 type RawServerEnv = typeof validatedEnv;

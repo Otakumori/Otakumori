@@ -2,7 +2,8 @@ import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
 import { paths } from '@/lib/paths';
-import GlassButton from '@/app/components/ui/GlassButton';
+import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
+import { HeaderButton } from '@/components/ui/header-button';
 
 interface Product {
   id: string;
@@ -66,52 +67,57 @@ export default async function ShopSection() {
             <p className="text-gray-300 mb-6">
               We're preparing something special for you. Check back soon!
             </p>
-            <GlassButton href={paths.shop()} size="lg" variant="primary">
-              Explore Shop
-            </GlassButton>
+            <HeaderButton href={paths.shop()}>Explore Shop</HeaderButton>
           </div>
         </div>
       ) : products.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.slice(0, 6).map((product) => (
             <Link
               key={product.id}
               href={paths.product(product.slug ?? product.id)}
-              className="group block"
+              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 hover:shadow-[0_0_30px_rgba(255,160,200,0.18)]">
-                <div className="aspect-square relative overflow-hidden">
+              <GlassCard className="flex h-full flex-col">
+                <div className="relative aspect-square overflow-hidden">
                   <Image
                     src={product.image || '/assets/placeholder-product.jpg'}
                     alt={product.title}
                     fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
+                  <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-200 backdrop-blur">
+                    {product.available ? 'Featured' : 'Coming Soon'}
+                  </span>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-white group-hover:text-pink-400 transition-colors line-clamp-2">
+                <GlassCardContent className="flex flex-1 flex-col justify-between">
+                  <div>
+                    <h3 className="font-semibold text-white transition-colors group-hover:text-pink-400">
                     {product.title}
                   </h3>
                   {product.description && (
-                    <p className="text-gray-300 text-sm mt-1 line-clamp-2">{product.description}</p>
+                      <p className="mt-2 line-clamp-2 text-sm text-white/70">{product.description}</p>
                   )}
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-lg font-bold text-pink-400">
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-lg font-bold text-pink-300">
                       ${product.price.toFixed(2)}
                     </span>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
+                      className={`rounded-full px-2 py-1 text-xs ${
                         product.available
-                          ? 'bg-green-500/20 text-green-300'
-                          : 'bg-red-500/20 text-red-300'
+                          ? 'bg-emerald-500/15 text-emerald-200'
+                          : 'bg-amber-500/15 text-amber-200'
                       }`}
                     >
-                      {product.available ? 'In Stock' : 'Out of Stock'}
+                      {product.available ? 'In Stock' : 'Notify Me'}
                     </span>
                   </div>
-                </div>
-              </div>
+                </GlassCardContent>
+              </GlassCard>
             </Link>
           ))}
         </div>
@@ -122,18 +128,14 @@ export default async function ShopSection() {
             <p className="text-gray-300 mb-6">
               We're working on adding new products. Check back soon!
             </p>
-            <GlassButton href={paths.shop()} size="lg" variant="primary">
-              Explore Shop
-            </GlassButton>
+            <HeaderButton href={paths.shop()}>Explore Shop</HeaderButton>
           </div>
         </div>
       )}
 
       {products.length > 0 && (
         <div className="text-center mt-8">
-          <GlassButton href={paths.shop()} size="md" variant="secondary">
-            View All Products
-          </GlassButton>
+          <HeaderButton href={paths.shop()}>View All Products</HeaderButton>
         </div>
       )}
     </div>

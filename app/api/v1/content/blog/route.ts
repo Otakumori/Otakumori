@@ -1,5 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSanityClient, isSanityConfigured } from '@/lib/sanity/client';
+import {
+  latestStoriesQuery,
+  latestStoriesCountQuery,
+  mapSanityStory,
+  type SanityStory,
+  type RawSanityStory,
+} from '@/lib/sanity/queries';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,6 +27,7 @@ const QuerySchema = z.object({
 const mockBlogPosts = [
   {
     id: '1',
+    type: 'blogPost' as const,
     title: 'Welcome Home, Traveler — The Otaku-mori Journey',
     slug: 'welcome-home-traveler',
     excerpt:
@@ -35,6 +44,7 @@ const mockBlogPosts = [
   },
   {
     id: '2',
+    type: 'blogPost' as const,
     title: 'Petals, Runes, and the Currency of Memory',
     slug: 'petals-runes-currency',
     excerpt:
@@ -51,6 +61,7 @@ const mockBlogPosts = [
   },
   {
     id: '3',
+    type: 'blogPost' as const,
     title: 'Dark Souls Meets Cherry Blossoms: Our Design Philosophy',
     slug: 'design-philosophy',
     excerpt:
@@ -67,15 +78,67 @@ const mockBlogPosts = [
   },
 ];
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const query = QuerySchema.parse(Object.fromEntries(searchParams));
+function mapStoryToApi(story: SanityStory) {
+  return {
+    id: story.id,
+    type: story.type,
+    title: story.title,
+    slug: story.slug,
+    excerpt: story.excerpt,
+    image: story.coverImageUrl,
+    imageAlt: story.coverImageAlt,
+    publishedAt: story.publishedAt,
+    url: story.type === 'communityPost' ? `/community/${story.slug}` : `/blog/${story.slug}`,
+  };
+}
 
-    // Calculate pagination
-    const startIndex = (query.page - 1) * query.limit;
-    const endIndex = startIndex + query.limit;
-    const paginatedPosts = mockBlogPosts.slice(startIndex, endIndex);
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const query = QuerySchema.parse(Object.fromEntries(searchParams));
+
+  const startIndex = (query.page - 1) * query.limit;
+  const rangeEnd = Math.max(startIndex + query.limit - 1, startIndex);
+
+  if (isSanityConfigured()) {
+    try {
+      const client = getSanityClient();
+
+      if (client) {
+        const [stories, total] = await Promise.all([
+          client.fetch<RawSanityStory[]>(latestStoriesQuery, {
+            offset: startIndex,
+            rangeEnd,
+          }),
+          client.fetch<number>(latestStoriesCountQuery),
+        ]);
+
+        const mappedStories = stories
+          .map(mapSanityStory)
+          .filter((story): story is SanityStory => Boolean(story))
+          .map((story) => mapStoryToApi(story));
+
+        return NextResponse.json({
+          ok: true,
+          data: {
+            posts: mappedStories,
+            pagination: {
+              currentPage: query.page,
+              totalPages: total ? Math.max(Math.ceil(total / query.limit), 1) : 1,
+              total: total ?? mappedStories.length,
+              limit: query.limit,
+            },
+          },
+          source: 'sanity',
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error('Sanity blog content fetch failed:', error);
+    }
+  }
+
+  try {
+    const paginatedPosts = mockBlogPosts.slice(startIndex, startIndex + query.limit);
 
     return NextResponse.json({
       ok: true,
@@ -92,7 +155,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Blog content API error:', error);
+    console.error('Blog content API fallback error:', error);
 
     return NextResponse.json(
       {
@@ -101,10 +164,10 @@ export async function GET(request: NextRequest) {
         data: {
           posts: [],
           pagination: {
-            currentPage: 1,
+            currentPage: query.page,
             totalPages: 0,
             total: 0,
-            limit: 10,
+            limit: query.limit,
           },
         },
       },

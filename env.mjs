@@ -74,6 +74,10 @@ export const env = createEnv({
     ALGOLIA_INDEX_PAGES: z.string().optional(),
     // Sanity
     SANITY_WEBHOOK_SECRET: z.string().optional(),
+    SANITY_PROJECT_ID: z.string().optional(),
+    SANITY_DATASET: z.string().optional(),
+    SANITY_READ_TOKEN: z.string().optional(),
+    SANITY_API_VERSION: z.string().optional(),
     // Supabase (legacy)
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     // Sentry
@@ -218,6 +222,10 @@ export const env = createEnv({
     ALGOLIA_INDEX_GAMES: process.env.ALGOLIA_INDEX_GAMES,
     ALGOLIA_INDEX_PAGES: process.env.ALGOLIA_INDEX_PAGES,
     SANITY_WEBHOOK_SECRET: process.env.SANITY_WEBHOOK_SECRET,
+    SANITY_PROJECT_ID: process.env.SANITY_PROJECT_ID,
+    SANITY_DATASET: process.env.SANITY_DATASET,
+    SANITY_READ_TOKEN: process.env.SANITY_READ_TOKEN,
+    SANITY_API_VERSION: process.env.SANITY_API_VERSION,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     SENTRY_DSN: process.env.SENTRY_DSN,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,

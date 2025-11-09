@@ -1,17 +1,8 @@
 import { z } from 'zod';
+import { REQUIRED_SERVER_KEYS } from './env-keys';
 import { getServerEnv } from '@/env/server';
 
-export const REQUIRED_SERVER_KEYS = [
-  'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
-  'CLERK_SECRET_KEY',
-  'DATABASE_URL',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
-  'PRINTIFY_API_KEY',
-  'PRINTIFY_SHOP_ID',
-  'UPSTASH_REDIS_REST_URL',
-  'UPSTASH_REDIS_REST_TOKEN',
-] as const;
+export { REQUIRED_SERVER_KEYS };
 
 const optionalString = z
   .string()
@@ -55,6 +46,11 @@ export const envSchema = z.object({
   // Feature flags / misc
   COUPON_SIGNING_SECRET: optionalString,
   FEATURE_COUPONS: optionalString,
+  // Sanity CMS
+  SANITY_PROJECT_ID: optionalString,
+  SANITY_DATASET: optionalString,
+  SANITY_READ_TOKEN: optionalString,
+  SANITY_API_VERSION: optionalString,
 });
 
 export type EnvSchema = z.infer<typeof envSchema>;
@@ -106,6 +102,10 @@ export function getEnvHealth() {
       printify: !!runtimeEnv.PRINTIFY_API_KEY && !!runtimeEnv.PRINTIFY_SHOP_ID,
       stripe: !!runtimeEnv.STRIPE_SECRET_KEY,
       upstash: !!runtimeEnv.UPSTASH_REDIS_REST_URL && !!runtimeEnv.UPSTASH_REDIS_REST_TOKEN,
+      sanity:
+        !!runtimeEnv.SANITY_PROJECT_ID &&
+        !!runtimeEnv.SANITY_DATASET &&
+        !!runtimeEnv.SANITY_READ_TOKEN,
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
