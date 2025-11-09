@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { buildPrintifyCheckoutLink } from '@/lib/printify/buildCheckoutLink';
+import { buildPrintifyCheckoutLink } from '@/app/lib/printify/buildCheckoutLink';
 import { clientEnv } from '@/env/client';
 
 interface Props {

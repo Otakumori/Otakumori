@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { env } from '@/env';
-import { createPrintifyOrder } from '@/lib/printify/printifyClient';
-import type { PrintifyOrderPayload } from '@/lib/printify/types';
+import { createPrintifyOrder } from '@/app/lib/printify/printifyClient';
+import type { PrintifyOrderPayload } from '@/app/lib/printify/types';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';

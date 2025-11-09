@@ -10,10 +10,6 @@
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
 const prisma = new PrismaClient();
 
 async function main() {

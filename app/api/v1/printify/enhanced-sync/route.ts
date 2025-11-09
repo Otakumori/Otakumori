@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server';
-import { enhancedPrintifyService } from '@/lib/printify/enhanced-service';
+import { enhancedPrintifyService } from '@/app/lib/printify/enhanced-service';
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 
 export const runtime = 'nodejs';
