@@ -1,3 +1,4 @@
+
 import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -29,42 +30,23 @@ export default async function ShopSection() {
   let isBlockedData = false;
 
   try {
-    // Try featured products API first, then fallback
-    const featuredResult = await safeFetch<ShopData>('/api/v1/products/featured', {
+    const featuredResult = await safeFetch<ShopData>('/api/v1/products/featured?force_printify=true', {
       allowLive: true,
     });
 
     const data = isSuccess(featuredResult) ? featuredResult.data : null;
 
-    products = data?.products?.map((product) => ({
-      ...product,
-      image: product.image || '/assets/placeholder-product.jpg',
-      slug: product.slug,
-    })) || [];
+    products =
+      data?.products?.map((product) => ({
+        ...product,
+        image: product.image || '/assets/placeholder-product.jpg',
+        slug: product.slug,
+      })) || [];
     isBlockedData = isBlocked(featuredResult);
   } catch (error) {
-    console.warn('ShopSection: primary fetch failed during SSR, attempting Printify direct fetch', error);
-    // Attempt a secondary fetch hitting Printify-backed endpoint directly
-    try {
-      const directResult = await safeFetch<ShopData>('/api/v1/printify/products?per_page=6', {
-        allowLive: true,
-      });
-      if (isSuccess(directResult) && Array.isArray(directResult.data?.products)) {
-        products =
-          directResult.data.products.map((product) => ({
-            ...product,
-            image: product.image || '/assets/placeholder-product.jpg',
-          })) || [];
-        isBlockedData = isBlocked(directResult);
-      } else {
-        products = [];
-        isBlockedData = true;
-      }
-    } catch (secondaryError) {
-      console.warn('ShopSection: secondary Printify fetch failed during SSR:', secondaryError);
-      products = [];
-      isBlockedData = true;
-    }
+    console.warn('ShopSection: featured API failed during SSR:', error);
+    products = [];
+    isBlockedData = true;
   }
 
   const hasProducts = !isBlockedData && products.length > 0;
