@@ -238,7 +238,7 @@ export class PrintifyService {
         prev_page_url?: string;
         next_page_url?: string;
         last_page_url?: string;
-      }>(`/shops/${this.shopId}/products.json?page=${page}&per_page=${limit}`);
+      }>(`/shops/${this.shopId}/products.json?page=${page}&limit=${limit}`);
 
       return {
         data: result.data || [],

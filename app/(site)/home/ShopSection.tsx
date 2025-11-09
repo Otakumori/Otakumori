@@ -43,11 +43,31 @@ export default async function ShopSection() {
     })) || [];
     isBlockedData = isBlocked(featuredResult);
   } catch (error) {
-    // Fallback to empty products if API calls fail during SSR
-    console.warn('ShopSection: API calls failed during SSR:', error);
-    products = [];
-    isBlockedData = true;
+    console.warn('ShopSection: primary fetch failed during SSR, attempting Printify direct fetch', error);
+    // Attempt a secondary fetch hitting Printify-backed endpoint directly
+    try {
+      const directResult = await safeFetch<ShopData>('/api/v1/printify/products?per_page=6', {
+        allowLive: true,
+      });
+      if (isSuccess(directResult) && Array.isArray(directResult.data?.products)) {
+        products =
+          directResult.data.products.map((product) => ({
+            ...product,
+            image: product.image || '/assets/placeholder-product.jpg',
+          })) || [];
+        isBlockedData = isBlocked(directResult);
+      } else {
+        products = [];
+        isBlockedData = true;
+      }
+    } catch (secondaryError) {
+      console.warn('ShopSection: secondary Printify fetch failed during SSR:', secondaryError);
+      products = [];
+      isBlockedData = true;
+    }
   }
+
+  const hasProducts = !isBlockedData && products.length > 0;
 
   return (
     <div className="rounded-2xl p-8">
@@ -70,12 +90,12 @@ export default async function ShopSection() {
             <HeaderButton href={paths.shop()}>Explore Shop</HeaderButton>
           </div>
         </div>
-      ) : products.length > 0 ? (
+      ) : hasProducts ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.slice(0, 6).map((product) => (
             <Link
               key={product.id}
-              href={paths.product(product.slug ?? product.id)}
+              href={product.slug ? paths.product(product.slug) : paths.shop()}
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               <GlassCard className="flex h-full flex-col">
@@ -133,7 +153,7 @@ export default async function ShopSection() {
         </div>
       )}
 
-      {products.length > 0 && (
+      {hasProducts && (
         <div className="text-center mt-8">
           <HeaderButton href={paths.shop()}>View All Products</HeaderButton>
         </div>
