@@ -1,4 +1,4 @@
-import { type Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import type { PrintifyProduct } from '@/app/lib/printify/service';
 import { type PrintifySyncResult } from '@/app/lib/printify/service';
@@ -57,8 +57,10 @@ function resolveVariantPreviewImage(product: PrintifyProduct, variantId: number)
   return product.images?.[0]?.src ?? null;
 }
 
+type PrismaClientOrTransaction = Prisma.TransactionClient | typeof db;
+
 async function syncProductRecord(
-  tx: Prisma.TransactionClient,
+  tx: PrismaClientOrTransaction,
   product: PrintifyProduct,
 ): Promise<string> {
   const categorySlug = normalizeCategorySlug(product);
@@ -109,37 +111,36 @@ async function syncProductRecord(
   });
 
   const incomingImages = new Set<string>();
-
-  product.images?.forEach((image) => {
-    if (!image?.src) return;
-    incomingImages.add(image.src);
-  });
-
   const images = product.images ?? [];
-  for (let index = 0; index < images.length; index += 1) {
-    const image = images[index];
-    if (!image?.src) continue;
-
-    await tx.productImage.upsert({
-      where: {
-        productId_url: {
+  const imageOperations = images
+    .map((image, index) => {
+      if (!image?.src) return null;
+      incomingImages.add(image.src);
+      return tx.productImage.upsert({
+        where: {
+          productId_url: {
+            productId: upserted.id,
+            url: image.src,
+          },
+        },
+        update: {
+          position: index,
+          variantIds: image.variant_ids ?? [],
+          isDefault: image.is_default ?? false,
+        },
+        create: {
           productId: upserted.id,
           url: image.src,
+          position: index,
+          variantIds: image.variant_ids ?? [],
+          isDefault: image.is_default ?? false,
         },
-      },
-      update: {
-        position: index,
-        variantIds: image.variant_ids ?? [],
-        isDefault: image.is_default ?? false,
-      },
-      create: {
-        productId: upserted.id,
-        url: image.src,
-        position: index,
-        variantIds: image.variant_ids ?? [],
-        isDefault: image.is_default ?? false,
-      },
-    });
+      });
+    })
+    .filter((operation): operation is ReturnType<typeof tx.productImage.upsert> => Boolean(operation));
+
+  if (imageOperations.length > 0) {
+    await Promise.all(imageOperations);
   }
 
   if (incomingImages.size > 0) {
@@ -151,55 +152,73 @@ async function syncProductRecord(
     });
   }
 
-  const incomingVariantIds = new Set<number>();
+  const variants = product.variants ?? [];
+  const incomingVariantIds = new Set<number>(variants.map((variant) => variant.id));
 
-  for (const variant of product.variants ?? []) {
-    incomingVariantIds.add(variant.id);
-    const optionValues = resolveVariantOptionValues(product, variant.options);
+  if (variants.length > 0) {
+    await Promise.all(
+      variants.map(async (variant) => {
+        const optionValues = resolveVariantOptionValues(product, variant.options);
+        const variantCostValue = (variant as { cost?: number }).cost;
+        const variantCost = typeof variantCostValue === 'number' ? variantCostValue : null;
+        const previewImageUrl = resolveVariantPreviewImage(product, variant.id);
+        const printProviderName = upserted.printProviderId ? String(upserted.printProviderId) : null;
+        const updateData = {
+          previewImageUrl,
+          printProviderName,
+          title: variant.title ?? null,
+          sku: variant.sku ?? null,
+          grams: variant.grams ?? null,
+          priceCents: variant.price ?? null,
+          isEnabled: variant.is_enabled ?? true,
+          inStock: variant.is_available ?? true,
+          currency: 'USD',
+          isDefaultVariant: variant.is_default ?? false,
+          optionValues,
+          costCents: variantCost,
+          lastSyncedAt: new Date(),
+        };
 
-    const variantCostValue = (variant as { cost?: number }).cost;
-    const variantCost = typeof variantCostValue === 'number' ? variantCostValue : null;
-
-    await tx.productVariant.upsert({
-      where: {
-        productId_printifyVariantId: {
-          productId: upserted.id,
-          printifyVariantId: variant.id,
-        },
-      },
-      update: {
-        previewImageUrl: resolveVariantPreviewImage(product, variant.id),
-        printProviderName: upserted.printProviderId ? String(upserted.printProviderId) : null,
-        title: variant.title ?? null,
-        sku: variant.sku ?? null,
-        grams: variant.grams ?? null,
-        priceCents: variant.price ?? null,
-        isEnabled: variant.is_enabled ?? true,
-        inStock: variant.is_available ?? true,
-        currency: 'USD',
-        isDefaultVariant: variant.is_default ?? false,
-        optionValues,
-        costCents: variantCost,
-        lastSyncedAt: new Date(),
-      },
-      create: {
-        productId: upserted.id,
-        previewImageUrl: resolveVariantPreviewImage(product, variant.id),
-        printifyVariantId: variant.id,
-        printProviderName: upserted.printProviderId ? String(upserted.printProviderId) : null,
-        title: variant.title ?? null,
-        sku: variant.sku ?? null,
-        grams: variant.grams ?? null,
-        isEnabled: variant.is_enabled ?? true,
-        inStock: variant.is_available ?? true,
-        priceCents: variant.price ?? null,
-        currency: 'USD',
-        isDefaultVariant: variant.is_default ?? false,
-        optionValues,
-        costCents: variantCost,
-        lastSyncedAt: new Date(),
-      },
-    });
+        try {
+          await tx.productVariant.update({
+            where: {
+              productId_printifyVariantId: {
+                productId: upserted.id,
+                printifyVariantId: variant.id,
+              },
+            },
+            data: updateData,
+          });
+        } catch (variantError) {
+          if (
+            variantError instanceof Prisma.PrismaClientKnownRequestError &&
+            variantError.code === 'P2025'
+          ) {
+            await tx.productVariant.create({
+              data: {
+                productId: upserted.id,
+                previewImageUrl,
+                printifyVariantId: variant.id,
+                printProviderName,
+                title: variant.title ?? null,
+                sku: variant.sku ?? null,
+                grams: variant.grams ?? null,
+                isEnabled: variant.is_enabled ?? true,
+                inStock: variant.is_available ?? true,
+                priceCents: variant.price ?? null,
+                currency: 'USD',
+                isDefaultVariant: variant.is_default ?? false,
+                optionValues,
+                costCents: variantCost,
+                lastSyncedAt: new Date(),
+              },
+            });
+          } else {
+            throw variantError;
+          }
+        }
+      }),
+    );
   }
 
   if (incomingVariantIds.size > 0) {
@@ -234,21 +253,19 @@ export async function syncPrintifyProducts(
 
   for (const product of products) {
     try {
-      await db.$transaction(async (tx) => {
-        const internalId = await syncProductRecord(tx, product);
-        incomingIds.add(String(product.id));
+      const internalId = await syncProductRecord(db, product);
+      incomingIds.add(String(product.id));
 
-        // Keep primary image fresh
-        if (product.images && product.images.length > 0) {
-          const defaultImage = product.images.find((img) => img.is_default) ?? product.images[0];
-          if (defaultImage?.src) {
-            await tx.product.update({
-              where: { id: internalId },
-              data: { primaryImageUrl: defaultImage.src },
-            });
-          }
+      // Keep primary image fresh
+      if (product.images && product.images.length > 0) {
+        const defaultImage = product.images.find((img) => img.is_default) ?? product.images[0];
+        if (defaultImage?.src) {
+          await db.product.update({
+            where: { id: internalId },
+            data: { primaryImageUrl: defaultImage.src },
+          });
         }
-      });
+      }
       stats.upserted += 1;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -287,6 +304,6 @@ export async function syncPrintifyProducts(
 }
 
 export async function syncSinglePrintifyProduct(product: PrintifyProduct) {
-  await db.$transaction((tx) => syncProductRecord(tx, product));
+  await syncProductRecord(db, product);
 }
 
