@@ -38,7 +38,28 @@ export default function ProductClient({ productId }: { productId: string }) {
           setError('Product not found');
           return;
         }
-        setProduct(catalogProduct);
+
+        const normalizeImageValue = (value: unknown): string | null => {
+          if (!value) return null;
+          if (typeof value === 'string') return value;
+          if (typeof value === 'object' && value !== null && 'src' in (value as Record<string, unknown>)) {
+            const src = (value as Record<string, unknown>).src;
+            return typeof src === 'string' ? src : null;
+          }
+          return null;
+        };
+
+        const normalizedImages = (catalogProduct.images ?? [])
+          .map((entry) => normalizeImageValue(entry))
+          .filter((entry): entry is string => typeof entry === 'string' && entry.length > 0);
+
+        const normalizedProduct: CatalogProduct = {
+          ...catalogProduct,
+          image: normalizeImageValue(catalogProduct.image) ?? normalizedImages[0] ?? null,
+          images: normalizedImages,
+        };
+
+        setProduct(normalizedProduct);
 
         const defaultVariant = catalogProduct.variants.find((variant) => variant.isEnabled && variant.inStock);
         setSelectedVariant(defaultVariant ?? catalogProduct.variants[0] ?? null);
@@ -52,7 +73,7 @@ export default function ProductClient({ productId }: { productId: string }) {
         addProduct({
           id: catalogProduct.id,
           title: catalogProduct.title,
-          image: catalogProduct.image ?? catalogProduct.images[0] ?? '/assets/placeholder-product.jpg',
+          image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/placeholder-product.jpg',
           price: displayPrice,
         });
       } catch (err) {
@@ -69,7 +90,7 @@ export default function ProductClient({ productId }: { productId: string }) {
     if (productId) {
       void fetchProduct();
     }
-  }, [productId, addProduct]);
+  }, [productId, addProduct, showError]);
 
   const handleAddToCart = () => {
     // TODO: Implement cart functionality
