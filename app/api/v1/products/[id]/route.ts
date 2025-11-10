@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import { getPrintifyService, type PrintifyProduct } from '@/app/lib/printify/service';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
@@ -122,20 +123,36 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
   const { id } = params;
 
   try {
-    const product = await db.product.findFirst({
-      where: {
-        OR: [
-          { id },
-          { printifyProductId: id },
-          { integrationRef: id },
-        ],
-        active: true,
-      },
-      include: {
-        ProductVariant: true,
-        ProductImage: true,
-      },
-    });
+    let product = null;
+
+    try {
+      product = await db.product.findFirst({
+        where: {
+          OR: [
+            { id },
+            { printifyProductId: id },
+            { integrationRef: id },
+          ],
+          active: true,
+        },
+        include: {
+          ProductVariant: true,
+          ProductImage: true,
+        },
+      });
+    } catch (prismaError) {
+      if (
+        prismaError instanceof Prisma.PrismaClientKnownRequestError &&
+        prismaError.code === 'P2022'
+      ) {
+        console.warn(
+          '[products/:id] Prisma schema mismatch detected, falling back to Printify',
+          prismaError.message,
+        );
+      } else {
+        throw prismaError;
+      }
+    }
 
     if (!product) {
       try {
