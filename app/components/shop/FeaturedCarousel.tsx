@@ -14,7 +14,7 @@ type FeaturedProduct = {
   images: string[];
   price: number | null;
   priceCents: number | null;
-  priceRange: { min: number | null; max: number | null };
+  priceRange?: { min: number | null; max: number | null };
   tags: string[];
 };
 
@@ -83,11 +83,17 @@ export function FeaturedCarousel({
     return null;
   }
 
-  const currentProduct = products[currentIndex];
-  const displayImage = currentProduct.image ?? currentProduct.images[0] ?? null;
+  const currentProduct = products[currentIndex] ?? null;
+  if (!currentProduct) {
+    return null;
+  }
 
-  const minPriceCents = currentProduct.priceRange.min ?? currentProduct.priceCents ?? null;
-  const maxPriceCents = currentProduct.priceRange.max ?? currentProduct.priceCents ?? null;
+  const productImages = currentProduct.images ?? [];
+  const displayImage = currentProduct.image ?? productImages[0] ?? null;
+
+  const priceRange = currentProduct.priceRange ?? { min: null, max: null };
+  const minPriceCents = priceRange.min ?? currentProduct.priceCents ?? null;
+  const maxPriceCents = priceRange.max ?? currentProduct.priceCents ?? null;
   const priceDisplay =
     minPriceCents != null && maxPriceCents != null
       ? minPriceCents === maxPriceCents
