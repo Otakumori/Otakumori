@@ -212,6 +212,12 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
     });
   } catch (error) {
     console.error('Error fetching product:', error);
-    return NextResponse.json({ ok: false, error: 'Failed to fetch product' }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch product',
+      },
+      { status: 500 },
+    );
   }
 }
