@@ -8,10 +8,16 @@ import { FeaturedCarousel } from './FeaturedCarousel';
 import { RecentlyViewed } from './RecentlyViewed';
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
+import { removeHtmlTables, stripHtml } from '@/lib/html';
 
 // Catalog Product Card
 function CatalogProductCard({ product }: { product: CatalogProduct }) {
   const displayImage = product.image ?? product.images[0] ?? '/assets/placeholder-product.jpg';
+
+  const summary = useMemo(() => {
+    const cleaned = removeHtmlTables(product.description || '');
+    return stripHtml(cleaned);
+  }, [product.description]);
 
   const minPriceCents = product.priceRange.min ?? product.priceCents ?? null;
   const maxPriceCents = product.priceRange.max ?? product.priceCents ?? null;
@@ -71,7 +77,7 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
         </div>
 
         <p className="text-zinc-300 text-sm line-clamp-2 leading-relaxed">
-          {product.description || 'High-quality print-on-demand product'}
+          {summary || 'High-quality print-on-demand product'}
         </p>
 
         {colorOptions.length > 1 && (

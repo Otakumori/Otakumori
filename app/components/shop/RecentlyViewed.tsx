@@ -30,7 +30,9 @@ export function RecentlyViewed() {
             </div>
             <div className="p-3">
               <h3 className="text-sm text-white font-medium line-clamp-2 mb-1">{product.title}</h3>
-              <p className="text-pink-400 font-bold text-sm">${(product.price / 100).toFixed(2)}</p>
+              <p className="text-pink-400 font-bold text-sm">
+                ${(product.priceCents / 100).toFixed(2)}
+              </p>
             </div>
           </Link>
         ))}

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { getGameDef } from '@/app/lib/games';
+import { getGameDef, getGameThumbnailAsset } from '@/app/lib/games';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       slug: game.key,
       title: game.name,
       description: game.howToPlay,
-      image: `/assets/games/${game.thumbKey}.jpg`,
+      image: getGameThumbnailAsset(game.thumbKey),
       category: game.difficulty,
       enabled: true,
       maxReward: game.maxRewardPerRun,

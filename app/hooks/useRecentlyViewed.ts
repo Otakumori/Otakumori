@@ -9,7 +9,7 @@ export interface RecentlyViewedProduct {
   id: string;
   title: string;
   image: string;
-  price: number;
+  priceCents: number;
   viewedAt: number;
 }
 
@@ -19,13 +19,33 @@ export function useRecentlyViewed() {
   // Load from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setRecentlyViewed(parsed);
-      } catch (err) {
-        console.error('Failed to parse recently viewed:', err);
-      }
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored) as Array<Partial<RecentlyViewedProduct & { price: number }>>;
+      const normalized = parsed
+        .map((item) => {
+          if (!item?.id || !item?.title || !item?.image) return null;
+
+          let priceCents = item.priceCents;
+          if (typeof priceCents !== 'number' || Number.isNaN(priceCents)) {
+            const fallback = typeof item.price === 'number' ? Math.round(item.price * 100) : 0;
+            priceCents = fallback;
+          }
+
+          return {
+            id: item.id,
+            title: item.title,
+            image: item.image,
+            priceCents,
+            viewedAt: item.viewedAt ?? Date.now(),
+          } satisfies RecentlyViewedProduct;
+        })
+        .filter(Boolean) as RecentlyViewedProduct[];
+
+      setRecentlyViewed(normalized);
+    } catch (err) {
+      console.error('Failed to parse recently viewed:', err);
     }
   }, []);
 

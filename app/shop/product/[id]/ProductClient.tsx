@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -12,8 +12,25 @@ import { ShareButtons } from '@/app/components/shop/ShareButtons';
 import { useRecentlyViewed } from '@/app/hooks/useRecentlyViewed';
 import { useToastContext } from '@/app/contexts/ToastContext';
 import { ProductSoapstoneWall } from '@/app/components/shop/ProductSoapstoneWall';
+import { HeaderButton } from '@/components/ui/header-button';
+import { removeHtmlTables, stripHtml } from '@/lib/html';
 
 type CatalogVariant = CatalogProduct['variants'][number];
+
+function formatProductDescription(description: string | null | undefined): string[] {
+  if (!description) return [];
+  const withoutTables = removeHtmlTables(description);
+  const normalized = withoutTables
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li)>/gi, '\n')
+    .replace(/<\/ul>/gi, '\n')
+    .replace(/<ul>/gi, '\n');
+  const text = stripHtml(normalized);
+  return text
+    .split(/\n+/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
 
 export default function ProductClient({ productId }: { productId: string }) {
   const [product, setProduct] = useState<CatalogProduct | null>(null);
@@ -70,11 +87,15 @@ export default function ProductClient({ productId }: { productId: string }) {
             ? Math.round(catalogProduct.priceRange.min) / 100
             : 0);
 
+        const normalizedPriceCents =
+          catalogProduct.priceCents ??
+          (displayPrice != null ? Math.round(displayPrice * 100) : 0);
+
         addProduct({
           id: catalogProduct.id,
           title: catalogProduct.title,
           image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/placeholder-product.jpg',
-          price: displayPrice,
+          priceCents: normalizedPriceCents,
         });
       } catch (err) {
         setError(
@@ -131,11 +152,14 @@ export default function ProductClient({ productId }: { productId: string }) {
     selectedVariant?.priceCents ??
     (product.priceRange.min != null ? Math.round(product.priceRange.min) : product.priceCents ?? null);
   const currentPrice =
-    currentPriceCents != null
-      ? currentPriceCents / 100
-      : product.price ?? 0;
+    currentPriceCents != null ? currentPriceCents / 100 : product.price ?? 0;
   const currency = 'USD';
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
+
+  const descriptionParagraphs = useMemo(
+    () => formatProductDescription(product.description),
+    [product.description],
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
@@ -189,7 +213,11 @@ export default function ProductClient({ productId }: { productId: string }) {
                 </p>
                 <ShareButtons productTitle={product.title} productId={product.id} />
               </div>
-              <p className="text-zinc-300 text-lg leading-relaxed">{product.description}</p>
+              <div className="space-y-4 text-zinc-300 text-lg leading-relaxed">
+                {descriptionParagraphs.length > 0
+                  ? descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+                  : <p>Premium quality print-on-demand merchandise.</p>}
+              </div>
             </div>
 
             {/* Variants */}
@@ -243,13 +271,13 @@ export default function ProductClient({ productId }: { productId: string }) {
             </div>
 
             {/* Add to Cart */}
-            <button
+            <HeaderButton
               onClick={handleAddToCart}
               disabled={!selectedVariant || !selectedVariant.isEnabled}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full justify-center py-4 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               Add to Cart
-            </button>
+            </HeaderButton>
 
             {/* Product Details */}
             <div className="glass-panel rounded-xl p-6 space-y-3">

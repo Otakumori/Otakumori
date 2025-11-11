@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { paths } from '@/lib/paths';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
+import { stripHtml } from '@/lib/html';
 
 interface Product {
   id: string;
@@ -40,6 +41,7 @@ export default async function ShopSection() {
       data?.products?.map((product) => ({
         ...product,
         image: product.image || '/assets/placeholder-product.jpg',
+        description: stripHtml(product.description || ''),
         slug: product.slug,
       })) || [];
     isBlockedData = isBlocked(featuredResult);

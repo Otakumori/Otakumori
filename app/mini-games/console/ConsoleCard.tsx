@@ -2,6 +2,7 @@
 
 import { audio } from '@/app/lib/audio';
 import { http } from '@/app/lib/http';
+import { getGameImageBySlug } from '@/app/lib/games';
 import * as Sentry from '@sentry/nextjs';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -1090,34 +1091,7 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
 // metadata loaded from JSON above
 
 function GameIcon({ slug, icon }: { slug: string; icon: string }) {
-  const [imgSrc, setImgSrc] = React.useState<string | null>(null);
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-    let cancelled = false;
-    const candidates = [
-      `/assets/games/${slug}.svg`,
-      `/assets/games/${slug}.png`,
-      `/assets/games/${slug}.jpg`,
-    ];
-    let i = 0;
-    const tryNext = () => {
-      if (i >= candidates.length) {
-        if (!cancelled) setImgSrc(null);
-        return;
-      }
-      const src = candidates[i++];
-      const img = new Image();
-      img.onload = () => {
-        if (!cancelled) setImgSrc(src);
-      };
-      img.onerror = () => tryNext();
-      img.src = src;
-    };
-    tryNext();
-    return () => {
-      cancelled = true;
-    };
-  }, [slug]);
+  const imgSrc = React.useMemo(() => getGameImageBySlug(slug), [slug]);
 
   const statusDot = process.env.NODE_ENV !== 'production' && (
     <span
@@ -1132,7 +1106,6 @@ function GameIcon({ slug, icon }: { slug: string; icon: string }) {
   if (imgSrc) {
     return (
       <span className="inline-flex items-center">
-        {}
         <img src={imgSrc} alt="" className="h-5 w-5 object-contain" aria-hidden />
         {statusDot}
       </span>

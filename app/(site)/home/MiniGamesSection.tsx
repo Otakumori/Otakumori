@@ -1,7 +1,7 @@
 import { safeFetch, isSuccess } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getEnabledGames } from '@/app/lib/games';
+import { getEnabledGames, getGameDef, getGameThumbnailAsset } from '@/app/lib/games';
 import { paths } from '@/lib/paths';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
@@ -14,6 +14,7 @@ type ApiGame = {
   image?: string;
   category?: string;
   enabled?: boolean;
+  thumbKey?: string;
 };
 
 type GamesData = {
@@ -28,10 +29,16 @@ function mapGame(game: {
   description?: string;
   image?: string;
   category?: string;
+  thumbKey?: string;
 }): ApiGame {
+  const fallbackThumbKey = game.thumbKey ?? getGameDef(game.slug)?.thumbKey ?? getGameDef(game.id)?.thumbKey;
+  const resolvedImage =
+    game.image ??
+    (fallbackThumbKey ? getGameThumbnailAsset(fallbackThumbKey) : '/assets/placeholder-game.jpg');
+
   return {
     ...game,
-    image: game.image ?? '/assets/placeholder-game.jpg',
+    image: resolvedImage,
     enabled: true,
   };
 }
@@ -43,7 +50,7 @@ export default async function MiniGamesSection() {
       slug: game.key,
       title: game.name,
       description: game.tagline,
-      image: `/assets/games/${game.thumbKey}.jpg`,
+      thumbKey: game.thumbKey,
       category: game.difficulty,
     }),
   );

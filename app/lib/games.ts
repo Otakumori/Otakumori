@@ -211,6 +211,28 @@ export function getGameDef(key: string): GameDefinition | null {
   return games[key] || null;
 }
 
+const GAME_THUMB_ASSETS: Record<string, string> = {
+  'samurai-thumb': '/assets/games/petal-samurai.svg',
+  'memory-thumb': '/assets/games/memory-match.svg',
+  'bubble-thumb': '/assets/games/bubble-girl.svg',
+  'rhythm-thumb': '/assets/games/petal-storm-rhythm.svg',
+  'pairs-thumb': '/assets/games/puzzle-reveal.svg',
+  'petal-thumb': '/assets/games/blossomware.svg',
+};
+
+const DEFAULT_GAME_THUMB = '/assets/placeholder-game.jpg';
+
+export function getGameThumbnailAsset(thumbKey: string | null | undefined): string {
+  if (!thumbKey) return DEFAULT_GAME_THUMB;
+  return GAME_THUMB_ASSETS[thumbKey] ?? DEFAULT_GAME_THUMB;
+}
+
+export function getGameImageBySlug(slug: string): string {
+  const game = getGameDef(slug);
+  if (!game) return DEFAULT_GAME_THUMB;
+  return getGameThumbnailAsset(game.thumbKey);
+}
+
 export function isGameEnabled(key: string): boolean {
   const game = getGameDef(key);
   if (!game) return false;

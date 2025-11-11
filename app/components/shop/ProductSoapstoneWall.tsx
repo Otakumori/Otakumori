@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useToastContext } from '@/app/contexts/ToastContext';
+import { HeaderButton } from '@/components/ui/header-button';
 
 interface Soapstone {
   id: string;
@@ -160,12 +161,13 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
           What travelers say
         </h3>
         {!composing && (
-          <button
+          <HeaderButton
+            type="button"
             onClick={() => setComposing(true)}
-            className="text-sm px-6 py-2 bg-gradient-to-r from-pink-500/30 to-purple-500/30 hover:from-pink-500/50 hover:to-purple-500/50 border border-pink-400/30 rounded-xl text-white font-semibold transition-all shadow-lg hover:shadow-pink-500/30 hover:scale-105"
+            className="px-6 py-2 text-sm font-semibold"
           >
             Leave a sign
-          </button>
+          </HeaderButton>
         )}
       </div>
 
@@ -213,25 +215,25 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
             <div className="text-xs text-zinc-400 mt-1">{message.length} / 280</div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
+          <div className="flex items-center gap-2 flex-wrap">
+            <HeaderButton
               type="submit"
               disabled={submitting || (!message.trim() && !selectedTemplate)}
-              className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               {submitting ? 'Placing...' : 'Place Sign (5 petals)'}
-            </button>
-            <button
+            </HeaderButton>
+            <HeaderButton
               type="button"
               onClick={() => {
                 setComposing(false);
                 setMessage('');
                 setSelectedTemplate(null);
               }}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl transition-all"
+              className="px-4 py-2 text-sm font-semibold bg-white/15 hover:bg-white/25 border border-white/20 text-white"
             >
               Cancel
-            </button>
+            </HeaderButton>
           </div>
         </form>
       )}

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { paths } from '@/lib/paths';
+import { HeaderButton } from '@/components/ui/header-button';
+import { removeHtmlTables, stripHtml } from '@/lib/html';
 
 type FeaturedProduct = {
   id: string;
@@ -91,6 +92,11 @@ export function FeaturedCarousel({
   const productImages = currentProduct.images ?? [];
   const displayImage = currentProduct.image ?? productImages[0] ?? null;
 
+  const sanitizedDescription = useMemo(() => {
+    const withoutTables = removeHtmlTables(currentProduct.description ?? '');
+    return stripHtml(withoutTables);
+  }, [currentProduct.description]);
+
   const priceRange = currentProduct.priceRange ?? { min: null, max: null };
   const minPriceCents = priceRange.min ?? currentProduct.priceCents ?? null;
   const maxPriceCents = priceRange.max ?? currentProduct.priceCents ?? null;
@@ -143,20 +149,20 @@ export function FeaturedCarousel({
             </h2>
 
             {/* Description */}
-            <p className="text-base md:text-lg text-zinc-200 line-clamp-2 max-w-xl">
-              {currentProduct.description || 'Premium quality print-on-demand merchandise'}
+            <p className="text-base md:text-lg text-zinc-200 line-clamp-3 max-w-xl">
+              {sanitizedDescription || 'Premium quality print-on-demand merchandise'}
             </p>
 
             {/* Price and CTA */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="text-2xl md:text-4xl font-bold text-pink-400">{priceDisplay}</div>
-              <Link
+              <HeaderButton
                 href={paths.product(currentProduct.id)}
-                className="group bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-pink-500/50 flex items-center gap-2"
+                className="group flex items-center gap-2 px-6 py-3 text-base font-semibold"
               >
                 Shop Now
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </HeaderButton>
             </div>
 
             {/* Product Highlights */}

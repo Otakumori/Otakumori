@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getPrintifyService } from '@/app/lib/printify/service';
+import { stripHtml } from '@/lib/html';
 import { z } from 'zod';
 
 export const runtime = 'nodejs';
@@ -161,20 +162,6 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
-}
-
-// Helper function to strip HTML tags from descriptions
-function stripHtml(html: string): string {
-  if (!html) return '';
-  return html
-    .replace(/<[^>]*>/g, '') // Remove all HTML tags
-    .replace(/&nbsp;/g, ' ') // Replace &nbsp; with space
-    .replace(/&amp;/g, '&') // Replace &amp; with &
-    .replace(/&lt;/g, '<') // Replace &lt; with <
-    .replace(/&gt;/g, '>') // Replace &gt; with >
-    .replace(/&quot;/g, '"') // Replace &quot; with "
-    .replace(/&#039;/g, "'") // Replace &#039; with '
-    .trim();
 }
 
 // Background sync function

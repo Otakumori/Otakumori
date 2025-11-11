@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 export const runtime = 'nodejs';
 
@@ -56,6 +57,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       },
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021') {
+      console.warn('ProductSoapstone table missing. Returning empty soapstone list.');
+      return NextResponse.json({
+        ok: true,
+        data: {
+          soapstones: [],
+          total: 0,
+        },
+      });
+    }
     console.error('Failed to fetch product soapstones:', error);
     return NextResponse.json({ ok: false, error: 'Failed to fetch soapstones' }, { status: 500 });
   }
@@ -135,6 +146,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021') {
+      console.warn('ProductSoapstone table missing. Unable to create soapstone.');
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Soapstones are not available yet. Please check back soon.',
+        },
+        { status: 503 },
+      );
+    }
     console.error('Failed to create product soapstone:', error);
     return NextResponse.json({ ok: false, error: 'Failed to create soapstone' }, { status: 500 });
   }
