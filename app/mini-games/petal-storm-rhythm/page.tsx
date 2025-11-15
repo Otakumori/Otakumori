@@ -7,6 +7,15 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
+import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { GameHUD } from '../_shared/GameHUD';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 interface Note {
   id: string;
@@ -61,7 +70,7 @@ const SAMPLE_TRACKS: Track[] = [
 ];
 
 export default function PetalStormRhythm() {
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'completed' | 'paused'>('menu');
+  const [gameState, setGameState] = useState<'instructions' | 'menu' | 'playing' | 'win' | 'lose' | 'paused'>('menu');
   const [selectedTrack, setSelectedTrack] = useState<Track>(SAMPLE_TRACKS[0]);
   const [currentTime, setCurrentTime] = useState(0);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -72,6 +81,28 @@ export default function PetalStormRhythm() {
   const [health, setHealth] = useState(100);
   const [multiplier, setMultiplier] = useState(1);
   const [finalScore, setFinalScore] = useState(0);
+  
+  // Avatar choice state
+  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
+  const [showAvatarChoice, setShowAvatarChoice] = useState(false);
+
+  // Avatar integration - use wrapper hook with choice
+  const avatarUsage = getGameAvatarUsage('petal-storm-rhythm');
+  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('petal-storm-rhythm', {
+    forcePreset: avatarChoice === 'preset',
+    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+  });
+  
+  // Handle avatar choice
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+    setAvatarChoice(choice);
+    if (choice === 'avatar' && avatar) {
+      setSelectedAvatar(avatar);
+    }
+    setShowAvatarChoice(false);
+    setGameState('instructions');
+  }, []);
 
   // Refs for game loop
   const gameLoopRef = useRef<number | undefined>(undefined);
@@ -144,7 +175,7 @@ export default function PetalStormRhythm() {
 
   // End game (game over)
   const endGame = useCallback(() => {
-    setGameState('completed');
+    setGameState('lose');
 
     if (gameLoopRef.current) {
       cancelAnimationFrame(gameLoopRef.current);
@@ -153,7 +184,7 @@ export default function PetalStormRhythm() {
 
   // Complete game
   const completeGame = useCallback(async () => {
-    setGameState('completed');
+    setGameState('win');
 
     if (gameLoopRef.current) {
       cancelAnimationFrame(gameLoopRef.current);
@@ -256,7 +287,7 @@ export default function PetalStormRhythm() {
     setHealth(100);
     setMultiplier(1);
 
-    setGameState('playing');
+    // Don't set to 'playing' here - let handleStart do it
     startTimeRef.current = Date.now();
 
     // Start game loop
@@ -384,18 +415,71 @@ export default function PetalStormRhythm() {
     return notePosition >= -0.1 && notePosition <= 1.1 && !note.hit;
   });
 
+  const handleRestart = useCallback(() => {
+    startGame();
+  }, [startGame]);
+
+  const handleStart = useCallback(() => {
+    // Check if avatar choice is needed
+    if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+      setShowAvatarChoice(true);
+      return;
+    }
+    startGame();
+    setGameState('playing');
+  }, [startGame, avatarUsage, avatarChoice]);
+  
+  // Update startGame to check avatar choice
+  const handleStartGame = useCallback(() => {
+    if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+      setShowAvatarChoice(true);
+    } else {
+      startGame();
+    }
+  }, [startGame, avatarUsage, avatarChoice]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black overflow-hidden">
+    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black overflow-hidden">
       {/* Header */}
-      <div className="text-center p-4">
+      <div className="text-center p-4 relative">
+        <div className="absolute top-4 right-4">
+          <Link
+            href="/mini-games"
+            className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+          >
+            Back to Arcade
+          </Link>
+        </div>
         <h1 className="text-4xl font-bold text-pink-400 mb-2">Petal Storm Rhythm</h1>
         <p className="text-slate-300 italic">
           "Stormy rhythm playlist—precision timing for petals."
         </p>
       </div>
 
+      {/* Avatar vs Preset Choice */}
+      {showAvatarChoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <AvatarPresetChoice
+            gameId="petal-storm-rhythm"
+            onChoice={handleAvatarChoice}
+            onCancel={() => setShowAvatarChoice(false)}
+          />
+        </div>
+      )}
+
+      {/* Avatar Display (Bust Mode) */}
+      {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+        <div className="flex justify-center mb-6">
+          <AvatarRenderer
+            profile={avatarConfig}
+            mode={representationConfig.mode}
+            size="small"
+          />
+        </div>
+      )}
+
       {/* Track Selection Menu */}
-      {gameState === 'menu' && (
+      {gameState === 'menu' && !showAvatarChoice && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -449,7 +533,7 @@ export default function PetalStormRhythm() {
 
             <div className="mt-8 text-center">
               <button
-                onClick={startGame}
+                onClick={handleStartGame}
                 className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-pink-400 hover:to-purple-500 transition-all"
               >
                 Start Playing
@@ -486,60 +570,17 @@ export default function PetalStormRhythm() {
       {/* Game UI */}
       {(gameState === 'playing' || gameState === 'paused') && (
         <div className="h-screen flex flex-col">
-          {/* Stats Bar */}
-          <div className="bg-slate-900/80 backdrop-blur-lg p-4 border-b border-slate-700">
-            <div className="container mx-auto grid grid-cols-5 gap-4 text-center">
-              <div>
-                <div className="text-slate-400 text-sm">Score</div>
-                <div className="text-white font-bold text-lg">{formatScore(score)}</div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-sm">Combo</div>
-                <div className="text-pink-400 font-bold text-lg">{combo}</div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-sm">Multiplier</div>
-                <div className="text-purple-400 font-bold text-lg">x{multiplier}</div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-sm">Health</div>
-                <div className="w-full bg-slate-700 rounded-full h-2 mt-1">
-                  <div
-                    className={`h-2 rounded-full transition-all ${
-                      health > 60 ? 'bg-green-500' : health > 30 ? 'bg-yellow-500' : 'bg-red-500'
-                    }`}
-                    style={{ width: `${health}%` }}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="text-slate-400 text-sm">Track</div>
-                <div className="text-white font-bold text-lg truncate">{selectedTrack.title}</div>
-              </div>
-            </div>
-          </div>
+          {/* Game HUD */}
+          <GameHUD
+            score={score}
+            health={health}
+            maxHealth={100}
+            combo={combo}
+            multiplier={multiplier}
+          />
 
           {/* Game Area */}
           <div className="flex-1 relative overflow-hidden">
-            {/* Pause Overlay */}
-            {gameState === 'paused' && (
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="bg-slate-800 rounded-2xl p-8 text-center"
-                >
-                  <h3 className="text-2xl font-bold text-white mb-4">Game Paused</h3>
-                  <p className="text-slate-300 mb-6">Press SPACE to resume</p>
-                  <button
-                    onClick={() => setGameState('menu')}
-                    className="bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-600 transition-all"
-                  >
-                    Return to Menu
-                  </button>
-                </motion.div>
-              </div>
-            )}
 
             {/* Lanes */}
             <div className="h-full flex">
@@ -598,8 +639,25 @@ export default function PetalStormRhythm() {
         </div>
       )}
 
-      {/* Completion Screen */}
-      {gameState === 'completed' && (
+      {/* Game Overlay */}
+      <GameOverlay
+        state={gameState === 'instructions' ? 'instructions' : gameState === 'win' ? 'win' : gameState === 'lose' ? 'lose' : gameState === 'paused' ? 'paused' : 'playing'}
+        instructions={[
+          'Press A, S, D, F to hit notes in each lane',
+          'Time your hits with the beat for perfect scores',
+          'Build combos for multiplier bonuses',
+          'Keep your health above 0 to survive',
+          'Complete the track to win!',
+        ]}
+        winMessage={`Rhythm Master! You completed ${selectedTrack.title} with ${maxCombo} max combo!`}
+        loseMessage="Your health reached zero. Try again!"
+        score={finalScore}
+        onRestart={handleRestart}
+        onResume={handleStart}
+      />
+
+      {/* Completion Screen (Legacy - will be replaced by GameOverlay) */}
+      {gameState === 'win' && false && (
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}

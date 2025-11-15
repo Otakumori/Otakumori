@@ -1,9 +1,17 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
-import GlassButton from '../../components/ui/GlassButton';
+import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import GlassCard from '../../components/ui/GlassCard';
+import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
+import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { GameHUD } from '../_shared/GameHUD';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 const InteractiveBuddyGame = dynamic(() => import('./InteractiveBuddyGame'), {
   ssr: false,
@@ -22,10 +30,48 @@ type GameMode = 'sandbox' | 'stress-relief' | 'challenge';
 export default function InteractiveBuddyPage() {
   const [mode, setMode] = useState<GameMode>('sandbox');
   const [key, setKey] = useState(0); // Force remount on mode change
+  const [gameState, setGameState] = useState<'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('instructions');
+  const [score, setScore] = useState(0);
+  
+  // Avatar choice state
+  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
+  const [showAvatarChoice, setShowAvatarChoice] = useState(false);
+  
+  // Avatar integration - use wrapper hook with choice
+  const avatarUsage = getGameAvatarUsage('bubble-girl');
+  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('bubble-girl', {
+    forcePreset: avatarChoice === 'preset',
+    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+  });
+  
+  // Handle avatar choice
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+    setAvatarChoice(choice);
+    if (choice === 'avatar' && avatar) {
+      setSelectedAvatar(avatar);
+    }
+    setShowAvatarChoice(false);
+    setGameState('instructions');
+  }, []);
 
   const handleModeChange = (newMode: GameMode) => {
     setMode(newMode);
     setKey((prev) => prev + 1); // Restart game with new mode
+  };
+
+  const handleStart = () => {
+    // Check if avatar choice is needed
+    if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+      setShowAvatarChoice(true);
+      return;
+    }
+    setGameState('playing');
+  };
+
+  const handleRestart = () => {
+    setKey((prev) => prev + 1);
+    setGameState('playing');
   };
 
   return (
@@ -43,10 +89,24 @@ export default function InteractiveBuddyPage() {
                 ragdoll mayhem!
               </p>
             </div>
-            <a href="/mini-games">
-              <GlassButton variant="secondary">⟵ Back to Hub</GlassButton>
-            </a>
+            <Link
+              href="/mini-games"
+              className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+            >
+              Back to Arcade
+            </Link>
           </div>
+
+          {/* Avatar Display (Chibi Mode) */}
+          {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+            <div className="flex justify-center mb-6">
+              <AvatarRenderer
+                profile={avatarConfig}
+                mode={representationConfig.mode}
+                size="small"
+              />
+            </div>
+          )}
 
           {/* Mode Selection */}
           <div className="flex flex-wrap gap-3">
@@ -69,9 +129,44 @@ export default function InteractiveBuddyPage() {
         </header>
 
         {/* Game Canvas */}
-        <GlassCard className="overflow-hidden p-4">
-          <InteractiveBuddyGame key={key} mode={mode} />
+        <GlassCard className="overflow-hidden p-4 relative">
+          {gameState === 'playing' && (
+            <GameHUD
+              score={score}
+              combo={0}
+            />
+          )}
+          <InteractiveBuddyGame key={key} mode={mode} onScoreChange={setScore} />
         </GlassCard>
+
+        {/* Avatar vs Preset Choice */}
+        {showAvatarChoice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            <AvatarPresetChoice
+              gameId="bubble-girl"
+              onChoice={handleAvatarChoice}
+              onCancel={() => setShowAvatarChoice(false)}
+            />
+          </div>
+        )}
+
+        {/* Game Overlay */}
+        {!showAvatarChoice && (
+          <GameOverlay
+            state={gameState}
+            instructions={[
+              'Click to use selected tool on character',
+              'Click + drag to grab and throw character parts',
+              'Select tools from the panel on the right',
+              'Build combos with rapid successive hits',
+              'Earn money to unlock better tools (Challenge mode)',
+            ]}
+            winMessage="Great job! You've mastered the Interactive Buddy!"
+            score={score}
+            onRestart={handleRestart}
+            onResume={handleStart}
+          />
+        )}
 
         {/* Game Instructions */}
         <GlassCard className="mt-6 p-6">

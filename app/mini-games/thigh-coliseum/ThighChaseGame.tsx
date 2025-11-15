@@ -22,7 +22,15 @@ interface Powerup {
   collected: boolean;
 }
 
-export default function ThighChaseGame() {
+export default function ThighChaseGame({
+  onScoreChange,
+  onLivesChange,
+  onStageChange,
+}: {
+  onScoreChange?: (score: number) => void;
+  onLivesChange?: (lives: number) => void;
+  onStageChange?: (stage: number) => void;
+} = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
@@ -33,6 +41,25 @@ export default function ThighChaseGame() {
   const [distance, setDistance] = useState(0);
   const [stage, setStage] = useState(1);
   const [lives, setLives] = useState(3);
+
+  // Notify parent of state changes
+  useEffect(() => {
+    if (onScoreChange) {
+      onScoreChange(score);
+    }
+  }, [score, onScoreChange]);
+
+  useEffect(() => {
+    if (onLivesChange) {
+      onLivesChange(lives);
+    }
+  }, [lives, onLivesChange]);
+
+  useEffect(() => {
+    if (onStageChange) {
+      onStageChange(stage);
+    }
+  }, [stage, onStageChange]);
 
   // Player state
   const [player, setPlayer] = useState({

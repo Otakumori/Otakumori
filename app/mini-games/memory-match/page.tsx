@@ -8,6 +8,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sessionTracker } from '@/lib/analytics/session-tracker';
+import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
+import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { GameHUD } from '../_shared/GameHUD';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import Link from 'next/link';
 
 interface Card {
   id: number;
@@ -35,11 +44,23 @@ export default function MemoryMatchGame() {
   const [moves, setMoves] = useState(0);
   const [matches, setMatches] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'completed' | 'paused'>('menu');
+  const [gameState, setGameState] = useState<'menu' | 'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('menu');
   const [difficulty, setDifficulty] = useState<'easy' | 'normal' | 'hard'>('normal');
   const [streak, setStreak] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const sessionId = useRef<string | null>(null);
+  
+  // Avatar choice state
+  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
+  const [showAvatarChoice, setShowAvatarChoice] = useState(false);
+  
+  // Avatar integration - use wrapper hook with choice
+  const avatarUsage = getGameAvatarUsage('memory-match');
+  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('memory-match', {
+    forcePreset: avatarChoice === 'preset',
+    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+  });
 
   // Difficulty settings
   const difficultySettings = {
@@ -84,7 +105,7 @@ export default function MemoryMatchGame() {
         sessionId.current = id;
       });
 
-    setGameState('playing');
+    // Don't set gameState here - let handleStart do it after instructions
   }, [difficulty, settings.pairs]);
 
   // No saved game loading for now - simplified implementation
@@ -104,7 +125,7 @@ export default function MemoryMatchGame() {
 
   // Complete game
   const completeGame = useCallback(async () => {
-    setGameState('completed');
+    setGameState('win');
 
     // Calculate score
     const timeBonus = Math.max(0, 300 - timeElapsed) * settings.timeBonus;
@@ -157,13 +178,14 @@ export default function MemoryMatchGame() {
     }
   }, [timeElapsed, moves, matches, streak, settings, difficulty]);
 
-  // Handle card flip
+  // Handle card flip (with double-click prevention)
   const handleCardFlip = useCallback(
     (cardId: number) => {
       if (gameState !== 'playing') return;
-      if (flippedCards.length >= 2) return;
-      if (flippedCards.includes(cardId)) return;
-      if (cards[cardId].isMatched) return;
+      if (flippedCards.length >= 2) return; // Prevent more than 2 cards flipped
+      if (flippedCards.includes(cardId)) return; // Prevent double-click
+      if (cards[cardId].isMatched) return; // Prevent clicking matched cards
+      if (cards[cardId].isFlipped) return; // Additional double-click prevention
 
       const newFlippedCards = [...flippedCards, cardId];
       setFlippedCards(newFlippedCards);
@@ -228,7 +250,7 @@ export default function MemoryMatchGame() {
   };
 
   // Pause/Resume
-  const togglePause = () => {
+  const _togglePause = () => {
     if (gameState === 'playing') {
       setGameState('paused');
     } else if (gameState === 'paused') {
@@ -236,17 +258,72 @@ export default function MemoryMatchGame() {
     }
   };
 
+  // Restart handler
+  const handleRestart = useCallback(() => {
+    initializeGame();
+  }, [initializeGame]);
+
+  // Handle avatar choice
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+    setAvatarChoice(choice);
+    if (choice === 'avatar' && avatar) {
+      setSelectedAvatar(avatar);
+    }
+    setShowAvatarChoice(false);
+    // Show instructions after choice
+    setGameState('instructions');
+  }, []);
+  
+  // Start game handler (from instructions overlay)
+  const handleStart = useCallback(() => {
+    initializeGame(); // Initialize game state
+    setGameState('playing'); // Start playing after instructions
+  }, [initializeGame]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black p-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black p-4">
       <div className="container mx-auto max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-pink-400 mb-2">Memory Match</h1>
-          <p className="text-slate-300 italic">"Recall the faces bound by fate."</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1" />
+            <div className="flex-1 text-center">
+              <h1 className="text-4xl font-bold text-pink-400 mb-2">Memory Match</h1>
+              <p className="text-slate-300 italic">"Recall the faces bound by fate."</p>
+            </div>
+            <div className="flex-1 flex justify-end">
+              <Link
+                href="/mini-games"
+                className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+              >
+                Back to Arcade
+              </Link>
+            </div>
+          </div>
         </div>
 
-        {/* Game Menu */}
-        {gameState === 'menu' && (
+        {/* Avatar Display (Portrait Mode) */}
+        {isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+          <div className="flex justify-center mb-6">
+            <AvatarRenderer
+              profile={avatarConfig}
+              mode={representationConfig.mode}
+              size="small"
+            />
+          </div>
+        )}
+
+        {/* Avatar vs Preset Choice */}
+        {showAvatarChoice && (
+          <AvatarPresetChoice
+            gameId="memory-match"
+            onChoice={handleAvatarChoice}
+            onCancel={() => setShowAvatarChoice(false)}
+          />
+        )}
+        
+        {/* Difficulty Selection Menu */}
+        {gameState === 'menu' && !showAvatarChoice && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -273,10 +350,17 @@ export default function MemoryMatchGame() {
               </div>
 
               <button
-                onClick={initializeGame}
+                onClick={() => {
+                  // Check if avatar choice is needed
+                  if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+                    setShowAvatarChoice(true);
+                  } else {
+                    setGameState('instructions');
+                  }
+                }}
                 className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-pink-400 hover:to-purple-500 transition-all"
               >
-                Start Game
+                Continue
               </button>
             </div>
           </motion.div>
@@ -285,64 +369,12 @@ export default function MemoryMatchGame() {
         {/* Game UI */}
         {(gameState === 'playing' || gameState === 'paused') && (
           <>
-            {/* Stats Bar */}
-            <div className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 mb-6 border border-slate-700">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-                <div>
-                  <div className="text-slate-400 text-sm">Time</div>
-                  <div className="text-white font-semibold">{formatTime(timeElapsed)}</div>
-                </div>
-                <div>
-                  <div className="text-slate-400 text-sm">Moves</div>
-                  <div className="text-white font-semibold">{moves}</div>
-                </div>
-                <div>
-                  <div className="text-slate-400 text-sm">Matches</div>
-                  <div className="text-white font-semibold">
-                    {matches}/{settings.pairs}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-slate-400 text-sm">Streak</div>
-                  <div className="text-pink-400 font-semibold">{streak}</div>
-                </div>
-                <div>
-                  <button
-                    onClick={togglePause}
-                    className="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-all"
-                  >
-                    {gameState === 'playing' ? 'Pause' : 'Resume'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Pause Overlay */}
-            {gameState === 'paused' && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="bg-slate-800 rounded-2xl p-8 text-center"
-                >
-                  <h3 className="text-2xl font-bold text-white mb-4">Game Paused</h3>
-                  <div className="space-x-4">
-                    <button
-                      onClick={togglePause}
-                      className="bg-pink-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-pink-400 transition-all"
-                    >
-                      Resume
-                    </button>
-                    <button
-                      onClick={() => setGameState('menu')}
-                      className="bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-600 transition-all"
-                    >
-                      Main Menu
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
-            )}
+            {/* Game HUD */}
+            <GameHUD
+              score={finalScore}
+              timer={timeElapsed}
+              combo={streak}
+            />
 
             {/* Game Board */}
             <div
@@ -411,62 +443,21 @@ export default function MemoryMatchGame() {
           </>
         )}
 
-        {/* Completion Screen */}
-        {gameState === 'completed' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 text-center"
-          >
-            <h2 className="text-3xl font-bold text-pink-400 mb-4"> Memory Master!</h2>
-            <p className="text-slate-300 mb-6">
-              "I didn't lose. Just ran out of health." – Edward Elric
-            </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-slate-700/50 rounded-lg p-3">
-                <div className="text-slate-400 text-sm">Final Score</div>
-                <div className="text-white font-bold text-xl">{finalScore}</div>
-              </div>
-              <div className="bg-slate-700/50 rounded-lg p-3">
-                <div className="text-slate-400 text-sm">Time</div>
-                <div className="text-white font-bold text-xl">{formatTime(timeElapsed)}</div>
-              </div>
-              <div className="bg-slate-700/50 rounded-lg p-3">
-                <div className="text-slate-400 text-sm">Moves</div>
-                <div className="text-white font-bold text-xl">{moves}</div>
-              </div>
-              <div className="bg-slate-700/50 rounded-lg p-3">
-                <div className="text-slate-400 text-sm">Accuracy</div>
-                <div className="text-white font-bold text-xl">
-                  {Math.round((matches / Math.max(moves, 1)) * 100)}%
-                </div>
-              </div>
-            </div>
-
-            <p className="text-pink-200 text-lg mb-6">
-              <span role="img" aria-label="Cherry blossom petal">
-                🌸
-              </span>{' '}
-              Petals Earned: <span className="font-bold">{Math.floor(finalScore / 10)}</span>
-            </p>
-
-            <div className="space-x-4">
-              <button
-                onClick={initializeGame}
-                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-pink-400 hover:to-purple-500 transition-all"
-              >
-                Play Again
-              </button>
-              <button
-                onClick={() => setGameState('menu')}
-                className="bg-slate-700 text-white px-6 py-3 rounded-xl font-semibold hover:bg-slate-600 transition-all"
-              >
-                Main Menu
-              </button>
-            </div>
-          </motion.div>
-        )}
+        {/* Game Overlay (Instructions, Win, Lose, Paused) */}
+        <GameOverlay
+          state={gameState === 'instructions' ? 'instructions' : gameState === 'win' ? 'win' : gameState === 'paused' ? 'paused' : 'playing'}
+          instructions={[
+            'Click cards to flip them',
+            'Match pairs of anime characters',
+            'Complete all pairs to win',
+            'Chain matches for streak bonuses',
+            'Complete faster for time bonuses',
+          ]}
+          winMessage={`Memory Master! You matched all ${settings.pairs} pairs in ${formatTime(timeElapsed)}!`}
+          score={finalScore}
+          onRestart={handleRestart}
+          onResume={handleStart}
+        />
       </div>
 
       <style>{`

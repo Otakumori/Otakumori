@@ -1,92 +1,97 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+/**
+ * Petal Samurai - Full-Body Avatar-Driven Combat Game
+ * Rebuilt as combat game per plan requirements
+ */
+
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
-// import Link from 'next/link';
-import { COPY } from '../../lib/copy';
-import GlassButton from '../../components/ui/GlassButton';
-import GlassCard from '../../components/ui/GlassCard';
+import { useState, useCallback } from 'react';
+import Link from 'next/link';
+import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
+import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
-const Game = dynamic(() => import('./Game'), {
+const CombatGame = dynamic(() => import('./CombatGame'), {
   ssr: false,
-  loading: () => <div className="flex items-center justify-center h-96">{COPY.loading.summon}</div>,
+  loading: () => (
+    <div className="flex items-center justify-center h-screen">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-pink-200">Loading Petal Samurai...</p>
+      </div>
+    </div>
+  ),
 });
 
 export default function PetalSamuraiPage() {
-  const [mode, setMode] = useState<'classic' | 'storm' | 'endless'>('classic');
+  // Avatar choice state
+  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
+  const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
+  
+  // Avatar integration - use wrapper hook with choice
+  const avatarUsage = getGameAvatarUsage('petal-samurai');
+  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('petal-samurai', {
+    forcePreset: avatarChoice === 'preset',
+    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+  });
+  
+  // Handle avatar choice
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+    setAvatarChoice(choice);
+    if (choice === 'avatar' && avatar) {
+      setSelectedAvatar(avatar);
+    }
+    setShowAvatarChoice(false);
+  }, []);
+  
+  // Check if we should show choice on mount
+  const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-black via-purple-950/30 to-black">
-      <div className="container mx-auto max-w-5xl p-4">
-        {/* Header */}
-        <header className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-pink-200 mb-2">Petal Samurai</h1>
-              <p className="text-pink-200/70">{COPY.games.petalSamurai}</p>
-            </div>
-            <GlassButton href="/mini-games" variant="secondary">
-              {COPY.games.backToHub}
-            </GlassButton>
-          </div>
+    <main className="relative min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+      {/* Header */}
+      <header className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-pink-200">Petal Samurai</h1>
+          <p className="text-sm text-pink-200/70">Full-body avatar-driven combat</p>
+        </div>
+        <Link
+          href="/mini-games"
+          className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+        >
+          Back to Arcade
+        </Link>
+      </header>
 
-          {/* Game Mode Selection */}
-          <div className="flex gap-4 items-center">
-            <div className="flex items-center gap-2">
-              <label htmlFor="mode-select" className="text-sm font-medium text-pink-200">
-                Mode:
-              </label>
-              <select
-                id="mode-select"
-                value={mode}
-                onChange={(e) => setMode(e.target.value as 'classic' | 'storm' | 'endless')}
-                className="px-3 py-1 text-sm bg-black/60 border border-pink-500/30 text-pink-200 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                aria-label="Select game mode"
-              >
-                <option value="classic">Classic (60s)</option>
-                <option value="storm">Storm Mode</option>
-                <option value="endless">Endless</option>
-              </select>
-            </div>
-          </div>
-        </header>
+      {/* Avatar vs Preset Choice */}
+      {shouldShowChoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <AvatarPresetChoice
+            gameId="petal-samurai"
+            onChoice={handleAvatarChoice}
+            onCancel={() => setShowAvatarChoice(false)}
+          />
+        </div>
+      )}
 
-        {/* Game Canvas */}
-        <GlassCard className="overflow-hidden">
-          <Game mode={mode} />
-        </GlassCard>
+      {/* Avatar Display (FullBody Mode) */}
+      {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
+          <AvatarRenderer
+            profile={avatarConfig}
+            mode={representationConfig.mode}
+            size="small"
+          />
+        </div>
+      )}
 
-        {/* Game Instructions */}
-        <GlassCard className="mt-6 p-4">
-          <h3 className="font-semibold text-pink-200 mb-2">How to Play</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-pink-200/90 mb-2">Petal Types:</h4>
-              <ul className="text-sm text-pink-200/70 space-y-1">
-                <li>
-                  • <span className="text-pink-400">Pink Petals</span> - 1 point each
-                </li>
-                <li>
-                  • <span className="text-yellow-400">Gold Petals</span> - 5 points, rare spawn
-                </li>
-                <li>
-                  • <span className="text-red-400">Cursed Petals</span> - -2 points, stuns you!
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-pink-200/90 mb-2">Combo System:</h4>
-              <ul className="text-sm text-pink-200/70 space-y-1">
-                <li>• Chain hits to build combo multiplier</li>
-                <li>• Miss three petals and the round ends</li>
-                <li>• Speed increases every 20 seconds</li>
-                <li>• Storm mode activates after 60 seconds</li>
-              </ul>
-            </div>
-          </div>
-        </GlassCard>
-      </div>
+      {/* Game */}
+      {!shouldShowChoice && <CombatGame />}
     </main>
   );
 }

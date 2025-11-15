@@ -75,7 +75,15 @@ const ART_COLLECTION: ArtPiece[] = [
   // Add more art pieces here
 ];
 
-export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode }) {
+export default function EnhancedTileGame({ 
+  mode = 'medium',
+  onScoreChange,
+  onComboChange,
+}: { 
+  mode?: GameMode;
+  onScoreChange?: (score: number) => void;
+  onComboChange?: (combo: number) => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const tilesRef = useRef<Tile[]>([]);
@@ -262,13 +270,22 @@ export default function EnhancedTileGame({ mode = 'medium' }: { mode?: GameMode 
     const comboBonus = newCombo * 50;
     const tileScore = baseScore + comboBonus;
 
+    const newScore = gameState.score + tileScore;
     setGameState((prev) => ({
       ...prev,
-      score: prev.score + tileScore,
+      score: newScore,
       tilesRevealed: prev.tilesRevealed + 1,
       combo: newCombo,
       maxCombo: Math.max(prev.maxCombo, newCombo),
     }));
+    
+    // Notify parent of state changes
+    if (onScoreChange) {
+      onScoreChange(newScore);
+    }
+    if (onComboChange) {
+      onComboChange(newCombo);
+    }
 
     // Check for completion
     if (gameState.tilesRevealed + 1 >= gameState.totalTiles) {

@@ -59,9 +59,12 @@ interface BeatIndicator {
 
 interface Props {
   mode: GameMode;
+  onScoreChange?: (score: number) => void;
+  onHealthChange?: (health: number) => void;
+  onComboChange?: (combo: number) => void;
 }
 
-export default function BeatEmUpGame({ mode }: Props) {
+export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onComboChange }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatIntervalRef = useRef<number | null>(null);
@@ -99,6 +102,25 @@ export default function BeatEmUpGame({ mode }: Props) {
   const lastBeatTimeRef = useRef<number>(0);
   const beatIndicatorsRef = useRef<BeatIndicator[]>([]);
   const beatCounterRef = useRef<number>(0);
+
+  // Notify parent of state changes
+  useEffect(() => {
+    if (onScoreChange) {
+      onScoreChange(gameState.score);
+    }
+  }, [gameState.score, onScoreChange]);
+
+  useEffect(() => {
+    if (onHealthChange) {
+      onHealthChange(gameState.health);
+    }
+  }, [gameState.health, onHealthChange]);
+
+  useEffect(() => {
+    if (onComboChange) {
+      onComboChange(gameState.combo);
+    }
+  }, [gameState.combo, onComboChange]);
 
   // BPM and rhythm settings
   const BPM = 128; // Beats per minute

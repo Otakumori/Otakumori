@@ -74,7 +74,13 @@ const TOOLS: Tool[] = [
   { id: 'confetti', name: 'Confetti', icon: '✧', type: 'fun', cost: 25, effect: 'celebrate' },
 ];
 
-export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: GameMode }) {
+export default function InteractiveBuddyGame({ 
+  mode = 'sandbox',
+  onScoreChange,
+}: { 
+  mode?: GameMode;
+  onScoreChange?: (score: number) => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<PhysicsEngine | null>(null);
   const animationRef = useRef<number | null>(null);
@@ -104,13 +110,19 @@ export default function InteractiveBuddyGame({ mode = 'sandbox' }: { mode?: Game
       engine.render();
 
       // Update game state from engine
+      const newScore = engine.getScore();
       setGameState((prev) => ({
         ...prev,
-        score: engine.getScore(),
+        score: newScore,
         money: engine.getMoney(),
         stressRelieved: engine.getStressRelieved(),
         comboMultiplier: engine.getComboMultiplier(),
       }));
+      
+      // Notify parent of score changes
+      if (onScoreChange) {
+        onScoreChange(newScore);
+      }
 
       animationRef.current = requestAnimationFrame(gameLoop);
     };
@@ -640,8 +652,10 @@ class PhysicsEngine {
 
     // Update score and money
     const pointsEarned = Math.floor((tool.damage || 5) * this.comboMultiplier);
-    this.score += pointsEarned;
-    this.money += Math.floor(pointsEarned / 10);
+    // Prevent score exploits - cap score increment per action
+    const cappedPoints = Math.min(pointsEarned, 1000); // Max 1000 points per action
+    this.score = Math.min(this.score + cappedPoints, 999999); // Cap total score at 999,999
+    this.money += Math.floor(cappedPoints / 10);
     this.stressRelieved += tool.type === 'destructive' ? 1 : 0;
 
     // Spawn particles

@@ -1,9 +1,16 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
-import GlassButton from '../../components/ui/GlassButton';
+import { useState, useCallback } from 'react';
 import GlassCard from '../../components/ui/GlassCard';
+import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
+import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { GameHUD } from '../_shared/GameHUD';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
   ssr: false,
@@ -22,10 +29,49 @@ type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 export default function PuzzleRevealPage() {
   const [mode, setMode] = useState<GameMode>('medium');
   const [key, setKey] = useState(0); // Force remount on mode change
+  const [gameState, setGameState] = useState<'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('instructions');
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  
+  // Avatar choice state
+  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
+  const [showAvatarChoice, setShowAvatarChoice] = useState(false);
+  
+  // Avatar integration - use wrapper hook with choice
+  const avatarUsage = getGameAvatarUsage('puzzle-reveal');
+  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('puzzle-reveal', {
+    forcePreset: avatarChoice === 'preset',
+    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+  });
+  
+  // Handle avatar choice
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+    setAvatarChoice(choice);
+    if (choice === 'avatar' && avatar) {
+      setSelectedAvatar(avatar);
+    }
+    setShowAvatarChoice(false);
+    setGameState('instructions');
+  }, []);
 
   const handleModeChange = (newMode: GameMode) => {
     setMode(newMode);
     setKey((prev) => prev + 1); // Restart game with new mode
+  };
+
+  const handleStart = () => {
+    // Check if avatar choice is needed
+    if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+      setShowAvatarChoice(true);
+      return;
+    }
+    setGameState('playing');
+  };
+
+  const handleRestart = () => {
+    setKey((prev) => prev + 1);
+    setGameState('playing');
   };
 
   return (
@@ -42,8 +88,11 @@ export default function PuzzleRevealPage() {
                 Click tiles to reveal breathtaking artwork. Fast clicks build combos!
               </p>
             </div>
-            <a href="/mini-games">
-              <GlassButton variant="secondary">âµ Back to Hub</GlassButton>
+            <a
+              href="/mini-games"
+              className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+            >
+              <span>âµ Back to Hub              </span>
             </a>
           </div>
 
@@ -68,10 +117,56 @@ export default function PuzzleRevealPage() {
           </div>
         </header>
 
+        {/* Avatar vs Preset Choice */}
+        {showAvatarChoice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            <AvatarPresetChoice
+              gameId="puzzle-reveal"
+              onChoice={handleAvatarChoice}
+              onCancel={() => setShowAvatarChoice(false)}
+            />
+          </div>
+        )}
+
+        {/* Avatar Display (Portrait Mode) */}
+        {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+          <div className="flex justify-center mb-6">
+            <AvatarRenderer
+              profile={avatarConfig}
+              mode={representationConfig.mode}
+              size="small"
+            />
+          </div>
+        )}
+
         {/* Game Canvas */}
-        <GlassCard className="overflow-hidden p-4">
-          <EnhancedTileGame key={key} mode={mode} />
+        <GlassCard className="overflow-hidden p-4 relative">
+          {gameState === 'playing' && (
+            <GameHUD
+              score={score}
+              combo={combo}
+            />
+          )}
+          <EnhancedTileGame key={key} mode={mode} onScoreChange={setScore} onComboChange={setCombo} />
         </GlassCard>
+
+        {/* Game Overlay */}
+        {!showAvatarChoice && (
+          <GameOverlay
+          state={gameState}
+          instructions={[
+            'Click tiles to reveal the hidden artwork',
+            'Click tiles quickly (within 0.5s) to build combos',
+            'Max combo is 10x for massive score boosts',
+            'Watch your energy - each click consumes energy',
+            'Reveal all tiles to complete the puzzle',
+          ]}
+          winMessage="Puzzle Master! You revealed all tiles!"
+          score={score}
+          onRestart={handleRestart}
+          onResume={handleStart}
+          />
+        )}
 
         {/* Game Instructions */}
         <GlassCard className="mt-6 p-6">

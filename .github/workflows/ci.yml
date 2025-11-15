@@ -51,6 +51,9 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
+      - name: Mini-Games QA Validation
+        run: pnpm run mini-games:qa
+
       - name: Run unit tests
         run: pnpm run test
 

@@ -1,35 +1,125 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import GameShell from '../_shared/GameShell';
 import BeatEmUpGame from './BeatEmUpGame';
 import { motion } from 'framer-motion';
+import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
+import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { GameHUD } from '../_shared/GameHUD';
+import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
+  const [score, setScore] = useState(0);
+  const [health, setHealth] = useState(100);
+  const [combo, setCombo] = useState(0);
+  
+  // Avatar choice state
+  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
+  const [showAvatarChoice, setShowAvatarChoice] = useState(false);
+  
+  // Avatar integration - use wrapper hook with choice
+  const avatarUsage = getGameAvatarUsage('otaku-beat-em-up');
+  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('otaku-beat-em-up', {
+    forcePreset: avatarChoice === 'preset',
+    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+  });
+  
+  // Handle avatar choice
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+    setAvatarChoice(choice);
+    if (choice === 'avatar' && avatar) {
+      setSelectedAvatar(avatar);
+    }
+    setShowAvatarChoice(false);
+  }, []);
 
   if (selectedMode) {
     return (
-      <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
-        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-4">
-          <div className="mb-4">
-            <button
-              onClick={() => setSelectedMode(null)}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors border border-white/20"
-            >
-              ← Back to Mode Select
-            </button>
+      <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-pink-800 to-red-900">
+        {/* Header */}
+        <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
+          <Link
+            href="/mini-games"
+            className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+          >
+            Back to Arcade
+          </Link>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-pink-200">Rhythm Beat-Em-Up</h1>
+            <p className="text-sm text-pink-200/70">Sync to the Moon Prism's pulse</p>
           </div>
-          <BeatEmUpGame mode={selectedMode} />
+          <div className="w-24" /> {/* Spacer */}
         </div>
-      </GameShell>
+
+        {/* Avatar vs Preset Choice */}
+        {showAvatarChoice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+            <AvatarPresetChoice
+              gameId="otaku-beat-em-up"
+              onChoice={handleAvatarChoice}
+              onCancel={() => setShowAvatarChoice(false)}
+            />
+          </div>
+        )}
+
+        {/* Avatar Display (FullBody Mode) */}
+        {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
+            <AvatarRenderer
+              profile={avatarConfig}
+              mode={representationConfig.mode}
+              size="small"
+            />
+          </div>
+        )}
+
+        {/* Game HUD */}
+        <GameHUD
+          score={score}
+          health={health}
+          maxHealth={100}
+          combo={combo}
+        />
+
+        <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-4">
+            <div className="mb-4">
+              <button
+                onClick={() => setSelectedMode(null)}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors border border-white/20"
+              >
+                ← Back to Mode Select
+              </button>
+            </div>
+            <BeatEmUpGame mode={selectedMode} onScoreChange={setScore} onHealthChange={setHealth} onComboChange={setCombo} />
+          </div>
+        </GameShell>
+      </div>
     );
   }
 
   return (
     <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
+      {/* Avatar vs Preset Choice */}
+      {showAvatarChoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <AvatarPresetChoice
+            gameId="otaku-beat-em-up"
+            onChoice={handleAvatarChoice}
+            onCancel={() => setShowAvatarChoice(false)}
+          />
+        </div>
+      )}
+      
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-8">
         <div className="max-w-4xl w-full">
           <motion.div
@@ -47,7 +137,13 @@ export default function RhythmBeatEmUpPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Story Mode */}
             <motion.button
-              onClick={() => setSelectedMode('story')}
+              onClick={() => {
+                if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+                  setShowAvatarChoice(true);
+                } else {
+                  setSelectedMode('story');
+                }
+              }}
               className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-pink-500/50 rounded-2xl p-6 text-white transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -71,7 +167,13 @@ export default function RhythmBeatEmUpPage() {
 
             {/* Arcade Mode */}
             <motion.button
-              onClick={() => setSelectedMode('arcade')}
+              onClick={() => {
+                if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+                  setShowAvatarChoice(true);
+                } else {
+                  setSelectedMode('arcade');
+                }
+              }}
               className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-purple-500/50 rounded-2xl p-6 text-white transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -94,7 +196,13 @@ export default function RhythmBeatEmUpPage() {
 
             {/* Survival Mode */}
             <motion.button
-              onClick={() => setSelectedMode('survival')}
+              onClick={() => {
+                if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
+                  setShowAvatarChoice(true);
+                } else {
+                  setSelectedMode('survival');
+                }
+              }}
               className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-red-500/50 rounded-2xl p-6 text-white transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

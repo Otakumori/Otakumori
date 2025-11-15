@@ -45,6 +45,7 @@
     "assets:curate": "tsx app/lib/assets/curate.ts",
     "assets:upload": "tsx app/lib/assets/upload.ts",
     "assets:build": "pnpm assets:scan && pnpm assets:curate && pnpm assets:upload",
+    "mini-games:qa": "tsx scripts/qa-mini-games.ts",
     "build:analyze": "ANALYZE=true prisma generate --no-engine && node scripts/build-with-env.js",
     "perf:budget": "npx tsx scripts/check-performance-budget.ts",
     "perf:analyze": "npm run build:analyze && npm run perf:budget",

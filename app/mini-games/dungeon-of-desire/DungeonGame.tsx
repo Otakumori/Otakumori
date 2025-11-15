@@ -45,7 +45,15 @@ interface Particle {
   color: string;
 }
 
-export default function DungeonGame() {
+export default function DungeonGame({
+  onScoreChange,
+  onHealthChange,
+  onFloorChange,
+}: {
+  onScoreChange?: (score: number) => void;
+  onHealthChange?: (health: number) => void;
+  onFloorChange?: (floor: number) => void;
+} = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
@@ -57,7 +65,8 @@ export default function DungeonGame() {
   const [floor, setFloor] = useState(1);
   const [score, setScore] = useState(0);
 
-  // Player state
+  // Notify parent of state changes
+  // Player state (must be declared before useEffect hooks that use it)
   const [player, setPlayer] = useState({
     x: 100,
     y: 400,
@@ -72,6 +81,24 @@ export default function DungeonGame() {
     facing: 'right' as 'left' | 'right',
     animationFrame: 0,
   });
+
+  useEffect(() => {
+    if (onScoreChange) {
+      onScoreChange(score);
+    }
+  }, [score, onScoreChange]);
+
+  useEffect(() => {
+    if (onHealthChange) {
+      onHealthChange(player.health);
+    }
+  }, [player.health, onHealthChange]);
+
+  useEffect(() => {
+    if (onFloorChange) {
+      onFloorChange(floor);
+    }
+  }, [floor, onFloorChange]);
 
   // Camera state (side-scrolling)
   const [camera, setCamera] = useState({ x: 0, y: 0 });
