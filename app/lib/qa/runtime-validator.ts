@@ -6,7 +6,7 @@
 
 import { validateCelShadedCompliance, logStyleViolations } from '@om/avatar-engine/validation';
 import { env } from '@/env.mjs';
-import * as THREE from 'three';
+import type * as THREE from 'three';
 
 /**
  * Validate game runtime compliance

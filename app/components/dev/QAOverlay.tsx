@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { validateGameRuntime } from '@/app/lib/qa/runtime-validator';
-import * as THREE from 'three';
+import type * as THREE from 'three';
 
 export interface QAOverlayProps {
   gameSlug: string;
@@ -19,7 +19,7 @@ export interface QAOverlayProps {
  * QA Overlay - Only visible in development mode
  */
 export function QAOverlay({ gameSlug, scene, enabled = true }: QAOverlayProps) {
-  const [violations, setViolations] = useState<Array<{ objectName: string; violationType: string; suggestion: string }>>([]);
+  const [violations] = useState<Array<{ objectName: string; violationType: string; suggestion: string }>>([]);
 
   useEffect(() => {
     if (!enabled || process.env.NODE_ENV !== 'development') {
@@ -39,7 +39,7 @@ export function QAOverlay({ gameSlug, scene, enabled = true }: QAOverlayProps) {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm rounded-lg bg-yellow-900/90 p-4 text-xs text-yellow-100 backdrop-blur">
-      <div className="mb-2 font-bold">⚠️ QA Violations ({gameSlug})</div>
+      <div className="mb-2 font-bold">QA Violations ({gameSlug})</div>
       <div className="space-y-1">
         {violations.map((v, i) => (
           <div key={i}>

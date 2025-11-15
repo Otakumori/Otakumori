@@ -82,7 +82,7 @@ export default function PuzzleRevealPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                ð¨ Puzzle Reveal
+                Puzzle Reveal
               </h1>
               <p className="text-zinc-300 font-medium">
                 Click tiles to reveal breathtaking artwork. Fast clicks build combos!
@@ -92,7 +92,7 @@ export default function PuzzleRevealPage() {
               href="/mini-games"
               className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
             >
-              <span>âµ Back to Hub              </span>
+              Back to Hub
             </a>
           </div>
 
@@ -108,10 +108,10 @@ export default function PuzzleRevealPage() {
                     : 'bg-black/30 border border-white/20 text-zinc-300 hover:bg-black/50 hover:border-white/40'
                 }`}
               >
-                {difficulty === 'easy' && 'ð¢ Easy (4Ã3)'}
-                {difficulty === 'medium' && 'ð¡ Medium (6Ã5)'}
-                {difficulty === 'hard' && 'ð  Hard (8Ã6)'}
-                {difficulty === 'expert' && 'ð´ Expert (10Ã8)'}
+                {difficulty === 'easy' && '🟢 Easy (4×3)'}
+                {difficulty === 'medium' && '🟡 Medium (6×5)'}
+                {difficulty === 'hard' && '🟠 Hard (8×6)'}
+                {difficulty === 'expert' && '🔴 Expert (10×8)'}
               </button>
             ))}
           </div>
@@ -170,8 +170,8 @@ export default function PuzzleRevealPage() {
 
         {/* Game Instructions */}
         <GlassCard className="mt-6 p-6">
-          <h3 className="font-semibold text-white text-lg mb-4 flex items-center gap-2">
-            <span className="text-2xl">â¹ï¸</span> How to Play
+          <h3 className="font-semibold text-white text-lg mb-4">
+            How to Play
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>

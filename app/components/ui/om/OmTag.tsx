@@ -20,7 +20,7 @@ export interface OmTagProps extends HTMLAttributes<HTMLSpanElement> {
  */
 export function OmTag({
   className,
-  variant = 'default',
+  variant: _variant = 'default',
   size = 'md',
   difficulty,
   category,
