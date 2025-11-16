@@ -123,12 +123,22 @@ function AvatarScene({
   // Apply scale from representation transform
   const transformConfig = getRepresentationTransform(mode);
   
+  // Standardized anime/cel-shaded light rig for consistent quality
+  // Key light: top-right (main illumination)
+  // Fill light: front-left (soft fill)
+  // Rim light: back (anime-style edge lighting)
+  // Ambient: subtle base illumination
   return (
     <>
       <primitive object={avatarGroup} ref={groupRef} scale={transformConfig.scale} />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1} />
-      <pointLight position={[-10, 10, -5]} intensity={0.5} />
+      {/* Ambient light - subtle base illumination */}
+      <ambientLight intensity={0.4} color="#ffffff" />
+      {/* Key light - main illumination from top-right (anime-style) */}
+      <directionalLight position={[5, 8, 3]} intensity={1.2} color="#ffffff" />
+      {/* Fill light - soft fill from front-left */}
+      <directionalLight position={[-3, 2, 2]} intensity={0.5} color="#fff5e6" />
+      {/* Rim light - back lighting for anime edge glow */}
+      <directionalLight position={[-2, 3, -5]} intensity={0.8} color="#ffe0cc" />
     </>
   );
 }
@@ -184,7 +194,10 @@ export function AvatarRenderer({
           powerPreference: 'high-performance',
         }}
         className="rounded-lg"
+        style={{ background: 'transparent' }}
       >
+        {/* Transparent background for consistent integration */}
+        <color attach="background" args={['transparent']} />
         <AvatarScene
           profile={profile}
           mode={mode}

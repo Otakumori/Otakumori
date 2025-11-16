@@ -26,7 +26,60 @@ export type BackgroundStyle =
   | 'dungeon' // Dark torch-lit dungeon
   | 'neon-lane' // Bright neon rhythm lane
   | 'airy' // Light, airy palette
-  | 'chaos'; // Chaotic micro-game background
+  | 'chaos' // Chaotic micro-game background
+  | 'starfield' // Starfield/abyss background
+  | 'blossom-night' // Cherry blossom night scene
+  | 'arcade' // Neon note highway (rhythm games)
+  | 'city-abyss' // Side-scrolling city with abyss purple
+  | 'bubble'; // Bubbly pastel background
+
+/**
+ * Game theme identifier
+ */
+export type GameTheme =
+  | 'petal-samurai'
+  | 'petal-hero'
+  | 'memory'
+  | 'puzzle'
+  | 'bubble'
+  | 'beat-em-up'
+  | 'dungeon'
+  | 'thigh-run'
+  | 'microgames';
+
+/**
+ * Background configuration
+ */
+export interface BackgroundConfig {
+  kind: BackgroundStyle;
+  accentColor: string; // Primary accent color
+  glowColor?: string; // Optional glow color
+  vignette?: boolean; // Vignette overlay flag
+}
+
+/**
+ * HUD configuration
+ */
+export interface HudConfig {
+  defaultHud: 'standard' | 'minimal';
+  allowQuakeOverlay: boolean;
+}
+
+/**
+ * Petal sprite configuration
+ */
+export interface PetalConfig {
+  usesPetalSpriteSheet: boolean;
+  spritePath?: string; // Defaults to /assets/images/petal_sprite.png
+}
+
+/**
+ * NSFW flavor configuration (disabled for testing)
+ */
+export interface NsfwFlavorConfig {
+  hasAltDemons?: boolean; // For dungeon-of-desire (disabled for testing)
+  hasAltOutfits?: boolean; // For future use (disabled for testing)
+}
 
 /**
  * Light configuration for R3F scenes
@@ -97,17 +150,25 @@ export interface VfxConfig {
  * Complete visual profile for a game
  */
 export interface GameVisualProfile {
-  gameId: string;
-  // Core visual identity
-  backgroundStyle: BackgroundStyle;
-  backgroundColor: string; // CSS color or gradient
+  id: string; // Game ID (e.g., 'petal-samurai')
+  displayName: string; // User-facing game name
+  theme: GameTheme;
+  background: BackgroundConfig;
+  backgroundColor: string; // CSS color or gradient (kept for backward compatibility)
   // Lighting (for 3D scenes)
   lights?: LightConfig;
   // Post-processing
   postProcessing?: PostProcessingConfig;
-  // Avatar representation
+  // Avatar configuration
+  usesAvatar: boolean;
   avatarRepresentationMode: RepresentationMode;
-  // HUD configuration (will be resolved via getHudForGame)
+  // HUD configuration
+  hud: HudConfig;
+  // Petal sprite configuration
+  petals?: PetalConfig;
+  // NSFW flavor (disabled for testing)
+  nsfwFlavor?: NsfwFlavorConfig;
+  // HUD configuration (will be resolved via getHudForGame) - kept for backward compatibility
   useQuakeHudByDefault?: boolean; // Only if unlocked and equipped
   // 2D game assets (if applicable)
   spriteSheetUrl?: string;
@@ -119,6 +180,9 @@ export interface GameVisualProfile {
   // Accessibility flags
   effectsEnabled?: boolean; // Screen shake, flashes, etc.
   reducedMotion?: boolean; // Respect prefers-reduced-motion
+  // Legacy fields for backward compatibility
+  gameId?: string;
+  backgroundStyle?: BackgroundStyle;
 }
 
 /**
@@ -128,10 +192,23 @@ export interface GameVisualProfile {
 export function getGameVisualProfile(gameId: string): GameVisualProfile {
   const gameConfig = getMiniGameConfig(gameId);
   const baseProfile: GameVisualProfile = {
-    gameId,
-    backgroundStyle: 'abyss',
+    id: gameId,
+    gameId, // Legacy field for backward compatibility
+    displayName: gameId,
+    theme: 'petal-samurai',
+    background: {
+      kind: 'abyss',
+      accentColor: '#ec4899',
+      vignette: false,
+    },
+    backgroundStyle: 'abyss', // Legacy field
     backgroundColor: 'linear-gradient(to bottom, #1a0a2e, #000000)',
     avatarRepresentationMode: gameConfig?.representationMode || 'fullBody',
+    usesAvatar: gameConfig?.avatarUsage === 'avatar-or-preset',
+    hud: {
+      defaultHud: 'standard',
+      allowQuakeOverlay: false,
+    },
     effectsEnabled: true,
     reducedMotion: false,
   };
@@ -141,7 +218,15 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
     case 'petal-samurai':
       return {
         ...baseProfile,
-        backgroundStyle: 'dojo',
+        displayName: 'Petal Samurai',
+        theme: 'petal-samurai',
+        background: {
+          kind: 'dojo',
+          accentColor: '#ec4899',
+          glowColor: '#f472b6',
+          vignette: true,
+        },
+        backgroundStyle: 'dojo', // Legacy
         backgroundColor: 'linear-gradient(to bottom, #2d1b4e, #0a0a0a)',
         lights: {
           key: {
@@ -167,7 +252,16 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           vignetteIntensity: 0.4,
         },
         avatarRepresentationMode: 'fullBody',
-        spriteSheetUrl: '/assets/images/petal_sprite.png', // 4x3 grid, 12 frames
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: true,
+        },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        spriteSheetUrl: '/assets/images/petal_sprite.png', // Legacy
         materialHints: {
           useAnimeToon: true,
           useOutline: true,
@@ -197,7 +291,15 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
     case 'petal-storm-rhythm':
       return {
         ...baseProfile,
-        backgroundStyle: 'neon-lane',
+        displayName: 'Petal Hero',
+        theme: 'petal-hero',
+        background: {
+          kind: 'arcade',
+          accentColor: '#a78bfa',
+          glowColor: '#c084fc',
+          vignette: false,
+        },
+        backgroundStyle: 'arcade', // Legacy (was 'neon-lane')
         backgroundColor: 'linear-gradient(to bottom, #1e1b4e, #312e81, #000000)',
         lights: {
           key: {
@@ -217,12 +319,25 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           bloomIntensity: 0.5,
         },
         avatarRepresentationMode: 'bust',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: true,
+        },
       };
 
     case 'thigh-coliseum':
       return {
         ...baseProfile,
-        backgroundStyle: 'arena',
+        displayName: 'Thigh Coliseum',
+        theme: 'thigh-run',
+        background: {
+          kind: 'arena',
+          accentColor: '#fbbf24',
+          glowColor: '#f97316',
+          vignette: true,
+        },
+        backgroundStyle: 'arena', // Legacy
         backgroundColor: 'linear-gradient(to bottom, #4c1d95, #1e1b4e, #000000)',
         lights: {
           key: {
@@ -248,12 +363,25 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           vignetteIntensity: 0.3,
         },
         avatarRepresentationMode: 'fullBody',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: false,
+        },
       };
 
     case 'dungeon-of-desire':
       return {
         ...baseProfile,
-        backgroundStyle: 'dungeon',
+        displayName: 'Dungeon of Desire',
+        theme: 'dungeon',
+        background: {
+          kind: 'dungeon',
+          accentColor: '#dc2626',
+          glowColor: '#991b1b',
+          vignette: true,
+        },
+        backgroundStyle: 'dungeon', // Legacy
         backgroundColor: 'linear-gradient(to bottom, #1a0a2e, #0a0a0a)',
         lights: {
           key: {
@@ -274,13 +402,29 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           vignetteIntensity: 0.6,
         },
         avatarRepresentationMode: 'bust',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: false,
+        },
+        nsfwFlavor: {
+          hasAltDemons: false, // Disabled for testing
+          hasAltOutfits: false, // Disabled for testing
+        },
       };
 
     case 'memory-match':
-    case 'puzzle-reveal':
       return {
         ...baseProfile,
-        backgroundStyle: 'airy',
+        displayName: 'Memory Match',
+        theme: 'memory',
+        background: {
+          kind: 'airy',
+          accentColor: '#ec4899',
+          glowColor: '#a78bfa',
+          vignette: false,
+        },
+        backgroundStyle: 'airy', // Legacy
         backgroundColor: 'linear-gradient(to bottom, #2d1b4e, #1e1b4e, #0a0a0a)',
         lights: {
           key: {
@@ -299,13 +443,64 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           bloomIntensity: 0.2,
         },
         avatarRepresentationMode: 'portrait',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: false,
+        },
+      };
+
+    case 'puzzle-reveal':
+      return {
+        ...baseProfile,
+        displayName: 'Puzzle Reveal',
+        theme: 'puzzle',
+        background: {
+          kind: 'airy',
+          accentColor: '#ec4899',
+          glowColor: '#a78bfa',
+          vignette: true,
+        },
+        backgroundStyle: 'airy', // Legacy
+        backgroundColor: 'linear-gradient(to bottom, #2d1b4e, #1e1b4e, #0a0a0a)',
+        lights: {
+          key: {
+            color: '#ec4899',
+            intensity: 0.8,
+            position: [0, 4, 0],
+          },
+          fill: {
+            color: '#a78bfa',
+            intensity: 0.4,
+            position: [-3, 2, 3],
+          },
+        },
+        postProcessing: {
+          bloom: true,
+          bloomIntensity: 0.2,
+          vignette: true,
+          vignetteIntensity: 0.3,
+        },
+        avatarRepresentationMode: 'portrait',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'minimal',
+          allowQuakeOverlay: false,
+        },
       };
 
     case 'bubble-girl':
-    case 'blossomware':
       return {
         ...baseProfile,
-        backgroundStyle: 'airy',
+        displayName: 'Bubble Girl',
+        theme: 'bubble',
+        background: {
+          kind: 'bubble',
+          accentColor: '#f472b6',
+          glowColor: '#c084fc',
+          vignette: false,
+        },
+        backgroundStyle: 'airy', // Legacy (bubble variant)
         backgroundColor: 'linear-gradient(to bottom, #581c87, #3b0764, #1e1b4e)',
         lights: {
           key: {
@@ -324,12 +519,62 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           bloomIntensity: 0.4,
         },
         avatarRepresentationMode: 'chibi',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: false,
+        },
+      };
+
+    case 'blossomware':
+      return {
+        ...baseProfile,
+        displayName: 'Blossomware',
+        theme: 'microgames',
+        background: {
+          kind: 'chaos',
+          accentColor: '#f472b6',
+          glowColor: '#c084fc',
+          vignette: false,
+        },
+        backgroundStyle: 'chaos', // Legacy (was 'airy')
+        backgroundColor: 'linear-gradient(to bottom, #581c87, #3b0764, #1e1b4e)',
+        lights: {
+          key: {
+            color: '#f472b6',
+            intensity: 1.0,
+            position: [0, 5, 0],
+          },
+          fill: {
+            color: '#c084fc',
+            intensity: 0.5,
+            position: [-2, 2, 2],
+          },
+        },
+        postProcessing: {
+          bloom: true,
+          bloomIntensity: 0.4,
+        },
+        avatarRepresentationMode: 'chibi',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'minimal',
+          allowQuakeOverlay: false,
+        },
       };
 
     case 'otaku-beat-em-up':
       return {
         ...baseProfile,
-        backgroundStyle: 'city',
+        displayName: 'Otaku Beat-Em-Up',
+        theme: 'beat-em-up',
+        background: {
+          kind: 'city-abyss',
+          accentColor: '#818cf8',
+          glowColor: '#a78bfa',
+          vignette: false,
+        },
+        backgroundStyle: 'city-abyss', // Legacy (was 'city')
         backgroundColor: 'linear-gradient(to bottom, #312e81, #1e1b4e, #000000)',
         lights: {
           key: {
@@ -349,10 +594,18 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           bloomIntensity: 0.4,
         },
         avatarRepresentationMode: 'fullBody',
+        usesAvatar: true,
+        hud: {
+          defaultHud: 'standard',
+          allowQuakeOverlay: false,
+        },
       };
 
     default:
-      return baseProfile;
+      return {
+        ...baseProfile,
+        backgroundStyle: 'abyss', // Legacy
+      };
   }
 }
 

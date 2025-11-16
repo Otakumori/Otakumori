@@ -49,7 +49,7 @@ export function getRepresentationTransform(mode: RepresentationMode): Representa
           toonSteps: 4,
           smoothness: 0.1,
           bloomIntensity: 0.5,
-          outlineWidth: 0.02,
+          outlineWidth: 0.015, // Tuned for anime-style (not chunky)
           outlineColor: '#000000',
         },
       };
@@ -85,7 +85,7 @@ export function getRepresentationTransform(mode: RepresentationMode): Representa
           toonSteps: 2, // Very few steps for simplified shading
           smoothness: 0.05,
           bloomIntensity: 0.4,
-          outlineWidth: 0.02, // Crisp lines
+          outlineWidth: 0.012, // Crisp, anime-style lines (not chunky)
           outlineColor: '#000000',
         },
         cropBounds: {

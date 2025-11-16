@@ -23,7 +23,8 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
-import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
@@ -379,8 +380,11 @@ export default function MemoryMatchGame() {
     setGameState('playing'); // Start playing after instructions
   }, [initializeGame]);
 
+  const displayName = getGameDisplayName('memory-match');
+
   return (
-    <div className="relative min-h-screen p-4" style={backgroundStyle}>
+    <MiniGameFrame gameId="memory-match">
+      <div className="relative min-h-screen p-4" style={backgroundStyle}>
       <div className="container mx-auto max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -626,6 +630,7 @@ export default function MemoryMatchGame() {
           transform: rotateY(180deg);
         }
       `}</style>
-    </div>
+      </div>
+    </MiniGameFrame>
   );
 }

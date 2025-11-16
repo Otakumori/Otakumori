@@ -14,6 +14,7 @@ import AccessibilitySettings, {
 import ErrorBoundary3D from '@/components/ErrorBoundary3D';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
+import StarfieldBackground from '@/app/components/backgrounds/StarfieldBackground';
 
 // Import games from registry
 import gamesRegistry from '@/lib/games.meta.json';
@@ -149,12 +150,7 @@ export default function GameCubeHubV2() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentFace, isLoading]);
 
-  // Check for reduced motion preference
-  const prefersReducedMotion =
-    accessibilitySettings.reducedMotion ||
-    (typeof window !== 'undefined'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false);
+  // Note: prefersReducedMotion is handled by StarfieldBackground component
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -262,35 +258,14 @@ export default function GameCubeHubV2() {
     <div
       ref={containerRef}
       className="relative min-h-screen overflow-hidden"
-      style={{
-        background:
-          'radial-gradient(ellipse at center, #8b2d69 0%, #6b1d4a 25%, #4a0033 50%, #2d0019 100%)',
-      }}
       aria-roledescription="3D menu"
       data-test="gc-cube"
     >
-      {/* Background and ambient elements */}
-      <div className="absolute inset-0">
-        {/* Subtle ambient glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-900/20 via-transparent to-pink-900/20" />
+      {/* Starfield background - full-screen abyss */}
+      <StarfieldBackground density={0.72} speed={0.62} zIndex={-10} />
 
-        {/* Minimal particle field */}
-        {!prefersReducedMotion && (
-          <div className="absolute inset-0 pointer-events-none">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 bg-pink-400/30 rounded-full"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animation: `twinkle ${3 + Math.random() * 4}s ease-in-out ${Math.random() * 2}s infinite`,
-                }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Subtle ambient glow overlay (optional, can be removed if starfield is enough) */}
+      <div className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none" style={{ zIndex: -9 }} />
 
       {/* Main Layout */}
       <div className="relative z-10 flex min-h-screen">
