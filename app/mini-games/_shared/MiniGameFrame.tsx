@@ -11,7 +11,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getGameVisualProfile, type BackgroundStyle } from './gameVisuals';
 import StarfieldBackground from '@/app/components/backgrounds/StarfieldBackground';
 
@@ -24,7 +24,7 @@ export interface MiniGameFrameProps {
 /**
  * Get CSS classes for background based on background kind
  */
-function getBackgroundClasses(kind: BackgroundStyle, accentColor: string, glowColor?: string): string {
+function getBackgroundClasses(kind: BackgroundStyle, _accentColor: string, _glowColor?: string): string {
   switch (kind) {
     case 'starfield':
       return 'bg-gradient-to-b from-purple-900 via-purple-800 to-black';
@@ -56,7 +56,7 @@ function getBackgroundClasses(kind: BackgroundStyle, accentColor: string, glowCo
  */
 export function MiniGameFrame({ gameId, children, className = '' }: MiniGameFrameProps) {
   const profile = getGameVisualProfile(gameId);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [_prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
