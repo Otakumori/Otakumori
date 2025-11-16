@@ -80,6 +80,7 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
       slug: dto.slug,
       integrationRef: dto.integrationRef,
       blueprintId: dto.blueprintId ?? null,
+      printifyProductId: dto.printifyProductId ?? null,
     };
   });
 
@@ -132,6 +133,7 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
       slug: undefined,
       integrationRef: product.id,
       blueprintId: product.blueprint_id ?? null,
+      printifyProductId: String(product.id),
     };
   });
 
@@ -139,7 +141,7 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
   const deduplicated = deduplicateProducts(mappedPrintify, {
     limit,
     excludeTitles,
-    deduplicateBy: 'blueprintId',
+    deduplicateBy: 'both', // Deduplicates by blueprintId, printifyProductId, and id
   });
 
   return {
@@ -159,10 +161,11 @@ export async function GET(request: NextRequest) {
     const catalogResult = await fetchCatalogProducts(query.limit, forcePrintify);
     if (catalogResult) {
       // Apply deduplication and exclusions to catalog products
+      // Deduplicate by blueprintId, printifyProductId, and id to prevent duplicates
       const deduplicated = deduplicateProducts(catalogResult.data.products, {
         limit: query.limit,
         excludeTitles: query.excludeTitles,
-        deduplicateBy: 'blueprintId',
+        deduplicateBy: 'both',
       });
 
       return NextResponse.json({

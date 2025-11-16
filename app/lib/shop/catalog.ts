@@ -6,12 +6,13 @@ export interface CatalogOptions {
   limit?: number;
   excludeTitles?: string[];
   excludeIds?: string[];
-  deduplicateBy?: 'blueprintId' | 'id' | 'both';
+  deduplicateBy?: 'blueprintId' | 'id' | 'printifyProductId' | 'both';
 }
 
 export interface ProductWithBlueprint {
   id: string;
   blueprintId?: number | null;
+  printifyProductId?: string | null;
   title: string;
 }
 
@@ -20,8 +21,9 @@ export interface ProductWithBlueprint {
  *
  * Deduplication strategy:
  * - If deduplicateBy is 'blueprintId' or 'both': deduplicate by blueprintId first (keep first occurrence)
+ * - If deduplicateBy is 'printifyProductId' or 'both': deduplicate by printifyProductId (keep first occurrence)
  * - If deduplicateBy is 'id' or 'both': deduplicate by id (keep first occurrence)
- * - Products without blueprintId are still included if deduplicating by blueprintId
+ * - Products without the deduplication field are still included
  *
  * Exclusions:
  * - excludeTitles: case-insensitive title matching
@@ -67,6 +69,20 @@ export function deduplicateProducts<T extends ProductWithBlueprint>(
         seenBlueprintIds.add(product.blueprintId);
       }
       return true; // Keep products without blueprintId or first occurrence
+    });
+  }
+
+  // Deduplicate by printifyProductId (if enabled)
+  if (deduplicateBy === 'printifyProductId' || deduplicateBy === 'both') {
+    const seenPrintifyIds = new Set<string>();
+    result = result.filter((product) => {
+      if (product.printifyProductId != null) {
+        if (seenPrintifyIds.has(product.printifyProductId)) {
+          return false; // Duplicate printifyProductId, skip
+        }
+        seenPrintifyIds.add(product.printifyProductId);
+      }
+      return true; // Keep products without printifyProductId or first occurrence
     });
   }
 

@@ -168,9 +168,10 @@ export async function GET(request: NextRequest) {
     const totalPages = Math.max(1, Math.ceil(total / limit));
     let serialized = products.map(serializeProduct);
 
-    // Deduplicate by blueprintId to prevent duplicate product cards
+    // Deduplicate by blueprintId and printifyProductId to prevent duplicate product cards
+    // This handles cases where products were synced multiple times with different IDs
     serialized = deduplicateProducts(serialized, {
-      deduplicateBy: 'blueprintId',
+      deduplicateBy: 'both', // Deduplicates by blueprintId, printifyProductId, and id
     });
 
     if (params.sortBy === 'price') {
