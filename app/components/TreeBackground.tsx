@@ -19,74 +19,16 @@ export default function TreeBackground() {
   const [pageHeight, setPageHeight] = useState(0);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    let rafId: number | null = null;
-    
     const updateDimensions = () => {
-      // Use the maximum of scrollHeight and clientHeight to ensure full coverage
-      const height = Math.max(
-        document.documentElement.scrollHeight,
-        document.documentElement.clientHeight,
-        document.body.scrollHeight,
-        document.body.clientHeight,
-      );
-      setPageHeight(height);
-    };
-
-    // Throttled update using requestAnimationFrame for better performance
-    const throttledUpdate = () => {
-      clearTimeout(timeoutId);
-      if (rafId === null) {
-        rafId = requestAnimationFrame(() => {
-          rafId = null;
-          updateDimensions();
-        });
-      }
-      // Also set a timeout fallback for slower updates
-      timeoutId = setTimeout(() => {
-        if (rafId === null) {
-          updateDimensions();
-        }
-      }, 200); // Less frequent updates
+      setPageHeight(document.documentElement.scrollHeight);
     };
 
     // Initialize dimensions
     updateDimensions();
 
-    // Update on resize only (removed scroll listener - too frequent)
-    window.addEventListener('resize', throttledUpdate);
-    
-    // Update when main content changes (limited scope, debounced)
-    const observer = new MutationObserver(() => {
-      throttledUpdate();
-    });
-    
-    // Only observe main content area, not entire body (better performance)
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      observer.observe(mainContent, {
-        childList: true,
-        subtree: false, // Only direct children, not deep subtree
-        attributes: false, // Don't watch attributes
-      });
-    }
-
-    // Update on initial load completion
-    if (document.readyState === 'complete') {
-      updateDimensions();
-    } else {
-      window.addEventListener('load', updateDimensions, { once: true });
-    }
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-      window.removeEventListener('resize', throttledUpdate);
-      window.removeEventListener('load', updateDimensions);
-      observer.disconnect();
-    };
+    // Update on resize
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
   return (
