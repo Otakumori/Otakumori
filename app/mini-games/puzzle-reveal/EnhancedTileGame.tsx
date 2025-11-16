@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
+import { easingFunctions, createPetalBurst, updatePetalParticles, type PetalParticle } from '../_shared/vfx';
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
@@ -108,6 +109,8 @@ export default function EnhancedTileGame({
 
   const [currentArt, setCurrentArt] = useState<ArtPiece | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [completionVfx, setCompletionVfx] = useState<{ active: boolean; scale: number; opacity: number }>({ active: false, scale: 1, opacity: 0 });
+  const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
 
   // Initialize game
   useEffect(() => {
@@ -236,7 +239,25 @@ export default function EnhancedTileGame({
 
   // Reveal tile with satisfying effects
   const revealTile = (tile: Tile) => {
-    tile.isRevealed = true;
+    // Start reveal animation (progress from 0 to 1)
+    tile.revealProgress = 0;
+    
+    // Animate reveal progress
+    const revealDuration = 300; // ms
+    const startTime = Date.now();
+    const animateReveal = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(1, elapsed / revealDuration);
+      tile.revealProgress = easingFunctions.easeOutCubic(progress);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateReveal);
+      } else {
+        tile.isRevealed = true;
+        tile.revealProgress = 1;
+      }
+    };
+    animateReveal();
 
     // Spawn particle burst
     const particleCount = 15 + Math.floor(Math.random() * 10);
@@ -254,6 +275,13 @@ export default function EnhancedTileGame({
         color: ['#ff9fbe', '#ec4899', '#ffc7d9', '#ff6bc1'][Math.floor(Math.random() * 4)],
       });
     }
+    
+    // Create petal burst particles
+    const burst = createPetalBurst(tile.x + tile.width / 2, tile.y + tile.height / 2, 8, {
+      speed: 2.5,
+      spread: Math.PI * 2,
+    });
+    setPetalParticles((prev) => [...prev, ...burst]);
 
     // Calculate combo
     const now = Date.now();
@@ -293,9 +321,103 @@ export default function EnhancedTileGame({
 
     // Check for completion
     if (gameState.tilesRevealed + 1 >= gameState.totalTiles) {
-      completeGame();
+      // Trigger completion VFX
+      setCompletionVfx({ active: true, scale: 1, opacity: 1 });
+      
+      // Create massive petal burst at center
+      if (canvasRef.current) {
+        const burst = createPetalBurst(
+          canvasRef.current.width / 2,
+          canvasRef.current.height / 2,
+          30,
+          {
+            speed: 4,
+            spread: Math.PI * 2,
+          }
+        );
+        setPetalParticles((prev) => [...prev, ...burst]);
+      }
+      
+      // Animate completion zoom/pulse
+      const startTime = Date.now();
+      const animateCompletion = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(1, elapsed / 1500); // 1.5s animation
+        
+        if (progress < 0.3) {
+          // Zoom in phase
+          const zoomProgress = progress / 0.3;
+          setCompletionVfx({
+            active: true,
+            scale: 1 + easingFunctions.easeOutCubic(zoomProgress) * 0.1,
+            opacity: 1,
+          });
+        } else if (progress < 0.7) {
+          // Pulse phase
+          const pulseProgress = (progress - 0.3) / 0.4;
+          const pulse = Math.sin(pulseProgress * Math.PI * 2) * 0.05;
+          setCompletionVfx({
+            active: true,
+            scale: 1.1 + pulse,
+            opacity: 1 - pulseProgress * 0.3,
+          });
+        } else {
+          // Fade out
+          const fadeProgress = (progress - 0.7) / 0.3;
+          setCompletionVfx({
+            active: true,
+            scale: 1.05,
+            opacity: 0.7 * (1 - fadeProgress),
+          });
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateCompletion);
+        } else {
+          setCompletionVfx({ active: false, scale: 1, opacity: 0 });
+          completeGame();
+        }
+      };
+      animateCompletion();
     }
   };
+  
+  // Update petal particles
+  useEffect(() => {
+    if (petalParticles.length === 0) return;
+    
+    let animationId: number | null = null;
+    let lastTime = performance.now();
+    let isRunning = true;
+    
+    const updateParticles = () => {
+      if (!isRunning) return;
+      
+      const now = performance.now();
+      const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
+      lastTime = now;
+      
+      setPetalParticles((prev) => {
+        if (prev.length === 0) {
+          return prev;
+        }
+        const updated = updatePetalParticles(prev, deltaTime, 0.1);
+        if (updated.length > 0 && isRunning) {
+          animationId = requestAnimationFrame(updateParticles);
+        }
+        return updated;
+      });
+    };
+    
+    animationId = requestAnimationFrame(updateParticles);
+    
+    return () => {
+      isRunning = false;
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [petalParticles.length]);
 
   // Complete game
   const completeGame = () => {
@@ -364,9 +486,25 @@ export default function EnhancedTileGame({
 
       // Draw tiles
       tilesRef.current.forEach((tile) => {
-        if (tile.isRevealed) {
-          // Draw revealed portion of image
+        const isRevealing = tile.revealProgress > 0 && tile.revealProgress < 1;
+        const isFullyRevealed = tile.isRevealed || tile.revealProgress >= 1;
+        
+        if (isFullyRevealed || isRevealing) {
+          // Draw revealed portion of image with flip animation
           ctx.save();
+          
+          // Apply flip animation
+          const centerX = tile.x + tile.width / 2;
+          const centerY = tile.y + tile.height / 2;
+          
+          if (isRevealing) {
+            // Animate flip: rotateY from 90deg to 0deg
+            const rotation = (1 - tile.revealProgress) * Math.PI / 2; // 90deg to 0deg
+            ctx.translate(centerX, centerY);
+            ctx.scale(Math.cos(rotation), 1); // Perspective effect
+            ctx.translate(-centerX, -centerY);
+          }
+          
           ctx.beginPath();
           ctx.rect(tile.x, tile.y, tile.width, tile.height);
           ctx.clip();
@@ -383,10 +521,19 @@ export default function EnhancedTileGame({
           );
           ctx.restore();
 
-          // Draw subtle glow border
-          ctx.strokeStyle = 'rgba(255, 155, 190, 0.5)';
+          // Draw subtle glow border with intensity based on reveal progress
+          const glowIntensity = isRevealing ? tile.revealProgress : 1;
+          ctx.strokeStyle = `rgba(255, 155, 190, ${0.5 * glowIntensity})`;
           ctx.lineWidth = 2;
           ctx.strokeRect(tile.x, tile.y, tile.width, tile.height);
+          
+          // Add pulse effect for newly revealed tiles
+          if (isRevealing && tile.revealProgress > 0.8) {
+            const pulse = Math.sin((tile.revealProgress - 0.8) * 5 * Math.PI) * 0.3;
+            ctx.strokeStyle = `rgba(236, 72, 153, ${0.8 + pulse})`;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(tile.x - 2, tile.y - 2, tile.width + 4, tile.height + 4);
+          }
         } else {
           // Draw pixelated/blurred preview
           ctx.save();
@@ -440,6 +587,43 @@ export default function EnhancedTileGame({
           return false;
         });
       });
+      
+      // Draw completion VFX overlay
+      if (completionVfx.active) {
+        ctx.save();
+        ctx.globalAlpha = completionVfx.opacity * 0.3;
+        ctx.fillStyle = 'rgba(236, 72, 153, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw radial pulse
+        const gradient = ctx.createRadialGradient(
+          canvas.width / 2,
+          canvas.height / 2,
+          0,
+          canvas.width / 2,
+          canvas.height / 2,
+          Math.max(canvas.width, canvas.height) * completionVfx.scale
+        );
+        gradient.addColorStop(0, 'rgba(236, 72, 153, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(236, 72, 153, 0.4)');
+        gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+      }
+      
+      // Draw petal particles overlay
+      if (petalParticles.length > 0) {
+        petalParticles.forEach((particle) => {
+          ctx.save();
+          ctx.globalAlpha = particle.alpha;
+          ctx.fillStyle = '#ec4899';
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, 4 * particle.scale, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+      }
 
       if (!gameState.isPaused) {
         animationRef.current = requestAnimationFrame(render);

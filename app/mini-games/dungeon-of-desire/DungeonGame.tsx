@@ -22,6 +22,8 @@ interface Enemy {
   animationFrame: number;
   direction: 'left' | 'right';
   attackCooldown: number;
+  telegraphTime: number; // Time remaining in telegraph state
+  state: 'idle' | 'telegraph' | 'attacking';
 }
 
 interface Spell {
@@ -66,6 +68,7 @@ export default function DungeonGame({
   >('menu');
   const [floor, setFloor] = useState(1);
   const [score, setScore] = useState(0);
+  const [roomEnemiesSpawned, setRoomEnemiesSpawned] = useState(false);
 
   // Notify parent of state changes
   // Player state (must be declared before useEffect hooks that use it)
@@ -112,7 +115,6 @@ export default function DungeonGame({
 
   // Game timing
   const [gameTime, setGameTime] = useState(0);
-  const [, setEnemySpawnTimer] = useState(0);
   const [nextEnemyId, setNextEnemyId] = useState(1);
   const [nextParticleId, setNextParticleId] = useState(1);
 
@@ -178,6 +180,7 @@ export default function DungeonGame({
     setSpells([]);
     setParticles([]);
     setNextEnemyId(1);
+    setRoomEnemiesSpawned(false);
   }, []);
 
   // Input handling
@@ -287,6 +290,8 @@ export default function DungeonGame({
         animationFrame: 0,
         direction: spawnX > player.x ? 'left' : 'right',
         attackCooldown: 0,
+        telegraphTime: 0,
+        state: 'idle',
       };
 
       setEnemies((prev) => [...prev, newEnemy]);
@@ -295,10 +300,33 @@ export default function DungeonGame({
     [nextEnemyId, player.x],
   );
 
-  // Game loop
+  // Generate room layout based on floor
+  const generateRoomLayout = useCallback((floorNum: number, enemyCount: number): Array<'succubus' | 'demon_lord'> => {
+    const layout: Array<'succubus' | 'demon_lord'> = [];
+    
+    // Boss room every 5 floors
+    if (floorNum % 5 === 0 && enemyCount > 0) {
+      layout.push('demon_lord');
+      enemyCount--;
+    }
+    
+    // Mix of enemies based on floor
+    for (let i = 0; i < enemyCount; i++) {
+      const demonLordChance = Math.min(0.1 + floorNum * 0.05, 0.4); // More demon lords as floors increase
+      if (Math.random() < demonLordChance) {
+        layout.push('demon_lord');
+      } else {
+        layout.push('succubus');
+      }
+    }
+    
+    return layout;
+  }, []);
+  
+  // Game loop (moved after generateRoomLayout)
   useEffect(() => {
     if (gameState !== 'playing') return;
-
+    
     const gameLoop = () => {
       const deltaTime = 16; // ~60fps
       setGameTime((prev) => prev + deltaTime);
@@ -367,48 +395,94 @@ export default function DungeonGame({
         return { ...prev, x: newX };
       });
 
-      // Enemy spawning
-      setEnemySpawnTimer((prev) => {
-        const spawnRate = 3000 - floor * 200; // Faster spawning each floor
-        if (prev <= 0 && enemies.length < 5) {
-          // Spawn ahead of player
-          const spawnX = player.x + CANVAS_WIDTH / 2 + Math.random() * 200;
-          if (Math.random() < 0.2) {
-            spawnEnemy('demon_lord', spawnX);
-          } else {
-            spawnEnemy('succubus', spawnX);
-          }
-          return Math.max(2000, spawnRate);
+      // Room-based enemy spawning
+      if (!roomEnemiesSpawned && enemies.length === 0) {
+        // Generate room layout based on floor
+        const roomEnemyCount = Math.min(2 + floor, 6); // More enemies per floor
+        const roomLayout = generateRoomLayout(floor, roomEnemyCount);
+        
+        // Spawn enemies for this room
+        roomLayout.forEach((enemyType, index) => {
+          setTimeout(() => {
+            const spawnX = player.x + CANVAS_WIDTH / 2 + (index * 150) + Math.random() * 100;
+            spawnEnemy(enemyType, spawnX);
+          }, index * 200);
+        });
+        
+        setRoomEnemiesSpawned(true);
+      }
+      
+      // Check if room is cleared (all enemies defeated)
+      if (roomEnemiesSpawned && enemies.length === 0 && gameState === 'playing') {
+        // Room cleared! Check if we should advance floor
+        const roomsPerFloor = 3 + Math.floor(floor / 2); // More rooms per floor as you go deeper
+        const currentRoomIndex = Math.floor((gameTime / 1000) / 30); // Approximate room index
+        
+        if (currentRoomIndex >= roomsPerFloor - 1) {
+          // Floor cleared! Advance to next floor
+          setFloor((f) => {
+            const newFloor = f + 1;
+            // Award petals for floor completion
+            if (onFloorChange) {
+              onFloorChange(newFloor);
+            }
+            // Award score bonus for floor completion
+            setScore((s) => s + newFloor * 500);
+            return newFloor;
+          });
         }
-        return prev - deltaTime;
-      });
+        setRoomEnemiesSpawned(false);
+      }
 
-      // Update enemies
+      // Update enemies with telegraphs
       setEnemies((prevEnemies) => {
         return prevEnemies.map((enemy) => {
           let newX = enemy.x;
           let newDirection = enemy.direction;
           let newAnimationFrame = (enemy.animationFrame + 0.1) % 4;
           let newAttackCooldown = Math.max(0, enemy.attackCooldown - deltaTime);
+          let newTelegraphTime = Math.max(0, enemy.telegraphTime - deltaTime);
+          let newState = enemy.state;
 
           // Move towards player
           const distanceToPlayer = player.x - enemy.x;
           if (Math.abs(distanceToPlayer) > 50) {
             newDirection = distanceToPlayer > 0 ? 'right' : 'left';
             newX += enemy.speed * (newDirection === 'right' ? 1 : -1);
+            newState = 'idle';
           } else {
-            // Attack player if close enough
-            if (newAttackCooldown <= 0 && player.invulnerable <= 0) {
-              const hit = Math.abs(player.x - enemy.x) < 60 && Math.abs(player.y - enemy.y) < 60;
-
-              if (hit) {
-                setPlayer((p) => ({
-                  ...p,
-                  health: Math.max(0, p.health - enemy.damage),
-                  invulnerable: 1000,
-                }));
-                newAttackCooldown = 1500;
+            // Close enough to attack - use telegraph system
+            if (enemy.state === 'telegraph') {
+              // In telegraph state - countdown to attack
+              if (newTelegraphTime <= 0) {
+                // Execute attack
+                newState = 'attacking';
+                if (player.invulnerable <= 0) {
+                  const hit = Math.abs(player.x - enemy.x) < 60 && Math.abs(player.y - enemy.y) < 60;
+                  if (hit) {
+                    setPlayer((p) => ({
+                      ...p,
+                      health: Math.max(0, p.health - enemy.damage),
+                      invulnerable: 1000,
+                    }));
+                  }
+                }
+                newAttackCooldown = enemy.type === 'demon_lord' ? 2000 : 1500;
+                setTimeout(() => {
+                  setEnemies((prev) =>
+                    prev.map((e) => (e.id === enemy.id ? { ...e, state: 'idle' } : e))
+                  );
+                }, 400);
               }
+            } else if (enemy.state === 'attacking') {
+              // Already attacking, wait for cooldown
+              if (newAttackCooldown <= 0) {
+                newState = 'idle';
+              }
+            } else if (newAttackCooldown <= 0) {
+              // Start telegraph - warn player before attack
+              newState = 'telegraph';
+              newTelegraphTime = enemy.type === 'demon_lord' ? 1000 : 600; // Longer telegraph for demon lords
             }
           }
 
@@ -418,6 +492,8 @@ export default function DungeonGame({
             direction: newDirection,
             animationFrame: newAnimationFrame,
             attackCooldown: newAttackCooldown,
+            telegraphTime: newTelegraphTime,
+            state: newState,
           };
         });
       });
@@ -518,10 +594,7 @@ export default function DungeonGame({
         }
       }
 
-      // Floor progression (every 30 seconds)
-      if (gameTime > 0 && Math.floor(gameTime / 30000) > floor - 1) {
-        setFloor((f) => f + 1);
-      }
+      // Floor progression is now room-based (handled above)
 
       animationRef.current = requestAnimationFrame(gameLoop);
     };
@@ -533,7 +606,7 @@ export default function DungeonGame({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, player, enemies, floor, gameTime, spawnEnemy, nextParticleId]);
+  }, [gameState, player, enemies, floor, gameTime, spawnEnemy, nextParticleId, roomEnemiesSpawned, onFloorChange, generateRoomLayout]);
 
   // Rendering
   useEffect(() => {
@@ -814,6 +887,31 @@ export default function DungeonGame({
     const healthPercent = enemy.health / enemy.maxHealth;
     ctx.fillStyle = healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
     ctx.fillRect(-25, -35, 50 * healthPercent, 5);
+    
+    // Telegraph warning - visual indicator before attack
+    if (enemy.state === 'telegraph') {
+      const telegraphProgress = 1 - (enemy.telegraphTime / (enemy.type === 'demon_lord' ? 1000 : 600));
+      const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
+      
+      ctx.save();
+      ctx.globalAlpha = pulse;
+      ctx.strokeStyle = enemy.type === 'demon_lord' ? '#ff4444' : '#ffaa44';
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = enemy.type === 'demon_lord' ? '#ff4444' : '#ffaa44';
+      ctx.beginPath();
+      ctx.arc(0, 0, 35, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Exclamation mark for demon lords
+      if (enemy.type === 'demon_lord') {
+        ctx.fillStyle = '#ff4444';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('!', 0, 5);
+      }
+      ctx.restore();
+    }
 
     ctx.restore();
   };
@@ -890,6 +988,28 @@ export default function DungeonGame({
     const healthPercent = enemy.health / enemy.maxHealth;
     ctx.fillStyle = healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
     ctx.fillRect(-35, -50, 70 * healthPercent, 6);
+    
+    // Telegraph warning for demon lord
+    if (enemy.state === 'telegraph') {
+      const telegraphProgress = 1 - (enemy.telegraphTime / 1000);
+      const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
+      
+      ctx.save();
+      ctx.globalAlpha = pulse;
+      ctx.strokeStyle = '#ff4444';
+      ctx.lineWidth = 4;
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = '#ff4444';
+      ctx.beginPath();
+      ctx.arc(0, 0, 50, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.fillStyle = '#ff4444';
+      ctx.font = 'bold 30px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('!', 0, 10);
+      ctx.restore();
+    }
 
     ctx.restore();
   };

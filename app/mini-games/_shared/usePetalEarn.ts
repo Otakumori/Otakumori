@@ -13,11 +13,13 @@ import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 export interface PetalEarnRequest {
   gameId: string;
   score: number;
+  didWin?: boolean; // Whether player won/completed the run
   metadata?: {
     combo?: number;
     accuracy?: number;
     wavesCleared?: number;
     timeElapsed?: number;
+    difficulty?: string;
     [key: string]: unknown;
   };
 }
@@ -49,6 +51,7 @@ export function usePetalEarn() {
           body: JSON.stringify({
             gameId: request.gameId,
             score: request.score,
+            didWin: request.didWin ?? true, // Default to win for backward compatibility
             metadata: request.metadata,
           }),
         });

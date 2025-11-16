@@ -12,6 +12,14 @@ interface PetalSummary {
     count: number;
     petalsEarned: number;
   };
+  cosmetics?: {
+    totalOwned: number;
+    hudSkins: number;
+    avatarCosmetics: number;
+  };
+  vouchers?: {
+    activeCount: number;
+  };
 }
 
 export default function RewardsSummary() {
@@ -118,7 +126,7 @@ export default function RewardsSummary() {
       </div>
 
       {/* Achievements Summary */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-6">
         <div className="text-sm text-zinc-300 mb-2">Achievements</div>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -133,6 +141,36 @@ export default function RewardsSummary() {
           </div>
         </div>
       </div>
+
+      {/* Cosmetics Summary */}
+      {summary.cosmetics && (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-6">
+          <div className="text-sm text-zinc-300 mb-2">Cosmetics</div>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <div className="text-xl font-semibold text-white">{summary.cosmetics.totalOwned}</div>
+              <div className="text-xs text-zinc-400">Total Owned</div>
+            </div>
+            <div>
+              <div className="text-xl font-semibold text-white">{summary.cosmetics.hudSkins}</div>
+              <div className="text-xs text-zinc-400">HUD Skins</div>
+            </div>
+            <div>
+              <div className="text-xl font-semibold text-white">{summary.cosmetics.avatarCosmetics}</div>
+              <div className="text-xs text-zinc-400">Avatar Items</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Active Vouchers */}
+      {summary.vouchers && summary.vouchers.activeCount > 0 && (
+        <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4">
+          <div className="text-sm text-green-200/70 mb-2">Active Discount Vouchers</div>
+          <div className="text-2xl font-semibold text-white">{summary.vouchers.activeCount}</div>
+          <div className="text-xs text-green-200/50 mt-1">Available for checkout</div>
+        </div>
+      )}
     </section>
   );
 }

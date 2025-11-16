@@ -30,6 +30,7 @@ import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import Link from 'next/link';
+import { createPetalBurst, updatePetalParticles, type PetalParticle, easingFunctions } from '../_shared/vfx';
 
 interface Card {
   id: number;
@@ -63,6 +64,11 @@ export default function MemoryMatchGame() {
   const [finalScore, setFinalScore] = useState(0);
   const sessionId = useRef<string | null>(null);
   
+  // VFX state
+  const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
+  const [shakingCardId, setShakingCardId] = useState<number | null>(null);
+  const [matchedCardIds, setMatchedCardIds] = useState<Set<number>>(new Set());
+  
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
@@ -85,13 +91,16 @@ export default function MemoryMatchGame() {
   // Game configuration - difficulty tuning parameters
   const GAME_CONFIG = {
     DIFFICULTY_SETTINGS: {
-      easy: { pairs: 6, timeBonus: 2, baseScore: 1000 },
-      normal: { pairs: 8, timeBonus: 1.5, baseScore: 1500 },
-      hard: { pairs: 10, timeBonus: 1, baseScore: 2000 },
+      easy: { pairs: 6, timeBonus: 2, baseScore: 1000, gridCols: 3, gridRows: 4 }, // 3×4 = 12 cards = 6 pairs
+      normal: { pairs: 8, timeBonus: 1.5, baseScore: 1500, gridCols: 4, gridRows: 4 }, // 4×4 = 16 cards = 8 pairs
+      hard: { pairs: 15, timeBonus: 1, baseScore: 2000, gridCols: 5, gridRows: 6 }, // 5×6 = 30 cards = 15 pairs
     },
     MOVE_BONUS_MULTIPLIER: 50,
     STREAK_BONUS_MULTIPLIER: 25,
     TIME_BONUS_BASE: 300,
+    FLIP_ANIMATION_DURATION: 300, // ms
+    MATCH_ANIMATION_DURATION: 1000, // ms
+    MISMATCH_ANIMATION_DURATION: 1500, // ms
   } as const;
 
   const difficultySettings = GAME_CONFIG.DIFFICULTY_SETTINGS;
@@ -242,7 +251,21 @@ export default function MemoryMatchGame() {
         const secondCard = cards[secondId];
 
         if (firstCard.value === secondCard.value) {
-          // Match found!
+          // Match found! - Add to matched set for glow effect
+          setMatchedCardIds((prev) => new Set([...prev, firstId, secondId]));
+          
+          // Create petal burst VFX at card positions
+          const card1Element = document.querySelector(`[data-card-id="${firstId}"]`);
+          
+          if (card1Element) {
+            const rect = card1Element.getBoundingClientRect();
+            const burst = createPetalBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 6, {
+              speed: 2,
+              spread: Math.PI * 2,
+            });
+            setPetalParticles((prev) => [...prev, ...burst]);
+          }
+          
           setTimeout(() => {
             setCards((prev) =>
               prev.map((card) =>
@@ -262,9 +285,12 @@ export default function MemoryMatchGame() {
             });
             setStreak((prev) => prev + 1);
             setFlippedCards([]);
-          }, 1000);
+          }, GAME_CONFIG.MATCH_ANIMATION_DURATION);
         } else {
-          // No match
+          // No match - shake animation
+          setShakingCardId(firstId);
+          setTimeout(() => setShakingCardId(secondId), 50);
+          
           setTimeout(() => {
             setCards((prev) =>
               prev.map((card) =>
@@ -273,12 +299,55 @@ export default function MemoryMatchGame() {
             );
             setFlippedCards([]);
             setStreak(0);
-          }, 1500);
+            setShakingCardId(null);
+          }, GAME_CONFIG.MISMATCH_ANIMATION_DURATION);
         }
       }
     },
     [gameState, flippedCards, cards, settings.pairs, completeGame],
   );
+  
+  // Update petal particles
+  useEffect(() => {
+    if (gameState !== 'playing' || petalParticles.length === 0) {
+      if (petalParticles.length > 0) {
+        setPetalParticles([]);
+      }
+      return;
+    }
+    
+    let animationId: number | null = null;
+    let lastTime = performance.now();
+    let isRunning = true;
+    
+    const updateParticles = () => {
+      if (!isRunning) return;
+      
+      const now = performance.now();
+      const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
+      lastTime = now;
+      
+      setPetalParticles((prev) => {
+        if (prev.length === 0) {
+          return prev;
+        }
+        const updated = updatePetalParticles(prev, deltaTime, 0.1);
+        if (updated.length > 0 && isRunning) {
+          animationId = requestAnimationFrame(updateParticles);
+        }
+        return updated;
+      });
+    };
+    
+    animationId = requestAnimationFrame(updateParticles);
+    
+    return () => {
+      isRunning = false;
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [gameState, petalParticles.length]);
 
   // Format time
   const formatTime = (seconds: number) => {
@@ -419,39 +488,66 @@ export default function MemoryMatchGame() {
             <div
               className={`grid gap-4 ${
                 settings.pairs <= 6
-                  ? 'grid-cols-4'
+                  ? `grid-cols-${settings.gridCols || 4}`
                   : settings.pairs <= 8
-                    ? 'grid-cols-4 md:grid-cols-5'
-                    : 'grid-cols-4 md:grid-cols-5 lg:grid-cols-6'
+                    ? `grid-cols-${settings.gridCols || 4} md:grid-cols-${settings.gridCols || 5}`
+                    : `grid-cols-${settings.gridCols || 4} md:grid-cols-${settings.gridCols || 5} lg:grid-cols-${settings.gridCols || 6}`
               }`}
+              style={{
+                gridTemplateColumns: `repeat(${settings.gridCols || 4}, minmax(0, 1fr))`,
+              }}
             >
               <AnimatePresence>
-                {cards.map((card) => (
-                  <motion.div
-                    key={card.id}
-                    layoutId={`card-${card.id}`}
-                    whileHover={{ scale: gameState === 'playing' ? 1.05 : 1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="aspect-square cursor-pointer"
-                    onClick={() => handleCardFlip(card.id)}
-                  >
-                    <div
-                      className={`w-full h-full relative preserve-3d transition-transform duration-500 ${
-                        card.isFlipped || card.isMatched ? 'rotate-y-180' : ''
-                      }`}
+                {cards.map((card) => {
+                  const isShaking = shakingCardId === card.id;
+                  const isMatched = matchedCardIds.has(card.id);
+                  
+                  return (
+                    <motion.div
+                      key={card.id}
+                      data-card-id={card.id}
+                      layoutId={`card-${card.id}`}
+                      whileHover={{ scale: gameState === 'playing' ? 1.05 : 1 }}
+                      whileTap={{ scale: 0.95 }}
+                      animate={isShaking ? {
+                        x: [0, -10, 10, -10, 10, 0],
+                        transition: { duration: 0.3 }
+                      } : {}}
+                      className="aspect-square cursor-pointer"
+                      onClick={() => handleCardFlip(card.id)}
                     >
-                      {/* Card Back */}
-                      <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl border-2 border-pink-400/50 flex items-center justify-center">
-                        <div className="text-4xl"></div>
-                      </div>
-                      {/* Card Front */}
-                      <div
-                        className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 p-2 flex flex-col items-center justify-center text-center ${
-                          card.isMatched
-                            ? 'bg-green-600/80 border-green-400'
-                            : 'bg-slate-800/90 border-slate-600'
+                      <motion.div
+                        className={`w-full h-full relative preserve-3d ${
+                          card.isFlipped || card.isMatched ? 'rotate-y-180' : ''
                         }`}
+                        transition={{
+                          duration: GAME_CONFIG.FLIP_ANIMATION_DURATION / 1000,
+                          ease: easingFunctions.easeInOutCubic,
+                        }}
+                        style={{
+                          transformStyle: 'preserve-3d',
+                        }}
                       >
+                        {/* Card Back */}
+                        <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl border-2 border-pink-400/50 flex items-center justify-center">
+                          <div className="text-4xl"></div>
+                        </div>
+                        {/* Card Front */}
+                        <motion.div
+                          className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 p-2 flex flex-col items-center justify-center text-center ${
+                            card.isMatched
+                              ? 'bg-green-600/80 border-green-400'
+                              : 'bg-slate-800/90 border-slate-600'
+                          }`}
+                          animate={isMatched ? {
+                            boxShadow: [
+                              '0 0 0px rgba(34, 197, 94, 0)',
+                              '0 0 20px rgba(34, 197, 94, 0.8)',
+                              '0 0 10px rgba(34, 197, 94, 0.4)',
+                            ],
+                            transition: { duration: 0.5, times: [0, 0.5, 1] }
+                          } : {}}
+                        >
                         <div className="text-2xl mb-1">
                           {card.character === 'Senku Ishigami'
                             ? ''
@@ -471,14 +567,33 @@ export default function MemoryMatchGame() {
                                           ? '†'
                                           : ''}
                         </div>
-                        <div className="text-xs text-white font-medium">{card.character}</div>
-                        <div className="text-xs text-slate-400">{card.series}</div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                          <div className="text-xs text-white font-medium">{card.character}</div>
+                          <div className="text-xs text-slate-400">{card.series}</div>
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
+            
+            {/* Petal Particles Overlay */}
+            {petalParticles.length > 0 && (
+              <svg
+                className="absolute inset-0 pointer-events-none z-20"
+                style={{ width: '100%', height: '100%' }}
+              >
+                {petalParticles.map((particle) => (
+                  <g
+                    key={particle.id}
+                    transform={`translate(${particle.x}, ${particle.y}) rotate(${(particle.rotation * 180) / Math.PI}) scale(${particle.scale})`}
+                    opacity={particle.alpha}
+                  >
+                    <circle r={4} fill="#ec4899" />
+                  </g>
+                ))}
+              </svg>
+            )}
           </>
         )}
 

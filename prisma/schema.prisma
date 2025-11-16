@@ -435,18 +435,56 @@ model Coupon {
   @@index([enabled])
 }
 
+model DiscountReward {
+  id                    String        @id @default(cuid())
+  name                  String // Display name for admin
+  description           String? // Description shown to users
+  discountType          DiscountType
+  amountOff             Int? // Fixed amount off in cents
+  percentOff            Int? // Percentage off (0-100)
+  petalCost             Int // Cost in petals to unlock
+  nsfwOnly              Boolean       @default(false) // Only applicable to NSFW products
+  requiresAchievementId String? // Optional achievement requirement
+  minSpendCents         Int? // Minimum order amount in cents
+  maxUsesPerUser        Int? // Max times a user can purchase this reward
+  maxTotalUses          Int? // Max total times this reward can be purchased
+  validityDays          Int           @default(30) // How many days the coupon is valid after purchase
+  enabled               Boolean       @default(true) // Whether this reward is available for purchase
+  startsAt              DateTime? // When this reward becomes available
+  endsAt                DateTime? // When this reward expires
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  createdBy             String? // Admin user ID who created this
+  CouponGrant           CouponGrant[]
+
+  @@index([enabled])
+  @@index([startsAt, endsAt])
+  @@index([nsfwOnly])
+}
+
 model CouponGrant {
-  id           String       @id @default(cuid())
-  userId       String
-  code         String       @unique
-  discountType DiscountType
-  amountOff    Int?
-  percentOff   Int?
-  expiresAt    DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  redeemedAt   DateTime?
-  User         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String          @id @default(cuid())
+  userId                String
+  code                  String          @unique
+  discountType          DiscountType
+  amountOff             Int?
+  percentOff            Int?
+  expiresAt             DateTime?
+  petalCost             Int? // Original petal cost to unlock this discount
+  nsfwOnly              Boolean         @default(false) // Only applicable to NSFW products
+  requiresAchievementId String? // Optional achievement requirement
+  minSpendCents         Int? // Minimum order amount in cents
+  discountRewardId      String? // Reference to DiscountReward template if purchased from shop
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  redeemedAt            DateTime?
+  User                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  DiscountReward        DiscountReward? @relation(fields: [discountRewardId], references: [id], onDelete: SetNull)
+
+  @@index([userId, redeemedAt])
+  @@index([expiresAt])
+  @@index([nsfwOnly])
+  @@index([discountRewardId])
 }
 
 model CouponRedemption {
@@ -1549,6 +1587,18 @@ model SiteConfig {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   updatedBy String?
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  boolValue   Boolean?
+  stringValue String?
+  jsonValue   Json?
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+
+  @@index([key])
 }
 
 model SlotAccepts {

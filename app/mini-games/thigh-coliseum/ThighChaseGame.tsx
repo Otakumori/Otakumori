@@ -12,6 +12,7 @@ interface Obstacle {
   height: number;
   type: 'low' | 'high' | 'wide';
   speed: number;
+  warningTime: number; // Time remaining for warning (0 = no warning, >0 = warning active)
 }
 
 interface Powerup {
@@ -43,6 +44,9 @@ export default function ThighChaseGame({
   const [distance, setDistance] = useState(0);
   const [stage, setStage] = useState(1);
   const [lives, setLives] = useState(3);
+  const [cameraX, setCameraX] = useState(0); // Camera position for following player
+  const [lastMilestoneDistance, setLastMilestoneDistance] = useState(0);
+  const [lastMilestoneStage, setLastMilestoneStage] = useState(1);
 
   // Notify parent of state changes
   useEffect(() => {
@@ -115,6 +119,9 @@ export default function ThighChaseGame({
     setStage(1);
     setLives(5); // Increased from 3 for better survivability
     setGameTime(0);
+    setCameraX(0);
+    setLastMilestoneDistance(0);
+    setLastMilestoneStage(1);
     setPlayer({
       x: 100,
       y: GROUND_Y - 40,
@@ -198,6 +205,7 @@ export default function ThighChaseGame({
       height: template.height,
       type: template.type,
       speed,
+      warningTime: 800, // 800ms warning before obstacle reaches player
     };
 
     setObstacles((prev) => [...prev, newObstacle]);
@@ -234,11 +242,34 @@ export default function ThighChaseGame({
         const newDistance = prev + (BASE_SPEED + stage * 0.3); // Match reduced speed scaling
 
         // Stage progression every 1500 distance units (was 1000, slower progression)
-        if (Math.floor(newDistance / 1500) > stage - 1) {
-          setStage((s) => s + 1);
+        const newStage = Math.floor(newDistance / 1500) + 1;
+        if (newStage > stage) {
+          setStage(newStage);
+        }
+
+        // Milestone rewards - every 500m
+        const milestoneDistance = Math.floor(newDistance / 500);
+        const lastMilestone = Math.floor(lastMilestoneDistance / 500);
+        if (milestoneDistance > lastMilestone) {
+          setLastMilestoneDistance(newDistance);
+          // Award milestone petals (handled in page component via onStageChange)
+          setScore((s) => s + milestoneDistance * 100); // Bonus score
         }
 
         return newDistance;
+      });
+      
+      // Stage milestone rewards
+      if (stage > lastMilestoneStage) {
+        setLastMilestoneStage(stage);
+        // Award stage milestone petals (handled in page component)
+        setScore((s) => s + stage * 200); // Bonus score for stage milestone
+      }
+      
+      // Camera following player with smooth interpolation
+      setCameraX((prev) => {
+        const targetX = Math.max(0, player.x - CANVAS_WIDTH / 3); // Keep player in left third of screen
+        return prev + (targetX - prev) * 0.1; // Smooth camera follow
       });
 
       // Player physics
@@ -326,10 +357,25 @@ export default function ThighChaseGame({
         return prev - deltaTime;
       });
 
-      // Update obstacles
+      // Update obstacles with warnings
       setObstacles((prev) =>
         prev
-          .map((obstacle) => ({ ...obstacle, x: obstacle.x - obstacle.speed }))
+          .map((obstacle) => {
+            const newX = obstacle.x - obstacle.speed;
+            const distanceToPlayer = newX - player.x;
+            const timeToCollision = distanceToPlayer / obstacle.speed; // Approximate time until collision
+            
+            // Update warning time based on distance to player
+            let newWarningTime = obstacle.warningTime;
+            if (distanceToPlayer < 400 && distanceToPlayer > 0) {
+              // Show warning when obstacle is approaching (400px away)
+              newWarningTime = Math.max(0, timeToCollision * 16); // Convert to ms (deltaTime is 16ms)
+            } else {
+              newWarningTime = 0;
+            }
+            
+            return { ...obstacle, x: newX, warningTime: newWarningTime };
+          })
           .filter((obstacle) => obstacle.x > -100),
       );
 
@@ -472,32 +518,60 @@ export default function ThighChaseGame({
 
     if (gameState !== 'playing') return;
 
+    // Apply camera transform
+    ctx.save();
+    ctx.translate(-cameraX, 0);
+
     // Draw background (moving pattern)
     ctx.fillStyle = '#2a2a2a';
     const bgOffset = (distance * 0.1) % 60;
-    for (let x = -bgOffset; x < CANVAS_WIDTH; x += 60) {
+    for (let x = -bgOffset + cameraX; x < CANVAS_WIDTH + cameraX; x += 60) {
       ctx.fillRect(x, 0, 30, CANVAS_HEIGHT);
     }
 
     // Draw ground
     ctx.fillStyle = '#3a3a3a';
-    ctx.fillRect(0, GROUND_Y, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y);
+    ctx.fillRect(cameraX, GROUND_Y, CANVAS_WIDTH + 200, CANVAS_HEIGHT - GROUND_Y);
 
     // Draw ground pattern
     ctx.fillStyle = '#4a4a4a';
     const groundOffset = (distance * 0.2) % 40;
-    for (let x = -groundOffset; x < CANVAS_WIDTH; x += 40) {
+    for (let x = -groundOffset + cameraX; x < CANVAS_WIDTH + cameraX; x += 40) {
       ctx.fillRect(x, GROUND_Y, 20, 10);
     }
 
-    // Draw obstacles
+    // Draw obstacles with warnings
     obstacles.forEach((obstacle) => {
+      // Warning glow effect when approaching
+      if (obstacle.warningTime > 0) {
+        const warningIntensity = Math.min(1, obstacle.warningTime / 400); // Fade as it gets closer
+        const pulse = Math.sin(Date.now() / 100) * 0.3 + 0.7;
+        
+        ctx.save();
+        ctx.globalAlpha = warningIntensity * pulse * 0.5;
+        ctx.fillStyle = '#ff4444';
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = '#ff4444';
+        ctx.fillRect(obstacle.x - 10, obstacle.y - 10, obstacle.width + 20, obstacle.height + 20);
+        ctx.restore();
+        
+        // Warning indicator above obstacle
+        ctx.save();
+        ctx.globalAlpha = warningIntensity;
+        ctx.fillStyle = '#ff4444';
+        ctx.font = 'bold 16px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('!', obstacle.x + obstacle.width / 2, obstacle.y - 15);
+        ctx.restore();
+      }
+      
       ctx.fillStyle = obstacle.type === 'high' ? '#8b0000' : '#654321';
       ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
 
       // Obstacle warning/style
       ctx.fillStyle = '#ffffff';
       ctx.font = '12px monospace';
+      ctx.textAlign = 'left';
       const symbols = { low: '▬', high: '▲', wide: '■' };
       ctx.fillText(symbols[obstacle.type], obstacle.x + 5, obstacle.y + 15);
     });
@@ -569,6 +643,8 @@ export default function ThighChaseGame({
     ctx.fillStyle = '#ffffff';
     ctx.font = '16px monospace';
     ctx.fillText('‍️', player.x + 5, player.y + 25);
+    
+    ctx.restore(); // Restore camera transform
 
     // Draw UI
     ctx.fillStyle = '#ffffff';

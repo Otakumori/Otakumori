@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { type Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import { serializeProduct } from '@/lib/catalog/serialize';
+import { deduplicateProducts } from '@/app/lib/shop/catalog';
 
 export const runtime = 'nodejs';
 
@@ -166,6 +167,11 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.max(1, Math.ceil(total / limit));
     let serialized = products.map(serializeProduct);
+
+    // Deduplicate by blueprintId to prevent duplicate product cards
+    serialized = deduplicateProducts(serialized, {
+      deduplicateBy: 'blueprintId',
+    });
 
     if (params.sortBy === 'price') {
       serialized = serialized.sort((a, b) => {

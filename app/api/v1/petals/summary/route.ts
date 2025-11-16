@@ -106,6 +106,31 @@ export async function GET() {
 
     achievementPetals = achievementEarnings.reduce((sum, entry) => sum + entry.amount, 0);
 
+    // Get cosmetics stats
+    const inventoryItems = await db.inventoryItem.findMany({
+      where: { userId: user.id },
+      select: { kind: true },
+    });
+
+    const hudSkins = inventoryItems.filter((item) => item.kind === 'OVERLAY').length;
+    const avatarCosmetics = inventoryItems.filter(
+      (item) => item.kind === 'COSMETIC' || item.kind === 'TEXT' || item.kind === 'CURSOR',
+    ).length;
+    const totalCosmetics = inventoryItems.length;
+
+    // Get active vouchers count
+    const now = new Date();
+    const activeVouchers = await db.couponGrant.count({
+      where: {
+        userId: user.id,
+        redeemedAt: null, // Not yet redeemed
+        OR: [
+          { expiresAt: null }, // No expiry
+          { expiresAt: { gt: now } }, // Not expired
+        ],
+      },
+    });
+
     // Check daily cap status (simplified - check if today's earnings exceed any limit)
     const dailyLimits = {
       game: 2000,
@@ -152,6 +177,14 @@ export async function GET() {
         achievements: {
           count: achievementCount,
           petalsEarned: achievementPetals,
+        },
+        cosmetics: {
+          totalOwned: totalCosmetics,
+          hudSkins,
+          avatarCosmetics,
+        },
+        vouchers: {
+          activeCount: activeVouchers,
         },
       },
     });

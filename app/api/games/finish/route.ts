@@ -5,6 +5,8 @@ import { z } from 'zod';
 import { GAME_FLAGS } from '@/config/games';
 import { logger } from '@/app/lib/logger';
 import { db } from '@/lib/db';
+import { PetalService } from '@/app/lib/petals';
+import { calculateGameReward } from '@/app/config/petalTuning';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
@@ -59,18 +61,70 @@ export async function POST(request: Request) {
   }
 
   const playerId = userId;
-  const petalsGranted = calculatePetals(body.game, score);
+  
+  // Map legacy game IDs to new game IDs
+  const gameIdMap: Record<string, string> = {
+    'samurai_petal_slice': 'petal-samurai',
+    'anime_memory_match': 'memory-match',
+    'bubble_pop_gacha': 'bubble-girl',
+    'rhythm_beat_em_up': 'petal-storm-rhythm',
+  };
+  const mappedGameId = gameIdMap[body.game] || body.game;
+  
+  // Calculate petal reward using centralized tuning config
+  // Default to win=true for legacy compatibility
+  const petalAmount = calculateGameReward(mappedGameId, true, score, {
+    difficulty: diff,
+  });
+  let petalsGranted = petalAmount;
 
   if (petalsGranted > 0) {
-    logger.info('petals_granted', {
-      userId: playerId,
-      game: body.game,
-      extra: {
-        score,
-        petalsGranted,
-      },
-    });
-    // TODO: integrate with petals ledger + achievements once migrations are stable
+    try {
+      const petalService = new PetalService();
+      const result = await petalService.awardPetals(playerId, {
+        type: 'earn',
+        amount: petalAmount,
+        reason: `Game reward: ${mappedGameId}`,
+        source: 'game',
+        metadata: {
+          gameId: mappedGameId,
+          legacyGame: body.game,
+          score,
+          diff,
+        },
+      });
+
+      if (result.success) {
+        petalsGranted = result.awarded;
+        logger.info('petals_granted', {
+          userId: playerId,
+          game: body.game,
+          extra: {
+            score,
+            petalsGranted: result.awarded,
+            newBalance: result.newBalance,
+            lifetimePetalsEarned: result.lifetimePetalsEarned,
+          },
+        });
+      } else {
+        logger.error('petals_grant_failed', {
+          userId: playerId,
+          game: body.game,
+          extra: {
+            error: result.error,
+            dailyCapReached: result.dailyCapReached,
+          },
+        });
+        petalsGranted = 0;
+      }
+    } catch (error) {
+      logger.error('petals_grant_error', {
+        userId: playerId,
+        game: body.game,
+        extra: { error },
+      });
+      petalsGranted = 0;
+    }
   }
 
   let personalBest = false;
@@ -182,21 +236,4 @@ function formatLeaderboardEntry(entry: LeaderboardEntry) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
-}
-
-function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number) {
-  if (inMax === inMin) return outMin;
-  const t = (value - inMin) / (inMax - inMin);
-  return outMin + t * (outMax - outMin);
-}
-
-function calculatePetals(game: string, score: number) {
-  const grants: Record<string, (s: number) => number> = {
-    samurai_petal_slice: (s) => clamp(Math.round(mapRange(s, 0, 5000, 5, 35)), 0, 50),
-    anime_memory_match: (s) => clamp(Math.round(mapRange(s, 0, 2000, 5, 25)), 0, 30),
-    bubble_pop_gacha: (s) => clamp(Math.round(mapRange(s, 0, 1500, 5, 20)), 0, 25),
-    rhythm_beat_em_up: (s) => clamp(Math.round(mapRange(s, 0, 8000, 10, 60)), 0, 80),
-  };
-
-  return grants[game]?.(score) ?? 0;
 }

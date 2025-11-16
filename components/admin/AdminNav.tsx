@@ -43,6 +43,18 @@ const adminRoutes = [
     description: 'Coupon SKUs and templates',
   },
   {
+    path: '/admin/discounts',
+    name: 'Discount Rewards',
+    icon: Ticket,
+    description: 'Manage petal-purchased discount vouchers',
+  },
+  {
+    path: '/admin/economy',
+    name: 'Economy Overview',
+    icon: Sparkles,
+    description: 'Monitor petals, discounts, and cosmetics',
+  },
+  {
     path: '/admin/burst',
     name: 'Burst System',
     icon: Zap,

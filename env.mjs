@@ -92,6 +92,11 @@ export const env = createEnv({
     FEATURE_GATED_COSMETICS: z.string().optional(),
     FEATURE_AVATARS: z.string().optional(),
     FEATURE_AVATAR_STYLIZED_SHADERS: z.string().optional(),
+    // Petal discount vouchers
+    PETAL_DISCOUNT_ENABLED: z.string().optional(), // Set to 'true' to enable discount vouchers
+    PETAL_DISCOUNT_MIN_ORDER_CENTS: z.string().optional(), // Minimum order total to apply discount (default: 2000 = $20)
+    PETAL_DISCOUNT_MAX_PERCENT: z.string().optional(), // Max allowed discount percent (default: 15)
+    PETAL_DISCOUNT_MAX_PER_USER_MONTH: z.string().optional(), // Max voucher redemptions per user per month (default: 3)
     // Internal
     INTERNAL_AUTH_TOKEN: z.string().optional(),
     // Adult content storage

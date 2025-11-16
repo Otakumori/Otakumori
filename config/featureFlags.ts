@@ -2,6 +2,7 @@
  * Centralized Feature Flags Configuration
  * Resolves from environment variables with safe defaults
  * Integrates with avatar-engine flags for single source of truth
+ * On server-side, uses DB overrides via getEffectiveFeatureFlags()
  */
 
 import { isAvatarsEnabled as isAvatarEngineEnabled, isNsfwAvatarsEnabled as isNsfwEngineEnabled } from '@om/avatar-engine/config/flags';
@@ -13,17 +14,52 @@ export interface FeatureFlags {
 }
 
 let cachedFlags: FeatureFlags | null = null;
+let serverFlagsPromise: Promise<FeatureFlags> | null = null;
 
 /**
  * Resolve feature flags from environment variables
  * Always resolves from env first, then falls back to defaults
  * Does not crash builds if env vars are absent
+ * On server-side, uses DB overrides when available
  */
 function resolveFeatureFlags(): FeatureFlags {
+  // Server-side: try to use DB-backed effective flags
+  if (typeof window === 'undefined' && typeof process !== 'undefined') {
+    // Use effective flags from server helper (includes DB overrides)
+    if (!serverFlagsPromise) {
+      serverFlagsPromise = (async () => {
+        try {
+          const { getEffectiveFeatureFlags } = await import('@/app/lib/config/featureFlags.server');
+          return await getEffectiveFeatureFlags();
+        } catch (error) {
+          // Fallback to env-based if server helper fails (e.g., during build)
+          console.warn('Failed to load effective feature flags, using env defaults:', error);
+          return resolveFromEnv();
+        }
+      })();
+    }
+    // For sync calls, return cached or fallback to env
+    // Note: This means server-side sync calls will use env, async calls will use DB
+    if (cachedFlags) {
+      return cachedFlags;
+    }
+    // Return env-based for now (caller should use async getEffectiveFeatureFlags() for DB overrides)
+    return resolveFromEnv();
+  }
+
+  // Client-side: use env/avatar-engine resolution
   if (cachedFlags) {
     return cachedFlags;
   }
 
+  cachedFlags = resolveFromEnv();
+  return cachedFlags;
+}
+
+/**
+ * Resolve flags from environment variables (fallback/default behavior)
+ */
+function resolveFromEnv(): FeatureFlags {
   // Resolve AVATARS_ENABLED from env or avatar-engine
   const envAvatarsEnabled =
     typeof process !== 'undefined' && process.env
@@ -48,13 +84,11 @@ function resolveFeatureFlags(): FeatureFlags {
   // Use avatar-engine resolution if available
   const nsfwEnabled = typeof window !== 'undefined' ? isNsfwEngineEnabled() : envNsfwEnabled;
 
-  cachedFlags = {
+  return {
     AVATARS_ENABLED: avatarsEnabled,
     REQUIRE_AUTH_FOR_MINI_GAMES: requireAuth,
     NSFW_AVATARS_ENABLED: nsfwEnabled,
   };
-
-  return cachedFlags;
 }
 
 /**

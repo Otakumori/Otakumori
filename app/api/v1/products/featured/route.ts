@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { serializeProduct } from '@/lib/catalog/serialize';
 import { getPrintifyService } from '@/app/lib/printify/service';
+import { deduplicateProducts } from '@/app/lib/shop/catalog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,13 @@ const QuerySchema = z.object({
     .transform((val) => {
       const parsed = val ? parseInt(val, 10) : 6;
       return Number.isNaN(parsed) ? 6 : Math.max(1, Math.min(parsed, 12));
+    }),
+  excludeTitles: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (!val) return [];
+      return val.split(',').map((t) => t.trim()).filter(Boolean);
     }),
 });
 
@@ -71,6 +79,7 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
       category: dto.category ?? undefined,
       slug: dto.slug,
       integrationRef: dto.integrationRef,
+      blueprintId: dto.blueprintId ?? null,
     };
   });
 
@@ -81,9 +90,11 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
   };
 }
 
-async function fetchPrintifyProducts(limit: number) {
+async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []) {
   const printifyClient = getPrintifyService();
-  const printifyResult = await printifyClient.getProducts(1, limit);
+  // Fetch more products than needed to account for deduplication and exclusions
+  const fetchLimit = Math.max(limit * 3, 50);
+  const printifyResult = await printifyClient.getProducts(1, fetchLimit);
   const publishedProducts = (printifyResult.data || []).filter((product) =>
     product?.variants?.some((variant) => variant.is_enabled),
   );
@@ -120,12 +131,20 @@ async function fetchPrintifyProducts(limit: number) {
       category: product.tags?.[0],
       slug: undefined,
       integrationRef: product.id,
+      blueprintId: product.blueprint_id ?? null,
     };
+  });
+
+  // Apply deduplication and exclusions
+  const deduplicated = deduplicateProducts(mappedPrintify, {
+    limit,
+    excludeTitles,
+    deduplicateBy: 'blueprintId',
   });
 
   return {
     ok: true,
-    data: { products: mappedPrintify },
+    data: { products: deduplicated },
     source: 'printify' as const,
   };
 }
@@ -138,15 +157,22 @@ export async function GET(request: NextRequest) {
 
     const catalogResult = await fetchCatalogProducts(query.limit, forcePrintify);
     if (catalogResult) {
+      // Apply deduplication and exclusions to catalog products too
+      const deduplicated = deduplicateProducts(catalogResult.data.products, {
+        limit: query.limit,
+        excludeTitles: query.excludeTitles,
+        deduplicateBy: 'blueprintId',
+      });
+
       return NextResponse.json({
         ok: true,
-        data: catalogResult.data,
+        data: { products: deduplicated },
         source: catalogResult.source,
         timestamp: new Date().toISOString(),
       });
     }
 
-    const fallbackResult = await fetchPrintifyProducts(query.limit);
+    const fallbackResult = await fetchPrintifyProducts(query.limit, query.excludeTitles);
     return NextResponse.json({
       ok: true,
       data: fallbackResult.data,

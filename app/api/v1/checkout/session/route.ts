@@ -10,6 +10,9 @@ import { prisma } from '@/app/lib/prisma';
 import { CheckoutRequest } from '@/app/lib/contracts';
 import { getApplicableCoupons, normalizeCode, type CouponMeta } from '@/lib/coupons/engine';
 import { rateLimitConfigs, withRateLimit } from '@/app/lib/rateLimit';
+import { getDiscountConfig } from '@/app/config/petalTuning';
+import { logger } from '@/app/lib/logger';
+import { generateRequestId } from '@/lib/requestId';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-10-29.clover',
@@ -54,14 +57,53 @@ export async function POST(req: NextRequest) {
     const subtotalCents = items.reduce((sum: number, i: any) => sum + i.priceCents * i.quantity, 0);
 
     // Coupons: fetch metadata and compute breakdown
+    // Includes both Coupon records and CouponGrant (petal-purchased vouchers)
     let appliedCodes: string[] = [];
     let discountTotalCents = 0;
     let shippingDiscountCents = 0;
     let discountedLineItems: { id: string; totalDiscountCents: number }[] = [];
     if (Array.isArray(couponCodes) && couponCodes.length > 0) {
       const codes = (couponCodes as string[]).map(normalizeCode);
-      const rows = await prisma.coupon.findMany({ where: { code: { in: codes } } });
-      const metas: CouponMeta[] = rows.map((r: any) => ({
+      
+      // Fetch regular Coupon records
+      const couponRows = await prisma.coupon.findMany({ where: { code: { in: codes } } });
+      
+      // Get NSFW policy for validation
+      const { getPolicyFromRequest } = await import('@/app/lib/policy/fromRequest');
+      const policy = getPolicyFromRequest(req);
+      const nsfwAllowed = policy.nsfwAllowed;
+
+      // Fetch CouponGrant vouchers for this user (petal-purchased vouchers)
+      const grantRows = await prisma.couponGrant.findMany({
+        where: {
+          userId: user.id,
+          code: { in: codes },
+          redeemedAt: null, // Not yet redeemed
+          OR: [
+            { expiresAt: null }, // No expiry
+            { expiresAt: { gt: new Date() } }, // Not expired
+          ],
+        },
+      });
+
+      // Filter NSFW discounts if NSFW not allowed
+      const validGrantRows = grantRows.filter((grant) => {
+        if (grant.nsfwOnly && !nsfwAllowed) {
+          logger.info('NSFW discount filtered out at checkout', {
+            userId: user.id,
+            extra: {
+              couponCode: grant.code,
+              discountRewardId: grant.discountRewardId,
+              nsfwAllowed,
+            },
+          });
+          return false;
+        }
+        return true;
+      });
+      
+      // Convert Coupon records to CouponMeta
+      const couponMetas: CouponMeta[] = couponRows.map((r: any) => ({
         id: r.id,
         code: r.code,
         type: r.type as any,
@@ -81,6 +123,37 @@ export async function POST(req: NextRequest) {
         stackable: r.stackable,
         oneTimeCode: r.oneTimeCode,
       }));
+      
+      // Convert CouponGrant vouchers to CouponMeta format
+      const discountConfig = await getDiscountConfig();
+      const grantMetas: CouponMeta[] = validGrantRows.map((g) => {
+        // Validate discount percent doesn't exceed max
+        const percentOff = g.percentOff || 0;
+        const validPercent = Math.min(percentOff, discountConfig.maxPercent);
+        
+        return {
+          id: g.id,
+          code: g.code,
+          type: g.discountType === 'PERCENT' ? 'PERCENT' : 'FIXED',
+          valueCents: g.amountOff || 0,
+          valuePct: validPercent > 0 ? validPercent : undefined,
+          enabled: true,
+          startsAt: g.createdAt,
+          endsAt: g.expiresAt ?? undefined,
+          maxRedemptions: 1, // Vouchers are single-use
+          maxRedemptionsPerUser: 1,
+          minSubtotalCents: g.minSpendCents || discountConfig.minOrderCents, // Use CouponGrant's minSpendCents if set
+          allowedProductIds: [],
+          excludedProductIds: [],
+          allowedCollections: [],
+          excludedCollections: [],
+          stackable: false, // Vouchers don't stack
+          oneTimeCode: true,
+        };
+      });
+      
+      // Combine both types
+      const metas: CouponMeta[] = [...couponMetas, ...grantMetas];
 
       const breakdown = await getApplicableCoupons({
         now: new Date(),
@@ -100,6 +173,38 @@ export async function POST(req: NextRequest) {
       appliedCodes = breakdown.normalizedCodes;
       discountTotalCents = Math.round(breakdown.discountTotal * 100);
       shippingDiscountCents = Math.round(breakdown.shippingDiscount * 100);
+
+      // Safety guard: Ensure discount never exceeds 100% of subtotal
+      const maxAllowedDiscount = subtotalCents;
+      if (discountTotalCents > maxAllowedDiscount) {
+        logger.error('Discount exceeds subtotal - capping discount', {
+          userId: user.id,
+          extra: {
+            discountTotalCents,
+            subtotalCents,
+            maxAllowedDiscount,
+            appliedCodes,
+          },
+        });
+        discountTotalCents = maxAllowedDiscount;
+      }
+
+      // Log discount application
+      if (appliedCodes.length > 0) {
+        const requestId = generateRequestId();
+        logger.info('Discount applied at checkout', {
+          requestId,
+          userId: user.id,
+          extra: {
+            appliedCodes,
+            discountTotalCents,
+            shippingDiscountCents,
+            subtotalCents,
+            grantCodes: validGrantRows.map((g) => g.code),
+            couponCodes: couponRows.map((c) => c.code),
+          },
+        });
+      }
 
       // Allocate non-shipping discount proportionally to eligible items for each coupon
       const itemTotals = items.map((i: any) => ({

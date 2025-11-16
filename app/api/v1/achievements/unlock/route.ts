@@ -96,7 +96,12 @@ export async function POST(request: NextRequest) {
 
       switch (achievement.Reward.kind) {
         case 'PETALS_BONUS':
-          const petalAmount = achievement.Reward.value || 0;
+          // Use tuning config to determine reward amount (respects existing DB values, falls back to tier-based)
+          const { getAchievementRewardFromPoints } = await import('@/app/config/petalTuning');
+          const petalAmount = getAchievementRewardFromPoints(
+            achievement.points,
+            achievement.Reward.value,
+          );
           
           // Use PetalService for consistent lifetime tracking and daily limits
           const { PetalService } = await import('@/app/lib/petals');

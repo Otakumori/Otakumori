@@ -26,12 +26,27 @@ interface ShopData {
   };
 }
 
+// Products to exclude from homepage preview (can still appear in full shop)
+const HOMEPAGE_EXCLUDED_TITLES = [
+  'Memory Match T-shirt',
+  'Petal Samurai Hoodie',
+  'Soapstone Mug',
+  'Guardian Rune Pin',
+  'Abyss T-Shirt',
+  'Cherry Blossom Hoodie',
+  'Otakumori Poster',
+];
+
 export default async function ShopSection() {
   let products: Product[] = [];
   let isBlockedData = false;
 
   try {
-    const featuredResult = await safeFetch<ShopData>('/api/v1/products/featured?force_printify=true', {
+    // Build exclusion query parameter
+    const excludeParam = HOMEPAGE_EXCLUDED_TITLES.map((t) => `excludeTitles=${encodeURIComponent(t)}`).join('&');
+    const apiUrl = `/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
+
+    const featuredResult = await safeFetch<ShopData>(apiUrl, {
       allowLive: true,
     });
 
@@ -76,7 +91,7 @@ export default async function ShopSection() {
         </div>
       ) : hasProducts ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {products.slice(0, 6).map((product) => (
+          {products.map((product) => (
             <Link
               key={product.id}
               href={product.slug ? paths.product(product.slug) : paths.shop()}

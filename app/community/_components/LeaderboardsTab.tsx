@@ -42,8 +42,18 @@ export function LeaderboardsTab() {
           }
         }
 
-        // Fetch game-specific leaderboards (for implemented games)
-        const games = ['petal-samurai', 'petal-storm-rhythm'];
+        // Fetch game-specific leaderboards (for all 9 mini-games)
+        const games = [
+          'petal-samurai',
+          'petal-storm-rhythm',
+          'memory-match',
+          'bubble-girl',
+          'puzzle-reveal',
+          'otaku-beat-em-up',
+          'dungeon-of-desire',
+          'thigh-coliseum',
+          'blossomware',
+        ];
         const gameData: Record<string, GameLeaderboardEntry[]> = {};
 
         for (const gameId of games) {

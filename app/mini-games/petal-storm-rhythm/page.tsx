@@ -28,6 +28,7 @@ import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetCh
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import { createPetalBurst, updatePetalParticles, type PetalParticle } from '../_shared/vfx';
 
 interface Note {
   id: string;
@@ -113,6 +114,10 @@ export default function PetalStormRhythm() {
   const [multiplier, setMultiplier] = useState(1);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
+  
+  // Hit VFX state
+  const [laneFlashes, setLaneFlashes] = useState<Record<number, { type: 'perfect' | 'great' | 'good' | 'miss'; time: number }>>({});
+  const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -352,7 +357,21 @@ export default function PetalStormRhythm() {
           Math.abs(currentTimeMs - note.time) <= TIMING_WINDOWS.miss,
       );
 
-      if (laneNotes.length === 0) return;
+      if (laneNotes.length === 0) {
+        // Miss - no note hit
+        setLaneFlashes((prev) => ({
+          ...prev,
+          [laneIndex]: { type: 'miss', time: Date.now() },
+        }));
+        setTimeout(() => {
+          setLaneFlashes((prev) => {
+            const updated = { ...prev };
+            delete updated[laneIndex];
+            return updated;
+          });
+        }, 300);
+        return;
+      }
 
       const closestNote = laneNotes.reduce((closest, note) =>
         Math.abs(currentTimeMs - note.time) < Math.abs(currentTimeMs - closest.time)
@@ -379,6 +398,34 @@ export default function PetalStormRhythm() {
         points = GAME_CONFIG.SCORE_MISS;
       }
 
+      // Trigger hit VFX
+      setLaneFlashes((prev) => ({
+        ...prev,
+        [laneIndex]: { type: accuracy, time: Date.now() },
+      }));
+      
+      // Create petal burst for perfect/great hits
+      if (accuracy === 'perfect' || accuracy === 'great') {
+        const laneWidth = 100; // Approximate lane width
+        const laneCenterX = (laneIndex + 0.5) * laneWidth;
+        const hitZoneY = window.innerHeight - 120; // Hit zone position
+        
+        const burst = createPetalBurst(laneCenterX, hitZoneY, accuracy === 'perfect' ? 8 : 4, {
+          speed: accuracy === 'perfect' ? 3 : 2,
+          spread: Math.PI,
+        });
+        setPetalParticles((prev) => [...prev, ...burst]);
+      }
+      
+      // Clear flash after animation
+      setTimeout(() => {
+        setLaneFlashes((prev) => {
+          const updated = { ...prev };
+          delete updated[laneIndex];
+          return updated;
+        });
+      }, accuracy === 'perfect' ? 400 : accuracy === 'great' ? 300 : 200);
+
       // Update note
       setNotes((prev) =>
         prev.map((note) => (note.id === closestNote.id ? { ...note, hit: true, accuracy } : note)),
@@ -401,17 +448,59 @@ export default function PetalStormRhythm() {
         } else {
           setMultiplier(1);
         }
-              } else {
-                setCombo(0);
-                setMultiplier(1);
-                setHealth((h: number) => Math.max(0, h - GAME_CONFIG.HEALTH_DAMAGE_PER_MISS));
-              }
+      } else {
+        setCombo(0);
+        setMultiplier(1);
+        setHealth((h: number) => Math.max(0, h - GAME_CONFIG.HEALTH_DAMAGE_PER_MISS));
+      }
 
       // Update max combo
       setMaxCombo((prev) => Math.max(prev, combo));
     },
     [gameState, currentTime, notes, combo, multiplier, score],
   );
+  
+  // Update petal particles
+  useEffect(() => {
+    if (gameState !== 'playing' || petalParticles.length === 0) {
+      if (petalParticles.length > 0) {
+        setPetalParticles([]);
+      }
+      return;
+    }
+    
+    let animationId: number | null = null;
+    let lastTime = performance.now();
+    let isRunning = true;
+    
+    const updateParticles = () => {
+      if (!isRunning) return;
+      
+      const now = performance.now();
+      const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
+      lastTime = now;
+      
+      setPetalParticles((prev) => {
+        if (prev.length === 0) {
+          return prev;
+        }
+        const updated = updatePetalParticles(prev, deltaTime, 0.1);
+        if (updated.length > 0 && isRunning) {
+          animationId = requestAnimationFrame(updateParticles);
+        }
+        return updated;
+      });
+    };
+    
+    animationId = requestAnimationFrame(updateParticles);
+    
+    return () => {
+      isRunning = false;
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [gameState, petalParticles.length]);
 
   // Keyboard controls (5 lanes: A, S, D, F, G)
   useEffect(() => {
@@ -635,38 +724,85 @@ export default function PetalStormRhythm() {
               gameId="petal-storm-rhythm"
             />
           ) : (
-            <HudComponent
-              {...hudProps}
-              score={score}
-              health={health}
-              maxHealth={GAME_CONFIG.INITIAL_HEALTH}
-              combo={combo}
-              multiplier={multiplier}
-            />
+            <div className="relative">
+              <HudComponent
+                {...hudProps}
+                score={score}
+                health={health}
+                maxHealth={GAME_CONFIG.INITIAL_HEALTH}
+                combo={combo}
+                multiplier={multiplier}
+              />
+              {/* Combo Meter Glow - increases with combo */}
+              {combo > 0 && (
+                <motion.div
+                  className="absolute left-1/2 top-8 -translate-x-1/2 pointer-events-none"
+                  initial={{ scale: 1, opacity: 0.3 }}
+                  animate={{
+                    scale: 1 + (combo / 100) * 0.5,
+                    opacity: Math.min(0.6, 0.3 + combo / 50),
+                  }}
+                  style={{
+                    width: `${Math.min(200, 100 + combo * 2)}px`,
+                    height: '40px',
+                    background: `radial-gradient(circle, rgba(236, 72, 153, ${Math.min(0.8, combo / 30)}) 0%, transparent 70%)`,
+                    filter: `blur(${Math.min(20, combo / 5)}px)`,
+                  }}
+                />
+              )}
+            </div>
           )}
 
           {/* Game Area */}
           <div className="flex-1 relative overflow-hidden">
 
             {/* Lanes */}
-            <div className="h-full flex">
-              {LANES.map((laneIndex) => (
-                <div
-                  key={laneIndex}
-                  className="flex-1 relative border-r border-slate-700/50 bg-gradient-to-b from-transparent to-slate-900/20"
-                  onClick={() => hitNote(laneIndex)}
-                  onKeyDown={(e) => e.key === 'Enter' && hitNote(laneIndex)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Hit note in lane ${laneIndex}`}
-                >
-                  {/* Hit Zone */}
-                  <div className="absolute bottom-20 left-2 right-2 h-16 bg-pink-500/20 border-2 border-pink-400/50 rounded-lg" />
+            <div className="h-full flex" style={{ perspective: '1000px' }}>
+              {LANES.map((laneIndex) => {
+                const flash = laneFlashes[laneIndex];
+                const flashAge = flash ? Date.now() - flash.time : Infinity;
+                const flashActive = flashAge < (flash?.type === 'perfect' ? 400 : flash?.type === 'great' ? 300 : flash?.type === 'good' ? 200 : 300);
+                
+                return (
+                  <div
+                    key={laneIndex}
+                    className="flex-1 relative border-r border-slate-700/50 bg-gradient-to-b from-transparent to-slate-900/20"
+                    style={{
+                      transform: `rotateX(5deg)`, // Slight perspective tilt
+                      transformStyle: 'preserve-3d',
+                    }}
+                    onClick={() => hitNote(laneIndex)}
+                    onKeyDown={(e) => e.key === 'Enter' && hitNote(laneIndex)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Hit note in lane ${laneIndex}`}
+                  >
+                    {/* Lane Flash VFX */}
+                    {flashActive && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: flash?.type === 'perfect' ? 0.8 : flash?.type === 'great' ? 0.6 : flash?.type === 'good' ? 0.4 : 0.3 }}
+                        exit={{ opacity: 0 }}
+                        className={`absolute inset-0 rounded-lg ${
+                          flash?.type === 'perfect'
+                            ? 'bg-green-400/80 shadow-lg shadow-green-400/50'
+                            : flash?.type === 'great'
+                              ? 'bg-blue-400/60 shadow-md shadow-blue-400/40'
+                              : flash?.type === 'good'
+                                ? 'bg-yellow-400/40 shadow shadow-yellow-400/30'
+                                : 'bg-red-400/30'
+                        }`}
+                        style={{ pointerEvents: 'none' }}
+                      />
+                    )}
 
-                  {/* Lane Label */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-pink-400 font-bold">
-                    {['A', 'S', 'D', 'F', 'G'][laneIndex]}
-                  </div>
+                    {/* Hit Zone */}
+                    <div className="absolute bottom-20 left-2 right-2 h-16 bg-pink-500/20 border-2 border-pink-400/50 rounded-lg" />
+
+                    {/* Lane Label */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-pink-400 font-bold">
+                      {['A', 'S', 'D', 'F', 'G'][laneIndex]}
+                    </div>
 
                   {/* Notes */}
                   <AnimatePresence>
@@ -698,9 +834,28 @@ export default function PetalStormRhythm() {
                         );
                       })}
                   </AnimatePresence>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
+            
+            {/* Petal Particles Overlay */}
+            {petalParticles.length > 0 && (
+              <svg
+                className="absolute inset-0 pointer-events-none z-20"
+                style={{ width: '100%', height: '100%' }}
+              >
+                {petalParticles.map((particle) => (
+                  <g
+                    key={particle.id}
+                    transform={`translate(${particle.x}, ${particle.y}) rotate(${(particle.rotation * 180) / Math.PI}) scale(${particle.scale})`}
+                    opacity={particle.alpha}
+                  >
+                    <circle r={4} fill="#ec4899" />
+                  </g>
+                ))}
+              </svg>
+            )}
           </div>
         </div>
       )}

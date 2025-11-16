@@ -7,6 +7,17 @@ import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 
+interface AvailableDiscount {
+  id: string;
+  code: string;
+  discountType: 'PERCENT' | 'OFF_AMOUNT';
+  amountOff: number | null;
+  percentOff: number | null;
+  expiresAt: string | null;
+  minSpendCents: number | null;
+  nsfwOnly: boolean;
+}
+
 export default function CheckoutContent() {
   const _router = useRouter();
   const { items } = useCart();
@@ -14,6 +25,8 @@ export default function CheckoutContent() {
   const [_couponInput, _setCouponInput] = useState('');
   const [codes, setCodes] = useState<string[]>([]);
   const [preview, setPreview] = useState<any>(null);
+  const [availableDiscounts, setAvailableDiscounts] = useState<AvailableDiscount[]>([]);
+  const [loadingDiscounts, setLoadingDiscounts] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -24,6 +37,27 @@ export default function CheckoutContent() {
     zipCode: '',
     country: 'US',
   });
+
+  // Fetch available discounts
+  useEffect(() => {
+    const fetchDiscounts = async () => {
+      try {
+        const response = await fetch('/api/v1/discounts/available');
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.ok && data?.data?.discounts) {
+            setAvailableDiscounts(data.data.discounts);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching available discounts:', err);
+      } finally {
+        setLoadingDiscounts(false);
+      }
+    };
+
+    fetchDiscounts();
+  }, []);
 
   // init codes from query (when navigating from cart)
   useEffect(() => {
@@ -39,6 +73,16 @@ export default function CheckoutContent() {
         );
     }
   }, []);
+
+  const handleSelectDiscount = (discountCode: string) => {
+    if (codes.includes(discountCode)) {
+      // Deselect if already selected
+      setCodes(codes.filter((c) => c !== discountCode));
+    } else {
+      // Select this discount (replace existing if any, since vouchers don't stack)
+      setCodes([discountCode]);
+    }
+  };
 
   // preview engine output
   useEffect(() => {
@@ -309,6 +353,90 @@ export default function CheckoutContent() {
 
       {/* Order Summary */}
       <div className="space-y-6">
+        {/* Available Discounts */}
+        {!loadingDiscounts && availableDiscounts.length > 0 && (
+          <GlassPanel className="p-6">
+            <h2 className="text-xl font-semibold text-white mb-4">Available Rewards</h2>
+            <p className="text-sm text-zinc-400 mb-4">
+              Select a discount voucher to apply to your order:
+            </p>
+            <div className="space-y-2">
+              {availableDiscounts.map((discount) => {
+                const isSelected = codes.includes(discount.code);
+                const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+                const subtotalCents = Math.round(subtotal * 100);
+                const meetsMinSpend =
+                  !discount.minSpendCents || subtotalCents >= discount.minSpendCents;
+                const discountAmount =
+                  discount.discountType === 'PERCENT'
+                    ? subtotal * ((discount.percentOff || 0) / 100)
+                    : (discount.amountOff || 0) / 100;
+
+                return (
+                  <button
+                    key={discount.id}
+                    onClick={() => meetsMinSpend && handleSelectDiscount(discount.code)}
+                    disabled={!meetsMinSpend}
+                    className={`w-full rounded-xl border p-4 text-left transition-all ${
+                      isSelected
+                        ? 'border-green-500/50 bg-green-500/20'
+                        : meetsMinSpend
+                          ? 'border-white/10 bg-white/5 hover:border-green-500/30 hover:bg-green-500/10'
+                          : 'border-neutral-700/50 bg-neutral-800/30 opacity-50 cursor-not-allowed'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-white">{discount.code}</span>
+                          {discount.nsfwOnly && (
+                            <span className="text-xs px-2 py-0.5 bg-pink-500/20 text-pink-300 rounded-full">
+                              NSFW
+                            </span>
+                          )}
+                          {isSelected && (
+                            <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
+                              Selected
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm text-zinc-300">
+                          {discount.discountType === 'PERCENT'
+                            ? `${discount.percentOff}% off`
+                            : `$${(discount.amountOff || 0) / 100} off`}
+                          {discount.minSpendCents && (
+                            <span className="text-zinc-400">
+                              {' '}
+                              (min. ${(discount.minSpendCents / 100).toFixed(2)})
+                            </span>
+                          )}
+                        </div>
+                        {discount.expiresAt && (
+                          <div className="text-xs text-zinc-400 mt-1">
+                            Expires: {new Date(discount.expiresAt).toLocaleDateString()}
+                          </div>
+                        )}
+                        {!meetsMinSpend && discount.minSpendCents && (
+                          <div className="text-xs text-amber-400 mt-1">
+                            Need ${((discount.minSpendCents - subtotalCents) / 100).toFixed(2)} more
+                            to use this discount
+                          </div>
+                        )}
+                      </div>
+                      <div className="ml-4 text-right">
+                        <div className="text-lg font-bold text-green-400">
+                          -${discountAmount.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-zinc-400">savings</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </GlassPanel>
+        )}
+
         <GlassPanel className="p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Order Summary</h2>
 

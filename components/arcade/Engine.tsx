@@ -8,6 +8,7 @@ import { useRewards } from './useRewards';
 import { Caption as CaptionComponent } from './ui/Caption';
 import { TimerRing } from './ui/TimerRing';
 import { OverlayPetals } from './ui/OverlayPetals';
+import { usePetalEarn } from '@/app/mini-games/_shared/usePetalEarn';
 // Shared UI components - imported for QA validation (Engine handles its own UI)
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { useGameHud } from '@/app/mini-games/_shared/useGameHud';
@@ -28,8 +29,14 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
   const [captions, setCaptions] = useState<Caption[]>([]);
   const [showPetals, setShowPetals] = useState(false);
 
-  const { updateBestScore, updateDailyStreak, addPetalsEarned, getBestScore } = useProgress();
-  const { attemptReward, isSignedIn: _isSignedIn } = useRewards();
+  const { updateBestScore, updateDailyStreak, addPetalsEarned, getBestScore, progress: progressData } = useProgress();
+  const { attemptReward, isSignedIn } = useRewards();
+  const { earnPetals } = usePetalEarn();
+  
+  // Track streak for milestone rewards
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [lastStreakMilestone, setLastStreakMilestone] = useState(0);
+  const [lastDailyStreakMilestone, setLastDailyStreakMilestone] = useState(0);
 
   const currentGame = playlist[currentGameIndex];
   const progress = timeRemaining / (currentGame?.durationSec || 1);
@@ -66,16 +73,67 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
         updateBestScore(game.id, score);
         updateDailyStreak();
         addPetalsEarned(petals);
-
-        // Attempt server reward (guests can still earn session petals)
-        attemptReward(petals).then((result) => {
-          if (!result.success && result.error === 'auth_required') {
-            pushCaption('Sign in to save your petals long-term.');
+        
+        // Update streak
+        const newStreak = currentStreak + 1;
+        setCurrentStreak(newStreak);
+        
+        // Award petals using usePetalEarn (supports guests with ephemeral petals)
+        earnPetals({
+          gameId: 'blossomware',
+          score: score,
+          metadata: {
+            microGameId: game.id,
+            streak: newStreak,
+            dailyStreak: progressData.dailyStreak,
+          },
+        }).then((result) => {
+          if (result.success) {
+            // Show petal reward
+            setShowPetals(true);
+            setTimeout(() => setShowPetals(false), 2000);
+            
+            // Soft CTA for guests (non-blocking)
+            if (!isSignedIn) {
+              pushCaption('💡 Sign in to save your petals permanently!');
+            }
           }
         });
-
-        setShowPetals(true);
-        setTimeout(() => setShowPetals(false), 2000);
+        
+        // Streak milestone rewards (every 5 games)
+        if (newStreak > 0 && newStreak % 5 === 0 && newStreak > lastStreakMilestone) {
+          setLastStreakMilestone(newStreak);
+          const milestoneReward = Math.floor(newStreak / 5) * 10; // 10 petals per 5-game milestone
+          earnPetals({
+            gameId: 'blossomware',
+            score: milestoneReward * 10,
+            metadata: {
+              milestoneType: 'streak',
+              milestoneValue: newStreak,
+            },
+          }).then(() => {
+            pushCaption(`🔥 ${newStreak}-game streak! Bonus petals earned!`);
+          });
+        }
+        
+        // Daily streak milestone rewards (every 5 days)
+        if (progressData.dailyStreak > 0 && progressData.dailyStreak % 5 === 0 && progressData.dailyStreak > lastDailyStreakMilestone) {
+          setLastDailyStreakMilestone(progressData.dailyStreak);
+          const dailyMilestoneReward = Math.floor(progressData.dailyStreak / 5) * 20;
+          earnPetals({
+            gameId: 'blossomware',
+            score: dailyMilestoneReward * 10,
+            metadata: {
+              milestoneType: 'daily_streak',
+              milestoneValue: progressData.dailyStreak,
+            },
+          }).then(() => {
+            pushCaption(`⭐ ${progressData.dailyStreak}-day streak! Daily bonus!`);
+          });
+        }
+      } else {
+        // Reset streak on failure
+        setCurrentStreak(0);
       }
 
       // Move to next game after delay (increased from 1500ms for better pacing)
@@ -94,6 +152,12 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
       attemptReward,
       pushCaption,
       playlist.length,
+      earnPetals,
+      isSignedIn,
+      currentStreak,
+      lastStreakMilestone,
+      progressData.dailyStreak,
+      lastDailyStreakMilestone,
     ],
   );
 

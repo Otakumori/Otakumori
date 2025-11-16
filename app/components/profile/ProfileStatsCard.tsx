@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 interface PetalSummary {
   balance: number;
   lifetimePetalsEarned: number;
+  todayEarned: number;
   achievements: {
     count: number;
   };
@@ -83,6 +84,26 @@ export default function ProfileStatsCard() {
             {isSignedIn ? `${achievementCount} unlocked` : '—'}
           </div>
         </div>
+
+        {/* Lifetime Petals */}
+        {summary && (
+          <div>
+            <div className="text-xs text-zinc-400 mb-1">Lifetime Petals</div>
+            <div className="text-sm font-semibold text-pink-300">
+              {summary.lifetimePetalsEarned.toLocaleString()}
+            </div>
+          </div>
+        )}
+
+        {/* Today's Petals */}
+        {summary && (
+          <div>
+            <div className="text-xs text-zinc-400 mb-1">Today's Petals</div>
+            <div className="text-sm text-white">
+              {summary.todayEarned.toLocaleString()}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

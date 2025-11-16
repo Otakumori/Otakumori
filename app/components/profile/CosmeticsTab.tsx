@@ -2,7 +2,8 @@
 
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import Link from 'next/link';
-import { cosmeticItems, type HudSkinId } from '@/app/lib/cosmetics/cosmeticsConfig';
+import { cosmeticItems, type HudSkinId, filterByNSFWPolicy, isNSFWCosmetic } from '@/app/lib/cosmetics/cosmeticsConfig';
+import { useNSFW } from '@/app/contexts/NSFWContext';
 
 /**
  * Cosmetics tab content
@@ -10,6 +11,7 @@ import { cosmeticItems, type HudSkinId } from '@/app/lib/cosmetics/cosmeticsConf
  */
 export default function CosmeticsTab() {
   const { unlockedIds, hudSkin, isHydrated } = useCosmetics();
+  const { isNSFWAllowed: nsfwAllowed } = useNSFW();
 
   // HUD skin display names
   const hudSkinNames: Record<HudSkinId, { name: string; description: string; icon: string }> = {
@@ -18,8 +20,18 @@ export default function CosmeticsTab() {
   };
 
   const equippedHud = hudSkinNames[hudSkin];
-  const ownedItems = cosmeticItems.filter((item) =>
-    unlockedIds.includes(item.id),
+  
+  // Filter owned items by NSFW policy
+  const allOwnedItems = cosmeticItems.filter((item) => unlockedIds.includes(item.id));
+  const ownedItems = filterByNSFWPolicy(allOwnedItems, nsfwAllowed);
+  
+  // Group by type
+  const ownedHudSkins = ownedItems.filter((item) => item.type === 'hud-skin');
+  const ownedAvatarCosmetics = ownedItems.filter((item) => 
+    item.type === 'avatar-outfit' || 
+    item.type === 'avatar-accessory' || 
+    item.type === 'avatar-vfx' || 
+    item.type === 'avatar-overlay'
   );
 
   if (!isHydrated) {
@@ -65,19 +77,55 @@ export default function CosmeticsTab() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {ownedItems.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-lg border border-white/10 bg-white/5 p-4 text-center"
-              >
-                <div className="text-3xl mb-2">
-                  <span role="img" aria-label="Sparkle">✨</span>
+          <div className="space-y-6">
+            {/* Avatar Cosmetics */}
+            {ownedAvatarCosmetics.length > 0 && (
+              <div>
+                <h4 className="text-md font-semibold text-white mb-3">Avatar Cosmetics</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {ownedAvatarCosmetics.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-lg border border-white/10 bg-white/5 p-4 text-center"
+                    >
+                      <div className="text-3xl mb-2">
+                        <span role="img" aria-label="Sparkle">✨</span>
+                      </div>
+                      <div className="text-sm text-white font-medium">{item.name}</div>
+                      <div className="text-xs text-zinc-400 mt-1">{item.description}</div>
+                      {isNSFWCosmetic(item) && (
+                        <div className="mt-2">
+                          <span className="text-xs px-2 py-0.5 bg-pink-500/20 text-pink-300 rounded-full">
+                            NSFW
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div className="text-sm text-white font-medium">{item.name}</div>
-                <div className="text-xs text-zinc-400 mt-1">{item.description}</div>
               </div>
-            ))}
+            )}
+
+            {/* Other Cosmetics */}
+            {ownedHudSkins.length > 0 && (
+              <div>
+                <h4 className="text-md font-semibold text-white mb-3">HUD Skins</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {ownedHudSkins.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-lg border border-white/10 bg-white/5 p-4 text-center"
+                    >
+                      <div className="text-3xl mb-2">
+                        <span role="img" aria-label="Sparkle">✨</span>
+                      </div>
+                      <div className="text-sm text-white font-medium">{item.name}</div>
+                      <div className="text-xs text-zinc-400 mt-1">{item.description}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

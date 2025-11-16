@@ -22,6 +22,7 @@ import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
 import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
+import { useScreenShake, createPetalBurst, updatePetalParticles, type PetalParticle, createTrailRenderer, type TrailRenderer } from '../_shared/vfx';
 
 type Props = {
   mode: 'classic' | 'storm' | 'endless' | 'timed';
@@ -106,6 +107,10 @@ export default function Game({ mode }: Props) {
   const [petalReward, setPetalReward] = useState<number | null>(null);
   const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
   const [gameStateOverlay, setGameStateOverlay] = useState<'instructions' | 'playing' | 'win' | 'lose'>('instructions');
+  
+  // VFX hooks
+  const { shake, shakeOffset, style: shakeStyle } = useScreenShake();
+  const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
 
   // Visual profile and HUD
   const visualProfile = getGameVisualProfile('petal-samurai');
@@ -165,6 +170,7 @@ export default function Game({ mode }: Props) {
                   const result = await earnPetals({
                     gameId: 'petal-samurai',
                     score: game.getScore(),
+                    didWin, // Pass win/lose state for tuned rewards
                     metadata: {
                       combo: game.getCombo(),
                       multiplier: game.getMultiplier(),
@@ -201,6 +207,12 @@ export default function Game({ mode }: Props) {
   // Handle mouse/touch slash mechanics
   const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
   const isSlashing = useRef(false);
+  const trailRendererRef = useRef<TrailRenderer | null>(null);
+  
+  // Initialize trail renderer
+  useEffect(() => {
+    trailRendererRef.current = createTrailRenderer(200); // 200ms lifetime
+  }, []);
 
   const handleMouseDown = useCallback(
     (_event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -233,12 +245,34 @@ export default function Game({ mode }: Props) {
     // Check if slash hits any petals
     const hitPetals = gameRef.current.getPetalsAlongPath(slashPoints.current);
     hitPetals.forEach((petal) => {
+      const wasBad = petal.type === 'bad';
       gameRef.current!.slashPetal(petal);
+      
+      // Create petal burst particles on slice
+      if (!wasBad && trailRendererRef.current) {
+        const burst = createPetalBurst(petal.x, petal.y, 6, {
+          speed: 2,
+          spread: Math.PI * 1.5,
+        });
+        setPetalParticles((prev) => [...prev, ...burst]);
+        
+        // Add trail point
+        trailRendererRef.current.addPoint(petal.x, petal.y, 4);
+      } else if (wasBad) {
+        // Screen shake on bad object hit
+        shake(0.4, 300);
+      }
     });
+
+    // Update trail renderer with current slash points
+    if (trailRendererRef.current && slashPoints.current.length > 0) {
+      const lastPoint = slashPoints.current[slashPoints.current.length - 1];
+      trailRendererRef.current.addPoint(lastPoint.x, lastPoint.y, 3);
+    }
 
     // Draw slash trail
     gameRef.current.setSlashTrail(slashPoints.current);
-  }, []);
+  }, [shake]);
 
   const handleMouseUp = useCallback(() => {
     isSlashing.current = false;
@@ -246,7 +280,51 @@ export default function Game({ mode }: Props) {
     if (gameRef.current) {
       gameRef.current.clearSlashTrail();
     }
+    if (trailRendererRef.current) {
+      trailRendererRef.current.clear();
+    }
   }, []);
+  
+  // Update petal particles
+  useEffect(() => {
+    if (gameStateOverlay !== 'playing') {
+      setPetalParticles([]); // Clear particles when not playing
+      return;
+    }
+    
+    let animationId: number | null = null;
+    let lastTime = performance.now();
+    let isRunning = true;
+    
+    const updateParticles = () => {
+      if (!isRunning) return;
+      
+      const now = performance.now();
+      const deltaTime = Math.min(0.033, (now - lastTime) / 1000); // Cap at 33ms
+      lastTime = now;
+      
+      setPetalParticles((prev) => {
+        if (prev.length === 0) {
+          return prev;
+        }
+        const updated = updatePetalParticles(prev, deltaTime, 0.15);
+        if (updated.length > 0 && isRunning) {
+          animationId = requestAnimationFrame(updateParticles);
+        }
+        return updated;
+      });
+    };
+    
+    // Start animation loop
+    animationId = requestAnimationFrame(updateParticles);
+    
+    return () => {
+      isRunning = false;
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [gameStateOverlay]);
 
   // Handle power-up activation
   const handlePowerUpClick = useCallback((powerUpType: string) => {
@@ -292,7 +370,7 @@ export default function Game({ mode }: Props) {
   }, []);
 
   return (
-    <div className="relative w-full h-screen" style={backgroundStyle}>
+    <div className="relative w-full h-screen" style={{ ...backgroundStyle, ...shakeStyle }}>
       {/* Keyboard Controls Display */}
       <GameControls
         game="Petal Samurai"
@@ -313,6 +391,41 @@ export default function Game({ mode }: Props) {
         onMouseLeave={handleMouseUp}
         aria-label="Petal Samurai game area - slash through petals to score"
       />
+      
+      {/* Render petal particles */}
+      {gameStateOverlay === 'playing' && petalParticles.length > 0 && (
+        <svg
+          className="absolute inset-0 pointer-events-none z-10"
+          width={800}
+          height={600}
+          style={{ transform: `translate(${shakeOffset.x}px, ${shakeOffset.y}px)` }}
+        >
+          {petalParticles.map((particle) => {
+            if (!visualProfile.spriteSheetUrl) return null;
+            
+            const spriteCol = particle.spriteIndex % 4;
+            const spriteRow = Math.floor(particle.spriteIndex / 4);
+            const spriteSize = 32; // Assuming sprite size
+            
+            return (
+              <g
+                key={particle.id}
+                transform={`translate(${particle.x}, ${particle.y}) rotate(${(particle.rotation * 180) / Math.PI}) scale(${particle.scale})`}
+                opacity={particle.alpha}
+              >
+                <image
+                  href={visualProfile.spriteSheetUrl}
+                  x={-spriteSize / 2}
+                  y={-spriteSize / 2}
+                  width={spriteSize}
+                  height={spriteSize}
+                  clipPath={`inset(${spriteRow * spriteSize}px ${(3 - spriteCol) * spriteSize}px ${(2 - spriteRow) * spriteSize}px ${spriteCol * spriteSize}px)`}
+                />
+              </g>
+            );
+          })}
+        </svg>
+      )}
 
       {/* HUD - uses loader for cosmetics */}
       {gameStateOverlay === 'playing' && (
@@ -463,8 +576,19 @@ class GameEngine {
       this.stormMode = true;
     }
 
-    // Spawn petals
-    const spawnRate = this.stormMode ? GAME_CONFIG.STORM_SPAWN_RATE : GAME_CONFIG.NORMAL_SPAWN_RATE;
+    // Spawn petals with difficulty curve
+    // Start: slow spawn (0.8s), basic petals only
+    // Mid: increase spawn rate, introduce special petals
+    // Later: introduce bad objects (15% chance), faster arcs
+    let spawnRate = this.stormMode ? GAME_CONFIG.STORM_SPAWN_RATE : GAME_CONFIG.NORMAL_SPAWN_RATE;
+    
+    // Difficulty curve: slower spawn at start
+    if (this.gameTime < 20) {
+      spawnRate = GAME_CONFIG.NORMAL_SPAWN_RATE * 1.5; // Slower at start
+    } else if (this.gameTime < 40) {
+      spawnRate = GAME_CONFIG.NORMAL_SPAWN_RATE * 1.2; // Gradually increase
+    }
+    
     if (this.gameTime - this.lastPetalSpawn > spawnRate) {
       this.spawnPetal();
       this.lastPetalSpawn = this.gameTime;
@@ -534,8 +658,12 @@ class GameEngine {
   }
 
   private spawnPetal() {
+    // Difficulty curve: bad objects only appear after 30 seconds
+    const canSpawnBadObjects = this.gameTime >= 30;
+    const badObjectChance = canSpawnBadObjects ? GAME_CONFIG.BAD_OBJECT_SPAWN_CHANCE : 0;
+    
     // Determine if spawning bad object or petal
-    const isBadObject = Math.random() < GAME_CONFIG.BAD_OBJECT_SPAWN_CHANCE;
+    const isBadObject = Math.random() < badObjectChance;
     
     if (isBadObject) {
       // Spawn bad object (nut/seed/branch)

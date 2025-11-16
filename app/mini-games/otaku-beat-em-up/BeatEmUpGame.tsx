@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
+import { useScreenShake, createPetalBurst, updatePetalParticles, type PetalParticle } from '../_shared/vfx';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
@@ -24,13 +25,15 @@ interface Player {
   vx: number;
   vy: number;
   facing: 'left' | 'right';
-  state: 'idle' | 'walk' | 'attack' | 'hurt' | 'block';
+  state: 'idle' | 'walk' | 'attack' | 'heavyAttack' | 'hurt' | 'block';
   animationFrame: number;
   attackCooldown: number;
+  heavyAttackCooldown: number;
   blockCooldown: number;
   invulnerable: number;
   comboCount: number;
   beatMultiplier: number;
+  comboChain: number; // Chain of successful hits
 }
 
 interface Enemy {
@@ -41,12 +44,14 @@ interface Enemy {
   vx: number;
   vy: number;
   facing: 'left' | 'right';
-  state: 'idle' | 'walk' | 'attack' | 'hurt' | 'dead';
+  state: 'idle' | 'walk' | 'attack' | 'telegraph' | 'hurt' | 'dead';
   health: number;
   maxHealth: number;
   attackCooldown: number;
   stunTime: number;
   animationFrame: number;
+  telegraphTime: number; // Time remaining in telegraph state
+  attackType: 'light' | 'heavy'; // Type of attack being telegraphed
 }
 
 interface BeatIndicator {
@@ -92,11 +97,17 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
     state: 'idle',
     animationFrame: 0,
     attackCooldown: 0,
+    heavyAttackCooldown: 0,
     blockCooldown: 0,
     invulnerable: 0,
     comboCount: 0,
     beatMultiplier: 1.0,
+    comboChain: 0,
   });
+  
+  // VFX hooks
+  const { shake } = useScreenShake();
+  const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
 
   const enemiesRef = useRef<Enemy[]>([]);
   const keysRef = useRef<Set<string>>(new Set());
@@ -193,9 +204,15 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
     const handleKeyDown = (e: KeyboardEvent) => {
       keysRef.current.add(e.key.toLowerCase());
 
-      // Attack on spacebar
+      // Light attack on spacebar
       if (e.key === ' ' && playerRef.current.attackCooldown <= 0) {
-        performAttack();
+        performAttack('light');
+        e.preventDefault();
+      }
+      
+      // Heavy attack on E key
+      if ((e.key === 'e' || e.key === 'E') && playerRef.current.heavyAttackCooldown <= 0) {
+        performAttack('heavy');
         e.preventDefault();
       }
 
@@ -231,10 +248,18 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
   }, []);
 
   // Perform player attack
-  const performAttack = useCallback(() => {
+  const performAttack = useCallback((attackType: 'light' | 'heavy' = 'light') => {
     const player = playerRef.current;
-    player.state = 'attack';
-    player.attackCooldown = 400;
+    
+    if (attackType === 'heavy' && player.heavyAttackCooldown > 0) {
+      return; // Heavy attack on cooldown
+    }
+    
+    player.state = attackType === 'heavy' ? 'heavyAttack' : 'attack';
+    player.attackCooldown = attackType === 'heavy' ? 800 : 400;
+    if (attackType === 'heavy') {
+      player.heavyAttackCooldown = 2000; // 2 second cooldown for heavy attacks
+    }
 
     // Check if attack is on-beat
     const timeSinceLastBeat = Date.now() - lastBeatTimeRef.current;
@@ -267,20 +292,39 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
     }
 
     // Check for enemy hits
-    const attackRange = 80;
+    const attackRange = attackType === 'heavy' ? 120 : 80;
     const attackX = player.facing === 'right' ? player.x + 50 : player.x - 50;
+    const baseDamage = attackType === 'heavy' ? 40 : 20;
+    const damage = baseDamage * damageMultiplier;
 
+    let hitEnemy = false;
     enemiesRef.current = enemiesRef.current.map((enemy) => {
       if (enemy.state === 'dead') return enemy;
 
       const distance = Math.hypot(enemy.x - attackX, enemy.y - player.y);
       if (distance < attackRange) {
-        const damage = 20 * damageMultiplier;
+        hitEnemy = true;
         const newHealth = Math.max(0, enemy.health - damage);
+        
+        // Screen shake on heavy hits or when enemy dies
+        if (attackType === 'heavy' || newHealth <= 0) {
+          shake(attackType === 'heavy' ? 0.4 : 0.3, attackType === 'heavy' ? 300 : 200);
+        }
+        
+        // Create petal burst on hit
+        const burst = createPetalBurst(enemy.x, enemy.y, attackType === 'heavy' ? 12 : 6, {
+          speed: attackType === 'heavy' ? 3 : 2,
+          spread: Math.PI * 1.5,
+        });
+        setPetalParticles((prev) => [...prev, ...burst]);
+
+        // Update combo chain
+        player.comboChain++;
+        const comboBonus = Math.min(player.comboChain * 5, 50); // Max 50 bonus per hit
 
         setGameState((prev) => ({
           ...prev,
-          score: prev.score + Math.floor(damage * 10),
+          score: prev.score + Math.floor(damage * 10) + comboBonus,
           combo: player.comboCount,
           multiplier: player.beatMultiplier,
           beatAccuracy: isPerfectBeat
@@ -292,20 +336,25 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
           ...enemy,
           health: newHealth,
           state: newHealth <= 0 ? 'dead' : 'hurt',
-          stunTime: 300,
-          vx: player.facing === 'right' ? 5 : -5,
+          stunTime: attackType === 'heavy' ? 600 : 300,
+          vx: player.facing === 'right' ? (attackType === 'heavy' ? 10 : 5) : (attackType === 'heavy' ? -10 : -5),
         };
       }
       return enemy;
     });
+    
+    // Reset combo chain if no enemy hit
+    if (!hitEnemy) {
+      player.comboChain = 0;
+    }
 
     // Reset attack state after animation
     setTimeout(() => {
-      if (player.state === 'attack') {
+      if (player.state === 'attack' || player.state === 'heavyAttack') {
         player.state = 'idle';
       }
-    }, 400);
-  }, []);
+    }, attackType === 'heavy' ? 600 : 400);
+  }, [shake]);
 
   // Spawn enemies
   const spawnEnemy = useCallback((type: Enemy['type'] = 'grunt') => {
@@ -333,6 +382,8 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       attackCooldown: 1000,
       stunTime: 0,
       animationFrame: 0,
+      telegraphTime: 0,
+      attackType: 'light',
     };
 
     enemiesRef.current.push(newEnemy);
@@ -392,8 +443,14 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
 
       // Update cooldowns
       if (player.attackCooldown > 0) player.attackCooldown -= deltaTime * 1000;
+      if (player.heavyAttackCooldown > 0) player.heavyAttackCooldown -= deltaTime * 1000;
       if (player.blockCooldown > 0) player.blockCooldown -= deltaTime * 1000;
       if (player.invulnerable > 0) player.invulnerable -= deltaTime * 1000;
+      
+      // Decay combo chain if no hits for 2 seconds
+      if (Date.now() - (lastBeatTimeRef.current || Date.now()) > 2000) {
+        player.comboChain = Math.max(0, player.comboChain - 1);
+      }
 
       // Update enemies
       enemiesRef.current = enemiesRef.current.filter((enemy) => {
@@ -425,30 +482,49 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
           enemy.vx = 0;
           enemy.vy = 0;
 
-          // Attack player
-          if (enemy.attackCooldown <= 0) {
-            enemy.state = 'attack';
-            enemy.attackCooldown =
-              enemy.type === 'ninja' ? 800 : enemy.type === 'brute' ? 1500 : 1000;
-
-            // Deal damage to player if not blocking
-            if (player.state !== 'block' && player.invulnerable <= 0) {
-              const damage = enemy.type === 'brute' ? 15 : enemy.type === 'ninja' ? 10 : 8;
-              setGameState((prev) => ({
-                ...prev,
-                health: Math.max(0, prev.health - damage),
-                combo: 0,
-                multiplier: 1.0,
-              }));
-              player.invulnerable = 500;
-              player.comboCount = 0;
-            }
-
-            setTimeout(() => {
-              if (enemy.state === 'attack') {
-                enemy.state = 'idle';
+          // Enemy attack logic with telegraphs
+          if (enemy.telegraphTime > 0) {
+            // In telegraph state - countdown to attack
+            enemy.telegraphTime -= deltaTime * 1000;
+            if (enemy.telegraphTime <= 0) {
+              // Execute attack
+              enemy.state = 'attack';
+              
+              // Deal damage to player if not blocking
+              if (player.state !== 'block' && player.invulnerable <= 0) {
+                const damage = enemy.attackType === 'heavy' 
+                  ? (enemy.type === 'brute' ? 25 : enemy.type === 'boss' ? 30 : 15)
+                  : (enemy.type === 'brute' ? 15 : enemy.type === 'ninja' ? 10 : 8);
+                
+                setGameState((prev) => ({
+                  ...prev,
+                  health: Math.max(0, prev.health - damage),
+                  combo: 0,
+                  multiplier: 1.0,
+                }));
+                player.invulnerable = 500;
+                player.comboCount = 0;
+                player.comboChain = 0;
+                
+                // Screen shake on heavy enemy attacks
+                if (enemy.attackType === 'heavy') {
+                  shake(0.3, 250);
+                }
               }
-            }, 400);
+              
+              setTimeout(() => {
+                if (enemy.state === 'attack') {
+                  enemy.state = 'idle';
+                }
+              }, enemy.attackType === 'heavy' ? 600 : 400);
+            }
+          } else if (enemy.attackCooldown <= 0) {
+            // Start telegraph - warn player before attack
+            const shouldHeavyAttack = enemy.type === 'brute' || enemy.type === 'boss' || Math.random() < 0.3;
+            enemy.state = 'telegraph';
+            enemy.attackType = shouldHeavyAttack ? 'heavy' : 'light';
+            enemy.telegraphTime = shouldHeavyAttack ? 800 : 400; // Longer telegraph for heavy attacks
+            enemy.attackCooldown = enemy.type === 'ninja' ? 800 : enemy.type === 'brute' ? 1500 : 1000;
           } else {
             enemy.state = 'idle';
             enemy.attackCooldown -= deltaTime * 1000;
@@ -467,14 +543,56 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
         return true;
       });
 
-      // Spawn enemies
+      // Wave progression - advance when all enemies defeated
+      const aliveEnemies = enemiesRef.current.filter((e) => e.state !== 'dead');
+      if (aliveEnemies.length === 0 && enemySpawnTimer > 1000) {
+        // Wave cleared! Advance to next wave
+        setGameState((prev) => ({
+          ...prev,
+          wave: prev.wave + 1,
+        }));
+        enemySpawnTimer = 0;
+        
+        // Spawn wave enemies (more enemies per wave)
+        const waveEnemyCount = Math.min(3 + gameState.wave, 8);
+        const waveTypes: Enemy['type'][] = [];
+        
+        // Mix enemy types based on wave
+        for (let i = 0; i < waveEnemyCount; i++) {
+          if (gameState.wave % 5 === 0 && i === waveEnemyCount - 1) {
+            waveTypes.push('boss'); // Boss every 5 waves
+          } else if (gameState.wave % 3 === 0 && Math.random() < 0.3) {
+            waveTypes.push('brute');
+          } else if (Math.random() < 0.4) {
+            waveTypes.push('ninja');
+          } else {
+            waveTypes.push('grunt');
+          }
+        }
+        
+        // Spawn enemies with slight delay
+        waveTypes.forEach((type, index) => {
+          setTimeout(() => {
+            spawnEnemy(type);
+          }, index * 300);
+        });
+      }
+      
+      // Spawn enemies during wave
       enemySpawnTimer += deltaTime * 1000;
-      const spawnInterval = mode === 'survival' ? 2000 : ENEMY_SPAWN_INTERVAL;
+      const maxEnemiesPerWave = Math.min(3 + gameState.wave, mode === 'survival' ? 10 : 8);
+      const spawnInterval = mode === 'survival' ? 2000 : ENEMY_SPAWN_INTERVAL / (1 + gameState.wave * 0.1); // Faster spawning as waves progress
+      
       if (
         enemySpawnTimer > spawnInterval &&
-        enemiesRef.current.length < (mode === 'survival' ? 10 : 5)
+        aliveEnemies.length < maxEnemiesPerWave
       ) {
-        const types: Enemy['type'][] = ['grunt', 'grunt', 'ninja', 'brute'];
+        const types: Enemy['type'][] = 
+          gameState.wave >= 5 
+            ? ['grunt', 'grunt', 'ninja', 'brute', 'brute']
+            : gameState.wave >= 3
+              ? ['grunt', 'grunt', 'ninja', 'brute']
+              : ['grunt', 'grunt', 'ninja'];
         const randomType = types[Math.floor(Math.random() * types.length)];
         spawnEnemy(randomType);
         enemySpawnTimer = 0;
@@ -573,6 +691,19 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
     // Beat perfect zone
     ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
     ctx.fillRect(CANVAS_WIDTH - 120, 10, 40, 40);
+    
+    // Draw petal particles
+    if (petalParticles.length > 0) {
+      petalParticles.forEach((particle) => {
+        ctx.save();
+        ctx.globalAlpha = particle.alpha;
+        ctx.fillStyle = '#ec4899';
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, 4 * particle.scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+    }
   };
 
   // Render player
@@ -619,13 +750,23 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
     ctx.fill();
 
     // Attack effect
-    if (player.state === 'attack') {
+    if (player.state === 'attack' || player.state === 'heavyAttack') {
       const attackX = player.facing === 'right' ? player.x + 40 : player.x - 40;
-      ctx.fillStyle =
-        player.beatMultiplier > 1.5 ? 'rgba(255, 215, 0, 0.6)' : 'rgba(255, 255, 255, 0.4)';
+      const isHeavy = player.state === 'heavyAttack';
+      const radius = isHeavy ? 40 : 25;
+      
+      // Heavy attack has larger, more intense effect
+      ctx.fillStyle = isHeavy
+        ? 'rgba(255, 100, 100, 0.8)'
+        : player.beatMultiplier > 1.5
+          ? 'rgba(255, 215, 0, 0.6)'
+          : 'rgba(255, 255, 255, 0.4)';
+      ctx.shadowBlur = isHeavy ? 30 : 15;
+      ctx.shadowColor = isHeavy ? '#ff6464' : '#ffffff';
       ctx.beginPath();
-      ctx.arc(attackX, player.y - 10, 25, 0, Math.PI * 2);
+      ctx.arc(attackX, player.y - 10, radius, 0, Math.PI * 2);
       ctx.fill();
+      ctx.shadowBlur = 0;
     }
 
     // Block shield
@@ -688,9 +829,83 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       healthBarWidth * healthPercent,
       4,
     );
+    
+    // Telegraph warning - visual indicator before attack
+    if (enemy.state === 'telegraph') {
+      const telegraphProgress = 1 - (enemy.telegraphTime / (enemy.attackType === 'heavy' ? 800 : 400));
+      const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
+      
+      ctx.save();
+      ctx.globalAlpha = pulse;
+      ctx.strokeStyle = enemy.attackType === 'heavy' ? '#ff4444' : '#ffaa44';
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = enemy.attackType === 'heavy' ? '#ff4444' : '#ffaa44';
+      ctx.beginPath();
+      ctx.arc(enemy.x, enemy.y - size * 0.3, size * 0.8, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Exclamation mark for heavy attacks
+      if (enemy.attackType === 'heavy') {
+        ctx.fillStyle = '#ff4444';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('!', enemy.x, enemy.y - size * 0.2);
+      }
+      ctx.restore();
+    }
 
     ctx.restore();
   };
+  
+  // Update petal particles
+  useEffect(() => {
+    if (petalParticles.length === 0) return;
+    
+    let animationId: number | null = null;
+    let lastTime = performance.now();
+    let isRunning = true;
+    
+    const updateParticles = () => {
+      if (!isRunning) return;
+      
+      const now = performance.now();
+      const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
+      lastTime = now;
+      
+      setPetalParticles((prev) => {
+        if (prev.length === 0) {
+          return prev;
+        }
+        const updated = updatePetalParticles(prev, deltaTime, 0.1);
+        if (updated.length > 0 && isRunning) {
+          animationId = requestAnimationFrame(updateParticles);
+        }
+        return updated;
+      });
+    };
+    
+    animationId = requestAnimationFrame(updateParticles);
+    
+    return () => {
+      isRunning = false;
+      if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, [petalParticles.length]);
+  
+  // Render petal particles
+  useEffect(() => {
+    if (!canvasRef.current || petalParticles.length === 0) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Particles are rendered in the main render loop, but we need to ensure they're visible
+    // The render function will handle drawing them
+  }, [petalParticles.length]);
 
   return (
     <div className="relative">
@@ -700,7 +915,8 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
         controls={[
           ...CONTROL_PRESETS['petal-samurai'],
           { key: 'WASD / Arrows', action: 'Move' },
-          { key: 'Space', action: 'Attack (on-beat for bonus!)' },
+          { key: 'Space', action: 'Light Attack (on-beat for bonus!)' },
+          { key: 'E', action: 'Heavy Attack (2s cooldown)' },
           { key: 'Shift', action: 'Block' },
           { key: 'Esc', action: 'Pause' },
         ]}
@@ -749,6 +965,13 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
           </div>
           <div className="text-xs text-zinc-400">
             Multiplier: {gameState.multiplier.toFixed(1)}x
+          </div>
+        </div>
+        
+        <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white border border-white/20">
+          <div className="text-xs text-blue-300 mb-1">WAVE</div>
+          <div className="text-lg font-bold text-blue-400">
+            {gameState.wave}
           </div>
         </div>
       </div>

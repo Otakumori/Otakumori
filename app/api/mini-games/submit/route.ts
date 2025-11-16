@@ -6,26 +6,12 @@ import { logger } from '@/app/lib/logger';
 import { db } from '@/lib/db';
 import { problem } from '@/lib/http/problem';
 import { reqId } from '@/lib/log';
-import { creditPetals } from '@/lib/petals';
+import { PetalService } from '@/app/lib/petals';
+import { calculateGameReward } from '@/app/config/petalTuning';
 import { submitScoreReq } from '@/lib/schemas/minigames';
 
 export const runtime = 'nodejs';
 export const maxDuration = 10;
-
-const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
-
-function calcAward(game: string, score: number): number {
-  switch (game) {
-    case 'petal-run':
-      return clamp(Math.floor(score / 10), 0, 50);
-    case 'memory':
-      return clamp(Math.floor(score / 20), 0, 30);
-    case 'rhythm':
-      return clamp(Math.floor(score / 12), 0, 60);
-    default:
-      return 0;
-  }
-}
 
 export async function POST(req: NextRequest) {
   const requestId = reqId(req.headers);
@@ -73,13 +59,48 @@ export async function POST(req: NextRequest) {
   }
   await upsertLeaderboardScore(scoreData);
 
-  let petalsGranted = calcAward(game, score);
+  // Calculate petal reward using centralized tuning config
+  // Map legacy game names to new game IDs
+  const gameIdMap: Record<string, string> = {
+    'petal-run': 'petal-samurai',
+    'memory': 'memory-match',
+    'rhythm': 'petal-storm-rhythm',
+  };
+  const mappedGameId = gameIdMap[game] || game;
+  
+  // Default to win=true for legacy compatibility
+  const petalAmount = calculateGameReward(mappedGameId, true, score, {});
+  let petalsGranted = petalAmount;
   let balance: number | undefined;
+  let lifetimePetalsEarned: number | undefined;
 
   if (petalsGranted > 0) {
     try {
-      const result = await creditPetals(userId, petalsGranted, 'game_reward');
-      balance = result.newBalance;
+      const petalService = new PetalService();
+      const result = await petalService.awardPetals(userId, {
+        type: 'earn',
+        amount: petalAmount,
+        reason: `Game reward: ${mappedGameId}`,
+        source: 'game',
+        metadata: {
+          gameId: mappedGameId,
+          legacyGame: game,
+          score,
+        },
+      }, requestId);
+
+      if (result.success) {
+        petalsGranted = result.awarded;
+        balance = result.newBalance;
+        lifetimePetalsEarned = result.lifetimePetalsEarned;
+      } else {
+        logger.error(
+          'petals_award_error',
+          { requestId: requestId || undefined, userId, game },
+          new Error(result.error || 'Failed to award petals'),
+        );
+        petalsGranted = 0;
+      }
     } catch (error) {
       logger.error(
         'petals_award_error',
@@ -95,6 +116,7 @@ export async function POST(req: NextRequest) {
     score,
     petalsGranted,
     ...(balance !== undefined ? { balance } : {}),
+    ...(lifetimePetalsEarned !== undefined ? { lifetimePetalsEarned } : {}),
     requestId,
   });
 }

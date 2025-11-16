@@ -331,15 +331,11 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
 
         if (result.ok || result.products) {
           const data = result.data || result;
-          const rawProducts = (data.products || []) as CatalogProduct[];
-          
-          // Deduplicate products by ID to prevent duplicates
-          const uniqueProducts = rawProducts.filter(
-            (product, index, self) => index === self.findIndex((p) => p.id === product.id)
-          );
+          // Products are already deduplicated server-side by blueprintId
+          const products = (data.products || []) as CatalogProduct[];
           
           setSearchResult({
-            products: uniqueProducts,
+            products,
             total: data.pagination?.total ?? data.total ?? 0,
             page: data.pagination?.page ?? data.page ?? 1,
             totalPages: data.pagination?.totalPages ?? data.totalPages ?? 0,
@@ -350,7 +346,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
               availableSizes: [],
             },
           });
-          setProducts(uniqueProducts);
+          setProducts(products);
           setError(null);
         } else {
           setSearchResult({

@@ -178,6 +178,22 @@ export async function POST(req: NextRequest) {
       select: { balance: true, lifetimeEarned: true },
     });
 
+    // Log cosmetic purchase
+    const { logger } = await import('@/app/lib/logger');
+    logger.info('Cosmetic purchased', {
+      requestId,
+      userId,
+      extra: {
+        itemId,
+        itemName: item.name,
+        itemType: item.type,
+        costPetals: item.costPetals,
+        rarity: item.rarity,
+        contentRating: item.contentRating,
+        newBalance: wallet?.balance ?? spendResult.newBalance,
+      },
+    });
+
     const response = NextResponse.json({
       ok: true,
       data: {

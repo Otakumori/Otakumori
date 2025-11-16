@@ -108,7 +108,13 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
         await updateAchievements(user.id, gameId, score, category, metadata);
 
         // Award petals for new personal best using PetalService (tracks lifetimeEarned)
-        const petalReward = calculatePetalReward(score, category, metadata);
+        // Use centralized reward calculation for consistency
+        const { calculateGameReward } = await import('@/app/config/petalTuning');
+        const petalReward = calculateGameReward(gameId, true, score, {
+          ...metadata,
+          category,
+          isPersonalBest: true,
+        });
         if (petalReward > 0) {
           const { PetalService } = await import('@/app/lib/petals');
           const petalService = new PetalService();
@@ -363,20 +369,7 @@ async function calculateRanking(gameId: string, category: string, score: number)
   return betterScores + 1;
 }
 
-function calculatePetalReward(score: number, category: string, metadata: any): number {
-  // Base reward calculation
-  let reward = Math.floor(score / 100);
-
-  // Bonus for accuracy
-  if (metadata.accuracy > 0.9) reward *= 1.5;
-  if (metadata.accuracy > 0.95) reward *= 2;
-
-  // Bonus for streak
-  if (metadata.streak > 10) reward += metadata.streak * 2;
-
-  // Cap rewards
-  return Math.min(reward, 1000);
-}
+// Legacy function removed - now using calculateGameReward() from petalTuning.ts
 
 async function updateAchievements(
   userId: string,

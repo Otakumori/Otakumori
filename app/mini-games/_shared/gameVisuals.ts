@@ -61,6 +61,39 @@ export interface PostProcessingConfig {
 }
 
 /**
+ * Material hints for avatar rendering
+ */
+export interface MaterialHints {
+  useAnimeToon: boolean;
+  useOutline: boolean;
+  outlineColor?: string;
+  outlineThickness?: number;
+  textureQuality?: 'low' | 'medium' | 'high';
+  useMatcap?: boolean; // For hair/accessory gloss
+}
+
+/**
+ * VFX configuration for game effects
+ */
+export interface VfxConfig {
+  screenshake?: {
+    enabled: boolean;
+    intensity: number; // 0-1
+    duration: number; // ms
+  };
+  particles?: {
+    enabled: boolean;
+    maxCount: number;
+    petalBurst?: boolean; // Use petal particles
+  };
+  trails?: {
+    enabled: boolean;
+    lifetime: number; // ms (150-250 for slash trails)
+    additiveBlending?: boolean;
+  };
+}
+
+/**
  * Complete visual profile for a game
  */
 export interface GameVisualProfile {
@@ -79,6 +112,10 @@ export interface GameVisualProfile {
   // 2D game assets (if applicable)
   spriteSheetUrl?: string;
   textureAtlasUrl?: string;
+  // Material hints for avatar rendering
+  materialHints?: MaterialHints;
+  // VFX configuration
+  vfxConfig?: VfxConfig;
   // Accessibility flags
   effectsEnabled?: boolean; // Screen shake, flashes, etc.
   reducedMotion?: boolean; // Respect prefers-reduced-motion
@@ -130,6 +167,31 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           vignetteIntensity: 0.4,
         },
         avatarRepresentationMode: 'fullBody',
+        spriteSheetUrl: '/assets/images/petal_sprite.png', // 4x3 grid, 12 frames
+        materialHints: {
+          useAnimeToon: true,
+          useOutline: true,
+          outlineColor: '#ec4899',
+          outlineThickness: 0.02,
+          textureQuality: 'high',
+        },
+        vfxConfig: {
+          screenshake: {
+            enabled: true,
+            intensity: 0.3,
+            duration: 200,
+          },
+          particles: {
+            enabled: true,
+            maxCount: 50,
+            petalBurst: true,
+          },
+          trails: {
+            enabled: true,
+            lifetime: 200, // 150-250ms for slash trails
+            additiveBlending: true,
+          },
+        },
       };
 
     case 'petal-storm-rhythm':
@@ -370,6 +432,73 @@ export function applyVisualProfile(
     },
     effectsEnabled,
     reducedMotion,
+  };
+}
+
+/**
+ * Representation Mode Documentation
+ * 
+ * Each game uses a specific representation mode for avatar display:
+ * 
+ * - fullBody: Complete avatar (petal-samurai, otaku-beat-em-up, thigh-coliseum)
+ *   - Use when avatar is central to gameplay or needs full visibility
+ *   - Conditional display: hide if avatar quality is low (focus on game VFX instead)
+ * 
+ * - bust: Waist-up view (petal-storm-rhythm, dungeon-of-desire)
+ *   - Emphasizes face, hair, torso
+ *   - Good for rhythm games and character-focused experiences
+ * 
+ * - portrait: Head/shoulder frame (memory-match, puzzle-reveal)
+ *   - Simplified, UI-integrated avatar
+ *   - Used when avatar is decorative, not gameplay-critical
+ * 
+ * - chibi: Proportional remap with larger head (bubble-girl, blossomware)
+ *   - Stylized, cute representation
+ *   - Good for casual/sandbox games
+ */
+
+/**
+ * Hook to get complete visual profile for a game
+ * Combines game visual profile, avatar bundle config, and cosmetics state
+ * 
+ * Note: This is a regular function, not a React hook (no hooks used internally).
+ * It can be called from React hooks or components.
+ */
+export function useGameVisualProfile(
+  gameId: string,
+  options?: {
+    avatarConfig?: unknown; // AvatarProfile | null
+    cosmeticsState?: {
+      hudSkin: HudSkinId;
+      isUnlocked: (itemId: string) => boolean;
+    };
+  },
+): GameVisualProfile & {
+  hudSkin: HudSkinId;
+  avatarBundle: ReturnType<typeof getAvatarBundleForGame>;
+} {
+  // Get base visual profile
+  const profile = getGameVisualProfile(gameId);
+  
+  // Get avatar bundle config
+  const avatarBundle = getAvatarBundleForGame(gameId);
+  
+  // Resolve HUD skin from cosmetics state
+  const cosmeticsState = options?.cosmeticsState || {
+    hudSkin: 'default' as HudSkinId,
+    isUnlocked: () => false,
+  };
+  const hudSkin = getHudForGame(gameId, cosmeticsState);
+  
+  // Merge material hints from avatar bundle into profile if not already set
+  if (!profile.materialHints) {
+    profile.materialHints = avatarBundle.materialHints;
+  }
+  
+  return {
+    ...profile,
+    hudSkin,
+    avatarBundle,
   };
 }
 

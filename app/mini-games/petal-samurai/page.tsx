@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
-import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
+import { getGameAvatarUsage, isAvatarQualitySufficient } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
@@ -104,8 +104,12 @@ export default function PetalSamuraiPage() {
         </div>
       )}
 
-      {/* Avatar Display (FullBody Mode) */}
-      {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+      {/* Avatar Display (FullBody Mode) - Conditional: only show if quality is sufficient */}
+      {!shouldShowChoice && 
+       isAvatarsEnabled() && 
+       avatarConfig && 
+       !avatarLoading && 
+       isAvatarQualitySufficient('petal-samurai', avatarConfig) && (
         <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
           <AvatarRenderer
             profile={avatarConfig}

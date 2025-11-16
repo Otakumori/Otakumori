@@ -2,9 +2,28 @@
  * Central Mini-Game Configuration Mapping
  * Defines representation mode and avatar usage for all mini-games
  * Used by useGameAvatar and QA validators
+ * 
+ * Representation Mode Mapping:
+ * 
+ * - fullBody: Complete avatar display
+ *   - Games: petal-samurai, otaku-beat-em-up, thigh-coliseum
+ *   - Use when avatar is central to gameplay
+ *   - petal-samurai: Conditional display (hide if low quality, focus on VFX)
+ * 
+ * - bust: Waist-up view, emphasizes face/hair/torso
+ *   - Games: petal-storm-rhythm, dungeon-of-desire
+ *   - Good for rhythm games and character-focused experiences
+ * 
+ * - portrait: Head/shoulder frame, simplified UI integration
+ *   - Games: memory-match, puzzle-reveal
+ *   - Used when avatar is decorative, not gameplay-critical
+ * 
+ * - chibi: Proportional remap with larger head, stylized
+ *   - Games: bubble-girl, blossomware
+ *   - Good for casual/sandbox games
  */
 
-import type { RepresentationMode } from '@om/avatar-engine/types/avatar';
+import type { RepresentationMode, AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 export type AvatarUsage = 'avatar-or-preset' | 'preset-only';
 
@@ -109,5 +128,62 @@ export function gameUsesAvatar(gameId: string): boolean {
  */
 export function getAllGameIds(): string[] {
   return Object.keys(miniGameConfigs);
+}
+
+/**
+ * Check if avatar should be displayed conditionally
+ * Some games (like petal-samurai) may hide avatar if quality is low
+ * to focus on game VFX instead
+ */
+export function shouldDisplayAvatarConditionally(
+  gameId: string,
+  avatarProfile: AvatarProfile | null,
+): boolean {
+  // Only petal-samurai uses conditional display
+  if (gameId !== 'petal-samurai') {
+    return true; // Always show for other games
+  }
+
+  if (!avatarProfile) {
+    return false; // No avatar to display
+  }
+
+  // Check avatar quality indicators
+  // Low quality indicators:
+  // - Missing color palette
+  // - Default/preset IDs suggest low customization
+  // - Missing morph weights (procedural avatars should have these)
+  
+  const hasValidPalette = Boolean(
+    avatarProfile.colorPalette && 
+    avatarProfile.colorPalette.skin &&
+    avatarProfile.colorPalette.hair &&
+    avatarProfile.colorPalette.eyes
+  );
+  
+  // For petal-samurai: only show if avatar has valid palette
+  // In practice, we can be more lenient - show if palette exists
+  return hasValidPalette;
+}
+
+/**
+ * Check if avatar quality is sufficient for display
+ * Returns true if avatar should be shown, false if it should be hidden
+ */
+export function isAvatarQualitySufficient(
+  gameId: string,
+  avatarProfile: AvatarProfile | null,
+): boolean {
+  if (!avatarProfile) {
+    return false;
+  }
+
+  // For games with conditional display, check quality
+  if (gameId === 'petal-samurai') {
+    return shouldDisplayAvatarConditionally(gameId, avatarProfile);
+  }
+
+  // For other games, always show if avatar exists
+  return true;
 }
 

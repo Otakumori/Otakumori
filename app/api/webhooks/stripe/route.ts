@@ -171,6 +171,7 @@ export async function POST(req: Request) {
       try {
         const codes = (fullSession.metadata?.coupon_codes || '').split(',').filter(Boolean);
         if (codes.length > 0) {
+          // Mark regular Coupon redemptions
           const coupons = await prisma.coupon.findMany({
             where: { code: { in: codes } },
             select: { id: true, code: true },
@@ -181,6 +182,18 @@ export async function POST(req: Request) {
               data: { status: 'SUCCEEDED', clientReferenceId: order.id },
             });
           }
+          
+          // Mark CouponGrant vouchers (petal-purchased) as redeemed
+          await prisma.couponGrant.updateMany({
+            where: {
+              userId: user.id,
+              code: { in: codes },
+              redeemedAt: null, // Only mark unused vouchers
+            },
+            data: {
+              redeemedAt: new Date(),
+            },
+          });
         }
       } catch (e) {
         console.warn('Coupon redemption update failed', e);

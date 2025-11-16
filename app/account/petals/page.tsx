@@ -10,7 +10,7 @@ interface ShopItem {
   id: string;
   sku: string;
   name: string;
-  kind: 'COSMETIC' | 'OVERLAY' | 'TEXT' | 'CURSOR';
+  kind: 'COSMETIC' | 'OVERLAY' | 'TEXT' | 'CURSOR' | 'DISCOUNT';
   pricePetals: number;
   eventTag?: string;
   metadata: {
@@ -19,6 +19,20 @@ interface ShopItem {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+interface DiscountReward {
+  id: string;
+  name: string;
+  description?: string | null;
+  discountType: 'PERCENT' | 'OFF_AMOUNT';
+  amountOff?: number | null;
+  percentOff?: number | null;
+  petalCost: number;
+  nsfwOnly: boolean;
+  minSpendCents?: number | null;
+  validityDays: number;
+  available: boolean;
 }
 
 interface PetalStoreResponse {
@@ -36,11 +50,13 @@ const CATEGORIES = [
   { id: 'OVERLAY', name: 'Overlays', icon: '' },
   { id: 'TEXT', name: 'Text Effects', icon: '' },
   { id: 'CURSOR', name: 'Cursors', icon: '' },
+  { id: 'DISCOUNT', name: 'Discount Vouchers', icon: '' },
 ];
 
 export default function PetalStorePage() {
   const { user } = useUser();
   const [items, setItems] = useState<ShopItem[]>([]);
+  const [discountRewards, setDiscountRewards] = useState<DiscountReward[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -51,6 +67,7 @@ export default function PetalStorePage() {
   useEffect(() => {
     if (user) {
       fetchShopItems();
+      fetchDiscountRewards();
       fetchPetalBalance();
     } else {
       setLoading(false);
@@ -79,6 +96,25 @@ export default function PetalStorePage() {
       console.error('Error fetching shop items:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDiscountRewards = async () => {
+    try {
+      const response = await fetch('/api/v1/petals/shop/discounts');
+      if (response.ok) {
+        const data = await response.json();
+        if (data?.ok && data?.data?.rewards) {
+          setDiscountRewards(
+            data.data.rewards.map((r: any) => ({
+              ...r,
+              available: true, // All rewards from API are already filtered for eligibility
+            })),
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching discount rewards:', err);
     }
   };
 
@@ -127,6 +163,48 @@ export default function PetalStorePage() {
     }
   };
 
+  const handlePurchaseDiscount = async (reward: DiscountReward) => {
+    if (petalBalance < reward.petalCost) {
+      alert('Insufficient petals!');
+      return;
+    }
+
+    if (!reward.available) {
+      alert('This discount reward is not available. You may need to unlock a required achievement.');
+      return;
+    }
+
+    try {
+      setPurchasing(reward.id);
+
+      const response = await fetch('/api/v1/petals/shop/discounts/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discountRewardId: reward.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok && data.data) {
+        // Update local state
+        if (typeof data.data.newBalance === 'number') setPetalBalance(data.data.newBalance);
+        setDiscountRewards((prev) => prev.filter((r) => r.id !== reward.id));
+        alert(
+          `Successfully purchased ${reward.name}! Your discount code is: ${data.data.couponGrant.code}. Valid for ${reward.validityDays} days.`,
+        );
+      } else {
+        throw new Error(data.error || 'Purchase failed');
+      }
+    } catch (err) {
+      alert('Purchase failed. Please try again.');
+      console.error('Error purchasing discount reward:', err);
+    } finally {
+      setPurchasing(null);
+    }
+  };
+
   const getCategoryIcon = (kind: string) => {
     switch (kind) {
       case 'COSMETIC':
@@ -162,6 +240,15 @@ export default function PetalStorePage() {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.metadata.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const filteredDiscounts =
+    selectedCategory === 'all' || selectedCategory === 'DISCOUNT'
+      ? discountRewards.filter(
+          (reward) =>
+            reward.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            reward.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      : [];
 
   if (loading) {
     return (
@@ -242,8 +329,94 @@ export default function PetalStorePage() {
           </div>
         )}
 
+        {/* Discount Rewards Section */}
+        {(selectedCategory === 'all' || selectedCategory === 'DISCOUNT') &&
+          filteredDiscounts.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold mb-6 text-white">Discount Vouchers</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {filteredDiscounts.map((reward) => (
+                  <div
+                    key={reward.id}
+                    className="group bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl overflow-hidden hover:scale-105 transition-all duration-200"
+                  >
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="font-semibold text-white group-hover:text-green-400 transition-colors">
+                          {reward.name}
+                        </h3>
+                        {reward.nsfwOnly && (
+                          <span className="text-xs px-2 py-1 bg-pink-500/20 text-pink-300 rounded-full">
+                            NSFW
+                          </span>
+                        )}
+                      </div>
+
+                      {reward.description && (
+                        <p className="text-sm text-neutral-400 mb-4">{reward.description}</p>
+                      )}
+
+                      <div className="mb-4 space-y-2">
+                        <div className="text-lg font-bold text-green-400">
+                          {reward.discountType === 'PERCENT'
+                            ? `${reward.percentOff}% OFF`
+                            : `$${(reward.amountOff || 0) / 100} OFF`}
+                        </div>
+                        {reward.minSpendCents && (
+                          <div className="text-xs text-neutral-400">
+                            Min. spend: ${(reward.minSpendCents / 100).toFixed(2)}
+                          </div>
+                        )}
+                        <div className="text-xs text-neutral-400">
+                          Valid for {reward.validityDays} days after purchase
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-pink-400">
+                          <Coins className="h-4 w-4" />
+                          <span className="font-semibold">{reward.petalCost.toLocaleString()}</span>
+                          <span className="text-sm">petals</span>
+                        </div>
+
+                        <button
+                          onClick={() => handlePurchaseDiscount(reward)}
+                          disabled={
+                            purchasing === reward.id ||
+                            petalBalance < reward.petalCost ||
+                            !reward.available
+                          }
+                          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400 ${
+                            petalBalance < reward.petalCost || !reward.available
+                              ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
+                              : purchasing === reward.id
+                                ? 'bg-blue-600 text-white cursor-wait'
+                                : 'bg-green-600 hover:bg-green-700 text-white hover:scale-105'
+                          }`}
+                          aria-label={`Purchase ${reward.name}`}
+                        >
+                          {purchasing === reward.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              Purchasing...
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingBag className="h-4 w-4" />
+                              Purchase
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         {/* Items Grid */}
-        {filteredItems.length > 0 ? (
+        {(selectedCategory === 'all' || selectedCategory !== 'DISCOUNT') && filteredItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
             {filteredItems.map((item) => (
               <div
@@ -329,15 +502,20 @@ export default function PetalStorePage() {
               </div>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4"></div>
-            <h3 className="text-xl font-semibold text-neutral-400 mb-2">No items found</h3>
-            <p className="text-neutral-500">
-              {searchQuery ? 'Try adjusting your search terms.' : 'Check back later for new items!'}
-            </p>
-          </div>
         )}
+
+        {/* Empty State */}
+        {filteredItems.length === 0 &&
+          filteredDiscounts.length === 0 &&
+          (selectedCategory === 'all' || selectedCategory !== 'DISCOUNT') && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4"></div>
+              <h3 className="text-xl font-semibold text-neutral-400 mb-2">No items found</h3>
+              <p className="text-neutral-500">
+                {searchQuery ? 'Try adjusting your search terms.' : 'Check back later for new items!'}
+              </p>
+            </div>
+          )}
 
         {/* How to Earn Petals */}
         <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-8 text-center">

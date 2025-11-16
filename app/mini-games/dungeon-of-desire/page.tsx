@@ -75,6 +75,24 @@ export default function DungeonOfDesirePage() {
     setGameState('instructions');
   }, []);
 
+  // Handle floor progression - award petals per floor cleared
+  const handleFloorChange = useCallback(async (newFloor: number) => {
+    setFloor(newFloor);
+    
+    // Award petals for floor completion (except floor 1, which is the starting floor)
+    if (newFloor > 1) {
+      const floorReward = Math.floor(newFloor * 10); // 20 petals for floor 2, 30 for floor 3, etc.
+      await earnPetals({
+        gameId: 'dungeon-of-desire',
+        score: floorReward * 10, // Convert to score equivalent
+        metadata: {
+          floorCleared: newFloor - 1, // Previous floor that was cleared
+          rewardType: 'floor_completion',
+        },
+      });
+    }
+  }, [earnPetals]);
+
   const handleGameEnd = useCallback(async (finalScoreValue: number, didWin: boolean) => {
     setFinalScore(finalScoreValue);
     setGameState(didWin ? 'win' : 'lose');
@@ -173,7 +191,7 @@ export default function DungeonOfDesirePage() {
       )}
 
       <GameShell title="Dungeon of Desire" gameKey="dungeon-of-desire">
-        <DungeonGame onScoreChange={setScore} onHealthChange={setHealth} onFloorChange={setFloor} onGameEnd={handleGameEnd} />
+        <DungeonGame onScoreChange={setScore} onHealthChange={setHealth} onFloorChange={handleFloorChange} onGameEnd={handleGameEnd} />
       </GameShell>
 
       {/* Game Overlay */}

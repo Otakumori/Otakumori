@@ -75,6 +75,24 @@ export default function ThighColiseumPage() {
     setGameState('instructions');
   }, []);
 
+  // Handle stage progression - award milestone petals
+  const handleStageChange = useCallback(async (newStage: number) => {
+    setStage(newStage);
+    
+    // Award petals for stage milestones (every 5 stages)
+    if (newStage > 1 && newStage % 5 === 0) {
+      const milestoneReward = Math.floor(newStage * 5); // 25 petals for stage 5, 50 for stage 10, etc.
+      await earnPetals({
+        gameId: 'thigh-coliseum',
+        score: milestoneReward * 10,
+        metadata: {
+          milestoneType: 'stage',
+          milestoneValue: newStage,
+        },
+      });
+    }
+  }, [earnPetals]);
+
   const handleGameEnd = useCallback(async (finalScoreValue: number, didWin: boolean) => {
     setFinalScore(finalScoreValue);
     setGameState(didWin ? 'win' : 'lose');
@@ -174,7 +192,7 @@ export default function ThighColiseumPage() {
       )}
 
       <GameShell title="Thigh Colosseum" gameKey="thigh-coliseum">
-        <ThighChaseGame onScoreChange={setScore} onLivesChange={setLives} onStageChange={setStage} onGameEnd={handleGameEnd} />
+        <ThighChaseGame onScoreChange={setScore} onLivesChange={setLives} onStageChange={handleStageChange} onGameEnd={handleGameEnd} />
       </GameShell>
 
       {/* Game Overlay */}
