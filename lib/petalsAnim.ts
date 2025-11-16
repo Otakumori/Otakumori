@@ -118,13 +118,14 @@ export function createPetalElement(
     position: fixed;
     top: 0;
     left: 0;
-    width: 24px;
-    height: 24px;
+    width: 6px;
+    height: 6px;
     background: radial-gradient(circle at 30% 30%, ${color}, ${color} 70%, rgba(0,0,0,0) 100%);
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
     pointer-events: ${interactive ? 'auto' : 'none'};
     cursor: ${interactive ? 'pointer' : 'default'};
     z-index: 50;
+    opacity: 0.3;
     transform: translate3d(${x}px, ${y}px, 0);
   `;
   return petal;

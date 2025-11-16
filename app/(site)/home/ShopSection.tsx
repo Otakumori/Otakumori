@@ -1,5 +1,5 @@
 
-import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
+import { headers } from 'next/headers';
 import Link from 'next/link';
 import Image from 'next/image';
 import { paths } from '@/lib/paths';
@@ -37,6 +37,19 @@ const HOMEPAGE_EXCLUDED_TITLES = [
   'Otakumori Poster',
 ];
 
+async function getBaseUrl(): Promise<string> {
+  const headersList = await headers();
+  const host = headersList.get('host');
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+  
+  // Fallback for development
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+}
+
 export default async function ShopSection() {
   let products: Product[] = [];
   let isBlockedData = false;
@@ -44,22 +57,32 @@ export default async function ShopSection() {
   try {
     // Build exclusion query parameter
     const excludeParam = HOMEPAGE_EXCLUDED_TITLES.map((t) => `excludeTitles=${encodeURIComponent(t)}`).join('&');
-    const apiUrl = `/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
+    const baseUrl = await getBaseUrl();
+    const apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
 
-    const featuredResult = await safeFetch<ShopData>(apiUrl, {
-      allowLive: true,
+    // Use direct fetch instead of safeFetch for server components
+    const response = await fetch(apiUrl, {
+      next: { revalidate: 60 }, // Cache for 60 seconds
+      headers: {
+        Accept: 'application/json',
+      },
     });
 
-    const data = isSuccess(featuredResult) ? featuredResult.data : null;
-
-    products =
-      data?.products?.map((product) => ({
-        ...product,
-        image: product.image || '/assets/placeholder-product.jpg',
-        description: stripHtml(product.description || ''),
-        slug: product.slug,
-      })) || [];
-    isBlockedData = isBlocked(featuredResult);
+    if (response.ok) {
+      const result = await response.json();
+      const data = result.ok ? result.data : result;
+      
+      products =
+        data?.products?.map((product: Product) => ({
+          ...product,
+          image: product.image || '/assets/placeholder-product.jpg',
+          description: stripHtml(product.description || ''),
+          slug: product.slug,
+        })) || [];
+    } else {
+      console.warn('ShopSection: API returned', response.status);
+      products = [];
+    }
   } catch (error) {
     console.warn('ShopSection: featured API failed during SSR:', error);
     products = [];

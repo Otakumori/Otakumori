@@ -65,7 +65,7 @@ export default function InteractiveBuddyPage() {
   const avatarUsage = getGameAvatarUsage('bubble-girl');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('bubble-girl', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
 
   // Visual profile and HUD
@@ -88,9 +88,9 @@ export default function InteractiveBuddyPage() {
   // } as const;
   
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
+    if (choice === 'creator' && avatar) {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
@@ -185,14 +185,16 @@ export default function InteractiveBuddyPage() {
             </Link>
           </div>
 
-          {/* Avatar Display (Chibi Mode) */}
+          {/* Avatar Display (Chibi Mode) - MAIN CHARACTER CENTER STAGE */}
           {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-            <div className="flex justify-center mb-6">
-              <AvatarRenderer
-                profile={avatarConfig}
-                mode={representationConfig.mode}
-                size="small"
-              />
+            <div className="flex justify-center mb-8">
+              <div className="relative w-80 h-80">
+                <AvatarRenderer
+                  profile={avatarConfig}
+                  mode={representationConfig.mode}
+                  size="large"
+                />
+              </div>
             </div>
           )}
 

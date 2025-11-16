@@ -79,7 +79,7 @@ export default function MemoryMatchGame() {
   const avatarUsage = getGameAvatarUsage('memory-match');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('memory-match', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
 
   // Visual profile and HUD
@@ -364,9 +364,9 @@ export default function MemoryMatchGame() {
   }, [initializeGame]);
 
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
+    if (choice === 'creator' && avatar) {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
@@ -405,14 +405,16 @@ export default function MemoryMatchGame() {
           </div>
         </div>
 
-        {/* Avatar Display (Portrait Mode) */}
+        {/* Avatar Display (Portrait Mode) - MAIN CHARACTER CENTER STAGE */}
         {isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-          <div className="flex justify-center mb-6">
-            <AvatarRenderer
-              profile={avatarConfig}
-              mode={representationConfig.mode}
-              size="small"
-            />
+          <div className="flex justify-center mb-8">
+            <div className="relative w-64 h-64">
+              <AvatarRenderer
+                profile={avatarConfig}
+                mode={representationConfig.mode}
+                size="large"
+              />
+            </div>
           </div>
         )}
 

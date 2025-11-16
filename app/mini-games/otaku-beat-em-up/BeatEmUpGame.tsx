@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 import { useScreenShake, createPetalBurst, updatePetalParticles, type PetalParticle } from '../_shared/vfx';
+import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
+import { createGlowEffect } from '../_shared/enhancedTextures';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
@@ -75,6 +77,10 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatIntervalRef = useRef<number | null>(null);
   const gameLoopRef = useRef<number | null>(null);
+  
+  // Physics renderers
+  const playerRendererRef = useRef<PhysicsCharacterRenderer | null>(null);
+  const enemyRenderersRef = useRef<Map<string, PhysicsCharacterRenderer>>(new Map());
 
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
@@ -157,6 +163,32 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
+    };
+  }, []);
+
+  // Initialize physics renderers
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    
+    const ctx = canvasRef.current.getContext('2d');
+    if (!ctx) return;
+    
+    // Initialize player renderer
+    if (!playerRendererRef.current) {
+      playerRendererRef.current = new PhysicsCharacterRenderer(ctx, 'player', {
+        quality: 'high',
+        enabled: true,
+      });
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      if (playerRendererRef.current) {
+        playerRendererRef.current.dispose();
+        playerRendererRef.current = null;
+      }
+      enemyRenderersRef.current.forEach((renderer) => renderer.dispose());
+      enemyRenderersRef.current.clear();
     };
   }, []);
 
@@ -306,6 +338,25 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
         hitEnemy = true;
         const newHealth = Math.max(0, enemy.health - damage);
         
+        // Apply physics impact
+        const renderer = enemyRenderersRef.current.get(enemy.id);
+        if (renderer) {
+          const impactForce = {
+            x: player.facing === 'right' ? (attackType === 'heavy' ? 5 : 3) : (attackType === 'heavy' ? -5 : -3),
+            y: -2,
+          };
+          renderer.applyImpact(impactForce, 'chest');
+        }
+        
+        // Apply physics impact to player (recoil)
+        if (playerRendererRef.current) {
+          const recoilForce = {
+            x: player.facing === 'right' ? -1 : 1,
+            y: 0,
+          };
+          playerRendererRef.current.applyImpact(recoilForce, 'chest');
+        }
+        
         // Screen shake on heavy hits or when enemy dies
         if (attackType === 'heavy' || newHealth <= 0) {
           shake(attackType === 'heavy' ? 0.4 : 0.3, attackType === 'heavy' ? 300 : 200);
@@ -331,6 +382,15 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
             ? 100
             : prev.beatAccuracy * 0.95 + (isPerfectBeat ? 100 : 70) * 0.05,
         }));
+
+        // Cleanup physics renderer if enemy dies
+        if (newHealth <= 0) {
+          const renderer = enemyRenderersRef.current.get(enemy.id);
+          if (renderer) {
+            renderer.dispose();
+            enemyRenderersRef.current.delete(enemy.id);
+          }
+        }
 
         return {
           ...enemy,
@@ -386,6 +446,19 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       attackType: 'light',
     };
 
+    // Create physics renderer for new enemy
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) {
+        const renderer = new PhysicsCharacterRenderer(
+          ctx,
+          'default', // Use default preset for enemies
+          { quality: 'high', enabled: true },
+        );
+        enemyRenderersRef.current.set(newEnemy.id, renderer);
+      }
+    }
+
     enemiesRef.current.push(newEnemy);
   }, []);
 
@@ -440,6 +513,15 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       // Clamp player to arena
       player.x = Math.max(30, Math.min(CANVAS_WIDTH - 30, player.x));
       player.y = Math.max(GROUND_Y - 100, Math.min(GROUND_Y + 100, player.y));
+      
+      // Update player physics
+      if (playerRendererRef.current) {
+        playerRendererRef.current.update(
+          deltaTime,
+          { x: player.vx, y: player.vy },
+          { x: player.x, y: player.y },
+        );
+      }
 
       // Update cooldowns
       if (player.attackCooldown > 0) player.attackCooldown -= deltaTime * 1000;
@@ -496,6 +578,15 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
                   ? (enemy.type === 'brute' ? 25 : enemy.type === 'boss' ? 30 : 15)
                   : (enemy.type === 'brute' ? 15 : enemy.type === 'ninja' ? 10 : 8);
                 
+                // Apply physics impact to player
+                if (playerRendererRef.current) {
+                  const impactForce = {
+                    x: enemy.facing === 'right' ? 3 : -3,
+                    y: -1,
+                  };
+                  playerRendererRef.current.applyImpact(impactForce, 'chest');
+                }
+                
                 setGameState((prev) => ({
                   ...prev,
                   health: Math.max(0, prev.health - damage),
@@ -533,6 +624,16 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
 
         enemy.x += enemy.vx;
         enemy.y += enemy.vy;
+        
+        // Update enemy physics
+        const renderer = enemyRenderersRef.current.get(enemy.id);
+        if (renderer) {
+          renderer.update(
+            deltaTime,
+            { x: enemy.vx, y: enemy.vy },
+            { x: enemy.x, y: enemy.y },
+          );
+        }
 
         // Clamp enemy to arena
         enemy.x = Math.max(30, Math.min(CANVAS_WIDTH - 30, enemy.x));
@@ -637,12 +738,19 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
     // Clear canvas
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw background gradient
+    // Draw background gradient - Enhanced
     const bgGradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
     bgGradient.addColorStop(0, '#1a0520');
     bgGradient.addColorStop(0.5, '#2e0b1a');
     bgGradient.addColorStop(1, '#0f0718');
     ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    
+    // Enhanced background overlay with glow
+    const overlayGradient = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, Math.max(CANVAS_WIDTH, CANVAS_HEIGHT));
+    overlayGradient.addColorStop(0, 'rgba(139, 92, 246, 0.1)');
+    overlayGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = overlayGradient;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     // Draw ground line
@@ -659,12 +767,84 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       ...enemiesRef.current.map((e) => ({ type: 'enemy' as const, y: e.y, enemy: e })),
     ].sort((a, b) => a.y - b.y);
 
-    // Render entities in depth order
+    // Render entities in depth order with physics
     allEntities.forEach((entity) => {
       if (entity.type === 'player') {
-        renderPlayer(ctx, playerRef.current);
+        const player = playerRef.current;
+        if (playerRendererRef.current) {
+          // Use physics renderer
+          playerRendererRef.current.render(player.x, player.y, player.facing);
+          
+          // Draw attack effect overlay
+          if (player.state === 'attack' || player.state === 'heavyAttack') {
+            const attackX = player.facing === 'right' ? player.x + 40 : player.x - 40;
+            const isHeavy = player.state === 'heavyAttack';
+            const radius = isHeavy ? 40 : 25;
+            
+            createGlowEffect(ctx, attackX, player.y - 10, radius, isHeavy ? '#ff6464' : '#ffffff', isHeavy ? 0.6 : 0.4);
+          }
+          
+          // Draw block shield overlay
+          if (player.state === 'block') {
+            ctx.save();
+            ctx.strokeStyle = '#60a5fa';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#60a5fa';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y - 10, 35, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+        } else {
+          // Fallback to original rendering
+          renderPlayer(ctx, player);
+        }
       } else if (entity.type === 'enemy' && entity.enemy) {
-        renderEnemy(ctx, entity.enemy);
+        const enemy = entity.enemy;
+        const renderer = enemyRenderersRef.current.get(enemy.id);
+        if (renderer) {
+          // Use physics renderer
+          renderer.render(enemy.x, enemy.y, enemy.facing);
+          
+          // Draw health bar
+          const healthBarWidth = 40;
+          const healthPercent = enemy.health / enemy.maxHealth;
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+          ctx.fillRect(enemy.x - healthBarWidth / 2, enemy.y - 50, healthBarWidth, 4);
+          ctx.fillStyle = healthPercent > 0.5 ? '#4ade80' : healthPercent > 0.25 ? '#fbbf24' : '#ef4444';
+          ctx.fillRect(
+            enemy.x - healthBarWidth / 2,
+            enemy.y - 50,
+            healthBarWidth * healthPercent,
+            4,
+          );
+          
+          // Telegraph warning
+          if (enemy.state === 'telegraph') {
+            const telegraphProgress = 1 - (enemy.telegraphTime / (enemy.attackType === 'heavy' ? 800 : 400));
+            const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
+            ctx.save();
+            ctx.globalAlpha = pulse;
+            ctx.strokeStyle = enemy.attackType === 'heavy' ? '#ff4444' : '#ffaa44';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = enemy.attackType === 'heavy' ? '#ff4444' : '#ffaa44';
+            ctx.beginPath();
+            ctx.arc(enemy.x, enemy.y - 20, 30, 0, Math.PI * 2);
+            ctx.stroke();
+            if (enemy.attackType === 'heavy') {
+              ctx.fillStyle = '#ff4444';
+              ctx.font = 'bold 16px Arial';
+              ctx.textAlign = 'center';
+              ctx.fillText('!', enemy.x, enemy.y - 15);
+            }
+            ctx.restore();
+          }
+        } else {
+          // Fallback to original rendering
+          renderEnemy(ctx, enemy);
+        }
       }
     });
 

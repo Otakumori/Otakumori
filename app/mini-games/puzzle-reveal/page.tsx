@@ -15,11 +15,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import GlassCard from '../../components/ui/GlassCard';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { PhysicsAvatarCanvas, PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
@@ -59,12 +60,13 @@ export default function PuzzleRevealPage() {
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
   const [showAvatarChoice, setShowAvatarChoice] = useState(false);
+  const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
   
   // Avatar integration - use wrapper hook with choice
   const avatarUsage = getGameAvatarUsage('puzzle-reveal');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('puzzle-reveal', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
 
   // Visual profile and HUD
@@ -89,9 +91,9 @@ export default function PuzzleRevealPage() {
   // } as const;
   
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
+    if (choice === 'creator' && avatar) {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
@@ -219,14 +221,44 @@ export default function PuzzleRevealPage() {
           </div>
         )}
 
-        {/* Avatar Display (Portrait Mode) */}
+        {/* Avatar Display (Portrait Mode) - MAIN CHARACTER CENTER STAGE */}
         {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-          <div className="flex justify-center mb-6">
-            <AvatarRenderer
-              profile={avatarConfig}
-              mode={representationConfig.mode}
-              size="small"
-            />
+          <div className="flex justify-center mb-8">
+            <div className="relative w-64 h-64">
+              <AvatarRenderer
+                profile={avatarConfig}
+                mode={representationConfig.mode}
+                size="large"
+              />
+              {/* Physics Avatar Overlay */}
+              {gameState === 'playing' && (
+                <div className="absolute top-0 right-0 w-32 h-40">
+                  <PhysicsAvatarCanvas
+                    ref={physicsAvatarRef}
+                    characterType="player"
+                    quality="high"
+                    width={128}
+                    height={160}
+                    className="rounded-lg"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {/* Physics Avatar Standalone (when no avatar config) */}
+        {!showAvatarChoice && (!isAvatarsEnabled() || !avatarConfig) && gameState === 'playing' && (
+          <div className="flex justify-center mb-8">
+            <div className="relative w-64 h-64 flex items-center justify-center">
+              <PhysicsAvatarCanvas
+                ref={physicsAvatarRef}
+                characterType="player"
+                quality="high"
+                width={160}
+                height={200}
+                className="rounded-lg"
+              />
+            </div>
           </div>
         )}
 
@@ -250,7 +282,7 @@ export default function PuzzleRevealPage() {
               )}
             </>
           )}
-          <EnhancedTileGame key={key} mode={mode} onScoreChange={setScore} onComboChange={setCombo} onGameEnd={handleGameEnd} />
+          <EnhancedTileGame key={key} mode={mode} onScoreChange={setScore} onComboChange={setCombo} onGameEnd={handleGameEnd} physicsAvatarRef={physicsAvatarRef} />
         </GlassCard>
 
         {/* Game Overlay */}

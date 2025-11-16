@@ -54,12 +54,12 @@ export default function InteractivePetals({
           id: petalIdCounter.current++,
           x: Math.random() * (canvasRef.current?.width || 800),
           y: -50,
-          vx: (Math.random() - 0.5) * 2,
-          vy: 1 + Math.random() * 2,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: 0.5 + Math.random() * 1,
           rotation: Math.random() * 360,
-          rotationSpeed: (Math.random() - 0.5) * 5,
-          size: 20 + Math.random() * 15,
-          opacity: 0.7 + Math.random() * 0.3,
+          rotationSpeed: (Math.random() - 0.5) * 2,
+          size: 4 + Math.random() * 3,
+          opacity: 0.3 + Math.random() * 0.2,
           color: ['#FFC0CB', '#FFB6C1', '#FF69B4', '#FF1493'][Math.floor(Math.random() * 4)],
         };
         setPetals((prev) => [...prev, newPetal]);
@@ -88,16 +88,31 @@ export default function InteractivePetals({
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw petals
+      // Update and draw petals with physics
+      const currentTime = Date.now();
       setPetals((prevPetals) => {
         return prevPetals
           .map((petal) => {
+            // Physics simulation
+            const deltaTime = 0.016; // ~60fps
+            
+            // Gravity (constant downward acceleration)
+            const gravity = 0.3;
+            const newVy = petal.vy + gravity * deltaTime;
+            
+            // Wind effect (sine wave for natural sway)
+            const windTime = currentTime * 0.001;
+            const windEffect = Math.sin((windTime * 0.5 + petal.id * 0.1) * 2) * 0.2;
+            const newVx = petal.vx * 0.99 + windEffect; // Air resistance + wind
+            
             // Update position
             const newPetal = {
               ...petal,
-              x: petal.x + petal.vx,
-              y: petal.y + petal.vy,
-              rotation: petal.rotation + petal.rotationSpeed,
+              vx: newVx,
+              vy: newVy,
+              x: petal.x + newVx * deltaTime * 60,
+              y: petal.y + newVy * deltaTime * 60,
+              rotation: petal.rotation + petal.rotationSpeed + windEffect * 0.5,
             };
 
             // Draw petal

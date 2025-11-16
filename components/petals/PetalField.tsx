@@ -22,6 +22,8 @@ interface Petal {
   y: number;
   vx: number; // Horizontal velocity (left to right)
   vy: number; // Vertical velocity (downward)
+  ax: number; // Horizontal acceleration (for wind/physics)
+  ay: number; // Vertical acceleration (gravity)
   spriteIndex: number; // 0-11 (12 petals in sprite sheet)
   rotation: number;
   rotationSpeed: number;
@@ -29,6 +31,7 @@ interface Petal {
   alpha: number;
   collected: boolean;
   popAnimationProgress: number; // 0-1 for pop animation
+  seed: number; // Random seed for wind variation
 }
 
 interface PetalFieldProps {
@@ -44,8 +47,8 @@ const SPRITE_COLS = 4;
 const SPRITE_ROWS = 3;
 const TOTAL_SPRITES = SPRITE_COLS * SPRITE_ROWS; // 12
 
-// Petal size multiplier - scales down sprites to appropriate size (20-30px instead of 80-120px)
-const PETAL_SIZE_MULTIPLIER = 0.25; // Scale sprites to 25% of their original size
+// Petal size multiplier - scales down sprites to appropriate size (4-8px instead of 80-120px)
+const PETAL_SIZE_MULTIPLIER = 0.08; // Scale sprites to 8% of their original size for subtle shop aesthetic
 
 // Guest petal storage key
 const GUEST_PETAL_KEY = 'otm-guest-petals';
@@ -94,18 +97,22 @@ export default function PetalField({
 
   // Initialize petals
   const createPetal = useCallback((canvas: HTMLCanvasElement): Petal => {
+    const seed = Math.random();
     return {
       x: -50, // Start off-screen left
       y: Math.random() * canvas.height,
-      vx: (0.5 + Math.random() * 0.5) * speedMultiplier, // Left to right, slow
-      vy: (0.2 + Math.random() * 0.3) * speedMultiplier, // Gentle downward drift
+      vx: (0.2 + Math.random() * 0.2) * speedMultiplier, // Initial horizontal velocity
+      vy: (0.1 + Math.random() * 0.2) * speedMultiplier, // Initial vertical velocity
+      ax: 0, // Acceleration starts at 0
+      ay: 0.05 * speedMultiplier, // Gravity pulling down
       spriteIndex: Math.floor(Math.random() * TOTAL_SPRITES), // Random sprite (0-11)
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.02, // Slow rotation
       scale: 0.8 + Math.random() * 0.4, // Vary size
-      alpha: 0.7 + Math.random() * 0.3,
+      alpha: 0.25 + Math.random() * 0.15,
       collected: false,
       popAnimationProgress: 0,
+      seed, // Store seed for wind variation
     };
   }, [speedMultiplier]);
 
@@ -224,16 +231,36 @@ export default function PetalField({
     const spriteWidth = imageRef.current.width / SPRITE_COLS;
     const spriteHeight = imageRef.current.height / SPRITE_ROWS;
 
-    // Animation loop
-    const animate = () => {
+    // Animation loop with physics
+    let lastTime = performance.now();
+    const animate = (currentTime: number) => {
+      const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.033); // Cap at ~30fps minimum
+      lastTime = currentTime;
+      
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       petalsRef.current.forEach((petal, index) => {
-        // Update position
+        // Update physics
         if (!petal.collected) {
-          petal.x += petal.vx;
-          petal.y += petal.vy;
-          petal.rotation += petal.rotationSpeed;
+          // Wind effect (sine wave for natural sway)
+          const windTime = currentTime * 0.001;
+          const windEffect = Math.sin((windTime * 0.5 + petal.seed * 10) * 2) * 0.15;
+          petal.ax = windEffect * speedMultiplier;
+          
+          // Gravity (constant downward acceleration)
+          petal.ay = 0.05 * speedMultiplier;
+          
+          // Air resistance (damping)
+          const airResistance = 0.98;
+          petal.vx = (petal.vx + petal.ax * deltaTime) * airResistance;
+          petal.vy = (petal.vy + petal.ay * deltaTime) * airResistance;
+          
+          // Update position based on velocity
+          petal.x += petal.vx * deltaTime * 60; // Scale for 60fps
+          petal.y += petal.vy * deltaTime * 60;
+          
+          // Rotation affected by wind
+          petal.rotation += petal.rotationSpeed + windEffect * 0.01;
         }
 
         // Update pop animation
@@ -298,7 +325,7 @@ export default function PetalField({
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    animate(performance.now());
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);

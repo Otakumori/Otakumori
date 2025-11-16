@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 import { easingFunctions, createPetalBurst, updatePetalParticles, type PetalParticle } from '../_shared/vfx';
@@ -83,11 +83,13 @@ export default function EnhancedTileGame({
   onScoreChange,
   onComboChange,
   onGameEnd,
+  physicsAvatarRef,
 }: { 
   mode?: GameMode;
   onScoreChange?: (score: number) => void;
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
+  physicsAvatarRef?: React.RefObject<{ applyImpact: (force: { x: number; y: number }, part: string) => void }>;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -311,6 +313,15 @@ export default function EnhancedTileGame({
       maxCombo: Math.max(prev.maxCombo, newCombo),
     }));
     
+    // Apply physics impact based on combo
+    if (physicsAvatarRef?.current) {
+      const impactForce = {
+        x: (Math.random() - 0.5) * 2,
+        y: -2 - Math.min(newCombo * 0.3, 2), // Stronger impact for higher combos
+      };
+      physicsAvatarRef.current.applyImpact(impactForce, 'chest');
+    }
+
     // Notify parent of state changes
     if (onScoreChange) {
       onScoreChange(newScore);

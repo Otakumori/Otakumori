@@ -19,9 +19,10 @@ interface EngineProps {
   playlist: EngineGame[];
   mode?: 'short' | 'long';
   autoplay?: boolean;
+  onGameComplete?: (success: boolean, score: number, streak: number) => void;
 }
 
-export default function Engine({ playlist, mode: _mode = 'short', autoplay = true }: EngineProps) {
+export default function Engine({ playlist, mode: _mode = 'short', autoplay = true, onGameComplete }: EngineProps) {
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -77,6 +78,11 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
         // Update streak
         const newStreak = currentStreak + 1;
         setCurrentStreak(newStreak);
+        
+        // Trigger game completion callback
+        if (onGameComplete) {
+          onGameComplete(true, score, newStreak);
+        }
         
         // Award petals using usePetalEarn (supports guests with ephemeral petals)
         earnPetals({
@@ -134,6 +140,10 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
       } else {
         // Reset streak on failure
         setCurrentStreak(0);
+        // Trigger game completion callback for failure
+        if (onGameComplete) {
+          onGameComplete(false, score, 0);
+        }
       }
 
       // Move to next game after delay (increased from 1500ms for better pacing)

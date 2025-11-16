@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
 import { RUNTIME_FLAGS } from '@/constants.client';
+import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
+import { createGlowEffect } from '../_shared/enhancedTextures';
 
 interface Obstacle {
   id: number;
@@ -37,6 +39,10 @@ export default function ThighChaseGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
+  
+  // Physics renderers
+  const playerRendererRef = useRef<PhysicsCharacterRenderer | null>(null);
+  const pursuerRendererRef = useRef<PhysicsCharacterRenderer | null>(null);
 
   // Game state
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameOver'>('menu');
@@ -102,6 +108,42 @@ export default function ThighChaseGame({
   const [nextPowerupId, setNextPowerupId] = useState(1);
 
   const { saveOnExit, autoSave } = useGameSave('thigh-coliseum');
+
+  // Initialize physics renderers
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    
+    const ctx = canvasRef.current.getContext('2d');
+    if (!ctx) return;
+    
+    // Initialize player renderer
+    if (!playerRendererRef.current) {
+      playerRendererRef.current = new PhysicsCharacterRenderer(ctx, 'player', {
+        quality: 'high',
+        enabled: true,
+      });
+    }
+    
+    // Initialize pursuer renderer (succubus-style for thighs theme)
+    if (!pursuerRendererRef.current) {
+      pursuerRendererRef.current = new PhysicsCharacterRenderer(ctx, 'succubus', {
+        quality: 'high',
+        enabled: true,
+      });
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      if (playerRendererRef.current) {
+        playerRendererRef.current.dispose();
+        playerRendererRef.current = null;
+      }
+      if (pursuerRendererRef.current) {
+        pursuerRendererRef.current.dispose();
+        pursuerRendererRef.current = null;
+      }
+    };
+  }, []);
 
   // Game constants (REBALANCED for fairness)
   const CANVAS_WIDTH = 800;
@@ -180,6 +222,10 @@ export default function ThighChaseGame({
   const jump = useCallback(() => {
     setPlayer((prev) => {
       if (prev.onGround) {
+        // Apply physics impact on jump
+        if (playerRendererRef.current) {
+          playerRendererRef.current.applyImpact({ x: 0, y: -3 }, 'chest');
+        }
         return { ...prev, velocityY: JUMP_FORCE, onGround: false };
       }
       return prev;
@@ -290,6 +336,12 @@ export default function ThighChaseGame({
         if (newY >= GROUND_Y - prev.height) {
           newY = GROUND_Y - prev.height;
           newVelocityY = 0;
+          if (!prev.onGround) {
+            // Apply physics impact on landing
+            if (playerRendererRef.current) {
+              playerRendererRef.current.applyImpact({ x: 0, y: 2 }, 'hips');
+            }
+          }
           newOnGround = true;
         }
 
@@ -304,7 +356,7 @@ export default function ThighChaseGame({
           newX = Math.min(CANVAS_WIDTH - 100, newX + speed);
         }
 
-        return {
+        const updatedPlayer = {
           ...prev,
           x: newX,
           y: newY,
@@ -314,6 +366,19 @@ export default function ThighChaseGame({
           shielded: newShielded,
           speedBoost: newSpeedBoost,
         };
+        
+        // Update player physics
+        if (playerRendererRef.current) {
+          const velocityX = (newX - prev.x) / (deltaTime / 1000);
+          const velocityY = newVelocityY;
+          playerRendererRef.current.update(
+            deltaTime / 1000,
+            { x: velocityX, y: velocityY },
+            { x: newX, y: newY },
+          );
+        }
+        
+        return updatedPlayer;
       });
 
       // Update pursuer (always getting closer - REBALANCED)
@@ -330,12 +395,25 @@ export default function ThighChaseGame({
           newSpeed += 0.2; // Reduced from 0.5 for fairer catch-up
         }
 
-        return {
+        const updatedPursuer = {
           ...prev,
           x: prev.x + newSpeed,
           speed: newSpeed,
           catching: false,
         };
+        
+        // Update pursuer physics
+        if (pursuerRendererRef.current) {
+          const velocityX = newSpeed;
+          const velocityY = 0;
+          pursuerRendererRef.current.update(
+            deltaTime / 1000,
+            { x: velocityX, y: velocityY },
+            { x: updatedPursuer.x, y: prev.y },
+          );
+        }
+        
+        return updatedPursuer;
       });
 
       // Spawn obstacles (REBALANCED spawn rate)
@@ -399,6 +477,14 @@ export default function ThighChaseGame({
               obstacle.y + obstacle.height > player.y;
             if (collision && !playerHit) {
               playerHit = true;
+              // Apply physics impact on obstacle hit
+              if (playerRendererRef.current) {
+                const impactForce = {
+                  x: obstacle.x < player.x ? -4 : 4,
+                  y: -2,
+                };
+                playerRendererRef.current.applyImpact(impactForce, 'chest');
+              }
               setLives((l) => l - 1);
               setPlayer((prev) => ({ ...prev, invulnerable: 2000 })); // 2 second invulnerability
               return false; // Remove obstacle
@@ -522,7 +608,15 @@ export default function ThighChaseGame({
     ctx.save();
     ctx.translate(-cameraX, 0);
 
-    // Draw background (moving pattern)
+    // Draw background (moving pattern) - Enhanced
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+    bgGradient.addColorStop(0, '#1a0a1a');
+    bgGradient.addColorStop(0.5, '#2a1a2a');
+    bgGradient.addColorStop(1, '#1a0a1a');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(cameraX, 0, CANVAS_WIDTH + 200, CANVAS_HEIGHT);
+    
+    // Moving pattern overlay
     ctx.fillStyle = '#2a2a2a';
     const bgOffset = (distance * 0.1) % 60;
     for (let x = -bgOffset + cameraX; x < CANVAS_WIDTH + cameraX; x += 60) {
@@ -588,7 +682,8 @@ export default function ThighChaseGame({
       ctx.fillStyle = colors[powerup.type];
       ctx.fillRect(powerup.x, powerup.y, 20, 20);
 
-      // Powerup glow effect
+      // Powerup glow effect - Enhanced
+      createGlowEffect(ctx, powerup.x + 10, powerup.y + 10, 15, colors[powerup.type], 0.5);
       ctx.shadowColor = colors[powerup.type];
       ctx.shadowBlur = 10;
       ctx.fillRect(powerup.x, powerup.y, 20, 20);
@@ -603,46 +698,68 @@ export default function ThighChaseGame({
       ctx.fillText(symbols[powerup.type], powerup.x + 2, powerup.y + 15);
     });
 
-    // Draw pursuer (menacing thighs)
-    ctx.fillStyle = pursuer.catching ? '#ff0000' : '#800080';
-    ctx.fillRect(pursuer.x, pursuer.y, pursuer.width, pursuer.height);
-
-    // Pursuer effects
-    if (pursuer.catching) {
-      ctx.shadowColor = '#ff0000';
-      ctx.shadowBlur = 20;
+    // Draw pursuer with physics
+    if (pursuerRendererRef.current) {
+      pursuerRendererRef.current.render(pursuer.x + pursuer.width / 2, pursuer.y + pursuer.height / 2, 'right');
+      
+      // Pursuer effects overlay
+      if (pursuer.catching) {
+        createGlowEffect(ctx, pursuer.x + pursuer.width / 2, pursuer.y + pursuer.height / 2, 50, '#ff0000', 0.5);
+      }
+    } else {
+      // Fallback rendering
+      ctx.fillStyle = pursuer.catching ? '#ff0000' : '#800080';
       ctx.fillRect(pursuer.x, pursuer.y, pursuer.width, pursuer.height);
-      ctx.shadowBlur = 0;
+      if (pursuer.catching) {
+        ctx.shadowColor = '#ff0000';
+        ctx.shadowBlur = 20;
+        ctx.fillRect(pursuer.x, pursuer.y, pursuer.width, pursuer.height);
+        ctx.shadowBlur = 0;
+      }
     }
 
-    // Pursuer symbol
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '24px monospace';
-    ctx.fillText('', pursuer.x + 25, pursuer.y + 50);
-
-    // Draw player
-    const playerColor =
-      player.invulnerable > 0
-        ? '#ff69b480'
-        : player.shielded > 0
-          ? '#00ffff'
-          : player.speedBoost > 0
-            ? '#ffff00'
-            : '#ff69b4';
-    ctx.fillStyle = playerColor;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-
-    // Player effects
-    if (player.shielded > 0) {
-      ctx.strokeStyle = '#00ffff';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
+    // Draw player with physics
+    if (playerRendererRef.current) {
+      playerRendererRef.current.render(player.x + player.width / 2, player.y + player.height / 2, 'right');
+      
+      // Player effects overlay
+      if (player.invulnerable > 0) {
+        ctx.save();
+        ctx.globalAlpha = Math.sin(Date.now() / 50) * 0.5 + 0.5;
+        ctx.strokeStyle = '#ff69b4';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
+        ctx.restore();
+      }
+      
+      if (player.shielded > 0) {
+        createGlowEffect(ctx, player.x + player.width / 2, player.y + player.height / 2, 30, '#00ffff', 0.4);
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
+      }
+      
+      if (player.speedBoost > 0) {
+        createGlowEffect(ctx, player.x + player.width / 2, player.y + player.height / 2, 25, '#ffff00', 0.3);
+      }
+    } else {
+      // Fallback rendering
+      const playerColor =
+        player.invulnerable > 0
+          ? '#ff69b480'
+          : player.shielded > 0
+            ? '#00ffff'
+            : player.speedBoost > 0
+              ? '#ffff00'
+              : '#ff69b4';
+      ctx.fillStyle = playerColor;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      if (player.shielded > 0) {
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
+      }
     }
-
-    // Player symbol
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '16px monospace';
-    ctx.fillText('‍️', player.x + 5, player.y + 25);
     
     ctx.restore(); // Restore camera transform
 

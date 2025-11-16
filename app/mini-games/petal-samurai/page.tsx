@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
-import { getGameAvatarUsage, isAvatarQualitySufficient } from '../_shared/miniGameConfigs';
+import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
@@ -61,14 +61,22 @@ export default function PetalSamuraiPage() {
   const avatarUsage = getGameAvatarUsage('petal-samurai');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('petal-samurai', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
   
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
-      setSelectedAvatar(avatar);
+    if (choice === 'creator' && avatar) {
+      // Handle both AvatarProfile and AvatarConfiguration
+      if ('id' in avatar && 'head' in avatar) {
+        // AvatarProfile format
+        setSelectedAvatar(avatar as AvatarProfile);
+      } else {
+        // AvatarConfiguration format - convert or use as-is
+        // For now, we'll use the avatar config directly
+        setSelectedAvatar(avatar as any);
+      }
     }
     setShowAvatarChoice(false);
   }, []);
@@ -108,18 +116,19 @@ export default function PetalSamuraiPage() {
         </div>
       )}
 
-      {/* Avatar Display (FullBody Mode) - Conditional: only show if quality is sufficient */}
+      {/* Avatar Display (FullBody Mode) - MAIN CHARACTER CENTER STAGE */}
       {!shouldShowChoice && 
        isAvatarsEnabled() && 
        avatarConfig && 
-       !avatarLoading && 
-       isAvatarQualitySufficient('petal-samurai', avatarConfig) && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
-          <AvatarRenderer
-            profile={avatarConfig}
-            mode={representationConfig.mode}
-            size="small"
-          />
+       !avatarLoading && (
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+          <div className="relative w-96 h-96">
+            <AvatarRenderer
+              profile={avatarConfig}
+              mode={representationConfig.mode}
+              size="large"
+            />
+          </div>
         </div>
       )}
 

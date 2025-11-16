@@ -172,15 +172,15 @@ export default function CherryPetalLayer({
               style={{
                 left: `${petal.startX}%`,
                 top: `${petal.startY + 20}%`, // Place them lower, static
-                transform: `translate(-50%, -50%) rotate(${petal.rotation}deg) scale(${petal.scale})`,
+                transform: `translate(-50%, -50%) rotate(${petal.rotation}deg) scale(${petal.scale * 0.2})`,
                 width: '32px',
                 height: '32px',
                 backgroundImage: 'url(/assets/images/petal_sprite.png)',
                 backgroundRepeat: 'no-repeat',
                 backgroundSize: `${SPRITE_COLS * 100}% ${SPRITE_ROWS * 100}%`,
                 backgroundPosition: `${xPercent}% ${yPercent}%`,
-                opacity: isClickable ? 0.9 : 0.6,
-                filter: isClickable ? 'drop-shadow(0 0 8px rgba(236, 72, 153, 0.6))' : 'none',
+                opacity: isClickable ? 0.4 : 0.25,
+                filter: isClickable ? 'drop-shadow(0 0 3px rgba(236, 72, 153, 0.3))' : 'none',
               }}
               onClick={(e) => handlePetalInteraction(petal.id, e)}
               onKeyDown={(e) => {
@@ -232,17 +232,17 @@ export default function CherryPetalLayer({
               backgroundRepeat: 'no-repeat',
               backgroundSize: `${SPRITE_COLS * 100}% ${SPRITE_ROWS * 100}%`,
               backgroundPosition: `${xPercent}% ${yPercent}%`,
-              opacity: isClicked ? 0 : isClickable ? 0.9 : 0.7,
-              filter: isClickable && !isClicked ? 'drop-shadow(0 0 8px rgba(236, 72, 153, 0.6))' : 'none',
-              transform: `translate(-50%, -50%) rotate(${petal.rotation}deg) scale(${petal.scale})`,
+              opacity: isClicked ? 0 : isClickable ? 0.4 : 0.25,
+              filter: isClickable && !isClicked ? 'drop-shadow(0 0 3px rgba(236, 72, 153, 0.3))' : 'none',
+              transform: `translate(-50%, -50%) rotate(${petal.rotation}deg) scale(${petal.scale * 0.2})`,
               animation: isClicked
                 ? 'none'
-                : `petal-fall ${petal.fallDuration}s ease-in-out ${petal.delay}s infinite`,
+                : `petal-fall ${petal.fallDuration * 1.5}s ease-in-out ${petal.delay}s infinite`,
               // CSS custom properties for animation
-              ['--drift' as string]: `${petal.drift}%`,
+              ['--drift' as string]: `${petal.drift * 0.5}%`,
               ['--final-rotation' as string]: `${petal.finalRotation}deg`,
               ['--initial-rotation' as string]: `${petal.rotation}deg`,
-              ['--scale' as string]: `${petal.scale}`,
+              ['--scale' as string]: `${petal.scale * 0.2}`,
             }}
             onClick={(e) => handlePetalInteraction(petal.id, e)}
             onKeyDown={(e) => {

@@ -11,7 +11,9 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import { getGameRepresentationMode, getGameAvatarUsage } from './miniGameConfigs';
 import { loadGuestAvatar } from './useGameAvatarWithConfig';
+import { useCreatorAvatar } from './useCreatorAvatar';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import { OmButton, OmPanel, OmPanelContent } from '@/app/components/ui/om';
 
 /**
@@ -27,11 +29,11 @@ export function saveGuestAvatar(avatar: AvatarProfile): void {
   }
 }
 
-export type AvatarChoice = 'avatar' | 'preset';
+export type AvatarChoice = 'creator' | 'preset';
 
 export interface AvatarPresetChoiceProps {
   gameId: string;
-  onChoice: (choice: AvatarChoice, avatar?: AvatarProfile) => void;
+  onChoice: (choice: AvatarChoice, avatar?: AvatarProfile | AvatarConfiguration) => void;
   onCancel?: () => void;
 }
 
@@ -45,6 +47,9 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
   const avatarsEnabled = isAvatarsEnabled();
   const avatarUsage = getGameAvatarUsage(gameId);
   const representationMode = getGameRepresentationMode(gameId);
+  
+  // Load CREATOR avatar
+  const { creatorAvatar, avatarConfig, isLoading: creatorLoading } = useCreatorAvatar(avatarsEnabled);
   
   // Load guest avatar on mount
   useEffect(() => {
@@ -60,11 +65,16 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
     return null;
   }
   
-  const hasAvatar = guestAvatar !== null;
+  const hasGuestAvatar = guestAvatar !== null;
+  const hasCreatorAvatar = avatarConfig !== null;
+  const hasAnyAvatar = hasGuestAvatar || hasCreatorAvatar;
   
-  const handlePlayWithAvatar = () => {
-    if (guestAvatar) {
-      onChoice('avatar', guestAvatar);
+  const handlePlayWithCreator = () => {
+    if (avatarConfig) {
+      onChoice('creator', avatarConfig);
+    } else if (guestAvatar) {
+      // Fallback to guest avatar if CREATOR avatar not available
+      onChoice('creator', guestAvatar);
     }
   };
   
@@ -90,7 +100,7 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
     
     saveGuestAvatar(tempAvatar);
     setGuestAvatar(tempAvatar);
-    onChoice('avatar', tempAvatar);
+    onChoice('creator', tempAvatar);
   };
   
   return (
@@ -101,7 +111,19 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
             <h2 className="text-2xl font-bold text-white mb-4">Choose Your Character</h2>
             
             {/* Avatar Preview */}
-            {hasAvatar && guestAvatar && (
+            {hasCreatorAvatar && avatarConfig && (
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="text-sm text-pink-200 mb-2">My CREATOR Avatar</div>
+                  {/* Note: AvatarRenderer from avatar-engine may need to be updated to support AvatarConfiguration */}
+                  {/* For now, show a placeholder */}
+                  <div className="w-32 h-32 bg-pink-500/20 rounded-lg flex items-center justify-center border border-pink-500/30">
+                    <span className="text-pink-200 text-xs">CREATOR Avatar</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {!hasCreatorAvatar && hasGuestAvatar && guestAvatar && (
               <div className="flex justify-center mb-4">
                 <div className="relative">
                   <AvatarRenderer
@@ -118,15 +140,16 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
             
             {/* Choice Buttons */}
             <div className="space-y-3">
-              {hasAvatar && guestAvatar ? (
+              {hasAnyAvatar ? (
                 <>
                   <OmButton
                     variant="primary"
                     size="lg"
                     className="w-full"
-                    onClick={handlePlayWithAvatar}
+                    onClick={handlePlayWithCreator}
+                    disabled={creatorLoading}
                   >
-                    Play with my avatar
+                    {hasCreatorAvatar ? 'Play with my CREATOR avatar' : 'Play with my avatar'}
                   </OmButton>
                   <OmButton
                     variant="ghost"

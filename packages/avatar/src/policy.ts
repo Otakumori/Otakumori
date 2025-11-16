@@ -26,11 +26,19 @@ export interface PolicyResult {
 /**
  * Resolves NSFW content policy based on user context
  * Defense-in-depth: requires both cookie preference AND adult verification
+ * Can be disabled via NEXT_PUBLIC_NSFW_FILTER_ENABLED=false
  *
  * @param ctx - Policy context containing cookie and verification status
  * @returns PolicyResult indicating if NSFW content is permitted
  */
 export function resolvePolicy(ctx: PolicyContext): PolicyResult {
+  // Check if NSFW filtering is disabled globally
+  const filterEnabled = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_NSFW_FILTER_ENABLED !== 'false';
+  
+  if (!filterEnabled) {
+    return { nsfwAllowed: true };
+  }
+
   // Default to safe mode
   if (!ctx.cookieValue || !ctx.adultVerified) {
     return { nsfwAllowed: false };

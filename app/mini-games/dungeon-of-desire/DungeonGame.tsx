@@ -9,6 +9,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
+import { createGlowEffect } from '../_shared/enhancedTextures';
 
 interface Enemy {
   id: number;
@@ -61,6 +63,9 @@ export default function DungeonGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
+  
+  // Physics renderers for enemies (Map<enemyId, PhysicsCharacterRenderer>)
+  const enemyRenderersRef = useRef<Map<number, PhysicsCharacterRenderer>>(new Map());
 
   // Game state
   const [gameState, setGameState] = useState<
@@ -181,6 +186,10 @@ export default function DungeonGame({
     setParticles([]);
     setNextEnemyId(1);
     setRoomEnemiesSpawned(false);
+    
+    // Cleanup physics renderers
+    enemyRenderersRef.current.forEach((renderer) => renderer.dispose());
+    enemyRenderersRef.current.clear();
   }, []);
 
   // Input handling
@@ -293,6 +302,19 @@ export default function DungeonGame({
         telegraphTime: 0,
         state: 'idle',
       };
+
+      // Create physics renderer for new enemy
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          const renderer = new PhysicsCharacterRenderer(
+            ctx,
+            type === 'succubus' ? 'succubus' : 'demon_lord',
+            { quality: 'high', enabled: true },
+          );
+          enemyRenderersRef.current.set(newEnemy.id, renderer);
+        }
+      }
 
       setEnemies((prev) => [...prev, newEnemy]);
       setNextEnemyId((id) => id + 1);
@@ -434,7 +456,7 @@ export default function DungeonGame({
         setRoomEnemiesSpawned(false);
       }
 
-      // Update enemies with telegraphs
+      // Update enemies with telegraphs and physics
       setEnemies((prevEnemies) => {
         return prevEnemies.map((enemy) => {
           let newX = enemy.x;
@@ -443,6 +465,9 @@ export default function DungeonGame({
           let newAttackCooldown = Math.max(0, enemy.attackCooldown - deltaTime);
           let newTelegraphTime = Math.max(0, enemy.telegraphTime - deltaTime);
           let newState = enemy.state;
+          
+          // Update physics renderer (will be called after position update)
+          // Store renderer reference for later update
 
           // Move towards player
           const distanceToPlayer = player.x - enemy.x;
@@ -486,7 +511,7 @@ export default function DungeonGame({
             }
           }
 
-          return {
+          const updatedEnemy = {
             ...enemy,
             x: newX,
             direction: newDirection,
@@ -495,6 +520,16 @@ export default function DungeonGame({
             telegraphTime: newTelegraphTime,
             state: newState,
           };
+          
+          // Update physics renderer after position is calculated
+          const renderer = enemyRenderersRef.current.get(enemy.id);
+          if (renderer) {
+            const velocityX = (newX - enemy.x) / deltaTime;
+            const velocityY = 0; // Enemies stay on ground
+            renderer.update(deltaTime, { x: velocityX, y: velocityY }, { x: newX, y: enemy.y });
+          }
+          
+          return updatedEnemy;
         });
       });
 
@@ -543,6 +578,16 @@ export default function DungeonGame({
                 spellHit = true;
                 hitEnemyIds.add(enemy.id);
 
+                // Apply physics impact
+                const renderer = enemyRenderersRef.current.get(enemy.id);
+                if (renderer) {
+                  const impactForce = {
+                    x: spell.vx > 0 ? 3 : -3,
+                    y: -2,
+                  };
+                  renderer.applyImpact(impactForce, 'chest');
+                }
+
                 // Spawn hit particles
                 for (let i = 0; i < 8; i++) {
                   const angle = (i / 8) * Math.PI * 2;
@@ -566,6 +611,12 @@ export default function DungeonGame({
                 const newHealth = enemy.health - spell.damage;
                 if (newHealth <= 0) {
                   setScore((s) => s + (enemy.type === 'demon_lord' ? 500 : 100));
+                  // Cleanup physics renderer
+                  const renderer = enemyRenderersRef.current.get(enemy.id);
+                  if (renderer) {
+                    renderer.dispose();
+                    enemyRenderersRef.current.delete(enemy.id);
+                  }
                   return { ...enemy, health: 0 }; // Will be filtered out
                 }
                 return { ...enemy, health: newHealth };
@@ -582,8 +633,21 @@ export default function DungeonGame({
         return remainingSpells;
       });
 
-      // Remove dead enemies
-      setEnemies((prev) => prev.filter((enemy) => enemy.health > 0));
+      // Remove dead enemies and cleanup physics renderers
+      setEnemies((prev) => {
+        const alive = prev.filter((enemy) => enemy.health > 0);
+        // Cleanup renderers for dead enemies
+        prev.forEach((enemy) => {
+          if (enemy.health <= 0) {
+            const renderer = enemyRenderersRef.current.get(enemy.id);
+            if (renderer) {
+              renderer.dispose();
+              enemyRenderersRef.current.delete(enemy.id);
+            }
+          }
+        });
+        return alive;
+      });
 
       // Check game over
       if (player.health <= 0) {
@@ -619,8 +683,15 @@ export default function DungeonGame({
       // Clear canvas
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      // Draw dungeon background (parallax layers)
+      // Draw dungeon background (parallax layers) - Enhanced
       drawDungeonBackground(ctx, camera.x);
+      
+      // Enhanced background gradient overlay
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
+      bgGradient.addColorStop(0, 'rgba(139, 92, 246, 0.1)');
+      bgGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
       // Transform context for camera
       ctx.save();
@@ -640,28 +711,86 @@ export default function DungeonGame({
         ctx.stroke();
       }
 
-      // Draw enemies
+      // Draw enemies with physics
       enemies.forEach((enemy) => {
-        if (enemy.type === 'succubus') {
-          drawSuccubus(ctx, enemy);
+        const renderer = enemyRenderersRef.current.get(enemy.id);
+        if (renderer) {
+          // Use physics renderer
+          renderer.render(enemy.x, enemy.y, enemy.direction);
+          
+          // Draw health bar (still needed)
+          ctx.save();
+          ctx.translate(enemy.x, enemy.y);
+          if (enemy.direction === 'left') ctx.scale(-1, 1);
+          ctx.fillStyle = '#1f2937';
+          ctx.fillRect(-25, -35, 50, 5);
+          const healthPercent = enemy.health / enemy.maxHealth;
+          ctx.fillStyle = healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
+          ctx.fillRect(-25, -35, 50 * healthPercent, 5);
+          
+          // Telegraph warning
+          if (enemy.state === 'telegraph') {
+            const telegraphProgress = 1 - (enemy.telegraphTime / (enemy.type === 'demon_lord' ? 1000 : 600));
+            const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
+            ctx.save();
+            ctx.globalAlpha = pulse;
+            ctx.strokeStyle = enemy.type === 'demon_lord' ? '#ff4444' : '#ffaa44';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = enemy.type === 'demon_lord' ? '#ff4444' : '#ffaa44';
+            ctx.beginPath();
+            ctx.arc(0, 0, 35, 0, Math.PI * 2);
+            ctx.stroke();
+            if (enemy.type === 'demon_lord') {
+              ctx.fillStyle = '#ff4444';
+              ctx.font = 'bold 20px Arial';
+              ctx.textAlign = 'center';
+              ctx.fillText('!', 0, 5);
+            }
+            ctx.restore();
+          }
+          ctx.restore();
         } else {
-          drawDemonLord(ctx, enemy);
+          // Fallback to original rendering if physics not ready
+          if (enemy.type === 'succubus') {
+            drawSuccubus(ctx, enemy);
+          } else {
+            drawDemonLord(ctx, enemy);
+          }
         }
       });
 
       // Draw player
       drawPlayer(ctx, player);
 
-      // Draw spells
+      // Draw spells - Enhanced with better gradients, glow, and bloom
       spells.forEach((spell) => {
         ctx.save();
         ctx.globalAlpha = spell.lifetime;
-        ctx.fillStyle = '#a855f7';
-        ctx.shadowBlur = 15;
+        
+        // Bloom effect
+        createGlowEffect(ctx, spell.x, spell.y, 15, '#9333ea', 0.4);
+        
+        // Outer glow
+        const spellGradient = ctx.createRadialGradient(spell.x, spell.y, 0, spell.x, spell.y, 12);
+        spellGradient.addColorStop(0, '#c084fc');
+        spellGradient.addColorStop(0.5, '#a855f7');
+        spellGradient.addColorStop(1, '#9333ea');
+        ctx.fillStyle = spellGradient;
+        ctx.shadowBlur = 20;
         ctx.shadowColor = '#9333ea';
         ctx.beginPath();
-        ctx.arc(spell.x, spell.y, 8, 0, Math.PI * 2);
+        ctx.arc(spell.x, spell.y, 10, 0, Math.PI * 2);
         ctx.fill();
+        
+        // Inner core
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#c084fc';
+        ctx.beginPath();
+        ctx.arc(spell.x, spell.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        
         ctx.restore();
       });
 
@@ -797,55 +926,167 @@ export default function DungeonGame({
     ctx.translate(enemy.x, enemy.y);
     if (enemy.direction === 'left') ctx.scale(-1, 1);
 
-    // Body (curvy silhouette)
+    // Body (curvy silhouette) - Enhanced with multiple gradients and highlights
     const bodyGradient = ctx.createLinearGradient(-20, 0, 20, 70);
     bodyGradient.addColorStop(0, '#ec4899');
     bodyGradient.addColorStop(0.3, '#db2777');
+    bodyGradient.addColorStop(0.6, '#be185d');
     bodyGradient.addColorStop(1, '#9f1239');
     ctx.fillStyle = bodyGradient;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(236, 72, 153, 0.4)';
     ctx.beginPath();
     ctx.ellipse(0, 30, 22, 35, 0, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    // Body highlight for depth
+    const highlightGradient = ctx.createRadialGradient(-8, 20, 0, -8, 20, 15);
+    highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+    highlightGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = highlightGradient;
+    ctx.beginPath();
+    ctx.ellipse(-8, 20, 12, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Wings (bat-like)
-    ctx.fillStyle = 'rgba(139, 0, 139, 0.6)';
+    // Wings (bat-like) - Enhanced with membrane detail and shadows
     const wingAnimation = Math.sin(enemy.animationFrame * 2) * 10;
+    
+    // Left wing shadow
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(-25, 22);
+    ctx.quadraticCurveTo(-50, 12 + wingAnimation, -55, 32);
+    ctx.quadraticCurveTo(-50, 52 - wingAnimation, -25, 42);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+    // Left wing with gradient
+    const leftWingGradient = ctx.createLinearGradient(-25, 20, -55, 30);
+    leftWingGradient.addColorStop(0, 'rgba(139, 0, 139, 0.8)');
+    leftWingGradient.addColorStop(0.5, 'rgba(75, 0, 130, 0.7)');
+    leftWingGradient.addColorStop(1, 'rgba(25, 25, 112, 0.6)');
+    ctx.fillStyle = leftWingGradient;
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = 'rgba(139, 0, 139, 0.5)';
     ctx.beginPath();
     ctx.moveTo(-25, 20);
     ctx.quadraticCurveTo(-50, 10 + wingAnimation, -55, 30);
     ctx.quadraticCurveTo(-50, 50 - wingAnimation, -25, 40);
     ctx.closePath();
     ctx.fill();
+    
+    // Wing membrane detail
+    ctx.strokeStyle = 'rgba(200, 0, 200, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-30, 25);
+    ctx.quadraticCurveTo(-45, 20 + wingAnimation, -50, 30);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    // Right wing shadow
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(25, 22);
+    ctx.quadraticCurveTo(50, 12 + wingAnimation, 55, 32);
+    ctx.quadraticCurveTo(50, 52 - wingAnimation, 25, 42);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    
+    // Right wing with gradient
+    const rightWingGradient = ctx.createLinearGradient(25, 20, 55, 30);
+    rightWingGradient.addColorStop(0, 'rgba(139, 0, 139, 0.8)');
+    rightWingGradient.addColorStop(0.5, 'rgba(75, 0, 130, 0.7)');
+    rightWingGradient.addColorStop(1, 'rgba(25, 25, 112, 0.6)');
+    ctx.fillStyle = rightWingGradient;
+    ctx.shadowBlur = 5;
+    ctx.shadowColor = 'rgba(139, 0, 139, 0.5)';
     ctx.beginPath();
     ctx.moveTo(25, 20);
     ctx.quadraticCurveTo(50, 10 + wingAnimation, 55, 30);
     ctx.quadraticCurveTo(50, 50 - wingAnimation, 25, 40);
     ctx.closePath();
     ctx.fill();
+    
+    // Wing membrane detail
+    ctx.strokeStyle = 'rgba(200, 0, 200, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(30, 25);
+    ctx.quadraticCurveTo(45, 20 + wingAnimation, 50, 30);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
 
-    // Head
-    const headGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 18);
+    // Head - Enhanced with better gradients and shadows
+    const headGradient = ctx.createRadialGradient(0, -5, 0, 0, 0, 18);
     headGradient.addColorStop(0, '#ffc0cb');
+    headGradient.addColorStop(0.5, '#ff91b4');
     headGradient.addColorStop(1, '#ff69b4');
     ctx.fillStyle = headGradient;
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = 'rgba(255, 105, 180, 0.5)';
     ctx.beginPath();
     ctx.arc(0, 0, 18, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    // Head highlight
+    const headHighlight = ctx.createRadialGradient(-5, -8, 0, -5, -8, 10);
+    headHighlight.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+    headHighlight.addColorStop(1, 'transparent');
+    ctx.fillStyle = headHighlight;
+    ctx.beginPath();
+    ctx.arc(-5, -8, 8, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Horns
-    ctx.fillStyle = '#4a0e0e';
+    // Horns - Enhanced with gradients and highlights
+    const hornGradient = ctx.createLinearGradient(-12, -10, -15, -30);
+    hornGradient.addColorStop(0, '#6b1f1f');
+    hornGradient.addColorStop(0.5, '#4a0e0e');
+    hornGradient.addColorStop(1, '#2d0505');
+    ctx.fillStyle = hornGradient;
+    ctx.shadowBlur = 4;
+    ctx.shadowColor = 'rgba(74, 14, 14, 0.6)';
     ctx.beginPath();
     ctx.moveTo(-12, -10);
     ctx.quadraticCurveTo(-18, -25, -15, -30);
     ctx.lineTo(-10, -25);
     ctx.closePath();
     ctx.fill();
+    
+    // Horn highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.beginPath();
+    ctx.moveTo(-11, -12);
+    ctx.quadraticCurveTo(-16, -24, -13, -28);
+    ctx.lineTo(-10, -25);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.fillStyle = hornGradient;
     ctx.beginPath();
     ctx.moveTo(12, -10);
     ctx.quadraticCurveTo(18, -25, 15, -30);
     ctx.lineTo(10, -25);
     ctx.closePath();
     ctx.fill();
+    
+    // Horn highlight
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.beginPath();
+    ctx.moveTo(11, -12);
+    ctx.quadraticCurveTo(16, -24, 13, -28);
+    ctx.lineTo(10, -25);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
 
     // Eyes (alluring)
     ctx.fillStyle = '#ffffff';
@@ -925,14 +1166,27 @@ export default function DungeonGame({
     // Larger, more imposing
     ctx.scale(1.5, 1.5);
 
-    // Body
+    // Body - Enhanced with better gradients and depth
     const bodyGradient = ctx.createLinearGradient(-30, 0, 30, 80);
     bodyGradient.addColorStop(0, '#7c2d12');
-    bodyGradient.addColorStop(0.5, '#991b1b');
+    bodyGradient.addColorStop(0.3, '#991b1b');
+    bodyGradient.addColorStop(0.6, '#7f1d1d');
     bodyGradient.addColorStop(1, '#450a0a');
     ctx.fillStyle = bodyGradient;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = 'rgba(153, 27, 27, 0.6)';
     ctx.beginPath();
     ctx.ellipse(0, 40, 30, 45, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    // Body highlight for depth
+    const demonHighlight = ctx.createRadialGradient(-10, 30, 0, -10, 30, 20);
+    demonHighlight.addColorStop(0, 'rgba(255, 200, 200, 0.15)');
+    demonHighlight.addColorStop(1, 'transparent');
+    ctx.fillStyle = demonHighlight;
+    ctx.beginPath();
+    ctx.ellipse(-10, 30, 18, 25, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Massive wings

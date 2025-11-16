@@ -215,13 +215,21 @@ export default function Game({ mode }: Props) {
         {cards.map((card, index) => (
           <motion.div
             key={card.id}
-            className={`aspect-square rounded-lg border-2 cursor-pointer flex items-center justify-center text-2xl font-bold transition-all duration-300 ${
+            className={`aspect-square rounded-lg border-2 cursor-pointer flex items-center justify-center text-2xl font-bold transition-all duration-300 relative overflow-hidden ${
               card.isMatched
-                ? 'bg-green-200 border-green-400 text-green-800'
+                ? 'bg-gradient-to-br from-emerald-400/30 to-emerald-600/30 border-emerald-400/50 text-emerald-100 shadow-lg shadow-emerald-500/30'
                 : card.isFlipped
-                  ? 'bg-white border-gray-300 text-gray-800'
-                  : 'bg-gray-200 border-gray-400 text-gray-600 hover:bg-gray-300'
+                  ? 'bg-gradient-to-br from-white/95 to-gray-100/95 border-white/40 text-gray-800 shadow-lg'
+                  : 'bg-gradient-to-br from-pink-500/20 via-purple-500/20 to-pink-600/20 border-pink-400/40 text-pink-200 hover:from-pink-500/30 hover:via-purple-500/30 hover:to-pink-600/30 hover:border-pink-400/60 hover:shadow-lg hover:shadow-pink-500/20'
             }`}
+            style={{
+              backdropFilter: 'blur(8px)',
+              boxShadow: card.isMatched 
+                ? '0 0 20px rgba(16, 185, 129, 0.4)' 
+                : card.isFlipped
+                  ? '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  : '0 2px 8px rgba(236, 72, 153, 0.2)',
+            }}
             onClick={() => handleCardClick(index)}
             whileHover={{ scale: card.isFlipped || card.isMatched ? 1 : 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -229,7 +237,24 @@ export default function Game({ mode }: Props) {
             animate={{ rotateY: card.isFlipped || card.isMatched ? 0 : 180 }}
             transition={{ duration: 0.3 }}
           >
-            {card.isFlipped || card.isMatched ? card.rune : '?'}
+            {/* Card back pattern (cherry blossom texture) when not flipped */}
+            {!card.isFlipped && !card.isMatched && (
+              <div 
+                className="absolute inset-0 opacity-40"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.3) 0%, transparent 70%), repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(167, 139, 250, 0.1) 10px, rgba(167, 139, 250, 0.1) 20px)',
+                  backgroundSize: '100% 100%, 20px 20px',
+                }}
+              />
+            )}
+            {/* Card content */}
+            <span className={`relative z-10 ${card.isMatched ? 'animate-pulse' : ''}`}>
+              {card.isFlipped || card.isMatched ? card.rune : ''}
+            </span>
+            {/* Glow effect for matched cards */}
+            {card.isMatched && (
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-transparent animate-pulse" />
+            )}
           </motion.div>
         ))}
       </div>

@@ -53,7 +53,7 @@ export default function RhythmBeatEmUpPage() {
   const avatarUsage = getGameAvatarUsage('otaku-beat-em-up');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('otaku-beat-em-up', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
 
   // Visual profile and HUD
@@ -72,9 +72,9 @@ export default function RhythmBeatEmUpPage() {
   } as const;
   
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
+    if (choice === 'creator' && avatar) {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
@@ -153,14 +153,16 @@ export default function RhythmBeatEmUpPage() {
           </div>
         )}
 
-        {/* Avatar Display (FullBody Mode) */}
+        {/* Avatar Display (FullBody Mode) - MAIN CHARACTER CENTER STAGE */}
         {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
-            <AvatarRenderer
-              profile={avatarConfig}
-              mode={representationConfig.mode}
-              size="small"
-            />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+            <div className="relative w-96 h-96">
+              <AvatarRenderer
+                profile={avatarConfig}
+                mode={representationConfig.mode}
+                size="large"
+              />
+            </div>
           </div>
         )}
 

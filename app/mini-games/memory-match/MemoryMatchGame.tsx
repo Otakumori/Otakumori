@@ -1,7 +1,8 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
 import { GameAvatarIntegration } from '../_shared/GameAvatarIntegration';
+import { PhysicsAvatarCanvas, PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 
 interface Card {
   id: number;
@@ -24,6 +25,8 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [gameState, setGameState] = useState<'setup' | 'playing' | 'won' | 'lost'>('setup');
   const [matchedPairs, setMatchedPairs] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
 
   const { saveOnExit, autoSave } = useGameSave('memory-match');
 
@@ -94,7 +97,17 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
       const secondCard = cards.find((c) => c.id === second);
 
       if (firstCard && secondCard && firstCard.value === secondCard.value) {
-        // Match found
+        // Match found - apply physics impact
+        const newCombo = combo + 1;
+        setCombo(newCombo);
+        const impactForce = {
+          x: (Math.random() - 0.5) * 2,
+          y: -3 - Math.min(newCombo * 0.5, 2), // Stronger impact for combos
+        };
+        if (physicsAvatarRef.current) {
+          physicsAvatarRef.current.applyImpact(impactForce, 'chest');
+        }
+
         setTimeout(() => {
           setCards((prev) =>
             prev.map((card) =>
@@ -108,6 +121,11 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
           setFlippedCards([]);
         }, 500);
       } else {
+        // No match - reset combo and apply slight negative impact
+        setCombo(0);
+        if (physicsAvatarRef.current) {
+          physicsAvatarRef.current.applyImpact({ x: 0, y: 1 }, 'chest');
+        }
         // No match
         setTimeout(() => {
           setCards((prev) =>
@@ -227,8 +245,21 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
 
   return (
     <div className="h-full flex flex-col p-4 relative">
-      {/* Avatar Integration */}
-      <GameAvatarIntegration gameId="memory-match" gameMode="puzzle" position={[0, 0, 0]} />
+      {/* Physics Avatar Integration */}
+      <div className="absolute top-4 right-4 z-10">
+        <PhysicsAvatarCanvas
+          ref={physicsAvatarRef}
+          characterType="player"
+          quality="high"
+          width={120}
+          height={160}
+          className="rounded-lg"
+        />
+      </div>
+      {/* Fallback Avatar Integration */}
+      <div className="absolute top-4 left-4 z-10 opacity-0 pointer-events-none">
+        <GameAvatarIntegration gameId="memory-match" gameMode="puzzle" position={[0, 0, 0]} />
+      </div>
 
       {/* Game Stats */}
       <div className="flex justify-between items-center mb-4 text-white">

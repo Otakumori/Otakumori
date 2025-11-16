@@ -23,6 +23,8 @@ import { usePetalEarn } from '../_shared/usePetalEarn';
 import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { useScreenShake, createPetalBurst, updatePetalParticles, type PetalParticle, createTrailRenderer, type TrailRenderer } from '../_shared/vfx';
+import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
+import { createGlowEffect } from '../_shared/enhancedTextures';
 
 type Props = {
   mode: 'classic' | 'storm' | 'endless' | 'timed';
@@ -119,12 +121,12 @@ export default function Game({ mode }: Props) {
   const { balance: petalBalance } = usePetalBalance();
   const { earnPetals } = usePetalEarn();
 
-  // Initialize game engine
+  // Initialize game engine with visual profile
   useEffect(() => {
     if (!canvasRef.current || typeof window === 'undefined') return;
 
     const canvas = canvasRef.current;
-    const game = new GameEngine(canvas, mode);
+    const game = new GameEngine(canvas, mode, visualProfile);
     gameRef.current = game;
 
     // Start game loop
@@ -507,6 +509,7 @@ class GameEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private mode: string;
+  private visualProfile: ReturnType<typeof getGameVisualProfile>;
   private score: number = 0;
   private combo: number = 0;
   private multiplier: number = 1;
@@ -525,13 +528,21 @@ class GameEngine {
   private slashedPetals: Set<string> = new Set();
   private spriteSheet: HTMLImageElement | null = null;
   private spriteSheetLoaded: boolean = false;
+  private physicsRenderer: PhysicsCharacterRenderer | null = null;
 
-  constructor(canvas: HTMLCanvasElement, mode: string) {
+  constructor(canvas: HTMLCanvasElement, mode: string, visualProfile: ReturnType<typeof getGameVisualProfile>) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.mode = mode;
+    this.visualProfile = visualProfile;
 
-    // Load sprite sheet
+    // Initialize physics renderer
+    this.physicsRenderer = new PhysicsCharacterRenderer(this.ctx, 'player', {
+      quality: 'high',
+      enabled: true,
+    });
+
+    // Load sprite sheet from visual profile
     this.loadSpriteSheet();
 
     this.startGameLoop();
@@ -539,7 +550,11 @@ class GameEngine {
 
   private loadSpriteSheet() {
     const img = new Image();
-    img.src = GAME_CONFIG.SPRITE_SHEET_URL;
+    // Use sprite sheet from visual profile if available, otherwise fallback
+    const spriteUrl = this.visualProfile.petals?.spritePath || 
+                      this.visualProfile.spriteSheetUrl || 
+                      GAME_CONFIG.SPRITE_SHEET_URL;
+    img.src = spriteUrl;
     img.onload = () => {
       this.spriteSheet = img;
       this.spriteSheetLoaded = true;
@@ -655,6 +670,18 @@ class GameEngine {
       const age = now - point.time;
       return age < 0.3; // Trail fades after 300ms
     });
+
+    // Update physics renderer
+    if (this.physicsRenderer) {
+      const centerX = this.canvas.width / 2;
+      const baseY = this.canvas.height - 80;
+      const slashPose = this.slashTrail.length > 0;
+      // Calculate velocity based on slash state
+      const velocityX = slashPose ? (this.slashTrail.length > 1 ? 
+        (this.slashTrail[this.slashTrail.length - 1].x - this.slashTrail[this.slashTrail.length - 2].x) * 10 : 0) : 0;
+      const velocityY = slashPose ? -1 : 0; // Slight upward motion during slash
+      this.physicsRenderer.update(deltaTime, { x: velocityX, y: velocityY }, { x: centerX, y: baseY });
+    }
   }
 
   private spawnPetal() {
@@ -739,6 +766,17 @@ class GameEngine {
     // Prevent double-slashing the same petal
     if (this.slashedPetals.has(petal.id)) return;
     this.slashedPetals.add(petal.id);
+
+    // Apply physics impact based on petal type
+    if (this.physicsRenderer) {
+      const impactForce = petal.type === 'bad' 
+        ? { x: 0, y: 3 } // Bad objects cause recoil
+        : petal.type === 'rare'
+        ? { x: (Math.random() - 0.5) * 2, y: -4 } // Rare petals cause stronger upward impact
+        : { x: (Math.random() - 0.5) * 1.5, y: -2 }; // Normal petals cause slight upward impact
+      const impactPart = petal.type === 'bad' ? 'chest' : 'chest'; // Impact on chest for all types
+      this.physicsRenderer.applyImpact(impactForce, impactPart);
+    }
 
     if (petal.type === 'bad') {
       // Bad objects cause penalty
@@ -861,14 +899,49 @@ class GameEngine {
     // CLEAR canvas properly (CRITICAL FIX)
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Draw background gradient (PREMIUM - layered gradients for depth)
+    // Draw background using visual profile colors
+    const bg = this.visualProfile.background;
+    const accentColor = bg.accentColor || '#ec4899';
+    
+    // Create gradient based on visual profile
     const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
-    bgGradient.addColorStop(0, '#1a0d2e'); // Deep purple-black
-    bgGradient.addColorStop(0.3, '#2e0b1a'); // Dark sakura pink
-    bgGradient.addColorStop(0.7, '#3d0a1f'); // Deep red-black
-    bgGradient.addColorStop(1, '#0f0718'); // Near black
+    
+    // Use dojo-style background for petal-samurai
+    if (bg.kind === 'dojo') {
+      bgGradient.addColorStop(0, '#0a0a0a'); // Deep black
+      bgGradient.addColorStop(0.3, '#1a0d2e'); // Deep purple-black
+      bgGradient.addColorStop(0.5, '#2e0b1a'); // Dark sakura pink
+      bgGradient.addColorStop(0.7, '#1a0d2e'); // Deep purple-black
+      bgGradient.addColorStop(1, '#0a0a0a'); // Near black
+    } else {
+      // Fallback to visual profile backgroundColor if it's a gradient string
+      // Parse gradient or use solid color
+      const bgColor = this.visualProfile.backgroundColor || '#0a0a0a';
+      if (bgColor.includes('gradient')) {
+        // Simple gradient parsing (basic support)
+        bgGradient.addColorStop(0, accentColor);
+        bgGradient.addColorStop(1, '#0a0a0a');
+      } else {
+        this.ctx.fillStyle = bgColor;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        return; // Skip gradient if solid color
+      }
+    }
+    
     this.ctx.fillStyle = bgGradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Add rim lighting effect for dojo
+    if (bg.kind === 'dojo') {
+      const rimGradient = this.ctx.createRadialGradient(
+        this.canvas.width / 2, this.canvas.height, 0,
+        this.canvas.width / 2, this.canvas.height, this.canvas.height * 0.8
+      );
+      rimGradient.addColorStop(0, `${accentColor}20`);
+      rimGradient.addColorStop(1, 'transparent');
+      this.ctx.fillStyle = rimGradient;
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
     // Atmospheric particles (ambient petals)
     this.renderAtmosphericPetals();
@@ -892,47 +965,123 @@ class GameEngine {
         const sx = spriteCol * spriteWidth;
         const sy = spriteRow * spriteHeight;
         
-        // Apply tint based on petal type
+        // Apply tint based on petal type using visual profile colors
+        const accentColor = this.visualProfile.background.accentColor || '#ec4899';
+        const glowColor = this.visualProfile.background.glowColor || '#a78bfa';
+        
         if (petal.type === 'gold') {
           this.ctx.globalCompositeOperation = 'multiply';
-          this.ctx.fillStyle = 'rgba(255, 215, 0, 0.3)'; // Gold tint
+          // Use glow color for gold petals
+          const goldTint = this.hexToRgba(glowColor, 0.4);
+          this.ctx.fillStyle = goldTint;
           this.ctx.fillRect(-petal.size, -petal.size, petal.size * 2, petal.size * 2);
           this.ctx.globalCompositeOperation = 'source-over';
         } else if (petal.type === 'rare') {
           this.ctx.globalCompositeOperation = 'multiply';
-          this.ctx.fillStyle = 'rgba(255, 20, 255, 0.4)'; // Magenta/purple tint for rare
+          // Use accent color for rare petals
+          const rareTint = this.hexToRgba(accentColor, 0.5);
+          this.ctx.fillStyle = rareTint;
           this.ctx.fillRect(-petal.size, -petal.size, petal.size * 2, petal.size * 2);
           this.ctx.globalCompositeOperation = 'source-over';
         }
         
-        // Draw sprite
+        // Draw sprite with enhanced rendering
+        // Add glow effect for special petals
+        if (petal.type === 'gold' || petal.type === 'rare') {
+          this.ctx.shadowBlur = 15;
+          this.ctx.shadowColor = petal.type === 'gold' 
+            ? this.hexToRgba(glowColor, 0.8)
+            : this.hexToRgba(accentColor, 0.8);
+        }
+        
+        // Draw sprite with proper scaling
         this.ctx.drawImage(
           this.spriteSheet,
           sx, sy, spriteWidth, spriteHeight,
           -petal.size, -petal.size * 0.6, petal.size * 2, petal.size * 1.2
         );
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowColor = 'transparent';
       } else if (petal.type === 'bad') {
-        // Draw bad object (nut/seed/branch) - simple brown shape
-        this.ctx.fillStyle = '#8B4513'; // Brown
+        // Draw bad object (nut/seed/branch) - enhanced with texture-like appearance
+        // Create gradient for depth
+        const badGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, petal.size * 0.8);
+        badGradient.addColorStop(0, '#A0522D'); // Saddle brown center
+        badGradient.addColorStop(0.5, '#8B4513'); // Brown
+        badGradient.addColorStop(1, '#654321'); // Dark brown edge
+        
+        this.ctx.fillStyle = badGradient;
         this.ctx.beginPath();
         this.ctx.ellipse(0, 0, petal.size * 0.8, petal.size * 0.5, petal.rotation, 0, Math.PI * 2);
         this.ctx.fill();
+        
+        // Add texture-like detail
         this.ctx.strokeStyle = '#654321';
         this.ctx.lineWidth = 2;
         this.ctx.stroke();
+        
+        // Add highlight for 3D effect
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(-petal.size * 0.2, -petal.size * 0.15, petal.size * 0.3, petal.size * 0.2, petal.rotation, 0, Math.PI * 2);
+        this.ctx.fill();
       } else {
-        // Fallback: draw simple petal shape if sprite not loaded
-        this.ctx.fillStyle = petal.type === 'gold' 
-          ? 'rgba(255, 105, 180, 1.0)' 
-          : petal.type === 'rare'
-          ? 'rgba(255, 20, 255, 1.0)'
-          : 'rgba(255, 182, 193, 0.9)';
+        // Fallback: draw simple petal shape if sprite not loaded, using visual profile colors
+        const accentColor = this.visualProfile.background.accentColor || '#ec4899';
+        const glowColor = this.visualProfile.background.glowColor || '#a78bfa';
+        
+        if (petal.type === 'gold') {
+          this.ctx.fillStyle = this.hexToRgba(glowColor, 1.0);
+        } else if (petal.type === 'rare') {
+          this.ctx.fillStyle = this.hexToRgba(accentColor, 1.0);
+        } else {
+          this.ctx.fillStyle = this.hexToRgba(accentColor, 0.9);
+        }
+        
+        // Enhanced fallback petal with gradient and glow
+        const petalGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, petal.size);
+        if (petal.type === 'gold') {
+          petalGradient.addColorStop(0, this.hexToRgba(glowColor, 1.0));
+          petalGradient.addColorStop(0.7, this.hexToRgba(glowColor, 0.8));
+          petalGradient.addColorStop(1, this.hexToRgba(glowColor, 0.6));
+        } else if (petal.type === 'rare') {
+          petalGradient.addColorStop(0, this.hexToRgba(accentColor, 1.0));
+          petalGradient.addColorStop(0.7, this.hexToRgba(accentColor, 0.8));
+          petalGradient.addColorStop(1, this.hexToRgba(accentColor, 0.6));
+        } else {
+          petalGradient.addColorStop(0, this.hexToRgba(accentColor, 0.95));
+          petalGradient.addColorStop(0.7, this.hexToRgba(accentColor, 0.8));
+          petalGradient.addColorStop(1, this.hexToRgba(accentColor, 0.6));
+        }
+        
+        // Add glow for special petals
+        if (petal.type === 'gold' || petal.type === 'rare') {
+          this.ctx.shadowBlur = 12;
+          this.ctx.shadowColor = petal.type === 'gold' 
+            ? this.hexToRgba(glowColor, 0.6)
+            : this.hexToRgba(accentColor, 0.6);
+        }
+        
+        this.ctx.fillStyle = petalGradient;
         this.ctx.beginPath();
         this.ctx.ellipse(0, 0, petal.size, petal.size * 0.6, 0, 0, Math.PI * 2);
         this.ctx.fill();
-        this.ctx.strokeStyle = 'rgba(255, 182, 193, 0.8)';
-        this.ctx.lineWidth = 2;
+        
+        // Enhanced stroke with gradient
+        const strokeGradient = this.ctx.createLinearGradient(-petal.size, 0, petal.size, 0);
+        strokeGradient.addColorStop(0, this.hexToRgba(accentColor, 0.6));
+        strokeGradient.addColorStop(0.5, this.hexToRgba(accentColor, 1.0));
+        strokeGradient.addColorStop(1, this.hexToRgba(accentColor, 0.6));
+        
+        this.ctx.strokeStyle = strokeGradient;
+        this.ctx.lineWidth = 2.5;
         this.ctx.stroke();
+        
+        // Reset shadow
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowColor = 'transparent';
       }
 
       this.ctx.restore();
@@ -1032,8 +1181,17 @@ class GameEngine {
     }
   }
 
+  // Helper to convert hex color to rgba string
+  private hexToRgba(hex: string, alpha: number): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
   private renderAtmosphericPetals() {
-    // Ambient floating petals in background
+    // Ambient floating petals in background using visual profile colors
+    const accentColor = this.visualProfile.background.accentColor || '#ec4899';
     const petalCount = 15;
     for (let i = 0; i < petalCount; i++) {
       const x = (this.gameTime * 20 + i * 50) % (this.canvas.width + 100);
@@ -1043,7 +1201,8 @@ class GameEngine {
 
       this.ctx.save();
       this.ctx.globalAlpha = alpha;
-      this.ctx.fillStyle = '#ffc7d9';
+      // Use visual profile accent color for atmospheric petals
+      this.ctx.fillStyle = accentColor;
       this.ctx.beginPath();
       this.ctx.ellipse(x, y, size, size * 0.6, (this.gameTime + i) * 0.5, 0, Math.PI * 2);
       this.ctx.fill();
@@ -1056,6 +1215,33 @@ class GameEngine {
     const centerX = this.canvas.width / 2;
     const baseY = this.canvas.height - 80;
 
+    // Render with physics if available
+    if (this.physicsRenderer) {
+      const slashPose = this.slashTrail.length > 0;
+      const facing = slashPose && this.slashTrail.length > 1
+        ? (this.slashTrail[this.slashTrail.length - 1].x > this.slashTrail[this.slashTrail.length - 2].x ? 'right' : 'left')
+        : 'right';
+      this.physicsRenderer.render(centerX, baseY, facing);
+      
+      // Draw sword overlay (keep original sword rendering)
+      const breatheOffset = Math.sin(this.gameTime * 2) * 2;
+      this.renderSword(breatheOffset, slashPose, centerX, baseY);
+      
+      // Power-up aura if active
+      if (this.activePowerUps.size > 0) {
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.3 + Math.sin(this.gameTime * 5) * 0.1;
+        this.ctx.strokeStyle = '#4ade80';
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, baseY - 10 + breatheOffset, 60, 0, Math.PI * 2);
+        this.ctx.stroke();
+        this.ctx.restore();
+      }
+      return;
+    }
+
+    // Fallback to original rendering if physics not available
     // Character stance animation (subtle breathing/idle)
     const breatheOffset = Math.sin(this.gameTime * 2) * 2;
     const slashPose = this.slashTrail.length > 0;
@@ -1205,6 +1391,23 @@ class GameEngine {
     this.ctx.restore();
 
     // Sword (katana) - positioned based on slash state
+    this.renderSword(breatheOffset, slashPose, centerX, baseY);
+
+    // Power-up aura if active
+    if (this.activePowerUps.size > 0) {
+      this.ctx.save();
+      this.ctx.globalAlpha = 0.3 + Math.sin(this.gameTime * 5) * 0.1;
+      this.ctx.strokeStyle = '#4ade80';
+      this.ctx.lineWidth = 3;
+      this.ctx.beginPath();
+      this.ctx.arc(centerX, baseY - 10 + breatheOffset, 60, 0, Math.PI * 2);
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+  }
+
+  private renderSword(breatheOffset: number, slashPose: boolean, centerX: number, baseY: number) {
+    // Sword (katana) - positioned based on slash state
     this.ctx.save();
     this.ctx.translate(0, breatheOffset);
 
@@ -1254,18 +1457,6 @@ class GameEngine {
     this.ctx.stroke();
 
     this.ctx.restore();
-
-    // Power-up aura if active
-    if (this.activePowerUps.size > 0) {
-      this.ctx.save();
-      this.ctx.globalAlpha = 0.3 + Math.sin(this.gameTime * 5) * 0.1;
-      this.ctx.strokeStyle = '#4ade80';
-      this.ctx.lineWidth = 3;
-      this.ctx.beginPath();
-      this.ctx.arc(centerX, baseY - 10 + breatheOffset, 60, 0, Math.PI * 2);
-      this.ctx.stroke();
-      this.ctx.restore();
-    }
   }
 
   endGame() {
@@ -1277,6 +1468,11 @@ class GameEngine {
   destroy() {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
+    }
+    // Cleanup physics renderer
+    if (this.physicsRenderer) {
+      this.physicsRenderer.dispose();
+      this.physicsRenderer = null;
     }
   }
 

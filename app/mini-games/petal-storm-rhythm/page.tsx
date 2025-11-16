@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
+import { PhysicsAvatarCanvas, PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
 import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
@@ -119,6 +120,7 @@ export default function PetalStormRhythm() {
   // Hit VFX state
   const [laneFlashes, setLaneFlashes] = useState<Record<number, { type: 'perfect' | 'great' | 'good' | 'miss'; time: number }>>({});
   const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
+  const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -129,16 +131,16 @@ export default function PetalStormRhythm() {
   const avatarUsage = getGameAvatarUsage('petal-storm-rhythm');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('petal-storm-rhythm', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
   
   // Get real petal balance for Quake HUD
   const { balance: petalBalance } = usePetalBalance();
   
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
+    if (choice === 'creator' && avatar) {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
@@ -399,6 +401,19 @@ export default function PetalStormRhythm() {
         points = GAME_CONFIG.SCORE_MISS;
       }
 
+      // Apply physics impact based on accuracy
+      if (physicsAvatarRef.current) {
+        const impactForce = 
+          accuracy === 'perfect'
+            ? { x: (Math.random() - 0.5) * 3, y: -4 - combo * 0.1 } // Strong upward impact for perfect
+            : accuracy === 'great'
+              ? { x: (Math.random() - 0.5) * 2, y: -3 }
+              : accuracy === 'good'
+                ? { x: (Math.random() - 0.5) * 1.5, y: -2 }
+                : { x: (Math.random() - 0.5) * 1, y: 1 }; // Slight downward for miss
+        physicsAvatarRef.current.applyImpact(impactForce, 'chest');
+      }
+
       // Trigger hit VFX
       setLaneFlashes((prev) => ({
         ...prev,
@@ -613,14 +628,44 @@ export default function PetalStormRhythm() {
         </div>
       )}
 
-      {/* Avatar Display (Bust Mode) */}
+      {/* Avatar Display (Bust Mode) - MAIN CHARACTER CENTER STAGE */}
       {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-        <div className="flex justify-center mb-6">
-          <AvatarRenderer
-            profile={avatarConfig}
-            mode={representationConfig.mode}
-            size="small"
-          />
+        <div className="flex justify-center mb-8">
+          <div className="relative w-80 h-80">
+            <AvatarRenderer
+              profile={avatarConfig}
+              mode={representationConfig.mode}
+              size="large"
+            />
+            {/* Physics Avatar Overlay */}
+            {gameState === 'playing' && (
+              <div className="absolute top-0 right-0 w-32 h-40">
+                <PhysicsAvatarCanvas
+                  ref={physicsAvatarRef}
+                  characterType="player"
+                  quality="high"
+                  width={128}
+                  height={160}
+                  className="rounded-lg"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Physics Avatar Standalone (when no avatar config) */}
+      {!showAvatarChoice && (!isAvatarsEnabled() || !avatarConfig) && gameState === 'playing' && (
+        <div className="flex justify-center mb-8">
+          <div className="relative w-80 h-80 flex items-center justify-center">
+            <PhysicsAvatarCanvas
+              ref={physicsAvatarRef}
+              characterType="player"
+              quality="high"
+              width={160}
+              height={200}
+              className="rounded-lg"
+            />
+          </div>
         </div>
       )}
 

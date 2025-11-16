@@ -8,6 +8,7 @@
 import type { ContentRating } from './types';
 import { getUserNSFWStatus } from './user';
 import { db } from '@/app/lib/db';
+import { shouldFilterNSFW } from './config';
 
 export interface VisibilityContext {
   viewerUserId: string | null;
@@ -32,6 +33,11 @@ export async function shouldShowNSFWContent(
 
   // SFW content is always shown
   if (contentRating === 'sfw') {
+    return true;
+  }
+
+  // If NSFW filtering is disabled globally, show all content
+  if (!shouldFilterNSFW()) {
     return true;
   }
 

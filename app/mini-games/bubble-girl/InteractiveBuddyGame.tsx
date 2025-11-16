@@ -8,6 +8,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
+import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
+import { createGlowEffect } from '../_shared/enhancedTextures';
 
 type GameMode = 'sandbox' | 'stress-relief' | 'challenge';
 
@@ -331,6 +333,9 @@ class PhysicsEngine {
   private readonly BOUNCE = 0.6;
 
   private characterVariant: 'girl' | 'boy';
+  
+  // Physics character renderer
+  private physicsRenderer: PhysicsCharacterRenderer | null = null;
 
   constructor(canvas: HTMLCanvasElement, mode: GameMode, characterVariant: 'girl' | 'boy' = 'girl') {
     this.canvas = canvas;
@@ -338,6 +343,13 @@ class PhysicsEngine {
     this.mode = mode;
     this.characterVariant = characterVariant;
     this.money = mode === 'sandbox' ? 10000 : 50;
+
+    // Initialize physics renderer
+    this.physicsRenderer = new PhysicsCharacterRenderer(
+      this.ctx,
+      characterVariant === 'girl' ? 'succubus' : 'player',
+      { quality: 'high', enabled: true },
+    );
 
     // Initialize character
     this.character = {
@@ -437,14 +449,38 @@ class PhysicsEngine {
     if (Date.now() - this.lastHitTime > 2000) {
       this.comboMultiplier = Math.max(1, this.comboMultiplier - 0.01);
     }
+    
+    // Update physics renderer
+    if (this.physicsRenderer) {
+      const centerX = torso.x;
+      const centerY = torso.y;
+      const velocityX = torso.vx;
+      const velocityY = torso.vy;
+      this.physicsRenderer.update(deltaTime, { x: velocityX, y: velocityY }, { x: centerX, y: centerY });
+    }
   }
 
   render(): void {
-    // Clear canvas with gradient background
+    // Clear canvas with gradient background - Enhanced
     const gradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
     gradient.addColorStop(0, '#1a0b2e');
-    gradient.addColorStop(1, '#2e0b1a');
+    gradient.addColorStop(0.5, '#2e0b1a');
+    gradient.addColorStop(1, '#0f0718');
     this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    // Enhanced background overlay
+    const overlayGradient = this.ctx.createRadialGradient(
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      0,
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      Math.max(this.canvas.width, this.canvas.height),
+    );
+    overlayGradient.addColorStop(0, 'rgba(236, 72, 153, 0.1)');
+    overlayGradient.addColorStop(1, 'transparent');
+    this.ctx.fillStyle = overlayGradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Draw floor
@@ -476,8 +512,24 @@ class PhysicsEngine {
       this.ctx.restore();
     });
 
-    // Draw character
-    this.drawCharacter();
+    // Draw character with physics
+    if (this.physicsRenderer) {
+      const { torso } = this.character;
+      // Use physics renderer
+      this.physicsRenderer.render(torso.x, torso.y, 'right');
+      
+      // Draw health bars
+      this.drawHealthBar(
+        torso.x,
+        torso.y - 80,
+        torso.width,
+        torso.health,
+        torso.maxHealth,
+      );
+    } else {
+      // Fallback to original rendering
+      this.drawCharacter();
+    }
   }
 
   private drawCharacter(): void {
@@ -659,6 +711,16 @@ class PhysicsEngine {
     hitPart.vx += (dx / distance) * force * (damage || 5);
     hitPart.vy += (dy / distance) * force * (damage || 5) - 2;
     hitPart.angularVelocity += (Math.random() - 0.5) * 0.1;
+    
+    // Apply physics impact
+    if (this.physicsRenderer) {
+      const impactForce = {
+        x: (dx / distance) * force * (damage || 5) * 2,
+        y: ((dy / distance) * force * (damage || 5) - 2) * 2,
+      };
+      const impactPart = hitHead ? 'chest' : 'hips';
+      this.physicsRenderer.applyImpact(impactForce, impactPart);
+    }
 
     // Update combo
     const now = Date.now();
@@ -677,8 +739,17 @@ class PhysicsEngine {
     this.money += Math.floor(cappedPoints / 10);
     this.stressRelieved += tool.type === 'destructive' ? 1 : 0;
 
-    // Spawn particles
+    // Spawn particles - Enhanced with glow
     this.spawnParticles(x, y, tool.type);
+    
+    // Enhanced particle effects
+    if (tool.type === 'destructive') {
+      createGlowEffect(this.ctx, x, y, 30, '#ef4444', 0.5);
+    } else if (tool.type === 'healing') {
+      createGlowEffect(this.ctx, x, y, 25, '#4ade80', 0.4);
+    } else {
+      createGlowEffect(this.ctx, x, y, 20, '#ec4899', 0.3);
+    }
   }
 
   private checkHit(part: CharacterPart, x: number, y: number): boolean {
@@ -781,6 +852,10 @@ class PhysicsEngine {
   }
 
   destroy(): void {
-    // Cleanup
+    // Cleanup physics renderer
+    if (this.physicsRenderer) {
+      this.physicsRenderer.dispose();
+      this.physicsRenderer = null;
+    }
   }
 }

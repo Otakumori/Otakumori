@@ -120,10 +120,10 @@ export function PetalFlowOverlay({ onPetalClick, petalCount = 8 }: PetalFlowOver
               }}
               exit={{ opacity: 0, scale: 0 }}
               transition={{
-                duration: petal.duration,
+                duration: petal.duration * 1.5,
                 delay: petal.delay,
                 repeat: isClicked ? 0 : Infinity,
-                repeatDelay: 2,
+                repeatDelay: 3,
                 ease: 'easeInOut',
               }}
               className={`absolute pointer-events-auto ${
@@ -141,18 +141,19 @@ export function PetalFlowOverlay({ onPetalClick, petalCount = 8 }: PetalFlowOver
             >
               {/* Petal SVG */}
               <svg
-                width="24"
-                height="24"
+                width="8"
+                height="8"
                 viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
-                className={petal.isClickable && !isClicked ? 'drop-shadow-lg' : ''}
+                className={petal.isClickable && !isClicked ? 'drop-shadow-sm' : ''}
+                style={{ filter: petal.isClickable && !isClicked ? 'drop-shadow(0 0 2px rgba(236, 72, 153, 0.3))' : 'none' }}
               >
                 <path
                   d="M12 2C12 2 8 6 8 10C8 14 12 18 12 18C12 18 16 14 16 10C16 6 12 2 12 2Z"
-                  fill={petal.isClickable && !isClicked ? '#ec4899' : 'rgba(236, 72, 153, 0.6)'}
-                  stroke={petal.isClickable && !isClicked ? '#f472b6' : 'rgba(236, 72, 153, 0.4)'}
-                  strokeWidth="1"
+                  fill={petal.isClickable && !isClicked ? 'rgba(236, 72, 153, 0.4)' : 'rgba(236, 72, 153, 0.25)'}
+                  stroke={petal.isClickable && !isClicked ? 'rgba(244, 114, 182, 0.3)' : 'rgba(236, 72, 153, 0.2)'}
+                  strokeWidth="0.5"
                 />
               </svg>
             </motion.div>

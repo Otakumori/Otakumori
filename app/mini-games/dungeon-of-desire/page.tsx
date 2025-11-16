@@ -49,7 +49,7 @@ export default function DungeonOfDesirePage() {
   const avatarUsage = getGameAvatarUsage('dungeon-of-desire');
   const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('dungeon-of-desire', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
+    avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
 
   // Visual profile and HUD
@@ -67,9 +67,9 @@ export default function DungeonOfDesirePage() {
   } as const;
   
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
+  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
-    if (choice === 'avatar' && avatar) {
+    if (choice === 'creator' && avatar) {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
@@ -167,14 +167,16 @@ export default function DungeonOfDesirePage() {
         </div>
       )}
 
-      {/* Avatar Display (Bust Mode) */}
+      {/* Avatar Display (Bust Mode) - MAIN CHARACTER CENTER STAGE */}
       {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30">
-          <AvatarRenderer
-            profile={avatarConfig}
-            mode={representationConfig.mode}
-            size="small"
-          />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+          <div className="relative w-80 h-80">
+            <AvatarRenderer
+              profile={avatarConfig}
+              mode={representationConfig.mode}
+              size="large"
+            />
+          </div>
         </div>
       )}
 
