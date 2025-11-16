@@ -12,7 +12,7 @@ import { stripHtml } from '@/lib/html';
 
 // Catalog Product Card
 function CatalogProductCard({ product }: { product: CatalogProduct }) {
-  const displayImage = product.image ?? product.images[0] ?? '/assets/placeholder-product.jpg';
+  const displayImage = product.image ?? product.images?.[0] ?? '';
 
   const summary = useMemo(() => stripHtml(product.description || ''), [product.description]);
 
@@ -47,21 +47,31 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
 
   return (
     <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-glass-border overflow-hidden hover:border-border-hover hover:shadow-2xl hover:shadow-[0_0_30px_var(--glow-pink)] transition-all duration-300 hover:-translate-y-1">
-      <div className="relative aspect-square bg-white/5 overflow-hidden">
-        <Image
-          src={displayImage}
-          alt={product.title}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-          sizes="(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw"
-          loading="lazy"
-        />
-        {!product.available && (
-          <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
-            Out of Stock
-          </div>
-        )}
-      </div>
+      {displayImage ? (
+        <div className="relative aspect-square bg-white/5 overflow-hidden">
+          <Image
+            src={displayImage}
+            alt={product.title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw"
+            loading="lazy"
+          />
+          {!product.available && (
+            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
+              Out of Stock
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="relative aspect-square bg-white/5 overflow-hidden flex items-center justify-center">
+          {!product.available && (
+            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg z-10">
+              Out of Stock
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="p-4 space-y-3">
         <div>

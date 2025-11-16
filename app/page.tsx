@@ -33,6 +33,9 @@ export default async function HomePage() {
     NEXT_PUBLIC_FEATURE_BLOG,
   } = env;
 
+  // Check if shop is enabled (accepts '1', 'true', 'on', or any truthy string)
+  const isShopEnabled = NEXT_PUBLIC_FEATURE_SHOP === '1' || NEXT_PUBLIC_FEATURE_SHOP === 'true' || NEXT_PUBLIC_FEATURE_SHOP === 'on';
+
   return (
     <>
       {/* Cherry blossom tree background - fixed with parallax */}
@@ -56,7 +59,7 @@ export default async function HomePage() {
 
       <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* SHOP */}
-        {NEXT_PUBLIC_FEATURE_SHOP === '1' && (
+        {isShopEnabled && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
             <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
               <ShopSection />
