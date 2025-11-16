@@ -324,6 +324,17 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           defaultHud: 'standard',
           allowQuakeOverlay: true,
         },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          particles: {
+            enabled: true,
+            maxCount: 30,
+            petalBurst: true,
+          },
+        },
       };
 
     case 'thigh-coliseum':
@@ -368,6 +379,22 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           defaultHud: 'standard',
           allowQuakeOverlay: false,
         },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          screenshake: {
+            enabled: true,
+            intensity: 0.25,
+            duration: 180,
+          },
+          particles: {
+            enabled: true,
+            maxCount: 30,
+            petalBurst: true,
+          },
+        },
       };
 
     case 'dungeon-of-desire':
@@ -406,6 +433,22 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
         hud: {
           defaultHud: 'standard',
           allowQuakeOverlay: false,
+        },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          screenshake: {
+            enabled: true,
+            intensity: 0.2,
+            duration: 200,
+          },
+          particles: {
+            enabled: true,
+            maxCount: 20,
+            petalBurst: true,
+          },
         },
         nsfwFlavor: {
           hasAltDemons: false, // Disabled for testing
@@ -448,6 +491,17 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           defaultHud: 'standard',
           allowQuakeOverlay: false,
         },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          particles: {
+            enabled: true,
+            maxCount: 20,
+            petalBurst: true,
+          },
+        },
       };
 
     case 'puzzle-reveal':
@@ -487,6 +541,17 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           defaultHud: 'minimal',
           allowQuakeOverlay: false,
         },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          particles: {
+            enabled: true,
+            maxCount: 15,
+            petalBurst: true,
+          },
+        },
       };
 
     case 'bubble-girl':
@@ -523,6 +588,16 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
         hud: {
           defaultHud: 'standard',
           allowQuakeOverlay: false,
+        },
+        petals: {
+          usesPetalSpriteSheet: false, // Uses bubble sprites instead
+        },
+        vfxConfig: {
+          particles: {
+            enabled: true,
+            maxCount: 40,
+            petalBurst: false, // Uses bubble particles
+          },
         },
       };
 
@@ -561,6 +636,17 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
           defaultHud: 'minimal',
           allowQuakeOverlay: false,
         },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          particles: {
+            enabled: true,
+            maxCount: 25,
+            petalBurst: true,
+          },
+        },
       };
 
     case 'otaku-beat-em-up':
@@ -598,6 +684,22 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
         hud: {
           defaultHud: 'standard',
           allowQuakeOverlay: false,
+        },
+        petals: {
+          usesPetalSpriteSheet: true,
+          spritePath: '/assets/images/petal_sprite.png',
+        },
+        vfxConfig: {
+          screenshake: {
+            enabled: true,
+            intensity: 0.2,
+            duration: 150,
+          },
+          particles: {
+            enabled: true,
+            maxCount: 35,
+            petalBurst: true,
+          },
         },
       };
 

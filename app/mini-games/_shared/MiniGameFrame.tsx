@@ -80,13 +80,19 @@ export function MiniGameFrame({ gameId, children, className = '' }: MiniGameFram
   // Use StarfieldBackground for starfield backgrounds
   const useStarfield = bgKind === 'starfield';
 
-  // Get background classes for CSS gradients
+  // Get background classes for CSS gradients (fallback)
   const bgClasses = useStarfield ? '' : getBackgroundClasses(bgKind, accentColor, glowColor);
+  
+  // Use backgroundColor from profile if available, otherwise use CSS classes
+  const backgroundStyle = profile.backgroundColor 
+    ? { background: profile.backgroundColor }
+    : {};
 
   return (
     <div
-      className={`relative min-h-screen w-full overflow-hidden ${bgClasses} ${className}`}
+      className={`relative min-h-screen w-full overflow-hidden ${useStarfield ? '' : bgClasses} ${className}`}
       style={{
+        ...backgroundStyle,
         // Apply accent color as CSS variable for potential use in child components
         ['--game-accent-color' as string]: accentColor,
         ['--game-glow-color' as string]: glowColor || accentColor,
