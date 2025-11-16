@@ -23,7 +23,8 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
-import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
@@ -158,8 +159,11 @@ export default function InteractiveBuddyPage() {
     }
   }, [mode, earnPetals, hasAwardedPetals]);
 
+  const displayName = getGameDisplayName('bubble-girl');
+
   return (
-    <main className="min-h-screen p-4 page-transition" style={backgroundStyle}>
+    <MiniGameFrame gameId="bubble-girl">
+      <main className="min-h-screen p-4 page-transition" style={backgroundStyle}>
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <header className="mb-6">
@@ -442,6 +446,7 @@ export default function InteractiveBuddyPage() {
           </div>
         </GlassCard>
       </div>
-    </main>
+      </main>
+    </MiniGameFrame>
   );
 }

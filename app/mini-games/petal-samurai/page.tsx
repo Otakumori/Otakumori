@@ -21,6 +21,8 @@ import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { useGameHud } from '../_shared/useGameHud';
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { GameOverlay } from '../_shared/GameOverlay';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
+import { getGameDisplayName } from '../_shared/gameVisuals';
 
 const SlicingGame = dynamic(() => import('./Game'), {
   ssr: false,
@@ -77,12 +79,14 @@ export default function PetalSamuraiPage() {
   // Show Quake overlay on win (for demo - in production, this would be triggered by game win event)
   // TODO: Connect to actual game win state from CombatGame
 
+  const displayName = getGameDisplayName('petal-samurai');
+
   return (
-    <main className="relative min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+    <MiniGameFrame gameId="petal-samurai">
       {/* Header */}
       <header className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-pink-200">Petal Samurai</h1>
+          <h1 className="text-2xl font-bold text-pink-200">{displayName}</h1>
           <p className="text-sm text-pink-200/70">Slice falling petals with precision</p>
         </div>
         <Link
@@ -136,6 +140,6 @@ export default function PetalSamuraiPage() {
           onOverlayClose={() => setShowQuakeOverlay(false)}
         />
       )}
-    </main>
+    </MiniGameFrame>
   );
 }

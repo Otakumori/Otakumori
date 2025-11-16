@@ -44,6 +44,9 @@ const SPRITE_COLS = 4;
 const SPRITE_ROWS = 3;
 const TOTAL_SPRITES = SPRITE_COLS * SPRITE_ROWS; // 12
 
+// Petal size multiplier - scales down sprites to appropriate size (20-30px instead of 80-120px)
+const PETAL_SIZE_MULTIPLIER = 0.25; // Scale sprites to 25% of their original size
+
 // Guest petal storage key
 const GUEST_PETAL_KEY = 'otm-guest-petals';
 
@@ -274,17 +277,19 @@ export default function PetalField({
         ctx.scale(petal.scale * popScale, petal.scale * popScale);
         ctx.globalAlpha = popAlpha;
 
-        // Draw sprite from sprite sheet
+        // Draw sprite from sprite sheet (scaled down to appropriate petal size)
+        const scaledWidth = spriteWidth * PETAL_SIZE_MULTIPLIER;
+        const scaledHeight = spriteHeight * PETAL_SIZE_MULTIPLIER;
         ctx.drawImage(
           imageRef.current!,
           sx,
           sy,
           spriteWidth,
           spriteHeight,
-          -spriteWidth / 2,
-          -spriteHeight / 2,
-          spriteWidth,
-          spriteHeight,
+          -scaledWidth / 2,
+          -scaledHeight / 2,
+          scaledWidth,
+          scaledHeight,
         );
 
         ctx.restore();

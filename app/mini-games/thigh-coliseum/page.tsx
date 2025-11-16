@@ -23,7 +23,8 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
-import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
@@ -137,8 +138,11 @@ export default function ThighColiseumPage() {
   // Check if we should show choice
   const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
 
+  const displayName = getGameDisplayName('thigh-coliseum');
+
   return (
-    <div className="relative min-h-screen" style={backgroundStyle}>
+    <MiniGameFrame gameId="thigh-coliseum">
+      <div className="relative min-h-screen" style={backgroundStyle}>
       {/* Header */}
       <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
         <Link
@@ -220,6 +224,7 @@ export default function ThighColiseumPage() {
           setHasAwardedPetals(false);
         }}
       />
-    </div>
+      </div>
+    </MiniGameFrame>
   );
 }

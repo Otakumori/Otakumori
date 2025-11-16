@@ -24,7 +24,8 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
-import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
@@ -121,10 +122,12 @@ export default function RhythmBeatEmUpPage() {
   }, [selectedMode, combo, earnPetals, hasAwardedPetals]);
 
   if (selectedMode) {
+    const displayName = getGameDisplayName('otaku-beat-em-up');
     return (
-      <div className="relative min-h-screen" style={backgroundStyle}>
-        {/* Header */}
-        <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
+      <MiniGameFrame gameId="otaku-beat-em-up">
+        <div className="relative min-h-screen" style={backgroundStyle}>
+          {/* Header */}
+          <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
           <Link
             href="/mini-games"
             className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
@@ -217,12 +220,16 @@ export default function RhythmBeatEmUpPage() {
             setHasAwardedPetals(false);
           }}
         />
-      </div>
+        </div>
+      </MiniGameFrame>
     );
   }
 
+  const displayName = getGameDisplayName('otaku-beat-em-up');
+
   return (
-    <div className="relative min-h-screen" style={backgroundStyle}>
+    <MiniGameFrame gameId="otaku-beat-em-up">
+      <div className="relative min-h-screen" style={backgroundStyle}>
       <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
       {/* Avatar vs Preset Choice */}
       {showAvatarChoice && (
@@ -370,6 +377,7 @@ export default function RhythmBeatEmUpPage() {
         </div>
       </div>
       </GameShell>
-    </div>
+      </div>
+    </MiniGameFrame>
   );
 }

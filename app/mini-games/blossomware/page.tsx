@@ -20,7 +20,8 @@ import { GAMES } from '@/components/arcade/registry';
 import Engine from '@/components/arcade/Engine';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -65,8 +66,11 @@ export default function BlossomwarePage() {
     // Engine manages its own restart state
   }, []);
 
+  const displayName = getGameDisplayName('blossomware');
+
   return (
-    <div className="relative min-h-screen" style={backgroundStyle}>
+    <MiniGameFrame gameId="blossomware">
+      <div className="relative min-h-screen" style={backgroundStyle}>
       <div className="mx-auto max-w-5xl px-4 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -110,6 +114,7 @@ export default function BlossomwarePage() {
           <Engine playlist={GAMES} mode="long" autoplay />
         </div>
       </div>
-    </div>
+      </div>
+    </MiniGameFrame>
   );
 }

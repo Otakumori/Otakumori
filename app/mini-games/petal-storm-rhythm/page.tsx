@@ -22,7 +22,8 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';
-import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
@@ -580,8 +581,11 @@ export default function PetalStormRhythm() {
     }
   }, [startGame, avatarUsage, avatarChoice]);
 
+  const displayName = getGameDisplayName('petal-storm-rhythm');
+
   return (
-    <div className="relative min-h-screen overflow-hidden" style={backgroundStyle}>
+    <MiniGameFrame gameId="petal-storm-rhythm">
+      <div className="relative min-h-screen overflow-hidden" style={backgroundStyle}>
       {/* Header */}
       <div className="text-center p-4 relative">
         <div className="absolute top-4 right-4">
@@ -951,6 +955,7 @@ export default function PetalStormRhythm() {
           </div>
         </motion.div>
       )}
-    </div>
+      </div>
+    </MiniGameFrame>
   );
 }

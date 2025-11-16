@@ -610,6 +610,24 @@ export function getGameVisualProfile(gameId: string): GameVisualProfile {
 }
 
 /**
+ * Get display name for a game
+ * Returns user-facing game name from visual profile
+ */
+export function getGameDisplayName(gameId: string): string {
+  const profile = getGameVisualProfile(gameId);
+  return profile.displayName;
+}
+
+/**
+ * Get theme for a game
+ * Returns game theme identifier from visual profile
+ */
+export function getGameTheme(gameId: string): GameTheme {
+  const profile = getGameVisualProfile(gameId);
+  return profile.theme;
+}
+
+/**
  * Get HUD skin for a game based on cosmetics state
  * Respects user's equipped HUD skin and unlock status
  */
