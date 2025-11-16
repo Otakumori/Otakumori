@@ -250,6 +250,23 @@ export function applyBloomPostProcess(
   threshold: number = 0.8,
 ): void {
   // Simple bloom: draw source with glow
+  // Threshold determines brightness cutoff for bloom (higher = only bright areas bloom)
+  const imageData = ctx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+  const data = imageData.data;
+  
+  // Apply threshold-based bloom (only bright pixels contribute)
+  for (let i = 0; i < data.length; i += 4) {
+    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3 / 255;
+    if (brightness < threshold) {
+      // Dim pixels below threshold
+      data[i] *= 0.5;
+      data[i + 1] *= 0.5;
+      data[i + 2] *= 0.5;
+    }
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+  
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.globalAlpha = intensity;
@@ -270,12 +287,32 @@ export function applyColorCorrection(
   contrast: number = 1.0,
   saturation: number = 1.0,
 ): void {
-  // Apply via composite operations (simplified)
+  // Apply brightness
   if (brightness !== 1.0) {
     ctx.save();
     ctx.globalCompositeOperation = brightness > 1 ? 'screen' : 'multiply';
     ctx.globalAlpha = Math.abs(brightness - 1.0);
     ctx.fillStyle = brightness > 1 ? '#ffffff' : '#000000';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
+  }
+  
+  // Apply contrast
+  if (contrast !== 1.0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'overlay';
+    ctx.globalAlpha = Math.abs(contrast - 1.0) * 0.5;
+    ctx.fillStyle = contrast > 1 ? '#ffffff' : '#808080';
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
+  }
+  
+  // Apply saturation (simplified - desaturate by mixing with grayscale)
+  if (saturation !== 1.0 && saturation < 1.0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'color';
+    ctx.globalAlpha = 1.0 - saturation;
+    ctx.fillStyle = '#808080';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.restore();
   }

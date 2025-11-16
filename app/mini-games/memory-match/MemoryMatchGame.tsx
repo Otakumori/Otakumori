@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
 import { GameAvatarIntegration } from '../_shared/GameAvatarIntegration';
-import { PhysicsAvatarCanvas, PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
+import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 
 interface Card {
   id: number;

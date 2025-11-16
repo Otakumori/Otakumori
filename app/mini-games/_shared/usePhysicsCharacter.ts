@@ -10,10 +10,12 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import {
   PhysicsCharacterRenderer,
-  R18PhysicsConfig,
-  CharacterVisualConfig,
   R18_PHYSICS_PRESETS,
   CHARACTER_VISUAL_PRESETS,
+} from './PhysicsCharacterRenderer';
+import type {
+  R18PhysicsConfig,
+  CharacterVisualConfig,
 } from './PhysicsCharacterRenderer';
 
 export interface UsePhysicsCharacterOptions {
@@ -283,7 +285,6 @@ export function usePhysicsCharacters(
   const characterAPIs: Record<string, PhysicsCharacterAPI> = {};
 
   for (const char of characters) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     characterAPIs[char.id] = usePhysicsCharacter(ctx, {
       ...char.options,
       characterType: char.characterType || 'default',

@@ -386,11 +386,13 @@ export default function CreatorPage() {
       {/* Main Creator Interface */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <GlassCard className="p-6">
-          <CharacterEditor
-            initialConfiguration={avatarConfig || undefined}
-            onConfigurationChange={handleConfigurationChange}
-            onSave={handleSave}
-          />
+          <GlassCardContent>
+            <CharacterEditor
+              initialConfiguration={avatarConfig || undefined}
+              onConfigurationChange={handleConfigurationChange}
+              onSave={handleSave}
+            />
+          </GlassCardContent>
         </GlassCard>
       </div>
     </div>

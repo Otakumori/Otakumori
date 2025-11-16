@@ -603,8 +603,10 @@ export class PhysicsCharacterRenderer {
     radius: number,
     partType: string,
   ): void {
-    // Base color (mid-tone)
-    this.ctx.fillStyle = part.color;
+    // Base color (mid-tone) - adjust based on part type for variety
+    const colorMultiplier = partType === 'chest' ? 1.0 : partType === 'hips' ? 0.95 : partType === 'hair' ? 0.9 : 1.0;
+    const baseColor = this.adjustColorBrightness(part.color, colorMultiplier);
+    this.ctx.fillStyle = baseColor;
     this.ctx.beginPath();
     this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     this.ctx.fill();
@@ -876,6 +878,21 @@ export class PhysicsCharacterRenderer {
   
   setQuality(quality: 'low' | 'medium' | 'high' | 'ultra'): void {
     this.config.quality = quality;
+  }
+  
+  // Helper to adjust color brightness
+  private adjustColorBrightness(color: string, multiplier: number): string {
+    // Simple brightness adjustment - if color is hex, parse and adjust
+    if (color.startsWith('#')) {
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      const newR = Math.min(255, Math.floor(r * multiplier));
+      const newG = Math.min(255, Math.floor(g * multiplier));
+      const newB = Math.min(255, Math.floor(b * multiplier));
+      return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    }
+    return color;
   }
 }
 

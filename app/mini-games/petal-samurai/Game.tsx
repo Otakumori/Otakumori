@@ -1229,8 +1229,10 @@ class GameEngine {
       
       // Power-up aura if active
       if (this.activePowerUps.size > 0) {
+        const auraAlpha = 0.3 + Math.sin(this.gameTime * 5) * 0.1;
+        createGlowEffect(this.ctx, centerX, baseY - 10 + breatheOffset, 60, '#4ade80', auraAlpha);
         this.ctx.save();
-        this.ctx.globalAlpha = 0.3 + Math.sin(this.gameTime * 5) * 0.1;
+        this.ctx.globalAlpha = auraAlpha;
         this.ctx.strokeStyle = '#4ade80';
         this.ctx.lineWidth = 3;
         this.ctx.beginPath();

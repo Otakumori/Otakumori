@@ -3,7 +3,7 @@
  * Provides option to use CREATOR-made avatars vs preset characters
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
 import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
@@ -131,6 +131,7 @@ export function useCreatorAvatar(enabled: boolean = true): UseCreatorAvatarResul
     data: creatorAvatar,
     isLoading,
     refetch,
+    error: queryError,
   } = useQuery({
     queryKey: ['creator-avatar', user?.id],
     queryFn: loadCreatorAvatar,
@@ -138,6 +139,11 @@ export function useCreatorAvatar(enabled: boolean = true): UseCreatorAvatarResul
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 1,
   });
+
+  // Update error state when query error changes
+  if (queryError && error !== queryError) {
+    setError(queryError instanceof Error ? queryError : new Error(String(queryError)));
+  }
 
   const avatarConfig = creatorAvatar ? convertCreatorToAvatarConfig(creatorAvatar) : null;
 

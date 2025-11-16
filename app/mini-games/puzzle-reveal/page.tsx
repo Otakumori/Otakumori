@@ -20,7 +20,7 @@ import Link from 'next/link';
 import GlassCard from '../../components/ui/GlassCard';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { PhysicsAvatarCanvas, PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
+import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { usePetalEarn } from '../_shared/usePetalEarn';

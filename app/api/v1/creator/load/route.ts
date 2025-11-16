@@ -9,7 +9,7 @@ import { db } from '@/lib/db';
 import { generateRequestId } from '@/lib/request-id';
 import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   const requestId = generateRequestId();
 
   try {

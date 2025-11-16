@@ -3,11 +3,13 @@
  * Centralized toggle for NSFW content filtering
  */
 
+import { clientEnv } from '@/env/client';
+
 /**
  * Whether NSFW content filtering is enabled
  * Set to false to disable all NSFW filtering temporarily
  */
-export const NSFW_FILTER_ENABLED = process.env.NEXT_PUBLIC_NSFW_FILTER_ENABLED !== 'false';
+export const NSFW_FILTER_ENABLED = clientEnv.NEXT_PUBLIC_NSFW_FILTER_ENABLED !== 'false';
 
 /**
  * Check if NSFW filtering should be applied

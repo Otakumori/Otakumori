@@ -51,7 +51,7 @@ async function getBaseUrl(): Promise<string> {
 }
 
 export default async function ShopSection() {
-  let products: Product[] = [];
+  let shopData: ShopData = { products: [] };
   let isBlockedData = false;
 
   try {
@@ -72,23 +72,29 @@ export default async function ShopSection() {
       const result = await response.json();
       const data = result.ok ? result.data : result;
       
-      products =
+      const products =
         data?.products?.map((product: Product) => ({
           ...product,
           image: product.image || '/assets/placeholder-product.jpg',
           description: stripHtml(product.description || ''),
           slug: product.slug,
         })) || [];
+      
+      shopData = {
+        products,
+        pagination: data?.pagination,
+      };
     } else {
       console.warn('ShopSection: API returned', response.status);
-      products = [];
+      shopData = { products: [] };
     }
   } catch (error) {
     console.warn('ShopSection: featured API failed during SSR:', error);
-    products = [];
+    shopData = { products: [] };
     isBlockedData = true;
   }
 
+  const { products } = shopData;
   const hasProducts = !isBlockedData && products.length > 0;
 
   return (

@@ -58,15 +58,15 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
       setGuestAvatar(loaded);
     }
   }, [avatarsEnabled]);
-  
+
   // If avatars disabled or preset-only, skip choice
   if (!avatarsEnabled || avatarUsage === 'preset-only') {
     onChoice('preset');
     return null;
   }
-  
+
   const hasGuestAvatar = guestAvatar !== null;
-  const hasCreatorAvatar = avatarConfig !== null;
+  const hasCreatorAvatar = avatarConfig !== null || creatorAvatar !== null;
   const hasAnyAvatar = hasGuestAvatar || hasCreatorAvatar;
   
   const handlePlayWithCreator = () => {

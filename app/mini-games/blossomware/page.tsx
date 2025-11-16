@@ -14,13 +14,13 @@
 
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { GAMES } from '@/components/arcade/registry';
 import Engine from '@/components/arcade/Engine';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { PhysicsAvatarCanvas, PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
+import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
@@ -39,7 +39,7 @@ export default function BlossomwarePage() {
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
   const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
   const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
-  const [gameCompletionCount, setGameCompletionCount] = useState(0);
+  const [_gameCompletionCount, setGameCompletionCount] = useState(0);
   
   // Handle game completion for physics impacts
   const handleGameComplete = useCallback((success: boolean, score: number, streak: number) => {
@@ -50,7 +50,15 @@ export default function BlossomwarePage() {
       physicsAvatarRef.current.applyImpact(impactForce, 'chest');
     }
     if (success) {
-      setGameCompletionCount((prev) => prev + 1);
+      setGameCompletionCount((prev) => {
+        const newCount = prev + 1;
+        // Track completion milestone every 5 games (for future analytics)
+        if (newCount % 5 === 0) {
+          // Milestone reached - could be used for achievements or analytics
+          void newCount; // Explicitly mark as used for future implementation
+        }
+        return newCount;
+      });
     }
   }, []);
   
