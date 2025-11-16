@@ -121,8 +121,9 @@ export default function RhythmBeatEmUpPage() {
     }
   }, [selectedMode, combo, earnPetals, hasAwardedPetals]);
 
+  const displayName = getGameDisplayName('otaku-beat-em-up');
+
   if (selectedMode) {
-    const displayName = getGameDisplayName('otaku-beat-em-up');
     return (
       <MiniGameFrame gameId="otaku-beat-em-up">
         <div className="relative min-h-screen" style={backgroundStyle}>
@@ -135,7 +136,7 @@ export default function RhythmBeatEmUpPage() {
             Back to Arcade
           </Link>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-pink-200">Rhythm Beat-Em-Up</h1>
+            <h1 className="text-2xl font-bold text-pink-200">{displayName}</h1>
             <p className="text-sm text-pink-200/70">Sync to the Moon Prism's pulse</p>
           </div>
           <div className="w-24" /> {/* Spacer */}
