@@ -16,14 +16,13 @@
       "@sentry/node": "10.15.0",
       "@sentry/react": "10.15.0",
       "@sentry/core": "10.15.0",
-      "@opentelemetry/api": "1.9.0",
-      "@react-three/fiber": {
-        "react": "$react",
-        "react-dom": "$react-dom"
-      },
-      "@react-three/drei": {
-        "react": "$react",
-        "react-dom": "$react-dom"
+      "@opentelemetry/api": "1.9.0"
+    },
+    "peerDependencyRules": {
+      "ignoreMissing": ["react", "react-dom"],
+      "allowedVersions": {
+        "react": "18",
+        "react-dom": "18"
       }
     },
     "onlyBuiltDependencies": [
