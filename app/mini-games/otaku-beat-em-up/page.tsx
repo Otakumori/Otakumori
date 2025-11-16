@@ -181,7 +181,7 @@ export default function RhythmBeatEmUpPage() {
           />
         )}
 
-        <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
+        <GameShell title={displayName} gameKey="rhythm-beat-em-up">
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-purple-900 via-pink-800 to-red-900 p-4">
             <div className="mb-4">
               <button
@@ -226,12 +226,10 @@ export default function RhythmBeatEmUpPage() {
     );
   }
 
-  const displayName = getGameDisplayName('otaku-beat-em-up');
-
   return (
     <MiniGameFrame gameId="otaku-beat-em-up">
       <div className="relative min-h-screen" style={backgroundStyle}>
-      <GameShell title="Rhythm Beat-Em-Up" gameKey="rhythm-beat-em-up">
+      <GameShell title={displayName} gameKey="rhythm-beat-em-up">
       {/* Avatar vs Preset Choice */}
       {showAvatarChoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
@@ -250,7 +248,7 @@ export default function RhythmBeatEmUpPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <h1 className="text-5xl font-bold text-white mb-4">Rhythm Beat-Em-Up</h1>
+            <h1 className="text-5xl font-bold text-white mb-4">{displayName}</h1>
             <p className="text-pink-200 text-xl mb-2">Sync to the Moon Prism's pulse.</p>
             <p className="text-sm text-pink-300 italic">
               "I didn't lose. Just ran out of health." – Edward Elric

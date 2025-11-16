@@ -596,7 +596,7 @@ export default function PetalStormRhythm() {
             Back to Arcade
           </Link>
         </div>
-                <h1 className="text-4xl font-bold text-pink-400 mb-2">Petal Hero</h1>
+                <h1 className="text-4xl font-bold text-pink-400 mb-2">{displayName}</h1>
                 <p className="text-slate-300 italic">
                   "Hit the notes in time—precision timing for petals."
                 </p>

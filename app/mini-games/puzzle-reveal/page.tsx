@@ -173,7 +173,7 @@ export default function PuzzleRevealPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                Puzzle Reveal
+                {displayName}
               </h1>
               <p className="text-zinc-300 font-medium">
                 Click tiles to reveal breathtaking artwork. Fast clicks build combos!

@@ -391,7 +391,7 @@ export default function MemoryMatchGame() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1" />
             <div className="flex-1 text-center">
-              <h1 className="text-4xl font-bold text-pink-400 mb-2">Memory Match</h1>
+              <h1 className="text-4xl font-bold text-pink-400 mb-2">{displayName}</h1>
               <p className="text-slate-300 italic">"Recall the faces bound by fate."</p>
             </div>
             <div className="flex-1 flex justify-end">

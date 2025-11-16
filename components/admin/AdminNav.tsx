@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, Flower, Zap, ChevronRight, Home, Ticket } from 'lucide-react';
+import { Sparkles, Flower, Zap, ChevronRight, Home, Ticket, Users, Palette, Shield } from 'lucide-react';
 
 const adminRoutes = [
   {
@@ -11,6 +11,36 @@ const adminRoutes = [
     name: 'Dashboard',
     icon: Home,
     description: 'Admin overview',
+  },
+  {
+    path: '/admin/users',
+    name: 'Users & Profiles',
+    icon: Users,
+    description: 'User overview and management',
+  },
+  {
+    path: '/admin/economy',
+    name: 'Economy Overview',
+    icon: Sparkles,
+    description: 'Monitor petals, discounts, and cosmetics',
+  },
+  {
+    path: '/admin/cosmetics',
+    name: 'Cosmetics',
+    icon: Palette,
+    description: 'Manage cosmetics config',
+  },
+  {
+    path: '/admin/vouchers',
+    name: 'Vouchers',
+    icon: Ticket,
+    description: 'Discount voucher management',
+  },
+  {
+    path: '/admin/nsfw',
+    name: 'NSFW Controls',
+    icon: Shield,
+    description: 'NSFW gating and controls',
   },
   {
     path: '/admin/settings',
@@ -47,12 +77,6 @@ const adminRoutes = [
     name: 'Discount Rewards',
     icon: Ticket,
     description: 'Manage petal-purchased discount vouchers',
-  },
-  {
-    path: '/admin/economy',
-    name: 'Economy Overview',
-    icon: Sparkles,
-    description: 'Monitor petals, discounts, and cosmetics',
   },
   {
     path: '/admin/burst',

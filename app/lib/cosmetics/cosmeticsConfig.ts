@@ -1,16 +1,27 @@
 /**
  * Cosmetics Configuration
- * Defines unlockable cosmetic items (HUD skins, overlays, avatar apparel, accessories, VFX, etc.)
+ * Defines unlockable cosmetic items (HUD skins, overlays, avatar apparel, accessories, VFX, vouchers, etc.)
  * Purchasable via petal shop
  */
 
+import type { ContentRating } from '@/app/lib/nsfw/types';
+
 export type HudSkinId = 'default' | 'quake';
 
-export type CosmeticType = 'hud-skin' | 'avatar-outfit' | 'avatar-accessory' | 'avatar-overlay' | 'avatar-vfx';
+export type CosmeticType = 
+  | 'hud-skin' 
+  | 'avatar-cosmetic' // Generic avatar cosmetic (outfits, hair, accessories, weapons, auras)
+  | 'avatar-outfit' // Deprecated: use avatar-cosmetic with avatarSlot='outfit'
+  | 'avatar-accessory' // Deprecated: use avatar-cosmetic with avatarSlot
+  | 'avatar-overlay' 
+  | 'avatar-vfx'
+  | 'profile-flair' // Titles, badges, profile frames, backgrounds
+  | 'voucher'; // Discount vouchers
 
 export type CosmeticRarity = 'common' | 'rare' | 'legendary';
 
-export type ContentRating = 'sfw' | 'nsfw-soft' | 'nsfw-hard';
+// Re-export ContentRating from nsfw/types for convenience
+export type { ContentRating } from '@/app/lib/nsfw/types';
 
 export interface CosmeticItem {
   id: string;
@@ -19,14 +30,28 @@ export interface CosmeticItem {
   name: string;
   description: string;
   costPetals: number;
-  rarity?: CosmeticRarity;
+  rarity: CosmeticRarity; // Required - all cosmetics must have a rarity
   previewUrl?: string;
-  contentRating?: ContentRating; // NSFW content rating (defaults to 'sfw')
-  nsfw?: boolean; // Shorthand for contentRating !== 'sfw' (deprecated, use contentRating)
-  matureVariant?: boolean; // Deprecated: use contentRating instead
+  contentRating?: ContentRating; // NSFW content rating (defaults to 'sfw' if not provided)
   avatarSlot?: string; // For avatar cosmetics: 'outfit', 'hair', 'accessory', 'eyes', etc.
   tags?: string[]; // For filtering/searching (e.g., ['hair', 'glasses', 'aura'])
-  metadata?: Record<string, unknown>; // Additional data (e.g., avatar part IDs, VFX config)
+  metadata?: Record<string, unknown>; // Additional data (e.g., avatar part IDs, VFX config, voucher details)
+}
+
+/**
+ * Get the content rating for a cosmetic item, defaulting to 'sfw' if not set
+ */
+export function getContentRating(item: CosmeticItem): ContentRating {
+  if (item.contentRating) {
+    // Map legacy ratings to new system (handle type compatibility)
+    const rating = item.contentRating as string;
+    if (rating === 'nsfw-soft') {
+      return 'nsfw-illustration';
+    }
+    // Type assertion for compatibility
+    return item.contentRating as ContentRating;
+  }
+  return 'sfw';
 }
 
 /**
@@ -73,18 +98,18 @@ export const cosmeticItems: CosmeticItem[] = [
   // Avatar Outfits (NSFW examples - gated)
   {
     id: 'outfit-nsfw-soft-lingerie',
-    type: 'avatar-outfit',
+    type: 'avatar-cosmetic',
     name: 'Lingerie Set',
     description: 'A delicate lingerie set. For mature audiences only.',
     costPetals: 2500,
     rarity: 'rare',
-    contentRating: 'nsfw-soft',
+    contentRating: 'nsfw-illustration', // Map from nsfw-soft
     avatarSlot: 'outfit',
     tags: ['lingerie', 'nsfw'],
   },
   {
     id: 'outfit-nsfw-hard-bikini',
-    type: 'avatar-outfit',
+    type: 'avatar-cosmetic',
     name: 'Bikini Set',
     description: 'A revealing bikini set. Explicit content.',
     costPetals: 3500,
@@ -160,6 +185,52 @@ export const cosmeticItems: CosmeticItem[] = [
     contentRating: 'sfw',
     tags: ['glitch', 'cyberpunk', 'overlay'],
   },
+
+  // Voucher Cosmetics (discount vouchers purchasable with petals)
+  {
+    id: 'voucher-5pct-off',
+    type: 'voucher',
+    name: '5% Off Voucher',
+    description: 'Get 5% off your next order (max $10 discount). Valid for 30 days.',
+    costPetals: 500,
+    rarity: 'common',
+    contentRating: 'sfw',
+    metadata: {
+      discountType: 'PERCENT',
+      percentOff: 5,
+      maxDiscountCents: 1000, // $10 max
+      validityDays: 30,
+    },
+  },
+  {
+    id: 'voucher-10pct-off',
+    type: 'voucher',
+    name: '10% Off Voucher',
+    description: 'Get 10% off your next order (max $20 discount). Valid for 30 days.',
+    costPetals: 1000,
+    rarity: 'rare',
+    contentRating: 'sfw',
+    metadata: {
+      discountType: 'PERCENT',
+      percentOff: 10,
+      maxDiscountCents: 2000, // $20 max
+      validityDays: 30,
+    },
+  },
+  {
+    id: 'voucher-free-shipping',
+    type: 'voucher',
+    name: 'Free Shipping Voucher',
+    description: 'Free shipping on orders over $25. Valid for 30 days.',
+    costPetals: 750,
+    rarity: 'common',
+    contentRating: 'sfw',
+    metadata: {
+      discountType: 'FREESHIP',
+      minSpendCents: 2500, // $25 min
+      validityDays: 30,
+    },
+  },
 ] as const;
 
 /**
@@ -206,11 +277,8 @@ export function getAvatarCosmetics(): CosmeticItem[] {
  * Check if a cosmetic is NSFW
  */
 export function isNSFWCosmetic(item: CosmeticItem): boolean {
-  if (item.contentRating) {
-    return item.contentRating !== 'sfw';
-  }
-  // Fallback to deprecated flags
-  return item.nsfw === true || item.matureVariant === true;
+  const rating = getContentRating(item);
+  return rating !== 'sfw';
 }
 
 /**

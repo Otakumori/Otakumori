@@ -152,7 +152,7 @@ export default function ThighColiseumPage() {
           Back to Arcade
         </Link>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-pink-200">Thigh Coliseum</h1>
+          <h1 className="text-2xl font-bold text-pink-200">{displayName}</h1>
           <p className="text-sm text-pink-200/70">Enter the arena. Win rounds and advance the bracket.</p>
         </div>
         <div className="w-24" /> {/* Spacer */}

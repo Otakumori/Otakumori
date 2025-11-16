@@ -150,7 +150,7 @@ export default function DungeonOfDesirePage() {
           Back to Arcade
         </Link>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-pink-200">Dungeon of Desire</h1>
+          <h1 className="text-2xl font-bold text-pink-200">{displayName}</h1>
           <p className="text-sm text-pink-200/70">Descend into the dungeon. Survive rooms and claim rewards.</p>
         </div>
         <div className="w-24" /> {/* Spacer */}

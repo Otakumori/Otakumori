@@ -75,7 +75,7 @@ export default function BlossomwarePage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-semibold mb-2 text-pink-400">BlossomWare Playlist</h1>
+            <h1 className="text-3xl font-semibold mb-2 text-pink-400">{displayName}</h1>
             <p className="text-sm opacity-80 text-slate-300">
               Chaotic micro-sessions—keep your petal streak alive.
             </p>

@@ -170,7 +170,7 @@ export default function InteractiveBuddyPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                Interactive Buddy
+                {displayName}
               </h1>
               <p className="text-zinc-300 font-medium">
                 Physics-based character interaction. Click, drag, and use tools for satisfying

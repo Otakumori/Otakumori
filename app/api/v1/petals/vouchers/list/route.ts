@@ -68,6 +68,8 @@ export async function GET(_req: NextRequest) {
           discountType: v.discountType,
           expiresAt: v.expiresAt,
           createdAt: v.createdAt,
+          minSpendCents: v.minSpendCents,
+          nsfwOnly: v.nsfwOnly,
         })),
       },
       requestId,

@@ -1,36 +1,56 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { withAdminAuth } from '@/app/lib/auth/admin';
+import { db } from '@/app/lib/db';
 
-// Mock user data
-let users = [
-  { id: 1, name: 'Adi', email: 'adi@otakumori.com', role: 'admin', status: 'active' },
-  { id: 2, name: 'User1', email: 'user1@email.com', role: 'user', status: 'active' },
-  { id: 3, name: 'User2', email: 'user2@email.com', role: 'user', status: 'banned' },
-];
+export const runtime = 'nodejs';
 
-export async function GET() {
-  // TODO: Connect to real database
-  return NextResponse.json(users);
+async function handler() {
+  try {
+    const users = await db.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        displayName: true,
+        petalBalance: true,
+        nsfwEnabled: true,
+        createdAt: true,
+        PetalWallet: {
+          select: {
+            lifetimeEarned: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 1000, // Limit to prevent huge queries
+    });
+
+    const usersWithLifetime = users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      displayName: user.displayName,
+      petalBalance: user.petalBalance,
+      lifetimePetalsEarned: user.PetalWallet?.lifetimeEarned || 0,
+      nsfwEnabled: user.nsfwEnabled,
+      createdAt: user.createdAt,
+    }));
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        users: usersWithLifetime,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return NextResponse.json(
+      { ok: false, error: 'Failed to fetch users' },
+      { status: 500 },
+    );
+  }
 }
 
-export async function POST(req: NextRequest) {
-  const data = await req.json();
-  // TODO: Add user to real database
-  const newUser = { ...data, id: Date.now() };
-  users.push(newUser);
-  return NextResponse.json(newUser, { status: 201 });
-}
-
-export async function PUT(req: NextRequest) {
-  const data = await req.json();
-  // TODO: Update user in real database
-  users = users.map((u) => (u.id === data.id ? { ...u, ...data } : u));
-  return NextResponse.json({ success: true });
-}
-
-export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-  // TODO: Remove user from real database
-  users = users.filter((u) => u.id !== id);
-  return NextResponse.json({ success: true });
-}
+export const GET = withAdminAuth(handler);
