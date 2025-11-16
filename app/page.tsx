@@ -57,7 +57,7 @@ export default async function HomePage() {
       {/* Sakura-style petal field with sprite sheet - full screen, clickable */}
       <PetalField petalCount={30} speedMultiplier={0.4} hitRadius={30} enabled={true} />
 
-      <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
+      <div className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* SHOP */}
         {isShopEnabled && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
@@ -128,7 +128,7 @@ export default async function HomePage() {
 
         {/* Spacer to ensure footer sits below the tree */}
         <div className="h-64" aria-hidden="true" />
-      </main>
+      </div>
     </>
   );
 }
