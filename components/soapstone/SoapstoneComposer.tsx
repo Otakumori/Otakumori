@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useAuthContext } from '@/app/contexts/AuthContext';
 
 interface SoapstoneComposerProps {
   disabled?: boolean;
@@ -13,6 +15,8 @@ export default function SoapstoneComposer({
   disabledMessage,
   onSubmit,
 }: SoapstoneComposerProps) {
+  const { user } = useUser();
+  const { requireAuthForSoapstone } = useAuthContext();
   const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +27,14 @@ export default function SoapstoneComposer({
       e.preventDefault();
 
       if (disabled || !text.trim() || isSubmitting) return;
+
+      // Check auth before submitting
+      if (!user) {
+        requireAuthForSoapstone(() => {
+          // After sign-in, user can try again
+        });
+        return;
+      }
 
       setIsSubmitting(true);
       setError(null);

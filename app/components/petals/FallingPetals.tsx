@@ -212,10 +212,11 @@ export default function FallingPetals({ onPetalCollect, counterPosition }: Falli
           ctx.rotate((petal.rotation * Math.PI) / 180);
           ctx.globalAlpha = petal.opacity;
 
-          // Draw petal shape (ellipse)
+          // Draw petal shape (ellipse) - reduced size for subtle aesthetic
           ctx.fillStyle = petal.color;
           ctx.beginPath();
-          ctx.ellipse(0, 0, 8 * petal.scale, 12 * petal.scale, 0, 0, Math.PI * 2);
+          // Scale down: 4-6px radius instead of 8-12px (50% reduction)
+          ctx.ellipse(0, 0, 4 * petal.scale, 6 * petal.scale, 0, 0, Math.PI * 2);
           ctx.fill();
 
           // Add glow for rare petals

@@ -47,8 +47,8 @@ const SPRITE_COLS = 4;
 const SPRITE_ROWS = 3;
 const TOTAL_SPRITES = SPRITE_COLS * SPRITE_ROWS; // 12
 
-// Petal size multiplier - scales down sprites to appropriate size (4-8px instead of 80-120px)
-const PETAL_SIZE_MULTIPLIER = 0.08; // Scale sprites to 8% of their original size for subtle shop aesthetic
+// Petal size multiplier - scales down sprites to appropriate size (3-6px instead of 80-120px)
+const PETAL_SIZE_MULTIPLIER = 0.05; // Scale sprites to 5% of their original size for subtle aesthetic
 
 // Guest petal storage key
 const GUEST_PETAL_KEY = 'otm-guest-petals';
@@ -108,7 +108,7 @@ export default function PetalField({
       spriteIndex: Math.floor(Math.random() * TOTAL_SPRITES), // Random sprite (0-11)
       rotation: Math.random() * Math.PI * 2,
       rotationSpeed: (Math.random() - 0.5) * 0.02, // Slow rotation
-      scale: 0.8 + Math.random() * 0.4, // Vary size
+      scale: 0.6 + Math.random() * 0.3, // Vary size (0.6-0.9 for smaller petals)
       alpha: 0.25 + Math.random() * 0.15,
       collected: false,
       popAnimationProgress: 0,

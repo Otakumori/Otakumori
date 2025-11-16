@@ -20,15 +20,37 @@ export default function TreeBackground() {
 
   useEffect(() => {
     const updateDimensions = () => {
-      setPageHeight(document.documentElement.scrollHeight);
+      // Use the maximum of scrollHeight and clientHeight to ensure full coverage
+      const height = Math.max(
+        document.documentElement.scrollHeight,
+        document.documentElement.clientHeight,
+        document.body.scrollHeight,
+        document.body.clientHeight,
+      );
+      setPageHeight(height);
     };
 
     // Initialize dimensions
     updateDimensions();
 
-    // Update on resize
+    // Update on resize and scroll (content may change)
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    window.addEventListener('scroll', updateDimensions, { passive: true });
+    
+    // Also update when DOM changes (content loaded)
+    const observer = new MutationObserver(updateDimensions);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener('scroll', updateDimensions);
+      observer.disconnect();
+    };
   }, []);
 
   return (

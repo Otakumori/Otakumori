@@ -1,9 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { useToastContext } from '@/app/contexts/ToastContext';
+import { useAuthContext } from '@/app/contexts/AuthContext';
 
 export default function Footer() {
+  const { user } = useUser();
+  const { requireAuthForSoapstone } = useAuthContext();
   const [soapstoneText, setSoapstoneText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { success, error: showError } = useToastContext();
@@ -11,6 +15,14 @@ export default function Footer() {
   const handleSoapstoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!soapstoneText.trim() || isSubmitting) return;
+
+    // Check auth before submitting
+    if (!user) {
+      requireAuthForSoapstone(() => {
+        // After sign-in, user can try again
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
