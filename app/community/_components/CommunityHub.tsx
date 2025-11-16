@@ -7,8 +7,9 @@ import { AvatarDisplay } from '@/app/components/profile/AvatarDisplay';
 import { AvatarGallery } from './AvatarGallery';
 import { CommunitySettings } from './CommunitySettings';
 import { AdultContentGate } from './AdultContentGate';
+import { LeaderboardsTab } from './LeaderboardsTab';
 
-type ActiveTab = 'showcase' | 'gallery' | 'settings' | 'gated';
+type ActiveTab = 'showcase' | 'gallery' | 'settings' | 'gated' | 'leaderboards';
 
 export function CommunityHub() {
   const { user } = useUser();
@@ -20,6 +21,7 @@ export function CommunityHub() {
   const tabs = [
     { id: 'showcase' as const, label: 'Avatar Showcase', icon: '' },
     { id: 'gallery' as const, label: 'Community Gallery', icon: '️' },
+    { id: 'leaderboards' as const, label: 'Leaderboards', icon: '🏆' },
     { id: 'settings' as const, label: 'Community Settings', icon: '' },
     ...(isAdultVerified ? [{ id: 'gated' as const, label: 'Gated Content', icon: '' }] : []),
   ];
@@ -64,6 +66,7 @@ export function CommunityHub() {
           >
             {activeTab === 'showcase' && <AvatarShowcase />}
             {activeTab === 'gallery' && <AvatarGallery />}
+            {activeTab === 'leaderboards' && <LeaderboardsTab />}
             {activeTab === 'settings' && <CommunitySettings />}
             {activeTab === 'gated' && isAdultVerified && <AdultContentGate />}
           </motion.div>

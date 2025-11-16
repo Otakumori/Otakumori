@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
 import { generateRequestId } from '@/lib/requestId';
+import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
 
 export const runtime = 'nodejs';
 
@@ -11,15 +12,39 @@ const CollectPetalsSchema = z.object({
   source: z.enum(['homepage_collection', 'game_reward', 'daily_bonus', 'achievement']),
 });
 
+// Rate limit config for petal collection (per minute)
+const PETAL_COLLECT_RATE_LIMIT = {
+  windowMs: 60000, // 1 minute
+  maxRequests: 10, // 10 collects per minute
+  message: 'Too many petal collections. Please wait a moment.',
+};
+
 export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
     const { userId } = await auth();
-    if (!userId) {
+    
+    // Rate limiting for both authenticated and guest users
+    const identifier = getClientIdentifier(req, userId || undefined);
+    const rateLimitResult = await checkRateLimit('PETAL_COLLECT', identifier, PETAL_COLLECT_RATE_LIMIT);
+    
+    if (!rateLimitResult.success) {
       return NextResponse.json(
-        { ok: false, error: 'AUTH_REQUIRED', requestId },
-        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+        {
+          ok: false,
+          error: 'RATE_LIMITED',
+          message: rateLimitResult.message,
+          requestId,
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+          },
+        },
       );
     }
 
@@ -34,6 +59,21 @@ export async function POST(req: NextRequest) {
     }
 
     const { amount, source } = validation.data;
+
+    // Guest user handling
+    if (!userId) {
+      // For guest users, return a response that client can use for localStorage
+      return NextResponse.json({
+        ok: true,
+        data: {
+          balance: null, // Client will handle localStorage
+          earned: amount,
+          guestPetals: amount,
+          isGuest: true,
+        },
+        requestId,
+      });
+    }
 
     // Check daily limit for homepage collection
     if (source === 'homepage_collection') {
@@ -125,7 +165,7 @@ export async function POST(req: NextRequest) {
       return { wallet, transaction, streakBonus };
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       data: {
         balance: result.wallet.balance,
@@ -133,9 +173,17 @@ export async function POST(req: NextRequest) {
         streakBonus: result.streakBonus,
         currentStreak: result.wallet.currentStreak,
         transactionId: result.transaction.id,
+        isGuest: false,
       },
       requestId,
     });
+
+    // Add rate limit headers
+    response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
+    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
+    response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toString());
+
+    return response;
   } catch (error: any) {
     console.error('[Petals Collect] Error:', error);
     return NextResponse.json(

@@ -216,13 +216,13 @@ html {
   }
 }
 
-/* Global Theme Colors - Matching Header/Footer */
+/* Global Theme Colors - Matching Header/Footer (using standardized variables) */
 :root {
   --theme-glass-bg: rgba(57, 5, 40, 0.7); /* Purple-pink glass background */
-  --theme-glass-border: rgba(236, 72, 153, 0.3); /* Pink border */
+  --theme-glass-border: rgba(244, 114, 182, 0.3); /* Pink border using off-pink */
   --theme-text-primary: rgb(252, 231, 243); /* pink-100 */
   --theme-text-secondary: rgba(252, 231, 243, 0.7); /* pink-100/70 */
-  --theme-accent: rgb(236, 72, 153); /* pink-500 */
+  --theme-accent: var(--color-primary); /* Using standardized primary color */
 }
 
 /* Glass Recipe - Updated with theme colors */
@@ -231,13 +231,13 @@ html {
   border: 1px solid var(--theme-glass-border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 0 60px -15px rgba(236, 72, 153, 0.25);
+  box-shadow: 0 0 60px -15px var(--glow-pink);
 }
 
 .glass-panel:hover {
   background: rgba(57, 5, 40, 0.85);
-  border-color: rgba(236, 72, 153, 0.5);
-  box-shadow: 0 0 80px -10px rgba(236, 72, 153, 0.35);
+  border-color: var(--color-border-hover);
+  box-shadow: 0 0 80px -10px var(--glow-pink-strong);
 }
 
 .glass-button {
@@ -245,7 +245,7 @@ html {
   border: 1px solid var(--theme-glass-border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 0 20px -8px rgba(236, 72, 153, 0.15);
+  box-shadow: 0 0 20px -8px var(--glow-pink);
 }
 
 /* Enhanced Glass Theme Utilities */
@@ -255,30 +255,34 @@ html {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: 1rem;
-  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.15);
+  box-shadow: 0 8px 32px var(--glow-pink);
   transition: all 0.3s ease;
 }
 
 .glass-card:hover {
   background: rgba(57, 5, 40, 0.85);
-  border-color: rgba(236, 72, 153, 0.5);
+  border-color: var(--color-border-hover);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(236, 72, 153, 0.25);
+  box-shadow: 0 12px 40px var(--glow-pink-strong);
 }
 
 .glass-card:focus-within {
-  border-color: var(--accent-pink);
-  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-focus);
 }
 
 /* Enhanced Button Styles */
 .btn-primary {
   @apply glass-button rounded-xl px-6 py-3 text-white font-ui;
-  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: all var(--motion-normal) var(--motion-ease);
   @apply hover-scale focus-ring hover-glow;
   @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-hover), var(--color-accent-hover));
 }
 
 .btn-secondary {
@@ -1470,7 +1474,7 @@ footer::after {
   letter-spacing: 0.01em;
 }
 
-/* Otaku-mori v0 Visual System */
+/* Otaku-mori v0 Visual System - Consolidated Color Scheme */
 :root {
   /* Deep indigo to near-black gradient */
   --space-from: #0f0f12; /* near-black */
@@ -1478,16 +1482,46 @@ footer::after {
   --star: rgba(255, 255, 255, 0.9);
   --star-dim: rgba(255, 255, 255, 0.35);
 
-  /* Enhanced Glass Theme Colors */
-  --glass-bg: rgba(255, 255, 255, 0.1);
+  /* Primary Colors - Pink (using "off pink" pink-400 from header) */
+  --color-primary: #f472b6;
+  --color-primary-hover: #fb7185;
+  --color-primary-active: #f472b6;
+  --color-primary-disabled: rgba(244, 114, 182, 0.4);
+  --color-primary-focus: rgba(244, 114, 182, 0.6);
+  
+  /* Accent Colors - Purple */
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #a78bfa;
+  
+  /* Text Colors (matching header) */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #d4d4d8;
+  --color-text-muted: rgba(255, 255, 255, 0.6);
+  --color-text-link: #835D75;
+  --color-text-link-hover: #f472b6;
+  
+  /* Background Colors */
+  --color-bg-base: #080611;
+  --color-bg-surface: rgba(0, 0, 0, 0.8);
+  --color-bg-glass: rgba(255, 255, 255, 0.1);
+  
+  /* Border Colors */
+  --color-border-default: rgba(255, 255, 255, 0.2);
+  --color-border-hover: rgba(244, 114, 182, 0.5);
+  --color-border-active: rgba(244, 114, 182, 0.7);
+
+  /* Enhanced Glass Theme Colors (using standardized colors) */
+  --glass-bg: var(--color-bg-glass);
   --glass-bg-hover: rgba(255, 255, 255, 0.15);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-border-hover: rgba(255, 255, 255, 0.3);
-  --accent-pink: #ec4899;
-  --accent-purple: #8b5cf6;
-  --text-primary: #ffffff;
-  --text-secondary: #d4d4d8;
-  --text-muted: rgba(255, 255, 255, 0.6);
+  --glass-border: var(--color-border-default);
+  --glass-border-hover: var(--color-border-hover);
+  
+  /* Legacy aliases for backward compatibility */
+  --accent-pink: var(--color-primary);
+  --accent-purple: var(--color-accent);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
 
   /* Motion timing - 120-300ms, easeOut/easeInOut only */
   --motion-fast: 120ms;
@@ -1496,10 +1530,10 @@ footer::after {
   --motion-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* easeOut */
   --motion-ease-in-out: cubic-bezier(0.42, 0, 0.58, 1); /* easeInOut */
 
-  /* Pink glow system */
-  --glow-pink: rgba(255, 79, 163, 0.3);
-  --glow-pink-strong: rgba(255, 79, 163, 0.5);
-  --glow-pink-focus: rgba(255, 79, 163, 0.6);
+  /* Pink glow system (using standardized primary color) */
+  --glow-pink: rgba(244, 114, 182, 0.3);
+  --glow-pink-strong: rgba(244, 114, 182, 0.5);
+  --glow-pink-focus: rgba(244, 114, 182, 0.6);
 }
 
 /* Otaku-mori v0 Background System */
@@ -1949,6 +1983,24 @@ textarea,
   100% {
     opacity: 0;
     transform: translateY(-40px) scale(0.8);
+  }
+}
+
+/* Cherry petal hero animation - sprite-based falling petals */
+@keyframes petal-fall {
+  0% {
+    transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(var(--initial-rotation, 0deg)) scale(var(--scale, 1));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) translateX(var(--drift, 0%)) translateY(100vh) rotate(var(--final-rotation, 0deg)) scale(var(--scale, 1));
+    opacity: 0;
   }
 }
 

@@ -26,6 +26,30 @@ export async function GET(request: NextRequest) {
   const startTime = Date.now();
 
   try {
+    // Check if Printify is configured
+    const { env } = await import('@/env');
+    if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID) {
+      console.warn('[printify/products] Printify not configured - missing API key or shop ID');
+      return NextResponse.json(
+        {
+          ok: true,
+          data: {
+            products: [],
+            pagination: {
+              currentPage: 1,
+              totalPages: 0,
+              total: 0,
+              perPage: 100,
+            },
+          },
+          source: 'not-configured',
+          message: 'Products temporarily unavailable. Printify integration not configured.',
+          requestId,
+        },
+        { status: 200 },
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const query = QuerySchema.parse(Object.fromEntries(searchParams));
 

@@ -156,6 +156,18 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 
     if (!product) {
       try {
+        // Check if Printify is configured before attempting to fetch
+        const { env } = await import('@/env');
+        if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID) {
+          return NextResponse.json(
+            {
+              ok: false,
+              error: 'Product temporarily unavailable. Printify integration not configured.',
+            },
+            { status: 503 },
+          );
+        }
+
         const printifyService = getPrintifyService();
         const printifyProduct = await printifyService.getProduct(id);
         const dto = mapPrintifyProductToCatalog(printifyProduct);

@@ -12,7 +12,7 @@ import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import { getGameRepresentationMode, getGameAvatarUsage } from './miniGameConfigs';
 import { loadGuestAvatar } from './useGameAvatarWithConfig';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
-import { OmButton, OmPanel, OmPanelContent } from '@/components/ui/om';
+import { OmButton, OmPanel, OmPanelContent } from '@/app/components/ui/om';
 
 /**
  * Save guest avatar to localStorage

@@ -16,8 +16,8 @@ export function HeaderButton({
 }: HeaderButtonProps) {
   const baseClasses = cn(
     'inline-flex items-center justify-center rounded-lg border border-current px-4 py-2 text-sm font-medium',
-    'bg-transparent text-[#835D75] transition-all duration-300',
-    'hover:text-pink-400 hover:border-pink-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black',
+    'bg-transparent text-text-link transition-all duration-300',
+    'hover:text-text-link-hover hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus focus-visible:ring-offset-2 focus-visible:ring-offset-black',
     className,
   );
 

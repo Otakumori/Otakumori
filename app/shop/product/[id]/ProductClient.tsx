@@ -14,6 +14,7 @@ import { useToastContext } from '@/app/contexts/ToastContext';
 import { ProductSoapstoneWall } from '@/app/components/shop/ProductSoapstoneWall';
 import { HeaderButton } from '@/components/ui/header-button';
 import { removeHtmlTables, stripHtml } from '@/lib/html';
+import { useCart } from '@/app/components/cart/CartProvider';
 
 type CatalogVariant = CatalogProduct['variants'][number];
 
@@ -40,6 +41,11 @@ export default function ProductClient({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1);
   const { addProduct } = useRecentlyViewed();
   const { success, error: showError } = useToastContext();
+  const { addItem } = useCart();
+  const descriptionParagraphs = useMemo(
+    () => formatProductDescription(product?.description),
+    [product?.description],
+  );
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -114,8 +120,31 @@ export default function ProductClient({ productId }: { productId: string }) {
   }, [productId, addProduct, showError]);
 
   const handleAddToCart = () => {
-    // TODO: Implement cart functionality
-    success(`Added ${product?.title} to cart!`);
+    if (!product) return;
+    if (!selectedVariant || !selectedVariant.isEnabled) {
+      showError('Please select an available variant');
+      return;
+    }
+
+    const imageUrl = product.image ?? product.images?.[0] ?? '/images/products/placeholder.svg';
+    const currentPriceCents =
+      selectedVariant.priceCents ??
+      (product.priceRange.min != null ? Math.round(product.priceRange.min) : product.priceCents ?? null);
+    const currentPrice = currentPriceCents != null ? currentPriceCents / 100 : product.price ?? 0;
+
+    addItem({
+      id: product.id,
+      name: product.title,
+      price: currentPrice,
+      quantity,
+      image: imageUrl,
+      selectedVariant: {
+        id: selectedVariant.id,
+        title: selectedVariant.title ?? `Variant ${selectedVariant.printifyVariantId}`,
+      },
+    });
+
+    success(`Added ${product.title} to cart!`);
   };
 
   if (loading) {
@@ -155,11 +184,6 @@ export default function ProductClient({ productId }: { productId: string }) {
     currentPriceCents != null ? currentPriceCents / 100 : product.price ?? 0;
   const currency = 'USD';
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
-
-  const descriptionParagraphs = useMemo(
-    () => formatProductDescription(product.description),
-    [product.description],
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">

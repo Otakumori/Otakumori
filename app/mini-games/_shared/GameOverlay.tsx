@@ -14,6 +14,7 @@ export interface GameOverlayProps {
   winMessage?: string;
   loseMessage?: string;
   score?: number;
+  petalReward?: number | null;
   onRestart?: () => void;
   onResume?: () => void;
   className?: string;
@@ -29,6 +30,7 @@ export function GameOverlay({
   winMessage,
   loseMessage,
   score,
+  petalReward,
   onRestart,
   onResume,
   className = '',
@@ -82,9 +84,19 @@ export function GameOverlay({
             </h2>
             {winMessage && <p className="mb-4" style={{ color: palette.softPink }}>{winMessage}</p>}
             {score !== undefined && (
-              <p className="text-2xl font-bold mb-6" style={{ color: palette.accent }}>
+              <p className="text-2xl font-bold mb-4" style={{ color: palette.accent }}>
                 Final Score: {score.toLocaleString()}
               </p>
+            )}
+            {petalReward !== null && petalReward !== undefined && petalReward > 0 && (
+              <div className="mb-6 p-4 rounded-xl" style={{ backgroundColor: `${palette.petals}20`, border: `2px solid ${palette.petals}40` }}>
+                <p className="text-lg font-semibold mb-1" style={{ color: palette.petals }}>
+                  +{petalReward} Petals Earned!
+                </p>
+                <p className="text-sm" style={{ color: palette.softPink }}>
+                  Your petal balance has been updated
+                </p>
+              </div>
             )}
             <div className="flex gap-4">
               {onRestart && (

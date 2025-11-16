@@ -77,9 +77,13 @@ const TOOLS: Tool[] = [
 export default function InteractiveBuddyGame({ 
   mode = 'sandbox',
   onScoreChange,
+  onGameEnd: _onGameEnd, // Reserved for future win/lose conditions in stress-relief/challenge modes
+  characterVariant = 'girl',
 }: { 
   mode?: GameMode;
   onScoreChange?: (score: number) => void;
+  onGameEnd?: (score: number, didWin: boolean) => void;
+  characterVariant?: 'girl' | 'boy';
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<PhysicsEngine | null>(null);
@@ -100,7 +104,7 @@ export default function InteractiveBuddyGame({
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const engine = new PhysicsEngine(canvas, mode);
+    const engine = new PhysicsEngine(canvas, mode, characterVariant);
     engineRef.current = engine;
 
     const gameLoop = () => {
@@ -135,7 +139,7 @@ export default function InteractiveBuddyGame({
       }
       engine.destroy();
     };
-  }, [mode]);
+  }, [mode, characterVariant]);
 
   // Handle canvas interactions
   const handleCanvasClick = useCallback(
@@ -326,10 +330,13 @@ class PhysicsEngine {
   private readonly FRICTION = 0.98;
   private readonly BOUNCE = 0.6;
 
-  constructor(canvas: HTMLCanvasElement, mode: GameMode) {
+  private characterVariant: 'girl' | 'boy';
+
+  constructor(canvas: HTMLCanvasElement, mode: GameMode, characterVariant: 'girl' | 'boy' = 'girl') {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.mode = mode;
+    this.characterVariant = characterVariant;
     this.money = mode === 'sandbox' ? 10000 : 50;
 
     // Initialize character
@@ -481,15 +488,20 @@ class PhysicsEngine {
     this.ctx.translate(torso.x, torso.y);
     this.ctx.rotate(torso.rotation);
 
-    // Body gradient
+    // Body gradient - different colors for boy vs girl
     const bodyGradient = this.ctx.createLinearGradient(
       -torso.width / 2,
       -torso.height / 2,
       torso.width / 2,
       torso.height / 2,
     );
-    bodyGradient.addColorStop(0, '#ff9fbe');
-    bodyGradient.addColorStop(1, '#ec4899');
+    if (this.characterVariant === 'boy') {
+      bodyGradient.addColorStop(0, '#87ceeb'); // Sky blue
+      bodyGradient.addColorStop(1, '#4682b4'); // Steel blue
+    } else {
+      bodyGradient.addColorStop(0, '#ff9fbe');
+      bodyGradient.addColorStop(1, '#ec4899');
+    }
 
     // Draw body
     this.ctx.fillStyle = bodyGradient;
@@ -509,10 +521,15 @@ class PhysicsEngine {
     this.ctx.translate(head.x, head.y);
     this.ctx.rotate(head.rotation);
 
-    // Head (face)
+    // Head (face) - different colors for boy vs girl
     const headGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, head.width / 2);
-    headGradient.addColorStop(0, '#ffc7d9');
-    headGradient.addColorStop(1, '#ff9fbe');
+    if (this.characterVariant === 'boy') {
+      headGradient.addColorStop(0, '#e0f2fe'); // Light blue
+      headGradient.addColorStop(1, '#b3e5fc'); // Sky blue
+    } else {
+      headGradient.addColorStop(0, '#ffc7d9');
+      headGradient.addColorStop(1, '#ff9fbe');
+    }
 
     this.ctx.fillStyle = headGradient;
     this.ctx.beginPath();
@@ -534,12 +551,14 @@ class PhysicsEngine {
     this.ctx.arc(17, -7, 2, 0, Math.PI * 2);
     this.ctx.fill();
 
-    // Blush
-    this.ctx.fillStyle = 'rgba(255, 105, 180, 0.3)';
-    this.ctx.beginPath();
-    this.ctx.ellipse(-20, 8, 8, 5, 0, 0, Math.PI * 2);
-    this.ctx.ellipse(20, 8, 8, 5, 0, 0, Math.PI * 2);
-    this.ctx.fill();
+    // Blush (only for girl variant)
+    if (this.characterVariant === 'girl') {
+      this.ctx.fillStyle = 'rgba(255, 105, 180, 0.3)';
+      this.ctx.beginPath();
+      this.ctx.ellipse(-20, 8, 8, 5, 0, 0, Math.PI * 2);
+      this.ctx.ellipse(20, 8, 8, 5, 0, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
 
     // Mouth (happy)
     this.ctx.strokeStyle = '#2d1b3d';

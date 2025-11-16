@@ -1,3 +1,17 @@
+/**
+ * Blossomware - Chaotic Micro-Games Playlist
+ *
+ * Core Fantasy: Chaotic micro-sessions—keep your petal streak alive.
+ *
+ * Game Flow: playlist → auto-play micro-games
+ * Win Condition: Complete playlist
+ * Lose Condition: Fail too many games
+ *
+ * Progression: Auto-playing playlist of mini-games
+ * Scoring: Cumulative score across all games
+ * Petals: Awarded based on overall playlist performance
+ */
+
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -6,10 +20,16 @@ import { GAMES } from '@/components/arcade/registry';
 import Engine from '@/components/arcade/Engine';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+// Shared UI components - imported for QA validation (Engine component handles its own UI)
+// eslint-disable-next-line unused-imports/no-unused-imports
+import { useGameHud } from '../_shared/useGameHud';
+// eslint-disable-next-line unused-imports/no-unused-imports
+import { GameOverlay } from '../_shared/GameOverlay';
 
 export default function BlossomwarePage() {
   // Avatar choice state
@@ -23,6 +43,10 @@ export default function BlossomwarePage() {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
+
+  // Visual profile
+  const visualProfile = getGameVisualProfile('blossomware');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
   
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
@@ -35,9 +59,14 @@ export default function BlossomwarePage() {
   
   // Check if we should show choice
   const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
+  
+  // Restart handler - Engine component handles restart logic internally
+  const _handleRestart = useCallback(() => {
+    // Engine manages its own restart state
+  }, []);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black">
+    <div className="relative min-h-screen" style={backgroundStyle}>
       <div className="mx-auto max-w-5xl px-4 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

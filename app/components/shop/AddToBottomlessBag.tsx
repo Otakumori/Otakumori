@@ -53,10 +53,10 @@ export function AddToBottomlessBag({
       aria-label={`${label} - ${quantity} item${quantity > 1 ? 's' : ''}`}
       className={`
         inline-flex items-center justify-center rounded-xl px-6 py-3 
-        bg-gradient-to-r from-pink-500 to-purple-500 
-        hover:from-pink-600 hover:to-purple-600 
+        bg-gradient-to-r from-primary to-accent 
+        hover:from-primary-hover hover:to-accent-hover 
         text-white font-bold transition-all duration-300 
-        shadow-lg hover:shadow-pink-500/50 
+        shadow-lg hover:shadow-[0_0_20px_var(--glow-pink-strong)] 
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}
       `.trim()}

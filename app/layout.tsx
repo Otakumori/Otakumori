@@ -15,6 +15,7 @@ import PetalHUD from './components/petals/PetalHUD';
 import Konami from './components/fun/Konami';
 import PetalProgressBar from './components/progress/PetalProgressBar';
 import { isCursorGlowEnabled } from './flags';
+import ScrollRestoration from './components/util/ScrollRestoration';
 
 export function generateMetadata(): Metadata {
   return {
@@ -54,6 +55,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           />
         </head>
         <body className="flex min-h-screen flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
+          <ScrollRestoration />
           <CherryBlossomEffect density="site" />
           {isCursorGlowEnabled() && <CursorGlow />}
           <PetalHUD />

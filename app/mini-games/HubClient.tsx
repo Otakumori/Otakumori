@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import GameCubeBootSequence from '@/app/components/gamecube/GameCubeBootSequence';
 import GameCubeHubV2 from './_components/GameCubeHubV2';
+import ErrorBoundary3D from '@/components/ErrorBoundary3D';
+import ClientErrorBoundary from '@/app/components/util/ClientErrorBoundary';
 
 export default function HubClient() {
   const [bootState, setBootState] = useState<'loading' | 'boot' | 'hub'>('loading');
@@ -26,8 +28,18 @@ export default function HubClient() {
   }
 
   if (bootState === 'boot') {
-    return <GameCubeBootSequence onComplete={handleBootComplete} skipable={true} />;
+    return (
+      <ClientErrorBoundary>
+        <GameCubeBootSequence onComplete={handleBootComplete} skipable={true} />
+      </ClientErrorBoundary>
+    );
   }
 
-  return <GameCubeHubV2 />;
+  return (
+    <ClientErrorBoundary>
+      <ErrorBoundary3D>
+        <GameCubeHubV2 />
+      </ErrorBoundary3D>
+    </ClientErrorBoundary>
+  );
 }

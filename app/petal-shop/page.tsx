@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import { cosmeticItems, type CosmeticItem } from '@/app/lib/cosmetics/cosmeticsConfig';
@@ -14,22 +14,98 @@ import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
 
 export default function PetalShopPage() {
   const { unlockedIds: _unlockedIds, hudSkin, isHydrated, unlockItem, selectHudSkin, isUnlocked } = useCosmetics();
-  const [petalBalance] = useState(1000); // TODO: Replace with real petal balance from store/API
+  const [petalBalance, setPetalBalance] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState<string | null>(null);
 
-  // Stub unlock function - in production, this would deduct petals via API
-  const handleUnlock = (item: CosmeticItem) => {
-    if (petalBalance < item.costPetals) {
+  // Fetch petal balance
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const response = await fetch('/api/v1/petals/balance');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.ok && data.data?.balance !== undefined) {
+            setPetalBalance(data.data.balance);
+          }
+        } else {
+          // Fallback to legacy API
+          const legacyResponse = await fetch('/api/petals/me');
+          if (legacyResponse.ok) {
+            const legacyData = await legacyResponse.json();
+            setPetalBalance(legacyData.total || 0);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch petal balance:', error);
+        setPetalBalance(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBalance();
+  }, []);
+
+  // Purchase function - calls API and updates local state
+  const handleUnlock = async (item: CosmeticItem) => {
+    if (petalBalance === null || petalBalance < item.costPetals) {
       alert(`Insufficient petals! You need ${item.costPetals} petals.`);
       return;
     }
 
-    // TODO: Call API to deduct petals and unlock item
-    // For now, just unlock locally
-    unlockItem(item.id);
+    if (isUnlocked(item.id)) {
+      // Already unlocked, just select it
+      if (item.type === 'hud-skin' && item.hudSkinId) {
+        selectHudSkin(item.hudSkinId);
+      }
+      return;
+    }
 
-    // If it's a HUD skin, auto-select it
-    if (item.type === 'hud-skin' && item.hudSkinId) {
-      selectHudSkin(item.hudSkinId);
+    try {
+      setPurchasing(item.id);
+
+      const response = await fetch('/api/v1/petals/shop/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: item.id }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok && data.data) {
+        // Update balance
+        if (data.data.balance !== null && data.data.balance !== undefined) {
+          setPetalBalance(data.data.balance);
+        }
+
+        // Unlock the item locally
+        await unlockItem(item.id);
+
+        // If it's a HUD skin, auto-select it
+        if (item.type === 'hud-skin' && item.hudSkinId) {
+          await selectHudSkin(item.hudSkinId);
+        }
+
+        // Dispatch event for PetalHUD to sync (includes lifetime)
+        window.dispatchEvent(
+          new CustomEvent('petal:spend', {
+            detail: {
+              balance: data.data.balance,
+              lifetimePetalsEarned: data.data.lifetimePetalsEarned,
+            },
+          }),
+        );
+
+        alert(`Successfully purchased ${item.name}!`);
+      } else {
+        throw new Error(data.error || 'Purchase failed');
+      }
+    } catch (error: any) {
+      console.error('Purchase error:', error);
+      alert(error.message || 'Purchase failed. Please try again.');
+    } finally {
+      setPurchasing(null);
     }
   };
 
@@ -68,8 +144,16 @@ export default function PetalShopPage() {
           {/* Petal Balance */}
           <OmCard className="inline-block">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-semibold text-pink-200">{petalBalance.toLocaleString()}</span>
-              <span className="text-zinc-400">petals</span>
+              {loading ? (
+                <span className="text-zinc-400">Loading...</span>
+              ) : (
+                <>
+                  <span className="text-xl font-semibold text-pink-200">
+                    {petalBalance !== null ? petalBalance.toLocaleString() : '0'}
+                  </span>
+                  <span className="text-zinc-400">petals</span>
+                </>
+              )}
             </div>
           </OmCard>
         </div>
@@ -103,9 +187,17 @@ export default function PetalShopPage() {
                       variant="primary"
                       className="w-full"
                       onClick={() => handleUnlock(item)}
-                      disabled={petalBalance < item.costPetals}
+                      disabled={
+                        purchasing === item.id ||
+                        petalBalance === null ||
+                        petalBalance < item.costPetals
+                      }
                     >
-                      {petalBalance < item.costPetals ? 'Insufficient Petals' : 'Unlock'}
+                      {purchasing === item.id
+                        ? 'Purchasing...'
+                        : petalBalance === null || petalBalance < item.costPetals
+                          ? 'Insufficient Petals'
+                          : 'Unlock'}
                     </OmButton>
                   ) : isSelected ? (
                     <OmButton variant="ghost" className="w-full" disabled>

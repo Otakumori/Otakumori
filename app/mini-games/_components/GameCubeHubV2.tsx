@@ -12,6 +12,8 @@ import AccessibilitySettings, {
   applyAccessibilitySettings,
 } from '@/app/components/games/AccessibilitySettings';
 import ErrorBoundary3D from '@/components/ErrorBoundary3D';
+import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
+import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
 
 // Import games from registry
 import gamesRegistry from '@/lib/games.meta.json';
@@ -69,6 +71,9 @@ export default function GameCubeHubV2() {
   const containerRef = useRef<HTMLDivElement>(null);
   const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
+  
+  // Cosmetics hook for HUD skin
+  const { hudSkin, isHydrated } = useCosmetics();
 
   // Apply accessibility settings on mount and when they change
   useEffect(() => {
@@ -230,6 +235,11 @@ export default function GameCubeHubV2() {
   };
 
   const handleGameSelect = async (game: (typeof allGames)[0]) => {
+    // Don't navigate if game is coming soon
+    if (game.status === 'coming-soon') {
+      return;
+    }
+
     setLoadingGame(game.id);
 
     // Disc load animation
@@ -538,6 +548,14 @@ export default function GameCubeHubV2() {
             <div className="text-center text-primary max-w-md p-8">
               <h2 className="text-3xl font-bold mb-4">{cubeConfig.frontOverlay.title}</h2>
               <p className="text-secondary mb-6">{cubeConfig.frontOverlay.subtitle}</p>
+              <div className="text-sm text-muted mb-6 space-y-2">
+                <p className="font-semibold text-text-link-hover">How to Navigate:</p>
+                <ul className="text-left space-y-1 list-disc list-inside">
+                  <li>Use <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Arrow Keys</kbd> or <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">WASD</kbd> to rotate the cube</li>
+                  <li>Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Enter</kbd> or <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Space</kbd> to select a face</li>
+                  <li>Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Escape</kbd> to return to front or exit</li>
+                </ul>
+              </div>
               <div className="text-sm text-muted">Click anywhere or press Escape to continue</div>
             </div>
           </motion.div>
@@ -607,8 +625,15 @@ export default function GameCubeHubV2() {
                     </h3>
                     <p className="text-secondary text-xs leading-relaxed opacity-80">{game.desc}</p>
 
+                    {/* Status Badge */}
+                    {game.status === 'coming-soon' && (
+                      <div className="absolute top-2 right-2 text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded">
+                        Coming Soon
+                      </div>
+                    )}
+
                     {/* Age Rating Badge */}
-                    {game.ageRating && (
+                    {game.ageRating && game.status !== 'coming-soon' && (
                       <div className="absolute top-2 right-2 text-xs bg-glass-bg px-2 py-1 rounded">
                         {game.ageRating}
                       </div>
@@ -850,6 +875,11 @@ export default function GameCubeHubV2() {
           }
         }
       `}</style>
+      
+      {/* Quake HUD (passive mode) - only if unlocked and selected */}
+      {isHydrated && hudSkin === 'quake' && (
+        <QuakeAvatarHud mode="passive" petals={1000} />
+      )}
     </div>
   );
 }

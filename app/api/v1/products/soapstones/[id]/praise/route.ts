@@ -54,7 +54,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     });
 
     if (existing) {
-      // Remove praise (toggle)
+      // Remove praise (toggle) - use PetalService to spend 1 petal from author
+      const { PetalService } = await import('@/app/lib/petals');
+      const petalService = new PetalService();
+      
+      const spendResult = await petalService.spendPetals(
+        soapstone.authorId,
+        1,
+        'soapstone_praise_removed',
+      );
+
       await db.$transaction([
         db.productSoapstonePraise.delete({
           where: { id: existing.id },
@@ -63,20 +72,33 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           where: { id: soapstoneId },
           data: { appraises: { decrement: 1 } },
         }),
-        // Author loses 1 petal when praise is removed
-        db.user.update({
-          where: { id: soapstone.authorId },
-          data: { petalBalance: { decrement: 1 } },
-        }),
       ]);
 
       return NextResponse.json({
         ok: true,
-        data: { praised: false, praiseCount: soapstone.appraises - 1 },
+        data: {
+          praised: false,
+          praiseCount: soapstone.appraises - 1,
+          authorBalance: spendResult.newBalance,
+        },
       });
     }
 
-    // Add praise
+    // Add praise - use PetalService to award 1 petal to author
+    const { PetalService } = await import('@/app/lib/petals');
+    const petalService = new PetalService();
+    
+    const earnResult = await petalService.awardPetals(soapstone.authorId, {
+      type: 'earn',
+      amount: 1,
+      reason: 'soapstone_praise',
+      source: 'other', // Soapstone praise is "other" source
+      metadata: {
+        soapstoneId,
+        praisedBy: user.id,
+      },
+    });
+
     await db.$transaction([
       db.productSoapstonePraise.create({
         data: {
@@ -88,16 +110,17 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         where: { id: soapstoneId },
         data: { appraises: { increment: 1 } },
       }),
-      // Author earns 1 petal per praise
-      db.user.update({
-        where: { id: soapstone.authorId },
-        data: { petalBalance: { increment: 1 } },
-      }),
     ]);
 
     return NextResponse.json({
       ok: true,
-      data: { praised: true, praiseCount: soapstone.appraises + 1 },
+      data: {
+        praised: true,
+        praiseCount: soapstone.appraises + 1,
+        authorBalance: earnResult.newBalance,
+        authorLifetimePetalsEarned: earnResult.lifetimePetalsEarned,
+        dailyCapReached: earnResult.dailyCapReached || false,
+      },
     });
   } catch (error) {
     console.error('Failed to praise soapstone:', error);

@@ -1,52 +1,52 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { db as prisma } from '@/lib/db';
-import { PetalBalanceSchema } from '@/app/lib/contracts';
+import { PetalService } from '@/app/lib/petals';
+import { generateRequestId } from '@/lib/requestId';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(_req: NextRequest) {
+  const requestId = generateRequestId();
+  
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json(
+        { ok: false, error: 'AUTH_REQUIRED', requestId },
+        { status: 401, headers: { 'x-otm-reason': 'AUTH_REQUIRED' } },
+      );
     }
 
-    // Compute current balance from ledger
-    const result = await prisma.petalLedger.aggregate({
-      where: { userId },
-      _sum: { amount: true },
-    });
+    // Use PetalService to get balance info (includes lifetimePetalsEarned)
+    const petalService = new PetalService();
+    const petalInfo = await petalService.getUserPetalInfo(userId, requestId);
 
-    const balance = result._sum.amount ?? 0;
+    if (!petalInfo.success || !petalInfo.data) {
+      return NextResponse.json(
+        { ok: false, error: petalInfo.error || 'Failed to fetch balance', requestId },
+        { status: 500 },
+      );
+    }
 
-    // Check if user needs daily grant
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const lastGrant = await prisma.petalLedger.findFirst({
-      where: {
-        userId,
-        type: 'earn',
-        reason: 'DAILY_LOGIN_GRANT',
-        createdAt: { gte: today },
+    return NextResponse.json({
+      ok: true,
+      data: {
+        balance: petalInfo.data.balance,
+        lifetimePetalsEarned: petalInfo.data.lifetimePetalsEarned,
+        totalSpent: petalInfo.data.totalSpent,
+        needsDailyGrant: !petalInfo.data.lastDailyReward,
+        lastGrantDate: petalInfo.data.lastDailyReward ?? null,
+        isGuest: false,
       },
-      orderBy: { createdAt: 'desc' },
+      requestId,
     });
-
-    const needsDailyGrant = !lastGrant;
-
-    const response = PetalBalanceSchema.parse({
-      balance,
-      needsDailyGrant,
-      lastGrantDate: lastGrant?.createdAt ?? null,
-    });
-
-    return NextResponse.json({ ok: true, data: response });
   } catch (error) {
     console.error('Error fetching petal balance:', error);
-    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: 'Internal server error', requestId },
+      { status: 500 },
+    );
   }
 }

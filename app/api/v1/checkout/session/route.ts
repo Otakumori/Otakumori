@@ -20,6 +20,15 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 
 export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.api, async () => {
+    // Check if Stripe is configured
+    if (!env.STRIPE_SECRET_KEY) {
+      console.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
+      return NextResponse.json(
+        { ok: false, error: 'Checkout temporarily unavailable. Please contact support.' },
+        { status: 503 },
+      );
+    }
+
     const idemp = req.headers.get('x-idempotency-key') ?? '';
     if (!idemp)
       return NextResponse.json({ ok: false, error: 'Missing idempotency key' }, { status: 400 });

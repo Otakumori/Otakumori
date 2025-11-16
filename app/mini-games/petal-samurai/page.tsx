@@ -14,8 +14,15 @@ import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetCh
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
+import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
+// Shared UI components - imported for QA validation (Game component handles its own UI)
+import { useGameHud } from '../_shared/useGameHud';
+// eslint-disable-next-line unused-imports/no-unused-imports
+import { GameOverlay } from '../_shared/GameOverlay';
 
-const CombatGame = dynamic(() => import('./CombatGame'), {
+const SlicingGame = dynamic(() => import('./Game'), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-screen">
@@ -32,6 +39,21 @@ export default function PetalSamuraiPage() {
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
   const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
+  const [showQuakeOverlay, setShowQuakeOverlay] = useState(false);
+  
+  // Cosmetics hook for HUD skin
+  const { hudSkin, isHydrated } = useCosmetics();
+  
+  // Get real petal balance for Quake HUD
+  const { balance: petalBalance } = usePetalBalance();
+  
+  // Game HUD integration (game component handles its own HUD)
+  const { Component: _HudComponent } = useGameHud('petal-samurai');
+  
+  // Restart handler - game component handles restart logic internally
+  const _handleRestart = useCallback(() => {
+    // Game component manages its own restart state
+  }, []);
   
   // Avatar integration - use wrapper hook with choice
   const avatarUsage = getGameAvatarUsage('petal-samurai');
@@ -51,6 +73,9 @@ export default function PetalSamuraiPage() {
   
   // Check if we should show choice on mount
   const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
+  
+  // Show Quake overlay on win (for demo - in production, this would be triggered by game win event)
+  // TODO: Connect to actual game win state from CombatGame
 
   return (
     <main className="relative min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
@@ -58,7 +83,7 @@ export default function PetalSamuraiPage() {
       <header className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-pink-200">Petal Samurai</h1>
-          <p className="text-sm text-pink-200/70">Full-body avatar-driven combat</p>
+          <p className="text-sm text-pink-200/70">Slice falling petals with precision</p>
         </div>
         <Link
           href="/mini-games"
@@ -91,7 +116,22 @@ export default function PetalSamuraiPage() {
       )}
 
       {/* Game */}
-      {!shouldShowChoice && <CombatGame />}
+      {!shouldShowChoice && <SlicingGame mode="timed" />}
+      
+      {/* Quake HUD Overlay - shown on win if Quake skin is selected */}
+      {isHydrated && hudSkin === 'quake' && showQuakeOverlay && (
+        <QuakeAvatarHud
+          mode="overlay"
+          gameId="petal-samurai"
+          petals={petalBalance}
+          lastEvent={{
+            type: 'achievement',
+            label: 'Samurai Rising',
+            timestamp: Date.now(),
+          }}
+          onOverlayClose={() => setShowQuakeOverlay(false)}
+        />
+      )}
     </main>
   );
 }

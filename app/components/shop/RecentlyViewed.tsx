@@ -3,6 +3,7 @@
 import { useRecentlyViewed } from '@/app/hooks/useRecentlyViewed';
 import Image from 'next/image';
 import Link from 'next/link';
+import { paths } from '@/lib/paths';
 
 export function RecentlyViewed() {
   const { recentlyViewed } = useRecentlyViewed();
@@ -16,8 +17,8 @@ export function RecentlyViewed() {
         {recentlyViewed.map((product) => (
           <Link
             key={product.id}
-            href={`/shop/product/${product.id}`}
-            className="group bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 overflow-hidden hover:border-pink-500/50 transition-all duration-300"
+            href={paths.product(product.id)}
+            className="group bg-white/10 backdrop-blur-lg rounded-xl border border-glass-border overflow-hidden hover:border-border-hover transition-all duration-300"
           >
             <div className="relative aspect-square">
               <Image
@@ -30,7 +31,7 @@ export function RecentlyViewed() {
             </div>
             <div className="p-3">
               <h3 className="text-sm text-white font-medium line-clamp-2 mb-1">{product.title}</h3>
-              <p className="text-pink-400 font-bold text-sm">
+              <p className="text-text-link-hover font-bold text-sm">
                 ${(product.priceCents / 100).toFixed(2)}
               </p>
             </div>

@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { prisma } from '@/app/lib/prisma';
+import { db } from '@/app/lib/db';
 import { z } from 'zod';
 import { env } from '@/env.mjs';
 
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     }
 
     // Get current user data
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: {
         id: true,
@@ -73,7 +73,6 @@ export async function POST(req: Request) {
     const lastClickDay = user.lastClickDayUTC ? new Date(user.lastClickDayUTC) : new Date(0);
 
     let dailyClicks = user.dailyClicks;
-    let petalBalance = user.petalBalance;
 
     // Reset daily clicks if it's a new day
     if (lastClickDay < today) {
@@ -95,30 +94,52 @@ export async function POST(req: Request) {
       );
     }
 
-    // Award petals (1-3 random)
+    // Award petals (1-3 random) using PetalService for lifetime tracking and daily caps
     const petalsAwarded = Math.floor(Math.random() * 3) + 1;
-    const newBalance = petalBalance + petalsAwarded;
     const newDailyClicks = dailyClicks + 1;
 
-    // Update user
-    await prisma.user.update({
+    // Use PetalService for consistent petal earning
+    const { PetalService } = await import('@/app/lib/petals');
+    const petalService = new PetalService();
+    const petalResult = await petalService.awardPetals(userId, {
+      type: 'earn',
+      amount: petalsAwarded,
+      reason: 'tree_petal_click',
+      source: 'other', // Homepage clicks are "other" source
+      metadata: {
+        dailyClicks: newDailyClicks,
+      },
+    });
+
+    if (!petalResult.success) {
+      // If daily cap reached, still update daily clicks but don't award petals
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          dailyClicks: newDailyClicks,
+          lastClickDayUTC: now,
+        },
+      });
+
+      return NextResponse.json({
+        ok: false,
+        error: petalResult.error || 'Daily petal limit reached',
+        dailyClicks: newDailyClicks,
+        dailyLimit,
+        dailyCapReached: petalResult.dailyCapReached || false,
+      });
+    }
+
+    // Update user daily clicks
+    await db.user.update({
       where: { id: userId },
       data: {
-        petalBalance: newBalance,
         dailyClicks: newDailyClicks,
         lastClickDayUTC: now,
       },
     });
 
-    // Record in petal ledger
-    await prisma.petalLedger.create({
-      data: {
-        userId,
-        type: 'earn',
-        amount: petalsAwarded,
-        reason: 'tree_petal_click',
-      },
-    });
+    const newBalance = petalResult.newBalance;
 
     // Check for achievements
     const achievements = [];
@@ -126,12 +147,12 @@ export async function POST(req: Request) {
     // First click achievement
     if (newDailyClicks === 1) {
       try {
-        const achievement = await prisma.achievement.findUnique({
+        const achievement = await db.achievement.findUnique({
           where: { code: 'first_daily_click' },
         });
 
         if (achievement) {
-          await prisma.userAchievement.create({
+          await db.userAchievement.create({
             data: {
               userId,
               achievementId: achievement.id,
@@ -150,12 +171,12 @@ export async function POST(req: Request) {
     for (const milestone of milestones) {
       if (newDailyClicks === milestone) {
         try {
-          const achievement = await prisma.achievement.findUnique({
+          const achievement = await db.achievement.findUnique({
             where: { code: `daily_click_${milestone}` },
           });
 
           if (achievement) {
-            await prisma.userAchievement.create({
+            await db.userAchievement.create({
               data: {
                 userId,
                 achievementId: achievement.id,
@@ -173,10 +194,12 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       data: {
-        petalsAwarded,
+        petalsAwarded: petalResult.awarded,
         newBalance,
+        lifetimePetalsEarned: petalResult.lifetimePetalsEarned,
         dailyClicks: newDailyClicks,
         dailyLimit,
+        dailyCapReached: petalResult.dailyCapReached || false,
         achievements: achievements.map((a) => ({ code: a.code, name: a.name })),
       },
     });

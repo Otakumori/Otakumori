@@ -1,6 +1,15 @@
 /**
- * Petal Storm Rhythm - Complete Implementation
- * "Stormy rhythm playlist—precision timing for petals."
+ * Petal Hero - Guitar Hero-style Lane Rhythm Game
+ * 
+ * Core Fantasy: Hit notes in time for petals and rank - precision timing rhythm game.
+ * 
+ * Game Flow: menu → instructions → playing → results
+ * Win Condition: Complete track with health > 0
+ * Lose Condition: Health reaches 0
+ * 
+ * Progression: Difficulty increases with track selection (easy/normal/hard/expert)
+ * Scoring: Base points per hit, accuracy bonuses, combo multipliers
+ * Petals: Awarded on completion based on score, accuracy, combo, difficulty
  */
 
 'use client';
@@ -10,8 +19,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameHUD } from '../_shared/GameHUD';
 import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -70,6 +82,25 @@ const SAMPLE_TRACKS: Track[] = [
 ];
 
 export default function PetalStormRhythm() {
+  // Game configuration - difficulty tuning parameters (must be declared before state)
+  const GAME_CONFIG = {
+    LANE_COUNT: 5, // Guitar Hero-style: 5 lanes
+    INITIAL_HEALTH: 100,
+    HEALTH_DAMAGE_PER_MISS: 10,
+    HEALTH_DAMAGE_PER_BAD_HIT: 5,
+    COMBO_MULTIPLIER_THRESHOLDS: {
+      x2: 10,
+      x3: 25,
+      x4: 50,
+    },
+    SCORE_PERFECT: 1000,
+    SCORE_GREAT: 500,
+    SCORE_GOOD: 200,
+    SCORE_MISS: 0,
+    NOTE_TRAVEL_TIME: 2000, // milliseconds
+    PREPARATION_DELAY: 2000, // milliseconds before first note
+  } as const;
+
   const [gameState, setGameState] = useState<'instructions' | 'menu' | 'playing' | 'win' | 'lose' | 'paused'>('menu');
   const [selectedTrack, setSelectedTrack] = useState<Track>(SAMPLE_TRACKS[0]);
   const [currentTime, setCurrentTime] = useState(0);
@@ -78,9 +109,10 @@ export default function PetalStormRhythm() {
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [accuracy, setAccuracy] = useState({ perfect: 0, great: 0, good: 0, miss: 0 });
-  const [health, setHealth] = useState(100);
+  const [health, setHealth] = useState<number>(GAME_CONFIG.INITIAL_HEALTH);
   const [multiplier, setMultiplier] = useState(1);
   const [finalScore, setFinalScore] = useState(0);
+  const [petalReward, setPetalReward] = useState<number | null>(null);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -93,6 +125,9 @@ export default function PetalStormRhythm() {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
+  
+  // Get real petal balance for Quake HUD
+  const { balance: petalBalance } = usePetalBalance();
   
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
@@ -109,8 +144,14 @@ export default function PetalStormRhythm() {
   const startTimeRef = useRef<number>(0);
   const _audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('petal-storm-rhythm');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-storm-rhythm');
+  const { earnPetals } = usePetalEarn();
+
   // Lane positions (4 lanes)
-  const LANE_COUNT = 4;
+  const LANE_COUNT = GAME_CONFIG.LANE_COUNT;
   const LANES = Array.from({ length: LANE_COUNT }, (_, i) => i);
 
   // Timing windows (in milliseconds)
@@ -201,19 +242,20 @@ export default function PetalStormRhythm() {
     const finalScore = score + comboBonus + accuracyBonus + healthBonus;
     setFinalScore(finalScore);
 
-    // Award completion petals
-    const petalReward = Math.round(finalScore / 100);
-    try {
-      await fetch('/api/v1/petals/collect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: petalReward,
-          source: 'petal-storm-rhythm',
-        }),
-      });
-    } catch (error) {
-      console.error('Failed to award petals:', error);
+    // Award completion petals using hook
+    const result = await earnPetals({
+      gameId: 'petal-storm-rhythm',
+      score: finalScore,
+      metadata: {
+        accuracy: finalAccuracy,
+        combo: maxCombo,
+        difficulty: selectedTrack.difficulty,
+        track: selectedTrack.id,
+      },
+    });
+    
+    if (result.success) {
+      setPetalReward(result.earned);
     }
 
     // Submit to leaderboard
@@ -251,7 +293,7 @@ export default function PetalStormRhythm() {
           // Missed note
           setCombo(0);
           setMultiplier(1);
-          setHealth((h) => Math.max(0, h - 10));
+          setHealth((h) => Math.max(0, h - GAME_CONFIG.HEALTH_DAMAGE_PER_MISS));
           setAccuracy((acc) => ({ ...acc, miss: acc.miss + 1 }));
 
           return { ...note, hit: true, accuracy: 'miss' };
@@ -277,15 +319,16 @@ export default function PetalStormRhythm() {
 
   // Initialize game
   const startGame = useCallback(() => {
-    const trackNotes = generateNotes(selectedTrack);
+        const trackNotes = generateNotes(selectedTrack);
     setNotes(trackNotes);
     setCurrentTime(0);
     setScore(0);
     setCombo(0);
     setMaxCombo(0);
     setAccuracy({ perfect: 0, great: 0, good: 0, miss: 0 });
-    setHealth(100);
+    setHealth(GAME_CONFIG.INITIAL_HEALTH);
     setMultiplier(1);
+    setPetalReward(null);
 
     // Don't set to 'playing' here - let handleStart do it
     startTimeRef.current = Date.now();
@@ -324,16 +367,16 @@ export default function PetalStormRhythm() {
       // Determine accuracy
       if (timeDiff <= TIMING_WINDOWS.perfect) {
         accuracy = 'perfect';
-        points = 1000;
+        points = GAME_CONFIG.SCORE_PERFECT;
       } else if (timeDiff <= TIMING_WINDOWS.great) {
         accuracy = 'great';
-        points = 500;
+        points = GAME_CONFIG.SCORE_GREAT;
       } else if (timeDiff <= TIMING_WINDOWS.good) {
         accuracy = 'good';
-        points = 200;
+        points = GAME_CONFIG.SCORE_GOOD;
       } else {
         accuracy = 'miss';
-        points = 0;
+        points = GAME_CONFIG.SCORE_MISS;
       }
 
       // Update note
@@ -343,20 +386,26 @@ export default function PetalStormRhythm() {
 
       // Update score and combo
       if (accuracy !== 'miss') {
-        setCombo((prev) => prev + 1);
+        const newCombo = combo + 1;
+        setCombo(newCombo);
         setScore((prev) => prev + points * multiplier);
         setAccuracy((acc) => ({ ...acc, [accuracy]: acc[accuracy] + 1 }));
 
-        // Update multiplier based on combo
-        if (combo >= 50) setMultiplier(4);
-        else if (combo >= 25) setMultiplier(3);
-        else if (combo >= 10) setMultiplier(2);
-        else setMultiplier(1);
-      } else {
-        setCombo(0);
-        setMultiplier(1);
-        setHealth((h) => Math.max(0, h - 5));
-      }
+        // Update multiplier based on combo thresholds
+        if (newCombo >= GAME_CONFIG.COMBO_MULTIPLIER_THRESHOLDS.x4) {
+          setMultiplier(4);
+        } else if (newCombo >= GAME_CONFIG.COMBO_MULTIPLIER_THRESHOLDS.x3) {
+          setMultiplier(3);
+        } else if (newCombo >= GAME_CONFIG.COMBO_MULTIPLIER_THRESHOLDS.x2) {
+          setMultiplier(2);
+        } else {
+          setMultiplier(1);
+        }
+              } else {
+                setCombo(0);
+                setMultiplier(1);
+                setHealth((h: number) => Math.max(0, h - GAME_CONFIG.HEALTH_DAMAGE_PER_MISS));
+              }
 
       // Update max combo
       setMaxCombo((prev) => Math.max(prev, combo));
@@ -364,7 +413,7 @@ export default function PetalStormRhythm() {
     [gameState, currentTime, notes, combo, multiplier, score],
   );
 
-  // Keyboard controls
+  // Keyboard controls (5 lanes: A, S, D, F, G)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameState !== 'playing') return;
@@ -385,6 +434,10 @@ export default function PetalStormRhythm() {
         case 'f':
         case 'F':
           hitNote(3);
+          break;
+        case 'g':
+        case 'G':
+          hitNote(4);
           break;
         case ' ':
           e.preventDefault();
@@ -411,7 +464,7 @@ export default function PetalStormRhythm() {
 
   // Get visible notes
   const visibleNotes = notes.filter((note) => {
-    const notePosition = (currentTime - note.time + 2000) / 2000; // 2s travel time
+    const notePosition = (currentTime - note.time + GAME_CONFIG.NOTE_TRAVEL_TIME) / GAME_CONFIG.NOTE_TRAVEL_TIME;
     return notePosition >= -0.1 && notePosition <= 1.1 && !note.hit;
   });
 
@@ -439,7 +492,7 @@ export default function PetalStormRhythm() {
   }, [startGame, avatarUsage, avatarChoice]);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden" style={backgroundStyle}>
       {/* Header */}
       <div className="text-center p-4 relative">
         <div className="absolute top-4 right-4">
@@ -450,10 +503,10 @@ export default function PetalStormRhythm() {
             Back to Arcade
           </Link>
         </div>
-        <h1 className="text-4xl font-bold text-pink-400 mb-2">Petal Storm Rhythm</h1>
-        <p className="text-slate-300 italic">
-          "Stormy rhythm playlist—precision timing for petals."
-        </p>
+                <h1 className="text-4xl font-bold text-pink-400 mb-2">Petal Hero</h1>
+                <p className="text-slate-300 italic">
+                  "Hit the notes in time—precision timing for petals."
+                </p>
       </div>
 
       {/* Avatar vs Preset Choice */}
@@ -543,7 +596,7 @@ export default function PetalStormRhythm() {
             {/* Controls Info */}
             <div className="mt-6 bg-slate-700/30 rounded-lg p-4">
               <h4 className="font-medium text-white mb-2">Controls:</h4>
-              <div className="grid grid-cols-4 gap-2 text-center text-sm">
+              <div className="grid grid-cols-5 gap-2 text-center text-sm">
                 <div className="bg-slate-600/50 rounded py-2">
                   <div className="font-bold text-pink-400">A</div>
                   <div className="text-slate-300">Lane 1</div>
@@ -560,6 +613,10 @@ export default function PetalStormRhythm() {
                   <div className="font-bold text-pink-400">F</div>
                   <div className="text-slate-300">Lane 4</div>
                 </div>
+                <div className="bg-slate-600/50 rounded py-2">
+                  <div className="font-bold text-pink-400">G</div>
+                  <div className="text-slate-300">Lane 5</div>
+                </div>
               </div>
               <p className="text-center text-slate-400 text-xs mt-2">Press SPACE to pause</p>
             </div>
@@ -570,14 +627,23 @@ export default function PetalStormRhythm() {
       {/* Game UI */}
       {(gameState === 'playing' || gameState === 'paused') && (
         <div className="h-screen flex flex-col">
-          {/* Game HUD */}
-          <GameHUD
-            score={score}
-            health={health}
-            maxHealth={100}
-            combo={combo}
-            multiplier={multiplier}
-          />
+          {/* HUD - uses loader for cosmetics */}
+          {isQuakeHud ? (
+            <HudComponent
+              {...hudProps}
+              petals={petalBalance}
+              gameId="petal-storm-rhythm"
+            />
+          ) : (
+            <HudComponent
+              {...hudProps}
+              score={score}
+              health={health}
+              maxHealth={GAME_CONFIG.INITIAL_HEALTH}
+              combo={combo}
+              multiplier={multiplier}
+            />
+          )}
 
           {/* Game Area */}
           <div className="flex-1 relative overflow-hidden">
@@ -599,7 +665,7 @@ export default function PetalStormRhythm() {
 
                   {/* Lane Label */}
                   <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-pink-400 font-bold">
-                    {['A', 'S', 'D', 'F'][laneIndex]}
+                    {['A', 'S', 'D', 'F', 'G'][laneIndex]}
                   </div>
 
                   {/* Notes */}
@@ -649,9 +715,10 @@ export default function PetalStormRhythm() {
           'Keep your health above 0 to survive',
           'Complete the track to win!',
         ]}
-        winMessage={`Rhythm Master! You completed ${selectedTrack.title} with ${maxCombo} max combo!`}
+        winMessage={`Rhythm Master! You completed ${selectedTrack.title} with ${Math.round(((accuracy.perfect + accuracy.great + accuracy.good) / Math.max(1, accuracy.perfect + accuracy.great + accuracy.good + accuracy.miss)) * 100)}% accuracy and ${maxCombo} max combo!`}
         loseMessage="Your health reached zero. Try again!"
         score={finalScore}
+        petalReward={petalReward}
         onRestart={handleRestart}
         onResume={handleStart}
       />

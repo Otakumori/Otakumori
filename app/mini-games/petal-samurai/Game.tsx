@@ -1,13 +1,58 @@
-// DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-girl\Game.tsx instead.
+/**
+ * Petal Samurai - Fruit Ninja-style Slicing Game
+ * 
+ * Core Fantasy: Slice falling petals with precision - chain combos for petals.
+ * 
+ * Game Flow: instructions → playing → results
+ * Win Condition: Survive time limit or reach target score
+ * Lose Condition: Miss 3 petals or time runs out
+ * 
+ * Progression: Speed increases every 20 seconds, storm mode after 60 seconds
+ * Scoring: Base points per petal, combo multipliers, gold petals worth more
+ * Petals: Awarded based on final score, combo, and accuracy
+ */
+
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 
 type Props = {
-  mode: 'classic' | 'storm' | 'endless';
+  mode: 'classic' | 'storm' | 'endless' | 'timed';
 };
+
+// Game configuration - difficulty tuning parameters
+const GAME_CONFIG = {
+  MAX_MISSES: 3,
+  TIME_LIMIT: 60, // seconds
+  SPEED_RAMP_INTERVAL: 20, // seconds between speed increases
+  SPEED_RAMP_AMOUNT: 0.3, // speed multiplier increase per ramp
+  STORM_MODE_TIME: 60, // seconds until storm mode
+  STORM_SPAWN_RATE: 0.3, // seconds between petal spawns in storm mode
+  NORMAL_SPAWN_RATE: 0.8, // seconds between petal spawns normally
+  POWER_UP_SPAWN_INTERVAL: 15, // seconds between power-up spawn chances
+  POWER_UP_SPAWN_CHANCE: 0.1, // probability of spawning power-up
+  COMBO_MULTIPLIER_BASE: 1.0,
+  COMBO_MULTIPLIER_INCREMENT: 0.2,
+  MAX_MULTIPLIER: 5.0,
+  NORMAL_PETAL_POINTS: 1,
+  GOLD_PETAL_POINTS: 5,
+  RARE_PETAL_POINTS: 10, // Special colored petals
+  BAD_OBJECT_PENALTY: 3, // Score penalty for slicing bad objects
+  BAD_OBJECT_PETAL_PENALTY: 1, // Petal penalty for slicing bad objects
+  STUN_DURATION: 0.5, // seconds
+  BAD_OBJECT_SPAWN_CHANCE: 0.15, // 15% chance to spawn bad object instead of petal
+  SPRITE_SHEET_URL: '/assets/images/petal_sprite.png',
+  SPRITE_GRID_COLS: 4,
+  SPRITE_GRID_ROWS: 3,
+  SPRITE_COUNT: 12, // 4x3 grid
+} as const;
 
 interface GameState {
   score: number;
@@ -25,11 +70,14 @@ interface Petal {
   id: string;
   x: number;
   y: number;
-  type: 'normal' | 'gold' | 'cursed';
+  type: 'normal' | 'gold' | 'rare' | 'bad'; // bad = nut/seed/branch
   speed: number;
   size: number;
   rotation: number;
   fallSpeed: number;
+  spriteIndex: number; // Index in 4x3 sprite grid (0-11)
+  vx: number; // Horizontal drift velocity
+  vy: number; // Vertical velocity
 }
 
 interface PowerUp {
@@ -49,12 +97,22 @@ export default function Game({ mode }: Props) {
     combo: 0,
     multiplier: 1,
     misses: 0,
-    timeLeft: mode === 'endless' ? 999 : 60,
+    timeLeft: mode === 'endless' ? 999 : GAME_CONFIG.TIME_LIMIT,
     isRunning: true,
     isGameOver: false,
     isStunned: false,
     stormMode: false,
   });
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const [gameStateOverlay, setGameStateOverlay] = useState<'instructions' | 'playing' | 'win' | 'lose'>('instructions');
+
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('petal-samurai');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-samurai');
+  const { balance: petalBalance } = usePetalBalance();
+  const { earnPetals } = usePetalEarn();
 
   // Initialize game engine
   useEffect(() => {
@@ -88,9 +146,42 @@ export default function Game({ mode }: Props) {
         }));
 
         // Check game over conditions
-        if (game.getMisses() >= 3 || (mode !== 'endless' && game.getTime() >= 60)) {
+        const isGameOver = game.getMisses() >= GAME_CONFIG.MAX_MISSES || (mode !== 'endless' && game.getTime() >= GAME_CONFIG.TIME_LIMIT);
+        if (isGameOver && gameState.isRunning) {
+          const didWin = game.getMisses() < GAME_CONFIG.MAX_MISSES && (mode === 'endless' || game.getTime() < GAME_CONFIG.TIME_LIMIT);
           setGameState((prev) => ({ ...prev, isRunning: false, isGameOver: true }));
+          setGameStateOverlay(didWin ? 'win' : 'lose');
           game.endGame();
+          
+          // Award petals on game end
+          if (!hasAwardedPetals) {
+            setHasAwardedPetals(true);
+            const awardPetals = async () => {
+                  // Calculate petal reward based on petals sliced, special petals, and penalties
+                  const petalsSliced = game.getScore() / 10; // Base: 1 petal per 10 points
+                  const specialPetalsBonus = game.getCombo() * 0.5; // Bonus for combos
+                  const _badObjectsPenalty = 0; // Will be tracked separately if needed
+                  
+                  const result = await earnPetals({
+                    gameId: 'petal-samurai',
+                    score: game.getScore(),
+                    metadata: {
+                      combo: game.getCombo(),
+                      multiplier: game.getMultiplier(),
+                      misses: game.getMisses(),
+                      mode,
+                      stormMode: game.isStormMode(),
+                      petalsSliced: Math.floor(petalsSliced),
+                      specialPetalsBonus: Math.floor(specialPetalsBonus),
+                    },
+                  });
+              
+              if (result.success) {
+                setPetalReward(result.earned);
+              }
+            };
+            awardPetals();
+          }
         }
       }
 
@@ -164,15 +255,11 @@ export default function Game({ mode }: Props) {
     }
   }, []);
 
-  // Submit score and award petals when game ends
+  // Submit score to leaderboard when game ends
   useEffect(() => {
-    if (gameState.isGameOver) {
+    if (gameState.isGameOver && gameRef.current) {
       const submitScore = async () => {
         try {
-          // Calculate petal reward (score / 10)
-          const petalReward = Math.floor(gameState.score / 10);
-
-          // Submit score to leaderboard
           await fetch('/api/v1/leaderboards/petal-samurai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -183,38 +270,29 @@ export default function Game({ mode }: Props) {
               metadata: {
                 multiplier: gameState.multiplier,
                 misses: gameState.misses,
+                stormMode: gameState.stormMode,
               },
             }),
           });
-
-          // Award petals
-          if (petalReward > 0) {
-            await fetch('/api/v1/petals/collect', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                amount: petalReward,
-                source: 'game_reward',
-              }),
-            });
-          }
         } catch (error) {
           console.error('Failed to submit score:', error);
         }
       };
       submitScore();
     }
-  }, [
-    gameState.isGameOver,
-    gameState.score,
-    gameState.combo,
-    gameState.multiplier,
-    gameState.misses,
-    mode,
-  ]);
+  }, [gameState.isGameOver, gameState.score, gameState.combo, gameState.multiplier, gameState.misses, gameState.stormMode, mode]);
+
+  const handleStart = useCallback(() => {
+    setGameStateOverlay('playing');
+    setGameState((prev) => ({ ...prev, isRunning: true }));
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    window.location.reload();
+  }, []);
 
   return (
-    <div className="relative">
+    <div className="relative w-full h-screen" style={backgroundStyle}>
       {/* Keyboard Controls Display */}
       <GameControls
         game="Petal Samurai"
@@ -236,83 +314,77 @@ export default function Game({ mode }: Props) {
         aria-label="Petal Samurai game area - slash through petals to score"
       />
 
-      {/* HUD Overlay */}
-      <div className="absolute top-4 left-4 flex gap-4">
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
-          Score: {gameState.score}
-        </div>
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
-          Combo: {gameState.combo}x{gameState.multiplier.toFixed(1)}
-        </div>
-        <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
-          Misses: {gameState.misses}/3
-        </div>
-        {mode !== 'endless' && (
-          <div className="bg-black/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm">
-            Time: {Math.ceil(gameState.timeLeft)}s
-          </div>
-        )}
-        {gameState.stormMode && (
-          <div className="bg-red-500/40 backdrop-blur-sm px-3 py-2 rounded-lg text-white text-sm animate-pulse">
-            STORM MODE!
-          </div>
-        )}
-      </div>
+      {/* HUD - uses loader for cosmetics */}
+      {gameStateOverlay === 'playing' && (
+        <>
+          {isQuakeHud ? (
+            <HudComponent
+              {...hudProps}
+              petals={petalBalance}
+              gameId="petal-samurai"
+            />
+          ) : (
+            <HudComponent
+              {...hudProps}
+              score={gameState.score}
+              combo={gameState.combo}
+              multiplier={gameState.multiplier}
+              lives={GAME_CONFIG.MAX_MISSES - gameState.misses}
+              timeLeft={mode !== 'endless' ? gameState.timeLeft : undefined}
+              message={gameState.stormMode ? 'STORM MODE!' : undefined}
+            />
+          )}
+        </>
+      )}
 
       {/* Power-ups */}
-      <div className="absolute top-4 right-4 flex gap-2">
-        <motion.button
-          className="px-3 py-1 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded text-blue-200 text-xs hover:bg-blue-500/30 transition-colors"
-          onClick={() => handlePowerUpClick('slow_time')}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Slow Time
-        </motion.button>
-        <motion.button
-          className="px-3 py-1 bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded text-green-200 text-xs hover:bg-green-500/30 transition-colors"
-          onClick={() => handlePowerUpClick('combo_boost')}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Combo Boost
-        </motion.button>
-      </div>
+      {gameStateOverlay === 'playing' && (
+        <div className="absolute top-4 right-4 flex gap-2">
+          <motion.button
+            className="px-3 py-1 bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded text-blue-200 text-xs hover:bg-blue-500/30 transition-colors"
+            onClick={() => handlePowerUpClick('slow_time')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Slow Time
+          </motion.button>
+          <motion.button
+            className="px-3 py-1 bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded text-green-200 text-xs hover:bg-green-500/30 transition-colors"
+            onClick={() => handlePowerUpClick('combo_boost')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Combo Boost
+          </motion.button>
+        </div>
+      )}
 
       {/* Stun Effect */}
-      {gameState.isStunned && (
-        <div className="absolute inset-0 bg-red-500/20 backdrop-blur-sm flex items-center justify-center">
+      {gameState.isStunned && gameStateOverlay === 'playing' && (
+        <div className="absolute inset-0 bg-red-500/20 backdrop-blur-sm flex items-center justify-center z-30">
           <div className="text-2xl font-bold text-red-500 animate-pulse">STUNNED!</div>
         </div>
       )}
 
-      {/* Game Over Screen */}
-      {gameState.isGameOver && (
-        <motion.div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <div className="bg-white/95 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center max-w-md mx-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              {gameState.misses >= 3 ? 'Game Over!' : "Time's Up!"}
-            </h2>
-            <div className="space-y-2 mb-6">
-              <p className="text-gray-600">Final Score: {gameState.score}</p>
-              <p className="text-gray-600">Best Combo: {gameState.combo}x</p>
-              <p className="text-gray-600">Multiplier: {gameState.multiplier.toFixed(1)}x</p>
-            </div>
-            <motion.button
-              className="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500"
-              onClick={() => window.location.reload()}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Play Again
-            </motion.button>
-          </div>
-        </motion.div>
-      )}
+      {/* Game Overlay */}
+      <GameOverlay
+        state={gameStateOverlay}
+        instructions={[
+          'Drag/swipe to slice falling petals',
+          'Chain slices for combo multipliers',
+          `Avoid missing ${GAME_CONFIG.MAX_MISSES} petals`,
+          mode !== 'endless' && `Survive ${GAME_CONFIG.TIME_LIMIT} seconds`,
+          'Gold petals are worth more points',
+          'Rare petals grant bonus combos',
+          'Avoid bad objects (nuts/seeds) - they break combos!',
+        ].filter(Boolean) as string[]}
+        winMessage="Excellent slicing! You've mastered the way of the Petal Samurai!"
+        loseMessage={gameState.misses >= GAME_CONFIG.MAX_MISSES ? 'Too many petals missed!' : "Time's up!"}
+        score={gameState.score}
+        petalReward={petalReward}
+        onRestart={handleRestart}
+        onResume={handleStart}
+      />
     </div>
   );
 }
@@ -338,13 +410,31 @@ class GameEngine {
   private lastPowerUpSpawn: number = 0;
   private slashTrail: { x: number; y: number; time: number }[] = [];
   private slashedPetals: Set<string> = new Set();
+  private spriteSheet: HTMLImageElement | null = null;
+  private spriteSheetLoaded: boolean = false;
 
   constructor(canvas: HTMLCanvasElement, mode: string) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.mode = mode;
 
+    // Load sprite sheet
+    this.loadSpriteSheet();
+
     this.startGameLoop();
+  }
+
+  private loadSpriteSheet() {
+    const img = new Image();
+    img.src = GAME_CONFIG.SPRITE_SHEET_URL;
+    img.onload = () => {
+      this.spriteSheet = img;
+      this.spriteSheetLoaded = true;
+    };
+    img.onerror = () => {
+      console.warn('Failed to load petal sprite sheet, falling back to canvas drawing');
+      this.spriteSheetLoaded = false;
+    };
   }
 
   private startGameLoop() {
@@ -366,39 +456,51 @@ class GameEngine {
     }
 
     // Speed scaling - ramps up every 20 seconds
-    this.baseSpeed = 1.0 + Math.floor(this.gameTime / 20) * 0.3;
+    this.baseSpeed = 1.0 + Math.floor(this.gameTime / GAME_CONFIG.SPEED_RAMP_INTERVAL) * GAME_CONFIG.SPEED_RAMP_AMOUNT;
 
     // Storm mode after 60 seconds
-    if (this.gameTime >= 60 && !this.stormMode) {
+    if (this.gameTime >= GAME_CONFIG.STORM_MODE_TIME && !this.stormMode) {
       this.stormMode = true;
     }
 
     // Spawn petals
-    const spawnRate = this.stormMode ? 0.3 : 0.8;
+    const spawnRate = this.stormMode ? GAME_CONFIG.STORM_SPAWN_RATE : GAME_CONFIG.NORMAL_SPAWN_RATE;
     if (this.gameTime - this.lastPetalSpawn > spawnRate) {
       this.spawnPetal();
       this.lastPetalSpawn = this.gameTime;
     }
 
     // Spawn power-ups occasionally
-    if (this.gameTime - this.lastPowerUpSpawn > 15 && Math.random() < 0.1) {
+    if (this.gameTime - this.lastPowerUpSpawn > GAME_CONFIG.POWER_UP_SPAWN_INTERVAL && Math.random() < GAME_CONFIG.POWER_UP_SPAWN_CHANCE) {
       this.spawnPowerUp();
       this.lastPowerUpSpawn = this.gameTime;
     }
 
-    // Update petals
+    // Update petals with physics (curved arcs, gravity, air drag)
     this.petals.forEach((petal) => {
-      petal.y += petal.fallSpeed * this.baseSpeed;
-      petal.rotation += 0.1;
+      // Apply gravity
+      petal.vy += 0.3 * deltaTime * 60; // Gravity acceleration
+      
+      // Apply air drag (horizontal drift)
+      petal.vx *= 0.98; // Slight horizontal drift decay
+      petal.vy *= 0.99; // Vertical drag
+      
+      // Update position
+      petal.x += petal.vx * this.baseSpeed;
+      petal.y += petal.vy * this.baseSpeed;
+      
+      // Rotation based on movement
+      petal.rotation += (petal.vx * 0.05 + 0.1);
     });
 
     // Remove off-screen petals and count as misses
     this.petals = this.petals.filter((petal) => {
-      if (petal.y > this.canvas.height) {
-        if (petal.type !== 'cursed') {
+      if (petal.y > this.canvas.height || petal.x < -50 || petal.x > this.canvas.width + 50) {
+        if (petal.type !== 'bad') {
+          // Only count misses for petals, not bad objects
           this.misses++;
           this.combo = 0;
-          this.multiplier = 1;
+          this.multiplier = GAME_CONFIG.COMBO_MULTIPLIER_BASE;
         }
         return false;
       }
@@ -432,15 +534,41 @@ class GameEngine {
   }
 
   private spawnPetal() {
-    const types: ('normal' | 'gold' | 'cursed')[] = [
-      'normal',
-      'normal',
-      'normal',
-      'normal',
-      'gold',
-      'cursed',
-    ];
-    const type = types[Math.floor(Math.random() * types.length)] ?? 'normal';
+    // Determine if spawning bad object or petal
+    const isBadObject = Math.random() < GAME_CONFIG.BAD_OBJECT_SPAWN_CHANCE;
+    
+    if (isBadObject) {
+      // Spawn bad object (nut/seed/branch)
+      const badObject: Petal = {
+        id: Math.random().toString(36).substr(2, 9),
+        x: Math.random() * (this.canvas.width - 40) + 20,
+        y: -20,
+        type: 'bad',
+        speed: 1,
+        size: 16,
+        rotation: 0,
+        fallSpeed: 1.0,
+        spriteIndex: 11, // Use last sprite slot for bad objects (or draw custom)
+        vx: (Math.random() - 0.5) * 0.5, // Random horizontal drift
+        vy: 1.2 + Math.random() * 0.3, // Slightly faster fall
+      };
+      this.petals.push(badObject);
+      return;
+    }
+
+    // Spawn petal (normal/gold/rare)
+    const rand = Math.random();
+    let type: 'normal' | 'gold' | 'rare';
+    if (rand < 0.7) {
+      type = 'normal';
+    } else if (rand < 0.95) {
+      type = 'gold';
+    } else {
+      type = 'rare'; // 5% chance for rare petals
+    }
+
+    // Random sprite index from 0-10 (save 11 for bad objects)
+    const spriteIndex = Math.floor(Math.random() * (GAME_CONFIG.SPRITE_COUNT - 1));
 
     const petal: Petal = {
       id: Math.random().toString(36).substr(2, 9),
@@ -448,9 +576,12 @@ class GameEngine {
       y: -20,
       type,
       speed: 1,
-      size: type === 'gold' ? 25 : type === 'cursed' ? 20 : 18,
+      size: type === 'gold' ? 25 : type === 'rare' ? 28 : 20,
       rotation: 0,
-      fallSpeed: type === 'gold' ? 1.5 : type === 'cursed' ? 0.8 : 1.2,
+      fallSpeed: type === 'gold' ? 1.5 : type === 'rare' ? 1.3 : 1.0 + Math.random() * 0.4,
+      spriteIndex,
+      vx: (Math.random() - 0.5) * 0.3, // Slight horizontal drift for curved arcs
+      vy: 0.8 + Math.random() * 0.4, // Initial vertical velocity
     };
 
     this.petals.push(petal);
@@ -481,19 +612,30 @@ class GameEngine {
     if (this.slashedPetals.has(petal.id)) return;
     this.slashedPetals.add(petal.id);
 
-    if (petal.type === 'cursed') {
-      this.score = Math.max(0, this.score - 2);
+    if (petal.type === 'bad') {
+      // Bad objects cause penalty
+      this.score = Math.max(0, this.score - GAME_CONFIG.BAD_OBJECT_PENALTY);
       this.combo = 0;
-      this.multiplier = 1;
-      this.stunTime = 0.5;
+      this.multiplier = GAME_CONFIG.COMBO_MULTIPLIER_BASE;
+      this.stunTime = GAME_CONFIG.STUN_DURATION;
     } else {
-      const points = petal.type === 'gold' ? 5 : 1;
+      // Award points based on petal type
+      let points: number = GAME_CONFIG.NORMAL_PETAL_POINTS;
+      if (petal.type === 'gold') {
+        points = GAME_CONFIG.GOLD_PETAL_POINTS;
+      } else if (petal.type === 'rare') {
+        points = GAME_CONFIG.RARE_PETAL_POINTS;
+      }
+      
       this.score += Math.floor(points * this.multiplier);
       this.combo++;
-      this.multiplier = Math.min(5, 1 + (this.combo - 1) * 0.2);
+      this.multiplier = Math.min(
+        GAME_CONFIG.MAX_MULTIPLIER,
+        GAME_CONFIG.COMBO_MULTIPLIER_BASE + (this.combo - 1) * GAME_CONFIG.COMBO_MULTIPLIER_INCREMENT,
+      );
 
-      if (petal.type === 'gold') {
-        this.combo += 2; // Gold petals give extra combo
+      if (petal.type === 'gold' || petal.type === 'rare') {
+        this.combo += petal.type === 'rare' ? 3 : 2; // Rare petals give even more combo
       }
     }
 
@@ -567,7 +709,10 @@ class GameEngine {
         break;
       case 'combo_boost':
         this.combo += 5;
-        this.multiplier = Math.min(5, 1 + (this.combo - 1) * 0.2);
+        this.multiplier = Math.min(
+          GAME_CONFIG.MAX_MULTIPLIER,
+          GAME_CONFIG.COMBO_MULTIPLIER_BASE + (this.combo - 1) * GAME_CONFIG.COMBO_MULTIPLIER_INCREMENT,
+        );
         break;
       case 'miss_forgive':
         this.misses = Math.max(0, this.misses - 1);
@@ -600,38 +745,67 @@ class GameEngine {
     // Atmospheric particles (ambient petals)
     this.renderAtmosphericPetals();
 
-    // Draw premium samurai character
-    this.renderSamuraiCharacter();
+    // Character rendering disabled - focusing on petal slicing mechanics
+    // this.renderSamuraiCharacter();
 
-    // Draw petals
+    // Draw petals using sprite sheet
     this.petals.forEach((petal) => {
       this.ctx.save();
       this.ctx.translate(petal.x, petal.y);
       this.ctx.rotate(petal.rotation);
 
-      // Petal colors based on type - all pink themed
-      switch (petal.type) {
-        case 'normal':
-          this.ctx.fillStyle = 'rgba(255, 182, 193, 0.9)'; // Light pink
-          break;
-        case 'gold':
-          this.ctx.fillStyle = 'rgba(255, 105, 180, 1.0)'; // Hot pink for gold
-          break;
-        case 'cursed':
-          this.ctx.fillStyle = 'rgba(139, 0, 139, 0.9)'; // Dark magenta for cursed
-          break;
+      if (this.spriteSheetLoaded && this.spriteSheet && petal.type !== 'bad') {
+        // Draw from sprite sheet (4x3 grid)
+        const spriteCol = petal.spriteIndex % GAME_CONFIG.SPRITE_GRID_COLS;
+        const spriteRow = Math.floor(petal.spriteIndex / GAME_CONFIG.SPRITE_GRID_COLS);
+        const spriteWidth = this.spriteSheet.width / GAME_CONFIG.SPRITE_GRID_COLS;
+        const spriteHeight = this.spriteSheet.height / GAME_CONFIG.SPRITE_GRID_ROWS;
+        
+        const sx = spriteCol * spriteWidth;
+        const sy = spriteRow * spriteHeight;
+        
+        // Apply tint based on petal type
+        if (petal.type === 'gold') {
+          this.ctx.globalCompositeOperation = 'multiply';
+          this.ctx.fillStyle = 'rgba(255, 215, 0, 0.3)'; // Gold tint
+          this.ctx.fillRect(-petal.size, -petal.size, petal.size * 2, petal.size * 2);
+          this.ctx.globalCompositeOperation = 'source-over';
+        } else if (petal.type === 'rare') {
+          this.ctx.globalCompositeOperation = 'multiply';
+          this.ctx.fillStyle = 'rgba(255, 20, 255, 0.4)'; // Magenta/purple tint for rare
+          this.ctx.fillRect(-petal.size, -petal.size, petal.size * 2, petal.size * 2);
+          this.ctx.globalCompositeOperation = 'source-over';
+        }
+        
+        // Draw sprite
+        this.ctx.drawImage(
+          this.spriteSheet,
+          sx, sy, spriteWidth, spriteHeight,
+          -petal.size, -petal.size * 0.6, petal.size * 2, petal.size * 1.2
+        );
+      } else if (petal.type === 'bad') {
+        // Draw bad object (nut/seed/branch) - simple brown shape
+        this.ctx.fillStyle = '#8B4513'; // Brown
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, petal.size * 0.8, petal.size * 0.5, petal.rotation, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = '#654321';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+      } else {
+        // Fallback: draw simple petal shape if sprite not loaded
+        this.ctx.fillStyle = petal.type === 'gold' 
+          ? 'rgba(255, 105, 180, 1.0)' 
+          : petal.type === 'rare'
+          ? 'rgba(255, 20, 255, 1.0)'
+          : 'rgba(255, 182, 193, 0.9)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 0, petal.size, petal.size * 0.6, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'rgba(255, 182, 193, 0.8)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
       }
-
-      // Draw petal shape
-      this.ctx.beginPath();
-      this.ctx.ellipse(0, 0, petal.size, petal.size * 0.6, 0, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Add outline - pink themed
-      this.ctx.strokeStyle =
-        petal.type === 'gold' ? 'rgba(255, 20, 147, 1)' : 'rgba(255, 182, 193, 0.8)';
-      this.ctx.lineWidth = 2;
-      this.ctx.stroke();
 
       this.ctx.restore();
     });

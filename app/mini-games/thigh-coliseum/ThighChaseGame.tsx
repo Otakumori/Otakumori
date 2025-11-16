@@ -26,10 +26,12 @@ export default function ThighChaseGame({
   onScoreChange,
   onLivesChange,
   onStageChange,
+  onGameEnd,
 }: {
   onScoreChange?: (score: number) => void;
   onLivesChange?: (lives: number) => void;
   onStageChange?: (stage: number) => void;
+  onGameEnd?: (score: number, didWin: boolean) => void;
 } = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
@@ -406,6 +408,10 @@ export default function ThighChaseGame({
       // Check game over
       if (lives <= 0) {
         setGameState('gameOver');
+        // Notify parent of game over
+        if (onGameEnd) {
+          onGameEnd(score, false); // didWin = false (lives reached 0)
+        }
       }
 
       // Score for survival

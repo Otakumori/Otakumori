@@ -15,7 +15,7 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
     const baseClasses = cn(
       // Base styles
       'relative inline-flex items-center justify-center rounded-xl font-medium transition-all duration-300',
-      'focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:ring-offset-2 focus:ring-offset-background',
+      'focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 focus:ring-offset-background',
       'disabled:pointer-events-none disabled:opacity-50',
       // Glass effect with pulse animation
       'backdrop-blur-lg',
@@ -27,10 +27,10 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
         // Primary: enhanced glassmorphic with iridescent hint
         'glass-button-primary': variant === 'primary',
         // Secondary: darker glass
-        'bg-white/10 border border-white/20 text-pink-200/80 hover:bg-white/15 hover:border-white/30 shadow-md':
+        'bg-glass-bg border border-glass-border text-text-secondary hover:bg-glass-bg-hover hover:border-border-hover shadow-md':
           variant === 'secondary',
         // Ghost: minimal with holographic hover
-        'bg-transparent border-0 text-pink-200/60 hover:text-pink-200/90 hover:bg-white/5':
+        'bg-transparent border-0 text-text-link hover:text-text-link-hover hover:bg-white/5':
           variant === 'ghost',
       },
       // Sizes

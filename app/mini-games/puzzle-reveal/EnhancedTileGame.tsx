@@ -58,7 +58,9 @@ const GRID_SIZES: Record<GameMode, { cols: number; rows: number; timeBonus: numb
   expert: { cols: 10, rows: 8, timeBonus: 20000 },
 };
 
-// Curated art collection (SFW placeholders - replace with your assets)
+// Curated art collection - uses Otaku-mori art assets
+// TODO: Add actual Otaku-mori artwork (including spicier ones as content library grows)
+// Current placeholders will be replaced with real assets
 const ART_COLLECTION: ArtPiece[] = [
   {
     url: '/assets/reveal/anime-landscape-1.jpg',
@@ -72,17 +74,19 @@ const ART_COLLECTION: ArtPiece[] = [
     artist: 'Otaku-mori Studios',
     category: 'sfw',
   },
-  // Add more art pieces here
+  // Add more art pieces here - including spicier ones as content library grows
 ];
 
 export default function EnhancedTileGame({ 
   mode = 'medium',
   onScoreChange,
   onComboChange,
+  onGameEnd,
 }: { 
   mode?: GameMode;
   onScoreChange?: (score: number) => void;
   onComboChange?: (combo: number) => void;
+  onGameEnd?: (score: number, didWin: boolean) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -298,16 +302,22 @@ export default function EnhancedTileGame({
     const timeElapsed = Date.now() - startTimeRef.current;
     const { timeBonus } = GRID_SIZES[mode];
     const timeBonusScore = Math.max(0, timeBonus - Math.floor(timeElapsed / 1000) * 10);
+    const finalScore = gameState.score + timeBonusScore;
 
     setGameState((prev) => ({
       ...prev,
       isComplete: true,
       timeElapsed: Math.floor(timeElapsed / 1000),
-      score: prev.score + timeBonusScore,
+      score: finalScore,
     }));
 
+    // Notify parent of game completion
+    if (onGameEnd) {
+      onGameEnd(finalScore, true); // didWin = true (completed puzzle)
+    }
+
     // Submit score
-    submitScore(gameState.score + timeBonusScore);
+    submitScore(finalScore);
   };
 
   // Submit score to leaderboard

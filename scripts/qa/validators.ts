@@ -127,10 +127,15 @@ export function validateSharedUI(filePath: string): ValidationResult {
 
   const content = readFileSync(filePath, 'utf-8');
 
-  // Check for GameHUD import
-  const hasGameHUD = content.includes('GameHUD') || content.includes('app/mini-games/_shared/GameHUD');
+  // Check for GameHUD import or useGameHud hook (which provides GameHUD)
+  const hasGameHUD = content.includes('GameHUD') || 
+                     content.includes('app/mini-games/_shared/GameHUD') ||
+                     content.includes('useGameHud') ||
+                     content.includes('app/mini-games/_shared/useGameHud');
   // Check for GameOverlay import
-  const hasGameOverlay = content.includes('GameOverlay') || content.includes('app/mini-games/_shared/GameOverlay');
+  const hasGameOverlay = content.includes('GameOverlay') || 
+                         content.includes('app/mini-games/_shared/GameOverlay') ||
+                         content.includes('../_shared/GameOverlay');
 
   if (!hasGameHUD) {
     warnings.push(`GameHUD component not found - should be added for consistent UI`);

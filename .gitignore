@@ -16,3 +16,7 @@ node_modules
 .vercel
 
 .vercel
+
+# TypeScript build info
+*.tsbuildinfo
+packages/avatar-engine/tsconfig.tsbuildinfo

@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { awardStreakShardIfEligible, userDayNY } from '@/app/lib/quests/server';
 import { db } from '@/lib/db';
+import { PetalService } from '@/app/lib/petals';
 // import { redis } from "@/lib/redis"; // Disabled due to Redis config issues
 
 const ClaimRequestSchema = z.object({
@@ -103,28 +104,28 @@ export async function POST(request: Request) {
     const availableToday = Math.max(0, DAILY_CAP - usedToday);
     const actualReward = Math.min(totalReward, availableToday);
 
-    await db.$transaction(async (tx) => {
-      await tx.questAssignment.update({
-        where: { id: assignment.id },
-        data: { claimedAt: new Date() },
-      });
-
-      if (actualReward > 0) {
-        await tx.user.update({
-          where: { id: user.id },
-          data: { petalBalance: { increment: actualReward } },
-        });
-
-        await tx.petalLedger.create({
-          data: {
-            userId: user.id,
-            type: 'earn',
-            amount: actualReward,
-            reason: `quest:${quest.key}`,
-          },
-        });
-      }
+    // Mark quest as claimed
+    await db.questAssignment.update({
+      where: { id: assignment.id },
+      data: { claimedAt: new Date() },
     });
+
+    // Award petals using PetalService (tracks lifetimeEarned)
+    let petalResult = { success: false, awarded: 0, newBalance: user.petalBalance, lifetimePetalsEarned: 0 };
+    if (actualReward > 0) {
+      const petalService = new PetalService();
+      petalResult = await petalService.awardPetals(user.id, {
+        type: 'earn',
+        amount: actualReward,
+        reason: `Quest reward: ${quest.key}`,
+        source: 'other', // Quest rewards are separate from games/achievements
+        metadata: {
+          questKey: quest.key,
+          questTitle: quest.title,
+          bonusEligible: assignment.bonusEligible,
+        },
+      });
+    }
 
     if (actualReward > 0) {
       // Redis disabled due to config issues - using database fallback
@@ -139,20 +140,16 @@ export async function POST(request: Request) {
 
     const streakShardAwarded = await awardStreakShardIfEligible(user.id, day);
 
-    const updatedUser = await db.user.findUnique({
-      where: { id: user.id },
-      select: { petalBalance: true },
-    });
-
     return NextResponse.json({
       ok: true,
-      petalsGranted: actualReward,
+      petalsGranted: petalResult.success ? petalResult.awarded : actualReward,
       totalReward,
       capped: actualReward < totalReward,
       dailyCapUsed: usedToday + actualReward,
       dailyCapRemaining: Math.max(0, DAILY_CAP - (usedToday + actualReward)),
       streakShardAwarded,
-      newBalance: updatedUser?.petalBalance ?? user.petalBalance ?? 0,
+      newBalance: petalResult.newBalance,
+      lifetimePetalsEarned: petalResult.lifetimePetalsEarned,
       quest: {
         key: quest.key,
         title: quest.title,

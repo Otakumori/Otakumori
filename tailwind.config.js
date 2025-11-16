@@ -28,14 +28,36 @@ module.exports = {
           border: 'var(--glass-border)',
           'border-hover': 'var(--glass-border-hover)',
         },
+        // Standardized color system
+        primary: {
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
+          active: 'var(--color-primary-active)',
+          disabled: 'var(--color-primary-disabled)',
+          focus: 'var(--color-primary-focus)',
+        },
         accent: {
-          pink: 'var(--accent-pink)',
-          purple: 'var(--accent-purple)',
+          DEFAULT: 'var(--color-accent)',
+          hover: 'var(--color-accent-hover)',
+          pink: 'var(--color-primary)', // Legacy alias
+          purple: 'var(--color-accent)', // Legacy alias
         },
         text: {
-          primary: 'var(--text-primary)',
-          secondary: 'var(--text-secondary)',
-          muted: 'var(--text-muted)',
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+          muted: 'var(--color-text-muted)',
+          link: 'var(--color-text-link)',
+          'link-hover': 'var(--color-text-link-hover)',
+        },
+        bg: {
+          base: 'var(--color-bg-base)',
+          surface: 'var(--color-bg-surface)',
+          glass: 'var(--color-bg-glass)',
+        },
+        border: {
+          DEFAULT: 'var(--color-border-default)',
+          hover: 'var(--color-border-hover)',
+          active: 'var(--color-border-active)',
         },
       },
       spacing: {

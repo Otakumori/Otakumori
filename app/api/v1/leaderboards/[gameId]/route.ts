@@ -107,12 +107,22 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
         // Update user achievements if applicable
         await updateAchievements(user.id, gameId, score, category, metadata);
 
-        // Award petals for new personal best
+        // Award petals for new personal best using PetalService (tracks lifetimeEarned)
         const petalReward = calculatePetalReward(score, category, metadata);
         if (petalReward > 0) {
-          await db.user.update({
-            where: { id: user.id },
-            data: { petalBalance: { increment: petalReward } },
+          const { PetalService } = await import('@/app/lib/petals');
+          const petalService = new PetalService();
+          await petalService.awardPetals(user.id, {
+            type: 'earn',
+            amount: petalReward,
+            reason: `Leaderboard reward: ${gameId} - ${category}`,
+            source: 'game', // Leaderboard rewards are game-based
+            metadata: {
+              gameId,
+              category,
+              score,
+              isPersonalBest: true,
+            },
           });
         }
 

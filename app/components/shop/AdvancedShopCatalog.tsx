@@ -8,16 +8,13 @@ import { FeaturedCarousel } from './FeaturedCarousel';
 import { RecentlyViewed } from './RecentlyViewed';
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
-import { removeHtmlTables, stripHtml } from '@/lib/html';
+import { stripHtml } from '@/lib/html';
 
 // Catalog Product Card
 function CatalogProductCard({ product }: { product: CatalogProduct }) {
   const displayImage = product.image ?? product.images[0] ?? '/assets/placeholder-product.jpg';
 
-  const summary = useMemo(() => {
-    const cleaned = removeHtmlTables(product.description || '');
-    return stripHtml(cleaned);
-  }, [product.description]);
+  const summary = useMemo(() => stripHtml(product.description || ''), [product.description]);
 
   const minPriceCents = product.priceRange.min ?? product.priceCents ?? null;
   const maxPriceCents = product.priceRange.max ?? product.priceCents ?? null;
@@ -49,7 +46,7 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
   );
 
   return (
-    <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 overflow-hidden hover:border-pink-500/50 hover:shadow-2xl hover:shadow-pink-500/20 transition-all duration-300 hover:-translate-y-1">
+    <div className="group bg-white/10 backdrop-blur-lg rounded-2xl border border-glass-border overflow-hidden hover:border-border-hover hover:shadow-2xl hover:shadow-[0_0_30px_var(--glow-pink)] transition-all duration-300 hover:-translate-y-1">
       <div className="relative aspect-square bg-white/5 overflow-hidden">
         <Image
           src={displayImage}
@@ -69,11 +66,11 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
       <div className="p-4 space-y-3">
         <div>
           <Link href={paths.product(product.id)} className="block">
-            <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 group-hover:text-pink-300 transition-colors">
+            <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2 group-hover:text-text-link-hover transition-colors">
               {product.title}
             </h3>
           </Link>
-          <div className="text-pink-400 font-bold text-xl">{priceDisplay}</div>
+          <div className="text-text-link-hover font-bold text-xl">{priceDisplay}</div>
         </div>
 
         <p className="text-zinc-300 text-sm line-clamp-2 leading-relaxed">
@@ -137,7 +134,7 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
 
         <Link
           href={paths.product(product.id)}
-          className="block w-full bg-gradient-to-r from-pink-500/80 to-purple-500/80 hover:from-pink-500 hover:to-purple-500 text-center text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-pink-500/40 hover:scale-105 active:scale-95"
+          className="block w-full bg-gradient-to-r from-primary/80 to-accent/80 hover:from-primary hover:to-accent text-center text-white font-semibold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_var(--glow-pink-strong)] hover:scale-105 active:scale-95"
         >
           View Details
         </Link>
@@ -334,8 +331,15 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
 
         if (result.ok || result.products) {
           const data = result.data || result;
+          const rawProducts = (data.products || []) as CatalogProduct[];
+          
+          // Deduplicate products by ID to prevent duplicates
+          const uniqueProducts = rawProducts.filter(
+            (product, index, self) => index === self.findIndex((p) => p.id === product.id)
+          );
+          
           setSearchResult({
-            products: (data.products || []) as CatalogProduct[],
+            products: uniqueProducts,
             total: data.pagination?.total ?? data.total ?? 0,
             page: data.pagination?.page ?? data.page ?? 1,
             totalPages: data.pagination?.totalPages ?? data.totalPages ?? 0,
@@ -346,7 +350,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
               availableSizes: [],
             },
           });
-          setProducts((data.products || []) as CatalogProduct[]);
+          setProducts(uniqueProducts);
           setError(null);
         } else {
           setSearchResult({
@@ -623,7 +627,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                         inStock: false,
                       })
                     }
-                    className="bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 px-6 py-3 rounded-xl transition-colors"
+                    className="bg-primary/20 hover:bg-primary/30 text-text-link-hover px-6 py-3 rounded-xl transition-colors"
                   >
                     Clear All Filters
                   </button>

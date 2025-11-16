@@ -154,10 +154,10 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
   }
 
   return (
-    <div className="glass-panel rounded-2xl p-6 space-y-6 border-pink-500/20 shadow-2xl shadow-pink-500/10">
+    <div className="glass-panel rounded-2xl p-6 space-y-6 border-primary/20 shadow-2xl shadow-[0_0_40px_var(--glow-pink)]">
       <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold text-pink-200 flex items-center gap-2">
-          <span className="text-pink-400">⚔</span>
+        <h3 className="text-2xl font-bold text-text-secondary flex items-center gap-2">
+          <span className="text-text-link-hover">⚔</span>
           What travelers say
         </h3>
         {!composing && (
@@ -186,7 +186,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
                   }}
                   className={`p-2 text-sm rounded-lg border transition-all ${
                     selectedTemplate === template
-                      ? 'bg-pink-500/20 border-pink-500/50 text-pink-200'
+                      ? 'bg-primary/20 border-primary/50 text-text-secondary'
                       : 'bg-white/5 border-white/10 text-zinc-300 hover:bg-white/10'
                   }`}
                 >
@@ -210,7 +210,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
               placeholder="Compose a sign..."
               maxLength={280}
               rows={3}
-              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-zinc-400 resize-none focus:border-pink-500/50 focus:outline-none"
+              className="w-full bg-white/10 border border-glass-border rounded-xl px-4 py-3 text-white placeholder-zinc-400 resize-none focus:border-border-hover focus:outline-none"
             />
             <div className="text-xs text-zinc-400 mt-1">{message.length} / 280</div>
           </div>
@@ -247,7 +247,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
           soapstones.map((stone) => (
             <div
               key={stone.id}
-              className="relative bg-black/30 border border-white/10 rounded-xl p-4 hover:border-pink-500/30 transition-all"
+              className="relative bg-black/30 border border-white/10 rounded-xl p-4 hover:border-border-hover transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -264,8 +264,8 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
                   disabled={!user}
                   className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
                     praisedIds.has(stone.id)
-                      ? 'bg-pink-500/20 text-pink-400'
-                      : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-pink-400'
+                      ? 'bg-primary/20 text-text-link-hover'
+                      : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-text-link-hover'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                   aria-label="Praise this sign"
                 >

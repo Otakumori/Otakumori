@@ -1,12 +1,30 @@
+/**
+ * Puzzle Reveal - Tile Reveal Puzzle Game
+ *
+ * Core Fantasy: Clear the fog to reveal the art. Watch your energy.
+ *
+ * Game Flow: instructions → playing → results
+ * Win Condition: Reveal all tiles before energy runs out
+ * Lose Condition: Energy reaches 0 before all tiles revealed
+ *
+ * Progression: Difficulty increases with grid size (easy: 4×3, medium: 6×5, hard: 8×6, expert: 10×8)
+ * Scoring: Base points per tile + combo multipliers + speed bonus
+ * Petals: Awarded based on final score, combo, difficulty
+ */
+
 'use client';
 
 import dynamic from 'next/dynamic';
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import GlassCard from '../../components/ui/GlassCard';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameHUD } from '../_shared/GameHUD';
 import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -32,6 +50,9 @@ export default function PuzzleRevealPage() {
   const [gameState, setGameState] = useState<'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('instructions');
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
+  const [finalScore, setFinalScore] = useState(0);
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -44,6 +65,27 @@ export default function PuzzleRevealPage() {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
+
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('puzzle-reveal');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('puzzle-reveal');
+  const { balance: petalBalance } = usePetalBalance();
+  const { earnPetals } = usePetalEarn();
+
+  // Game configuration - reserved for future game logic tuning
+  // const GAME_CONFIG = {
+  //   BASE_SCORE_PER_TILE: 100,
+  //   COMBO_BONUS_PER_LEVEL: 50,
+  //   MAX_COMBO: 10,
+  //   COMBO_WINDOW_MS: 500,
+  //   DIFFICULTY_MULTIPLIERS: {
+  //     easy: 1,
+  //     medium: 1.5,
+  //     hard: 2,
+  //     expert: 3,
+  //   },
+  // } as const;
   
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
@@ -67,15 +109,60 @@ export default function PuzzleRevealPage() {
       return;
     }
     setGameState('playing');
+    setPetalReward(null);
+    setHasAwardedPetals(false);
   };
 
   const handleRestart = () => {
     setKey((prev) => prev + 1);
     setGameState('playing');
+    setPetalReward(null);
+    setHasAwardedPetals(false);
   };
 
+  const handleGameEnd = useCallback(async (finalScoreValue: number, didWin: boolean) => {
+    setFinalScore(finalScoreValue);
+    setGameState(didWin ? 'win' : 'lose');
+
+    // Award petals using hook
+    if (!hasAwardedPetals) {
+      setHasAwardedPetals(true);
+      const result = await earnPetals({
+        gameId: 'puzzle-reveal',
+        score: finalScoreValue,
+        metadata: {
+          mode,
+          didWin,
+          combo,
+        },
+      });
+
+      if (result.success) {
+        setPetalReward(result.earned);
+      }
+    }
+
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/puzzle-reveal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScoreValue,
+          metadata: {
+            mode,
+            didWin,
+            combo,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [mode, combo, earnPetals, hasAwardedPetals]);
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-900 to-black p-4 page-transition">
+    <main className="min-h-screen p-4 page-transition" style={backgroundStyle}>
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <header className="mb-6">
@@ -88,12 +175,12 @@ export default function PuzzleRevealPage() {
                 Click tiles to reveal breathtaking artwork. Fast clicks build combos!
               </p>
             </div>
-            <a
+            <Link
               href="/mini-games"
               className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
             >
-              Back to Hub
-            </a>
+              Back to Arcade
+            </Link>
           </div>
 
           {/* Difficulty Selection */}
@@ -141,30 +228,44 @@ export default function PuzzleRevealPage() {
 
         {/* Game Canvas */}
         <GlassCard className="overflow-hidden p-4 relative">
+          {/* HUD - uses loader for cosmetics */}
           {gameState === 'playing' && (
-            <GameHUD
-              score={score}
-              combo={combo}
-            />
+            <>
+              {isQuakeHud ? (
+                <HudComponent
+                  {...hudProps}
+                  petals={petalBalance}
+                  gameId="puzzle-reveal"
+                />
+              ) : (
+                <HudComponent
+                  {...hudProps}
+                  score={score}
+                  combo={combo}
+                />
+              )}
+            </>
           )}
-          <EnhancedTileGame key={key} mode={mode} onScoreChange={setScore} onComboChange={setCombo} />
+          <EnhancedTileGame key={key} mode={mode} onScoreChange={setScore} onComboChange={setCombo} onGameEnd={handleGameEnd} />
         </GlassCard>
 
         {/* Game Overlay */}
         {!showAvatarChoice && (
           <GameOverlay
-          state={gameState}
-          instructions={[
-            'Click tiles to reveal the hidden artwork',
-            'Click tiles quickly (within 0.5s) to build combos',
-            'Max combo is 10x for massive score boosts',
-            'Watch your energy - each click consumes energy',
-            'Reveal all tiles to complete the puzzle',
-          ]}
-          winMessage="Puzzle Master! You revealed all tiles!"
-          score={score}
-          onRestart={handleRestart}
-          onResume={handleStart}
+            state={gameState}
+            instructions={[
+              'Click tiles to reveal the hidden artwork',
+              'Click tiles quickly (within 0.5s) to build combos',
+              'Max combo is 10x for massive score boosts',
+              'Watch your energy - each click consumes energy',
+              'Reveal all tiles to complete the puzzle',
+            ]}
+            winMessage="Puzzle Master! You revealed all tiles!"
+            loseMessage="Out of energy! Try again and manage your clicks better!"
+            score={finalScore || score}
+            petalReward={petalReward}
+            onRestart={handleRestart}
+            onResume={handleStart}
           />
         )}
 

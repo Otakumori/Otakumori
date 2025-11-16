@@ -1,6 +1,16 @@
 /**
  * Memory Match - Complete Implementation
  * "Recall the faces bound by fate."
+ *
+ * Core Fantasy: Match pairs of anime characters - memory and pattern recognition.
+ *
+ * Game Flow: menu → instructions → playing → results
+ * Win Condition: Match all pairs before time runs out
+ * Lose Condition: Time runs out (if time limit enabled)
+ *
+ * Progression: Difficulty increases with more pairs (easy: 6, normal: 8, hard: 10)
+ * Scoring: Base points + time bonus + move efficiency + streak bonuses
+ * Petals: Awarded on completion based on score, accuracy, difficulty
  */
 
 'use client';
@@ -10,8 +20,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { sessionTracker } from '@/lib/analytics/session-tracker';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameHUD } from '../_shared/GameHUD';
 import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -62,13 +75,26 @@ export default function MemoryMatchGame() {
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
 
-  // Difficulty settings
-  const difficultySettings = {
-    easy: { pairs: 6, timeBonus: 2 },
-    normal: { pairs: 8, timeBonus: 1.5 },
-    hard: { pairs: 10, timeBonus: 1 },
-  };
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('memory-match');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('memory-match');
+  const { balance: petalBalance } = usePetalBalance();
+  const { earnPetals } = usePetalEarn();
 
+  // Game configuration - difficulty tuning parameters
+  const GAME_CONFIG = {
+    DIFFICULTY_SETTINGS: {
+      easy: { pairs: 6, timeBonus: 2, baseScore: 1000 },
+      normal: { pairs: 8, timeBonus: 1.5, baseScore: 1500 },
+      hard: { pairs: 10, timeBonus: 1, baseScore: 2000 },
+    },
+    MOVE_BONUS_MULTIPLIER: 50,
+    STREAK_BONUS_MULTIPLIER: 25,
+    TIME_BONUS_BASE: 300,
+  } as const;
+
+  const difficultySettings = GAME_CONFIG.DIFFICULTY_SETTINGS;
   const settings = difficultySettings[difficulty];
 
   // Initialize game
@@ -94,6 +120,8 @@ export default function MemoryMatchGame() {
     setTimeElapsed(0);
     setStreak(0);
     setFinalScore(0);
+    setPetalReward(null);
+    setHasAwardedPetals(false);
 
     // Start session tracking
     sessionTracker
@@ -123,42 +151,51 @@ export default function MemoryMatchGame() {
 
   // Auto-save removed for simplified implementation
 
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+
   // Complete game
   const completeGame = useCallback(async () => {
     setGameState('win');
 
     // Calculate score
-    const timeBonus = Math.max(0, 300 - timeElapsed) * settings.timeBonus;
-    const moveBonus = Math.max(0, settings.pairs * 2 - moves) * 50;
-    const streakBonus = streak * 25;
-    const calculatedScore = Math.round(1000 + timeBonus + moveBonus + streakBonus);
+    const timeBonus = Math.max(0, GAME_CONFIG.TIME_BONUS_BASE - timeElapsed) * settings.timeBonus;
+    const moveBonus = Math.max(0, settings.pairs * 2 - moves) * GAME_CONFIG.MOVE_BONUS_MULTIPLIER;
+    const streakBonus = streak * GAME_CONFIG.STREAK_BONUS_MULTIPLIER;
+    const calculatedScore = Math.round(settings.baseScore + timeBonus + moveBonus + streakBonus);
     setFinalScore(calculatedScore);
 
     // Calculate accuracy
     const accuracy = matches / Math.max(moves, 1);
-
-    // Calculate petal reward
-    const petalReward = Math.floor(calculatedScore / 10);
 
     // End session tracking
     if (sessionId.current) {
       await sessionTracker.endSession(calculatedScore);
     }
 
-    try {
-      // Award petals
-      if (petalReward > 0) {
-        await fetch('/api/v1/petals/collect', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: petalReward,
-            source: 'game_reward',
-          }),
-        });
-      }
+    // Award petals using hook
+    if (!hasAwardedPetals) {
+      setHasAwardedPetals(true);
+      const result = await earnPetals({
+        gameId: 'memory-match',
+        score: calculatedScore,
+        metadata: {
+          timeElapsed,
+          moves,
+          accuracy,
+          difficulty,
+          streak,
+          pairs: settings.pairs,
+        },
+      });
 
-      // Submit to leaderboard
+      if (result.success) {
+        setPetalReward(result.earned);
+      }
+    }
+
+    // Submit to leaderboard
+    try {
       await fetch('/api/v1/leaderboards/memory-match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,14 +206,15 @@ export default function MemoryMatchGame() {
             moves,
             accuracy,
             difficulty,
-            streakBonus,
+            streak,
+            pairs: settings.pairs,
           },
         }),
       });
     } catch (error) {
       console.error('Failed to submit score:', error);
     }
-  }, [timeElapsed, moves, matches, streak, settings, difficulty]);
+  }, [timeElapsed, moves, matches, streak, settings, difficulty, earnPetals, hasAwardedPetals]);
 
   // Handle card flip (with double-click prevention)
   const handleCardFlip = useCallback(
@@ -249,14 +287,6 @@ export default function MemoryMatchGame() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Pause/Resume
-  const _togglePause = () => {
-    if (gameState === 'playing') {
-      setGameState('paused');
-    } else if (gameState === 'paused') {
-      setGameState('playing');
-    }
-  };
 
   // Restart handler
   const handleRestart = useCallback(() => {
@@ -281,7 +311,7 @@ export default function MemoryMatchGame() {
   }, [initializeGame]);
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-slate-900 to-black p-4">
+    <div className="relative min-h-screen p-4" style={backgroundStyle}>
       <div className="container mx-auto max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -369,12 +399,21 @@ export default function MemoryMatchGame() {
         {/* Game UI */}
         {(gameState === 'playing' || gameState === 'paused') && (
           <>
-            {/* Game HUD */}
-            <GameHUD
-              score={finalScore}
-              timer={timeElapsed}
-              combo={streak}
-            />
+            {/* HUD - uses loader for cosmetics */}
+            {isQuakeHud ? (
+              <HudComponent
+                {...hudProps}
+                petals={petalBalance}
+                gameId="memory-match"
+              />
+            ) : (
+              <HudComponent
+                {...hudProps}
+                score={finalScore}
+                timer={timeElapsed}
+                combo={streak}
+              />
+            )}
 
             {/* Game Board */}
             <div
@@ -455,6 +494,7 @@ export default function MemoryMatchGame() {
           ]}
           winMessage={`Memory Master! You matched all ${settings.pairs} pairs in ${formatTime(timeElapsed)}!`}
           score={finalScore}
+          petalReward={petalReward}
           onRestart={handleRestart}
           onResume={handleStart}
         />

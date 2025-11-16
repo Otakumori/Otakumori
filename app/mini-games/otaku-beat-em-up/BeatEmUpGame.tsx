@@ -62,9 +62,10 @@ interface Props {
   onScoreChange?: (score: number) => void;
   onHealthChange?: (health: number) => void;
   onComboChange?: (combo: number) => void;
+  onGameEnd?: (score: number, didWin: boolean) => void;
 }
 
-export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onComboChange }: Props) {
+export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onComboChange, onGameEnd }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const beatIntervalRef = useRef<number | null>(null);
@@ -494,6 +495,10 @@ export default function BeatEmUpGame({ mode, onScoreChange, onHealthChange, onCo
       // Check game over
       if (gameState.health <= 0) {
         setGameState((prev) => ({ ...prev, isGameOver: true }));
+        // Notify parent of game over
+        if (onGameEnd) {
+          onGameEnd(gameState.score, false); // didWin = false (health reached 0)
+        }
         return;
       }
 

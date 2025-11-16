@@ -1,3 +1,17 @@
+/**
+ * Dungeon of Desire - Roguelike Dungeon Crawler
+ *
+ * Core Fantasy: Descend into the dungeon. Survive rooms and claim rewards.
+ *
+ * Game Flow: instructions → playing → results
+ * Win Condition: Complete dungeon floors
+ * Lose Condition: Health reaches 0
+ *
+ * Progression: Procedural dungeon floors with increasing difficulty
+ * Scoring: Base points per room + floor bonus + survival bonus
+ * Petals: Awarded based on final score, floors cleared, rooms survived
+ */
+
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -6,7 +20,11 @@ import GameShell from '../_shared/GameShell';
 import DungeonGame from './DungeonGame';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameHUD } from '../_shared/GameHUD';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -15,7 +33,11 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 export default function DungeonOfDesirePage() {
   const [score, setScore] = useState(0);
   const [health, setHealth] = useState(100);
-  const [_floor, setFloor] = useState(1);
+  const [floor, setFloor] = useState(1);
+  const [gameState, setGameState] = useState<'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('instructions');
+  const [finalScore, setFinalScore] = useState(0);
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -28,6 +50,20 @@ export default function DungeonOfDesirePage() {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
+
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('dungeon-of-desire');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('dungeon-of-desire');
+  const { balance: petalBalance } = usePetalBalance();
+  const { earnPetals } = usePetalEarn();
+
+  // Game configuration
+  const GAME_CONFIG = {
+    MAX_HEALTH: 100,
+    BASE_SCORE_PER_ROOM: 50,
+    FLOOR_BONUS_MULTIPLIER: 100,
+  } as const;
   
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
@@ -36,13 +72,53 @@ export default function DungeonOfDesirePage() {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
+    setGameState('instructions');
   }, []);
+
+  const handleGameEnd = useCallback(async (finalScoreValue: number, didWin: boolean) => {
+    setFinalScore(finalScoreValue);
+    setGameState(didWin ? 'win' : 'lose');
+
+    // Award petals using hook
+    if (!hasAwardedPetals) {
+      setHasAwardedPetals(true);
+      const result = await earnPetals({
+        gameId: 'dungeon-of-desire',
+        score: finalScoreValue,
+        metadata: {
+          didWin,
+          floor,
+        },
+      });
+
+      if (result.success) {
+        setPetalReward(result.earned);
+      }
+    }
+
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/dungeon-of-desire', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScoreValue,
+          metadata: {
+            didWin,
+            floor,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [floor, earnPetals, hasAwardedPetals]);
   
   // Check if we should show choice
   const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black">
+    <div className="relative min-h-screen" style={backgroundStyle}>
       {/* Header */}
       <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
         <Link
@@ -80,16 +156,51 @@ export default function DungeonOfDesirePage() {
         </div>
       )}
 
-      {/* Game HUD */}
-      <GameHUD
-        score={score}
-        health={health}
-        maxHealth={100}
-      />
+      {/* HUD - uses loader for cosmetics */}
+      {isQuakeHud ? (
+        <HudComponent
+          {...hudProps}
+          petals={petalBalance}
+          gameId="dungeon-of-desire"
+        />
+      ) : (
+        <HudComponent
+          {...hudProps}
+          score={score}
+          health={health}
+          maxHealth={GAME_CONFIG.MAX_HEALTH}
+        />
+      )}
 
       <GameShell title="Dungeon of Desire" gameKey="dungeon-of-desire">
-        <DungeonGame onScoreChange={setScore} onHealthChange={setHealth} onFloorChange={setFloor} />
+        <DungeonGame onScoreChange={setScore} onHealthChange={setHealth} onFloorChange={setFloor} onGameEnd={handleGameEnd} />
       </GameShell>
+
+      {/* Game Overlay */}
+      <GameOverlay
+        state={gameState}
+        instructions={[
+          'Navigate through dungeon rooms',
+          'Defeat enemies to progress',
+          'Collect items and power-ups',
+          'Survive to reach deeper floors',
+          'Each floor increases difficulty',
+        ]}
+        winMessage={`Dungeon Master! You cleared floor ${floor}!`}
+        loseMessage="Your health reached zero. Try again!"
+        score={finalScore || score}
+        petalReward={petalReward}
+        onRestart={() => {
+          setGameState('playing');
+          setPetalReward(null);
+          setHasAwardedPetals(false);
+        }}
+        onResume={() => {
+          setGameState('playing');
+          setPetalReward(null);
+          setHasAwardedPetals(false);
+        }}
+      />
     </div>
   );
 }

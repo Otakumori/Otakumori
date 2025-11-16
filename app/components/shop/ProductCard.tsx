@@ -65,7 +65,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="flex flex-col">
             {typeof petalPrice === 'number' ? (
               <>
-                <div className="flex items-center gap-1.5 text-pink-200">
+                <div className="flex items-center gap-1.5 text-text-secondary">
                   <PetalIcon className="h-4 w-4" />
                   <span className="text-sm font-bold">{petalPrice.toLocaleString()} petals</span>
                 </div>
@@ -97,7 +97,7 @@ export default function ProductCard({ product }: { product: Product }) {
           className={[
             'w-full rounded-2xl px-4 py-2.5 text-sm font-semibold transition-colors',
             inStock
-              ? 'bg-pink-500/90 hover:bg-pink-400/90 text-black'
+              ? 'bg-gradient-to-r from-primary/90 to-accent/90 hover:from-primary hover:to-accent text-white'
               : 'bg-white/10 text-white/50 cursor-not-allowed',
           ].join(' ')}
         >

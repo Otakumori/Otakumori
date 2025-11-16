@@ -10,6 +10,8 @@ import { useAuthContext } from '@/app/contexts/AuthContext';
 import gamesRegistry from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
 import { HeaderButton } from '@/components/ui/header-button';
+import { useCart } from '@/app/components/cart/CartProvider';
+import { ShoppingCart } from 'lucide-react';
 
 // Get featured games from registry
 const FEATURED_GAMES = gamesRegistry.games
@@ -99,6 +101,7 @@ export default function Navbar() {
     requireAuthForSoapstone: _requireAuthForSoapstone,
     requireAuthForWishlist: _requireAuthForWishlist,
   } = useAuthContext(); // Reserved for future protected nav links
+  const { itemCount } = useCart();
 
   // State for mega-menu and search
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -224,6 +227,13 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Close dropdowns when navigating to a new page
+  useEffect(() => {
+    setActiveDropdown(null);
+    setShowSearchDropdown(false);
+    setIsMenuOpen(false);
+  }, [pathname]);
+
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -266,9 +276,8 @@ export default function Navbar() {
           {/* Home */}
           <Link
             href={paths.home()}
-            style={{ color: '#835D75' }}
-            className={`hover:text-pink-400 transition-colors ${
-              pathname === paths.home() ? 'text-pink-400 border-b-2 border-pink-400' : ''
+            className={`text-text-link hover:text-text-link-hover transition-colors ${
+              pathname === paths.home() ? 'text-text-link-hover border-b-2 border-primary' : ''
             }`}
           >
             Home
@@ -278,9 +287,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onMouseEnter={() => setActiveDropdown('shop')}
-              style={{ color: '#835D75' }}
-              className={`hover:text-pink-400 transition-colors flex items-center ${
-                pathname.startsWith('/shop') ? 'text-pink-400 border-b-2 border-pink-400' : ''
+              className={`text-text-link hover:text-text-link-hover transition-colors flex items-center ${
+                pathname.startsWith('/shop') ? 'text-text-link-hover border-b-2 border-primary' : ''
               }`}
             >
               Shop
@@ -331,7 +339,7 @@ export default function Navbar() {
                             </div>
                             <div className="min-w-0">
                               <p className="truncate text-sm font-medium text-white">{product.title}</p>
-                              <p className="text-xs text-pink-300">${product.price.toFixed(2)}</p>
+                              <p className="text-xs text-text-link-hover">${product.price.toFixed(2)}</p>
                             </div>
                           </Link>
                         ))}
@@ -373,9 +381,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onMouseEnter={() => setActiveDropdown('games')}
-              style={{ color: '#835D75' }}
-              className={`hover:text-pink-400 transition-colors flex items-center ${
-                pathname.startsWith('/mini-games') ? 'text-pink-400 border-b-2 border-pink-400' : ''
+              className={`text-text-link hover:text-text-link-hover transition-colors flex items-center ${
+                pathname.startsWith('/mini-games') ? 'text-text-link-hover border-b-2 border-primary' : ''
               }`}
             >
               Mini-Games
@@ -458,9 +465,8 @@ export default function Navbar() {
           <div className="relative">
             <button
               onMouseEnter={() => setActiveDropdown('blog')}
-              style={{ color: '#835D75' }}
-              className={`hover:text-pink-400 transition-colors flex items-center ${
-                pathname.startsWith('/blog') ? 'text-pink-400 border-b-2 border-pink-400' : ''
+              className={`text-text-link hover:text-text-link-hover transition-colors flex items-center ${
+                pathname.startsWith('/blog') ? 'text-text-link-hover border-b-2 border-primary' : ''
               }`}
             >
               Blog
@@ -506,7 +512,7 @@ export default function Navbar() {
                 </div>
                 <Link
                   href="/blog"
-                  className="block text-center text-pink-400 hover:text-pink-300 text-sm font-medium"
+                  className="block text-center text-text-link-hover hover:text-primary-hover text-sm font-medium"
                 >
                   View All Posts →
                 </Link>
@@ -517,9 +523,8 @@ export default function Navbar() {
           {/* About */}
           <Link
             href="/about"
-            style={{ color: '#835D75' }}
-            className={`hover:text-pink-400 transition-colors ${
-              pathname === '/about' ? 'text-pink-400 border-b-2 border-pink-400' : ''
+            className={`text-text-link hover:text-text-link-hover transition-colors ${
+              pathname === '/about' ? 'text-text-link-hover border-b-2 border-primary' : ''
             }`}
           >
             About
@@ -565,7 +570,7 @@ export default function Navbar() {
                   >
                     <span>{suggestion}</span>
                     {EASTER_EGGS[suggestion] && (
-                      <span className="text-xs text-pink-400">{EASTER_EGGS[suggestion]}</span>
+                      <span className="text-xs text-text-link-hover">{EASTER_EGGS[suggestion]}</span>
                     )}
                   </button>
                 ))}
@@ -573,21 +578,34 @@ export default function Navbar() {
             )}
           </div>
 
+          {/* Cart Icon */}
+          <Link
+            href={paths.cart()}
+            className="relative p-2 text-text-link hover:text-text-link-hover transition-colors"
+            aria-label={`Shopping cart with ${itemCount} items`}
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
+          </Link>
+
           {/* Auth */}
           {isSignedIn ? (
             <UserButton
               appearance={{
                 elements: {
                   avatarBox:
-                    'w-8 h-8 border border-white/20 hover:border-pink-400/50 transition-colors',
+                    'w-8 h-8 border border-glass-border hover:border-border-hover transition-colors',
                 },
               }}
             />
           ) : (
             <SignInButton mode="modal">
               <button
-                style={{ color: '#835D75' }}
-                className="px-4 py-2 bg-transparent border border-current rounded-lg hover:text-pink-400 hover:border-pink-400 transition-all duration-300"
+                className="px-4 py-2 bg-transparent border border-current rounded-lg text-text-link hover:text-text-link-hover hover:border-primary transition-all duration-300"
               >
                 Sign In
               </button>
@@ -612,20 +630,32 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/20">
           <div className="px-4 py-2 space-y-2">
-            <Link href={paths.home()} className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.home()} className="block text-text-primary hover:text-text-link-hover py-2">
               Home
             </Link>
-            <Link href={paths.shop()} className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.shop()} className="block text-text-primary hover:text-text-link-hover py-2">
               Shop
             </Link>
-            <Link href={paths.games()} className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.games()} className="block text-text-primary hover:text-text-link-hover py-2">
               Mini-Games
             </Link>
-            <Link href={paths.blogIndex()} className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.blogIndex()} className="block text-text-primary hover:text-text-link-hover py-2">
               Blog
             </Link>
-            <Link href={paths.help()} className="block text-white hover:text-pink-400 py-2">
+            <Link href={paths.help()} className="block text-text-primary hover:text-text-link-hover py-2">
               About
+            </Link>
+            <Link
+              href={paths.cart()}
+              className="flex items-center gap-2 text-text-primary hover:text-text-link-hover py-2"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              Cart
+              {itemCount > 0 && (
+                <span className="bg-primary text-white text-xs rounded-full px-2 py-0.5 font-semibold">
+                  {itemCount}
+                </span>
+              )}
             </Link>
           </div>
         </div>

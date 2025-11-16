@@ -176,7 +176,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           disabled={!isInStock || isAddingToCart}
           className={`w-full rounded-xl px-6 py-4 font-semibold transition-colors ${
             isInStock && !isAddingToCart
-              ? 'bg-fuchsia-500/90 text-white hover:bg-fuchsia-500'
+              ? 'bg-gradient-to-r from-primary to-accent text-white hover:from-primary-hover hover:to-accent-hover'
               : 'bg-zinc-600 text-zinc-400 cursor-not-allowed'
           }`}
           data-testid="add-to-cart"

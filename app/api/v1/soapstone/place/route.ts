@@ -13,7 +13,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { db } from '@/app/lib/db';
 import { ensureUserByClerkId } from '@/lib/petals-db';
 import { withRateLimit } from '@/lib/security/rate-limiting';
 import { withSecurityHeaders } from '@/lib/security/headers';
@@ -192,31 +191,27 @@ async function handler(request: NextRequest) {
       createdAt: new Date(),
     };
 
-    // Award petals for message placement
+    // Award petals for message placement using PetalService
     const petalReward = calculatePetalReward(message, tags, messageScore);
+    let petalResult = null;
+    
     if (petalReward > 0) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { petalBalance: { increment: petalReward } },
+      const { PetalService } = await import('@/app/lib/petals');
+      const petalService = new PetalService();
+      
+      petalResult = await petalService.awardPetals(user.id, {
+        type: 'earn',
+        amount: petalReward,
+        reason: 'soapstone_place',
+        source: 'other', // Soapstone placement is "other" source
+        metadata: {
+          messageId,
+          messageLength: message.length,
+          tags,
+          score: messageScore,
+          location: location.page,
+        },
       });
-
-      // Mock petal transaction record
-      // await db.petalTransaction.create({
-      //   data: {
-      //     id: generateTransactionId(),
-      //     userId: user.id,
-      //     type: 'earn',
-      //     amount: petalReward,
-      //     source: 'soapstone_place',
-      //     sourceId: messageId,
-      //     metadata: {
-      //       messageLength: message.length,
-      //       tags,
-      //       score: messageScore,
-      //     },
-      //     status: 'completed',
-      //   }
-      // });
     }
 
     // Update user stats - simplified
@@ -261,11 +256,13 @@ async function handler(request: NextRequest) {
           createdAt: soapstoneMessage.createdAt,
         },
         rewards: {
-          petals: petalReward,
+          petals: petalResult?.awarded || petalReward,
           experience: Math.floor(messageScore * 10),
+          dailyCapReached: petalResult?.dailyCapReached || false,
         },
         user: {
-          newBalance: user.petalBalance + petalReward,
+          newBalance: petalResult?.newBalance || user.petalBalance,
+          lifetimePetalsEarned: petalResult?.lifetimePetalsEarned || 0,
           messagesPlaced: await getSoapstoneCount(user.id),
         },
         limits: {

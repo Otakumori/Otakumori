@@ -133,7 +133,7 @@ export function FeaturedCarousel({
           <div className="max-w-2xl space-y-4 md:space-y-6">
             {/* Badge */}
             <div className="flex items-center gap-3">
-              <span className="bg-pink-500/90 text-white text-xs md:text-sm font-bold px-4 py-1.5 rounded-full">
+              <span className="bg-primary/90 text-white text-xs md:text-sm font-bold px-4 py-1.5 rounded-full">
                 FEATURED
               </span>
               {currentProduct.tags && currentProduct.tags.includes('express_shipping') && (
@@ -155,7 +155,7 @@ export function FeaturedCarousel({
 
             {/* Price and CTA */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="text-2xl md:text-4xl font-bold text-pink-400">{priceDisplay}</div>
+              <div className="text-2xl md:text-4xl font-bold text-text-link-hover">{priceDisplay}</div>
               <HeaderButton
                 href={paths.product(currentProduct.id)}
                 className="group flex items-center gap-2 px-6 py-3 text-base font-semibold"
@@ -208,9 +208,9 @@ export function FeaturedCarousel({
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 ${
+                className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-focus ${
                   index === currentIndex
-                    ? 'bg-pink-500 w-8 h-2'
+                    ? 'bg-primary w-8 h-2'
                     : 'bg-white/40 hover:bg-white/60 w-2 h-2'
                 }`}
                 aria-label={`Go to product ${index + 1}`}

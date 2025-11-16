@@ -34,6 +34,8 @@
       "@/lib/*": ["./lib/*", "./app/lib/*"],
       "@om/avatar": ["./packages/avatar/src/index.ts"],
       "@om/avatar/*": ["./packages/avatar/src/*"],
+      "@om/avatar-engine": ["./packages/avatar-engine/src/index.ts"],
+      "@om/avatar-engine/*": ["./packages/avatar-engine/src/*"],
       "@om/game-kit": ["./packages/game-kit/src/index.ts"],
       "@om/game-kit/*": ["./packages/game-kit/src/*"],
       "@om/ecs": ["./packages/ecs/src/index.ts"],

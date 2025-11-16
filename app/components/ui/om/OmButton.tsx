@@ -24,20 +24,20 @@ export const OmButton = forwardRef<HTMLButtonElement, OmButtonProps>(
     const baseClasses = cn(
       // Base styles
       'relative inline-flex items-center justify-center rounded-xl font-medium transition-all duration-300',
-      'focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:ring-offset-2 focus:ring-offset-black',
+      'focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 focus:ring-offset-black',
       'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed',
       'backdrop-blur-lg',
       'active:scale-95',
       // Variants
       {
         // Primary: pink gradient with glass effect
-        'bg-gradient-to-r from-pink-500/80 to-purple-500/80 border border-pink-400/40 text-white shadow-lg hover:from-pink-500 hover:to-purple-500 hover:shadow-[0_0_30px_rgba(236,72,153,0.4)]':
+        'bg-gradient-to-r from-primary/80 to-accent/80 border border-primary/40 text-white shadow-lg hover:from-primary hover:to-accent hover:shadow-[0_0_30px_var(--glow-pink-strong)]':
           variant === 'primary',
         // Ghost: minimal glass effect
-        'bg-white/5 border border-white/10 text-pink-200/80 hover:bg-white/10 hover:border-white/20 hover:text-pink-200':
+        'bg-white/5 border border-glass-border text-text-secondary hover:bg-glass-bg-hover hover:border-border-hover hover:text-text-link-hover':
           variant === 'ghost',
         // Danger: red/pink gradient
-        'bg-gradient-to-r from-red-500/80 to-pink-500/80 border border-red-400/40 text-white shadow-lg hover:from-red-500 hover:to-pink-500 hover:shadow-[0_0_30px_rgba(239,68,68,0.4)]':
+        'bg-gradient-to-r from-red-500/80 to-primary/80 border border-red-400/40 text-white shadow-lg hover:from-red-500 hover:to-primary hover:shadow-[0_0_30px_rgba(239,68,68,0.4)]':
           variant === 'danger',
       },
       // Sizes

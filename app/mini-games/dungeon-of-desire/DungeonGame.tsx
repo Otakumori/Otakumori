@@ -49,10 +49,12 @@ export default function DungeonGame({
   onScoreChange,
   onHealthChange,
   onFloorChange,
+  onGameEnd,
 }: {
   onScoreChange?: (score: number) => void;
   onHealthChange?: (health: number) => void;
   onFloorChange?: (floor: number) => void;
+  onGameEnd?: (score: number, didWin: boolean) => void;
 } = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
@@ -510,6 +512,10 @@ export default function DungeonGame({
       // Check game over
       if (player.health <= 0) {
         setGameState('gameOver');
+        // Notify parent of game over
+        if (onGameEnd) {
+          onGameEnd(score, false); // didWin = false (health reached 0)
+        }
       }
 
       // Floor progression (every 30 seconds)

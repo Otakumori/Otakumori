@@ -1,3 +1,17 @@
+/**
+ * Thigh Coliseum - Arena Combat Game
+ *
+ * Core Fantasy: Enter the arena. Win rounds and advance the bracket.
+ *
+ * Game Flow: instructions → playing → results
+ * Win Condition: Win all rounds in bracket
+ * Lose Condition: Lose all lives
+ *
+ * Progression: Bracket-style tournament with increasing difficulty
+ * Scoring: Base points per round + win streak + bracket position
+ * Petals: Awarded based on final score, rounds won, bracket position
+ */
+
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -6,7 +20,11 @@ import GameShell from '../_shared/GameShell';
 import ThighChaseGame from './ThighChaseGame';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameHUD } from '../_shared/GameHUD';
+import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -15,7 +33,11 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 export default function ThighColiseumPage() {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
-  const [_stage, setStage] = useState(1);
+  const [stage, setStage] = useState(1);
+  const [gameState, setGameState] = useState<'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('instructions');
+  const [finalScore, setFinalScore] = useState(0);
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -28,6 +50,20 @@ export default function ThighColiseumPage() {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
+
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('thigh-coliseum');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('thigh-coliseum');
+  const { balance: petalBalance } = usePetalBalance();
+  const { earnPetals } = usePetalEarn();
+
+  // Game configuration - reserved for future game logic tuning
+  // const GAME_CONFIG = {
+  //   INITIAL_LIVES: 3,
+  //   BASE_SCORE_PER_ROUND: 100,
+  //   STAGE_BONUS_MULTIPLIER: 50,
+  // } as const;
   
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
@@ -36,13 +72,55 @@ export default function ThighColiseumPage() {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
+    setGameState('instructions');
   }, []);
+
+  const handleGameEnd = useCallback(async (finalScoreValue: number, didWin: boolean) => {
+    setFinalScore(finalScoreValue);
+    setGameState(didWin ? 'win' : 'lose');
+
+    // Award petals using hook
+    if (!hasAwardedPetals) {
+      setHasAwardedPetals(true);
+      const result = await earnPetals({
+        gameId: 'thigh-coliseum',
+        score: finalScoreValue,
+        metadata: {
+          didWin,
+          stage,
+          lives,
+        },
+      });
+
+      if (result.success) {
+        setPetalReward(result.earned);
+      }
+    }
+
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/thigh-coliseum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScoreValue,
+          metadata: {
+            didWin,
+            stage,
+            lives,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [stage, lives, earnPetals, hasAwardedPetals]);
   
   // Check if we should show choice
   const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-900 via-pink-800 to-red-900">
+    <div className="relative min-h-screen" style={backgroundStyle}>
       {/* Header */}
       <div className="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
         <Link
@@ -80,15 +158,50 @@ export default function ThighColiseumPage() {
         </div>
       )}
 
-      {/* Game HUD */}
-      <GameHUD
-        score={score}
-        lives={lives}
-      />
+      {/* HUD - uses loader for cosmetics */}
+      {isQuakeHud ? (
+        <HudComponent
+          {...hudProps}
+          petals={petalBalance}
+          gameId="thigh-coliseum"
+        />
+      ) : (
+        <HudComponent
+          {...hudProps}
+          score={score}
+          lives={lives}
+        />
+      )}
 
       <GameShell title="Thigh Colosseum" gameKey="thigh-coliseum">
-        <ThighChaseGame onScoreChange={setScore} onLivesChange={setLives} onStageChange={setStage} />
+        <ThighChaseGame onScoreChange={setScore} onLivesChange={setLives} onStageChange={setStage} onGameEnd={handleGameEnd} />
       </GameShell>
+
+      {/* Game Overlay */}
+      <GameOverlay
+        state={gameState}
+        instructions={[
+          'Win rounds to advance in the bracket',
+          'Defeat opponents to progress',
+          'Use strategy and timing',
+          'Survive with your lives',
+          'Reach the final round to win!',
+        ]}
+        winMessage={`Arena Champion! You won stage ${stage}!`}
+        loseMessage="All lives lost. Try again!"
+        score={finalScore || score}
+        petalReward={petalReward}
+        onRestart={() => {
+          setGameState('playing');
+          setPetalReward(null);
+          setHasAwardedPetals(false);
+        }}
+        onResume={() => {
+          setGameState('playing');
+          setPetalReward(null);
+          setHasAwardedPetals(false);
+        }}
+      />
     </div>
   );
 }

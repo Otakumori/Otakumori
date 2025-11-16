@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
 import { DAILY_QUESTS } from '@/app/lib/quests';
+import { PetalService } from '@/app/lib/petals';
 
 const db = new PrismaClient();
 
@@ -46,18 +47,29 @@ export async function POST(req: Request) {
     return new NextResponse('Already claimed', { status: 409 });
   }
 
-  // reward petals
-  await db.$transaction([
-    db.questAssignment.update({
-      where: { id: assignment.id },
-      data: { claimedAt: new Date() },
-    }),
-    db.petalWallet.upsert({
-      where: { userId },
-      update: { balance: { increment: q.reward } },
-      create: { User: { connect: { id: userId } }, balance: q.reward },
-    }),
-  ]);
+  // Mark quest as claimed
+  await db.questAssignment.update({
+    where: { id: assignment.id },
+    data: { claimedAt: new Date() },
+  });
 
-  return NextResponse.json({ ok: true, reward: q.reward });
+  // Award petals using PetalService (tracks lifetimeEarned)
+  const petalService = new PetalService();
+  const petalResult = await petalService.awardPetals(userId, {
+    type: 'earn',
+    amount: q.reward,
+    reason: `Quest reward: ${q.id}`,
+    source: 'other', // Quest rewards are separate from games/achievements
+    metadata: {
+      questId: q.id,
+      questTitle: q.title,
+    },
+  });
+
+  return NextResponse.json({
+    ok: true,
+    reward: petalResult.success ? petalResult.awarded : q.reward,
+    balance: petalResult.newBalance,
+    lifetimePetalsEarned: petalResult.lifetimePetalsEarned,
+  });
 }

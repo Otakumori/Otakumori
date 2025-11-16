@@ -15,9 +15,12 @@ import InteractivePetals from '@/components/hero/InteractivePetals';
 
 // Client-side petal system components
 import PetalSystem from './components/petals/PetalSystem';
+import PetalField from '@/components/petals/PetalField';
 
 // Cherry blossom tree background
 import TreeBackground from './components/TreeBackground';
+import { PetalFlowOverlayWrapper } from './components/home/PetalFlowOverlayWrapper';
+import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapper';
 
 export const revalidate = 60;
 
@@ -33,10 +36,23 @@ export default async function HomePage() {
   return (
     <>
       {/* Cherry blossom tree background - fixed with parallax */}
-      <TreeBackground />
+      <div className="relative">
+        <TreeBackground />
+        
+        {/* Sprite-based cherry petal layer - new implementation */}
+        <div className="absolute inset-0" style={{ zIndex: -8 }}>
+          <CherryPetalLayerWrapper />
+        </div>
+        
+        {/* Legacy petal flow overlay - kept for compatibility, can be removed later */}
+        <PetalFlowOverlayWrapper />
+      </div>
 
       {/* Petal collection system - renders behind main content */}
       <PetalSystem />
+
+      {/* Sakura-style petal field with sprite sheet - full screen, clickable */}
+      <PetalField petalCount={30} speedMultiplier={0.4} hitRadius={30} enabled={true} />
 
       <main className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* SHOP */}

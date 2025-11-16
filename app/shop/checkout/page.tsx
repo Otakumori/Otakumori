@@ -83,11 +83,15 @@ export default function CheckoutPage() {
         printifyVariantId: item.selectedVariant?.id || 1, // This would come from the variant data
       }));
 
+      // Generate idempotency key
+      const idempotencyKey = `checkout_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
       // Create checkout session
-      const response = await fetch('/api/checkout/session', {
+      const response = await fetch('/api/v1/checkout/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-idempotency-key': idempotencyKey,
         },
         body: JSON.stringify({
           items: orderItems,
@@ -99,11 +103,16 @@ export default function CheckoutPage() {
 
       const data = await response.json();
 
-      if (data.ok) {
+      if (data.ok && data.data?.url) {
         // Redirect to Stripe checkout
         window.location.href = data.data.url;
       } else {
-        setError(data.error || 'Failed to create checkout session');
+        // Handle specific error cases
+        if (response.status === 503) {
+          setError('Checkout is temporarily unavailable. Please contact support or try again later.');
+        } else {
+          setError(data.error || 'Failed to create checkout session. Please try again.');
+        }
       }
     } catch (err) {
       setError('An error occurred while processing your order');

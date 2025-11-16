@@ -1,3 +1,17 @@
+/**
+ * Bubble Girl - Physics-Based Interactive Character Game
+ *
+ * Core Fantasy: Spawn bubbles, float and score. Sandbox or challenge mode.
+ *
+ * Game Flow: instructions → playing → results
+ * Win Condition: Complete challenge objectives (challenge mode) or reach target score
+ * Lose Condition: Health reaches 0 (challenge mode)
+ *
+ * Progression: Sandbox (free play), Stress Relief (relaxing), Challenge (objectives)
+ * Scoring: Points for interactions, combos, stress relief
+ * Petals: Awarded based on final score and mode completion
+ */
+
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -6,8 +20,11 @@ import Link from 'next/link';
 import GlassCard from '../../components/ui/GlassCard';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { GameHUD } from '../_shared/GameHUD';
 import { GameOverlay } from '../_shared/GameOverlay';
+import { useGameHud } from '../_shared/useGameHud';
+import { usePetalEarn } from '../_shared/usePetalEarn';
+import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
+import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -32,6 +49,11 @@ export default function InteractiveBuddyPage() {
   const [key, setKey] = useState(0); // Force remount on mode change
   const [gameState, setGameState] = useState<'instructions' | 'playing' | 'win' | 'lose' | 'paused'>('instructions');
   const [score, setScore] = useState(0);
+  const [finalScore, setFinalScore] = useState(0);
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const [characterVariant, setCharacterVariant] = useState<'girl' | 'boy'>('girl');
+  const [hasUnlockedBubbleBoyAchievement, setHasUnlockedBubbleBoyAchievement] = useState(false);
   
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -44,6 +66,25 @@ export default function InteractiveBuddyPage() {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'avatar' ? selectedAvatar : null,
   });
+
+  // Visual profile and HUD
+  const visualProfile = getGameVisualProfile('bubble-girl');
+  const { backgroundStyle } = applyVisualProfile(visualProfile);
+  const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('bubble-girl');
+  const { balance: petalBalance } = usePetalBalance();
+  const { earnPetals } = usePetalEarn();
+
+  // Game configuration - reserved for future game logic tuning
+  // const GAME_CONFIG = {
+  //   SANDBOX_SCORE_MULTIPLIER: 1,
+  //   STRESS_RELIEF_SCORE_MULTIPLIER: 1.5,
+  //   CHALLENGE_SCORE_MULTIPLIER: 2,
+  //   TARGET_SCORE: {
+  //     sandbox: 0, // No target in sandbox
+  //     'stress-relief': 500,
+  //     challenge: 1000,
+  //   },
+  // } as const;
   
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile) => {
@@ -67,15 +108,58 @@ export default function InteractiveBuddyPage() {
       return;
     }
     setGameState('playing');
+    setPetalReward(null);
+    setHasAwardedPetals(false);
   };
 
   const handleRestart = () => {
     setKey((prev) => prev + 1);
     setGameState('playing');
+    setPetalReward(null);
+    setHasAwardedPetals(false);
   };
 
+  const handleGameEnd = useCallback(async (finalScoreValue: number, didWin: boolean) => {
+    setFinalScore(finalScoreValue);
+    setGameState(didWin ? 'win' : 'lose');
+
+    // Award petals using hook
+    if (!hasAwardedPetals) {
+      setHasAwardedPetals(true);
+      const result = await earnPetals({
+        gameId: 'bubble-girl',
+        score: finalScoreValue,
+        metadata: {
+          mode,
+          didWin,
+        },
+      });
+
+      if (result.success) {
+        setPetalReward(result.earned);
+      }
+    }
+
+    // Submit to leaderboard
+    try {
+      await fetch('/api/v1/leaderboards/bubble-girl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: finalScoreValue,
+          metadata: {
+            mode,
+            didWin,
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to submit score:', error);
+    }
+  }, [mode, earnPetals, hasAwardedPetals]);
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-900 to-black p-4 page-transition">
+    <main className="min-h-screen p-4 page-transition" style={backgroundStyle}>
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
         <header className="mb-6">
@@ -109,7 +193,7 @@ export default function InteractiveBuddyPage() {
           )}
 
           {/* Mode Selection */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 mb-4">
             {(['sandbox', 'stress-relief', 'challenge'] as GameMode[]).map((gameMode) => (
               <button
                 key={gameMode}
@@ -126,17 +210,63 @@ export default function InteractiveBuddyPage() {
               </button>
             ))}
           </div>
+
+          {/* Character Variant Toggle */}
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-zinc-300 text-sm">Character:</span>
+            <button
+              onClick={() => {
+                const newVariant = characterVariant === 'girl' ? 'boy' : 'girl';
+                setCharacterVariant(newVariant);
+                
+                // Unlock achievement when switching to Bubble Boy for the first time
+                if (newVariant === 'boy' && !hasUnlockedBubbleBoyAchievement) {
+                  setHasUnlockedBubbleBoyAchievement(true);
+                  // Call achievement unlock API
+                  fetch('/api/v1/achievements/unlock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      achievementCode: 'bubble....boy????',
+                      idempotencyKey: `bubble-boy-${Date.now()}-${Math.random()}`,
+                    }),
+                  }).catch((error) => {
+                    console.error('Failed to unlock Bubble Boy achievement:', error);
+                  });
+                }
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                characterVariant === 'girl'
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                  : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+              }`}
+            >
+              {characterVariant === 'girl' ? 'Bubble Girl' : 'Bubble Boy'}
+            </button>
+          </div>
         </header>
 
         {/* Game Canvas */}
         <GlassCard className="overflow-hidden p-4 relative">
+          {/* HUD - uses loader for cosmetics */}
           {gameState === 'playing' && (
-            <GameHUD
-              score={score}
-              combo={0}
-            />
+            <>
+              {isQuakeHud ? (
+                <HudComponent
+                  {...hudProps}
+                  petals={petalBalance}
+                  gameId="bubble-girl"
+                />
+              ) : (
+                <HudComponent
+                  {...hudProps}
+                  score={score}
+                  combo={0}
+                />
+              )}
+            </>
           )}
-          <InteractiveBuddyGame key={key} mode={mode} onScoreChange={setScore} />
+          <InteractiveBuddyGame key={key} mode={mode} onScoreChange={setScore} onGameEnd={handleGameEnd} characterVariant={characterVariant} />
         </GlassCard>
 
         {/* Avatar vs Preset Choice */}
@@ -162,7 +292,9 @@ export default function InteractiveBuddyPage() {
               'Earn money to unlock better tools (Challenge mode)',
             ]}
             winMessage="Great job! You've mastered the Interactive Buddy!"
-            score={score}
+            loseMessage="Try again! Keep practicing to improve your score!"
+            score={finalScore || score}
+            petalReward={petalReward}
             onRestart={handleRestart}
             onResume={handleStart}
           />

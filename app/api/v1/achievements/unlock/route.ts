@@ -97,22 +97,33 @@ export async function POST(request: NextRequest) {
       switch (achievement.Reward.kind) {
         case 'PETALS_BONUS':
           const petalAmount = achievement.Reward.value || 0;
-          await db.petalLedger.create({
-            data: {
-              userId: user.id,
-              type: 'earn',
-              amount: petalAmount,
-              reason: `Achievement: ${achievement.name}`,
+          
+          // Use PetalService for consistent lifetime tracking and daily limits
+          const { PetalService } = await import('@/app/lib/petals');
+          const petalService = new PetalService();
+          const petalResult = await petalService.awardPetals(user.id, {
+            type: 'earn',
+            amount: petalAmount,
+            reason: `Achievement: ${achievement.name}`,
+            source: 'achievement',
+            metadata: {
+              achievementCode: achievement.code,
+              achievementId: achievement.id,
             },
           });
 
-          // Update user balance
-          await db.user.update({
-            where: { id: user.id },
-            data: { petalBalance: { increment: petalAmount } },
-          });
+          if (!petalResult.success) {
+            // Log but don't fail the achievement unlock
+            console.error('Failed to award achievement petals:', petalResult.error);
+          }
 
-          rewardDetails = { type: 'petals', amount: petalAmount };
+          rewardDetails = {
+            type: 'petals',
+            amount: petalResult.awarded || petalAmount,
+            balance: petalResult.newBalance || 0,
+            lifetimePetalsEarned: petalResult.lifetimePetalsEarned || 0,
+            dailyCapReached: petalResult.dailyCapReached || false,
+          };
           break;
 
         case 'COSMETIC':
