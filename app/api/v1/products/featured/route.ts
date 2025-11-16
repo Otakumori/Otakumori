@@ -61,7 +61,7 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
       title: dto.title,
       description: dto.description,
       price: dto.price ?? 0,
-      image: dto.image ?? '/assets/placeholder-product.jpg',
+      image: dto.image ?? '',
       images: dto.images,
       tags: dto.tags,
       variants: dto.variants.map((variant) => ({
@@ -112,7 +112,7 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
       description: product.description,
       price,
       priceCents,
-      image: defaultImage?.src ?? '/assets/placeholder-product.jpg',
+      image: defaultImage?.src ?? '',
       images: (product.images ?? []).map((img) => img.src),
       tags: product.tags ?? [],
       variants:
@@ -180,7 +180,6 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Featured products API error:', error);
     return NextResponse.json(
       {
         ok: true,

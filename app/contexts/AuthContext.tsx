@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut = clerkAuth.signOut;
   } catch (error) {
     // Clerk is not available, use mock state
-    console.warn('Clerk hooks not available, using mock auth state:', error);
     isLoaded = true;
   }
 

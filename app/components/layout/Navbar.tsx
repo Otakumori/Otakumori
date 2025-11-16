@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
-import { SignInButton, UserButton } from '@clerk/nextjs';
+import { SignInButton } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
 import gamesRegistry from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
@@ -96,11 +96,12 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const { user: _user } = useUser(); // Reserved for future user menu features
+  const { user } = useUser();
   const {
-    requireAuthForSoapstone: _requireAuthForSoapstone,
-    requireAuthForWishlist: _requireAuthForWishlist,
-  } = useAuthContext(); // Reserved for future protected nav links
+    requireAuthForSoapstone,
+    requireAuthForWishlist,
+    signOut,
+  } = useAuthContext();
   const { itemCount } = useCart();
 
   // State for mega-menu and search
@@ -109,6 +110,7 @@ export default function Navbar() {
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Scroll state for navbar effects
   const [isScrolled, setIsScrolled] = useState(false);
@@ -122,6 +124,7 @@ export default function Navbar() {
 
   const searchRef = useRef<HTMLDivElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Fetch real data from APIs
   const fetchProducts = async () => {
@@ -221,6 +224,9 @@ export default function Navbar() {
       if (megaMenuRef.current && !megaMenuRef.current.contains(event.target as Node)) {
         setActiveDropdown(null);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -232,6 +238,7 @@ export default function Navbar() {
     setActiveDropdown(null);
     setShowSearchDropdown(false);
     setIsMenuOpen(false);
+    setShowUserMenu(false);
   }, [pathname]);
 
   // Handle keyboard navigation
@@ -239,6 +246,30 @@ export default function Navbar() {
     if (e.key === 'Escape') {
       setActiveDropdown(null);
       setShowSearchDropdown(false);
+      setShowUserMenu(false);
+    }
+  };
+
+  // Handle protected link clicks
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isSignedIn) {
+      router.push('/wishlist');
+    } else {
+      requireAuthForWishlist(() => {
+        router.push('/wishlist');
+      });
+    }
+  };
+
+  const handleSoapstoneClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isSignedIn) {
+      router.push(paths.community());
+    } else {
+      requireAuthForSoapstone(() => {
+        router.push(paths.community());
+      });
     }
   };
 
@@ -529,6 +560,59 @@ export default function Navbar() {
           >
             About
           </Link>
+
+          {/* Protected Links */}
+          <button
+            onClick={handleWishlistClick}
+            className={`text-text-link hover:text-text-link-hover transition-colors flex items-center gap-1 ${
+              pathname === '/wishlist' ? 'text-text-link-hover border-b-2 border-primary' : ''
+            }`}
+            title={isSignedIn ? 'Wishlist' : 'Sign in to access wishlist'}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            {!isSignedIn && (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </button>
+
+          <button
+            onClick={handleSoapstoneClick}
+            className={`text-text-link hover:text-text-link-hover transition-colors flex items-center gap-1 ${
+              pathname.startsWith('/community') ? 'text-text-link-hover border-b-2 border-primary' : ''
+            }`}
+            title={isSignedIn ? 'Community' : 'Sign in to access community'}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            {!isSignedIn && (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </button>
         </div>
 
         {/* Search and Auth */}
@@ -594,14 +678,92 @@ export default function Navbar() {
 
           {/* Auth */}
           {isSignedIn ? (
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox:
-                    'w-8 h-8 border border-glass-border hover:border-border-hover transition-colors',
-                },
-              }}
-            />
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-white/10 transition-colors"
+                aria-label="User menu"
+                aria-expanded={showUserMenu}
+              >
+                {user?.imageUrl ? (
+                  <Image
+                    src={user.imageUrl}
+                    alt={user.fullName || user.firstName || 'User'}
+                    width={32}
+                    height={32}
+                    className="rounded-full border border-white/20"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-pink-500/20 border border-white/20 flex items-center justify-center text-white text-sm font-medium">
+                    {user?.firstName?.[0] || user?.emailAddresses?.[0]?.emailAddress?.[0] || 'U'}
+                  </div>
+                )}
+                <span className="hidden sm:inline text-sm text-white">
+                  {user?.fullName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || 'User'}
+                </span>
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* User Menu Dropdown */}
+              {showUserMenu && (
+                <div
+                  className="absolute right-0 top-full mt-2 w-56 bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg shadow-lg z-50"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') setShowUserMenu(false);
+                  }}
+                  role="menu"
+                  aria-label="User menu"
+                >
+                  <div className="p-2">
+                    {/* User Info */}
+                    <div className="px-3 py-2 border-b border-white/10">
+                      <p className="text-sm font-medium text-white truncate">
+                        {user?.fullName || user?.firstName || 'User'}
+                      </p>
+                      <p className="text-xs text-white/60 truncate">
+                        {user?.emailAddresses?.[0]?.emailAddress || ''}
+                      </p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <Link
+                      href={paths.profile()}
+                      className="block px-3 py-2 text-sm text-white hover:bg-white/10 rounded transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href={paths.achievements()}
+                      className="block px-3 py-2 text-sm text-white hover:bg-white/10 rounded transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Achievements
+                    </Link>
+                    <Link
+                      href="/wishlist"
+                      className="block px-3 py-2 text-sm text-white hover:bg-white/10 rounded transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Wishlist
+                    </Link>
+
+                    {/* Sign Out */}
+                    <button
+                      onClick={async () => {
+                        setShowUserMenu(false);
+                        await signOut();
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded transition-colors mt-2 border-t border-white/10 pt-2"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <SignInButton mode="modal">
               <button

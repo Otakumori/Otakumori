@@ -75,7 +75,7 @@ export default async function ShopSection() {
       const products =
         data?.products?.map((product: Product) => ({
           ...product,
-          image: product.image || '/assets/placeholder-product.jpg',
+          image: product.image || '',
           description: stripHtml(product.description || ''),
           slug: product.slug,
         })) || [];
@@ -85,11 +85,9 @@ export default async function ShopSection() {
         pagination: data?.pagination,
       };
     } else {
-      console.warn('ShopSection: API returned', response.status);
       shopData = { products: [] };
     }
   } catch (error) {
-    console.warn('ShopSection: featured API failed during SSR:', error);
     shopData = { products: [] };
     isBlockedData = true;
   }
@@ -127,19 +125,28 @@ export default async function ShopSection() {
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               <GlassCard className="flex h-full flex-col">
-                <div className="relative aspect-square overflow-hidden">
-                  <Image
-                    src={product.image || '/assets/placeholder-product.jpg'}
-                    alt={product.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
-                  <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-200 backdrop-blur">
-                    {product.available ? 'Featured' : 'Coming Soon'}
-                  </span>
-                </div>
+                {product.image ? (
+                  <div className="relative aspect-square overflow-hidden">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
+                    <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-200 backdrop-blur">
+                      {product.available ? 'Featured' : 'Coming Soon'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="relative aspect-square overflow-hidden bg-white/5 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
+                    <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-200 backdrop-blur">
+                      {product.available ? 'Featured' : 'Coming Soon'}
+                    </span>
+                  </div>
+                )}
                 <GlassCardContent className="flex flex-1 flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-white transition-colors group-hover:text-pink-400">
