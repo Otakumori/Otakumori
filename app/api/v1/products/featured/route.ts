@@ -26,6 +26,7 @@ const QuerySchema = z.object({
 });
 
 async function fetchCatalogProducts(limit: number, forcePrintify = false) {
+  // If forcePrintify is true, skip database fetch and let it fall through to Printify
   if (forcePrintify) {
     return null;
   }
@@ -157,11 +158,10 @@ export async function GET(request: NextRequest) {
     const query = QuerySchema.parse(Object.fromEntries(searchParams));
     const forcePrintify = searchParams.get('force_printify') === 'true';
 
-    // Only fetch from database - no Printify fallback to avoid showing unwanted products
+    // Try database first (unless forcePrintify is true)
     const catalogResult = await fetchCatalogProducts(query.limit, forcePrintify);
     if (catalogResult) {
       // Apply deduplication and exclusions to catalog products
-      // Deduplicate by blueprintId, printifyProductId, and id to prevent duplicates
       const deduplicated = deduplicateProducts(catalogResult.data.products, {
         limit: query.limit,
         excludeTitles: query.excludeTitles,
@@ -176,12 +176,28 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Return empty array instead of falling back to Printify
-    // Only products synced to database will be shown
+    // If forcePrintify is true or no database products, try Printify
+    if (forcePrintify) {
+      try {
+        const printifyResult = await fetchPrintifyProducts(query.limit, query.excludeTitles);
+        if (printifyResult && printifyResult.data.products.length > 0) {
+          return NextResponse.json({
+            ok: true,
+            data: { products: printifyResult.data.products },
+            source: printifyResult.source,
+            timestamp: new Date().toISOString(),
+          });
+        }
+      } catch (printifyError) {
+        // Fall through to empty response
+      }
+    }
+
+    // Return empty array if no products found
     return NextResponse.json({
       ok: true,
       data: { products: [] },
-      source: 'database-only',
+      source: 'empty',
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

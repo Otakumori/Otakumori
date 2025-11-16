@@ -43,12 +43,14 @@ export default async function HomePage() {
         <TreeBackground />
         
         {/* Sprite-based cherry petal layer - new implementation */}
-        <div className="absolute inset-0" style={{ zIndex: -8 }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -8 }}>
           <CherryPetalLayerWrapper />
         </div>
         
         {/* Legacy petal flow overlay - kept for compatibility, can be removed later */}
-        <PetalFlowOverlayWrapper />
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -7 }}>
+          <PetalFlowOverlayWrapper />
+        </div>
       </div>
 
       {/* Petal collection system - renders behind main content */}

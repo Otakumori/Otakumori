@@ -20,15 +20,43 @@ export default function TreeBackground() {
 
   useEffect(() => {
     const updateDimensions = () => {
-      setPageHeight(document.documentElement.scrollHeight);
+      // Background should stop before footer starts (where it ended before)
+      // Use viewport height as base, or stop at footer if visible
+      const footer = document.querySelector('footer');
+      
+      let height = window.innerHeight; // Default: viewport height
+      
+      if (footer) {
+        const footerRect = footer.getBoundingClientRect();
+        const footerTop = footerRect.top + window.scrollY;
+        // Stop background just before footer starts
+        height = Math.min(footerTop, window.innerHeight * 1.2); // Cap at 120% viewport
+      }
+      
+      setPageHeight(height);
     };
 
-    // Initialize dimensions
+    // Initialize dimensions after a short delay to ensure footer is rendered
+    const initTimeout = setTimeout(updateDimensions, 100);
     updateDimensions();
 
     // Update on resize
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    
+    // Update on scroll (throttled)
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(updateDimensions, 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      clearTimeout(initTimeout);
+      clearTimeout(scrollTimeout);
+      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
