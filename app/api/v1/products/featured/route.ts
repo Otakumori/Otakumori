@@ -155,9 +155,10 @@ export async function GET(request: NextRequest) {
     const query = QuerySchema.parse(Object.fromEntries(searchParams));
     const forcePrintify = searchParams.get('force_printify') === 'true';
 
+    // Only fetch from database - no Printify fallback to avoid showing unwanted products
     const catalogResult = await fetchCatalogProducts(query.limit, forcePrintify);
     if (catalogResult) {
-      // Apply deduplication and exclusions to catalog products too
+      // Apply deduplication and exclusions to catalog products
       const deduplicated = deduplicateProducts(catalogResult.data.products, {
         limit: query.limit,
         excludeTitles: query.excludeTitles,
@@ -172,11 +173,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const fallbackResult = await fetchPrintifyProducts(query.limit, query.excludeTitles);
+    // Return empty array instead of falling back to Printify
+    // Only products synced to database will be shown
     return NextResponse.json({
       ok: true,
-      data: fallbackResult.data,
-      source: fallbackResult.source,
+      data: { products: [] },
+      source: 'database-only',
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
