@@ -2,7 +2,8 @@
 // Ensures all client-side providers are properly nested and available across all routes
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CartProvider } from './components/cart/CartProvider';
 import { PetalProvider } from '../providers';
 import { WorldProvider } from './world/WorldProvider';
@@ -19,27 +20,44 @@ import ClerkPostHogBridge from './(site)/_providers/ClerkPostHogBridge.safe';
 export default function Providers({ children }: { children: React.ReactNode }) {
   const pathname = (typeof window !== 'undefined' ? window.location.pathname : '/') as string;
   const showTree = pathname === '/about';
+  
+  // Create QueryClient instance (singleton pattern for React Query)
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 minute
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      }),
+  );
+
   return (
-    <PostHogProvider>
-      <ClerkPostHogBridge />
-      <ToastProvider>
-        <AuthProvider>
-          <WorldProvider>
-            <PetalProvider>
-              <CartProvider>
-                <GlobalMusicProvider>
-                  {/* Site-wide background (fixed, behind everything) */}
-                  {showTree && <GlobalBackground />}
-                  {children}
-                  <GlobalMusicBar />
-                  <SoapstoneDock />
-                  <QuakeHUD />
-                </GlobalMusicProvider>
-              </CartProvider>
-            </PetalProvider>
-          </WorldProvider>
-        </AuthProvider>
-      </ToastProvider>
-    </PostHogProvider>
+    <QueryClientProvider client={queryClient}>
+      <PostHogProvider>
+        <ClerkPostHogBridge />
+        <ToastProvider>
+          <AuthProvider>
+            <WorldProvider>
+              <PetalProvider>
+                <CartProvider>
+                  <GlobalMusicProvider>
+                    {/* Site-wide background (fixed, behind everything) */}
+                    {showTree && <GlobalBackground />}
+                    {children}
+                    <GlobalMusicBar />
+                    <SoapstoneDock />
+                    <QuakeHUD />
+                  </GlobalMusicProvider>
+                </CartProvider>
+              </PetalProvider>
+            </WorldProvider>
+          </AuthProvider>
+        </ToastProvider>
+      </PostHogProvider>
+    </QueryClientProvider>
   );
 }

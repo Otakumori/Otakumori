@@ -54,7 +54,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             rel="stylesheet"
           />
         </head>
-        <body className="flex min-h-screen flex-col bg-[#080611] text-zinc-100 antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50">
+        <body className="flex min-h-screen flex-col bg-[#080611] text-white antialiased selection:bg-fuchsia-400/20 selection:text-fuchsia-50" style={{ color: 'var(--color-text-primary, #ffffff)' }}>
           <ScrollRestoration />
           <CherryBlossomEffect density="site" />
           {isCursorGlowEnabled() && <CursorGlow />}
@@ -70,9 +70,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             }
           >
             <Providers>
-              <div className="flex min-h-screen flex-col relative z-10">
+              <div className="flex min-h-screen flex-col relative z-10 overflow-x-hidden">
                 <Navbar />
-                <main id="main-content" className="flex-1">
+                <main id="main-content" className="flex-1 w-full">
                   {children}
                 </main>
                 <Footer />
