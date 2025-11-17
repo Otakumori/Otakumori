@@ -15,8 +15,17 @@ import { useEffect, useState } from 'react';
  */
 export default function TreeBackground() {
   const [dimensions, setDimensions] = useState({ top: 0, height: 0 });
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Mark as mounted to prevent SSR issues
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Only run on client side
+    if (!isMounted || typeof window === 'undefined') return;
+
     const updateDimensions = () => {
       // Find footer to determine where tree should end
       const footer = document.querySelector('footer');
@@ -49,7 +58,8 @@ export default function TreeBackground() {
       setDimensions({ top: 0, height });
     };
 
-    // Initial calculation
+    // Initial calculation with a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(updateDimensions, 0);
     updateDimensions();
 
     // Update on resize and scroll
@@ -69,11 +79,12 @@ export default function TreeBackground() {
     }
 
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('resize', updateDimensions);
       window.removeEventListener('scroll', updateDimensions);
       observer.disconnect();
     };
-  }, []);
+  }, [isMounted]);
 
   return (
     <>
