@@ -91,7 +91,7 @@ function AvatarShowcase() {
         <div className="bg-white/10 rounded-xl p-6 border border-white/20">
           <h3 className="text-xl font-semibold text-white mb-4">Current Avatar</h3>
           <div className="flex justify-center">
-            <AvatarDisplay size="large" showEditButton={true} />
+            <AvatarDisplay size="lg" showEditButton={true} />
           </div>
           <div className="mt-4 text-center">
             <button className="px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors">

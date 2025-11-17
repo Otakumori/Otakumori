@@ -27,12 +27,12 @@ export default function Error({
         <h2 className="mb-4 text-2xl md:text-3xl font-bold text-pink-300">{errorMessage.title}</h2>
         <p className="mb-6 text-zinc-300">{errorMessage.message}</p>
         <div className="flex gap-4 justify-center">
-          <button
-            onClick={reset}
+        <button
+          onClick={reset}
             className="rounded-xl bg-pink-500/90 px-6 py-3 text-white hover:bg-pink-500 transition-colors"
-          >
-            Try again
-          </button>
+        >
+          Try again
+        </button>
           {errorMessage.cta && (
             <Link
               href={errorMessage.cta.href}

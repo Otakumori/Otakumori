@@ -1,20 +1,30 @@
 'use client';
 
 import { AvatarRenderer } from '../../components/avatar/AvatarRenderer';
+import type { AvatarSize } from '@/app/lib/avatar-sizes';
 
 interface AvatarPreviewProps {
   config: any;
-  size?: 'small' | 'medium' | 'large';
+  size?: AvatarSize;
   showInteractions?: boolean;
   physics?: boolean;
 }
 
 export function AvatarPreview({
   config,
-  size = 'large',
+  size = 'lg',
   showInteractions = true,
   physics = true,
 }: AvatarPreviewProps) {
+  // Map canonical sizes to container dimensions
+  const containerClasses = {
+    xs: 'w-24 h-32',
+    sm: 'w-48 h-64',
+    md: 'w-64 h-80',
+    lg: 'w-80 h-96',
+    xl: 'w-96 h-[28rem]',
+  };
+
   return (
     <div className="space-y-6">
       <h3 className="text-white font-semibold">Avatar Preview</h3>
@@ -22,7 +32,7 @@ export function AvatarPreview({
       {/* Preview Container */}
       <div className="flex justify-center">
         <div
-          className={`relative ${size === 'small' ? 'w-48 h-64' : size === 'medium' ? 'w-64 h-80' : size === 'large' ? 'w-80 h-96' : 'w-96 h-[28rem]'} bg-gradient-to-b from-zinc-900 to-zinc-800 rounded-xl border border-white/20 overflow-hidden`}
+          className={`relative ${containerClasses[size]} bg-gradient-to-b from-zinc-900 to-zinc-800 rounded-xl border border-white/20 overflow-hidden`}
         >
           <AvatarRenderer
             config={config}

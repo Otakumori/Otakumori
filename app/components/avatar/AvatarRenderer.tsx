@@ -1,30 +1,35 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { AvatarRenderer as R3FAvatarRenderer } from '../../adults/_components/AvatarRenderer.safe';
 import { AvatarCard } from './AvatarCard';
+import { AvatarSkeleton } from './AvatarSkeleton';
+import { AvatarFallback } from './AvatarFallback';
+import { getAvatarDimensions, type AvatarSize } from '@/app/lib/avatar-sizes';
 
 interface AvatarRendererProps {
   config: any;
   mode?: '2d' | '3d' | 'hybrid' | 'auto';
-  size?: 'small' | 'medium' | 'large';
+  size?: AvatarSize;
   interactions?: boolean;
   physics?: boolean;
   className?: string;
   fallbackTo2D?: boolean;
   onLoad?: () => void;
   onError?: (error: Error) => void;
+  avatarMode?: 'preset' | 'user' | 'auto'; // Avatar mode for fallback handling
 }
 
 export function AvatarRenderer({
   config,
   mode = 'auto',
-  size = 'medium',
+  size = 'md',
   interactions = true,
   physics = true,
   className = '',
   fallbackTo2D = true,
+  avatarMode = 'auto',
   onLoad,
   onError,
 }: AvatarRendererProps) {
@@ -57,35 +62,11 @@ export function AvatarRenderer({
     }
   }, [mode]);
 
-  // Size configurations
+  const reducedMotion = useReducedMotion();
+  
+  // Use canonical avatar size system
   const sizeConfig = useMemo(() => {
-    const configs = {
-      small: {
-        width: 48,
-        height: 48,
-        canvasSize: 128,
-        detail: 'low',
-      },
-      medium: {
-        width: 128,
-        height: 128,
-        canvasSize: 256,
-        detail: 'medium',
-      },
-      large: {
-        width: 256,
-        height: 256,
-        canvasSize: 512,
-        detail: 'high',
-      },
-      xlarge: {
-        width: 512,
-        height: 512,
-        canvasSize: 1024,
-        detail: 'ultra',
-      },
-    };
-    return configs[size];
+    return getAvatarDimensions(size);
   }, [size]);
 
   // Handle 3D rendering errors
@@ -118,77 +99,106 @@ export function AvatarRenderer({
   }, [renderMode, is3DSupported]);
 
   // Render 2D Avatar
-  const render2D = () => (
-    <motion.div
-      className={`${className} relative`}
-      style={{ width: sizeConfig.width, height: sizeConfig.height }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <AvatarCard config={config} size={size} className="w-full h-full" />
-    </motion.div>
-  );
+  const render2D = () => {
+    // Map canonical size to legacy AvatarCard size
+    const cardSize = size === 'xs' || size === 'sm' ? 'small' : size === 'lg' || size === 'xl' ? 'large' : 'medium';
+    
+    return (
+      <motion.div
+        className={`${className} relative`}
+        style={{ width: sizeConfig.width, height: sizeConfig.height }}
+        initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.3 }}
+      >
+        {config ? (
+          <AvatarCard config={config} size={cardSize} className="w-full h-full" />
+        ) : (
+          <AvatarFallback size={size} mode={avatarMode === 'auto' ? 'guest' : avatarMode} className="w-full h-full" />
+        )}
+      </motion.div>
+    );
+  };
 
   // Render 3D Avatar
   const render3D = () => (
     <motion.div
       className={`${className} relative`}
       style={{ width: sizeConfig.width, height: sizeConfig.height }}
-      initial={{ opacity: 0 }}
+      initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={reducedMotion ? { duration: 0 } : { duration: 0.3 }}
     >
-      <R3FAvatarRenderer
-        config={config}
-        size={size}
-        showInteractions={interactions}
-        physicsEnabled={physics}
-      />
+      {config ? (
+        <R3FAvatarRenderer
+          config={config}
+          size={size}
+          showInteractions={interactions && !reducedMotion}
+          physicsEnabled={physics && !reducedMotion}
+        />
+      ) : (
+        <AvatarFallback size={size} mode={avatarMode === 'auto' ? 'guest' : avatarMode} className="w-full h-full" />
+      )}
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+          <AvatarSkeleton size={size} />
         </div>
       )}
     </motion.div>
   );
 
   // Render Hybrid (2D with 3D effects)
-  const renderHybrid = () => (
-    <motion.div
-      className={`${className} relative`}
-      style={{ width: sizeConfig.width, height: sizeConfig.height }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* 2D Base */}
-      <div className="absolute inset-0">
-        <AvatarCard config={config} size={size} className="w-full h-full" />
-      </div>
+  const renderHybrid = () => {
+    const cardSize = size === 'xs' || size === 'sm' ? 'small' : size === 'lg' || size === 'xl' ? 'large' : 'medium';
+    
+    return (
+      <motion.div
+        className={`${className} relative`}
+        style={{ width: sizeConfig.width, height: sizeConfig.height }}
+        initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.3 }}
+      >
+        {/* 2D Base */}
+        <div className="absolute inset-0">
+          <AvatarCard config={config} size={cardSize} className="w-full h-full" />
+        </div>
 
-      {/* 3D Effects Overlay (simplified) */}
-      <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          className="w-full h-full bg-gradient-to-t from-pink-500/10 to-transparent"
-          animate={{
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-      </div>
-    </motion.div>
-  );
+        {/* 3D Effects Overlay (simplified) */}
+        {!reducedMotion && (
+          <div className="absolute inset-0 pointer-events-none">
+            <motion.div
+              className="w-full h-full bg-gradient-to-t from-pink-500/10 to-transparent"
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          </div>
+        )}
+      </motion.div>
+    );
+  };
 
   // Determine render mode
-  const shouldRender3D = renderMode === '3d' && is3DSupported && !hasError;
-  const shouldRenderHybrid = mode === 'hybrid' || (mode === 'auto' && size === 'large');
+  const shouldRender3D = renderMode === '3d' && is3DSupported && !hasError && !reducedMotion;
+  const shouldRenderHybrid = (mode === 'hybrid' || (mode === 'auto' && (size === 'lg' || size === 'xl'))) && !reducedMotion;
+
+  // Show skeleton while loading
+  if (isLoading && !hasError) {
+    return <AvatarSkeleton size={size} className={className} />;
+  }
+
+  // Show fallback on error or missing config
+  if (hasError || !config) {
+    return <AvatarFallback size={size} mode={avatarMode === 'auto' ? 'guest' : avatarMode} className={className} />;
+  }
 
   // Render based on mode
   if (shouldRenderHybrid) {
@@ -222,19 +232,19 @@ export function GameAvatarRenderer({
     return 'auto';
   }, [gameMode, performance]);
 
-  const size = useMemo(() => {
-    if (gameMode === 'action') return 'large';
-    if (gameMode === 'puzzle') return 'medium';
-    if (gameMode === 'strategy') return 'medium';
-    if (gameMode === 'rhythm') return 'large';
-    return 'medium';
+  const avatarSize = useMemo(() => {
+    if (gameMode === 'action') return 'lg';
+    if (gameMode === 'puzzle') return 'md';
+    if (gameMode === 'strategy') return 'md';
+    if (gameMode === 'rhythm') return 'lg';
+    return 'md';
   }, [gameMode]);
 
   return (
     <AvatarRenderer
       config={config}
       mode={renderMode}
-      size={size}
+      size={avatarSize}
       interactions={gameMode !== 'puzzle'}
       physics={gameMode === 'action' || gameMode === 'rhythm'}
       className={className}

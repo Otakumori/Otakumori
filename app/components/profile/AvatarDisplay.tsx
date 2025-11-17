@@ -4,24 +4,29 @@ import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { AvatarRenderer } from '@/app/adults/_components/AvatarRenderer.safe';
+import { getAvatarSizeClasses } from '@/app/lib/avatar-sizes';
+import { AvatarSkeleton } from '@/app/components/avatar/AvatarSkeleton';
+import { AvatarFallback } from '@/app/components/avatar/AvatarFallback';
+import type { AvatarSize } from '@/app/lib/avatar-sizes';
 
 interface AvatarDisplayProps {
   userId?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: AvatarSize;
   showEditButton?: boolean;
   className?: string;
 }
 
 export function AvatarDisplay({
   userId,
-  size = 'medium',
+  size = 'md',
   showEditButton = false,
   className = '',
 }: AvatarDisplayProps) {
   const { user } = useUser();
   const [isHovered, setIsHovered] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   // Fetch user's avatar configuration
   const { data: avatarData, isLoading } = useQuery({
@@ -35,54 +40,37 @@ export function AvatarDisplay({
     enabled: !!userId || !!user?.id,
   });
 
-  const sizeClasses = {
-    small: 'w-16 h-16',
-    medium: 'w-32 h-32',
-    large: 'w-64 h-64',
-  };
+  const sizeClasses = getAvatarSizeClasses(size);
 
   const isOwnProfile = !userId || userId === user?.id;
 
   if (isLoading) {
-    return (
-      <div className={`${sizeClasses[size]} rounded-lg bg-white/10 animate-pulse ${className}`}>
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      </div>
-    );
+    return <AvatarSkeleton size={size} className={className} />;
   }
 
   if (!avatarData?.avatarConfig) {
     return (
-      <div
-        className={`${sizeClasses[size]} rounded-lg bg-white/10 border border-white/20 ${className}`}
-      >
-        <div className="w-full h-full flex flex-col items-center justify-center text-center p-2">
-          <div className="w-8 h-8 mb-2 rounded-full bg-pink-500/20 flex items-center justify-center">
-            <span className="text-pink-400 text-lg"></span>
-          </div>
-          <p className="text-xs text-zinc-400">{isOwnProfile ? 'No avatar yet' : 'No avatar'}</p>
-          {isOwnProfile && showEditButton && (
-            <Link
-              href="/adults/editor"
-              className="mt-2 text-xs text-pink-400 hover:text-pink-300 transition-colors"
-            >
-              Create Avatar
-            </Link>
-          )}
-        </div>
+      <div className={`${sizeClasses.container} ${className}`}>
+        <AvatarFallback size={size} mode="user" className="w-full h-full" />
+        {isOwnProfile && showEditButton && (
+          <Link
+            href="/adults/editor"
+            className="mt-2 block text-xs text-pink-400 hover:text-pink-300 transition-colors text-center"
+          >
+            Create Avatar
+          </Link>
+        )}
       </div>
     );
   }
 
   return (
     <motion.div
-      className={`${sizeClasses[size]} rounded-lg overflow-hidden border border-white/20 ${className}`}
+      className={`${sizeClasses.container} rounded-lg overflow-hidden border border-white/20 ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
+      whileHover={reducedMotion ? {} : { scale: 1.02 }}
+      transition={reducedMotion ? { duration: 0 } : { duration: 0.2 }}
     >
       {/* 3D Avatar Renderer */}
       <div className="w-full h-full relative">

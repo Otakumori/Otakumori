@@ -5,9 +5,11 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
 import { ACESFilmicToneMapping, Color, type Group, type Mesh } from 'three';
 
+import type { AvatarSize } from '@/app/lib/avatar-sizes';
+
 interface AvatarRendererProps {
   config: any;
-  size?: 'small' | 'medium' | 'large';
+  size?: AvatarSize;
   showInteractions?: boolean;
   physicsEnabled?: boolean;
   className?: string;
@@ -238,7 +240,7 @@ function AvatarScene({ config, physicsEnabled = true }: { config: any; physicsEn
 // Main Avatar Renderer Component
 export function AvatarRenderer({
   config,
-  size = 'medium',
+  size = 'md',
   showInteractions = false,
   physicsEnabled = false,
   className = '',
@@ -260,10 +262,13 @@ export function AvatarRenderer({
     );
   }
 
-  const sizeClasses = {
-    small: 'w-32 h-32',
-    medium: 'w-64 h-64',
-    large: 'w-96 h-96',
+  // Map canonical sizes to container classes
+  const sizeClasses: Record<AvatarSize, string> = {
+    xs: 'w-24 h-24',
+    sm: 'w-32 h-32',
+    md: 'w-64 h-64',
+    lg: 'w-96 h-96',
+    xl: 'w-[512px] h-[512px]',
   };
 
   return (

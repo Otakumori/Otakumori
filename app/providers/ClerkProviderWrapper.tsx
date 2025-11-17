@@ -19,12 +19,6 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
 
   // Environment-specific configuration - use the actual env var that's set
   const isProduction = clientEnv.NEXT_PUBLIC_VERCEL_ENVIRONMENT === 'production';
-  
-  // Check if we're actually on the production domain (not a preview deployment)
-  const isProductionDomain =
-    typeof window !== 'undefined' &&
-    (window.location.hostname === 'otaku-mori.com' || window.location.hostname === 'www.otaku-mori.com');
-  
   const _isDevelopment =
     typeof window !== 'undefined'
       ? window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -40,12 +34,11 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
     nonce,
   };
 
-  // Only set domain if we're actually on the production domain
-  // Production keys only work with approved domains, so don't set domain on preview deployments
-  if (isProduction && isProductionDomain) {
+  // Production: use main domain (not subdomain), no proxy
+  if (isProduction) {
     clerkProps.domain = 'otaku-mori.com';
   }
-  // Development/Preview: use proxy if available, no domain
+  // Development/Preview: use proxy, no domain
   else {
     if (clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL) {
       clerkProps.proxyUrl = clientEnv.NEXT_PUBLIC_CLERK_PROXY_URL;

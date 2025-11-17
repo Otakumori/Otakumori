@@ -7,21 +7,22 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { SignInButton } from '@clerk/nextjs';
 import { useAuthContext } from '@/app/contexts/AuthContext';
-import gamesRegistry from '@/lib/games.meta.json';
+import gamesRegistryData from '@/lib/games.meta.json';
 import { paths } from '@/lib/paths';
 import { HeaderButton } from '@/components/ui/header-button';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { ShoppingCart } from 'lucide-react';
 
-// Get featured games from registry
-const FEATURED_GAMES = gamesRegistry.games
-  .filter((game) => game.enabled && game.featured)
+// Safely get featured games from registry with defensive checks
+const gamesRegistry = gamesRegistryData as { games?: Array<{ id?: string; enabled?: boolean; featured?: boolean; title?: string; description?: string; ageRating?: string }> };
+const FEATURED_GAMES = (gamesRegistry?.games || [])
+  .filter((game) => game?.enabled && game?.featured)
   .slice(0, 6)
   .map((game) => ({
-    id: game.id,
-    title: game.title,
-    summary: game.description,
-    status: game.ageRating === 'M' ? 'beta' : 'ready',
+    id: game?.id || 'unknown',
+    title: game?.title || 'Unknown Game',
+    summary: game?.description || '',
+    status: game?.ageRating === 'M' ? 'beta' : 'ready',
   }));
 
 // Real data will be fetched from APIs

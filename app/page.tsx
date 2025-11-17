@@ -15,7 +15,6 @@ import SectionErrorBoundary from './components/home/SectionErrorBoundary';
 
 // Client-side petal system components
 import PetalSystem from './components/petals/PetalSystem';
-import PetalField from '@/components/petals/PetalField';
 import PhysicsCherryPetals from './components/petals/PhysicsCherryPetals';
 
 // TreeBackgroundWrapper ensures tree only renders on home page
@@ -26,46 +25,63 @@ import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapp
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const {
-    NEXT_PUBLIC_FEATURE_HERO,
-    NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
-    NEXT_PUBLIC_FEATURE_SHOP,
-    NEXT_PUBLIC_FEATURE_MINIGAMES,
-    NEXT_PUBLIC_FEATURE_BLOG,
-  } = env;
+  try {
+    const {
+      NEXT_PUBLIC_FEATURE_HERO,
+      NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE,
+      NEXT_PUBLIC_FEATURE_SHOP,
+      NEXT_PUBLIC_FEATURE_MINIGAMES,
+      NEXT_PUBLIC_FEATURE_BLOG,
+    } = env;
 
-  // Check if shop is enabled (accepts '1', 'true', 'on', or any truthy string)
-  const isShopEnabled = NEXT_PUBLIC_FEATURE_SHOP === '1' || NEXT_PUBLIC_FEATURE_SHOP === 'true' || NEXT_PUBLIC_FEATURE_SHOP === 'on';
+    // Check if shop is enabled (accepts '1', 'true', 'on', or any truthy string)
+    const isShopEnabled = NEXT_PUBLIC_FEATURE_SHOP === '1' || NEXT_PUBLIC_FEATURE_SHOP === 'true' || NEXT_PUBLIC_FEATURE_SHOP === 'on';
 
-  return (
+    return (
     <>
-      {/* Cherry blossom tree background - fixed with parallax */}
-      {/* TreeBackgroundWrapper ensures tree only renders on home page */}
+      {/* Background Layer Stack - Unified Z-Index Strategy */}
+      {/* 
+        Z-Index Layering (from back to front):
+        -10: TreeBackground (deepest background)
+        -8:  CherryPetalLayer (atmospheric petals)
+        -7:  PetalFlowOverlay (legacy, can be removed)
+        -5:  PetalSystem (interactive collection)
+        0:   GlobalBackground (starfield, only on /about)
+        10+: Main content (above all backgrounds)
+      */}
       <div className="relative">
-        <TreeBackgroundWrapper />
+        {/* Tree hero - deepest layer, behind everything */}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -10 }}>
+          <TreeBackgroundWrapper />
+        </div>
         
-        {/* Sprite-based cherry petal layer - new implementation */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -8 }}>
+        {/* Atmospheric petal layers - above tree, below content */}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -8 }}>
           <CherryPetalLayerWrapper />
         </div>
         
-        {/* Legacy petal flow overlay - kept for compatibility, can be removed later */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -7 }}>
+        {/* Legacy petal flow overlay - kept for compatibility */}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -7 }}>
           <PetalFlowOverlayWrapper />
         </div>
       </div>
 
-      {/* Physics-based cherry blossom petals - clickable/collectible (silent mechanic) */}
-      <PhysicsCherryPetals density={2} onCollect={(_id) => {
-        // Silent collection - no UI feedback, just tracking
-        // Could be used for analytics, achievements, etc.
-      }} />
+      {/* Interactive petal systems - above atmospheric layers, below content */}
+      {/* Physics-based cherry blossom petals - clickable/collectible */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -5 }}>
+        <PhysicsCherryPetals density={2} onCollect={(_id) => {
+          // Silent collection - no UI feedback, just tracking
+          // Could be used for analytics, achievements, etc.
+        }} />
+      </div>
 
-      {/* Petal collection system - renders behind main content */}
-      <PetalSystem />
+      {/* Petal collection system - renders behind main content but above backgrounds */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -5 }}>
+        <PetalSystem />
+      </div>
 
-      {/* Sakura-style petal field with sprite sheet - full screen, clickable */}
-      <PetalField petalCount={30} speedMultiplier={0.4} hitRadius={30} enabled={true} />
+      {/* Note: PetalField removed from home page to reduce visual noise
+          PetalSystem and PhysicsCherryPetals handle interactive petals */}
 
       <div className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* SHOP */}
@@ -140,5 +156,33 @@ export default async function HomePage() {
         <div className="h-64" aria-hidden="true" />
       </div>
     </>
-  );
+    );
+  } catch (error) {
+    // Defensive error handling - log but don't crash
+    // Fallback to minimal page if something goes wrong
+    if (typeof console !== 'undefined' && console.error) {
+      console.error('[HomePage] Error rendering page:', error);
+    }
+    
+    // Return minimal fallback page
+    return (
+      <>
+        <div className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+            <div className="text-center">
+              <h1
+                className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight"
+                style={{ color: '#835D75' }}
+              >
+                Welcome Home, Traveler
+              </h1>
+              <p className="mt-4 text-xl text-white/70">
+                Anime x gaming shop + play — petals, runes, rewards.
+              </p>
+            </div>
+          </section>
+        </div>
+      </>
+    );
+  }
 }

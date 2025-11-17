@@ -103,32 +103,40 @@ export default async function MiniGamesSection() {
             <Link
               key={game.id}
               href={paths.game(game.slug)}
-              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-transform duration-200 hover:scale-[1.02]"
             >
-              <GlassCard className="flex h-full flex-col">
-                <div className="relative aspect-video overflow-hidden">
+              <GlassCard className="flex h-full flex-col overflow-hidden">
+                <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-purple-900/20 to-pink-900/20">
                   <Image
                     src={game.image ?? '/assets/placeholder-game.jpg'}
                     alt={game.title}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    onError={(e) => {
+                      // Graceful fallback if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent transition-opacity duration-300 group-hover:opacity-95" />
-                  <div className="absolute left-4 right-4 bottom-4 flex flex-col gap-2">
-                    <h3 className="font-semibold text-white transition-colors group-hover:text-pink-300">
+                  {/* Gradient overlay for text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
+                  
+                  {/* Game info overlay */}
+                  <div className="absolute left-4 right-4 bottom-4 flex flex-col gap-2 z-10">
+                    <h3 className="font-semibold text-white text-lg transition-colors group-hover:text-pink-300 drop-shadow-lg">
                       {game.title}
                     </h3>
                     {game.category && (
-                      <span className="self-start rounded-full bg-pink-500/20 px-2 py-1 text-xs font-medium text-pink-200 backdrop-blur">
+                      <span className="self-start rounded-full bg-pink-500/30 backdrop-blur-sm border border-pink-400/20 px-3 py-1 text-xs font-medium text-pink-100">
                         {game.category}
                       </span>
                     )}
                   </div>
                 </div>
                 {game.description && (
-                  <GlassCardContent>
-                    <p className="text-sm text-white/70 line-clamp-2">{game.description}</p>
+                  <GlassCardContent className="flex-1">
+                    <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">{game.description}</p>
                   </GlassCardContent>
                 )}
               </GlassCard>

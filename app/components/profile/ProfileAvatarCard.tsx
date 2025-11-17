@@ -68,7 +68,7 @@ export default function ProfileAvatarCard() {
         </div>
       ) : hasAvatar ? (
         <div className="mb-4">
-          <AvatarDisplay size="large" showEditButton={false} />
+          <AvatarDisplay size="lg" showEditButton={false} />
           <p className="text-xs text-zinc-400 text-center mt-2">
             This is your Otaku-mori avatar
           </p>

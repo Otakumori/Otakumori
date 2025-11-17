@@ -31,35 +31,43 @@ export default function TreeBackground() {
     if (!isMounted || typeof window === 'undefined') return;
 
     const updateDimensions = () => {
-      // Find footer to determine where tree should end
-      const footer = document.querySelector('footer');
-      
-      // Calculate full page height (from top to footer or document end)
-      let fullHeight = window.innerHeight; // Default to viewport
-      
-      if (footer) {
-        const footerRect = footer.getBoundingClientRect();
-        fullHeight = footerRect.top + window.scrollY;
-      } else {
-        // Fallback: use document scroll height or main-content end
-        const mainContent = document.getElementById('main-content');
-        if (mainContent) {
-          const mainRect = mainContent.getBoundingClientRect();
-          fullHeight = mainRect.bottom + window.scrollY;
+      try {
+        // Find footer to determine where tree should end
+        const footer = document.querySelector('footer');
+        
+        // Calculate full page height (from top to footer or document end)
+        let fullHeight = window.innerHeight; // Default to viewport
+        
+        if (footer) {
+          const footerRect = footer.getBoundingClientRect();
+          fullHeight = footerRect.top + window.scrollY;
         } else {
-          fullHeight = Math.max(
-            document.documentElement.scrollHeight,
-            document.body.scrollHeight,
-            window.innerHeight
-          );
+          // Fallback: use document scroll height or main-content end
+          const mainContent = document.getElementById('main-content');
+          if (mainContent) {
+            const mainRect = mainContent.getBoundingClientRect();
+            fullHeight = mainRect.bottom + window.scrollY;
+          } else {
+            fullHeight = Math.max(
+              document.documentElement.scrollHeight,
+              document.body.scrollHeight,
+              window.innerHeight
+            );
+          }
         }
+        
+        // Tree starts at top (behind navbar) and extends to footer
+        // Use full document height to ensure it reaches the bottom
+        const height = Math.max(fullHeight, window.innerHeight);
+        
+        setDimensions({ top: 0, height });
+      } catch (error) {
+        // Defensive: if DOM queries fail, use viewport height
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('[TreeBackground] Error updating dimensions:', error);
+        }
+        setDimensions({ top: 0, height: window.innerHeight });
       }
-      
-      // Tree starts at top (behind navbar) and extends to footer
-      // Use full document height to ensure it reaches the bottom
-      const height = Math.max(fullHeight, window.innerHeight);
-      
-      setDimensions({ top: 0, height });
     };
 
     // Initial calculation with a small delay to ensure DOM is ready

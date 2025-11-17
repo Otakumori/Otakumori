@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface AvatarCardProps {
   config: any;
@@ -23,6 +23,7 @@ export function AvatarCard({
   onClick,
 }: AvatarCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   const sizeClasses = {
     small: 'w-12 h-12',
@@ -67,9 +68,9 @@ export function AvatarCard({
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ duration: 0.2 }}
+      whileHover={reducedMotion ? {} : { scale: 1.05 }}
+      whileTap={reducedMotion ? {} : { scale: 0.95 }}
+      transition={reducedMotion ? { duration: 0 } : { duration: 0.2 }}
     >
       {/* Avatar Card Container */}
       <div className="w-full h-full rounded-xl overflow-hidden border-2 border-white/20 bg-gradient-to-br from-purple-900/20 to-pink-900/20 relative">
@@ -110,11 +111,13 @@ export function AvatarCard({
         )}
 
         {/* Hover Effect */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-0"
-          animate={{ opacity: isHovered ? 1 : 0 }}
-          transition={{ duration: 0.2 }}
-        />
+        {!reducedMotion && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent opacity-0"
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+          />
+        )}
       </div>
 
       {/* Name Display */}

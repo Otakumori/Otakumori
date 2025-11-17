@@ -824,7 +824,7 @@ export function UltraDetailedCharacterCreator({
               <div className="aspect-video bg-black/20 rounded-lg overflow-hidden">
                 <AvatarRenderer
                   config={characterConfig}
-                  size="large"
+                  size="lg"
                   interactions={true}
                   physics={
                     characterConfig.physics.softBody.enable ||
