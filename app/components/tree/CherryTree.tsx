@@ -17,7 +17,7 @@ export const CANOPY_POINTS = [
   { x: 0.75, y: 0.21 },
 ];
 
-const TREE_IMG = '/assets/images/CherryTree.png';
+const TREE_IMG = '/assets/images/cherry-tree.png';
 
 const CherryTree: React.FC = () => {
   const { swayPhase: _swayPhase } = useWind();
