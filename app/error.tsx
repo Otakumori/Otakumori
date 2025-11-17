@@ -12,7 +12,22 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    // Enhanced error logging for development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Error Boundary] Full error details:', {
+        message: error.message,
+        stack: error.stack,
+        digest: error.digest,
+        name: error.name,
+        cause: (error as any).cause,
+        // Log all error properties
+        ...Object.fromEntries(
+          Object.entries(error).filter(([key]) => !['message', 'stack', 'digest', 'name'].includes(key))
+        ),
+      });
+    } else {
+      console.error('[Error Boundary]', error.message, error.digest ? `(digest: ${error.digest})` : '');
+    }
   }, [error]);
 
   const errorType = getErrorType(error);

@@ -66,8 +66,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               <div className="p-8 text-center">
                 <h1 className="text-2xl font-bold text-red-500">Something went wrong!</h1>
                 <p className="mt-2 text-gray-400">Please refresh the page or contact support.</p>
+                <p className="mt-4 text-xs text-gray-500">
+                  Check the browser console for detailed error information (dev mode only).
+                </p>
               </div>
             }
+            showDialog={process.env.NODE_ENV === 'development'}
           >
             <Providers>
               <div className="flex min-h-screen flex-col relative z-10">
