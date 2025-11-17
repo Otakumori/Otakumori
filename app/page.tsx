@@ -16,6 +16,7 @@ import SectionErrorBoundary from './components/home/SectionErrorBoundary';
 // Client-side petal system components
 import PetalSystem from './components/petals/PetalSystem';
 import PhysicsCherryPetals from './components/petals/PhysicsCherryPetals';
+import SakuraPetalBackground from './components/petals/SakuraPetalBackground';
 
 // TreeBackgroundWrapper ensures tree only renders on home page
 import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
@@ -67,6 +68,15 @@ export default async function HomePage() {
       </div>
 
       {/* Interactive petal systems - above atmospheric layers, below content */}
+      {/* New Sakura Petal Background - real petal shapes with proper physics */}
+      <SakuraPetalBackground
+        enabled={NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' || NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === 'true'}
+        maxPetals={30}
+        spawnInterval={2000}
+        hitRadius={32}
+      />
+
+      {/* Legacy petal systems - kept for compatibility, can be removed after testing */}
       {/* Physics-based cherry blossom petals - clickable/collectible */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -5 }}>
         <PhysicsCherryPetals density={2} onCollect={(_id) => {
@@ -79,9 +89,6 @@ export default async function HomePage() {
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -5 }}>
         <PetalSystem />
       </div>
-
-      {/* Note: PetalField removed from home page to reduce visual noise
-          PetalSystem and PhysicsCherryPetals handle interactive petals */}
 
       <div className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
         {/* SHOP */}
