@@ -24,13 +24,6 @@ const EarnPetalsSchema = z.object({
     .optional(),
 });
 
-// Rate limit config for petal earning (per minute)
-const PETAL_EARN_RATE_LIMIT = {
-  windowMs: 60000, // 1 minute
-  maxRequests: 20, // 20 earns per minute
-  message: 'Too many petal earning requests. Please wait a moment.',
-};
-
 export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 

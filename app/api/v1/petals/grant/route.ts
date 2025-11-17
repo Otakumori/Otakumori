@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { generateRequestId } from '@/lib/requestId';
-import { grantPetals, type PetalSource, PETAL_RULES } from '@/app/lib/petals/grant';
+import { grantPetals, type PetalSource } from '@/app/lib/petals/grant';
 import { logger } from '@/app/lib/logger';
 
 export const runtime = 'nodejs';

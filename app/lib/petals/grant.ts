@@ -164,7 +164,8 @@ const MAX_PETALS_PER_GRANT = 1000;
  * - Returns detailed result for UI feedback
  */
 export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsResult> {
-  const { userId, amount, source, metadata, description, requestId, req } = input;
+  const { userId, amount, source, metadata: _metadata, description, requestId, req } = input;
+  // metadata is stored in PetalTransaction but not used in validation logic
 
   // Validation: amount must be finite, integer, positive, within max
   if (!Number.isFinite(amount) || !Number.isInteger(amount)) {
@@ -353,6 +354,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
       });
 
       // Create PetalTransaction record for audit trail
+      // Note: metadata is not stored in PetalTransaction model, only in PetalLedger
       await tx.petalTransaction.create({
         data: {
           userId,
@@ -363,6 +365,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
       });
 
       // Create PetalLedger entry for lifetime tracking
+      // Note: PetalLedger doesn't have a metadata field, but reason can include context
       await tx.petalLedger.create({
         data: {
           id: `petal_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
