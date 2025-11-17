@@ -6,7 +6,6 @@ import { logger } from '@/app/lib/logger';
 import { db } from '@/lib/db';
 import { problem } from '@/lib/http/problem';
 import { reqId } from '@/lib/log';
-import { PetalService } from '@/app/lib/petals';
 import { calculateGameReward } from '@/app/config/petalTuning';
 import { submitScoreReq } from '@/lib/schemas/minigames';
 
@@ -76,23 +75,26 @@ export async function POST(req: NextRequest) {
 
   if (petalsGranted > 0) {
     try {
-      const petalService = new PetalService();
-      const result = await petalService.awardPetals(userId, {
-        type: 'earn',
+      // Use centralized grantPetals function
+      const { grantPetals } = await import('@/app/lib/petals/grant');
+      const result = await grantPetals({
+        userId,
         amount: petalAmount,
-        reason: `Game reward: ${mappedGameId}`,
-        source: 'game',
+        source: 'mini_game',
         metadata: {
           gameId: mappedGameId,
           legacyGame: game,
           score,
         },
-      }, requestId);
+        description: `Game reward: ${mappedGameId}`,
+        requestId,
+        req,
+      });
 
       if (result.success) {
-        petalsGranted = result.awarded;
+        petalsGranted = result.granted;
         balance = result.newBalance;
-        lifetimePetalsEarned = result.lifetimePetalsEarned;
+        lifetimePetalsEarned = result.lifetimeEarned;
       } else {
         logger.error(
           'petals_award_error',

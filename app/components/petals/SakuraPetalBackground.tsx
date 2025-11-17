@@ -290,9 +290,11 @@ export default function SakuraPetalBackground({
           p.id === hit.id ? { ...p, collected: true } : p,
         );
 
-        // Trigger petal economy
+        // Trigger petal economy via centralized API
         const normalizedX = hit.x / rect.width;
         const normalizedY = hit.y / rect.height;
+        
+        // Use the centralized petal collection hook
         collectPetal(parseInt(hit.id.split('-')[0]) || Date.now(), PETAL_VALUE, normalizedX, normalizedY);
 
         // Call optional callback

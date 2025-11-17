@@ -14,7 +14,7 @@ interface ProfileHeaderProps {
  */
 export default function ProfileHeader({ displayName, tagline }: ProfileHeaderProps) {
   const { user, isSignedIn } = useUser();
-  const { balance, lifetimePetalsEarned, isGuest } = usePetalBalance();
+  const { balance, lifetimeEarned, isGuest } = usePetalBalance();
 
   const userName = displayName || user?.fullName || user?.username || 'Wanderer';
   const userTagline = tagline || 'Embrace the shadows, master the art.';
@@ -47,7 +47,7 @@ export default function ProfileHeader({ displayName, tagline }: ProfileHeaderPro
             {/* Lifetime Petals */}
             <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 backdrop-blur-sm p-4 min-w-[140px]">
               <div className="text-xs text-purple-200/70 mb-1">Lifetime Petals</div>
-              <div className="text-2xl font-bold text-white">{lifetimePetalsEarned.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-white">{lifetimeEarned.toLocaleString()}</div>
               <div className="text-[10px] text-purple-200/50 mt-1">Total earned</div>
             </div>
           </div>

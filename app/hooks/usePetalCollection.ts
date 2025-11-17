@@ -36,7 +36,7 @@ export function usePetalCollection() {
     setState((prev) => ({ ...prev, hasCollectedAny: hasCollected }));
   }, []);
 
-  // Submit collected petals to API
+  // Submit collected petals to API using centralized grant endpoint
   const submitCollections = useCallback(async () => {
     if (pendingCollections.current.length === 0) return;
 
@@ -46,24 +46,41 @@ export function usePetalCollection() {
     const totalValue = collections.reduce((sum, c) => sum + c.value, 0);
 
     try {
-      const response = await fetch('/api/petals/collect', {
+      // Use the centralized petal grant API
+      const response = await fetch('/api/v1/petals/grant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          count: totalValue,
-          x: collections[0].x,
-          y: collections[0].y,
+          amount: totalValue,
+          source: 'background_petal_click',
+          metadata: {
+            clickCount: collections.length,
+            positions: collections.map((c) => ({ x: c.x, y: c.y })),
+          },
+          description: `Collected ${collections.length} sakura petals`,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
 
-        setState((prev) => ({
-          ...prev,
-          sessionTotal: prev.sessionTotal + totalValue,
-          lifetimeTotal: data.data?.totalPetals || prev.lifetimeTotal + totalValue,
-        }));
+        if (data.ok && data.data) {
+          setState((prev) => ({
+            ...prev,
+            sessionTotal: prev.sessionTotal + (data.data.granted || totalValue),
+            lifetimeTotal: data.data.lifetimeEarned || prev.lifetimeTotal + (data.data.granted || totalValue),
+          }));
+        }
+      } else {
+        // If rate limited or daily limit reached, still update UI but don't retry
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.error === 'RATE_LIMITED' || errorData.error === 'DAILY_LIMIT_REACHED') {
+          // Don't re-add to pending - limits are intentional
+          console.warn('Petal collection limited:', errorData.error);
+        } else {
+          // Re-add failed collections to try again for other errors
+          pendingCollections.current.push(...collections);
+        }
       }
     } catch (error) {
       console.error('Failed to submit petal collection:', error);

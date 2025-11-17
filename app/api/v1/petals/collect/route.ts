@@ -1,53 +1,23 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { db } from '@/app/lib/db';
 import { generateRequestId } from '@/lib/requestId';
-import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
+import { grantPetals } from '@/app/lib/petals/grant';
+import { logger } from '@/app/lib/logger';
 
 export const runtime = 'nodejs';
 
 const CollectPetalsSchema = z.object({
   amount: z.number().int().positive().max(500),
   source: z.enum(['homepage_collection', 'game_reward', 'daily_bonus', 'achievement']),
+  metadata: z.record(z.unknown()).optional(),
 });
-
-// Rate limit config for petal collection (per minute)
-const PETAL_COLLECT_RATE_LIMIT = {
-  windowMs: 60000, // 1 minute
-  maxRequests: 10, // 10 collects per minute
-  message: 'Too many petal collections. Please wait a moment.',
-};
 
 export async function POST(req: NextRequest) {
   const requestId = generateRequestId();
 
   try {
     const { userId } = await auth();
-    
-    // Rate limiting for both authenticated and guest users
-    const identifier = getClientIdentifier(req, userId || undefined);
-    const rateLimitResult = await checkRateLimit('PETAL_COLLECT', identifier, PETAL_COLLECT_RATE_LIMIT);
-    
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'RATE_LIMITED',
-          message: rateLimitResult.message,
-          requestId,
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
-            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
-          },
-        },
-      );
-    }
-
     const body = await req.json();
     const validation = CollectPetalsSchema.safeParse(body);
 
@@ -58,136 +28,83 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { amount, source } = validation.data;
+    const { amount, source, metadata } = validation.data;
 
-    // Guest user handling
+    // Map legacy source names to new PetalSource types
+    const sourceMap: Record<string, 'background_petal_click' | 'mini_game' | 'daily_login' | 'achievement'> = {
+      homepage_collection: 'background_petal_click',
+      game_reward: 'mini_game',
+      daily_bonus: 'daily_login',
+      achievement: 'achievement',
+    };
+
+    const mappedSource = sourceMap[source] || 'other';
+
+    // Use centralized grantPetals function
+    const result = await grantPetals({
+      userId: userId || null,
+      amount,
+      source: mappedSource,
+      metadata,
+      description: `Collected ${amount} petals from ${source}`,
+      requestId,
+      req,
+    });
+
+    if (!result.success) {
+      const statusCode =
+        result.errorCode === 'RATE_LIMITED'
+          ? 429
+          : result.errorCode === 'AUTH_REQUIRED'
+            ? 401
+            : result.errorCode === 'VALIDATION_ERROR'
+              ? 400
+              : 500;
+
+      return NextResponse.json(
+        {
+          ok: false,
+          error: result.errorCode || 'INTERNAL_ERROR',
+          message: result.error,
+          requestId,
+        },
+        { status: statusCode },
+      );
+    }
+
+    // Guest user handling - return early for guests
     if (!userId) {
-      // For guest users, return a response that client can use for localStorage
       return NextResponse.json({
         ok: true,
         data: {
-          balance: null, // Client will handle localStorage
-          earned: amount,
-          guestPetals: amount,
+          balance: null,
+          earned: result.granted,
+          guestPetals: result.granted,
           isGuest: true,
         },
         requestId,
       });
     }
 
-    // Check daily limit for homepage collection
-    if (source === 'homepage_collection') {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const todayCollected = await db.petalTransaction.aggregate({
-        where: {
-          userId,
-          source: 'homepage_collection',
-          createdAt: { gte: today },
-        },
-        _sum: { amount: true },
-      });
-
-      const collectedToday = todayCollected._sum.amount || 0;
-      const dailyLimit = 1000; // 1000 petals per day from homepage
-
-      if (collectedToday + amount > dailyLimit) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: 'DAILY_LIMIT_REACHED',
-            message: `Daily limit of ${dailyLimit} petals reached`,
-            requestId,
-          },
-          { status: 429 },
-        );
-      }
-    }
-
-    // Use transaction to update wallet and create transaction record
-    const result = await db.$transaction(async (tx) => {
-      // Upsert petal wallet
-      const wallet = await tx.petalWallet.upsert({
-        where: { userId },
-        create: {
-          userId,
-          balance: amount,
-          lifetimeEarned: amount,
-          lastCollectedAt: new Date(),
-        },
-        update: {
-          balance: { increment: amount },
-          lifetimeEarned: { increment: amount },
-          lastCollectedAt: new Date(),
-        },
-      });
-
-      // Create transaction record
-      const transaction = await tx.petalTransaction.create({
-        data: {
-          userId,
-          amount,
-          source,
-          description: `Collected ${amount} petals from ${source}`,
-        },
-      });
-
-      // Check for streak bonus
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(0, 0, 0, 0);
-
-      const yesterdayCollection = await tx.petalTransaction.findFirst({
-        where: {
-          userId,
-          source: 'homepage_collection',
-          createdAt: { gte: yesterday },
-        },
-      });
-
-      let streakBonus = 0;
-      if (yesterdayCollection) {
-        // Update streak
-        await tx.petalWallet.update({
-          where: { userId },
-          data: { currentStreak: { increment: 1 } },
-        });
-        streakBonus = Math.floor(amount * 0.1); // 10% streak bonus
-      } else {
-        // Reset streak
-        await tx.petalWallet.update({
-          where: { userId },
-          data: { currentStreak: 1 },
-        });
-      }
-
-      return { wallet, transaction, streakBonus };
-    });
-
-    const response = NextResponse.json({
+    // For authenticated users, return full result
+    return NextResponse.json({
       ok: true,
       data: {
-        balance: result.wallet.balance,
-        earned: amount,
-        streakBonus: result.streakBonus,
-        currentStreak: result.wallet.currentStreak,
-        transactionId: result.transaction.id,
+        balance: result.newBalance,
+        earned: result.granted,
+        lifetimeEarned: result.lifetimeEarned,
+        limited: result.limited || false,
+        dailyRemaining: result.dailyRemaining,
         isGuest: false,
       },
       requestId,
     });
-
-    // Add rate limit headers
-    response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
-    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
-    response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toString());
-
-    return response;
   } catch (error: any) {
-    console.error('[Petals Collect] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[Petals Collect] Error', { requestId }, new Error(errorMessage));
+
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      { ok: false, error: 'INTERNAL_ERROR', message: error.message || 'Failed to collect petals', requestId },
       { status: 500 },
     );
   }

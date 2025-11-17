@@ -1,10 +1,10 @@
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PetalService } from '@/app/lib/petals';
 import { generateRequestId } from '@/lib/requestId';
-import { checkRateLimit, getClientIdentifier } from '@/app/lib/rate-limiting';
+import { grantPetals } from '@/app/lib/petals/grant';
 import { calculateGameReward } from '@/app/config/petalTuning';
+import { logger } from '@/app/lib/logger';
 
 export const runtime = 'nodejs';
 
@@ -36,30 +36,6 @@ export async function POST(req: NextRequest) {
 
   try {
     const { userId } = await auth();
-
-    // Rate limiting
-    const identifier = getClientIdentifier(req, userId || undefined);
-    const rateLimitResult = await checkRateLimit('PETAL_EARN', identifier, PETAL_EARN_RATE_LIMIT);
-
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'RATE_LIMITED',
-          message: rateLimitResult.message,
-          requestId,
-        },
-        {
-          status: 429,
-          headers: {
-            'X-RateLimit-Limit': rateLimitResult.limit.toString(),
-            'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
-            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
-          },
-        },
-      );
-    }
-
     const body = await req.json();
     const validation = EarnPetalsSchema.safeParse(body);
 
@@ -77,8 +53,6 @@ export async function POST(req: NextRequest) {
     const petalAmount = calculateGameReward(gameId, didWin ?? true, score, metadata);
 
     // Guest user handling - return success, client handles localStorage persistence
-    // Note: localStorage is client-side only, so we can't access it here
-    // The client will handle persistence and daily limits
     if (!userId) {
       return NextResponse.json({
         ok: true,
@@ -93,55 +67,61 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Authenticated user - award petals via PetalService
-    const petalService = new PetalService();
-    const result = await petalService.awardPetals(userId, {
-      type: 'earn',
+    // Use centralized grantPetals function
+    const result = await grantPetals({
+      userId,
       amount: petalAmount,
-      reason: `Game reward: ${gameId}`,
-      source: 'game',
+      source: 'mini_game',
       metadata: {
         gameId,
         score,
+        didWin: didWin ?? true,
         ...metadata,
       },
-    }, requestId);
+      description: `Game reward: ${gameId}`,
+      requestId,
+      req,
+    });
 
     if (!result.success) {
+      const statusCode =
+        result.errorCode === 'RATE_LIMITED'
+          ? 429
+          : result.errorCode === 'VALIDATION_ERROR'
+            ? 400
+            : 500;
+
       return NextResponse.json(
         {
           ok: false,
-          error: result.error || 'Failed to award petals',
+          error: result.errorCode || 'INTERNAL_ERROR',
+          message: result.error,
           requestId,
-          dailyCapReached: result.dailyCapReached || false,
+          dailyCapReached: result.errorCode === 'DAILY_LIMIT_REACHED',
         },
-        { status: result.dailyCapReached ? 429 : 500 },
+        { status: statusCode },
       );
     }
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       ok: true,
       data: {
-        earned: result.awarded,
+        earned: result.granted,
         balance: result.newBalance,
-        lifetimePetalsEarned: result.lifetimePetalsEarned,
+        lifetimePetalsEarned: result.lifetimeEarned,
         isGuest: false,
         source: 'game',
-        dailyCapReached: result.dailyCapReached || false,
+        dailyCapReached: result.limited || false,
+        dailyRemaining: result.dailyRemaining,
       },
       requestId,
     });
-
-    // Add rate limit headers
-    response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString());
-    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
-    response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toString());
-
-    return response;
   } catch (error: any) {
-    console.error('[Petals Earn] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[Petals Earn] Error', { requestId }, new Error(errorMessage));
+
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },
+      { ok: false, error: 'INTERNAL_ERROR', message: errorMessage, requestId },
       { status: 500 },
     );
   }

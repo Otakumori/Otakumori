@@ -1,108 +1,75 @@
-/**
- * Hook to fetch and sync petal balance (including lifetime)
- * Used by Quake HUD and other components that need real-time petal data
- */
-
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useUser } from '@clerk/nextjs';
 
-export interface PetalBalanceData {
-  balance: number;
-  lifetimePetalsEarned: number;
-  isGuest: boolean;
-}
-
+/**
+ * Standardized hook for reading petal balance
+ * 
+ * This hook provides a single source of truth for petal balance in the UI.
+ * It fetches from /api/v1/petals/wallet and caches the result.
+ * 
+ * Usage:
+ * ```tsx
+ * const { balance, isLoading, refetch } = usePetalBalance();
+ * ```
+ */
 export function usePetalBalance() {
-  const [balance, setBalance] = useState<number | null>(null);
-  const [lifetimePetalsEarned, setLifetimePetalsEarned] = useState<number | null>(null);
-  const [isGuest, setIsGuest] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const { user, isLoaded } = useUser();
 
-  const syncBalance = useCallback(async () => {
-    try {
-      setLoading(true);
-      
-      // Try v1 API first (for authenticated users)
-      const response = await fetch('/api/v1/petals/balance');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.ok && data.data) {
-          setBalance(data.data.balance ?? 0);
-          setLifetimePetalsEarned(data.data.lifetimePetalsEarned ?? 0);
-          setIsGuest(false);
-          return;
-        }
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['petal-balance', user?.id],
+    queryFn: async () => {
+      if (!user?.id) {
+        // Guest users - check localStorage
+        const guestPetals = localStorage.getItem('otm-guest-petals');
+        return {
+          balance: guestPetals ? parseInt(guestPetals, 10) : 0,
+          lifetimeEarned: 0,
+          isGuest: true,
+        };
       }
-      
-      // Fallback: check guest localStorage
-      const guestData = localStorage.getItem('om_guest_petals_v1');
-      if (guestData) {
-        try {
-          const parsed = JSON.parse(guestData);
-          const updatedAt = parsed.updatedAt ? new Date(parsed.updatedAt) : null;
-          const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          
-          if (updatedAt && updatedAt > sevenDaysAgo) {
-            setBalance(parsed.balance ?? 0);
-            setLifetimePetalsEarned(parsed.lifetimePetalsEarned ?? 0);
-            setIsGuest(true);
-            return;
-          }
-        } catch {
-          // Invalid guest data, reset
-        }
-      }
-      
-      // Default: no balance
-      setBalance(0);
-      setLifetimePetalsEarned(0);
-      setIsGuest(true);
-    } catch (error) {
-      console.error('Failed to sync petal balance:', error);
-      setBalance(0);
-      setLifetimePetalsEarned(0);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
-  useEffect(() => {
-    syncBalance();
-
-    // Listen for petal events
-    const onEarn = (event: CustomEvent) => {
-      if (event.detail?.balance !== null && event.detail?.balance !== undefined) {
-        setBalance(event.detail.balance);
+      const response = await fetch('/api/v1/petals/wallet');
+      if (!response.ok) {
+        throw new Error('Failed to fetch petal balance');
       }
-      if (event.detail?.lifetimePetalsEarned !== null && event.detail?.lifetimePetalsEarned !== undefined) {
-        setLifetimePetalsEarned(event.detail.lifetimePetalsEarned);
-      }
-      setIsGuest(event.detail?.isGuest ?? false);
-    };
 
-    const onSpend = (event: CustomEvent) => {
-      if (event.detail?.balance !== null && event.detail?.balance !== undefined) {
-        setBalance(event.detail.balance);
+      const result = await response.json();
+      if (!result.ok) {
+        throw new Error(result.error || 'Failed to fetch petal balance');
       }
-      // Lifetime doesn't change on spend
-    };
 
-    window.addEventListener('petal:earn', onEarn as any);
-    window.addEventListener('petal:spend', onSpend as any);
-    
-    return () => {
-      window.removeEventListener('petal:earn', onEarn as any);
-      window.removeEventListener('petal:spend', onSpend as any);
-    };
-  }, [syncBalance]);
+      return {
+        balance: result.data.balance || 0,
+        lifetimeEarned: result.data.lifetimeEarned || 0,
+        currentStreak: result.data.currentStreak || 0,
+        todayCollected: result.data.todayCollected || 0,
+        dailyLimit: result.data.dailyLimit || 0,
+        isGuest: false,
+      };
+    },
+    enabled: isLoaded,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
+  });
+
+  // Sync balance function for authenticated users
+  const syncBalance = async () => {
+    if (!user?.id) return;
+    await refetch();
+  };
 
   return {
-    balance: balance ?? 0,
-    lifetimePetalsEarned: lifetimePetalsEarned ?? 0,
-    isGuest,
-    loading,
+    balance: data?.balance ?? 0,
+    lifetimeEarned: data?.lifetimeEarned ?? 0,
+    currentStreak: data?.currentStreak ?? 0,
+    todayCollected: data?.todayCollected ?? 0,
+    dailyLimit: data?.dailyLimit ?? 0,
+    isGuest: data?.isGuest ?? false,
+    isLoading: isLoading || !isLoaded,
+    error,
+    refetch,
     syncBalance,
   };
 }
-
