@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 
 /**
  * Cherry Blossom Tree Background Component
+ * 
+ * CRITICAL: This component should ONLY be used via TreeBackgroundWrapper, 
+ * which ensures it only renders on the home page. Do not import directly 
+ * in other pages.
  *
  * CRITICAL SPECIFICATIONS:
  * - Starts behind header (header is sticky, ~80px height)

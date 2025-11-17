@@ -1,5 +1,4 @@
 // app/page.tsx - Updated imports
-import dynamic from 'next/dynamic';
 import { env } from '@/env.mjs';
 
 // Legacy components for fallback sections
@@ -19,20 +18,8 @@ import PetalSystem from './components/petals/PetalSystem';
 import PetalField from '@/components/petals/PetalField';
 import PhysicsCherryPetals from './components/petals/PhysicsCherryPetals';
 
-// Cherry blossom tree background - dynamically imported to prevent SSR evaluation
-const TreeBackground = dynamic(
-  () => import('./components/TreeBackground'),
-  {
-    ssr: false, // CRITICAL: Prevent any server-side evaluation
-    loading: () => (
-      <div 
-        className="fixed inset-x-0 pointer-events-none" 
-        style={{ top: 0, height: '100vh', zIndex: -10 }}
-        aria-hidden="true"
-      />
-    ),
-  }
-);
+// TreeBackgroundWrapper ensures tree only renders on home page
+import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
 import { PetalFlowOverlayWrapper } from './components/home/PetalFlowOverlayWrapper';
 import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapper';
 
@@ -53,8 +40,9 @@ export default async function HomePage() {
   return (
     <>
       {/* Cherry blossom tree background - fixed with parallax */}
+      {/* TreeBackgroundWrapper ensures tree only renders on home page */}
       <div className="relative">
-        <TreeBackground />
+        <TreeBackgroundWrapper />
         
         {/* Sprite-based cherry petal layer - new implementation */}
         <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -8 }}>
