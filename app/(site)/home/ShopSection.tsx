@@ -62,7 +62,16 @@ export default async function ShopSection() {
   try {
     // Build exclusion query parameter
     const excludeParam = HOMEPAGE_EXCLUDED_TITLES.map((t) => `excludeTitles=${encodeURIComponent(t)}`).join('&');
-    const baseUrl = await getBaseUrl();
+    
+    // Safely get base URL - fallback if headers() fails
+    let baseUrl: string;
+    try {
+      baseUrl = await getBaseUrl();
+    } catch {
+      // Fallback if headers() is unavailable
+      baseUrl = env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    }
+    
     apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
 
     // Use direct fetch instead of safeFetch for server components

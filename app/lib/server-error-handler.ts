@@ -64,18 +64,26 @@ export function handleServerError(
     timestamp: new Date().toISOString(),
   };
 
-  // Track error in Sentry with enhanced context
-  trackError(
-    error instanceof Error ? error : new Error(String(error)),
-    sentryContext,
-    {
-      section: context.section,
-      component: context.component,
-      ...(context.operation && { operation: context.operation }),
+  // Track error in Sentry with enhanced context (defensive - never throw)
+  try {
+    trackError(
+      error instanceof Error ? error : new Error(String(error)),
+      sentryContext,
+      {
+        section: context.section,
+        component: context.component,
+        ...(context.operation && { operation: context.operation }),
+      }
+    );
+  } catch (sentryError) {
+    // Silently fail if Sentry tracking fails - don't crash the app
+    // Fallback to console.error in case Sentry is unavailable
+    if (typeof console !== 'undefined' && console.error) {
+      console.error('[handleServerError] Failed to track error in Sentry:', sentryError);
     }
-  );
+  }
 
-  // Log to structured logger
+  // Log to structured logger (defensive - never throw)
   const logContext: LogCtx = {
     requestId,
     route: `/${context.section}`,
@@ -86,28 +94,37 @@ export function handleServerError(
     },
   };
 
-  switch (logLevel) {
-    case 'warn':
-      logger.warn(
-        `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
-        logContext,
-        errorDetails
-      );
-      break;
-    case 'info':
-      logger.info(
-        `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
-        logContext,
-        errorDetails
-      );
-      break;
-    default:
-      logger.error(
-        `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
-        logContext,
-        errorDetails,
-        error instanceof Error ? error : undefined
-      );
+  try {
+    switch (logLevel) {
+      case 'warn':
+        logger.warn(
+          `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
+          logContext,
+          errorDetails
+        );
+        break;
+      case 'info':
+        logger.info(
+          `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
+          logContext,
+          errorDetails
+        );
+        break;
+      default:
+        logger.error(
+          `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
+          logContext,
+          errorDetails,
+          error instanceof Error ? error : undefined
+        );
+    }
+  } catch (loggerError) {
+    // Silently fail if logger fails - don't crash the app
+    // Fallback to console.error in case logger is unavailable
+    if (typeof console !== 'undefined' && console.error) {
+      console.error('[handleServerError] Failed to log error:', loggerError);
+      console.error('[handleServerError] Original error:', errorDetails);
+    }
   }
 
   // Re-throw if requested (for critical errors)
