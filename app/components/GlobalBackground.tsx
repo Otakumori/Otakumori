@@ -26,7 +26,17 @@ export default function GlobalBackground() {
       for (let i = 0; i < 100; i++) {
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
-        const size = Math.random() * 1.5 + 0.5;
+        // Guard: Ensure radius is finite and positive to prevent IndexSizeError
+        // Clamp size to safe range [0.5, 2.0] for valid arc rendering
+        let size = Math.random() * 1.5 + 0.5;
+        if (!Number.isFinite(size) || size <= 0) {
+          size = 0.5; // Safe default
+        }
+        size = Math.max(0.5, Math.min(2.0, size));
+        
+        // Validate coordinates are finite before drawing
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        
         ctx.beginPath();
         ctx.arc(x, y, size, 0, Math.PI * 2);
         ctx.fill();
@@ -68,17 +78,31 @@ export default function GlobalBackground() {
         const k = 128.0 / star.z;
         const px = star.x * k + canvas.width / 2;
         const py = star.y * k + canvas.height / 2;
-        if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
-          // Guard: Ensure radius is never negative or NaN to prevent IndexSizeError
-          // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
-          // Clamp to minimum 0.1 to ensure valid arc rendering
-          const size = Math.max(0.1, (1 - star.z / canvas.width) * 1.5);
-          if (isNaN(size) || size <= 0) return; // Additional safety check
-          ctx.fillStyle = 'rgba(255,255,255,0.7)';
-          ctx.beginPath();
-          ctx.arc(px, py, size, 0, Math.PI * 2);
-          ctx.fill();
+        // Validate coordinates are finite and within bounds before drawing
+        if (
+          !Number.isFinite(px) ||
+          !Number.isFinite(py) ||
+          px < 0 ||
+          px >= canvas.width ||
+          py < 0 ||
+          py >= canvas.height
+        ) {
+          continue;
         }
+
+        // Guard: Ensure radius is never negative, NaN, or infinite to prevent IndexSizeError
+        // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
+        // Clamp to safe range [0.5, 2.0] to ensure valid arc rendering
+        let size = (1 - star.z / canvas.width) * 1.5;
+        if (!Number.isFinite(size) || size <= 0) {
+          size = 0.5; // Safe default if calculation fails
+        }
+        size = Math.max(0.5, Math.min(2.0, size));
+
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.arc(px, py, size, 0, Math.PI * 2);
+        ctx.fill();
       }
       requestAnimationFrame(updateStars);
     };

@@ -12,6 +12,16 @@ import { clientEnv } from '@/env/client';
  * Note: instrumentation-client.ts also had posthog.init() - that has been removed
  * to prevent the "You have already initialized PostHog!" warning.
  */
+/**
+ * Global singleton guard to prevent PostHog initialization across multiple provider instances
+ * This ensures PostHog is only initialized once, even if the provider component re-mounts
+ */
+declare global {
+  interface Window {
+    __posthogInitialized?: boolean;
+  }
+}
+
 export default function PostHogProvider({ children }: { children: React.ReactNode }) {
   const initializedRef = useRef(false);
 
@@ -20,10 +30,23 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
     if (initializedRef.current) return;
     
     const key = clientEnv.NEXT_PUBLIC_POSTHOG_KEY;
-    if (!key) return;
+    if (!key || typeof window === 'undefined') return;
 
-    // Check if PostHog is already initialized (from instrumentation-client or previous mount)
-    if (typeof window !== 'undefined' && (posthog as any).__loaded) {
+    // Check global singleton guard first (prevents multiple provider instances)
+    if (window.__posthogInitialized) {
+      initializedRef.current = true;
+      return;
+    }
+
+    // Check PostHog's built-in initialization state
+    // PostHog sets __loaded and config after successful initialization
+    const isAlreadyInitialized =
+      (posthog as any).__loaded === true ||
+      (posthog as any).config !== undefined ||
+      (posthog as any).has_opted_out !== undefined; // Uninitialized PostHog has undefined has_opted_out
+
+    if (isAlreadyInitialized) {
+      window.__posthogInitialized = true;
       initializedRef.current = true;
       return;
     }
@@ -38,10 +61,13 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
         mask_all_text: true,
         mask_all_element_attributes: true,
       });
+      // Mark as initialized globally and locally
+      window.__posthogInitialized = true;
       initializedRef.current = true;
     } catch (error) {
-      // Silently fail if PostHog is already initialized (prevents console spam)
+      // Silently handle "already initialized" errors (prevents console spam)
       if (error instanceof Error && error.message.includes('already initialized')) {
+        window.__posthogInitialized = true;
         initializedRef.current = true;
       } else {
         console.error('[PostHogProvider] Failed to initialize PostHog:', error);

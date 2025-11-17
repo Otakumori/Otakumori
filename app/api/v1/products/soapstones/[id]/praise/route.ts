@@ -84,19 +84,19 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       });
     }
 
-    // Add praise - use PetalService to award 1 petal to author
-    const { PetalService } = await import('@/app/lib/petals');
-    const petalService = new PetalService();
+    // Add praise - use centralized grantPetals to award petals to author
+    const { grantPetals } = await import('@/app/lib/petals/grant');
     
-    const earnResult = await petalService.awardPetals(soapstone.authorId, {
-      type: 'earn',
+    const earnResult = await grantPetals({
+      userId: soapstone.authorId,
       amount: 1,
-      reason: 'soapstone_praise',
-      source: 'other', // Soapstone praise is "other" source
+      source: 'soapstone_praise',
       metadata: {
         soapstoneId,
         praisedBy: user.id,
       },
+      description: 'Soapstone praise',
+      req: req as any, // For rate limiting
     });
 
     await db.$transaction([
@@ -118,8 +118,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         praised: true,
         praiseCount: soapstone.appraises + 1,
         authorBalance: earnResult.newBalance,
-        authorLifetimePetalsEarned: earnResult.lifetimePetalsEarned,
-        dailyCapReached: earnResult.dailyCapReached || false,
+        authorLifetimePetalsEarned: earnResult.lifetimeEarned,
+        dailyCapReached: earnResult.limited || false,
       },
     });
   } catch (error) {

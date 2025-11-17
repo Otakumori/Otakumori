@@ -38,7 +38,7 @@ export default function ShopTeaser() {
               id: product.id,
               title: product.title,
               description: product.description,
-              image: product.images?.[0]?.src || product.images?.[0] || '/placeholder-product.jpg',
+              image: product.images?.[0]?.src || product.images?.[0] || '/assets/images/placeholder-product.jpg',
               price: product.variants?.[0]?.price || product.price || 0,
               available: product.variants?.some((v: any) => v.is_enabled && v.is_available) || true,
               slug: product.id,

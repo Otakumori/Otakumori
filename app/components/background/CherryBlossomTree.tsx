@@ -121,7 +121,7 @@ export default function CherryBlossomTree() {
       <div className="fixed left-0 top-0 h-screen w-96 flex items-end pointer-events-none z-0">
         <div className="relative h-screen w-full">
           <Image
-            src="/assets/images/CherryTree.png"
+            src="/assets/images/cherry-tree.png"
             alt="Cherry Blossom Tree"
             fill
             className="object-contain object-left-bottom"

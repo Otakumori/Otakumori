@@ -191,19 +191,17 @@ async function handler(request: NextRequest) {
       createdAt: new Date(),
     };
 
-    // Award petals for message placement using PetalService
+    // Award petals for message placement using centralized grantPetals
     const petalReward = calculatePetalReward(message, tags, messageScore);
     let petalResult = null;
     
     if (petalReward > 0) {
-      const { PetalService } = await import('@/app/lib/petals');
-      const petalService = new PetalService();
+      const { grantPetals } = await import('@/app/lib/petals/grant');
       
-      petalResult = await petalService.awardPetals(user.id, {
-        type: 'earn',
+      petalResult = await grantPetals({
+        userId: user.id,
         amount: petalReward,
-        reason: 'soapstone_place',
-        source: 'other', // Soapstone placement is "other" source
+        source: 'other', // Soapstone placement uses "other" source (not in rules, will use default limits)
         metadata: {
           messageId,
           messageLength: message.length,
@@ -211,6 +209,8 @@ async function handler(request: NextRequest) {
           score: messageScore,
           location: location.page,
         },
+        description: 'Soapstone message placement',
+        req: request as any, // For rate limiting
       });
     }
 
@@ -256,13 +256,13 @@ async function handler(request: NextRequest) {
           createdAt: soapstoneMessage.createdAt,
         },
         rewards: {
-          petals: petalResult?.awarded || petalReward,
+          petals: petalResult?.granted || petalReward,
           experience: Math.floor(messageScore * 10),
-          dailyCapReached: petalResult?.dailyCapReached || false,
+          dailyCapReached: petalResult?.limited || false,
         },
         user: {
           newBalance: petalResult?.newBalance || user.petalBalance,
-          lifetimePetalsEarned: petalResult?.lifetimePetalsEarned || 0,
+          lifetimePetalsEarned: petalResult?.lifetimeEarned || 0,
           messagesPlaced: await getSoapstoneCount(user.id),
         },
         limits: {

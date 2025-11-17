@@ -178,28 +178,37 @@ export const awardPurchasePetals = inngest.createFunction(
           return { success: true, awarded: 0, reason: 'Amount too small' };
         }
 
-        // Award petals
-        await db.petalLedger.create({
-          data: {
-            User: { connect: { id: userId } },
-            type: 'purchase_bonus',
-            amount: petalsToAward,
-            reason: 'Purchase bonus',
+        // Award petals using centralized grantPetals
+        const { grantPetals } = await import('@/app/lib/petals/grant');
+        const result = await grantPetals({
+          userId,
+          amount: petalsToAward,
+          source: 'purchase_reward',
+          metadata: {
+            orderId,
+            amountCents,
+            stripeSessionId,
           },
+          description: `Purchase bonus for order ${orderId}`,
+          // Note: No req object in Inngest context, rate limiting handled by Inngest retries
         });
 
-        // Get new balance
-        const balance = await db.petalLedger.aggregate({
-          where: { userId },
-          _sum: { amount: true },
-        });
+        if (!result.success) {
+          console.error(`Failed to award purchase petals: ${result.error}`);
+          return {
+            success: false,
+            error: result.error || 'Failed to award petals',
+            stripeSessionId: stripeSessionId ?? null,
+          };
+        }
 
-        console.warn(`Awarded ${petalsToAward} petals to user ${userId} for order ${orderId}`);
+        console.warn(`Awarded ${result.granted} petals to user ${userId} for order ${orderId}`);
 
         return {
           success: true,
-          awarded: petalsToAward,
-          newBalance: balance._sum.amount || 0,
+          awarded: result.granted,
+          newBalance: result.newBalance,
+          lifetimeEarned: result.lifetimeEarned,
           stripeSessionId: stripeSessionId ?? null,
         };
       } catch (error) {

@@ -103,18 +103,18 @@ export async function POST(request: NextRequest) {
             achievement.Reward.value,
           );
           
-          // Use PetalService for consistent lifetime tracking and daily limits
-          const { PetalService } = await import('@/app/lib/petals');
-          const petalService = new PetalService();
-          const petalResult = await petalService.awardPetals(user.id, {
-            type: 'earn',
+          // Use centralized grantPetals for consistent validation, rate limiting, and daily caps
+          const { grantPetals } = await import('@/app/lib/petals/grant');
+          const petalResult = await grantPetals({
+            userId: user.id,
             amount: petalAmount,
-            reason: `Achievement: ${achievement.name}`,
             source: 'achievement',
             metadata: {
               achievementCode: achievement.code,
               achievementId: achievement.id,
             },
+            description: `Achievement: ${achievement.name}`,
+            req: request as any, // For rate limiting
           });
 
           if (!petalResult.success) {
@@ -124,10 +124,10 @@ export async function POST(request: NextRequest) {
 
           rewardDetails = {
             type: 'petals',
-            amount: petalResult.awarded || petalAmount,
+            amount: petalResult.granted || petalAmount,
             balance: petalResult.newBalance || 0,
-            lifetimePetalsEarned: petalResult.lifetimePetalsEarned || 0,
-            dailyCapReached: petalResult.dailyCapReached || false,
+            lifetimePetalsEarned: petalResult.lifetimeEarned || 0,
+            dailyCapReached: petalResult.limited || false,
           };
           break;
 

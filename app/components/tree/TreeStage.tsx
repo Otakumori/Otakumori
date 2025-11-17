@@ -68,7 +68,7 @@ export default function TreeStage() {
           {layers.map((layer, _i) => (
             <LayerPlane
               key={layer.name}
-              src="/assets/images/CherryTree.png"
+              src="/assets/images/cherry-tree.png"
               hue={layer.hue}
               sat={layer.sat}
               val={layer.val}

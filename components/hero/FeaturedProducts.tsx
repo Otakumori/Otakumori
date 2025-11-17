@@ -13,7 +13,7 @@ interface FeaturedProduct {
   url: string;
 }
 
-const PLACEHOLDER_IMAGE = '/placeholder-product.jpg';
+const PLACEHOLDER_IMAGE = '/assets/images/placeholder-product.jpg';
 const MAX_FEATURED_PRODUCTS = 8;
 
 async function getLogger() {

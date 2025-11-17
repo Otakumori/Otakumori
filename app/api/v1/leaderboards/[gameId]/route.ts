@@ -116,19 +116,19 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
           isPersonalBest: true,
         });
         if (petalReward > 0) {
-          const { PetalService } = await import('@/app/lib/petals');
-          const petalService = new PetalService();
-          await petalService.awardPetals(user.id, {
-            type: 'earn',
+          const { grantPetals } = await import('@/app/lib/petals/grant');
+          await grantPetals({
+            userId: user.id,
             amount: petalReward,
-            reason: `Leaderboard reward: ${gameId} - ${category}`,
-            source: 'game', // Leaderboard rewards are game-based
+            source: 'leaderboard_reward',
             metadata: {
               gameId,
               category,
               score,
               isPersonalBest: true,
             },
+            description: `Leaderboard reward: ${gameId} - ${category}`,
+            req: request as any, // For rate limiting
           });
         }
 

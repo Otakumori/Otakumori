@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       title: product.title,
       description: product.description,
       price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0,
-      image: product.images?.[0]?.src || '/assets/placeholder-product.jpg',
+      image: product.images?.[0]?.src || '/assets/images/placeholder-product.jpg',
       tags: product.tags || [],
       variants:
         product.variants?.map((v: PrintifyVariant) => ({

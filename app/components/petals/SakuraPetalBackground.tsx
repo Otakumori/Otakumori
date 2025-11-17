@@ -411,6 +411,13 @@ export default function SakuraPetalBackground({
       onClick={handleContainerClick}
       aria-hidden="true"
     >
+      {/* 
+        Layering strategy for non-blocking petal collection:
+        - Container has pointer-events-auto to receive clicks (z-index: -5, below main content)
+        - Canvas has pointer-events-none so it doesn't block UI interactions
+        - Click handler uses small hit radius (32px default) to avoid interfering with links/buttons
+        - z-index -5 ensures petals are behind main content (z-index 10+) but above backgrounds (z-index -10)
+      */}
       <canvas
         ref={canvasRef}
         className="pointer-events-none fixed inset-0 w-full h-full"

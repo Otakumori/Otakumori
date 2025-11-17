@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { awardStreakShardIfEligible, userDayNY } from '@/app/lib/quests/server';
 import { db } from '@/lib/db';
-import { PetalService } from '@/app/lib/petals';
+import { grantPetals } from '@/app/lib/petals/grant';
 // import { redis } from "@/lib/redis"; // Disabled due to Redis config issues
 
 const ClaimRequestSchema = z.object({
@@ -110,20 +110,25 @@ export async function POST(request: Request) {
       data: { claimedAt: new Date() },
     });
 
-    // Award petals using PetalService (tracks lifetimeEarned)
-    let petalResult = { success: false, awarded: 0, newBalance: user.petalBalance, lifetimePetalsEarned: 0 };
+    // Award petals using centralized grantPetals (tracks lifetimeEarned, enforces daily caps)
+    let petalResult: Awaited<ReturnType<typeof grantPetals>> = { 
+      success: false, 
+      granted: 0, 
+      newBalance: user.petalBalance, 
+      lifetimeEarned: 0 
+    };
     if (actualReward > 0) {
-      const petalService = new PetalService();
-      petalResult = await petalService.awardPetals(user.id, {
-        type: 'earn',
+      petalResult = await grantPetals({
+        userId: user.id,
         amount: actualReward,
-        reason: `Quest reward: ${quest.key}`,
-        source: 'other', // Quest rewards are separate from games/achievements
+        source: 'quest_reward',
         metadata: {
           questKey: quest.key,
           questTitle: quest.title,
           bonusEligible: assignment.bonusEligible,
         },
+        description: `Quest reward: ${quest.key}`,
+        req: request as any, // For rate limiting
       });
     }
 
@@ -142,14 +147,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ok: true,
-      petalsGranted: petalResult.success ? petalResult.awarded : actualReward,
+      petalsGranted: petalResult.success ? petalResult.granted : actualReward,
       totalReward,
-      capped: actualReward < totalReward,
+      capped: actualReward < totalReward || petalResult.limited || false,
       dailyCapUsed: usedToday + actualReward,
-      dailyCapRemaining: Math.max(0, DAILY_CAP - (usedToday + actualReward)),
+      dailyCapRemaining: petalResult.dailyRemaining ?? Math.max(0, DAILY_CAP - (usedToday + actualReward)),
       streakShardAwarded,
       newBalance: petalResult.newBalance,
-      lifetimePetalsEarned: petalResult.lifetimePetalsEarned,
+      lifetimePetalsEarned: petalResult.lifetimeEarned,
       quest: {
         key: quest.key,
         title: quest.title,

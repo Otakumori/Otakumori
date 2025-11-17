@@ -118,7 +118,7 @@ export default function ProductClient({ productId }: { productId: string }) {
           addProduct({
             id: catalogProduct.id,
             title: catalogProduct.title,
-            image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/placeholder-product.jpg',
+            image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/images/placeholder-product.jpg',
             priceCents: normalizedPriceCents,
           });
         }
