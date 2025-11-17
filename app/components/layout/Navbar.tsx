@@ -96,13 +96,22 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { user, isLoaded: userLoaded } = useUser();
   const {
     requireAuthForSoapstone,
     requireAuthForWishlist,
     signOut,
   } = useAuthContext();
   const { itemCount } = useCart();
+  
+  // Force re-render when auth state changes
+  const [authKey, setAuthKey] = useState(0);
+  
+  useEffect(() => {
+    if (userLoaded) {
+      setAuthKey((prev) => prev + 1);
+    }
+  }, [isSignedIn, user?.id, userLoaded]);
 
   // State for mega-menu and search
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);

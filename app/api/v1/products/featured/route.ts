@@ -138,8 +138,25 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
     };
   });
 
+  // Filter out placeholder/fake products
+  const filtered = mappedPrintify.filter((product) => {
+    // Exclude products with placeholder images
+    if (product.image?.includes('placeholder') || product.image?.includes('seed:')) {
+      return false;
+    }
+    // Exclude products with seed: integrationRef
+    if (product.integrationRef?.startsWith('seed:')) {
+      return false;
+    }
+    // Exclude products with no image or empty image
+    if (!product.image || product.image.trim() === '') {
+      return false;
+    }
+    return true;
+  });
+
   // Apply deduplication and exclusions
-  const deduplicated = deduplicateProducts(mappedPrintify, {
+  const deduplicated = deduplicateProducts(filtered, {
     limit,
     excludeTitles,
     deduplicateBy: 'both', // Deduplicates by blueprintId, printifyProductId, and id
@@ -161,8 +178,25 @@ export async function GET(request: NextRequest) {
     // Try database first (unless forcePrintify is true)
     const catalogResult = await fetchCatalogProducts(query.limit, forcePrintify);
     if (catalogResult) {
+      // Filter out placeholder/fake products from database
+      const filtered = catalogResult.data.products.filter((product) => {
+        // Exclude products with placeholder images
+        if (product.image?.includes('placeholder') || product.image?.includes('seed:')) {
+          return false;
+        }
+        // Exclude products with seed: integrationRef
+        if (product.integrationRef?.startsWith('seed:')) {
+          return false;
+        }
+        // Exclude products with no image or empty image
+        if (!product.image || product.image.trim() === '') {
+          return false;
+        }
+        return true;
+      });
+
       // Apply deduplication and exclusions to catalog products
-      const deduplicated = deduplicateProducts(catalogResult.data.products, {
+      const deduplicated = deduplicateProducts(filtered, {
         limit: query.limit,
         excludeTitles: query.excludeTitles,
         deduplicateBy: 'both',

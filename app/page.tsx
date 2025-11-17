@@ -16,6 +16,7 @@ import InteractivePetals from '@/components/hero/InteractivePetals';
 // Client-side petal system components
 import PetalSystem from './components/petals/PetalSystem';
 import PetalField from '@/components/petals/PetalField';
+import PhysicsCherryPetals from './components/petals/PhysicsCherryPetals';
 
 // Cherry blossom tree background
 import TreeBackground from './components/TreeBackground';
@@ -52,6 +53,12 @@ export default async function HomePage() {
           <PetalFlowOverlayWrapper />
         </div>
       </div>
+
+      {/* Physics-based cherry blossom petals - clickable/collectible (silent mechanic) */}
+      <PhysicsCherryPetals density={2} onCollect={(id) => {
+        // Silent collection - no UI feedback, just tracking
+        // Could be used for analytics, achievements, etc.
+      }} />
 
       {/* Petal collection system - renders behind main content */}
       <PetalSystem />
