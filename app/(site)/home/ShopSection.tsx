@@ -42,15 +42,19 @@ const HOMEPAGE_EXCLUDED_TITLES = [
 ];
 
 async function getBaseUrl(): Promise<string> {
-  const headersList = await headers();
-  const host = headersList.get('host');
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  
-  if (host) {
-    return `${protocol}://${host}`;
+  try {
+    const headersList = await headers();
+    const host = headersList.get('host');
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    
+    if (host) {
+      return `${protocol}://${host}`;
+    }
+  } catch {
+    // Fallback if headers() fails
   }
   
-  // Fallback for development
+  // Fallback for development or if headers() fails
   return env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 }
 

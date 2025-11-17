@@ -40,7 +40,11 @@ export default function GlobalBackground() {
         const px = star.x * k + canvas.width / 2;
         const py = star.y * k + canvas.height / 2;
         if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
-          const size = Math.max(0.1, (1 - star.z / canvas.width) * 1.5); // Ensure size is never negative
+          // Guard: Ensure radius is never negative or NaN to prevent IndexSizeError
+          // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
+          // Clamp to minimum 0.1 to ensure valid arc rendering
+          const size = Math.max(0.1, (1 - star.z / canvas.width) * 1.5);
+          if (isNaN(size) || size <= 0) return; // Additional safety check
           ctx.fillStyle = 'rgba(255,255,255,0.7)';
           ctx.beginPath();
           ctx.arc(px, py, size, 0, Math.PI * 2);

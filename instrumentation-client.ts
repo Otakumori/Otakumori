@@ -1,17 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
-import posthog from 'posthog-js';
 import { env } from './env.mjs';
 
-// Initialize PostHog client
-if (env.NEXT_PUBLIC_POSTHOG_KEY) {
-  posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: '/ingest',
-    ui_host: 'https://us.posthog.com',
-    defaults: '2025-05-24',
-    capture_exceptions: true, // Enables capturing exceptions via PostHog Error Tracking
-    debug: process.env.NODE_ENV === 'development',
-  });
-}
+// NOTE: PostHog initialization has been moved to PostHogProvider.safe.tsx
+// to prevent double initialization errors. Do NOT call posthog.init() here.
+// The PostHogProvider component handles all initialization in a single, controlled location.
 
 if (env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
