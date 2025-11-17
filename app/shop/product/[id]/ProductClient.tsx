@@ -48,17 +48,30 @@ export default function ProductClient({ productId }: { productId: string }) {
   );
 
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchProduct = async () => {
       try {
         setLoading(true);
+        setError(null);
         const response = await fetch(`/api/v1/products/${productId}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch product: ${response.statusText}`);
         }
         const json = await response.json();
+        
+        if (isCancelled) return;
+        
+        if (!json.ok) {
+          setError(json.error || 'Product not found');
+          setLoading(false);
+          return;
+        }
+        
         const catalogProduct = json?.data as CatalogProduct | undefined;
         if (!catalogProduct) {
           setError('Product not found');
+          setLoading(false);
           return;
         }
 
@@ -82,6 +95,8 @@ export default function ProductClient({ productId }: { productId: string }) {
           images: normalizedImages,
         };
 
+        if (isCancelled) return;
+
         setProduct(normalizedProduct);
 
         const defaultVariant = catalogProduct.variants.find((variant) => variant.isEnabled && variant.inStock);
@@ -97,27 +112,36 @@ export default function ProductClient({ productId }: { productId: string }) {
           catalogProduct.priceCents ??
           (displayPrice != null ? Math.round(displayPrice * 100) : 0);
 
-        addProduct({
-          id: catalogProduct.id,
-          title: catalogProduct.title,
-          image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/placeholder-product.jpg',
-          priceCents: normalizedPriceCents,
-        });
+        // Only add to recently viewed if not cancelled
+        if (!isCancelled) {
+          addProduct({
+            id: catalogProduct.id,
+            title: catalogProduct.title,
+            image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/placeholder-product.jpg',
+            priceCents: normalizedPriceCents,
+          });
+        }
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : 'An error occurred while fetching the product',
-        );
+        if (isCancelled) return;
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching the product';
+        setError(errorMessage);
         console.error('Error fetching product:', err);
         showError('Failed to fetch product details. Please try again.');
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     if (productId) {
       void fetchProduct();
     }
-  }, [productId, addProduct, showError]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [productId]); // Removed addProduct and showError from deps - they're stable functions
 
   const handleAddToCart = () => {
     if (!product) return;
