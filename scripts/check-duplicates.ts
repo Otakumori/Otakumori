@@ -36,7 +36,7 @@ async function checkDuplicates() {
   });
 
   const printifyDupes = Array.from(printifyDuplicates.entries()).filter(
-    ([_, products]) => products.length > 1
+    ([, products]) => products.length > 1
   );
 
   if (printifyDupes.length > 0) {
@@ -66,7 +66,7 @@ async function checkDuplicates() {
   });
 
   const integrationDupes = Array.from(integrationDuplicates.entries()).filter(
-    ([_, products]) => products.length > 1
+    ([, products]) => products.length > 1
   );
 
   if (integrationDupes.length > 0) {
@@ -96,7 +96,7 @@ async function checkDuplicates() {
   });
 
   const blueprintDupes = Array.from(blueprintDuplicates.entries()).filter(
-    ([_, products]) => products.length > 1
+    ([, products]) => products.length > 1
   );
 
   if (blueprintDupes.length > 0) {
@@ -129,7 +129,7 @@ async function checkDuplicates() {
   });
 
   const nameDupes = Array.from(nameDuplicates.entries()).filter(
-    ([_, products]) => products.length > 1
+    ([, products]) => products.length > 1
   );
 
   if (nameDupes.length > 0) {

@@ -222,7 +222,7 @@ export async function GET(request: NextRequest) {
             timestamp: new Date().toISOString(),
           });
         }
-      } catch (printifyError) {
+      } catch {
         // Fall through to empty response
       }
     }
@@ -234,7 +234,7 @@ export async function GET(request: NextRequest) {
       source: 'empty',
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         ok: true,

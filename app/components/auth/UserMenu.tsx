@@ -1,12 +1,11 @@
 'use client';
 
-import { SignedIn, SignedOut, UserButton, useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { clientEnv } from '@/env/client';
 
 export default function UserMenu() {
-  const { isSignedIn } = useUser();
   const [redirectParam, setRedirectParam] = useState<string>('');
 
   useEffect(() => {

@@ -81,7 +81,7 @@ export function PetalRewardNotification({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">🎉</span>
+              <span className="text-2xl" role="img" aria-label="Celebration">🎉</span>
               <h3 className="text-lg font-bold text-pink-300">Reward Unlocked!</h3>
             </div>
             <p className="text-white/90 mb-1">
@@ -138,7 +138,9 @@ export function PetalRewardProgress({ currentPetals }: { currentPetals: number }
   if (!nextReward) {
     return (
       <div className="text-center py-4">
-        <p className="text-pink-300 font-semibold">All rewards unlocked! 🎉</p>
+        <p className="text-pink-300 font-semibold">
+          All rewards unlocked! <span role="img" aria-label="Celebration">🎉</span>
+        </p>
       </div>
     );
   }

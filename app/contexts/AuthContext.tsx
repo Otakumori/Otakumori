@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user = clerkUser.user as User | null;
     isLoaded = clerkUser.isLoaded;
     signOut = clerkAuth.signOut;
-  } catch (error) {
+  } catch {
     // Clerk is not available, use mock state
     isLoaded = true;
   }
