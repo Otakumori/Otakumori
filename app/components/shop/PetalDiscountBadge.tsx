@@ -13,7 +13,6 @@ interface PetalDiscountBadgeProps {
  */
 export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
   const { isSignedIn } = useUser();
-  const [balance, setBalance] = useState<number | null>(null);
   const [availableDiscount, setAvailableDiscount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
           const result = await response.json();
           if (result.ok) {
             const userBalance = result.data.balance;
-            setBalance(userBalance);
 
             // Find highest discount user qualifies for
             const discountRewards = PETAL_REWARDS.filter(

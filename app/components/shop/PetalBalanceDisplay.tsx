@@ -10,7 +10,7 @@ import { paths } from '@/lib/paths';
  * Display petal balance and next reward progress in shop pages
  */
 export function PetalBalanceDisplay() {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const [balance, setBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 

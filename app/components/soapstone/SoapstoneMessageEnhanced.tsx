@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { getCategoryInfo, type SoapstoneCategory, type SoapstoneMessageEnhanced } from '@/app/lib/soapstone-enhancements';
+import { getCategoryInfo, type SoapstoneMessageEnhanced } from '@/app/lib/soapstone-enhancements';
 
 interface SoapstoneMessageEnhancedProps {
   message: SoapstoneMessageEnhanced;

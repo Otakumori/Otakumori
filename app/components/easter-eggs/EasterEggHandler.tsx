@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   EASTER_EGGS,
   findEasterEggByPattern,
   markEasterEggDiscovered,
   isEasterEggDiscovered,
-  type EasterEggTrigger,
 } from '@/app/lib/easter-eggs';
 
 interface EasterEggHandlerProps {
@@ -19,7 +18,6 @@ interface EasterEggHandlerProps {
  * Detects triggers and activates easter eggs
  */
 export function EasterEggHandler({ children }: EasterEggHandlerProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [activeEgg, setActiveEgg] = useState<string | null>(null);
   const konamiSequence = useRef<string[]>([]);
@@ -82,7 +80,7 @@ export function EasterEggHandler({ children }: EasterEggHandlerProps) {
 
   // Click sequence handler
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
+    const handleClick = () => {
       const now = Date.now();
       const timeSinceLastClick = now - lastClickTime.current;
 
@@ -121,7 +119,7 @@ export function EasterEggHandler({ children }: EasterEggHandlerProps) {
 
     // Show notification
     if (egg.reward === 'message') {
-      console.log(`[Easter Egg] ${egg.message}`);
+      // Notification shown in UI below
     }
 
     // Handle different reward types
@@ -129,17 +127,14 @@ export function EasterEggHandler({ children }: EasterEggHandlerProps) {
       case 'feature':
         // Enable developer mode or special feature
         if (egg.id === 'konami_code') {
-          console.log('[Developer Mode] Enabled');
           // Could set a feature flag or enable debug mode
         }
         break;
       case 'unlock':
         // Unlock content (could trigger API call)
-        console.log(`[Unlock] ${egg.message}`);
         break;
       case 'achievement':
         // Grant achievement (could trigger API call)
-        console.log(`[Achievement] ${egg.message}`);
         break;
     }
 

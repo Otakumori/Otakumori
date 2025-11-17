@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { generateRecommendations, getAchievementSuggestions, type UserBehaviorProfile } from '@/app/lib/recommendations';
+import { generateRecommendations, type UserBehaviorProfile } from '@/app/lib/recommendations';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { SectionHeader } from './SectionHeader';
 import { paths } from '@/lib/paths';
@@ -23,7 +23,7 @@ interface Recommendation {
  * "For You" personalized recommendations section
  */
 export function ForYouSection() {
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
         const couponCode = `PETAL${threshold}-${userId.slice(0, 8).toUpperCase()}`;
 
         // Grant coupon to user
-        const couponGrant = await db.couponGrant.create({
+        await db.couponGrant.create({
           data: {
             userId,
             code: couponCode,
