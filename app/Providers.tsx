@@ -3,6 +3,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CartProvider } from './components/cart/CartProvider';
 import { PetalProvider } from '../providers';
@@ -16,10 +17,12 @@ import QuakeHUD from './components/hud/QuakeHUD';
 import GlobalBackground from './components/GlobalBackground';
 import PostHogProvider from './providers/PostHogProvider.safe';
 import ClerkPostHogBridge from './(site)/_providers/ClerkPostHogBridge.safe';
+import { isStarfieldEnabled } from './flags';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  const pathname = (typeof window !== 'undefined' ? window.location.pathname : '/') as string;
-  const showTree = pathname === '/about';
+  const pathname = usePathname();
+  const isStarfieldOn = isStarfieldEnabled();
+  const showStarfield = isStarfieldOn && (pathname === '/' || pathname === '/about');
   
   // Create QueryClient instance (singleton pattern for React Query)
   const [queryClient] = useState(
@@ -45,8 +48,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               <PetalProvider>
                 <CartProvider>
                   <GlobalMusicProvider>
-                    {/* Site-wide background (fixed, behind everything) */}
-                    {showTree && <GlobalBackground />}
+                    {/* Site-wide starfield background (fixed, behind everything, z-0) */}
+                    {showStarfield && <GlobalBackground />}
                     {children}
                     <GlobalMusicBar />
                     <SoapstoneDock />

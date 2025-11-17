@@ -1,5 +1,5 @@
 // app/page.tsx - Updated imports
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { env } from '@/env.mjs';
 
 // Legacy components for fallback sections
@@ -12,14 +12,27 @@ import ShopSection from '@/app/(site)/home/ShopSection';
 import MiniGamesSection from '@/app/(site)/home/MiniGamesSection';
 import BlogSection from '@/app/(site)/home/BlogSection';
 import InteractivePetals from '@/components/hero/InteractivePetals';
+import SectionErrorBoundary from './components/home/SectionErrorBoundary';
 
 // Client-side petal system components
 import PetalSystem from './components/petals/PetalSystem';
 import PetalField from '@/components/petals/PetalField';
 import PhysicsCherryPetals from './components/petals/PhysicsCherryPetals';
 
-// Cherry blossom tree background
-import TreeBackground from './components/TreeBackground';
+// Cherry blossom tree background - dynamically imported to prevent SSR evaluation
+const TreeBackground = dynamic(
+  () => import('./components/TreeBackground'),
+  {
+    ssr: false, // CRITICAL: Prevent any server-side evaluation
+    loading: () => (
+      <div 
+        className="fixed inset-x-0 pointer-events-none" 
+        style={{ top: 0, height: '100vh', zIndex: -10 }}
+        aria-hidden="true"
+      />
+    ),
+  }
+);
 import { PetalFlowOverlayWrapper } from './components/home/PetalFlowOverlayWrapper';
 import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapper';
 
@@ -55,7 +68,7 @@ export default async function HomePage() {
       </div>
 
       {/* Physics-based cherry blossom petals - clickable/collectible (silent mechanic) */}
-      <PhysicsCherryPetals density={2} onCollect={(id) => {
+      <PhysicsCherryPetals density={2} onCollect={(_id) => {
         // Silent collection - no UI feedback, just tracking
         // Could be used for analytics, achievements, etc.
       }} />
@@ -70,9 +83,9 @@ export default async function HomePage() {
         {/* SHOP */}
         {isShopEnabled && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <Suspense fallback={<div className="text-pink-200/70">Loading shop…</div>}>
+            <SectionErrorBoundary sectionName="shop">
               <ShopSection />
-            </Suspense>
+            </SectionErrorBoundary>
           </section>
         )}
 
@@ -100,18 +113,18 @@ export default async function HomePage() {
         {/* BLOG */}
         {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <Suspense fallback={<div className="text-pink-200/70">Loading blog…</div>}>
+            <SectionErrorBoundary sectionName="blog">
               <BlogSection />
-            </Suspense>
+            </SectionErrorBoundary>
           </section>
         )}
 
         {/* MINI-GAMES */}
         {NEXT_PUBLIC_FEATURE_MINIGAMES === 'on' && (
           <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <Suspense fallback={<div className="text-pink-200/70">Loading mini-games…</div>}>
+            <SectionErrorBoundary sectionName="mini-games">
               <MiniGamesSection />
-            </Suspense>
+            </SectionErrorBoundary>
           </section>
         )}
 

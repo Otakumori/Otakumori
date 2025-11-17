@@ -6,6 +6,10 @@ import { paths } from '@/lib/paths';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
 import { stripHtml } from '@/lib/html';
+import { handleServerError } from '@/app/lib/server-error-handler';
+import { env } from '@/env.mjs';
+import { SectionHeader } from '@/app/components/home/SectionHeader';
+import { EmptyState } from '@/app/components/home/EmptyState';
 
 interface Product {
   id: string;
@@ -47,18 +51,19 @@ async function getBaseUrl(): Promise<string> {
   }
   
   // Fallback for development
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  return env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 }
 
 export default async function ShopSection() {
   let shopData: ShopData = { products: [] };
   let isBlockedData = false;
+  let apiUrl: string | undefined;
 
   try {
     // Build exclusion query parameter
     const excludeParam = HOMEPAGE_EXCLUDED_TITLES.map((t) => `excludeTitles=${encodeURIComponent(t)}`).join('&');
     const baseUrl = await getBaseUrl();
-    const apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
+    apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
 
     // Use direct fetch instead of safeFetch for server components
     const response = await fetch(apiUrl, {
@@ -88,6 +93,14 @@ export default async function ShopSection() {
       shopData = { products: [] };
     }
   } catch (error) {
+    handleServerError(error, {
+      section: 'shop',
+      component: 'ShopSection',
+      operation: 'fetch_products',
+      metadata: {
+        apiUrl: apiUrl || 'unknown',
+      },
+    });
     shopData = { products: [] };
     isBlockedData = true;
   }
@@ -97,25 +110,18 @@ export default async function ShopSection() {
 
   return (
     <div className="rounded-2xl p-8">
-      <header className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
-          Shop
-        </h2>
-        <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
-          Discover unique anime-inspired merchandise
-        </p>
-      </header>
+      <SectionHeader
+        title="Shop"
+        description="Discover unique anime-inspired merchandise"
+      />
 
       {isBlockedData ? (
-        <div className="text-center py-12">
-          <div className="p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-white mb-4">Shop Coming Soon</h3>
-            <p className="text-gray-300 mb-6">
-              We're preparing something special for you. Check back soon!
-            </p>
-            <HeaderButton href={paths.shop()}>Explore Shop</HeaderButton>
-          </div>
-        </div>
+        <EmptyState
+          title="Shop Coming Soon"
+          description="We're preparing something special for you. Check back soon!"
+          actionLabel="Explore Shop"
+          actionHref={paths.shop()}
+        />
       ) : hasProducts ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
@@ -177,15 +183,12 @@ export default async function ShopSection() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <div className="p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-white mb-4">No Products Available</h3>
-            <p className="text-gray-300 mb-6">
-              We're working on adding new products. Check back soon!
-            </p>
-            <HeaderButton href={paths.shop()}>Explore Shop</HeaderButton>
-          </div>
-        </div>
+        <EmptyState
+          title="No Products Available"
+          description="We're working on adding new products. Check back soon!"
+          actionLabel="Explore Shop"
+          actionHref={paths.shop()}
+        />
       )}
 
       {hasProducts && (

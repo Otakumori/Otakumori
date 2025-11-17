@@ -4,6 +4,9 @@ import Image from 'next/image';
 import { paths } from '@/lib/paths';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
+import { handleServerError } from '@/app/lib/server-error-handler';
+import { SectionHeader } from '@/app/components/home/SectionHeader';
+import { EmptyState } from '@/app/components/home/EmptyState';
 
 type StoryType = 'blogPost' | 'communityPost';
 
@@ -56,38 +59,34 @@ export default async function BlogSection() {
       })) ?? [];
     isBlockedData = isBlocked(blogResult) && isBlocked(postsResult);
   } catch (error) {
-    // Fallback to empty posts if API calls fail during SSR
-    console.warn('BlogSection: API calls failed during SSR:', error);
+    handleServerError(error, {
+      section: 'blog',
+      component: 'BlogSection',
+      operation: 'fetch_posts',
+      metadata: {
+        endpoints: ['/api/v1/content/blog', '/api/blog/posts'],
+      },
+    }, {
+      logLevel: 'warn',
+    });
     posts = [];
     isBlockedData = true;
   }
 
   return (
     <div className="rounded-2xl p-8">
-      <header className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
-          Latest Stories
-        </h2>
-        <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
-          Fresh drops from the blog and community message board
-        </p>
-      </header>
+      <SectionHeader
+        title="Latest Stories"
+        description="Fresh drops from the blog and community message board"
+      />
 
       {isBlockedData ? (
-        <div className="text-center py-12">
-          <div className="p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-white mb-4">Blog Coming Soon</h3>
-            <p className="text-gray-300 mb-6">
-              We're preparing engaging content for you. Stay tuned!
-            </p>
-            <Link
-              href={paths.blogIndex()}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg inline-block transition-colors hover:shadow-[0_0_30px_rgba(255,160,200,0.18)] [animation:shimmerPulse_1.6s_ease-out_1]"
-            >
-              Explore Blog
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          title="Blog Coming Soon"
+          description="We're preparing engaging content for you. Stay tuned!"
+          actionLabel="Explore Blog"
+          actionHref={paths.blogIndex()}
+        />
       ) : posts.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.slice(0, 3).map((post) => (
@@ -149,15 +148,12 @@ export default async function BlogSection() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <div className="p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-white mb-4">No Stories Yet</h3>
-            <p className="text-gray-300 mb-6">
-              We're brewing up fresh lore. Check back soon for new blog entries and community posts.
-            </p>
-            <HeaderButton href={paths.blogIndex()}>Explore Blog</HeaderButton>
-          </div>
-        </div>
+        <EmptyState
+          title="No Stories Yet"
+          description="We're brewing up fresh lore. Check back soon for new blog entries and community posts."
+          actionLabel="Explore Blog"
+          actionHref={paths.blogIndex()}
+        />
       )}
 
       {posts.length > 0 && (

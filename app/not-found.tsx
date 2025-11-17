@@ -141,6 +141,15 @@ export default function LRoom404() {
   };
 
   if (phase === 'skip' || skipTimer === 0) {
+    const errorMessage = {
+      title: "You've gone hollow, traveler.",
+      message: "This path doesn't exist. The bonfire has faded.",
+      cta: {
+        label: 'Return to Home',
+        href: '/',
+      },
+    };
+
     return (
       <main className="relative min-h-screen bg-[#080611] text-zinc-100 flex items-center justify-center">
         <Head>
@@ -149,13 +158,13 @@ export default function LRoom404() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_circle_at_50%_35%,#1a0f2a,#120b1f_40%,#080611_100%)]" />
 
         <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
-          <h1 className="text-3xl font-bold md:text-5xl mb-4">404 - Page Not Found</h1>
-          <p className="mt-3 text-zinc-300/90 mb-8">The page you're looking for doesn't exist.</p>
+          <h1 className="text-3xl font-bold md:text-5xl mb-4">{errorMessage.title}</h1>
+          <p className="mt-3 text-zinc-300/90 mb-8">{errorMessage.message}</p>
           <Link
-            href="/"
+            href={errorMessage.cta.href}
             className="rounded-xl bg-pink-500/90 px-6 py-3 text-white hover:bg-pink-500 transition-colors"
           >
-            Return to Homepage
+            {errorMessage.cta.label}
           </Link>
         </section>
       </main>

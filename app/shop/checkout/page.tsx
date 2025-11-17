@@ -12,6 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '@clerk/nextjs';
+import { PetalBalanceDisplay } from '@/app/components/shop/PetalBalanceDisplay';
 
 interface ShippingInfo {
   firstName: string;
@@ -322,6 +323,7 @@ export default function CheckoutPage() {
           {/* Order Summary */}
           <div>
             <Card className="border-pink-500/30 bg-white/10 p-6 backdrop-blur-lg">
+              <PetalBalanceDisplay />
               <h2 className="mb-6 text-2xl font-bold text-white">Order Summary</h2>
               <div className="space-y-4">
                 {cart.map((item: CartItem) => (

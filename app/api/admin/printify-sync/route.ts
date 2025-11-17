@@ -3,6 +3,7 @@
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { db } from '@/lib/db';
 import { printifyService } from '@/app/lib/printify/client';
+import { randomUUID } from 'crypto';
 
 export const runtime = 'nodejs';
 
@@ -21,35 +22,42 @@ async function syncPrintify() {
     for (const product of products) {
       const visible = product.variants?.some((v: any) => v.available) ?? false;
       const subcategory = mapSubcategory(product);
+      const printifyProductId = String(product.id);
 
-      // Note: subcategory field doesn't exist in Product schema
-      // Store it in category or add to schema if needed
-      await db.product.upsert({
-        where: { id: String(product.id) },
+      // Use printifyProductId as unique identifier for upsert, generate separate DB ID
+      // This prevents duplicates when syncing the same Printify product multiple times
+      const dbProduct = await db.product.upsert({
+        where: { printifyProductId },
         update: {
           name: product.title,
           description: product.description ?? '',
           category: `${mapCategory(product)}:${subcategory}`, // Combine category and subcategory
           primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
-          printifyProductId: String(product.id),
+          printifyProductId,
         },
         create: {
-          id: String(product.id),
+          id: randomUUID(), // Generate unique DB ID
           name: product.title,
           description: product.description ?? '',
           category: `${mapCategory(product)}:${subcategory}`, // Combine category and subcategory
           primaryImageUrl: product.images?.[0] ?? null,
           active: visible,
-          printifyProductId: String(product.id),
+          printifyProductId,
+        },
+        select: {
+          id: true, // Return the DB ID for variant creation
         },
       });
+
+      // Use the DB product ID (not Printify ID) for variants
+      const dbProductId = dbProduct.id;
 
       for (const variant of product.variants || []) {
         await db.productVariant.upsert({
           where: {
             productId_printifyVariantId: {
-              productId: String(product.id),
+              productId: dbProductId,
               printifyVariantId: variant.id,
             },
           },
@@ -59,8 +67,8 @@ async function syncPrintify() {
             inStock: variant.available,
           },
           create: {
-            id: `${product.id}-${variant.id}`,
-            productId: String(product.id),
+            id: randomUUID(), // Generate unique variant ID
+            productId: dbProductId, // Use DB product ID, not Printify ID
             printifyVariantId: variant.id,
             priceCents: toCents(variant.price),
             isEnabled: variant.available,

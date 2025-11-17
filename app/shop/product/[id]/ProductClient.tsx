@@ -15,6 +15,7 @@ import { ProductSoapstoneWall } from '@/app/components/shop/ProductSoapstoneWall
 import { HeaderButton } from '@/components/ui/header-button';
 import { removeHtmlTables, stripHtml } from '@/lib/html';
 import { useCart } from '@/app/components/cart/CartProvider';
+import { PetalDiscountBadge } from '@/app/components/shop/PetalDiscountBadge';
 
 type CatalogVariant = CatalogProduct['variants'][number];
 
@@ -261,6 +262,7 @@ export default function ProductClient({ productId }: { productId: string }) {
                 </p>
                 <ShareButtons productTitle={product.title} productId={product.id} />
               </div>
+              <PetalDiscountBadge productPrice={currentPrice} />
               <div className="space-y-4 text-zinc-300 text-lg leading-relaxed">
                 {descriptionParagraphs.length > 0
                   ? descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)

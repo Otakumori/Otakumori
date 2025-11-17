@@ -5,6 +5,9 @@ import { getEnabledGames, getGameDef, getGameThumbnailAsset } from '@/app/lib/ga
 import { paths } from '@/lib/paths';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
+import { handleServerError } from '@/app/lib/server-error-handler';
+import { SectionHeader } from '@/app/components/home/SectionHeader';
+import { EmptyState } from '@/app/components/home/EmptyState';
 
 type ApiGame = {
   id: string;
@@ -73,21 +76,26 @@ export default async function MiniGamesSection() {
       }
     }
   } catch (error) {
-    console.warn('MiniGamesSection: API calls failed during SSR:', error);
+    handleServerError(error, {
+      section: 'mini-games',
+      component: 'MiniGamesSection',
+      operation: 'fetch_games',
+      metadata: {
+        endpoints: ['/api/v1/games', '/api/games', '/api/mini-games', '/api/games/featured'],
+      },
+    }, {
+      logLevel: 'warn',
+    });
   }
 
   const enabledGames = games.filter((game) => game.enabled !== false).slice(0, 6);
 
   return (
     <div className="rounded-2xl p-8">
-      <header className="mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: '#835D75' }}>
-          Mini-Games
-        </h2>
-        <p className="mt-2" style={{ color: '#835D75', opacity: 0.7 }}>
-          Play fun anime-inspired games and earn rewards
-        </p>
-      </header>
+      <SectionHeader
+        title="Mini-Games"
+        description="Play fun anime-inspired games and earn rewards"
+      />
 
       {enabledGames.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -128,15 +136,12 @@ export default async function MiniGamesSection() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <div className="p-8 max-w-md mx-auto">
-            <h3 className="text-xl font-semibold text-primary mb-4">No Games Available</h3>
-            <p className="text-secondary mb-6">
-              We're working on adding new games. Check back soon!
-            </p>
-            <HeaderButton href={paths.games()}>Explore Games</HeaderButton>
-          </div>
-        </div>
+        <EmptyState
+          title="No Games Available"
+          description="We're working on adding new games. Check back soon!"
+          actionLabel="Explore Games"
+          actionHref={paths.games()}
+        />
       )}
 
       {enabledGames.length > 0 && (

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
+import { PetalBalanceDisplay } from './PetalBalanceDisplay';
 
 export default function CartContent() {
   const { items, updateQuantity, removeItem } = useCart();
@@ -109,6 +110,7 @@ export default function CartContent() {
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4">
+        <PetalBalanceDisplay />
         {items.map((item) => (
           <GlassPanel key={item.id} className="p-4">
             <div className="flex items-center gap-4">
