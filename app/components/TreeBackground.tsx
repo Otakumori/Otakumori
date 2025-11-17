@@ -18,32 +18,35 @@ export default function TreeBackground() {
 
   useEffect(() => {
     const updateDimensions = () => {
-      // Find header (sticky navbar)
-      const header = document.querySelector('header, nav[class*="sticky"], nav[class*="fixed"]');
+      // Find footer to determine where tree should end
       const footer = document.querySelector('footer');
       
-      // Header height (default ~80px if not found)
-      const headerHeight = header ? header.getBoundingClientRect().height : 80;
+      // Calculate full page height (from top to footer or document end)
+      let fullHeight = window.innerHeight; // Default to viewport
       
-      // Footer position
-      let footerTop = window.innerHeight; // Default to viewport height
       if (footer) {
         const footerRect = footer.getBoundingClientRect();
-        footerTop = footerRect.top + window.scrollY;
+        fullHeight = footerRect.top + window.scrollY;
       } else {
-        // Fallback: use main-content end or viewport
+        // Fallback: use document scroll height or main-content end
         const mainContent = document.getElementById('main-content');
         if (mainContent) {
           const mainRect = mainContent.getBoundingClientRect();
-          footerTop = mainRect.bottom + window.scrollY;
+          fullHeight = mainRect.bottom + window.scrollY;
+        } else {
+          fullHeight = Math.max(
+            document.documentElement.scrollHeight,
+            document.body.scrollHeight,
+            window.innerHeight
+          );
         }
       }
       
-      // Tree starts after header, ends at footer
-      const top = headerHeight;
-      const height = Math.max(footerTop - headerHeight, window.innerHeight - headerHeight);
+      // Tree starts at top (behind navbar) and extends to footer
+      // Use full document height to ensure it reaches the bottom
+      const height = Math.max(fullHeight, window.innerHeight);
       
-      setDimensions({ top, height });
+      setDimensions({ top: 0, height });
     };
 
     // Initial calculation
@@ -74,12 +77,12 @@ export default function TreeBackground() {
 
   return (
     <>
-      {/* Absolute tree background - starts behind header, ends at footer */}
+      {/* Absolute tree background - starts at top (behind navbar), extends to footer */}
       <div
-        className="absolute inset-x-0 pointer-events-none"
+        className="fixed inset-x-0 pointer-events-none"
         style={{
-          top: `${dimensions.top}px`,
-          height: dimensions.height > 0 ? `${dimensions.height}px` : 'calc(100vh - 80px)',
+          top: 0,
+          height: dimensions.height > 0 ? `${dimensions.height}px` : '100vh',
           zIndex: -10,
         }}
         aria-hidden="true"
@@ -95,11 +98,11 @@ export default function TreeBackground() {
           }}
         />
 
-        {/* Top fade gradient - clear boundary where tree starts (behind header) */}
+        {/* Top fade gradient - subtle fade behind navbar (tree visible but subtle) */}
         <div
-          className="absolute inset-x-0 top-0 h-32 pointer-events-none"
+          className="absolute inset-x-0 top-0 h-24 pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, #080611 0%, #080611 40%, rgba(8, 6, 17, 0.8) 70%, transparent 100%)',
+            background: 'linear-gradient(to bottom, rgba(8, 6, 17, 0.4) 0%, rgba(8, 6, 17, 0.2) 50%, transparent 100%)',
             zIndex: 1,
           }}
         />
