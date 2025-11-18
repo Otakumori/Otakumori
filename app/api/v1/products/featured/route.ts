@@ -4,6 +4,12 @@ import { db } from '@/app/lib/db';
 import { serializeProduct } from '@/lib/catalog/serialize';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
+import {
+  generateRequestId,
+  createApiError,
+  createApiSuccess,
+  FeaturedProductsResponseSchema,
+} from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -170,9 +176,21 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
 }
 
 export async function GET(request: NextRequest) {
+  const requestId = generateRequestId();
+  
   try {
     const { searchParams } = new URL(request.url);
-    const query = QuerySchema.parse(Object.fromEntries(searchParams));
+    
+    // Validate query parameters
+    const queryResult = QuerySchema.safeParse(Object.fromEntries(searchParams));
+    if (!queryResult.success) {
+      return NextResponse.json(
+        createApiError('VALIDATION_ERROR', 'Invalid query parameters', requestId, queryResult.error.issues),
+        { status: 400 }
+      );
+    }
+    
+    const query = queryResult.data;
     const forcePrintify = searchParams.get('force_printify') === 'true';
 
     // Try database first (unless forcePrintify is true)
@@ -202,12 +220,44 @@ export async function GET(request: NextRequest) {
         deduplicateBy: 'both',
       });
 
-      return NextResponse.json({
-        ok: true,
-        data: { products: deduplicated },
+      // Normalize products to ensure consistent structure
+      const normalizedProducts = deduplicated.map((product) => ({
+        id: String(product.id || ''),
+        title: String(product.title || 'Untitled Product'),
+        description: product.description ? String(product.description) : null,
+        price: typeof product.price === 'number' ? Math.max(0, product.price) : 0,
+        image: String(product.image || '/assets/images/placeholder-product.jpg'),
+        available: product.available !== false,
+        slug: product.slug ? String(product.slug) : String(product.id || ''),
+        category: product.category ? String(product.category) : null,
+        tags: Array.isArray(product.tags) ? product.tags.map(String) : [],
+      }));
+
+      const response = createApiSuccess(
+        {
+          products: normalizedProducts,
+          pagination: undefined, // Catalog results don't include pagination
+        },
+        requestId
+      );
+
+      // Validate response before returning
+      const validated = FeaturedProductsResponseSchema.safeParse({
+        ...response,
         source: catalogResult.source,
         timestamp: new Date().toISOString(),
       });
+
+      if (!validated.success) {
+        console.error('[API] Response validation failed:', validated.error);
+        // Return safe fallback
+        return NextResponse.json(
+          createApiSuccess({ products: [], pagination: undefined }, requestId),
+          { status: 200 }
+        );
+      }
+
+      return NextResponse.json(validated.data);
     }
 
     // If forcePrintify is true or no database products, try Printify
@@ -215,34 +265,68 @@ export async function GET(request: NextRequest) {
       try {
         const printifyResult = await fetchPrintifyProducts(query.limit, query.excludeTitles);
         if (printifyResult && printifyResult.data.products.length > 0) {
-          return NextResponse.json({
-            ok: true,
-            data: { products: printifyResult.data.products },
+          // Normalize Printify products
+          const normalizedProducts = printifyResult.data.products.map((product) => ({
+            id: String(product.id || ''),
+            title: String(product.title || 'Untitled Product'),
+            description: product.description ? String(product.description) : null,
+            price: typeof product.price === 'number' ? Math.max(0, product.price) : 0,
+            image: String(product.image || '/assets/images/placeholder-product.jpg'),
+            available: product.available !== false,
+            slug: product.slug ? String(product.slug) : String(product.id || ''),
+            category: product.category ? String(product.category) : null,
+            tags: Array.isArray(product.tags) ? product.tags.map(String) : [],
+          }));
+
+          const response = createApiSuccess(
+            {
+              products: normalizedProducts,
+              pagination: undefined, // Printify results don't include pagination
+            },
+            requestId
+          );
+
+          // Validate response
+          const validated = FeaturedProductsResponseSchema.safeParse({
+            ...response,
             source: printifyResult.source,
             timestamp: new Date().toISOString(),
           });
+
+          if (!validated.success) {
+            console.error('[API] Printify response validation failed:', validated.error);
+            return NextResponse.json(
+              createApiSuccess({ products: [], pagination: undefined }, requestId),
+              { status: 200 }
+            );
+          }
+
+          return NextResponse.json(validated.data);
         }
-      } catch {
+      } catch (error) {
+        console.warn('[API] Printify fetch failed:', error);
         // Fall through to empty response
       }
     }
 
     // Return empty array if no products found
-    return NextResponse.json({
-      ok: true,
-      data: { products: [] },
+    const emptyResponse = createApiSuccess(
+      { products: [], pagination: undefined },
+      requestId
+    );
+
+    const validated = FeaturedProductsResponseSchema.safeParse({
+      ...emptyResponse,
       source: 'empty',
       timestamp: new Date().toISOString(),
     });
-  } catch {
+
+    return NextResponse.json(validated.success ? validated.data : emptyResponse);
+  } catch (error) {
+    console.error('[API] Featured products endpoint error:', error);
     return NextResponse.json(
-      {
-        ok: true,
-        data: { products: [] },
-        source: 'fallback',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 200 },
+      createApiError('INTERNAL_ERROR', 'Failed to fetch featured products', requestId),
+      { status: 500 }
     );
   }
 }

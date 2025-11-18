@@ -95,7 +95,7 @@ export default async function MiniGamesSection() {
             games = Array.isArray(rawGames) ? rawGames.map(mapGame) : registryGames;
             break;
           }
-        } catch (endpointError) {
+        } catch {
           // Continue to next endpoint
           continue;
         }

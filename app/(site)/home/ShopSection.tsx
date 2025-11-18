@@ -10,16 +10,11 @@ import { handleServerError } from '@/app/lib/server-error-handler';
 import { env } from '@/env.mjs';
 import { SectionHeader } from '@/app/components/home/SectionHeader';
 import { EmptyState } from '@/app/components/home/EmptyState';
+import { validateApiEnvelope } from '@/app/lib/api-response-validator';
+import { FeaturedProductsResponseSchema, type FeaturedProduct } from '@/app/lib/api-contracts';
 
-interface Product {
-  id: string;
-  title: string;
-  description?: string;
-  price: number;
-  image: string;
-  available: boolean;
-  slug?: string;
-}
+// Use validated schema type instead of manual interface
+type Product = FeaturedProduct;
 
 interface ShopData {
   products: Product[];
@@ -126,24 +121,48 @@ export default async function ShopSection() {
     if (response.ok) {
       try {
         const result = await response.json();
-        const data = result.ok ? result.data : result;
         
-        // Safely map products with validation
-        const productsArray = Array.isArray(data?.products) ? data.products : [];
-        const products = productsArray.map((product: any): Product => ({
-          id: String(product.id || ''),
-          title: String(product.title || 'Untitled Product'),
-          description: product.description ? String(stripHtml(String(product.description))) : undefined,
-          price: typeof product.price === 'number' ? product.price : 0,
-          image: String(product.image || '/assets/images/placeholder-product.jpg'),
-          available: product.available !== false,
-          slug: String(product.slug || product.id || ''),
-        }));
+        // Validate API response structure
+        // Extract the data schema from the full response schema
+        const DataSchema = FeaturedProductsResponseSchema.shape.data;
+        const validated = validateApiEnvelope(result, DataSchema);
         
-        shopData = {
-          products,
-          pagination: data?.pagination,
-        };
+        if (validated?.ok) {
+          // Response is validated and type-safe
+          const products = validated.data.products.map((product): Product => ({
+            id: product.id,
+            title: product.title,
+            description: product.description ? stripHtml(product.description) : undefined,
+            price: product.price,
+            image: product.image,
+            available: product.available,
+            slug: product.slug,
+            category: product.category ?? undefined,
+            tags: product.tags,
+          }));
+          
+          // Handle pagination - only include if all required fields are present
+          const pagination = validated.data.pagination;
+          const paginationData = pagination &&
+            typeof pagination.currentPage === 'number' &&
+            typeof pagination.totalPages === 'number' &&
+            typeof pagination.total === 'number'
+            ? {
+                currentPage: pagination.currentPage,
+                totalPages: pagination.totalPages,
+                total: pagination.total,
+              }
+            : undefined;
+          
+          shopData = {
+            products,
+            pagination: paginationData,
+          };
+        } else {
+          // Validation failed - log and use empty state
+          console.warn('[ShopSection] API response validation failed for', apiUrl);
+          shopData = { products: [] };
+        }
       } catch (parseError) {
         // JSON parse error - log but don't throw
         console.warn('[ShopSection] Failed to parse response:', parseError);

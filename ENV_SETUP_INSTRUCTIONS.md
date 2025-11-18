@@ -1,69 +1,29 @@
-# Environment Setup - Copy These Lines to Your `.env` File
+# Environment Variable Setup & Validation
 
-## ✅ What to Add to Your `.env` File
+## Where the Missing Variables Apply
 
-Open `C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\.env` and add these lines:
+The env schema (`env.mjs`) marks several server variables as **required**—`DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `CLERK_SECRET_KEY`, `PRINTIFY_API_KEY`, `PRINTIFY_SHOP_ID`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN`. If any of these are absent or malformed, validation fails and the app (or `pnpm env:verify`) throws.
 
-```env
-# Supabase PostgreSQL Connection (Pooled - for queries)
-DATABASE_URL="postgresql://postgres.ydbhokoxqwqbtqqeibef:te8ZdCF5oFh2mbDc@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+The validation runs anywhere the app loads the env module: your local machine, CI (e.g., GitHub Actions), or production hosting (e.g., Vercel). The failure isn't coming from "GitHub" itself; it's whichever runtime doesn't have those variables populated.
 
-# Supabase PostgreSQL Connection (Direct - for migrations)
-DIRECT_URL="postgresql://postgres.ydbhokoxqwqbtqqeibef:te8ZdCF5oFh2mbDc@aws-1-us-east-1.pooler.supabase.com:5432/postgres"
-```
+## How to Fix in Each Environment
 
-## ✅ Your Prisma Schema is Already Correct!
+### Local
 
-I already updated `prisma/schema.prisma` - it has:
+Create a `.env.local` (or `.env`) in the project root and set the required keys with real values. Restart `pnpm dev` afterward so the new vars load.
 
-```prisma
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-```
+### Vercel (or Other Host)
 
-Nothing else to change there! ✅
+Open the project's **Environment Variables** settings and add the same keys/values for the active environment (Preview/Production). Redeploy so the new vars are available.
 
-## 🎯 After Adding to `.env`
+### CI (GitHub Actions)
 
-Run these commands:
+Add them as repository or environment secrets, then ensure your workflow exports them (e.g., `env:` block or dotenv step) before running `pnpm env:verify` or building.
 
-```bash
-# Step 1: Generate Prisma client
-npx prisma generate
+## Quick Validation Steps
 
-# Step 2: Test the build
-npm run build
+1. Populate the required keys in the target environment (local `.env.local`, Vercel dashboard, or GitHub secrets).
 
-# Step 3: Start dev server and test avatar demo
-npm run dev
-# Then visit: http://localhost:3000/avatar/demo
-```
+2. Rerun `pnpm env:verify` locally (or trigger a redeploy/CI run) to confirm validation passes.
 
-## 📝 Why These URLs?
-
-- **DATABASE_URL** (port 6543): Connection pooling via PgBouncer - faster for queries
-- **DIRECT_URL** (port 5432): Direct Postgres connection - required for schema migrations
-
-Both point to your **Supabase database** where all your 80+ tables and data live!
-
-## ⚠️ What About Prisma Accelerate?
-
-Your Accelerate credentials (`db.prisma.io`) seem to point to a **different database**. Since your actual data is in Supabase (you showed 80+ tables there), **use Supabase directly** to avoid connecting to the wrong database.
-
-If you want to use Accelerate in the future, you'd need to configure it to proxy to your Supabase database.
-
-## 🚀 Quick Copy-Paste
-
-**Just copy these 2 lines into your `.env` file:**
-
-```
-DATABASE_URL="postgresql://postgres.ydbhokoxqwqbtqqeibef:te8ZdCF5oFh2mbDc@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.ydbhokoxqwqbtqqeibef:te8ZdCF5oFh2mbDc@aws-1-us-east-1.pooler.supabase.com:5432/postgres"
-```
-
-Then run: `npx prisma generate && npm run build`
-
-Done! 🎉
+3. Reload the app; the homepage error will clear once all required vars are present.

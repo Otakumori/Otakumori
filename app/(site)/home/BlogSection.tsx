@@ -63,7 +63,7 @@ export default async function BlogSection() {
         ? rawPosts
             .filter((post): post is BlogPost => post && typeof post === 'object' && 'id' in post && 'title' in post)
             .map((post) => ({
-              ...post,
+        ...post,
               imageAlt: (post as BlogPost).imageAlt ?? post.title ?? 'Blog post image',
             }))
         : [];
@@ -141,9 +141,9 @@ export default async function BlogSection() {
                         ? (() => {
                             try {
                               return new Date(post.publishedAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                               });
                             } catch {
                               return 'Recently';

@@ -5,6 +5,26 @@ import dotenv from 'dotenv';
 
 process.env.OTM_SKIP_SERVER_ONLY = '1';
 
+// Load .env.local into process.env before importing env.mjs (which validates it)
+const projectRoot = process.cwd();
+const dotEnvPath = path.join(projectRoot, '.env');
+const dotEnvLocalPath = path.join(projectRoot, '.env.local');
+
+// Load .env first, then .env.local (latter overrides former)
+if (existsSync(dotEnvPath)) {
+  const envConfig = dotenv.config({ path: dotEnvPath });
+  if (envConfig.error) {
+    console.warn(`Warning: Could not load .env: ${envConfig.error.message}`);
+  }
+}
+
+if (existsSync(dotEnvLocalPath)) {
+  const envLocalConfig = dotenv.config({ path: dotEnvLocalPath });
+  if (envLocalConfig.error) {
+    console.warn(`Warning: Could not load .env.local: ${envLocalConfig.error.message}`);
+  }
+}
+
 const { envSchema, REQUIRED_SERVER_KEYS } = await import('../app/lib/env-schema');
 
 type EnvValues = Record<string, string>;

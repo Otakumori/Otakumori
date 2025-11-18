@@ -91,7 +91,7 @@ export default function GlobalBackground() {
         }
 
         // Guard: Ensure radius is never negative, NaN, or infinite to prevent IndexSizeError
-        // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
+          // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
         // Clamp to safe range [0.5, 2.0] to ensure valid arc rendering
         let size = (1 - star.z / canvas.width) * 1.5;
         if (!Number.isFinite(size) || size <= 0) {
@@ -99,10 +99,10 @@ export default function GlobalBackground() {
         }
         size = Math.max(0.5, Math.min(2.0, size));
 
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.beginPath();
-        ctx.arc(px, py, size, 0, Math.PI * 2);
-        ctx.fill();
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.beginPath();
+          ctx.arc(px, py, size, 0, Math.PI * 2);
+          ctx.fill();
       }
       requestAnimationFrame(updateStars);
     };

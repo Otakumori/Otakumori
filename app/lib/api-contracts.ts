@@ -202,3 +202,34 @@ export function validateRequest<T>(
   }
   return { success: false, error: result.error };
 }
+
+// Featured Products Response Schema
+export const FeaturedProductSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string().optional().nullable(),
+  price: z.number().nonnegative(),
+  image: z.string().url().or(z.string().startsWith('/')), // Allow relative URLs
+  available: z.boolean(),
+  slug: z.string().optional(),
+  category: z.string().optional().nullable(),
+  tags: z.array(z.string()).optional(),
+});
+
+export const FeaturedProductsResponseSchema = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    products: z.array(FeaturedProductSchema),
+    pagination: z.object({
+      currentPage: z.number().int().positive().optional(),
+      totalPages: z.number().int().positive().optional(),
+      total: z.number().int().nonnegative().optional(),
+    }).optional(),
+  }),
+  source: z.string().optional(),
+  timestamp: z.string().optional(),
+  requestId: z.string().optional(),
+});
+
+export type FeaturedProduct = z.infer<typeof FeaturedProductSchema>;
+export type FeaturedProductsResponse = z.infer<typeof FeaturedProductsResponseSchema>;
