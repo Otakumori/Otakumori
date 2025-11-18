@@ -32,6 +32,10 @@ interface BlogData {
   data?: BlogPost[];
 }
 
+/**
+ * BlogSection Server Component - NEVER throws errors.
+ * All errors are caught and logged, always returns renderable content.
+ */
 export default async function BlogSection() {
   let posts: BlogPost[] = [];
   let isBlockedData = true;
@@ -52,11 +56,22 @@ export default async function BlogSection() {
         ? postsResult.data
         : null;
 
-    posts =
-      (data?.posts || data?.data || []).map((post) => ({
-        ...post,
-        imageAlt: (post as BlogPost).imageAlt ?? post.title,
-      })) ?? [];
+    // Safely map posts with validation
+    try {
+      const rawPosts = data?.posts || data?.data || [];
+      posts = Array.isArray(rawPosts)
+        ? rawPosts
+            .filter((post): post is BlogPost => post && typeof post === 'object' && 'id' in post && 'title' in post)
+            .map((post) => ({
+              ...post,
+              imageAlt: (post as BlogPost).imageAlt ?? post.title ?? 'Blog post image',
+            }))
+        : [];
+    } catch (mapError) {
+      console.warn('[BlogSection] Failed to map posts:', mapError);
+      posts = [];
+    }
+    
     isBlockedData = isBlocked(blogResult) && isBlocked(postsResult);
   } catch (error) {
     handleServerError(error, {
@@ -122,13 +137,21 @@ export default async function BlogSection() {
                   </div>
                   <div className="flex flex-col gap-2 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
                     <span>
-                      {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {post.publishedAt
+                        ? (() => {
+                            try {
+                              return new Date(post.publishedAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              });
+                            } catch {
+                              return 'Recently';
+                            }
+                          })()
+                        : 'Recently'}
                     </span>
-                    {post.author && <span>By {post.author.name}</span>}
+                    {post.author?.name && <span>By {post.author.name}</span>}
                   </div>
                   {post.tags && post.tags.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2">

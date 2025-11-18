@@ -46,17 +46,31 @@ function mapGame(game: {
   };
 }
 
+/**
+ * MiniGamesSection Server Component - NEVER throws errors.
+ * All errors are caught and logged, always returns renderable content.
+ */
 export default async function MiniGamesSection() {
-  const registryGames = getEnabledGames().map((game) =>
-    mapGame({
-      id: game.key,
-      slug: game.key,
-      title: game.name,
-      description: game.tagline,
-      thumbKey: game.thumbKey,
-      category: game.difficulty,
-    }),
-  );
+  // Safely get registry games with fallback
+  let registryGames: ApiGame[] = [];
+  try {
+    const enabledGames = getEnabledGames();
+    registryGames = enabledGames
+      .filter((game) => game && game.key && game.name)
+      .map((game) =>
+        mapGame({
+          id: game.key,
+          slug: game.key,
+          title: game.name,
+          description: game.tagline,
+          thumbKey: game.thumbKey,
+          category: game.difficulty,
+        }),
+      );
+  } catch (registryError) {
+    console.warn('[MiniGamesSection] Failed to get registry games:', registryError);
+    registryGames = [];
+  }
 
   let games: ApiGame[] = registryGames;
 
@@ -64,14 +78,26 @@ export default async function MiniGamesSection() {
     const gamesResult = await safeFetch<GamesData>('/api/v1/games', { allowLive: true });
 
     if (isSuccess(gamesResult)) {
-      games = (gamesResult.data?.games || []).map(mapGame);
+      try {
+        const rawGames = gamesResult.data?.games || [];
+        games = Array.isArray(rawGames) ? rawGames.map(mapGame) : registryGames;
+      } catch (mapError) {
+        console.warn('[MiniGamesSection] Failed to map games from API:', mapError);
+        games = registryGames;
+      }
     } else {
       const endpoints = ['/api/games', '/api/mini-games', '/api/games/featured'];
       for (const endpoint of endpoints) {
-        const result = await safeFetch<GamesData>(endpoint, { allowLive: true });
-        if (isSuccess(result) && (result.data?.games?.length || result.data?.data?.length)) {
-          games = (result.data?.games || result.data?.data || []).map(mapGame);
-          break;
+        try {
+          const result = await safeFetch<GamesData>(endpoint, { allowLive: true });
+          if (isSuccess(result) && (result.data?.games?.length || result.data?.data?.length)) {
+            const rawGames = result.data?.games || result.data?.data || [];
+            games = Array.isArray(rawGames) ? rawGames.map(mapGame) : registryGames;
+            break;
+          }
+        } catch (endpointError) {
+          // Continue to next endpoint
+          continue;
         }
       }
     }
@@ -86,9 +112,14 @@ export default async function MiniGamesSection() {
     }, {
       logLevel: 'warn',
     });
+    // Keep registryGames as fallback
+    games = registryGames;
   }
 
-  const enabledGames = games.filter((game) => game.enabled !== false).slice(0, 6);
+  // Safely filter and slice games
+  const enabledGames = Array.isArray(games)
+    ? games.filter((game) => game && game.enabled !== false).slice(0, 6)
+    : [];
 
   return (
     <div className="rounded-2xl p-8">
@@ -113,11 +144,6 @@ export default async function MiniGamesSection() {
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    onError={(e) => {
-                      // Graceful fallback if image fails to load
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
                   />
                   {/* Gradient overlay for text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
