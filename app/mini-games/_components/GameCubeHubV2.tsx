@@ -138,7 +138,7 @@ export default function GameCubeHubV2() {
     setCurrentFace(face);
     setIsLoading(true);
 
-    const faceConfig = cubeConfig.faces.find((f) => f.slot === getFaceSlot(face));
+    const faceConfig = cubeConfig.faces[face];
     if (!faceConfig) {
       setIsLoading(false);
       return;
@@ -147,24 +147,23 @@ export default function GameCubeHubV2() {
     // Add loading delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    if (faceConfig.type === 'trade' || faceConfig.type === 'about') {
-      router.push(faceConfig.route);
-    } else if (faceConfig.type === 'games') {
-      setActivePanel('games');
-      setIsLoading(false);
-    } else if (faceConfig.type === 'music') {
-      setActivePanel('extras');
-      setIsLoading(false);
-    } else if (faceConfig.type === 'community') {
-      setActivePanel('avatar-community');
+    if (faceConfig.action === 'route' && faceConfig.href) {
+      router.push(faceConfig.href);
+    } else if (faceConfig.action === 'panel' && faceConfig.panel) {
+      if (faceConfig.panel === 'games') {
+        setActivePanel('games');
+      } else if (faceConfig.panel === 'extras') {
+        setActivePanel('extras');
+      }
       setIsLoading(false);
     } else {
       setIsLoading(false);
     }
-  }, [isLoading, router, getFaceSlot]);
+  }, [isLoading, router]);
 
   const handleGameSelect = useCallback(async (game: (typeof allGames)[0]) => {
-    if (game.status === 'coming-soon') {
+    // Games are always available in this implementation
+    if (!game || !game.href) {
       return;
     }
 
@@ -615,15 +614,9 @@ export default function GameCubeHubV2() {
                     </h3>
                     <p className="text-white/70 text-xs leading-relaxed line-clamp-2 min-h-[2.5rem]">{game.desc}</p>
 
-                    {/* Status Badge */}
-                    {game.status === 'coming-soon' && (
-                      <div className="absolute top-3 right-3 text-xs bg-yellow-500/30 backdrop-blur-sm text-yellow-200 px-2.5 py-1 rounded-md font-medium border border-yellow-400/30">
-                        Coming Soon
-                      </div>
-                    )}
-
+                    {/* Status Badge - Games are always available in this implementation */}
                     {/* Age Rating Badge */}
-                    {game.ageRating && game.status !== 'coming-soon' && (
+                    {game.ageRating && (
                       <div className="absolute top-3 right-3 text-xs bg-white/10 backdrop-blur-sm text-white/90 px-2.5 py-1 rounded-md font-medium border border-white/20">
                         {game.ageRating}
                       </div>
