@@ -63,5 +63,8 @@
     "**/.turbo/**": true,
     "**/packages/**/dist/**": true
   },
-  "search.followSymlinks": false
+  "search.followSymlinks": false,
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

@@ -154,6 +154,7 @@ interface HairParameters {
 
 ### Basic Usage
 
+{% raw %}
 ```tsx
 import Avatar3D from '@/app/components/avatar/Avatar3D';
 
@@ -186,6 +187,7 @@ import Avatar3D from '@/app/components/avatar/Avatar3D';
   quality="high"
 />;
 ```
+{% endraw %}
 
 ### Store Integration
 

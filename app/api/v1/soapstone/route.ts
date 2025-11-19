@@ -56,7 +56,11 @@ export async function GET(req: NextRequest) {
           items: items.map((msg) => ({
             id: msg.id,
             body: msg.text,
-            createdAt: msg.createdAt,
+            text: msg.text, // Alias for compatibility
+            createdAt: msg.createdAt.toISOString(),
+            x: msg.x,
+            y: msg.y,
+            appraises: msg.appraises || 0,
             user: msg.User
               ? {
                   id: msg.User.id,
@@ -124,16 +128,17 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const { body: messageBody } = validation.data;
+      const { body: messageBody, x, y } = validation.data;
 
       const { Visibility } = await import('@prisma/client');
       
-      // Create soapstone message
+      // Create soapstone message with optional x/y coordinates
       const message = await db.soapstoneMessage.create({
         data: {
           text: messageBody,
-          User: { connect: { id: userId } },
+          authorId: userId,
           status: Visibility.PUBLIC,
+          ...(x !== undefined && y !== undefined && { x: Math.round(x), y: Math.round(y) }),
         },
         include: {
           User: {
@@ -150,7 +155,11 @@ export async function POST(req: NextRequest) {
         {
           id: message.id,
           body: message.text,
-          createdAt: message.createdAt,
+          text: message.text, // Alias for compatibility
+          createdAt: message.createdAt.toISOString(),
+          x: message.x,
+          y: message.y,
+          appraises: message.appraises || 0,
           user: {
             id: message.User!.id,
             displayName: message.User!.displayName,

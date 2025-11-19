@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import NextImage from 'next/image';
@@ -19,24 +19,26 @@ import StarfieldBackground from '@/app/components/backgrounds/StarfieldBackgroun
 // Import games from registry
 import gamesRegistry from '@/lib/games.meta.json';
 
-// Transform registry games to component format
-const allGames = gamesRegistry.games
-  .filter((game) => game.enabled)
-  .sort((a, b) => a.order - b.order)
-  .map((game) => ({
-    id: game.id,
-    label: game.title,
-    desc: game.description,
-    href: `/mini-games/${game.slug}`,
-    icon: game.icon,
-    status: 'available',
-    category: game.category,
-    ageRating: game.ageRating,
-    nsfw: game.nsfw || false,
-    tooltips: game.tooltips,
-    features: game.features,
-    slug: game.slug,
-  }));
+// Memoize game list transformation to avoid recalculation on every render
+const transformGames = (games: typeof gamesRegistry.games) => {
+  return games
+    .filter((game) => game.enabled)
+    .sort((a, b) => a.order - b.order)
+    .map((game) => ({
+      id: game.id,
+      label: game.title,
+      desc: game.description,
+      href: `/mini-games/${game.slug}`,
+      icon: game.icon,
+      status: 'available' as const,
+      category: game.category,
+      ageRating: game.ageRating,
+      nsfw: game.nsfw || false,
+      tooltips: game.tooltips,
+      features: game.features,
+      slug: game.slug,
+    }));
+};
 
 // Function to get thumbnail path for a game
 const getGameThumbnail = (gameSlug: string): string => {
@@ -76,6 +78,9 @@ export default function GameCubeHubV2() {
   // Cosmetics hook for HUD skin
   const { hudSkin, isHydrated } = useCosmetics();
 
+  // Memoize games list to avoid recalculation
+  const allGames = useMemo(() => transformGames(gamesRegistry.games), []);
+
   // Apply accessibility settings on mount and when they change
   useEffect(() => {
     applyAccessibilitySettings(accessibilitySettings);
@@ -109,25 +114,98 @@ export default function GameCubeHubV2() {
     }
   }, [accessibilitySettings.volume]);
 
-  // Keyboard navigation for GameCube face buttons
+  // Helper function to get face slot
+  const getFaceSlot = useCallback((face: FacePosition): number => {
+    switch (face) {
+      case 'up': return 4;
+      case 'left': return 3;
+      case 'right': return 1;
+      case 'down': return 5;
+      case 'front': return 0;
+      default: return 0;
+    }
+  }, []);
+
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleFaceAction = useCallback(async (face: FacePosition) => {
+    if (face === 'front') {
+      setShowFrontOverlay(false);
+      return;
+    }
+
+    if (isLoading) return;
+    
+    setCurrentFace(face);
+    setIsLoading(true);
+
+    const faceConfig = cubeConfig.faces.find((f) => f.slot === getFaceSlot(face));
+    if (!faceConfig) {
+      setIsLoading(false);
+      return;
+    }
+
+    // Add loading delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    if (faceConfig.type === 'trade' || faceConfig.type === 'about') {
+      router.push(faceConfig.route);
+    } else if (faceConfig.type === 'games') {
+      setActivePanel('games');
+      setIsLoading(false);
+    } else if (faceConfig.type === 'music') {
+      setActivePanel('extras');
+      setIsLoading(false);
+    } else if (faceConfig.type === 'community') {
+      setActivePanel('avatar-community');
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoading, router, getFaceSlot]);
+
+  const handleGameSelect = useCallback(async (game: (typeof allGames)[0]) => {
+    if (game.status === 'coming-soon') {
+      return;
+    }
+
+    if (loadingGame) return;
+    
+    setLoadingGame(game.id);
+
+    // Disc load animation
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    try {
+      await router.push(game.href);
+    } catch (error) {
+      console.error('Failed to navigate to game:', error);
+      setLoadingGame(null);
+    }
+  }, [loadingGame, router]);
+
+  // Keyboard navigation for GameCube face buttons - consolidated handler
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isLoading) return; // Don't handle keys during loading
+      if (isLoading || activePanel) return; // Don't handle keys during loading or when panel is open
 
       switch (event.key) {
         case 'ArrowUp':
+        case 'KeyW':
           event.preventDefault();
           handleFaceAction('up');
           break;
         case 'ArrowDown':
+        case 'KeyS':
           event.preventDefault();
           handleFaceAction('down');
           break;
         case 'ArrowLeft':
+        case 'KeyA':
           event.preventDefault();
           handleFaceAction('left');
           break;
         case 'ArrowRight':
+        case 'KeyD':
           event.preventDefault();
           handleFaceAction('right');
           break;
@@ -142,107 +220,31 @@ export default function GameCubeHubV2() {
           event.preventDefault();
           setCurrentFace('front');
           setActivePanel(null);
+          setShowFrontOverlay(false);
+          setShowAccessibilitySettings(false);
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentFace, isLoading]);
+  }, [currentFace, isLoading, activePanel, handleFaceAction]);
 
   // Note: prefersReducedMotion is handled by StarfieldBackground component
 
+  // Handle accessibility settings shortcut (Ctrl+S / Cmd+S)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (activePanel) {
-        if (e.code === 'Escape') {
-          setActivePanel(null);
-        }
-        return;
-      }
-
-      switch (e.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-          e.preventDefault();
-          handleFaceAction('up');
-          break;
-        case 'ArrowLeft':
-        case 'KeyA':
-          e.preventDefault();
-          handleFaceAction('left');
-          break;
-        case 'ArrowRight':
-        case 'KeyD':
-          e.preventDefault();
-          handleFaceAction('right');
-          break;
-        case 'ArrowDown':
-        case 'KeyS':
-          e.preventDefault();
-          handleFaceAction('down');
-          break;
-        case 'Enter':
-        case 'Space':
-          e.preventDefault();
-          handleFaceAction(currentFace);
-          break;
-        case 'Escape':
-          setActivePanel(null);
-          setShowFrontOverlay(false);
-          setShowAccessibilitySettings(false);
-          break;
-        case 'KeyS':
-          if (e.ctrlKey || e.metaKey) {
-            e.preventDefault();
-            setShowAccessibilitySettings(true);
-          }
-          break;
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        setShowAccessibilitySettings(true);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [currentFace, activePanel]);
+  }, []);
 
-  const handleFaceAction = async (face: FacePosition) => {
-    if (face === 'front') {
-      setShowFrontOverlay(false);
-      return;
-    }
-
-    if (isLoading) return; // Prevent multiple clicks during loading
-
-    setCurrentFace(face);
-    setIsLoading(true);
-
-    const faceConfig = cubeConfig.faces[face as keyof typeof cubeConfig.faces];
-
-    // Add loading delay for better UX
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    if (faceConfig.action === 'route') {
-      router.push((faceConfig as any).href);
-    } else if (faceConfig.action === 'panel') {
-      setActivePanel((faceConfig as any).panel as ActivePanel);
-    }
-
-    setIsLoading(false);
-  };
-
-  const handleGameSelect = async (game: (typeof allGames)[0]) => {
-    // Don't navigate if game is coming soon
-    if (game.status === 'coming-soon') {
-      return;
-    }
-
-    setLoadingGame(game.id);
-
-    // Disc load animation
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    router.push(game.href);
-  };
 
   const dismissOverlay = () => {
     if (cubeConfig.frontOverlay.dismissible) {
@@ -546,80 +548,96 @@ export default function GameCubeHubV2() {
             exit={{ opacity: 0, y: 50 }}
             className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-end justify-center z-30 p-8"
           >
-            <div className="glass-card max-w-6xl w-full max-h-[80vh] overflow-y-auto p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-primary">Mini-Games</h2>
+            <div className="bg-gradient-to-br from-black/90 via-purple-900/20 to-black/90 backdrop-blur-xl border border-white/20 rounded-2xl max-w-6xl w-full max-h-[80vh] overflow-y-auto p-8 shadow-2xl shadow-purple-900/20">
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2">Mini-Games</h2>
+                  <p className="text-white/60 text-sm">Select a game to play</p>
+                </div>
                 <button
                   onClick={() => setActivePanel(null)}
-                  className="text-muted hover:text-primary transition-colors text-xl"
+                  className="text-white/60 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-all duration-200 text-2xl w-10 h-10 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-black/50"
                   aria-label="Close games panel"
                 >
                   ×
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                 {allGames.map((game) => (
                   <button
                     key={game.id}
                     onClick={() => handleGameSelect(game)}
                     disabled={loadingGame === game.id}
-                    className="p-4 glass-card 
-                              hover:bg-glass-bg-hover hover:border-glass-border-hover 
-                              disabled:opacity-50 disabled:cursor-not-allowed
-                              transition-all duration-300 text-left group relative"
+                    className="relative p-5 rounded-xl
+                              bg-gradient-to-br from-white/10 via-white/5 to-transparent
+                              backdrop-blur-md border border-white/20
+                              hover:from-white/15 hover:via-white/10 hover:to-white/5
+                              hover:border-pink-400/40 hover:shadow-lg hover:shadow-pink-500/20
+                              hover:-translate-y-1
+                              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0
+                              transition-all duration-300 text-left group
+                              focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-black/50"
+                    aria-label={`Play ${game.label}${game.desc ? `: ${game.desc}` : ''}`}
+                    aria-disabled={loadingGame === game.id}
                   >
                     {loadingGame === game.id && (
-                      <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
-                        <div className="text-white text-sm">Loading disc...</div>
+                      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="animate-spin w-6 h-6 border-2 border-pink-400 border-t-transparent rounded-full" />
+                          <div className="text-white text-sm font-medium">Loading disc...</div>
+                        </div>
                       </div>
                     )}
 
                     {/* Game Thumbnail */}
-                    <div className="w-full h-20 mb-3 flex items-center justify-center">
+                    <div className="w-full h-24 mb-4 flex items-center justify-center bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-lg p-3 group-hover:from-purple-800/30 group-hover:to-pink-800/30 transition-all duration-300">
                       <NextImage
                         src={getGameThumbnail(game.slug)}
-                        alt={`${game.label} thumbnail`}
+                        alt=""
                         width={80}
                         height={80}
-                        className="w-16 h-16 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                        className="w-16 h-16 object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
                         onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                           // Fallback to emoji if image fails to load
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
                           const parent = target.parentElement;
                           if (parent) {
-                            parent.innerHTML = `<div class="text-2xl">${game.icon}</div>`;
+                            parent.innerHTML = `<div class="text-3xl">${game.icon}</div>`;
                           }
                         }}
                       />
                     </div>
 
-                    <h3 className="text-primary font-semibold text-sm mb-1 group-hover:text-accent-pink transition-colors">
+                    <h3 className="text-white font-semibold text-sm mb-2 group-hover:text-pink-300 transition-colors line-clamp-1">
                       {game.label}
                     </h3>
-                    <p className="text-secondary text-xs leading-relaxed opacity-80">{game.desc}</p>
+                    <p className="text-white/70 text-xs leading-relaxed line-clamp-2 min-h-[2.5rem]">{game.desc}</p>
 
                     {/* Status Badge */}
                     {game.status === 'coming-soon' && (
-                      <div className="absolute top-2 right-2 text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded">
+                      <div className="absolute top-3 right-3 text-xs bg-yellow-500/30 backdrop-blur-sm text-yellow-200 px-2.5 py-1 rounded-md font-medium border border-yellow-400/30">
                         Coming Soon
                       </div>
                     )}
 
                     {/* Age Rating Badge */}
                     {game.ageRating && game.status !== 'coming-soon' && (
-                      <div className="absolute top-2 right-2 text-xs bg-glass-bg px-2 py-1 rounded">
+                      <div className="absolute top-3 right-3 text-xs bg-white/10 backdrop-blur-sm text-white/90 px-2.5 py-1 rounded-md font-medium border border-white/20">
                         {game.ageRating}
                       </div>
                     )}
 
                     {/* NSFW Indicator */}
                     {game.nsfw && (
-                      <div className="absolute top-2 left-2 text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded">
+                      <div className="absolute top-3 left-3 text-xs bg-red-500/30 backdrop-blur-sm text-red-200 px-2.5 py-1 rounded-md font-medium border border-red-400/30">
                         NSFW
                       </div>
                     )}
+
+                    {/* Hover glow effect */}
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500/0 via-pink-500/5 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   </button>
                 ))}
               </div>

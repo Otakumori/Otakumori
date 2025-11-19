@@ -101,9 +101,9 @@ export default function MemoryCardDock({ className = '' }: MemoryCardDockProps) 
   if (orders.length === 0) {
     return (
       <div className={`${className} text-center`} data-test="gc-memcard-dock">
-        <div className="bg-gradient-to-br from-purple-900/30 to-black/40 backdrop-blur-sm border border-purple-400/20 rounded-xl p-6">
-          <div className="text-white/60 text-sm mb-2">No memory cards yet</div>
-          <div className="text-purple-200 text-xs">Make your first claim in the Shop</div>
+          <div className="bg-gradient-to-br from-purple-900/30 to-black/40 backdrop-blur-md border border-purple-400/20 rounded-xl p-6 text-center">
+          <div className="text-white/70 text-sm mb-2 font-medium">No memory cards yet</div>
+          <div className="text-purple-200 text-xs">Make your first purchase in the Shop</div>
         </div>
       </div>
     );
@@ -124,10 +124,11 @@ export default function MemoryCardDock({ className = '' }: MemoryCardDockProps) 
                 key={order.id}
                 onClick={() => setSelectedCard(order)}
                 className="group relative bg-gradient-to-br from-pink-500/20 to-purple-600/20 
-                          backdrop-blur-sm border border-pink-400/30 rounded-lg p-3 
+                          backdrop-blur-md border border-pink-400/30 rounded-xl p-4 
                           hover:from-pink-400/30 hover:to-purple-500/30 hover:border-pink-300/50
+                          hover:shadow-lg hover:shadow-pink-500/20 hover:-translate-y-0.5
                           transition-all duration-300 text-left focus:outline-none 
-                          focus:ring-2 focus:ring-pink-400 focus:ring-opacity-50"
+                          focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-black/50"
                 data-test={`gc-memcard-${order.id}`}
                 aria-label={`Open Order #${order.displayNumber} – ${getItemName(order)}`}
               >

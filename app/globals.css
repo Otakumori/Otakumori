@@ -39,6 +39,28 @@ html {
   .will-change-opacity {
     will-change: opacity;
   }
+
+  /* Line clamp utilities for text truncation */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
 /* Hover states - instant feedback */
@@ -156,6 +178,7 @@ html {
   background: rgba(0, 0, 0, 0.95) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Parallax container for tree background */
@@ -1342,6 +1365,7 @@ footer::after {
 /* Glass effect */
 .glass {
   background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -1622,18 +1646,21 @@ footer::after {
 .cl-page {
   background: transparent !important;
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* Glassmorphic card styles */
 .glass-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .glass-card-dark {
   background: rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -1642,6 +1669,8 @@ footer::after {
 /* Canopy component styles */
 .canopy-background {
   background: linear-gradient(135deg, rgba(247, 191, 211, 0.1) 0%, rgba(255, 182, 193, 0.05) 100%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .canopy-rotation {
@@ -1676,6 +1705,7 @@ footer::after {
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.5),
     inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
   will-change: transform, opacity;
 }
@@ -1717,6 +1747,48 @@ footer::after {
 }
 .soapstone-enter {
   animation: soapstone-stick 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Dark Souls soapstone pulse glow effect */
+@keyframes soapstone-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.4)) drop-shadow(0 0 12px rgba(236, 72, 153, 0.2));
+    opacity: calc(0.7 + var(--glow-intensity, 0.5) * 0.3);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 24px rgba(236, 72, 153, 0.4));
+    opacity: calc(0.85 + var(--glow-intensity, 0.5) * 0.15);
+  }
+}
+
+.soapstone-pulse-glow {
+  animation: soapstone-pulse 2.5s ease-in-out infinite;
+}
+
+/* Soapstone marker collapsed state - overlay hides text */
+.soapstone-marker-collapsed .soapstone-card {
+  position: relative;
+}
+
+.soapstone-marker-collapsed .soapstone-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/assets/images/soapstonefilter.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.95;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 1;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+/* Revealed state - no overlay, text is visible */
+.soapstone-message-revealed .soapstone-card::after {
+  display: none;
 }
 
 /* === Otaku-mori custom cursor === */

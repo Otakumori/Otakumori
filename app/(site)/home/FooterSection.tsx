@@ -1,7 +1,8 @@
 import { safeFetch, isSuccess } from '@/lib/safeFetch';
-import { env } from '@/env';
+import { env } from '@/env.mjs';
 import SoapstoneComposer from '@/components/soapstone/SoapstoneComposer';
 import SoapstoneWall from '@/components/soapstone/SoapstoneWall';
+import { transformApiUserToComponent, type ApiSoapstoneUser } from '@/app/lib/soapstone-user-utils';
 
 interface SoapstoneMessage {
   id: string;
@@ -14,9 +15,21 @@ interface SoapstoneMessage {
   };
 }
 
-interface SoapstoneData {
-  items?: SoapstoneMessage[];
-  data?: SoapstoneMessage[];
+interface ApiSoapstoneMessage {
+  id: string;
+  text?: string;
+  body?: string;
+  appraises?: number;
+  createdAt: string;
+  user?: ApiSoapstoneUser | null;
+}
+
+interface SoapstoneApiResponse {
+  ok: boolean;
+  data?: {
+    items?: ApiSoapstoneMessage[];
+  };
+  error?: string;
 }
 
 interface FooterSectionProps {
@@ -28,13 +41,20 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
   let isSoapstoneBlocked = true;
 
   if (showSoapstones) {
-    // Try to fetch soapstone messages
-    const result = await safeFetch<SoapstoneData>('/api/soapstone/messages?take=10', {
+    // Fetch soapstone messages from v1 API
+    const result = await safeFetch<SoapstoneApiResponse>('/api/v1/soapstone?limit=10', {
       allowLive: true,
     });
 
-    if (isSuccess(result)) {
-      soapstoneMessages = result.data?.items || result.data?.data || [];
+    if (isSuccess(result) && result.data?.ok && result.data.data?.items) {
+      // Transform API response to component format using shared utility
+      soapstoneMessages = result.data.data.items.map((msg): SoapstoneMessage => ({
+        id: msg.id,
+        text: msg.text || msg.body || '',
+        score: msg.appraises || 0,
+        createdAt: msg.createdAt,
+        user: transformApiUserToComponent(msg.user || undefined),
+      }));
       isSoapstoneBlocked = false;
     }
   }
@@ -42,7 +62,7 @@ export default async function FooterSection({ showSoapstones }: FooterSectionPro
   const isLiveDataEnabled = env.NEXT_PUBLIC_LIVE_DATA === '1';
 
   return (
-    <footer className="relative z-40 mt-16" style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)' }}>
+    <footer className= "relative z-40 mt-16 bg-[rgba(57,5,40,0.8)]" >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         {/* Soapstones Section */}
         {showSoapstones && (
