@@ -13,15 +13,11 @@ import BlogSection from '@/app/(site)/home/BlogSection';
 import InteractivePetals from '@/components/hero/InteractivePetals';
 import SectionErrorBoundary from './components/home/SectionErrorBoundary';
 
-// Client-side petal system components
-import PetalSystem from './components/petals/PetalSystem';
-import PhysicsCherryPetals from './components/petals/PhysicsCherryPetals';
-import SakuraPetalBackground from './components/petals/SakuraPetalBackground';
-
 // TreeBackgroundWrapper ensures tree only renders on home page
 import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
 import { PetalFlowOverlayWrapper } from './components/home/PetalFlowOverlayWrapper';
 import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapper';
+import HomePetalSystemWrapper from './components/home/HomePetalSystemWrapper';
 
 export const revalidate = 60;
 
@@ -67,91 +63,73 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Interactive petal systems - above atmospheric layers, below content */}
-      {/* New Sakura Petal Background - real petal shapes with proper physics */}
-      <SakuraPetalBackground
-        enabled={NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' || NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === 'true'}
-        maxPetals={30}
-        spawnInterval={2000}
-        hitRadius={32}
-      />
-
-      {/* Legacy petal systems - kept for compatibility, can be removed after testing */}
-      {/* Physics-based cherry blossom petals - clickable/collectible */}
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -5 }}>
-        <PhysicsCherryPetals density={2} onCollect={(_id) => {
-          // Silent collection - no UI feedback, just tracking
-          // Could be used for analytics, achievements, etc.
-        }} />
-      </div>
-
-      {/* Petal collection system - renders behind main content but above backgrounds */}
-      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -5 }}>
-        <PetalSystem />
+      {/* Interactive petal system - clickable, collectible petals with tree-matched colors */}
+      <div className="fixed inset-0 pointer-events-auto" style={{ zIndex: -5 }}>
+        <HomePetalSystemWrapper />
       </div>
 
       <div className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
-        {/* SHOP */}
-        {isShopEnabled && (
-          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        {/* HERO - Always visible */}
+        <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="text-center">
+            <h1
+              className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight"
+              style={{ color: '#835D75' }}
+            >
+              Welcome Home, Traveler
+            </h1>
+
+            {/* Interactive petals in hero only */}
+            {(NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' || NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === 'true') && (
+              <div className="relative mt-8 h-48">
+                <InteractivePetals />
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* SHOP - Always visible (with fallback if disabled) */}
+        {isShopEnabled ? (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10" aria-label="Shop section">
             <SectionErrorBoundary sectionName="shop">
               <ShopSection />
             </SectionErrorBoundary>
           </section>
-        )}
-
-        {/* HERO */}
-        {NEXT_PUBLIC_FEATURE_HERO === '1' && (
-          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-            <div className="text-center">
-              <h1
-                className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight"
-                style={{ color: '#835D75' }}
-              >
-                Welcome Home, Traveler
-              </h1>
-
-              {/* Interactive petals in hero only */}
-              {NEXT_PUBLIC_FEATURE_PETALS_INTERACTIVE === '1' && (
-                <div className="relative mt-8 h-48">
-                  <InteractivePetals />
-                </div>
-              )}
+        ) : (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10" aria-label="Shop section">
+            <div className="text-center py-16">
+              <h2 className="text-3xl font-bold text-white mb-4">Shop</h2>
+              <p className="text-white/70">Shop section coming soon</p>
             </div>
           </section>
         )}
 
-        {/* BLOG */}
-        {NEXT_PUBLIC_FEATURE_BLOG === '1' && (
-          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-            <SectionErrorBoundary sectionName="blog">
-              <BlogSection />
-            </SectionErrorBoundary>
-          </section>
-        )}
-
-        {/* MINI-GAMES */}
-        {NEXT_PUBLIC_FEATURE_MINIGAMES === 'on' && (
-          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+        {/* MINI-GAMES - Always visible (with fallback if disabled) */}
+        {(NEXT_PUBLIC_FEATURE_MINIGAMES === 'on' || NEXT_PUBLIC_FEATURE_MINIGAMES === '1' || NEXT_PUBLIC_FEATURE_MINIGAMES === 'true') ? (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10" aria-label="Mini-games section">
             <SectionErrorBoundary sectionName="mini-games">
               <MiniGamesSection />
             </SectionErrorBoundary>
           </section>
-        )}
-
-        {/* Fallback sections when feature flags are off */}
-        {NEXT_PUBLIC_FEATURE_BLOG !== 'on' && (
-          <section className="bg-gradient-to-b from-black/30 via-black/20 to-transparent py-24">
+        ) : (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10" aria-label="Mini-games section">
             <div className="mx-auto w-full max-w-7xl px-4">
-              <BlogTeaser />
+              <MiniGameTeaser />
             </div>
           </section>
         )}
 
-        {NEXT_PUBLIC_FEATURE_MINIGAMES !== 'on' && (
-          <section className="bg-gradient-to-b from-transparent via-black/20 to-black/40 py-24">
+        {/* BLOG - Always visible (with fallback if disabled) */}
+        {(NEXT_PUBLIC_FEATURE_BLOG === '1' || NEXT_PUBLIC_FEATURE_BLOG === 'on' || NEXT_PUBLIC_FEATURE_BLOG === 'true') ? (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10" aria-label="Blog section">
+            <SectionErrorBoundary sectionName="blog">
+              <BlogSection />
+            </SectionErrorBoundary>
+          </section>
+        ) : (
+          <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10" aria-label="Blog section">
             <div className="mx-auto w-full max-w-7xl px-4">
-              <MiniGameTeaser />
+              <BlogTeaser />
             </div>
           </section>
         )}
