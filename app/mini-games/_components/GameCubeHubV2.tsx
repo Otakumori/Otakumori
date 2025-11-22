@@ -114,17 +114,6 @@ export default function GameCubeHubV2() {
     }
   }, [accessibilitySettings.volume]);
 
-  // Helper function to get face slot
-  const getFaceSlot = useCallback((face: FacePosition): number => {
-    switch (face) {
-      case 'up': return 4;
-      case 'left': return 3;
-      case 'right': return 1;
-      case 'down': return 5;
-      case 'front': return 0;
-      default: return 0;
-    }
-  }, []);
 
   // Memoize handlers to prevent unnecessary re-renders
   const handleFaceAction = useCallback(async (face: FacePosition) => {
@@ -147,15 +136,22 @@ export default function GameCubeHubV2() {
     // Add loading delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 200));
 
-    if (faceConfig.action === 'route' && faceConfig.href) {
-      router.push(faceConfig.href);
-    } else if (faceConfig.action === 'panel' && faceConfig.panel) {
-      if (faceConfig.panel === 'games') {
-        setActivePanel('games');
-      } else if (faceConfig.panel === 'extras') {
-        setActivePanel('extras');
+    // Type guard for discriminated union
+    if (faceConfig.action === 'route') {
+      // TypeScript now knows this is the route variant
+      if ('href' in faceConfig && faceConfig.href) {
+        router.push(faceConfig.href);
       }
-      setIsLoading(false);
+    } else if (faceConfig.action === 'panel') {
+      // TypeScript now knows this is the panel variant
+      if ('panel' in faceConfig && faceConfig.panel) {
+        if (faceConfig.panel === 'games') {
+          setActivePanel('games');
+        } else if (faceConfig.panel === 'extras') {
+          setActivePanel('extras');
+        }
+        setIsLoading(false);
+      }
     } else {
       setIsLoading(false);
     }
@@ -578,7 +574,6 @@ export default function GameCubeHubV2() {
                               transition-all duration-300 text-left group
                               focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-black/50"
                     aria-label={`Play ${game.label}${game.desc ? `: ${game.desc}` : ''}`}
-                    aria-disabled={loadingGame === game.id}
                   >
                     {loadingGame === game.id && (
                       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">

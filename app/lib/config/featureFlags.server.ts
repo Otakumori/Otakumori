@@ -33,6 +33,8 @@ export async function getEffectiveFeatureFlags(): Promise<EffectiveFeatureFlags>
       settingsMap.REQUIRE_AUTH_FOR_MINI_GAMES?.boolValue ?? staticFlags.REQUIRE_AUTH_FOR_MINI_GAMES,
     NSFW_AVATARS_ENABLED:
       settingsMap.NSFW_AVATARS_ENABLED?.boolValue ?? staticFlags.NSFW_AVATARS_ENABLED,
+    HOMEPAGE_EXPERIMENTAL_ENABLED:
+      settingsMap.HOMEPAGE_EXPERIMENTAL_ENABLED?.boolValue ?? staticFlags.HOMEPAGE_EXPERIMENTAL_ENABLED,
   };
 }
 

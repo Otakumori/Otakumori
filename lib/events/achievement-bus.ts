@@ -9,6 +9,7 @@ export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legen
 
 export interface AchievementEvent {
   id: string;
+  code?: string;
   title: string;
   description?: string;
   rarity: AchievementRarity;
@@ -61,14 +62,33 @@ class AchievementEventBus {
       console.warn(`🏆 Achievement Unlocked: ${achievement.title} [${achievement.rarity}]`);
     }
 
-    // Track with analytics if available
-    if (typeof window !== 'undefined' && 'gtag' in window) {
-      (window as any).gtag('event', 'achievement_unlocked', {
-        achievement_id: achievement.id,
-        achievement_title: achievement.title,
-        achievement_rarity: achievement.rarity,
-        game_id: achievement.gameId,
-      });
+    // Track with PostHog analytics (client-side only)
+    if (typeof window !== 'undefined') {
+      // Use dynamic import to avoid SSR issues
+      import('@/app/lib/analytics/achievements')
+        .then(({ trackAchievementUnlock }) => {
+          trackAchievementUnlock({
+            achievementId: achievement.id,
+            achievementCode: achievement.code || achievement.id,
+            achievementName: achievement.title,
+            rarity: achievement.rarity,
+            metadata: {
+              gameId: achievement.gameId,
+              description: achievement.description,
+            },
+          });
+        })
+        .catch(() => {
+          // Fallback to gtag if PostHog fails
+          if ('gtag' in window) {
+            (window as any).gtag('event', 'achievement_unlocked', {
+              achievement_id: achievement.id,
+              achievement_title: achievement.title,
+              achievement_rarity: achievement.rarity,
+              game_id: achievement.gameId,
+            });
+          }
+        });
     }
   }
 

@@ -37,7 +37,6 @@ export default function SoapstonePlacer({ onPlaceSuccess }: SoapstonePlacerProps
       }
 
       // Get click position relative to viewport
-      const rect = document.documentElement.getBoundingClientRect();
       const x = e.clientX;
       const y = e.clientY;
 
@@ -58,10 +57,6 @@ export default function SoapstonePlacer({ onPlaceSuccess }: SoapstonePlacerProps
       try {
         // Generate idempotency key
         const idempotencyKey = `soapstone_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-        // Convert pixel position to percentage for storage
-        const xPercent = (position.x / window.innerWidth) * 100;
-        const yPercent = (position.y / window.innerHeight) * 100;
 
         const response = await fetch('/api/v1/soapstone', {
           method: 'POST',
@@ -111,11 +106,30 @@ export default function SoapstonePlacer({ onPlaceSuccess }: SoapstonePlacerProps
   const remainingChars = 280 - text.length;
   const isOverLimit = remainingChars < 0;
 
+  const handleOverlayKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowComposer(false);
+      }
+    },
+    [],
+  );
+
   if (showComposer) {
     return (
-      <div className="fixed inset-0 z-50 pointer-events-auto" onClick={handlePlaceClick}>
+      <div className="fixed inset-0 z-50 pointer-events-auto" role="dialog" aria-modal="true" aria-label="Place a soapstone sign">
+        {/* Clickable overlay for positioning */}
+        <button
+          type="button"
+          className="absolute inset-0 w-full h-full cursor-crosshair"
+          onClick={handlePlaceClick}
+          onKeyDown={handleOverlayKeyDown}
+          aria-label="Click to position soapstone sign"
+        >
+          <span className="sr-only">Click anywhere to position your soapstone sign</span>
+        </button>
         {/* Overlay with instructions */}
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm pointer-events-none" />
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-zinc-900/95 border border-pink-400/30 rounded-xl p-4 shadow-2xl max-w-md w-full mx-4 z-50">
           <h3 className="text-lg font-bold text-pink-200 mb-2">Place a Sign</h3>
           <p className="text-sm text-pink-200/70 mb-4">

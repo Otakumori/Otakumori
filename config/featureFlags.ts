@@ -5,12 +5,26 @@
  * On server-side, uses DB overrides via getEffectiveFeatureFlags()
  */
 
+import { z } from 'zod';
+import { env } from '@/env.mjs';
 import { isAvatarsEnabled as isAvatarEngineEnabled, isNsfwAvatarsEnabled as isNsfwEngineEnabled } from '@om/avatar-engine/config/flags';
 
 export interface FeatureFlags {
   AVATARS_ENABLED: boolean;
   REQUIRE_AUTH_FOR_MINI_GAMES: boolean;
   NSFW_AVATARS_ENABLED: boolean;
+  HOMEPAGE_EXPERIMENTAL_ENABLED: boolean;
+}
+
+/**
+ * Helper to convert env string to boolean with safe defaults
+ */
+function toBool(value: string | undefined, fallback: boolean): boolean {
+  if (value === undefined) return fallback;
+  const normalized = value.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+  return fallback;
 }
 
 let cachedFlags: FeatureFlags | null = null;
@@ -58,36 +72,51 @@ function resolveFeatureFlags(): FeatureFlags {
 
 /**
  * Resolve flags from environment variables (fallback/default behavior)
+ * Uses Zod-validated env from env.mjs for type safety
  */
 function resolveFromEnv(): FeatureFlags {
   // Resolve AVATARS_ENABLED from env or avatar-engine
   const envAvatarsEnabled =
     typeof process !== 'undefined' && process.env
-      ? process.env.NEXT_PUBLIC_AVATARS_ENABLED !== 'false'
+      ? toBool(process.env.NEXT_PUBLIC_FEATURE_AVATARS_ENABLED, true)
       : true; // Default: true for dev
 
   // Use avatar-engine resolution if available (handles client-side flags)
   const avatarsEnabled = typeof window !== 'undefined' ? isAvatarEngineEnabled() : envAvatarsEnabled;
 
-  // Resolve REQUIRE_AUTH_FOR_MINI_GAMES
-  const requireAuth =
+  // Resolve REQUIRE_AUTH_FOR_MINI_GAMES from validated env
+  const requireAuth = toBool(
     typeof process !== 'undefined' && process.env
-      ? process.env.NEXT_PUBLIC_REQUIRE_AUTH_FOR_MINI_GAMES === 'true'
-      : false; // Default: false (guests can play)
+      ? process.env.NEXT_PUBLIC_FEATURE_REQUIRE_AUTH_FOR_MINI_GAMES
+      : undefined,
+    false, // Default: false (guests can play)
+  );
 
   // Resolve NSFW_AVATARS_ENABLED from env or avatar-engine
-  const envNsfwEnabled =
+  const envNsfwEnabled = toBool(
     typeof process !== 'undefined' && process.env
-      ? process.env.NEXT_PUBLIC_NSFW_AVATARS_ENABLED === 'true'
-      : false; // Default: false
+      ? process.env.NEXT_PUBLIC_FEATURE_NSFW_AVATARS_ENABLED
+      : undefined,
+    false, // Default: false
+  );
 
   // Use avatar-engine resolution if available
   const nsfwEnabled = typeof window !== 'undefined' ? isNsfwEngineEnabled() : envNsfwEnabled;
+
+  // Resolve HOMEPAGE_EXPERIMENTAL_ENABLED from validated env
+  // Defaults to false in production, true in development for safety
+  const homepageExperimental = toBool(
+    typeof process !== 'undefined' && process.env
+      ? process.env.NEXT_PUBLIC_FEATURE_HOMEPAGE_EXPERIMENTAL_ENABLED
+      : undefined,
+    process.env.NODE_ENV === 'development', // Safe default: off in production
+  );
 
   return {
     AVATARS_ENABLED: avatarsEnabled,
     REQUIRE_AUTH_FOR_MINI_GAMES: requireAuth,
     NSFW_AVATARS_ENABLED: nsfwEnabled,
+    HOMEPAGE_EXPERIMENTAL_ENABLED: homepageExperimental,
   };
 }
 
@@ -120,6 +149,13 @@ export function isNsfwAvatarsEnabled(): boolean {
 }
 
 /**
+ * Get HOMEPAGE_EXPERIMENTAL_ENABLED flag
+ */
+export function isHomepageExperimentalEnabled(): boolean {
+  return resolveFeatureFlags().HOMEPAGE_EXPERIMENTAL_ENABLED;
+}
+
+/**
  * Clear cached flags (useful for testing)
  */
 export function clearFlagsCache(): void {
@@ -139,6 +175,9 @@ export const featureFlags: FeatureFlags = {
   },
   get NSFW_AVATARS_ENABLED() {
     return isNsfwAvatarsEnabled();
+  },
+  get HOMEPAGE_EXPERIMENTAL_ENABLED() {
+    return isHomepageExperimentalEnabled();
   },
 };
 

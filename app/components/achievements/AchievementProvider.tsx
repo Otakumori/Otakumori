@@ -126,13 +126,34 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
   }, [achievements]);
 
   const unlockAchievement = (id: string) => {
-    setAchievements((current) =>
-      current.map((achievement) =>
+    setAchievements((current) => {
+      const achievement = current.find((a) => a.id === id);
+      if (achievement && !achievement.unlocked) {
+        // Track achievement unlock with analytics (client-side)
+        if (typeof window !== 'undefined') {
+          import('@/app/lib/analytics/achievements')
+            .then(({ trackAchievementUnlock }) => {
+              trackAchievementUnlock({
+                achievementId: id,
+                achievementCode: achievement.id,
+                achievementName: achievement.title,
+                metadata: {
+                  component: 'AchievementProvider',
+                },
+              });
+            })
+            .catch(() => {
+              // Silently fail if analytics unavailable
+            });
+        }
+      }
+
+      return current.map((achievement) =>
         achievement.id === id
           ? { ...achievement, unlocked: true, progress: achievement.total }
           : achievement,
-      ),
-    );
+      );
+    });
   };
 
   const updateProgress = (id: string, progress: number) => {

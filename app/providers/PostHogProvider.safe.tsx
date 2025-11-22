@@ -29,8 +29,19 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
     // Guard: Only initialize once, even if component re-mounts
     if (initializedRef.current) return;
     
+    // Check if we're in browser environment
+    if (typeof window === 'undefined') return;
+    
+    // Safely get PostHog key - handle undefined gracefully
     const key = clientEnv.NEXT_PUBLIC_POSTHOG_KEY;
-    if (!key || typeof window === 'undefined') return;
+    if (!key || typeof key !== 'string' || key.trim().length === 0) {
+      // PostHog key is missing - silently skip initialization
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[PostHogProvider] NEXT_PUBLIC_POSTHOG_KEY is not set – analytics disabled.');
+      }
+      initializedRef.current = true;
+      return;
+    }
 
     // Check global singleton guard first (prevents multiple provider instances)
     if (window.__posthogInitialized) {
@@ -52,8 +63,13 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
     }
 
     try {
+      // Safely get PostHog host with fallback
+      const host = (clientEnv.NEXT_PUBLIC_POSTHOG_HOST && typeof clientEnv.NEXT_PUBLIC_POSTHOG_HOST === 'string')
+        ? clientEnv.NEXT_PUBLIC_POSTHOG_HOST
+        : 'https://us.posthog.com';
+      
       posthog.init(key, {
-        api_host: clientEnv.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.posthog.com',
+        api_host: host,
         autocapture: true,
         capture_pageview: true,
         capture_pageleave: true,
@@ -70,10 +86,15 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
         window.__posthogInitialized = true;
         initializedRef.current = true;
       } else {
-        console.error('[PostHogProvider] Failed to initialize PostHog:', error);
+        // Log error but don't crash - analytics is non-critical
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[PostHogProvider] Failed to initialize PostHog:', error);
+        }
+        // Mark as initialized to prevent retry loops
+        initializedRef.current = true;
       }
     }
   }, []);
 
-  return <>{children}</>;
+  return <>{ children } </>;
 }

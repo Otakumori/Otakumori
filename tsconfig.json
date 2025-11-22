@@ -9,7 +9,6 @@
     "skipLibCheck": true,
     "strict": true,
     "noUncheckedIndexedAccess": false,
-    "ignoreDeprecations": "6.0",
     "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -29,7 +28,6 @@
         "name": "next"
       }
     ],
-    "ignoreDeprecations": "5.0",
     "paths": {
       "@/*": ["./*"],
       "@/lib/*": ["./lib/*", "./app/lib/*"],

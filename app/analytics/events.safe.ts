@@ -10,6 +10,10 @@ export const Events = {
   GameRunStarted: 'game_run_started',
   GameRunEnded: 'game_run_ended',
   PetalsCollected: 'petals_collected',
+  PetalMilestoneReached: 'petal_milestone_reached',
+  PetalsSpent: 'petals_spent',
+  AchievementUnlocked: 'achievement_unlocked',
+  AchievementProgress: 'achievement_progress',
   QuestClaimed: 'quest_claimed',
   LeaderboardOpened: 'leaderboard_opened',
 } as const;

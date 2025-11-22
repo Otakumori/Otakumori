@@ -123,6 +123,19 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
     petal.collected = true;
     petal.collectAnimation = 0;
 
+    // Track petal collection for analytics
+    const { trackPetalCollection } = await import('@/app/lib/analytics/petals');
+    trackPetalCollection({
+      petalId: petal.id,
+      amount: 1,
+      source: 'homepage_collection',
+      location: { x: petal.x, y: petal.y },
+      metadata: {
+        frameIndex: petal.frameIndex,
+        density,
+      },
+    });
+
     try {
       const response = await fetch('/api/v1/petals/collect', {
         method: 'POST',
@@ -140,13 +153,25 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
       const data = await response.json();
 
       if (data.ok && data.data) {
+        const { balance, earned = 1, lifetimeEarned } = data.data;
+
+        // Track petal milestone if reached
+        if (lifetimeEarned && typeof lifetimeEarned === 'number') {
+          const milestones = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+          const reachedMilestone = milestones.find((m) => lifetimeEarned >= m && lifetimeEarned - earned < m);
+          if (reachedMilestone) {
+            const { trackPetalMilestone } = await import('@/app/lib/analytics/petals');
+            trackPetalMilestone(reachedMilestone, lifetimeEarned, 'homepage_collection');
+          }
+        }
+
         // Dispatch petal:earn event for HUD
         window.dispatchEvent(
           new CustomEvent('petal:earn', {
             detail: {
-              balance: data.data.balance,
-              granted: data.data.earned || 1,
-              lifetimePetalsEarned: data.data.lifetimeEarned,
+              balance,
+              granted: earned,
+              lifetimePetalsEarned: lifetimeEarned,
               isGuest: data.data.isGuest || false,
             },
           }),
@@ -158,7 +183,7 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
     } catch (error) {
       console.error('Failed to collect petal:', error);
     }
-  }, []);
+  }, [density]);
 
   // Handle canvas click
   const handleCanvasClick = useCallback(

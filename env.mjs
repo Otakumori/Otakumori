@@ -173,6 +173,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: z.string().optional(),
     NEXT_PUBLIC_FEATURE_JIGGLE: z.string().optional(),
     NEXT_PUBLIC_FEATURE_EVENTS: z.string().optional(),
+    NEXT_PUBLIC_FEATURE_HOMEPAGE_EXPERIMENTAL_ENABLED: z.string().optional(),
   },
   runtimeEnv: {
     // Server vars
@@ -304,6 +305,7 @@ export const env = createEnv({
     NEXT_PUBLIC_FEATURE_DIRTY_EMOTES: process.env.NEXT_PUBLIC_FEATURE_DIRTY_EMOTES,
     NEXT_PUBLIC_FEATURE_JIGGLE: process.env.NEXT_PUBLIC_FEATURE_JIGGLE,
     NEXT_PUBLIC_FEATURE_EVENTS: process.env.NEXT_PUBLIC_FEATURE_EVENTS,
+    NEXT_PUBLIC_FEATURE_HOMEPAGE_EXPERIMENTAL_ENABLED: process.env.NEXT_PUBLIC_FEATURE_HOMEPAGE_EXPERIMENTAL_ENABLED,
   },
   // Skip validation on client-side to prevent errors when env is imported in client components
   skipValidation: shouldSkipValidation,

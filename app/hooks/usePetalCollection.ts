@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { COLLECTION } from '@/app/lib/petals/constants';
+import { trackPetalCollection, trackPetalMilestone } from '@/app/lib/analytics/petals';
 
 export interface CollectedPetal {
   id: number;
@@ -65,10 +66,24 @@ export function usePetalCollection() {
         const data = await response.json();
 
         if (data.ok && data.data) {
+          const { granted = totalValue, lifetimeEarned } = data.data;
+          const newLifetimeTotal = lifetimeEarned || state.lifetimeTotal + granted;
+
+          // Track petal milestone if reached
+          if (newLifetimeTotal && typeof newLifetimeTotal === 'number') {
+            const milestones = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+            const reachedMilestone = milestones.find(
+              (m) => newLifetimeTotal >= m && state.lifetimeTotal < m,
+            );
+            if (reachedMilestone) {
+              trackPetalMilestone(reachedMilestone, newLifetimeTotal, 'background_petal_click');
+            }
+          }
+
           setState((prev) => ({
             ...prev,
-            sessionTotal: prev.sessionTotal + (data.data.granted || totalValue),
-            lifetimeTotal: data.data.lifetimeEarned || prev.lifetimeTotal + (data.data.granted || totalValue),
+            sessionTotal: prev.sessionTotal + granted,
+            lifetimeTotal: newLifetimeTotal,
           }));
         }
       } else {
@@ -94,6 +109,17 @@ export function usePetalCollection() {
   // Collect a petal
   const collectPetal = useCallback(
     (petalId: number, value: number, x: number, y: number) => {
+      // Track petal collection for analytics
+      trackPetalCollection({
+        petalId,
+        amount: value,
+        source: 'background_petal_click',
+        location: { x, y },
+        metadata: {
+          sessionTotal: state.sessionTotal + value,
+        },
+      });
+
       // Add to pending collections
       pendingCollections.current.push({
         id: petalId,
@@ -128,7 +154,7 @@ export function usePetalCollection() {
         submitCollections();
       }, COLLECTION.DEBOUNCE_MS);
     },
-    [submitCollections],
+    [submitCollections, state.sessionTotal],
   );
 
   // Dismiss achievement notification

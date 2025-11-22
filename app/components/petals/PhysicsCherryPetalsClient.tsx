@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import PhysicsCherryPetals from './PhysicsCherryPetals';
+import { trackPetalCollection } from '@/app/lib/analytics/petals';
 
 interface PhysicsCherryPetalsClientProps {
   density?: number;
@@ -12,12 +13,19 @@ interface PhysicsCherryPetalsClientProps {
  * Handles onCollect internally to avoid passing functions from Server Components
  */
 export default function PhysicsCherryPetalsClient({ density = 2 }: PhysicsCherryPetalsClientProps) {
-  // Handle collection internally - no need to pass function from server
+  // Handle collection internally with analytics tracking
   const handleCollect = useCallback((petalId: number) => {
-    // Silent collection - no UI feedback, just tracking
-    // Could be used for analytics, achievements, etc.
-    // This is intentionally empty as per the original component's design
-  }, []);
+    // Track petal collection for analytics
+    trackPetalCollection({
+      petalId,
+      amount: 1,
+      source: 'physics_cherry_petals',
+      metadata: {
+        component: 'PhysicsCherryPetalsClient',
+        density,
+      },
+    });
+  }, [density]);
 
   return <PhysicsCherryPetals density={density} onCollect={handleCollect} />;
 }

@@ -87,6 +87,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Track achievement unlock with analytics (server-side)
+    try {
+      const { trackAchievementUnlock } = await import('@/app/lib/analytics/achievements');
+      trackAchievementUnlock({
+        achievementId: achievement.id,
+        achievementCode: achievement.code,
+        achievementName: achievement.name,
+        points: achievement.points,
+        rewardType: achievement.Reward?.kind || undefined,
+        rewardAmount: achievement.Reward?.value || undefined,
+        metadata: {
+          userId: user.id,
+          source: 'api_unlock',
+        },
+      });
+    } catch (analyticsError) {
+      // Don't fail achievement unlock if analytics fails
+      console.warn('Failed to track achievement unlock analytics:', analyticsError);
+    }
+
     // Grant rewards
     let rewardGranted = false;
     let rewardDetails = null;

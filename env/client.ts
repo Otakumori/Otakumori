@@ -129,9 +129,9 @@ export const clientEnv = Object.freeze(
     | undefined,
     NEXT_PUBLIC_VERCEL_ENVIRONMENT: envRecord['NEXT_PUBLIC_VERCEL_ENVIRONMENT'],
     NEXT_PUBLIC_VERCEL_ENV: envRecord['NEXT_PUBLIC_VERCEL_ENV'],
-    ...optionalEnvValues,
+    ...optionalEnvValues, // PostHog keys are already included in optionalEnvValues
   }),
-);
+) as typeof clientSchema._output;
 
 export type ClientEnv = typeof clientEnv;
 
