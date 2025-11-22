@@ -1,4 +1,5 @@
 # 🎨 CREATOR System - Comprehensive Plan
+
 ## Sexier than Nikke, More Comprehensive than Code Vein
 
 ### 🎯 **Vision Statement**
@@ -12,6 +13,7 @@ Create the most comprehensive, visually stunning, and user-friendly avatar creat
 ### **1. CREATOR UI Components**
 
 #### **Main Creator Interface** (`app/creator/page.tsx`)
+
 - **Full-screen immersive experience** - Dark glass theme with pink/purple accents
 - **Three-panel layout**:
   - **Left Panel**: Category navigation (Body, Face, Hair, Clothing, Accessories, NSFW)
@@ -21,6 +23,7 @@ Create the most comprehensive, visually stunning, and user-friendly avatar creat
 - **Bottom status bar**: Performance metrics, save status, tips
 
 #### **Advanced Slider System** (`components/creator/SliderPanel.tsx`)
+
 - **Category-based organization**:
   - **Body**: Height, Weight, Muscle Mass, Body Fat, Shoulder Width, Waist, Hips, Chest, Thighs, Calves, Arms
   - **Face**: Face Shape, Jawline, Cheekbones, Chin, Eye Size, Eye Spacing, Eye Height, Eye Angle, Nose Size/Width/Height, Mouth Size/Width, Lip Thickness
@@ -37,6 +40,7 @@ Create the most comprehensive, visually stunning, and user-friendly avatar creat
   - **Sound effects**: Click sounds for slider changes
 
 #### **Part Selection System** (`components/creator/PartSelector.tsx`)
+
 - **Grid-based part browser**:
   - **Thumbnail previews**: High-quality preview images
   - **Category filters**: Filter by type, rarity, content rating
@@ -51,6 +55,7 @@ Create the most comprehensive, visually stunning, and user-friendly avatar creat
   - **Preview on hover**: 3D preview of part on avatar
 
 #### **3D Preview System** (`components/creator/AvatarPreview3D.tsx`)
+
 - **Real-time rendering**:
   - **60fps target**: Smooth, responsive preview
   - **Multiple camera presets**: Front, Side, Back, Top, Bottom, Free Orbit
@@ -69,6 +74,7 @@ Create the most comprehensive, visually stunning, and user-friendly avatar creat
   - **Transparent**: For export with transparency
 
 #### **Pose & Animation System** (`components/creator/PoseSelector.tsx`)
+
 - **Pose presets**:
   - **Idle**: Standing, relaxed, confident
   - **Action**: Running, jumping, attacking
@@ -96,103 +102,103 @@ interface CreatorAvatarConfig {
   version: string; // Schema version for migration
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Base model
   baseModel: 'male' | 'female' | 'custom';
   baseModelUrl?: string;
-  
+
   // Body morphs (0.0 to 1.0, normalized)
   body: {
     // Overall proportions
-    height: number;        // 0.7 to 1.3
-    weight: number;        // 0.4 to 1.6
-    muscleMass: number;   // 0.0 to 1.0
-    bodyFat: number;      // 0.0 to 1.0
-    
+    height: number; // 0.7 to 1.3
+    weight: number; // 0.4 to 1.6
+    muscleMass: number; // 0.0 to 1.0
+    bodyFat: number; // 0.0 to 1.0
+
     // Torso
     shoulderWidth: number; // 0.7 to 1.4
-    chestSize: number;    // 0.6 to 1.4
-    waistSize: number;    // 0.6 to 1.3
-    hipWidth: number;     // 0.7 to 1.4
-    
+    chestSize: number; // 0.6 to 1.4
+    waistSize: number; // 0.6 to 1.3
+    hipWidth: number; // 0.7 to 1.4
+
     // Limbs
-    armLength: number;    // 0.8 to 1.2
-    legLength: number;   // 0.8 to 1.3
-    thighSize: number;   // 0.7 to 1.3
-    calfSize: number;    // 0.7 to 1.2
-    
+    armLength: number; // 0.8 to 1.2
+    legLength: number; // 0.8 to 1.3
+    thighSize: number; // 0.7 to 1.3
+    calfSize: number; // 0.7 to 1.2
+
     // Head
-    headSize: number;    // 0.8 to 1.2
-    neckLength: number;  // 0.7 to 1.3
+    headSize: number; // 0.8 to 1.2
+    neckLength: number; // 0.7 to 1.3
   };
-  
+
   // Face morphs
   face: {
     // Overall shape
-    faceShape: number;   // 0.0 to 1.0
-    jawline: number;     // 0.0 to 1.0
-    cheekbones: number;  // 0.0 to 1.0
-    chinShape: number;   // 0.0 to 1.0
-    
+    faceShape: number; // 0.0 to 1.0
+    jawline: number; // 0.0 to 1.0
+    cheekbones: number; // 0.0 to 1.0
+    chinShape: number; // 0.0 to 1.0
+
     // Eyes
-    eyeSize: number;     // 0.7 to 1.3
-    eyeSpacing: number;  // 0.8 to 1.2
-    eyeHeight: number;   // 0.8 to 1.2
-    eyeAngle: number;    // -0.3 to 0.3
+    eyeSize: number; // 0.7 to 1.3
+    eyeSpacing: number; // 0.8 to 1.2
+    eyeHeight: number; // 0.8 to 1.2
+    eyeAngle: number; // -0.3 to 0.3
     eyelidShape: number; // 0.0 to 1.0
-    eyeColor: string;    // Hex color
-    
+    eyeColor: string; // Hex color
+
     // Eyebrows
     eyebrowThickness: number; // 0.5 to 1.5
-    eyebrowAngle: number;     // -0.2 to 0.2
-    
+    eyebrowAngle: number; // -0.2 to 0.2
+
     // Nose
-    noseSize: number;    // 0.7 to 1.3
-    noseWidth: number;   // 0.7 to 1.3
-    noseHeight: number;  // 0.8 to 1.2
+    noseSize: number; // 0.7 to 1.3
+    noseWidth: number; // 0.7 to 1.3
+    noseHeight: number; // 0.8 to 1.2
     bridgeWidth: number; // 0.5 to 1.3
     nostrilSize: number; // 0.7 to 1.3
-    noseTip: number;     // 0.0 to 1.0
-    
+    noseTip: number; // 0.0 to 1.0
+
     // Mouth
-    mouthSize: number;   // 0.7 to 1.3
+    mouthSize: number; // 0.7 to 1.3
     mouthWidth: number; // 0.8 to 1.2
     lipThickness: number; // 0.5 to 1.5
-    lipShape: number;   // 0.0 to 1.0
-    cupidBow: number;   // 0.0 to 1.0
+    lipShape: number; // 0.0 to 1.0
+    cupidBow: number; // 0.0 to 1.0
     mouthAngle: number; // -0.2 to 0.2
   };
-  
+
   // Skin
   skin: {
-    tone: string;        // Hex color
-    texture: number;     // 0.0 to 1.0
-    blemishes: number;   // 0.0 to 1.0
-    freckles: number;    // 0.0 to 1.0
-    ageSpots: number;    // 0.0 to 1.0
-    wrinkles: number;    // 0.0 to 1.0
-    glossiness: number;  // 0.0 to 1.0
+    tone: string; // Hex color
+    texture: number; // 0.0 to 1.0
+    blemishes: number; // 0.0 to 1.0
+    freckles: number; // 0.0 to 1.0
+    ageSpots: number; // 0.0 to 1.0
+    wrinkles: number; // 0.0 to 1.0
+    glossiness: number; // 0.0 to 1.0
   };
-  
+
   // Hair
   hair: {
-    style: string;      // Part ID
-    length: number;     // 0.0 to 1.0
-    volume: number;     // 0.5 to 1.5
-    texture: number;    // 0.0 to 1.0
+    style: string; // Part ID
+    length: number; // 0.0 to 1.0
+    volume: number; // 0.5 to 1.5
+    texture: number; // 0.0 to 1.0
     color: {
-      primary: string;  // Hex color
+      primary: string; // Hex color
       secondary?: string; // Hex color
       gradient: boolean;
     };
     highlights: {
       enabled: boolean;
-      color: string;    // Hex color
+      color: string; // Hex color
       intensity: number; // 0.0 to 1.0
       pattern: 'streaks' | 'tips' | 'roots' | 'random';
     };
   };
-  
+
   // Parts (40+ equipment slots)
   parts: {
     // Head & Face
@@ -203,12 +209,12 @@ interface CreatorAvatarConfig {
     Nose?: string;
     Mouth?: string;
     Ears?: string;
-    
+
     // Hair & Facial
     Hair?: string;
     FacialHair?: string;
     Eyelashes?: string;
-    
+
     // Body
     Torso?: string;
     Chest?: string;
@@ -216,7 +222,7 @@ interface CreatorAvatarConfig {
     Hands?: string;
     Legs?: string;
     Feet?: string;
-    
+
     // Clothing
     Underwear?: string;
     InnerWear?: string;
@@ -224,7 +230,7 @@ interface CreatorAvatarConfig {
     Pants?: string;
     Shoes?: string;
     Gloves?: string;
-    
+
     // Accessories
     Headwear?: string;
     Eyewear?: string;
@@ -232,26 +238,26 @@ interface CreatorAvatarConfig {
     Earrings?: string;
     Bracelets?: string;
     Rings?: string;
-    
+
     // Fantasy/Anime
     Horns?: string;
     Tail?: string;
     Wings?: string;
     AnimalEars?: string;
     Halo?: string;
-    
+
     // Back & Weapons
     Back?: string;
     WeaponPrimary?: string;
     WeaponSecondary?: string;
     Shield?: string;
-    
+
     // NSFW (gated)
     NSFWChest?: string;
     NSFWGroin?: string;
     NSFWAccessory?: string;
   };
-  
+
   // Materials
   materials: {
     shader: 'AnimeToon' | 'Realistic' | 'CelShaded' | 'Stylized';
@@ -272,7 +278,7 @@ interface CreatorAvatarConfig {
       decals?: string;
     };
   };
-  
+
   // Physics (for games)
   physics: {
     softBody: {
@@ -290,7 +296,7 @@ interface CreatorAvatarConfig {
       wind: number;
     };
   };
-  
+
   // NSFW (gated)
   nsfw?: {
     enabled: boolean;
@@ -335,16 +341,14 @@ interface CreatorAvatarConfig {
 
 #### **Caching Strategy**
 
-- **Memory Cache**: 
+- **Memory Cache**:
   - LRU cache for loaded models (max 50 models)
   - Cache key: `partId + morphHash + materialHash`
   - TTL: 5 minutes of inactivity
-  
 - **IndexedDB Cache**:
   - Persistent cache for frequently used parts
   - Cache key: `partId + version`
   - Max size: 500MB
-  
 - **CDN Cache**:
   - Static assets cached at CDN level
   - Cache-Control: `public, max-age=31536000, immutable`
@@ -356,12 +360,10 @@ interface CreatorAvatarConfig {
   2. Load critical parts (head, body, hair)
   3. Load secondary parts (clothing, accessories)
   4. Load tertiary parts (weapons, effects)
-  
 - **LOD System**:
   - **High**: Full detail (creator, close-up games)
   - **Medium**: Reduced polygons (most games)
   - **Low**: Minimal detail (background, many avatars)
-  
 - **Texture Streaming**:
   - Load low-res textures first
   - Stream high-res textures in background
@@ -383,10 +385,10 @@ export function useGameAvatar(gameId: string) {
     queryFn: () => loadAvatarConfig(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-  
+
   const visualProfile = getGameVisualProfile(gameId);
   const representationMode = visualProfile.avatarRepresentationMode;
-  
+
   return {
     config: avatarConfig,
     representationMode,
@@ -424,6 +426,7 @@ export function useGameAvatar(gameId: string) {
 ### **5. API Routes**
 
 #### **Save Avatar** (`app/api/v1/creator/save/route.ts`)
+
 - **POST** `/api/v1/creator/save`
 - **Body**: `CreatorAvatarConfig`
 - **Response**: `{ ok: true, data: { avatarId, savedAt } }`
@@ -435,6 +438,7 @@ export function useGameAvatar(gameId: string) {
   - Return success response
 
 #### **Load Avatar** (`app/api/v1/creator/load/route.ts`)
+
 - **GET** `/api/v1/creator/load`
 - **Response**: `{ ok: true, data: CreatorAvatarConfig }`
 - **Features**:
@@ -444,6 +448,7 @@ export function useGameAvatar(gameId: string) {
   - Return avatar config
 
 #### **Export Avatar** (`app/api/v1/creator/export/route.ts`)
+
 - **POST** `/api/v1/creator/export`
 - **Body**: `{ format: 'glb' | 'gltf' | 'fbx', includePhysics: boolean }`
 - **Response**: `{ ok: true, data: { downloadUrl, expiresAt } }`
@@ -486,6 +491,7 @@ export function useGameAvatar(gameId: string) {
 ### **7. Implementation Phases**
 
 #### **Phase 1: Core Creator UI** (Week 1)
+
 - [ ] Main creator page layout
 - [ ] Slider panel component
 - [ ] Part selector component
@@ -493,6 +499,7 @@ export function useGameAvatar(gameId: string) {
 - [ ] Basic save/load functionality
 
 #### **Phase 2: Advanced Features** (Week 2)
+
 - [ ] Pose/animation system
 - [ ] Material customization
 - [ ] Export functionality
@@ -500,6 +507,7 @@ export function useGameAvatar(gameId: string) {
 - [ ] Undo/redo system
 
 #### **Phase 3: Game Integration** (Week 3)
+
 - [ ] Avatar loading system
 - [ ] Caching implementation
 - [ ] Game-specific hooks
@@ -507,6 +515,7 @@ export function useGameAvatar(gameId: string) {
 - [ ] Performance optimization
 
 #### **Phase 4: Polish & Testing** (Week 4)
+
 - [ ] UI/UX refinements
 - [ ] Accessibility improvements
 - [ ] Performance optimization
@@ -528,4 +537,3 @@ export function useGameAvatar(gameId: string) {
 ## 🎉 **Conclusion**
 
 This CREATOR system will be the most comprehensive avatar creation tool in the Otaku-mori ecosystem, providing users with unprecedented control over their character's appearance while maintaining excellent performance and user experience.
-

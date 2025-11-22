@@ -9,17 +9,30 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
-import { type CosmeticItem, getAvatarCosmetics, getHudSkinCosmetics } from '@/app/lib/cosmetics/cosmeticsConfig';
+import {
+  type CosmeticItem,
+  getAvatarCosmetics,
+  getHudSkinCosmetics,
+} from '@/app/lib/cosmetics/cosmeticsConfig';
 import { DISCOUNT_VOUCHER_TIERS } from '@/app/config/petalTuning';
 import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
 
 export default function PetalShopPage() {
-  const { unlockedIds: _unlockedIds, hudSkin, isHydrated, unlockItem, selectHudSkin, isUnlocked } = useCosmetics();
+  const {
+    unlockedIds: _unlockedIds,
+    hudSkin,
+    isHydrated,
+    unlockItem,
+    selectHudSkin,
+    isUnlocked,
+  } = useCosmetics();
   const [petalBalance, setPetalBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [purchasingVoucher, setPurchasingVoucher] = useState<string | null>(null);
-  const [vouchers, setVouchers] = useState<Array<{ code: string; percentOff: number | null; expiresAt: Date | null }>>([]);
+  const [vouchers, setVouchers] = useState<
+    Array<{ code: string; percentOff: number | null; expiresAt: Date | null }>
+  >([]);
   const [discountEnabled, setDiscountEnabled] = useState(false);
 
   // Fetch petal balance and vouchers
@@ -41,7 +54,7 @@ export default function PetalShopPage() {
             setPetalBalance(legacyData.total || 0);
           }
         }
-        
+
         // Fetch vouchers (if discount feature is enabled)
         try {
           const voucherResponse = await fetch('/api/v1/petals/vouchers/list');
@@ -138,7 +151,7 @@ export default function PetalShopPage() {
   // Purchase discount voucher
   const handlePurchaseVoucher = async (tier: 'tier1' | 'tier2' | 'tier3') => {
     const voucherConfig = DISCOUNT_VOUCHER_TIERS[tier];
-    
+
     if (petalBalance === null || petalBalance < voucherConfig.costPetals) {
       alert(`Insufficient petals! You need ${voucherConfig.costPetals} petals.`);
       return;
@@ -181,7 +194,9 @@ export default function PetalShopPage() {
           }),
         );
 
-        alert(`Successfully purchased ${voucherConfig.name}! Your voucher code is: ${data.data.voucherCode}`);
+        alert(
+          `Successfully purchased ${voucherConfig.name}! Your voucher code is: ${data.data.voucherCode}`,
+        );
       } else {
         throw new Error(data.error || 'Purchase failed');
       }
@@ -251,8 +266,16 @@ export default function PetalShopPage() {
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
                         <h3 className="text-xl font-semibold text-white">{item.name}</h3>
-                        {isSelected && <OmTag variant="status" status="active">Selected</OmTag>}
-                        {unlocked && !isSelected && <OmTag variant="status" status="active">Unlocked</OmTag>}
+                        {isSelected && (
+                          <OmTag variant="status" status="active">
+                            Selected
+                          </OmTag>
+                        )}
+                        {unlocked && !isSelected && (
+                          <OmTag variant="status" status="active">
+                            Unlocked
+                          </OmTag>
+                        )}
                         {item.rarity && <OmTag variant="category">{item.rarity}</OmTag>}
                       </div>
 
@@ -287,7 +310,11 @@ export default function PetalShopPage() {
                           Currently Selected
                         </OmButton>
                       ) : (
-                        <OmButton variant="primary" className="w-full" onClick={() => handleSelect(item)}>
+                        <OmButton
+                          variant="primary"
+                          className="w-full"
+                          onClick={() => handleSelect(item)}
+                        >
                           Select
                         </OmButton>
                       )}
@@ -310,7 +337,11 @@ export default function PetalShopPage() {
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-3">
                         <h3 className="text-xl font-semibold text-white">{item.name}</h3>
-                        {unlocked && <OmTag variant="status" status="active">Unlocked</OmTag>}
+                        {unlocked && (
+                          <OmTag variant="status" status="active">
+                            Unlocked
+                          </OmTag>
+                        )}
                         {item.rarity && <OmTag variant="category">{item.rarity}</OmTag>}
                       </div>
 
@@ -358,7 +389,8 @@ export default function PetalShopPage() {
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-pink-400 mb-4">Discount Vouchers</h2>
             <p className="text-zinc-300 text-sm mb-4">
-              Purchase discount vouchers with petals to save on shop orders. Vouchers expire after 30 days.
+              Purchase discount vouchers with petals to save on shop orders. Vouchers expire after
+              30 days.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {Object.entries(DISCOUNT_VOUCHER_TIERS).map(([tier, config]) => (
@@ -366,7 +398,9 @@ export default function PetalShopPage() {
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-xl font-semibold text-white">{config.name}</h3>
-                      {'limitedTime' in config && config.limitedTime && <OmTag variant="category">Limited</OmTag>}
+                      {'limitedTime' in config && config.limitedTime && (
+                        <OmTag variant="category">Limited</OmTag>
+                      )}
                     </div>
 
                     <p className="text-zinc-300 text-sm mb-4">
@@ -407,10 +441,15 @@ export default function PetalShopPage() {
                 <h3 className="text-lg font-semibold text-white mb-3">Your Active Vouchers</h3>
                 <div className="space-y-2">
                   {vouchers.map((v) => (
-                    <div key={v.code} className="flex items-center justify-between p-2 bg-black/20 rounded">
+                    <div
+                      key={v.code}
+                      className="flex items-center justify-between p-2 bg-black/20 rounded"
+                    >
                       <div>
                         <span className="text-pink-400 font-mono text-sm">{v.code}</span>
-                        {v.percentOff && <span className="text-zinc-300 ml-2">{v.percentOff}% off</span>}
+                        {v.percentOff && (
+                          <span className="text-zinc-300 ml-2">{v.percentOff}% off</span>
+                        )}
                       </div>
                       {v.expiresAt && (
                         <span className="text-zinc-400 text-xs">
@@ -433,12 +472,13 @@ export default function PetalShopPage() {
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-white mb-2">About Cosmetics</h3>
             <p className="text-zinc-300 text-sm">
-              Cosmetics are visual enhancements that change how your game interface and avatar look. HUD skins affect the
-              appearance of game overlays and achievement screens. Avatar cosmetics (outfits, accessories, VFX) customize your character's appearance.
+              Cosmetics are visual enhancements that change how your game interface and avatar look.
+              HUD skins affect the appearance of game overlays and achievement screens. Avatar
+              cosmetics (outfits, accessories, VFX) customize your character's appearance.
             </p>
             <p className="text-zinc-400 text-xs mt-4">
-              Note: Current implementation uses localStorage. Your cosmetics will sync with your account when you sign
-              in.
+              Note: Current implementation uses localStorage. Your cosmetics will sync with your
+              account when you sign in.
             </p>
           </div>
         </OmPanel>
@@ -446,4 +486,3 @@ export default function PetalShopPage() {
     </div>
   );
 }
-

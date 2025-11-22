@@ -162,4 +162,3 @@ export function EasterEggHandler({ children }: EasterEggHandlerProps) {
     </>
   );
 }
-

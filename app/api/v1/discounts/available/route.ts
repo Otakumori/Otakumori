@@ -13,10 +13,7 @@ export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'Unauthorized' },
-        { status: 401 },
-      );
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = await db.user.findUnique({
@@ -25,10 +22,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'User not found' },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
     // Get NSFW policy
@@ -74,9 +68,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching available discounts:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

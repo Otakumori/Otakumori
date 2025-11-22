@@ -66,4 +66,3 @@ export const OmButton = forwardRef<HTMLButtonElement, OmButtonProps>(
 );
 
 OmButton.displayName = 'OmButton';
-

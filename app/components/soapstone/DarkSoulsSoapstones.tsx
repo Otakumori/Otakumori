@@ -2,7 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { type ApiSoapstoneUser, getUserDisplayName, getUserAvatarUrl, getUserInitials } from '@/app/lib/soapstone-user-utils';
+import {
+  type ApiSoapstoneUser,
+  getUserDisplayName,
+  getUserAvatarUrl,
+  getUserInitials,
+} from '@/app/lib/soapstone-user-utils';
 
 interface SoapstoneMessage {
   id: string;
@@ -39,7 +44,10 @@ export default function DarkSoulsSoapstones({
     const updateSize = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        setContainerSize({ width: rect.width || window.innerWidth, height: rect.height || window.innerHeight });
+        setContainerSize({
+          width: rect.width || window.innerWidth,
+          height: rect.height || window.innerHeight,
+        });
       }
     };
 
@@ -58,28 +66,32 @@ export default function DarkSoulsSoapstones({
       if (result.ok && result.data?.items) {
         const messages = result.data.items.slice(0, maxSoapstones);
         // Map API response to component format
-        const mappedMessages = messages.map((msg: {
-          id: string;
-          text?: string;
-          body?: string;
-          x?: number | null;
-          y?: number | null;
-          appraises?: number;
-          createdAt: string;
-          user?: ApiSoapstoneUser | null;
-        }): SoapstoneMessage => ({
-          id: msg.id,
-          text: msg.text || msg.body || '',
-          x: msg.x ?? null,
-          y: msg.y ?? null,
-          appraises: msg.appraises || 0,
-          createdAt: msg.createdAt || new Date().toISOString(),
-          user: msg.user ? {
-            id: msg.user.id,
-            displayName: msg.user.displayName,
-            avatarUrl: msg.user.avatarUrl,
-          } : undefined,
-        }));
+        const mappedMessages = messages.map(
+          (msg: {
+            id: string;
+            text?: string;
+            body?: string;
+            x?: number | null;
+            y?: number | null;
+            appraises?: number;
+            createdAt: string;
+            user?: ApiSoapstoneUser | null;
+          }): SoapstoneMessage => ({
+            id: msg.id,
+            text: msg.text || msg.body || '',
+            x: msg.x ?? null,
+            y: msg.y ?? null,
+            appraises: msg.appraises || 0,
+            createdAt: msg.createdAt || new Date().toISOString(),
+            user: msg.user
+              ? {
+                  id: msg.user.id,
+                  displayName: msg.user.displayName,
+                  avatarUrl: msg.user.avatarUrl,
+                }
+              : undefined,
+          }),
+        );
         // Assign random positions if x/y not set
         const positionedMessages = mappedMessages.map((msg: SoapstoneMessage) => {
           if (msg.x === null || msg.y === null) {
@@ -176,9 +188,12 @@ function SoapstoneMarker({ text, x, y, appraises, createdAt, user }: SoapstoneMa
 
   // Pulse glow effect - like Dark Souls
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsGlowing((prev) => !prev);
-    }, 2000 + Math.random() * 1000); // 2-3 second pulse
+    const interval = setInterval(
+      () => {
+        setIsGlowing((prev) => !prev);
+      },
+      2000 + Math.random() * 1000,
+    ); // 2-3 second pulse
 
     return () => clearInterval(interval);
   }, []);
@@ -201,13 +216,15 @@ function SoapstoneMarker({ text, x, y, appraises, createdAt, user }: SoapstoneMa
   return (
     <div
       className="soapstone-marker absolute pointer-events-auto"
-      style={{
-        left: `${x}px`,
-        top: `${y}px`,
-        transform: `rotate(${rotation.current}deg)`,
-        '--glow-intensity': glowIntensity.toString(),
-        '--glow-active': isGlowing ? '1' : '0',
-      } as React.CSSProperties & { '--glow-intensity': string; '--glow-active': string }}
+      style={
+        {
+          left: `${x}px`,
+          top: `${y}px`,
+          transform: `rotate(${rotation.current}deg)`,
+          '--glow-intensity': glowIntensity.toString(),
+          '--glow-active': isGlowing ? '1' : '0',
+        } as React.CSSProperties & { '--glow-intensity': string; '--glow-active': string }
+      }
     >
       {!isRevealed ? (
         // Collapsed state - Dark Souls soapstone with overlay (text hidden)
@@ -264,7 +281,9 @@ function SoapstoneMarker({ text, x, y, appraises, createdAt, user }: SoapstoneMa
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-pink-200 truncate">{getUserDisplayName(user)}</p>
+                <p className="text-xs font-medium text-pink-200 truncate">
+                  {getUserDisplayName(user)}
+                </p>
                 <p className="text-xs text-pink-200/50">{formatTimeAgo(createdAt)}</p>
               </div>
               {appraises > 0 && (
@@ -274,7 +293,9 @@ function SoapstoneMarker({ text, x, y, appraises, createdAt, user }: SoapstoneMa
                 </div>
               )}
             </div>
-            <p className="text-sm leading-relaxed text-pink-100 mb-2 whitespace-pre-wrap break-words">{text}</p>
+            <p className="text-sm leading-relaxed text-pink-100 mb-2 whitespace-pre-wrap break-words">
+              {text}
+            </p>
             <p className="text-xs text-pink-200/40 text-center mt-2">Tap to hide</p>
           </div>
         </button>
@@ -295,4 +316,3 @@ function formatTimeAgo(dateString: string): string {
   if (diffDays < 7) return `${diffDays}d ago`;
   return date.toLocaleDateString();
 }
-

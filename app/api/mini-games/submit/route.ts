@@ -62,11 +62,11 @@ export async function POST(req: NextRequest) {
   // Map legacy game names to new game IDs
   const gameIdMap: Record<string, string> = {
     'petal-run': 'petal-samurai',
-    'memory': 'memory-match',
-    'rhythm': 'petal-storm-rhythm',
+    memory: 'memory-match',
+    rhythm: 'petal-storm-rhythm',
   };
   const mappedGameId = gameIdMap[game] || game;
-  
+
   // Default to win=true for legacy compatibility
   const petalAmount = calculateGameReward(mappedGameId, true, score, {});
   let petalsGranted = petalAmount;

@@ -272,4 +272,3 @@ export interface BackgroundPreset {
   value: string;
   hdrUrl?: string;
 }
-

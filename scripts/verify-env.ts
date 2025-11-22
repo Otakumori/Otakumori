@@ -85,9 +85,7 @@ function parseVercelFile(filePath: string): EnvValues {
 }
 
 function trimValues(values: EnvValues): EnvValues {
-  return Object.fromEntries(
-    Object.entries(values).map(([key, value]) => [key, value.trim()]),
-  );
+  return Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value.trim()]));
 }
 
 function collectSources(): EnvSource[] {
@@ -192,7 +190,8 @@ function reportSchemaViolations(sources: EnvSource[]) {
 
     const result = envSchema.safeParse(candidateValues);
     if (!result.success) {
-      const issues = result.error.issues.map((issue) => issue.path.join('.')).join(', ') || 'unknown';
+      const issues =
+        result.error.issues.map((issue) => issue.path.join('.')).join(', ') || 'unknown';
       failures.push(`${source.name}: ${issues}`);
     }
   }
@@ -222,9 +221,7 @@ function reportMismatchedValues(sources: EnvSource[]) {
         if (!valueOrigins.has(key)) {
           valueOrigins.set(key, new Map<string, string>());
         }
-        valueOrigins
-          .get(key)!
-          .set(source.name, `${value.slice(0, 4)}…${value.slice(-4)}`);
+        valueOrigins.get(key)!.set(source.name, `${value.slice(0, 4)}…${value.slice(-4)}`);
       }
     }
   }
@@ -276,4 +273,3 @@ main().catch((error) => {
   console.error('verify-env failed:', error);
   process.exit(1);
 });
-

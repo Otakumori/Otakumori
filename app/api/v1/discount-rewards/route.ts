@@ -13,7 +13,7 @@ export const runtime = 'nodejs';
 export async function GET(req: NextRequest) {
   try {
     const { userId } = await auth();
-    
+
     // Get NSFW policy
     const policy = getPolicyFromRequest(req);
     const nsfwAllowed = policy.nsfwAllowed;
@@ -26,16 +26,10 @@ export async function GET(req: NextRequest) {
         enabled: true,
         AND: [
           {
-            OR: [
-              { startsAt: null },
-              { startsAt: { lte: now } },
-            ],
+            OR: [{ startsAt: null }, { startsAt: { lte: now } }],
           },
           {
-            OR: [
-              { endsAt: null },
-              { endsAt: { gte: now } },
-            ],
+            OR: [{ endsAt: null }, { endsAt: { gte: now } }],
           },
         ],
       },
@@ -102,10 +96,6 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching discount rewards:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
-

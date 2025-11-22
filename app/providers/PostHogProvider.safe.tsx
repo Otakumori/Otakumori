@@ -5,10 +5,10 @@ import { clientEnv } from '@/env/client';
 
 /**
  * PostHogProvider - Single source of truth for PostHog initialization
- * 
+ *
  * Prevents double initialization by checking if PostHog is already initialized.
  * This provider should be the ONLY place where posthog.init() is called.
- * 
+ *
  * Note: instrumentation-client.ts also had posthog.init() - that has been removed
  * to prevent the "You have already initialized PostHog!" warning.
  */
@@ -28,10 +28,10 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
   useEffect(() => {
     // Guard: Only initialize once, even if component re-mounts
     if (initializedRef.current) return;
-    
+
     // Check if we're in browser environment
     if (typeof window === 'undefined') return;
-    
+
     // Safely get PostHog key - handle undefined gracefully
     const key = clientEnv.NEXT_PUBLIC_POSTHOG_KEY;
     if (!key || typeof key !== 'string' || key.trim().length === 0) {
@@ -64,10 +64,11 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
 
     try {
       // Safely get PostHog host with fallback
-      const host = (clientEnv.NEXT_PUBLIC_POSTHOG_HOST && typeof clientEnv.NEXT_PUBLIC_POSTHOG_HOST === 'string')
-        ? clientEnv.NEXT_PUBLIC_POSTHOG_HOST
-        : 'https://us.posthog.com';
-      
+      const host =
+        clientEnv.NEXT_PUBLIC_POSTHOG_HOST && typeof clientEnv.NEXT_PUBLIC_POSTHOG_HOST === 'string'
+          ? clientEnv.NEXT_PUBLIC_POSTHOG_HOST
+          : 'https://us.posthog.com';
+
       posthog.init(key, {
         api_host: host,
         autocapture: true,
@@ -96,5 +97,5 @@ export default function PostHogProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
-  return <>{ children } </>;
+  return <>{children} </>;
 }

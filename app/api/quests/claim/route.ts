@@ -111,11 +111,11 @@ export async function POST(request: Request) {
     });
 
     // Award petals using centralized grantPetals (tracks lifetimeEarned, enforces daily caps)
-    let petalResult: Awaited<ReturnType<typeof grantPetals>> = { 
-      success: false, 
-      granted: 0, 
-      newBalance: user.petalBalance, 
-      lifetimeEarned: 0 
+    let petalResult: Awaited<ReturnType<typeof grantPetals>> = {
+      success: false,
+      granted: 0,
+      newBalance: user.petalBalance,
+      lifetimeEarned: 0,
     };
     if (actualReward > 0) {
       petalResult = await grantPetals({
@@ -151,7 +151,8 @@ export async function POST(request: Request) {
       totalReward,
       capped: actualReward < totalReward || petalResult.limited || false,
       dailyCapUsed: usedToday + actualReward,
-      dailyCapRemaining: petalResult.dailyRemaining ?? Math.max(0, DAILY_CAP - (usedToday + actualReward)),
+      dailyCapRemaining:
+        petalResult.dailyRemaining ?? Math.max(0, DAILY_CAP - (usedToday + actualReward)),
       streakShardAwarded,
       newBalance: petalResult.newBalance,
       lifetimePetalsEarned: petalResult.lifetimeEarned,

@@ -1,6 +1,6 @@
 /**
  * Admin Feature Flags API
- * 
+ *
  * GET: Returns effective feature flags and DB settings
  * POST: Updates a feature flag setting
  */
@@ -32,9 +32,7 @@ async function requireAdmin() {
 
   const user = await currentUser();
   const email =
-    user?.primaryEmailAddress?.emailAddress ??
-    user?.emailAddresses?.[0]?.emailAddress ??
-    null;
+    user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress ?? null;
 
   if (!isAdminEmail(email)) {
     return { error: 'Forbidden', status: 403 };
@@ -48,7 +46,10 @@ async function requireAdmin() {
  */
 function getSystemStatus() {
   return [
-    { name: 'Clerk', configured: Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) },
+    {
+      name: 'Clerk',
+      configured: Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY),
+    },
     { name: 'Stripe', configured: Boolean(env.STRIPE_SECRET_KEY) },
     { name: 'Printify', configured: Boolean(env.PRINTIFY_API_KEY) },
     { name: 'Inngest', configured: Boolean(env.INNGEST_EVENT_KEY) },
@@ -60,7 +61,10 @@ export async function GET() {
   try {
     const adminCheck = await requireAdmin();
     if ('error' in adminCheck) {
-      return NextResponse.json({ ok: false, error: adminCheck.error }, { status: adminCheck.status });
+      return NextResponse.json(
+        { ok: false, error: adminCheck.error },
+        { status: adminCheck.status },
+      );
     }
 
     // Get effective flags and DB settings
@@ -78,10 +82,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching admin feature flags:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -89,7 +90,10 @@ export async function POST(req: NextRequest) {
   try {
     const adminCheck = await requireAdmin();
     if ('error' in adminCheck) {
-      return NextResponse.json({ ok: false, error: adminCheck.error }, { status: adminCheck.status });
+      return NextResponse.json(
+        { ok: false, error: adminCheck.error },
+        { status: adminCheck.status },
+      );
     }
 
     const body = await req.json();
@@ -119,10 +123,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error updating feature flag:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
-

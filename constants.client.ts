@@ -31,5 +31,4 @@ export const CLERK_PUBLIC_PATHS = Object.freeze({
 
 export const PETAL_COLOR_OVERRIDE = clientEnv.NEXT_PUBLIC_PETAL_COLOR_OVERRIDE;
 
-export const FEATURE_FLAG_PROVIDER =
-  clientEnv.NEXT_PUBLIC_FEATURE_FLAG_PROVIDER ?? 'local';
+export const FEATURE_FLAG_PROVIDER = clientEnv.NEXT_PUBLIC_FEATURE_FLAG_PROVIDER ?? 'local';

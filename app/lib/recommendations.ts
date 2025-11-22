@@ -1,6 +1,6 @@
 /**
  * Smart Recommendations System
- * 
+ *
  * AI-powered personalization based on user behavior
  */
 
@@ -31,16 +31,14 @@ export function generateRecommendations(
   profile: UserBehaviorProfile,
   availableProducts: any[],
   availableGames: any[],
-  availablePosts: any[]
+  availablePosts: any[],
 ): Recommendation[] {
   const recommendations: Recommendation[] = [];
 
   // Product recommendations based on viewed products
   if (profile.productsViewed.length > 0) {
     const viewedCategories = new Set(
-      availableProducts
-        .filter((p) => profile.productsViewed.includes(p.id))
-        .map((p) => p.category)
+      availableProducts.filter((p) => profile.productsViewed.includes(p.id)).map((p) => p.category),
     );
 
     availableProducts
@@ -61,9 +59,7 @@ export function generateRecommendations(
   // Game recommendations based on played games
   if (profile.gamesPlayed.length > 0) {
     const playedCategories = new Set(
-      availableGames
-        .filter((g) => profile.gamesPlayed.includes(g.id))
-        .map((g) => g.category)
+      availableGames.filter((g) => profile.gamesPlayed.includes(g.id)).map((g) => g.category),
     );
 
     availableGames
@@ -84,9 +80,7 @@ export function generateRecommendations(
   // Blog recommendations based on read posts
   if (profile.postsRead.length > 0) {
     const readTags = new Set(
-      availablePosts
-        .filter((p) => profile.postsRead.includes(p.id))
-        .flatMap((p) => p.tags || [])
+      availablePosts.filter((p) => profile.postsRead.includes(p.id)).flatMap((p) => p.tags || []),
     );
 
     availablePosts
@@ -113,7 +107,7 @@ export function generateRecommendations(
  */
 export function getAchievementSuggestions(
   profile: UserBehaviorProfile,
-  allAchievements: any[]
+  allAchievements: any[],
 ): Recommendation[] {
   const suggestions: Recommendation[] = [];
 
@@ -136,4 +130,3 @@ export function getAchievementSuggestions(
 
   return suggestions.sort((a, b) => b.score - a.score).slice(0, 3);
 }
-

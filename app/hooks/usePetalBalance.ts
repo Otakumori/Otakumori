@@ -5,10 +5,10 @@ import { useUser } from '@clerk/nextjs';
 
 /**
  * Standardized hook for reading petal balance
- * 
+ *
  * This hook provides a single source of truth for petal balance in the UI.
  * It fetches from /api/v1/petals/wallet and caches the result.
- * 
+ *
  * Usage:
  * ```tsx
  * const { balance, isLoading, refetch } = usePetalBalance();

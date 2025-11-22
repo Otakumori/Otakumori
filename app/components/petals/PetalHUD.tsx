@@ -44,7 +44,7 @@ export default function PetalHUD() {
     fetch('/api/petals/global')
       .then((r) => r.json())
       .then((j) => setTeam(j))
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   // Sync balance function
@@ -61,7 +61,7 @@ export default function PetalHUD() {
           return;
         }
       }
-      
+
       // Fallback to legacy API
       const j = await fetch('/api/petals/me').then((r) => r.json());
       setMe(j.total);
@@ -74,10 +74,12 @@ export default function PetalHUD() {
   useEffect(() => {
     const onCollect = async () => {
       await syncBalance();
-      const g = await fetch('/api/petals/global').then((r) => r.json()).catch(() => null);
+      const g = await fetch('/api/petals/global')
+        .then((r) => r.json())
+        .catch(() => null);
       if (g) setTeam(g);
     };
-    
+
     const onEarn = async (event: CustomEvent) => {
       // Check if this is the first collect (HUD reveal)
       const hasSeenHUD = localStorage.getItem('om_has_seen_petal_hud') === 'true';
@@ -90,17 +92,20 @@ export default function PetalHUD() {
         // Otherwise sync from server
         await syncBalance();
       }
-      
+
       // Update lifetime if provided
-      if (event.detail?.lifetimePetalsEarned !== null && event.detail?.lifetimePetalsEarned !== undefined) {
+      if (
+        event.detail?.lifetimePetalsEarned !== null &&
+        event.detail?.lifetimePetalsEarned !== undefined
+      ) {
         setLifetimePetals(event.detail.lifetimePetalsEarned);
       }
-      
+
       // Update guest status
       if (event.detail?.isGuest !== undefined) {
         setIsGuest(event.detail.isGuest);
       }
-      
+
       // Reveal HUD on first collect
       if (isFirstCollect) {
         localStorage.setItem('om_has_seen_petal_hud', 'true');
@@ -110,7 +115,7 @@ export default function PetalHUD() {
         setTimeout(() => setShowAnimation(false), 800);
       }
     };
-    
+
     const onSpend = async (event: CustomEvent) => {
       // Update balance optimistically if provided
       if (event.detail?.balance !== null && event.detail?.balance !== undefined) {
@@ -119,13 +124,16 @@ export default function PetalHUD() {
         // Otherwise sync from server
         await syncBalance();
       }
-      
+
       // Lifetime doesn't change on spend, but update if provided
-      if (event.detail?.lifetimePetalsEarned !== null && event.detail?.lifetimePetalsEarned !== undefined) {
+      if (
+        event.detail?.lifetimePetalsEarned !== null &&
+        event.detail?.lifetimePetalsEarned !== undefined
+      ) {
         setLifetimePetals(event.detail.lifetimePetalsEarned);
       }
     };
-    
+
     window.addEventListener('petal:collect', onCollect as any);
     window.addEventListener('petal:earn', onEarn as any);
     window.addEventListener('petal:spend', onSpend as any);

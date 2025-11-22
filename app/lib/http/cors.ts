@@ -93,4 +93,3 @@ export function handleCorsPreflight(request: NextRequest) {
   response.headers.set('Access-Control-Max-Age', '600');
   return withCors(response, request.headers.get('origin'));
 }
-

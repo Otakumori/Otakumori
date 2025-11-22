@@ -15,10 +15,7 @@ export interface ValidationResult {
 /**
  * Validate avatar integration in game file
  */
-export function validateAvatarIntegration(
-  gameSlug: string,
-  filePath: string,
-): ValidationResult {
+export function validateAvatarIntegration(gameSlug: string, filePath: string): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -30,11 +27,15 @@ export function validateAvatarIntegration(
   const content = readFileSync(filePath, 'utf-8');
 
   // Check for avatar engine imports
-  const hasUseGameAvatar = content.includes('useGameAvatar') || content.includes('@om/avatar-engine/gameIntegration');
-  const hasAvatarRenderer = content.includes('AvatarRenderer') || content.includes('@om/avatar-engine/renderer');
+  const hasUseGameAvatar =
+    content.includes('useGameAvatar') || content.includes('@om/avatar-engine/gameIntegration');
+  const hasAvatarRenderer =
+    content.includes('AvatarRenderer') || content.includes('@om/avatar-engine/renderer');
 
   if (!hasUseGameAvatar && !hasAvatarRenderer) {
-    errors.push(`Missing avatar integration: ${gameSlug} does not import useGameAvatar or AvatarRenderer`);
+    errors.push(
+      `Missing avatar integration: ${gameSlug} does not import useGameAvatar or AvatarRenderer`,
+    );
   }
 
   // Check for correct representation mode (if avatar is used)
@@ -47,7 +48,7 @@ export function validateAvatarIntegration(
       'memory-match': 'portrait',
       'puzzle-reveal': 'portrait',
       'bubble-girl': 'chibi',
-      'blossomware': 'chibi',
+      blossomware: 'chibi',
       'dungeon-of-desire': 'bust',
     };
 
@@ -93,7 +94,8 @@ export function validateCelShadedMaterials(filePath: string): ValidationResult {
   const hasMeshPhongMaterial = /new\s+THREE\.MeshPhongMaterial\s*\(/i.test(content);
 
   // Check for cel-shaded material imports
-  const hasCelShadedImport = content.includes('@om/avatar-engine/materials') ||
+  const hasCelShadedImport =
+    content.includes('@om/avatar-engine/materials') ||
     content.includes('createCelShadedMaterial') ||
     content.includes('skinMaterialProcedural') ||
     content.includes('hairGlowMaterial') ||
@@ -101,9 +103,13 @@ export function validateCelShadedMaterials(filePath: string): ValidationResult {
 
   if (hasMeshStandardMaterial || hasMeshBasicMaterial || hasMeshPhongMaterial) {
     if (!hasCelShadedImport) {
-      errors.push(`Found non-cel-shaded materials (MeshStandardMaterial/MeshBasicMaterial/MeshPhongMaterial) without cel-shaded imports`);
+      errors.push(
+        `Found non-cel-shaded materials (MeshStandardMaterial/MeshBasicMaterial/MeshPhongMaterial) without cel-shaded imports`,
+      );
     } else {
-      warnings.push(`Found non-cel-shaded materials but also has cel-shaded imports - may need replacement`);
+      warnings.push(
+        `Found non-cel-shaded materials but also has cel-shaded imports - may need replacement`,
+      );
     }
   }
 
@@ -128,21 +134,25 @@ export function validateSharedUI(filePath: string): ValidationResult {
   const content = readFileSync(filePath, 'utf-8');
 
   // Check for GameHUD import or useGameHud hook (which provides GameHUD)
-  const hasGameHUD = content.includes('GameHUD') || 
-                     content.includes('app/mini-games/_shared/GameHUD') ||
-                     content.includes('useGameHud') ||
-                     content.includes('app/mini-games/_shared/useGameHud');
+  const hasGameHUD =
+    content.includes('GameHUD') ||
+    content.includes('app/mini-games/_shared/GameHUD') ||
+    content.includes('useGameHud') ||
+    content.includes('app/mini-games/_shared/useGameHud');
   // Check for GameOverlay import
-  const hasGameOverlay = content.includes('GameOverlay') || 
-                         content.includes('app/mini-games/_shared/GameOverlay') ||
-                         content.includes('../_shared/GameOverlay');
+  const hasGameOverlay =
+    content.includes('GameOverlay') ||
+    content.includes('app/mini-games/_shared/GameOverlay') ||
+    content.includes('../_shared/GameOverlay');
 
   if (!hasGameHUD) {
     warnings.push(`GameHUD component not found - should be added for consistent UI`);
   }
 
   if (!hasGameOverlay) {
-    warnings.push(`GameOverlay component not found - should be added for instructions/win/lose screens`);
+    warnings.push(
+      `GameOverlay component not found - should be added for instructions/win/lose screens`,
+    );
   }
 
   // Check for restart handler
@@ -152,7 +162,10 @@ export function validateSharedUI(filePath: string): ValidationResult {
   }
 
   // Check for "Back to Arcade" link
-  const hasBackLink = content.includes('/mini-games') || content.includes('Back to Arcade') || content.includes('Back to Hub');
+  const hasBackLink =
+    content.includes('/mini-games') ||
+    content.includes('Back to Arcade') ||
+    content.includes('Back to Hub');
   if (!hasBackLink) {
     warnings.push(`No "Back to Arcade" link found`);
   }
@@ -253,7 +266,8 @@ export function validateFeatureFlags(filePath: string): ValidationResult {
   }
 
   // Check for REQUIRE_AUTH_FOR_MINI_GAMES flag
-  const hasAuthFlag = content.includes('REQUIRE_AUTH_FOR_MINI_GAMES') || content.includes('requireAuth');
+  const hasAuthFlag =
+    content.includes('REQUIRE_AUTH_FOR_MINI_GAMES') || content.includes('requireAuth');
   // This is optional, so just a warning
   if (!hasAuthFlag) {
     // Not an error, just informational
@@ -265,4 +279,3 @@ export function validateFeatureFlags(filePath: string): ValidationResult {
     warnings,
   };
 }
-

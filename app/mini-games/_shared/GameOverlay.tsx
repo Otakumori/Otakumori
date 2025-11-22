@@ -82,14 +82,24 @@ export function GameOverlay({
             <h2 className="text-3xl font-bold mb-4" style={{ color: palette.petals }}>
               Victory!
             </h2>
-            {winMessage && <p className="mb-4" style={{ color: palette.softPink }}>{winMessage}</p>}
+            {winMessage && (
+              <p className="mb-4" style={{ color: palette.softPink }}>
+                {winMessage}
+              </p>
+            )}
             {score !== undefined && (
               <p className="text-2xl font-bold mb-4" style={{ color: palette.accent }}>
                 Final Score: {score.toLocaleString()}
               </p>
             )}
             {petalReward !== null && petalReward !== undefined && petalReward > 0 && (
-              <div className="mb-6 p-4 rounded-xl" style={{ backgroundColor: `${palette.petals}20`, border: `2px solid ${palette.petals}40` }}>
+              <div
+                className="mb-6 p-4 rounded-xl"
+                style={{
+                  backgroundColor: `${palette.petals}20`,
+                  border: `2px solid ${palette.petals}40`,
+                }}
+              >
                 <p className="text-lg font-semibold mb-1" style={{ color: palette.petals }}>
                   +{petalReward} Petals Earned!
                 </p>
@@ -131,7 +141,11 @@ export function GameOverlay({
             <h2 className="text-3xl font-bold mb-4" style={{ color: '#f43f5e' }}>
               Defeat
             </h2>
-            {loseMessage && <p className="mb-4" style={{ color: palette.softPink }}>{loseMessage}</p>}
+            {loseMessage && (
+              <p className="mb-4" style={{ color: palette.softPink }}>
+                {loseMessage}
+              </p>
+            )}
             {score !== undefined && (
               <p className="text-xl font-bold mb-6" style={{ color: palette.accent }}>
                 Score: {score.toLocaleString()}
@@ -200,4 +214,3 @@ export function GameOverlay({
     </div>
   );
 }
-

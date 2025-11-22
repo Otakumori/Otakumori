@@ -45,13 +45,16 @@ function convertCreatorToAvatarConfig(creatorConfig: CreatorAvatarConfig): Avata
     userId: creatorConfig.userId,
     baseModel: creatorConfig.baseModel,
     baseModelUrl: creatorConfig.baseModelUrl,
-    parts: Object.entries(creatorConfig.parts).reduce((acc, [key, value]) => {
-      if (value) {
-        const partType = key.toLowerCase() as any;
-        acc[partType] = value;
-      }
-      return acc;
-    }, {} as Partial<Record<string, string>>),
+    parts: Object.entries(creatorConfig.parts).reduce(
+      (acc, [key, value]) => {
+        if (value) {
+          const partType = key.toLowerCase() as any;
+          acc[partType] = value;
+        }
+        return acc;
+      },
+      {} as Partial<Record<string, string>>,
+    ),
     morphTargets: {
       // Body morphs
       height: creatorConfig.body.height,
@@ -157,4 +160,3 @@ export function useCreatorAvatar(enabled: boolean = true): UseCreatorAvatarResul
     },
   };
 }
-

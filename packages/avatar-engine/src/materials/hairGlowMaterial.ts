@@ -40,4 +40,3 @@ export function hairGlowMaterial(options: HairGlowMaterialOptions): THREE.Shader
 
   return material;
 }
-

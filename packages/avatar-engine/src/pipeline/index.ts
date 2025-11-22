@@ -4,4 +4,3 @@
 
 export * from './proceduralTextures';
 export * from './textureQuality';
-

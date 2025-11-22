@@ -1,6 +1,6 @@
 /**
  * Petal Economy Tuning Configuration
- * 
+ *
  * Central configuration for petal rewards, cosmetic prices, and discount vouchers.
  * Designed to feel rewarding without being grindy, competitive with big-brand loyalty programs.
  */
@@ -93,12 +93,12 @@ export const GAME_DURATION_MAP: Record<string, 'short' | 'medium' | 'long'> = {
   'otaku-beat-em-up': 'medium',
   'dungeon-of-desire': 'long',
   'thigh-coliseum': 'short',
-  'blossomware': 'short',
+  blossomware: 'short',
 } as const;
 
 /**
  * Calculate petal reward for a game completion
- * 
+ *
  * @param gameId - Game identifier
  * @param didWin - Whether the player won/completed the run
  * @param score - Final score
@@ -164,17 +164,17 @@ export function calculateGameReward(
 
 /**
  * Get achievement petal reward based on achievement tier
- * 
+ *
  * @param tier - Achievement tier
  * @returns Petal reward amount
  */
 export function getAchievementReward(tier: keyof typeof ACHIEVEMENT_REWARD_TIERS): number {
   const config = ACHIEVEMENT_REWARD_TIERS[tier];
-  
+
   if (typeof config === 'number') {
     return config;
   }
-  
+
   // Range-based rewards
   return Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
 }
@@ -182,11 +182,13 @@ export function getAchievementReward(tier: keyof typeof ACHIEVEMENT_REWARD_TIERS
 /**
  * Map achievement points to reward tier
  * Used to suggest reward amounts for achievements based on their point value
- * 
+ *
  * @param points - Achievement points value
  * @returns Suggested reward tier
  */
-export function getAchievementTierFromPoints(points: number): keyof typeof ACHIEVEMENT_REWARD_TIERS {
+export function getAchievementTierFromPoints(
+  points: number,
+): keyof typeof ACHIEVEMENT_REWARD_TIERS {
   if (points <= 25) {
     return 'small'; // "Try it once" achievements
   } else if (points <= 100) {
@@ -201,17 +203,20 @@ export function getAchievementTierFromPoints(points: number): keyof typeof ACHIE
 /**
  * Get achievement petal reward based on achievement points
  * Falls back to tier-based calculation if reward value is missing
- * 
+ *
  * @param points - Achievement points value
  * @param existingReward - Existing reward value from database (if any)
  * @returns Petal reward amount
  */
-export function getAchievementRewardFromPoints(points: number, existingReward?: number | null): number {
+export function getAchievementRewardFromPoints(
+  points: number,
+  existingReward?: number | null,
+): number {
   // If existing reward is set and valid, use it (respects database values)
   if (existingReward && existingReward > 0) {
     return existingReward;
   }
-  
+
   // Otherwise, calculate from points-based tier
   const tier = getAchievementTierFromPoints(points);
   return getAchievementReward(tier);
@@ -231,7 +236,7 @@ export async function getDiscountConfig() {
       maxPerUserMonth: 3, // 3 per month default
     };
   }
-  
+
   // Server-side: read from env
   try {
     // Use dynamic import to avoid require() in ES modules
@@ -251,4 +256,3 @@ export async function getDiscountConfig() {
     };
   }
 }
-

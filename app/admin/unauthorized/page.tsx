@@ -15,7 +15,8 @@ export default function UnauthorizedPage() {
         </div>
         <h1 className="text-3xl font-bold text-white mb-4">Access Denied</h1>
         <p className="text-zinc-300 mb-6">
-          You do not have permission to access the admin console. Only administrators can view this page.
+          You do not have permission to access the admin console. Only administrators can view this
+          page.
         </p>
         <Link
           href="/"
@@ -27,4 +28,3 @@ export default function UnauthorizedPage() {
     </div>
   );
 }
-

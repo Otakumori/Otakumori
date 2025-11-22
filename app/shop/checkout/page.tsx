@@ -110,7 +110,9 @@ export default function CheckoutPage() {
       } else {
         // Handle specific error cases
         if (response.status === 503) {
-          setError('Checkout is temporarily unavailable. Please contact support or try again later.');
+          setError(
+            'Checkout is temporarily unavailable. Please contact support or try again later.',
+          );
         } else {
           setError(data.error || 'Failed to create checkout session. Please try again.');
         }

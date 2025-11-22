@@ -8,12 +8,12 @@ import type { ContentRating } from '@/app/lib/nsfw/types';
 
 export type HudSkinId = 'default' | 'quake';
 
-export type CosmeticType = 
-  | 'hud-skin' 
+export type CosmeticType =
+  | 'hud-skin'
   | 'avatar-cosmetic' // Generic avatar cosmetic (outfits, hair, accessories, weapons, auras)
   | 'avatar-outfit' // Deprecated: use avatar-cosmetic with avatarSlot='outfit'
   | 'avatar-accessory' // Deprecated: use avatar-cosmetic with avatarSlot
-  | 'avatar-overlay' 
+  | 'avatar-overlay'
   | 'avatar-vfx'
   | 'profile-flair' // Titles, badges, profile frames, backgrounds
   | 'voucher'; // Discount vouchers
@@ -65,12 +65,13 @@ export const cosmeticItems: CosmeticItem[] = [
     type: 'hud-skin',
     hudSkinId: 'quake',
     name: 'Quake-Style HUD Overlay',
-    description: 'Unlock a crunchy, metal HUD style inspired by old-school arena shooters. Perfect for retro gaming vibes.',
+    description:
+      'Unlock a crunchy, metal HUD style inspired by old-school arena shooters. Perfect for retro gaming vibes.',
     costPetals: 500,
     rarity: 'common',
     contentRating: 'sfw',
   },
-  
+
   // Avatar Outfits (SFW)
   {
     id: 'outfit-casual-pink',
@@ -94,7 +95,7 @@ export const cosmeticItems: CosmeticItem[] = [
     avatarSlot: 'outfit',
     tags: ['formal', 'black', 'outfit'],
   },
-  
+
   // Avatar Outfits (NSFW examples - gated)
   {
     id: 'outfit-nsfw-soft-lingerie',
@@ -118,7 +119,7 @@ export const cosmeticItems: CosmeticItem[] = [
     avatarSlot: 'outfit',
     tags: ['bikini', 'nsfw'],
   },
-  
+
   // Avatar Accessories (SFW)
   {
     id: 'accessory-glasses-round',
@@ -153,7 +154,7 @@ export const cosmeticItems: CosmeticItem[] = [
     avatarSlot: 'accessory',
     tags: ['earrings', 'gold', 'jewelry'],
   },
-  
+
   // Avatar VFX/Overlays (SFW)
   {
     id: 'vfx-petal-aura',
@@ -265,11 +266,12 @@ export function getCosmeticsByRarity(rarity: CosmeticRarity): CosmeticItem[] {
  * Get avatar cosmetics (outfits, accessories, VFX, overlays)
  */
 export function getAvatarCosmetics(): CosmeticItem[] {
-  return cosmeticItems.filter((item) => 
-    item.type === 'avatar-outfit' || 
-    item.type === 'avatar-accessory' || 
-    item.type === 'avatar-vfx' || 
-    item.type === 'avatar-overlay'
+  return cosmeticItems.filter(
+    (item) =>
+      item.type === 'avatar-outfit' ||
+      item.type === 'avatar-accessory' ||
+      item.type === 'avatar-vfx' ||
+      item.type === 'avatar-overlay',
   );
 }
 
@@ -284,10 +286,7 @@ export function isNSFWCosmetic(item: CosmeticItem): boolean {
 /**
  * Filter cosmetics by NSFW policy
  */
-export function filterByNSFWPolicy(
-  items: CosmeticItem[],
-  nsfwAllowed: boolean,
-): CosmeticItem[] {
+export function filterByNSFWPolicy(items: CosmeticItem[], nsfwAllowed: boolean): CosmeticItem[] {
   if (nsfwAllowed) {
     return items; // Show all if NSFW allowed
   }
@@ -300,4 +299,3 @@ export function filterByNSFWPolicy(
 export function getCosmeticsBySlot(slot: string): CosmeticItem[] {
   return cosmeticItems.filter((item) => item.avatarSlot === slot);
 }
-

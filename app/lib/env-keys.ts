@@ -9,4 +9,3 @@ export const REQUIRED_SERVER_KEYS = [
   'UPSTASH_REDIS_REST_URL',
   'UPSTASH_REDIS_REST_TOKEN',
 ] as const;
-

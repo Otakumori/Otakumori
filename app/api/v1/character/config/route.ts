@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
       // Extract configuration data from JSON
       const cfg = avatarConfig.configurationData as any;
-      
+
       // Transform database result to API format
       const transformedConfig = {
         id: avatarConfig.id,
@@ -279,7 +279,7 @@ export async function POST(request: NextRequest) {
 
       // Extract config data for response
       const savedCfg = avatarConfig.configurationData as any;
-      
+
       return NextResponse.json({
         ok: true,
         data: {

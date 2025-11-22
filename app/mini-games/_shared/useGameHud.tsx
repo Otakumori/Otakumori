@@ -1,6 +1,6 @@
 /**
  * Game HUD Loader Hook
- * 
+ *
  * Centralized HUD selection based on cosmetics state
  * Games should use this hook instead of manually choosing HUD components
  */
@@ -20,7 +20,7 @@ import type { QuakeAvatarHudProps } from '@/app/components/arcade/QuakeAvatarHud
  */
 export function useGameHud(gameId: string) {
   const cosmetics = useCosmetics();
-  
+
   const hudSkin = getHudForGame(gameId, {
     hudSkin: cosmetics.hudSkin,
     isUnlocked: cosmetics.isUnlocked,
@@ -67,4 +67,3 @@ export function GameHudLoader({
 
   return <Component {...defaultProps} {...hudProps} />;
 }
-

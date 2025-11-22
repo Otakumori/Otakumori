@@ -44,19 +44,19 @@ export function createNSFWLayers(
       continue;
     }
 
-        // Create mesh for NSFW layer
-        // In full implementation, we would load GLTF and attach to bones
-        // For now, create placeholder mesh
-        const nsfwMat = nsfwLayerMaterial({
-          baseColor: profile.colorPalette.accent,
-        });
+    // Create mesh for NSFW layer
+    // In full implementation, we would load GLTF and attach to bones
+    // For now, create placeholder mesh
+    const nsfwMat = nsfwLayerMaterial({
+      baseColor: profile.colorPalette.accent,
+    });
 
-        if (!nsfwMat) {
-          // Material creation failed (flag disabled), skip
-          continue;
-        }
+    if (!nsfwMat) {
+      // Material creation failed (flag disabled), skip
+      continue;
+    }
 
-        const layerMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), nsfwMat);
+    const layerMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), nsfwMat);
 
     layerMesh.name = `NSFWLayer_${layerId}`;
     layerMesh.renderOrder = 1; // Render after base body
@@ -66,4 +66,3 @@ export function createNSFWLayers(
   // Return group if it has children, otherwise null
   return nsfwGroup.children.length > 0 ? nsfwGroup : null;
 }
-

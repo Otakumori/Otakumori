@@ -5,10 +5,10 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 /**
  * PetalToast - Reusable UI feedback for petal gains
- * 
+ *
  * Shows a small "+N petals" notification when petals are granted.
  * Should be used consistently across the app for petal feedback.
- * 
+ *
  * Usage:
  * ```tsx
  * <PetalToast amount={grantedAmount} position="top-right" />
@@ -16,7 +16,13 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
  */
 interface PetalToastProps {
   amount: number;
-  position?: 'top-right' | 'top-center' | 'top-left' | 'bottom-right' | 'bottom-center' | 'bottom-left';
+  position?:
+    | 'top-right'
+    | 'top-center'
+    | 'top-left'
+    | 'bottom-right'
+    | 'bottom-center'
+    | 'bottom-left';
   duration?: number; // milliseconds
   onComplete?: () => void;
 }
@@ -72,11 +78,11 @@ export function PetalToast({
 
 /**
  * Hook to trigger petal toast notifications
- * 
+ *
  * Usage:
  * ```tsx
  * const showPetalToast = usePetalToast();
- * 
+ *
  * // After granting petals:
  * showPetalToast(result.granted);
  * ```
@@ -96,12 +102,7 @@ export function usePetalToast() {
   return {
     showToast,
     toasts: toasts.map((toast) => (
-      <PetalToast
-        key={toast.id}
-        amount={toast.amount}
-        onComplete={() => removeToast(toast.id)}
-      />
+      <PetalToast key={toast.id} amount={toast.amount} onComplete={() => removeToast(toast.id)} />
     )),
   };
 }
-

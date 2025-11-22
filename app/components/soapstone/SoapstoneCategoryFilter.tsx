@@ -28,9 +28,10 @@ export function SoapstoneCategoryFilter({
   return (
     <div className="flex flex-wrap gap-2 mb-6">
       {categories.map((category) => {
-        const info = category === 'all' 
-          ? { label: 'All', icon: '💬', color: 'text-white' }
-          : getCategoryInfo(category);
+        const info =
+          category === 'all'
+            ? { label: 'All', icon: '💬', color: 'text-white' }
+            : getCategoryInfo(category);
 
         return (
           <button
@@ -50,4 +51,3 @@ export function SoapstoneCategoryFilter({
     </div>
   );
 }
-

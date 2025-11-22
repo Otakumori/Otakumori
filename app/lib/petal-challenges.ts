@@ -1,6 +1,6 @@
 /**
  * Petal Challenges System
- * 
+ *
  * Daily challenges that reward users with petals and achievements
  */
 
@@ -94,4 +94,3 @@ export function updateChallengeProgress(
     progress: Math.min(challenge.progress + increment, challenge.target),
   };
 }
-

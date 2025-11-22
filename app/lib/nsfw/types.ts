@@ -1,6 +1,6 @@
 /**
  * NSFW Content Rating System
- * 
+ *
  * Centralized content rating types for NSFW gating.
  * Maps to cosmetics config and other content systems.
  */
@@ -54,4 +54,3 @@ export function mapLegacyRating(oldRating: string): ContentRating {
       return 'sfw';
   }
 }
-

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50);
 
     const { Visibility } = await import('@prisma/client');
-    
+
     const messages = await db.soapstoneMessage.findMany({
       where: {
         status: Visibility.PUBLIC,
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       const { body: messageBody, x, y } = validation.data;
 
       const { Visibility } = await import('@prisma/client');
-      
+
       // Create soapstone message with optional x/y coordinates
       const message = await db.soapstoneMessage.create({
         data: {

@@ -28,12 +28,10 @@ export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
 
             // Find highest discount user qualifies for
             const discountRewards = PETAL_REWARDS.filter(
-              (r) => r.type === 'discount' && hasReachedThreshold(userBalance, r.threshold)
+              (r) => r.type === 'discount' && hasReachedThreshold(userBalance, r.threshold),
             );
             if (discountRewards.length > 0) {
-              const highestDiscount = Math.max(
-                ...discountRewards.map((r) => r.value as number)
-              );
+              const highestDiscount = Math.max(...discountRewards.map((r) => r.value as number));
               setAvailableDiscount(highestDiscount);
             }
           }
@@ -59,20 +57,14 @@ export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
         <span className="text-lg" role="img" aria-label="Discount">
           💰
         </span>
-        <span className="text-sm font-semibold text-pink-300">
-          Petal Discount Available!
-        </span>
+        <span className="text-sm font-semibold text-pink-300">Petal Discount Available!</span>
       </div>
       <p className="text-xs text-white/80 mb-2">
         You qualify for {availableDiscount}% off with your petal balance
       </p>
       <div className="flex items-baseline gap-2">
-        <span className="text-lg font-bold text-pink-300">
-          ${discountedPrice.toFixed(2)}
-        </span>
-        <span className="text-sm text-white/60 line-through">
-          ${productPrice.toFixed(2)}
-        </span>
+        <span className="text-lg font-bold text-pink-300">${discountedPrice.toFixed(2)}</span>
+        <span className="text-sm text-white/60 line-through">${productPrice.toFixed(2)}</span>
         <span className="text-xs text-emerald-300 font-medium">
           Save ${discountAmount.toFixed(2)}
         </span>
@@ -80,4 +72,3 @@ export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
     </div>
   );
 }
-

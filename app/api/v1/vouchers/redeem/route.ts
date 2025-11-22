@@ -13,7 +13,7 @@ const RedeemVoucherRequestSchema = z.object({
 
 /**
  * POST /api/v1/vouchers/redeem
- * 
+ *
  * Mark a voucher as redeemed when used in an order.
  * Called from checkout webhook after successful payment.
  */
@@ -55,10 +55,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'USER_NOT_FOUND', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'USER_NOT_FOUND', requestId }, { status: 404 });
     }
 
     // Find voucher
@@ -91,10 +88,7 @@ export async function POST(req: NextRequest) {
 
     // Validate voucher is not expired
     if (voucher.expiresAt && voucher.expiresAt < new Date()) {
-      return NextResponse.json(
-        { ok: false, error: 'VOUCHER_EXPIRED', requestId },
-        { status: 400 },
-      );
+      return NextResponse.json({ ok: false, error: 'VOUCHER_EXPIRED', requestId }, { status: 400 });
     }
 
     // Mark voucher as redeemed
@@ -127,4 +121,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

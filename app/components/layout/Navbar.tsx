@@ -14,7 +14,16 @@ import { useCart } from '@/app/components/cart/CartProvider';
 import { ShoppingCart } from 'lucide-react';
 
 // Safely get featured games from registry with defensive checks
-const gamesRegistry = gamesRegistryData as { games?: Array<{ id?: string; enabled?: boolean; featured?: boolean; title?: string; description?: string; ageRating?: string }> };
+const gamesRegistry = gamesRegistryData as {
+  games?: Array<{
+    id?: string;
+    enabled?: boolean;
+    featured?: boolean;
+    title?: string;
+    description?: string;
+    ageRating?: string;
+  }>;
+};
 const FEATURED_GAMES = (gamesRegistry?.games || [])
   .filter((game) => game?.enabled && game?.featured)
   .slice(0, 6)
@@ -98,11 +107,7 @@ export default function Navbar() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const {
-    requireAuthForSoapstone,
-    requireAuthForWishlist,
-    signOut,
-  } = useAuthContext();
+  const { requireAuthForSoapstone, requireAuthForWishlist, signOut } = useAuthContext();
   const { itemCount } = useCart();
 
   // State for mega-menu and search
@@ -370,8 +375,12 @@ export default function Navbar() {
                               )}
                             </div>
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-white">{product.title}</p>
-                              <p className="text-xs text-text-link-hover">${product.price.toFixed(2)}</p>
+                              <p className="truncate text-sm font-medium text-white">
+                                {product.title}
+                              </p>
+                              <p className="text-xs text-text-link-hover">
+                                ${product.price.toFixed(2)}
+                              </p>
                             </div>
                           </Link>
                         ))}
@@ -394,8 +403,12 @@ export default function Navbar() {
                           href={category.href}
                           className="rounded-lg p-3 transition-colors hover:bg-white/10"
                         >
-                          <span className="block text-sm font-medium text-white">{category.label}</span>
-                          <span className="mt-1 block text-xs text-white/60">{category.description}</span>
+                          <span className="block text-sm font-medium text-white">
+                            {category.label}
+                          </span>
+                          <span className="mt-1 block text-xs text-white/60">
+                            {category.description}
+                          </span>
                         </Link>
                       ))}
                     </div>
@@ -414,7 +427,9 @@ export default function Navbar() {
             <button
               onMouseEnter={() => setActiveDropdown('games')}
               className={`text-text-link hover:text-text-link-hover transition-colors flex items-center ${
-                pathname.startsWith('/mini-games') ? 'text-text-link-hover border-b-2 border-primary' : ''
+                pathname.startsWith('/mini-games')
+                  ? 'text-text-link-hover border-b-2 border-primary'
+                  : ''
               }`}
             >
               Mini-Games
@@ -479,7 +494,9 @@ export default function Navbar() {
                           className="rounded-lg p-3 transition-colors hover:bg-white/10"
                         >
                           <span className="block text-sm font-medium text-white">{face.label}</span>
-                          <span className="mt-1 block text-xs text-white/60">{face.description}</span>
+                          <span className="mt-1 block text-xs text-white/60">
+                            {face.description}
+                          </span>
                         </Link>
                       ))}
                     </div>
@@ -592,7 +609,9 @@ export default function Navbar() {
           <button
             onClick={handleSoapstoneClick}
             className={`text-text-link hover:text-text-link-hover transition-colors flex items-center gap-1 ${
-              pathname.startsWith('/community') ? 'text-text-link-hover border-b-2 border-primary' : ''
+              pathname.startsWith('/community')
+                ? 'text-text-link-hover border-b-2 border-primary'
+                : ''
             }`}
             title={isSignedIn ? 'Community' : 'Sign in to access community'}
           >
@@ -655,7 +674,9 @@ export default function Navbar() {
                   >
                     <span>{suggestion}</span>
                     {EASTER_EGGS[suggestion] && (
-                      <span className="text-xs text-text-link-hover">{EASTER_EGGS[suggestion]}</span>
+                      <span className="text-xs text-text-link-hover">
+                        {EASTER_EGGS[suggestion]}
+                      </span>
                     )}
                   </button>
                 ))}
@@ -700,10 +721,23 @@ export default function Navbar() {
                   </div>
                 )}
                 <span className="hidden sm:inline text-sm text-white">
-                  {user?.fullName || user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || 'User'}
+                  {user?.fullName ||
+                    user?.firstName ||
+                    user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] ||
+                    'User'}
                 </span>
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
@@ -767,9 +801,7 @@ export default function Navbar() {
             </div>
           ) : (
             <SignInButton mode="modal">
-              <button
-                className="px-4 py-2 bg-transparent border border-current rounded-lg text-text-link hover:text-text-link-hover hover:border-primary transition-all duration-300"
-              >
+              <button className="px-4 py-2 bg-transparent border border-current rounded-lg text-text-link hover:text-text-link-hover hover:border-primary transition-all duration-300">
                 Sign In
               </button>
             </SignInButton>
@@ -793,19 +825,34 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden bg-black/90 backdrop-blur-lg border-t border-white/20">
           <div className="px-4 py-2 space-y-2">
-            <Link href={paths.home()} className="block text-text-primary hover:text-text-link-hover py-2">
+            <Link
+              href={paths.home()}
+              className="block text-text-primary hover:text-text-link-hover py-2"
+            >
               Home
             </Link>
-            <Link href={paths.shop()} className="block text-text-primary hover:text-text-link-hover py-2">
+            <Link
+              href={paths.shop()}
+              className="block text-text-primary hover:text-text-link-hover py-2"
+            >
               Shop
             </Link>
-            <Link href={paths.games()} className="block text-text-primary hover:text-text-link-hover py-2">
+            <Link
+              href={paths.games()}
+              className="block text-text-primary hover:text-text-link-hover py-2"
+            >
               Mini-Games
             </Link>
-            <Link href={paths.blogIndex()} className="block text-text-primary hover:text-text-link-hover py-2">
+            <Link
+              href={paths.blogIndex()}
+              className="block text-text-primary hover:text-text-link-hover py-2"
+            >
               Blog
             </Link>
-            <Link href={paths.help()} className="block text-text-primary hover:text-text-link-hover py-2">
+            <Link
+              href={paths.help()}
+              className="block text-text-primary hover:text-text-link-hover py-2"
+            >
               About
             </Link>
             <Link

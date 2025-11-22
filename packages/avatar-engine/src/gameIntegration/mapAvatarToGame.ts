@@ -5,7 +5,11 @@
  * should be used instead. This is kept for backward compatibility.
  */
 
-import type { AvatarProfile, AvatarRepresentationConfig, RepresentationMode } from '../types/avatar';
+import type {
+  AvatarProfile,
+  AvatarRepresentationConfig,
+  RepresentationMode,
+} from '../types/avatar';
 import { getRepresentationTransform } from '../renderer/representationModes';
 
 /**
@@ -20,7 +24,7 @@ const GAME_REPRESENTATION_MAP: Record<string, RepresentationMode> = {
   'memory-match': 'portrait',
   'puzzle-reveal': 'portrait',
   'bubble-girl': 'chibi',
-  'blossomware': 'chibi',
+  blossomware: 'chibi',
   'dungeon-of-desire': 'bust',
 };
 
@@ -55,4 +59,3 @@ export function mapAvatarToGameRepresentation(
 export function getGameRepresentationMode(gameId: string): RepresentationMode {
   return GAME_REPRESENTATION_MAP[gameId] || 'fullBody';
 }
-

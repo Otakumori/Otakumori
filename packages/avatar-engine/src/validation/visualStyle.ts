@@ -62,7 +62,8 @@ function checkMaterial(
       violations.push({
         objectName,
         violationType: 'realistic_pbr',
-        suggestion: 'Replace with cel-shaded material (animeToonMaterial or createCelShadedMaterial)',
+        suggestion:
+          'Replace with cel-shaded material (animeToonMaterial or createCelShadedMaterial)',
       });
       return;
     }
@@ -103,4 +104,3 @@ export function logStyleViolations(violations: StyleViolation[]): void {
     });
   }
 }
-

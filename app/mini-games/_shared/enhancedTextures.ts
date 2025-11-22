@@ -1,6 +1,6 @@
 /**
  * Enhanced Texture Utilities
- * 
+ *
  * Procedural texture generators, gradient utilities, particle effects,
  * and bloom/glow utilities for enhanced visual quality.
  */
@@ -382,4 +382,3 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
       }
     : { r: 0, g: 0, b: 0 };
 }
-

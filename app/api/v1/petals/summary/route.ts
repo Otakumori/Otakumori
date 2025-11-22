@@ -1,6 +1,6 @@
 /**
  * Petal Summary API - Returns comprehensive petal stats for profile view
- * 
+ *
  * Returns:
  * - Current balance
  * - Lifetime petals earned
@@ -19,12 +19,9 @@ export const runtime = 'nodejs';
 export async function GET() {
   try {
     const { userId } = await auth();
-    
+
     if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'Unauthorized' },
-        { status: 401 },
-      );
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user
@@ -34,10 +31,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'User not found' },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 });
     }
 
     // Get petal info via PetalService
@@ -88,7 +82,7 @@ export async function GET() {
     });
 
     const achievementCount = achievements.length;
-    
+
     // Calculate total petals earned from achievements
     let achievementPetals = 0;
     const achievementEarnings = await db.petalLedger.findMany({
@@ -190,10 +184,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching petal summary:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
-

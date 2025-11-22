@@ -45,7 +45,9 @@ export default function ProfileAvatarCard() {
         <div className="aspect-square rounded-lg border-2 border-dashed border-white/20 bg-black/30 flex items-center justify-center mb-4">
           <div className="text-center">
             <div className="text-4xl mb-2">
-              <span role="img" aria-label="User icon">👤</span>
+              <span role="img" aria-label="User icon">
+                👤
+              </span>
             </div>
             <p className="text-sm text-zinc-400">No avatar yet</p>
           </div>
@@ -69,15 +71,15 @@ export default function ProfileAvatarCard() {
       ) : hasAvatar ? (
         <div className="mb-4">
           <AvatarDisplay size="lg" showEditButton={false} />
-          <p className="text-xs text-zinc-400 text-center mt-2">
-            This is your Otaku-mori avatar
-          </p>
+          <p className="text-xs text-zinc-400 text-center mt-2">This is your Otaku-mori avatar</p>
         </div>
       ) : (
         <div className="aspect-square rounded-lg border-2 border-dashed border-white/20 bg-black/30 flex items-center justify-center mb-4">
           <div className="text-center">
             <div className="text-4xl mb-2">
-              <span role="img" aria-label="Cherry blossom">🌸</span>
+              <span role="img" aria-label="Cherry blossom">
+                🌸
+              </span>
             </div>
             <p className="text-sm text-zinc-400">No avatar yet</p>
           </div>
@@ -103,4 +105,3 @@ export default function ProfileAvatarCard() {
     </div>
   );
 }
-

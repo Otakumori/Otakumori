@@ -39,17 +39,17 @@ const requiredKeys = [
   'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
 ];
 
-const inProcessEnv = requiredKeys.filter(key => process.env[key]);
+const inProcessEnv = requiredKeys.filter((key) => process.env[key]);
 console.log(`   ✅ ${inProcessEnv.length}/${requiredKeys.length} keys in process.env`);
 
 console.log('\n3. Importing env.mjs (which validates process.env)...');
 try {
   const { env } = await import('../env.mjs');
-  
+
   console.log('\n4. Checking if env.mjs can access the keys:');
   const accessible = [];
   const missing = [];
-  
+
   for (const key of requiredKeys) {
     const value = env[key];
     if (value) {
@@ -61,11 +61,11 @@ try {
       console.log(`   ❌ ${key}: MISSING`);
     }
   }
-  
+
   console.log(`\n📊 Summary:`);
   console.log(`   ✅ Accessible via env.mjs: ${accessible.length}/${requiredKeys.length}`);
   console.log(`   ❌ Missing from env.mjs: ${missing.length}/${requiredKeys.length}`);
-  
+
   if (missing.length === 0) {
     console.log('\n✅ SUCCESS: All keys are properly loaded and accessible!');
     console.log('   The verify-env script ACTUALLY loads the keys, not just checks files.');
@@ -78,9 +78,10 @@ try {
 } catch (error) {
   console.error('\n❌ Error importing env.mjs:', error.message);
   if (error.message.includes('Invalid environment variables')) {
-    console.error('\n   This means env.mjs validation failed because keys are missing from process.env');
+    console.error(
+      '\n   This means env.mjs validation failed because keys are missing from process.env',
+    );
     console.error('   The verify-env script needs to load .env.local BEFORE importing env.mjs');
   }
   process.exit(1);
 }
-

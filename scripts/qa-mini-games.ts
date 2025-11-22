@@ -2,9 +2,9 @@
 /**
  * Mini-Games QA Validation Script
  * Runs static checks on all mini-games for avatar integration, materials, UI, mechanics, and flags
- * 
+ *
  * Usage: pnpm mini-games:qa
- * 
+ *
  * Exits with non-zero status if hard failures are found (errors, not warnings)
  */
 
@@ -37,12 +37,18 @@ const GAMES = [
 async function validateGame(gameSlug: string): Promise<GameQAResult> {
   const gamePath = join(process.cwd(), 'app', 'mini-games', gameSlug);
   const pagePath = join(gamePath, 'page.tsx');
-  
+
   // Try to find game component files
   const possibleFiles = [
     pagePath,
     join(gamePath, 'Game.tsx'),
-    join(gamePath, `${gameSlug.split('-').map(s => s[0].toUpperCase() + s.slice(1)).join('')}Game.tsx`),
+    join(
+      gamePath,
+      `${gameSlug
+        .split('-')
+        .map((s) => s[0].toUpperCase() + s.slice(1))
+        .join('')}Game.tsx`,
+    ),
   ];
 
   const gameFile = possibleFiles.find((f) => existsSync(f)) || pagePath;
@@ -150,4 +156,3 @@ runQA()
 
 // Export for programmatic use
 export { runQA, validateGame };
-

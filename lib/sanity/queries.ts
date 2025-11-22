@@ -130,4 +130,3 @@ export function mapSanityStory(doc: RawSanityStory): SanityStory | null {
     publishedAt: doc.publishedAt,
   };
 }
-

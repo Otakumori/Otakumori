@@ -170,16 +170,16 @@ export async function POST(request: NextRequest) {
     }
     const newComment = await db.comment.create({
       data: commentData,
-        include: {
-          User: {
-            select: {
-              id: true,
-              username: true,
-              displayName: true,
-              avatarUrl: true,
-            },
+      include: {
+        User: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            avatarUrl: true,
           },
         },
+      },
     });
 
     // Create activity for the comment

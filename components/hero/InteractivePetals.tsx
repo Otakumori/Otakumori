@@ -95,16 +95,16 @@ export default function InteractivePetals({
           .map((petal) => {
             // Physics simulation
             const deltaTime = 0.016; // ~60fps
-            
+
             // Gravity (constant downward acceleration)
             const gravity = 0.3;
             const newVy = petal.vy + gravity * deltaTime;
-            
+
             // Wind effect (sine wave for natural sway)
             const windTime = currentTime * 0.001;
             const windEffect = Math.sin((windTime * 0.5 + petal.id * 0.1) * 2) * 0.2;
             const newVx = petal.vx * 0.99 + windEffect; // Air resistance + wind
-            
+
             // Update position
             const newPetal = {
               ...petal,

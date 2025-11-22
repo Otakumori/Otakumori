@@ -27,7 +27,7 @@ const GrantPetalsSchema = z.object({
 
 /**
  * POST /api/v1/petals/grant
- * 
+ *
  * Centralized endpoint for granting petals.
  * All petal grants should use this endpoint to ensure:
  * - Consistent validation
@@ -119,4 +119,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

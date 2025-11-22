@@ -83,10 +83,12 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 #### Hardware Acceleration
 
 {% raw %}
+
 ```typescript
 className="transform-gpu"
 style={{ transformStyle: 'preserve-3d' }}
 ```
+
 {% endraw %}
 
 #### Cleanup

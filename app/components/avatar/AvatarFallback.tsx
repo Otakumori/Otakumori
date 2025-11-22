@@ -11,17 +11,17 @@ interface AvatarFallbackProps {
 
 /**
  * AvatarFallback - Graceful fallback when avatar fails to load
- * 
+ *
  * Shows a branded silhouette that matches the site's aesthetic.
  * Different styles for preset vs user avatars.
  */
-export function AvatarFallback({ 
-  size = 'md', 
+export function AvatarFallback({
+  size = 'md',
   className = '',
-  mode = 'guest'
+  mode = 'guest',
 }: AvatarFallbackProps) {
   const sizeClasses = getAvatarSizeClasses(size);
-  
+
   // Different fallback styles based on mode
   const fallbackStyles = {
     preset: 'bg-gradient-to-br from-purple-600/40 to-pink-600/40',
@@ -49,4 +49,3 @@ export function AvatarFallback({
 }
 
 export default AvatarFallback;
-

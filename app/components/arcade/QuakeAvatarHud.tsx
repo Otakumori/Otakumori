@@ -65,7 +65,8 @@ export function QuakeAvatarHud({
         <div
           className="bg-gradient-to-t from-black/90 via-slate-900/80 to-transparent backdrop-blur-sm border-t-2 border-pink-500/30"
           style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(236,72,153,0.03) 2px, rgba(236,72,153,0.03) 4px)',
+            backgroundImage:
+              'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(236,72,153,0.03) 2px, rgba(236,72,153,0.03) 4px)',
           }}
         >
           <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -126,7 +127,8 @@ export function QuakeAvatarHud({
             <div
               className="absolute inset-0 pointer-events-none opacity-20"
               style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(236,72,153,0.1) 2px, rgba(236,72,153,0.1) 4px)',
+                backgroundImage:
+                  'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(236,72,153,0.1) 2px, rgba(236,72,153,0.1) 4px)',
               }}
             />
 
@@ -139,9 +141,7 @@ export function QuakeAvatarHud({
                 <h2 className="text-3xl font-bold text-pink-400 font-mono uppercase tracking-wider mb-2">
                   {lastEvent?.type === 'achievement' ? 'Achievement Unlocked' : 'Event'}
                 </h2>
-                {lastEvent && (
-                  <p className="text-xl text-white font-mono">{lastEvent.label}</p>
-                )}
+                {lastEvent && <p className="text-xl text-white font-mono">{lastEvent.label}</p>}
               </div>
 
               {/* Avatar Display */}
@@ -164,7 +164,9 @@ export function QuakeAvatarHud({
               <div className="grid grid-cols-2 gap-4 text-center">
                 <OmCard className="bg-black/40 border-pink-500/30">
                   <div className="text-xs text-pink-400 font-mono uppercase mb-1">Petals</div>
-                  <div className="text-2xl font-bold text-white font-mono">{petals.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-white font-mono">
+                    {petals.toLocaleString()}
+                  </div>
                 </OmCard>
                 {gameId && (
                   <OmCard className="bg-black/40 border-pink-500/30">
@@ -177,7 +179,12 @@ export function QuakeAvatarHud({
               {/* Continue Button */}
               {onOverlayClose && (
                 <div className="flex justify-center pt-4">
-                  <OmButton variant="primary" size="lg" onClick={onOverlayClose} className="font-mono uppercase">
+                  <OmButton
+                    variant="primary"
+                    size="lg"
+                    onClick={onOverlayClose}
+                    className="font-mono uppercase"
+                  >
                     Continue
                   </OmButton>
                 </div>
@@ -189,4 +196,3 @@ export function QuakeAvatarHud({
     </AnimatePresence>
   );
 }
-

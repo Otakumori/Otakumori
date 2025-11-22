@@ -1,9 +1,9 @@
 /**
  * Client Error Logging Endpoint
- * 
+ *
  * This endpoint receives client-side error reports and logs them server-side.
  * It may later be wired to Sentry or another external error tracking provider.
- * 
+ *
  * TODO: Consider migrating to Sentry client-side SDK for better error tracking
  */
 
@@ -44,7 +44,7 @@ type ClientErrorPayload = z.infer<typeof ClientErrorPayloadSchema>;
 
 /**
  * POST /api/log-client-error
- * 
+ *
  * Receives client-side error reports and logs them safely.
  * Returns { ok: true } on success, { ok: false, error: string } on failure.
  */
@@ -53,10 +53,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);
 
     if (!body) {
-      return NextResponse.json(
-        { ok: false, error: 'Invalid JSON payload' },
-        { status: 400 },
-      );
+      return NextResponse.json({ ok: false, error: 'Invalid JSON payload' }, { status: 400 });
     }
 
     // Validate payload
@@ -73,10 +70,7 @@ export async function POST(req: NextRequest) {
 
     // Extract error message safely
     const errorMessage =
-      payload.message ||
-      payload.error?.message ||
-      payload.reason ||
-      'Unknown error';
+      payload.message || payload.error?.message || payload.reason || 'Unknown error';
 
     // Build safe log entry (no secrets, sanitized)
     const logEntry = {
@@ -102,9 +96,6 @@ export async function POST(req: NextRequest) {
     // Log parsing/processing errors but don't expose details to client
     console.error('[CLIENT-ERROR-API] Failed to process error log:', error);
 
-    return NextResponse.json(
-      { ok: false, error: 'Failed to process error log' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Failed to process error log' }, { status: 500 });
   }
 }

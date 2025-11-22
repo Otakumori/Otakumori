@@ -1,14 +1,11 @@
 /**
  * Enhanced Rendering Utilities
- * 
+ *
  * Better shadows, lighting, particles, and post-processing effects
  * for improved visual quality across all games.
  */
 
 'use client';
-
-
-
 
 /**
  * Create enhanced shadow with blur and color
@@ -210,7 +207,11 @@ export function createParticleSystem(
   return particles;
 }
 
-export function updateParticleSystem(particles: Particle[], deltaTime: number, gravity: number = 0): Particle[] {
+export function updateParticleSystem(
+  particles: Particle[],
+  deltaTime: number,
+  gravity: number = 0,
+): Particle[] {
   return particles
     .map((particle) => {
       particle.x += particle.vx * deltaTime;
@@ -253,7 +254,7 @@ export function applyBloomPostProcess(
   // Threshold determines brightness cutoff for bloom (higher = only bright areas bloom)
   const imageData = ctx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
   const data = imageData.data;
-  
+
   // Apply threshold-based bloom (only bright pixels contribute)
   for (let i = 0; i < data.length; i += 4) {
     const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3 / 255;
@@ -264,9 +265,9 @@ export function applyBloomPostProcess(
       data[i + 2] *= 0.5;
     }
   }
-  
+
   ctx.putImageData(imageData, 0, 0);
-  
+
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
   ctx.globalAlpha = intensity;
@@ -296,7 +297,7 @@ export function applyColorCorrection(
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.restore();
   }
-  
+
   // Apply contrast
   if (contrast !== 1.0) {
     ctx.save();
@@ -306,7 +307,7 @@ export function applyColorCorrection(
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.restore();
   }
-  
+
   // Apply saturation (simplified - desaturate by mixing with grayscale)
   if (saturation !== 1.0 && saturation < 1.0) {
     ctx.save();
@@ -331,7 +332,14 @@ export function createGradientBackground(
   let gradient: CanvasGradient;
 
   if (direction === 'radial') {
-    gradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, Math.max(width, height));
+    gradient = ctx.createRadialGradient(
+      width / 2,
+      height / 2,
+      0,
+      width / 2,
+      height / 2,
+      Math.max(width, height),
+    );
   } else if (direction === 'horizontal') {
     gradient = ctx.createLinearGradient(0, 0, width, 0);
   } else {
@@ -360,4 +368,3 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
       }
     : { r: 255, g: 255, b: 255 };
 }
-

@@ -124,7 +124,8 @@ export default function NSFWPageClient() {
             {globalEnabled ? 'Disable Globally' : 'Enable Globally'}
           </button>
           <span className="text-sm text-neutral-400">
-            Current: <span className="font-medium text-white">{globalEnabled ? 'Enabled' : 'Disabled'}</span>
+            Current:{' '}
+            <span className="font-medium text-white">{globalEnabled ? 'Enabled' : 'Disabled'}</span>
           </span>
         </div>
       </div>
@@ -132,11 +133,10 @@ export default function NSFWPageClient() {
       {/* User Override Note */}
       <div className="rounded-xl border border-white/10 bg-black/50 p-4">
         <p className="text-sm text-neutral-400">
-          User-level overrides can be managed by editing individual user records. For now, this is a read-only view.
-          Future updates will allow forcing NSFW disabled for specific users.
+          User-level overrides can be managed by editing individual user records. For now, this is a
+          read-only view. Future updates will allow forcing NSFW disabled for specific users.
         </p>
       </div>
     </div>
   );
 }
-

@@ -5,16 +5,19 @@
 ### **1. NSFW Filter Toggle**
 
 #### **Configuration File** (`app/lib/nsfw/config.ts`)
+
 - Created centralized NSFW filter configuration
 - **Toggle**: `NEXT_PUBLIC_NSFW_FILTER_ENABLED` environment variable
 - **Default**: `true` (filtering enabled)
 - **To disable**: Set `NEXT_PUBLIC_NSFW_FILTER_ENABLED=false` in `.env`
 
 #### **Updated Files**
+
 - `app/lib/nsfw/visibility.ts` - Checks `shouldFilterNSFW()` before filtering
 - `packages/avatar/src/policy.ts` - Checks environment variable to bypass filtering
 
 #### **How It Works**
+
 ```typescript
 // If NSFW filtering is disabled globally, show all content
 if (!shouldFilterNSFW()) {
@@ -23,6 +26,7 @@ if (!shouldFilterNSFW()) {
 ```
 
 **To toggle NSFW filtering:**
+
 1. **Disable filtering**: Add `NEXT_PUBLIC_NSFW_FILTER_ENABLED=false` to `.env`
 2. **Enable filtering**: Set `NEXT_PUBLIC_NSFW_FILTER_ENABLED=true` or remove the variable (defaults to true)
 
@@ -31,11 +35,13 @@ if (!shouldFilterNSFW()) {
 ### **2. CREATOR Avatar Choice System**
 
 #### **New Hook** (`app/mini-games/_shared/useCreatorAvatar.ts`)
+
 - Loads CREATOR avatar configuration from `/api/v1/creator/load`
 - Converts `CreatorAvatarConfig` to `AvatarConfiguration` for game use
 - Provides loading states and error handling
 
 #### **Updated Component** (`app/mini-games/_shared/AvatarPresetChoice.tsx`)
+
 - **Choice Type Changed**: `'avatar'` → `'creator'`
 - **New Options**:
   - **"Play with my CREATOR avatar"** - Uses avatar created in `/creator`
@@ -43,11 +49,14 @@ if (!shouldFilterNSFW()) {
 - **Fallback**: If no CREATOR avatar exists, falls back to guest avatar or preset
 
 #### **Updated All 9 Games**
+
 All games now support choosing between:
+
 - ✅ **CREATOR avatar** (from `/creator` page)
 - ✅ **Preset character** (default game character)
 
 **Updated Games:**
+
 - petal-samurai
 - petal-storm-rhythm
 - memory-match
@@ -69,11 +78,11 @@ All games now support choosing between:
 2. **Game shows choice modal** (if `avatarUsage === 'avatar-or-preset'`)
    - "Play with my CREATOR avatar" (if CREATOR avatar exists)
    - "Play with preset character"
-   ↓
+     ↓
 3. **User selects choice**
    - **CREATOR**: Loads avatar from `/api/v1/creator/load`
    - **Preset**: Uses default game character
-   ↓
+     ↓
 4. **Game renders selected character**
    - CREATOR avatars use full customization (morphs, parts, materials)
    - Presets use default game character
@@ -85,6 +94,7 @@ All games now support choosing between:
 ### **NSFW Filter Toggle**
 
 **Environment Variable:**
+
 ```bash
 # Disable NSFW filtering (show all content)
 NEXT_PUBLIC_NSFW_FILTER_ENABLED=false
@@ -94,6 +104,7 @@ NEXT_PUBLIC_NSFW_FILTER_ENABLED=true
 ```
 
 **Code Usage:**
+
 ```typescript
 import { shouldFilterNSFW } from '@/app/lib/nsfw/config';
 
@@ -106,6 +117,7 @@ if (!shouldFilterNSFW()) {
 ### **CREATOR Avatar Loading**
 
 **Hook Usage:**
+
 ```typescript
 import { useCreatorAvatar } from '@/app/mini-games/_shared/useCreatorAvatar';
 
@@ -113,6 +125,7 @@ const { creatorAvatar, avatarConfig, isLoading } = useCreatorAvatar(true);
 ```
 
 **API Endpoint:**
+
 - `GET /api/v1/creator/load` - Loads user's CREATOR avatar configuration
 
 ---
@@ -120,10 +133,12 @@ const { creatorAvatar, avatarConfig, isLoading } = useCreatorAvatar(true);
 ## 📝 **Files Changed**
 
 ### **New Files**
+
 - `app/lib/nsfw/config.ts` - NSFW filter toggle configuration
 - `app/mini-games/_shared/useCreatorAvatar.ts` - CREATOR avatar loading hook
 
 ### **Updated Files**
+
 - `app/lib/nsfw/visibility.ts` - Added NSFW filter check
 - `packages/avatar/src/policy.ts` - Added environment variable check
 - `app/mini-games/_shared/AvatarPresetChoice.tsx` - Updated to support CREATOR avatars
@@ -158,4 +173,3 @@ const { creatorAvatar, avatarConfig, isLoading } = useCreatorAvatar(true);
 - ✅ All 9 games updated
 - ✅ TypeScript errors fixed
 - ✅ Ready for testing
-

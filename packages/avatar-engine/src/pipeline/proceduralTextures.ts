@@ -175,8 +175,7 @@ export function generateDecal(
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
 
-  const decalColor =
-    color instanceof THREE.Color ? color : new THREE.Color(color);
+  const decalColor = color instanceof THREE.Color ? color : new THREE.Color(color);
 
   // Clear canvas
   ctx.fillStyle = `rgba(0, 0, 0, 0)`;
@@ -255,10 +254,7 @@ export function generateDecal(
 /**
  * Generate palette-based recoloring texture
  */
-export function generatePaletteTexture(
-  colors: string[],
-  width: number = 256,
-): THREE.Texture {
+export function generatePaletteTexture(colors: string[], width: number = 256): THREE.Texture {
   const height = 1;
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -298,4 +294,3 @@ export function generatePaletteTexture(
 
   return texture;
 }
-

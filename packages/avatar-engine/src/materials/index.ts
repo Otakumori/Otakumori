@@ -25,4 +25,3 @@ export type { OutlinePassOptions } from './outlinePass';
 
 export { getOtakumoriPalette, paletteToColors, getPaletteColor } from './palette';
 export type { OtakumoriPalette, PaletteMode } from './palette';
-

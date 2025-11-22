@@ -1,6 +1,6 @@
 /**
  * Global Petal Leaderboard API
- * 
+ *
  * Returns top users by lifetime petals earned
  * Public endpoint (read-only, no auth required)
  */
@@ -58,10 +58,6 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Error fetching global petal leaderboard:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
-

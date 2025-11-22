@@ -1,12 +1,12 @@
 /**
  * Central Game Visual Loader
- * 
+ *
  * Provides consistent visual profiles for all mini-games:
  * - Background styles, lighting, post-processing
  * - HUD skin selection (respects cosmetics)
  * - Avatar representation modes
  * - Material/shader configurations
- * 
+ *
  * No game should hardcode visual decisions - they all use this loader.
  */
 
@@ -810,21 +810,21 @@ export function applyVisualProfile(
 
 /**
  * Representation Mode Documentation
- * 
+ *
  * Each game uses a specific representation mode for avatar display:
- * 
+ *
  * - fullBody: Complete avatar (petal-samurai, otaku-beat-em-up, thigh-coliseum)
  *   - Use when avatar is central to gameplay or needs full visibility
  *   - Conditional display: hide if avatar quality is low (focus on game VFX instead)
- * 
+ *
  * - bust: Waist-up view (petal-storm-rhythm, dungeon-of-desire)
  *   - Emphasizes face, hair, torso
  *   - Good for rhythm games and character-focused experiences
- * 
+ *
  * - portrait: Head/shoulder frame (memory-match, puzzle-reveal)
  *   - Simplified, UI-integrated avatar
  *   - Used when avatar is decorative, not gameplay-critical
- * 
+ *
  * - chibi: Proportional remap with larger head (bubble-girl, blossomware)
  *   - Stylized, cute representation
  *   - Good for casual/sandbox games
@@ -833,7 +833,7 @@ export function applyVisualProfile(
 /**
  * Hook to get complete visual profile for a game
  * Combines game visual profile, avatar bundle config, and cosmetics state
- * 
+ *
  * Note: This is a regular function, not a React hook (no hooks used internally).
  * It can be called from React hooks or components.
  */
@@ -852,26 +852,25 @@ export function useGameVisualProfile(
 } {
   // Get base visual profile
   const profile = getGameVisualProfile(gameId);
-  
+
   // Get avatar bundle config
   const avatarBundle = getAvatarBundleForGame(gameId);
-  
+
   // Resolve HUD skin from cosmetics state
   const cosmeticsState = options?.cosmeticsState || {
     hudSkin: 'default' as HudSkinId,
     isUnlocked: () => false,
   };
   const hudSkin = getHudForGame(gameId, cosmeticsState);
-  
+
   // Merge material hints from avatar bundle into profile if not already set
   if (!profile.materialHints) {
     profile.materialHints = avatarBundle.materialHints;
   }
-  
+
   return {
     ...profile,
     hudSkin,
     avatarBundle,
   };
 }
-

@@ -62,8 +62,12 @@ export default function RewardsSummary() {
       <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
         <h2 className="text-xl font-semibold text-white mb-4">Your Petal Rewards</h2>
         <div className="text-center py-8">
-          <p className="text-zinc-300 mb-2">Sign in to save your petals and track your lifetime total.</p>
-          <p className="text-sm text-zinc-400">Your progress will be saved and you can unlock achievements!</p>
+          <p className="text-zinc-300 mb-2">
+            Sign in to save your petals and track your lifetime total.
+          </p>
+          <p className="text-sm text-zinc-400">
+            Your progress will be saved and you can unlock achievements!
+          </p>
         </div>
       </section>
     );
@@ -95,7 +99,7 @@ export default function RewardsSummary() {
   return (
     <section className="rounded-2xl border border-white/10 bg-black/50 p-5">
       <h2 className="text-xl font-semibold text-white mb-4">Your Petal Rewards</h2>
-      
+
       {/* Current Balance & Lifetime */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="rounded-xl border border-pink-500/30 bg-pink-500/10 p-4">
@@ -103,10 +107,12 @@ export default function RewardsSummary() {
           <div className="text-3xl font-bold text-white">{summary.balance.toLocaleString()}</div>
           <div className="text-xs text-pink-200/50 mt-1">Available to spend</div>
         </div>
-        
+
         <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
           <div className="text-sm text-purple-200/70 mb-1">Lifetime Earned</div>
-          <div className="text-3xl font-bold text-white">{summary.lifetimePetalsEarned.toLocaleString()}</div>
+          <div className="text-3xl font-bold text-white">
+            {summary.lifetimePetalsEarned.toLocaleString()}
+          </div>
           <div className="text-xs text-purple-200/50 mt-1">Total all-time</div>
         </div>
       </div>
@@ -121,7 +127,9 @@ export default function RewardsSummary() {
             </span>
           )}
         </div>
-        <div className="text-2xl font-semibold text-white">{summary.todayEarned.toLocaleString()}</div>
+        <div className="text-2xl font-semibold text-white">
+          {summary.todayEarned.toLocaleString()}
+        </div>
         <div className="text-xs text-zinc-400 mt-1">Petals earned today</div>
       </div>
 
@@ -156,7 +164,9 @@ export default function RewardsSummary() {
               <div className="text-xs text-zinc-400">HUD Skins</div>
             </div>
             <div>
-              <div className="text-xl font-semibold text-white">{summary.cosmetics.avatarCosmetics}</div>
+              <div className="text-xl font-semibold text-white">
+                {summary.cosmetics.avatarCosmetics}
+              </div>
               <div className="text-xs text-zinc-400">Avatar Items</div>
             </div>
           </div>
@@ -174,4 +184,3 @@ export default function RewardsSummary() {
     </section>
   );
 }
-

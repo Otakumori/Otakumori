@@ -1,6 +1,6 @@
 /**
  * Centralized Petal Granting System
- * 
+ *
  * This module provides a single, well-validated entry point for all petal grants.
  * All petal earning should flow through grantPetals() to ensure:
  * - Consistent validation
@@ -8,13 +8,13 @@
  * - Daily caps per source
  * - Proper transaction logging
  * - Anti-exploit protection
- * 
+ *
  * ARCHITECTURE:
  * - PetalWallet is the source of truth for balance (with lifetimeEarned tracking)
  * - User.petalBalance kept in sync for backward compatibility
  * - PetalTransaction records all grants for audit trail
  * - PetalLedger tracks lifetime earnings by type
- * 
+ *
  * ENTRY POINTS:
  * - Mini-games: /api/v1/petals/earn, /api/mini-games/submit
  * - Background clicks: /api/v1/petals/collect (homepage_collection)
@@ -46,7 +46,7 @@ export type PetalSource =
 
 /**
  * Petal grant rules per source
- * 
+ *
  * maxPerEvent: Maximum petals that can be granted in a single event
  * maxPerDay: Maximum petals that can be granted per day from this source (optional)
  * rateLimitWindowMs: Rate limit window in milliseconds (optional, defaults to 60000)
@@ -142,7 +142,12 @@ export interface GrantPetalsResult {
   newBalance: number;
   lifetimeEarned: number;
   error?: string;
-  errorCode?: 'VALIDATION_ERROR' | 'RATE_LIMITED' | 'DAILY_LIMIT_REACHED' | 'AUTH_REQUIRED' | 'INTERNAL_ERROR';
+  errorCode?:
+    | 'VALIDATION_ERROR'
+    | 'RATE_LIMITED'
+    | 'DAILY_LIMIT_REACHED'
+    | 'AUTH_REQUIRED'
+    | 'INTERNAL_ERROR';
   limited?: boolean; // True if amount was capped by daily limit
   dailyRemaining?: number; // Remaining daily allowance for this source
 }
@@ -154,7 +159,7 @@ const MAX_PETALS_PER_GRANT = 1000;
 
 /**
  * Centralized function to grant petals
- * 
+ *
  * This function:
  * - Validates amount (finite, integer, within sane range)
  * - Guards against negative values
@@ -216,10 +221,15 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
   // Get rules for this source
   const rules = PETAL_RULES[source];
   if (!rules) {
-    logger.error('[Petals] Unknown source', {
-      userId: userId || 'guest',
-      extra: { source },
-    }, undefined, new Error(`Unknown petal source: ${source}`));
+    logger.error(
+      '[Petals] Unknown source',
+      {
+        userId: userId || 'guest',
+        extra: { source },
+      },
+      undefined,
+      new Error(`Unknown petal source: ${source}`),
+    );
     return {
       success: false,
       granted: 0,
@@ -408,10 +418,14 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
   } catch (error) {
     // Log error without leaking sensitive data
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('[Petals] Grant failed', {
-      userId: userId ? userId.substring(0, 8) + '...' : 'guest',
-      requestId,
-    }, new Error(`Grant failed: source=${source}, error=${errorMessage}`));
+    logger.error(
+      '[Petals] Grant failed',
+      {
+        userId: userId ? userId.substring(0, 8) + '...' : 'guest',
+        requestId,
+      },
+      new Error(`Grant failed: source=${source}, error=${errorMessage}`),
+    );
 
     return {
       success: false,
@@ -423,4 +437,3 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
     };
   }
 }
-

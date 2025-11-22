@@ -33,8 +33,9 @@ export interface PolicyResult {
  */
 export function resolvePolicy(ctx: PolicyContext): PolicyResult {
   // Check if NSFW filtering is disabled globally
-  const filterEnabled = typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_NSFW_FILTER_ENABLED !== 'false';
-  
+  const filterEnabled =
+    typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_NSFW_FILTER_ENABLED !== 'false';
+
   if (!filterEnabled) {
     return { nsfwAllowed: true };
   }

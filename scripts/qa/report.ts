@@ -144,4 +144,3 @@ export function generateSummary(results: GameQAResult[]): QASummary {
     results,
   };
 }
-

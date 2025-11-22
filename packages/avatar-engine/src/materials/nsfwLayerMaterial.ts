@@ -42,4 +42,3 @@ export function nsfwLayerMaterial(options: NsfwLayerMaterialOptions): THREE.Shad
     toonSteps: 4,
   });
 }
-

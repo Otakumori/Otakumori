@@ -32,9 +32,12 @@ export default async function ProfilePage() {
       <div className="mx-auto max-w-6xl px-6 py-10">
         <ProfileHeader />
         <div className="mt-8 rounded-2xl border border-white/10 bg-black/50 p-12 text-center">
-          <h2 className="text-2xl font-semibold text-white mb-4">Sign in to view your Otaku-mori profile</h2>
+          <h2 className="text-2xl font-semibold text-white mb-4">
+            Sign in to view your Otaku-mori profile
+          </h2>
           <p className="text-zinc-300 mb-6 max-w-md mx-auto">
-            Profiles track your lifetime petals, achievements, and avatar. Sign in to see your progress and unlock rewards!
+            Profiles track your lifetime petals, achievements, and avatar. Sign in to see your
+            progress and unlock rewards!
           </p>
           <a
             href="/sign-in"

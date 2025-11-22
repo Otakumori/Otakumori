@@ -16,7 +16,12 @@ type TabId = 'overview' | 'achievements' | 'games' | 'cosmetics';
  * Tabbed interface for profile sections
  * Keyboard accessible and responsive
  */
-export default function ProfileTabs({ overview, achievements, games, cosmetics }: ProfileTabsProps) {
+export default function ProfileTabs({
+  overview,
+  achievements,
+  games,
+  cosmetics,
+}: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
@@ -99,4 +104,3 @@ export default function ProfileTabs({ overview, achievements, games, cosmetics }
     </div>
   );
 }
-

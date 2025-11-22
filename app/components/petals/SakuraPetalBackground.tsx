@@ -6,7 +6,7 @@ import type { TreeArea } from '@/app/hooks/useTreeCanopyArea';
 
 /**
  * SakuraPetalBackground - Real sakura petals with physics and click-to-collect
- * 
+ *
  * Features:
  * - Real petal shapes using Bézier curves (not circles/orbs)
  * - Proper physics: wind sway, rotation, gravity
@@ -22,10 +22,10 @@ export type SakuraPetal = {
   y: number;
   vx: number;
   vy: number;
-  spin: number;      // rotation angle in radians
+  spin: number; // rotation angle in radians
   spinSpeed: number; // rotation speed
-  radius: number;    // size scalar, always > 0
-  life: number;      // 0 → 1 (fade in/out), < 0 means dead
+  radius: number; // size scalar, always > 0
+  life: number; // 0 → 1 (fade in/out), < 0 means dead
   collected: boolean;
 };
 
@@ -46,11 +46,7 @@ const PETAL_VALUE = 1; // petals per collection
 /**
  * Spawn a new petal - invisible spawn, fades in smoothly
  */
-function spawnPetal(
-  width: number,
-  height: number,
-  treeArea?: TreeArea,
-): SakuraPetal {
+function spawnPetal(width: number, height: number, treeArea?: TreeArea): SakuraPetal {
   const useTree = !!treeArea && Math.random() < 0.7; // 70% spawn around tree, 30% random top
 
   const x = useTree
@@ -58,9 +54,7 @@ function spawnPetal(
     : Math.random() * width;
 
   // If from tree: start somewhere inside canopy; else: just above viewport
-  const y = useTree
-    ? treeArea!.yMin + Math.random() * (treeArea!.yMax - treeArea!.yMin)
-    : -40;
+  const y = useTree ? treeArea!.yMin + Math.random() * (treeArea!.yMax - treeArea!.yMin) : -40;
 
   const radius = 8 + Math.random() * 10; // 8-18px, clamped to prevent huge blobs
 
@@ -68,12 +62,12 @@ function spawnPetal(
     id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     x,
     y,
-    vx: (Math.random() - 0.5) * 0.3,     // slight horizontal drift
-    vy: 0.4 + Math.random() * 0.5,       // soft fall speed
-    spin: Math.random() * Math.PI * 2,   // random initial angle
+    vx: (Math.random() - 0.5) * 0.3, // slight horizontal drift
+    vy: 0.4 + Math.random() * 0.5, // soft fall speed
+    spin: Math.random() * Math.PI * 2, // random initial angle
     spinSpeed: (Math.random() - 0.5) * 0.002, // slow spin
     radius: Math.max(4, Math.min(18, radius)), // Clamp to safe range
-    life: 0,                  // fade/scale in
+    life: 0, // fade/scale in
     collected: false,
   };
 }
@@ -81,15 +75,13 @@ function spawnPetal(
 /**
  * Update petal physics - wind + spin + fade
  */
-function updatePetal(
-  p: SakuraPetal,
-  width: number,
-  height: number,
-  dt: number,
-): SakuraPetal {
+function updatePetal(p: SakuraPetal, width: number, height: number, dt: number): SakuraPetal {
   // dt is normalized time step (typically ~16ms for 60fps)
   // Wind effect: sinusoidal sway based on y position and time
-  const wind = Math.sin((p.y / 60) + (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000) * 0.18;
+  const wind =
+    Math.sin(
+      p.y / 60 + (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000,
+    ) * 0.18;
 
   let x = p.x + (p.vx + wind) * dt;
   let y = p.y + p.vy * dt;
@@ -139,9 +131,20 @@ function drawPetal(ctx: CanvasRenderingContext2D, p: SakuraPetal) {
   ctx.rotate(p.spin);
 
   // Subtle flutter by modulating scale
-  const flutter = 0.9 + Math.sin((typeof performance !== 'undefined' ? performance.now() : Date.now()) / 220 + p.x * 0.01) * 0.08;
+  const flutter =
+    0.9 +
+    Math.sin(
+      (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 220 + p.x * 0.01,
+    ) *
+      0.08;
   const scaleX = r * flutter;
-  const scaleY = r * (0.6 + Math.sin((typeof performance !== 'undefined' ? performance.now() : Date.now()) / 350 + p.y * 0.02) * 0.1);
+  const scaleY =
+    r *
+    (0.6 +
+      Math.sin(
+        (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 350 + p.y * 0.02,
+      ) *
+        0.1);
 
   ctx.scale(scaleX, scaleY);
   ctx.globalAlpha = alpha * (p.collected ? 0.6 : 0.95);
@@ -217,10 +220,10 @@ export default function SakuraPetalBackground({
   const lastSpawnTimeRef = useRef(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const { collectPetal } = usePetalCollection();
-  
+
   // Use provided tree area or detect it dynamically
   const [detectedTreeArea, setDetectedTreeArea] = useState<TreeArea | undefined>(providedTreeArea);
-  
+
   // Detect tree area if not provided
   useEffect(() => {
     if (providedTreeArea || typeof window === 'undefined') {
@@ -229,7 +232,9 @@ export default function SakuraPetalBackground({
     }
 
     const detectTreeArea = () => {
-      const treeImg = document.querySelector('img[alt="Cherry Blossom Tree"]') as HTMLImageElement | null;
+      const treeImg = document.querySelector(
+        'img[alt="Cherry Blossom Tree"]',
+      ) as HTMLImageElement | null;
       if (!treeImg) {
         // Fallback estimate based on typical tree position (left side, ~30% width)
         const width = window.innerWidth;
@@ -293,9 +298,14 @@ export default function SakuraPetalBackground({
         // Trigger petal economy via centralized API
         const normalizedX = hit.x / rect.width;
         const normalizedY = hit.y / rect.height;
-        
+
         // Use the centralized petal collection hook
-        collectPetal(parseInt(hit.id.split('-')[0]) || Date.now(), PETAL_VALUE, normalizedX, normalizedY);
+        collectPetal(
+          parseInt(hit.id.split('-')[0]) || Date.now(),
+          PETAL_VALUE,
+          normalizedX,
+          normalizedY,
+        );
 
         // Call optional callback
         if (onCollect) {
@@ -378,7 +388,10 @@ export default function SakuraPetalBackground({
         .filter((p) => p.life > 0); // Remove dead petals
 
       // Maintain target count by respawning dead ones
-      while (petalsRef.current.length < maxPetals && currentTime - lastSpawnTimeRef.current > spawnInterval / 2) {
+      while (
+        petalsRef.current.length < maxPetals &&
+        currentTime - lastSpawnTimeRef.current > spawnInterval / 2
+      ) {
         petalsRef.current.push(spawnPetal(width, height, treeArea));
         lastSpawnTimeRef.current = currentTime;
       }
@@ -399,7 +412,16 @@ export default function SakuraPetalBackground({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [enabled, prefersReducedMotion, maxPetals, spawnInterval, treeArea, hitRadius, collectPetal, onCollect]);
+  }, [
+    enabled,
+    prefersReducedMotion,
+    maxPetals,
+    spawnInterval,
+    treeArea,
+    hitRadius,
+    collectPetal,
+    onCollect,
+  ]);
 
   if (!enabled) return null;
 
@@ -426,4 +448,3 @@ export default function SakuraPetalBackground({
     </div>
   );
 }
-

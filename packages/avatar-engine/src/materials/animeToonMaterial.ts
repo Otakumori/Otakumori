@@ -27,4 +27,3 @@ export function animeToonMaterial(options: AnimeToonMaterialOptions): THREE.Shad
     toonSteps: options.toonSteps ?? 4,
   });
 }
-

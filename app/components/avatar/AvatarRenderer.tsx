@@ -63,7 +63,7 @@ export function AvatarRenderer({
   }, [mode]);
 
   const reducedMotion = useReducedMotion();
-  
+
   // Use canonical avatar size system
   const sizeConfig = useMemo(() => {
     return getAvatarDimensions(size);
@@ -101,8 +101,13 @@ export function AvatarRenderer({
   // Render 2D Avatar
   const render2D = () => {
     // Map canonical size to legacy AvatarCard size
-    const cardSize = size === 'xs' || size === 'sm' ? 'small' : size === 'lg' || size === 'xl' ? 'large' : 'medium';
-    
+    const cardSize =
+      size === 'xs' || size === 'sm'
+        ? 'small'
+        : size === 'lg' || size === 'xl'
+          ? 'large'
+          : 'medium';
+
     return (
       <motion.div
         className={`${className} relative`}
@@ -114,7 +119,11 @@ export function AvatarRenderer({
         {config ? (
           <AvatarCard config={config} size={cardSize} className="w-full h-full" />
         ) : (
-          <AvatarFallback size={size} mode={avatarMode === 'auto' ? 'guest' : avatarMode} className="w-full h-full" />
+          <AvatarFallback
+            size={size}
+            mode={avatarMode === 'auto' ? 'guest' : avatarMode}
+            className="w-full h-full"
+          />
         )}
       </motion.div>
     );
@@ -137,7 +146,11 @@ export function AvatarRenderer({
           physicsEnabled={physics && !reducedMotion}
         />
       ) : (
-        <AvatarFallback size={size} mode={avatarMode === 'auto' ? 'guest' : avatarMode} className="w-full h-full" />
+        <AvatarFallback
+          size={size}
+          mode={avatarMode === 'auto' ? 'guest' : avatarMode}
+          className="w-full h-full"
+        />
       )}
 
       {/* Loading overlay */}
@@ -151,8 +164,13 @@ export function AvatarRenderer({
 
   // Render Hybrid (2D with 3D effects)
   const renderHybrid = () => {
-    const cardSize = size === 'xs' || size === 'sm' ? 'small' : size === 'lg' || size === 'xl' ? 'large' : 'medium';
-    
+    const cardSize =
+      size === 'xs' || size === 'sm'
+        ? 'small'
+        : size === 'lg' || size === 'xl'
+          ? 'large'
+          : 'medium';
+
     return (
       <motion.div
         className={`${className} relative`}
@@ -188,7 +206,8 @@ export function AvatarRenderer({
 
   // Determine render mode
   const shouldRender3D = renderMode === '3d' && is3DSupported && !hasError && !reducedMotion;
-  const shouldRenderHybrid = (mode === 'hybrid' || (mode === 'auto' && (size === 'lg' || size === 'xl'))) && !reducedMotion;
+  const shouldRenderHybrid =
+    (mode === 'hybrid' || (mode === 'auto' && (size === 'lg' || size === 'xl'))) && !reducedMotion;
 
   // Show skeleton while loading
   if (isLoading && !hasError) {
@@ -197,7 +216,13 @@ export function AvatarRenderer({
 
   // Show fallback on error or missing config
   if (hasError || !config) {
-    return <AvatarFallback size={size} mode={avatarMode === 'auto' ? 'guest' : avatarMode} className={className} />;
+    return (
+      <AvatarFallback
+        size={size}
+        mode={avatarMode === 'auto' ? 'guest' : avatarMode}
+        className={className}
+      />
+    );
   }
 
   // Render based on mode

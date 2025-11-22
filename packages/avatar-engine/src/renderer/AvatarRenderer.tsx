@@ -122,7 +122,7 @@ function AvatarScene({
 
   // Apply scale from representation transform
   const transformConfig = getRepresentationTransform(mode);
-  
+
   // Standardized anime/cel-shaded light rig for consistent quality
   // Key light: top-right (main illumination)
   // Fill light: front-left (soft fill)
@@ -171,7 +171,9 @@ export function AvatarRenderer({
 
   if (!mounted) {
     return (
-      <div className={`${sizeClasses[size]} bg-black/20 rounded-lg flex items-center justify-center`}>
+      <div
+        className={`${sizeClasses[size]} bg-black/20 rounded-lg flex items-center justify-center`}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2" />
           <p className="text-white text-sm">Loading Avatar...</p>
@@ -223,4 +225,3 @@ export interface AvatarRendererRef {
 
 // Note: To use ref methods, the component would need to be wrapped with forwardRef
 // For now, mode switching is done via props
-

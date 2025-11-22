@@ -1,6 +1,6 @@
 /**
  * Petal Streak Tracking
- * 
+ *
  * Tracks daily collection streaks and provides multiplier bonuses
  */
 
@@ -15,7 +15,7 @@ export interface StreakData {
  * Calculate streak multiplier based on streak length
  */
 export function getStreakMultiplier(streakDays: number): number {
-  if (streakDays >= 30) return 1.10; // 10% bonus for 30+ days
+  if (streakDays >= 30) return 1.1; // 10% bonus for 30+ days
   if (streakDays >= 7) return 1.05; // 5% bonus for 7+ days
   return 1.0; // No bonus for < 7 days
 }
@@ -23,7 +23,10 @@ export function getStreakMultiplier(streakDays: number): number {
 /**
  * Calculate streak from last collection date
  */
-export function calculateStreak(lastCollectionDate: Date | null, currentStreak: number): {
+export function calculateStreak(
+  lastCollectionDate: Date | null,
+  currentStreak: number,
+): {
   newStreak: number;
   multiplier: number;
   isNewDay: boolean;
@@ -38,7 +41,7 @@ export function calculateStreak(lastCollectionDate: Date | null, currentStreak: 
 
   const now = new Date();
   const lastDate = new Date(lastCollectionDate);
-  
+
   // Reset to midnight for comparison
   now.setHours(0, 0, 0, 0);
   lastDate.setHours(0, 0, 0, 0);
@@ -86,4 +89,3 @@ export function getStreakRecoveryCost(brokenStreak: number): number {
     return 7 * 50 + 23 * 100 + (brokenStreak - 30) * 200;
   }
 }
-

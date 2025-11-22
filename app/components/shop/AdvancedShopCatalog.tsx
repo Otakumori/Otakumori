@@ -121,9 +121,7 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
                 </span>
               ))}
               {sizeOptions.length > 6 && (
-                <span className="text-xs text-zinc-400">
-                  +{sizeOptions.length - 6} more
-                </span>
+                <span className="text-xs text-zinc-400">+{sizeOptions.length - 6} more</span>
               )}
             </div>
           </div>
@@ -343,7 +341,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
           const data = result.data || result;
           // Products are already deduplicated server-side by blueprintId
           const products = (data.products || []) as CatalogProduct[];
-          
+
           setSearchResult({
             products,
             total: data.pagination?.total ?? data.total ?? 0,
@@ -612,9 +610,9 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
             {/* Products Grid */}
             {products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-            {products.map((product) => (
-                <CatalogProductCard key={product.id} product={product} />
-              ))}
+                {products.map((product) => (
+                  <CatalogProductCard key={product.id} product={product} />
+                ))}
               </div>
             ) : (
               <div className="text-center py-12">

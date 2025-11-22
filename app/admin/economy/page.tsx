@@ -32,7 +32,12 @@ interface EconomyStats {
     totalWallets: number;
     totalBalance: number;
     avgBalance: number;
-    topBalances: Array<{ userId: string; balance: number; lifetimeEarned: number; username: string }>;
+    topBalances: Array<{
+      userId: string;
+      balance: number;
+      lifetimeEarned: number;
+      username: string;
+    }>;
   };
 }
 
@@ -244,9 +249,7 @@ export default function AdminEconomyPage() {
                         ({reward.petalCost.toLocaleString()} petals)
                       </span>
                     </div>
-                    <span className="text-blue-400 font-medium">
-                      {reward.purchases} purchases
-                    </span>
+                    <span className="text-blue-400 font-medium">{reward.purchases} purchases</span>
                   </div>
                 ))}
               </div>

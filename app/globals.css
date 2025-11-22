@@ -1512,23 +1512,23 @@ footer::after {
   --color-primary-active: #f472b6;
   --color-primary-disabled: rgba(244, 114, 182, 0.4);
   --color-primary-focus: rgba(244, 114, 182, 0.6);
-  
+
   /* Accent Colors - Purple */
   --color-accent: #8b5cf6;
   --color-accent-hover: #a78bfa;
-  
+
   /* Text Colors (matching header) */
   --color-text-primary: #ffffff;
   --color-text-secondary: #d4d4d8;
   --color-text-muted: rgba(255, 255, 255, 0.6);
-  --color-text-link: #835D75;
+  --color-text-link: #835d75;
   --color-text-link-hover: #f472b6;
-  
+
   /* Background Colors */
   --color-bg-base: #080611;
   --color-bg-surface: rgba(0, 0, 0, 0.8);
   --color-bg-glass: rgba(255, 255, 255, 0.1);
-  
+
   /* Border Colors */
   --color-border-default: rgba(255, 255, 255, 0.2);
   --color-border-hover: rgba(244, 114, 182, 0.5);
@@ -1539,7 +1539,7 @@ footer::after {
   --glass-bg-hover: rgba(255, 255, 255, 0.15);
   --glass-border: var(--color-border-default);
   --glass-border-hover: var(--color-border-hover);
-  
+
   /* Legacy aliases for backward compatibility */
   --accent-pink: var(--color-primary);
   --accent-purple: var(--color-accent);
@@ -1751,12 +1751,15 @@ footer::after {
 
 /* Dark Souls soapstone pulse glow effect */
 @keyframes soapstone-pulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.4)) drop-shadow(0 0 12px rgba(236, 72, 153, 0.2));
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.4))
+      drop-shadow(0 0 12px rgba(236, 72, 153, 0.2));
     opacity: calc(0.7 + var(--glow-intensity, 0.5) * 0.3);
   }
   50% {
-    filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 24px rgba(236, 72, 153, 0.4));
+    filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.8))
+      drop-shadow(0 0 24px rgba(236, 72, 153, 0.4));
     opacity: calc(0.85 + var(--glow-intensity, 0.5) * 0.15);
   }
 }
@@ -2061,7 +2064,8 @@ textarea,
 /* Cherry petal hero animation - sprite-based falling petals */
 @keyframes petal-fall {
   0% {
-    transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(var(--initial-rotation, 0deg)) scale(var(--scale, 1));
+    transform: translate(-50%, -50%) translateX(0) translateY(0)
+      rotate(var(--initial-rotation, 0deg)) scale(var(--scale, 1));
     opacity: 0;
   }
   10% {
@@ -2071,7 +2075,8 @@ textarea,
     opacity: 0.8;
   }
   100% {
-    transform: translate(-50%, -50%) translateX(var(--drift, 0%)) translateY(100vh) rotate(var(--final-rotation, 0deg)) scale(var(--scale, 1));
+    transform: translate(-50%, -50%) translateX(var(--drift, 0%)) translateY(100vh)
+      rotate(var(--final-rotation, 0deg)) scale(var(--scale, 1));
     opacity: 0;
   }
 }

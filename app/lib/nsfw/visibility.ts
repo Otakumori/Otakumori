@@ -1,6 +1,6 @@
 /**
  * NSFW Visibility Rules
- * 
+ *
  * Centralized logic for determining when NSFW content should be shown
  * to viewers based on their NSFW preferences and the content rating.
  */
@@ -19,16 +19,14 @@ export interface VisibilityContext {
 
 /**
  * Determine if NSFW content should be shown to a viewer
- * 
+ *
  * Rules:
  * - Guest or NSFW off → return false (show SFW fallback)
  * - User with NSFW enabled → return true if rating matches their level
  * - Owner NSFW visibility 'private' → only show to NSFW-enabled viewers
  * - Global NSFW toggle disabled → return false for all NSFW content
  */
-export async function shouldShowNSFWContent(
-  context: VisibilityContext,
-): Promise<boolean> {
+export async function shouldShowNSFWContent(context: VisibilityContext): Promise<boolean> {
   const { viewerUserId, contentRating, ownerNSFWEnabled, ownerNSFWVisibility } = context;
 
   // SFW content is always shown
@@ -94,4 +92,3 @@ export function canViewNSFWClientSide(
 
   return viewerNSFWEnabled;
 }
-

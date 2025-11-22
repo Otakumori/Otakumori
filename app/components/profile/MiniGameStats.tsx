@@ -36,8 +36,18 @@ export default function MiniGameStats() {
         <div className="text-center py-12 rounded-xl border border-white/10 bg-white/5">
           <p className="text-zinc-400 mb-2">You haven't logged any mini-game runs yet.</p>
           <p className="text-sm text-zinc-500">
-            Try <Link href="/mini-games/petal-samurai" className="text-pink-400 hover:text-pink-300">Petal Samurai</Link> or{' '}
-            <Link href="/mini-games/petal-storm-rhythm" className="text-pink-400 hover:text-pink-300">Petal Storm Rhythm</Link> to start filling this out.
+            Try{' '}
+            <Link href="/mini-games/petal-samurai" className="text-pink-400 hover:text-pink-300">
+              Petal Samurai
+            </Link>{' '}
+            or{' '}
+            <Link
+              href="/mini-games/petal-storm-rhythm"
+              className="text-pink-400 hover:text-pink-300"
+            >
+              Petal Storm Rhythm
+            </Link>{' '}
+            to start filling this out.
           </p>
         </div>
       ) : (
@@ -51,7 +61,9 @@ export default function MiniGameStats() {
               <div>
                 <h4 className="text-lg font-semibold text-white mb-1">{game.displayName}</h4>
                 {game.bestScore !== undefined ? (
-                  <p className="text-sm text-zinc-400">Best Score: {game.bestScore.toLocaleString()}</p>
+                  <p className="text-sm text-zinc-400">
+                    Best Score: {game.bestScore.toLocaleString()}
+                  </p>
                 ) : game.petalsEarned !== undefined ? (
                   <p className="text-sm text-zinc-400">
                     {game.petalsEarned.toLocaleString()} petals earned
@@ -68,4 +80,3 @@ export default function MiniGameStats() {
     </div>
   );
 }
-

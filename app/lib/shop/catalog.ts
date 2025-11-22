@@ -36,12 +36,7 @@ export function deduplicateProducts<T extends ProductWithBlueprint>(
   products: T[],
   options: CatalogOptions = {},
 ): T[] {
-  const {
-    limit,
-    excludeTitles = [],
-    excludeIds = [],
-    deduplicateBy = 'blueprintId',
-  } = options;
+  const { limit, excludeTitles = [], excludeIds = [], deduplicateBy = 'blueprintId' } = options;
 
   let result = [...products];
 
@@ -105,4 +100,3 @@ export function deduplicateProducts<T extends ProductWithBlueprint>(
 
   return result;
 }
-

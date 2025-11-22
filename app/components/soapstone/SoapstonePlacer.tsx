@@ -106,18 +106,20 @@ export default function SoapstonePlacer({ onPlaceSuccess }: SoapstonePlacerProps
   const remainingChars = 280 - text.length;
   const isOverLimit = remainingChars < 0;
 
-  const handleOverlayKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setShowComposer(false);
-      }
-    },
-    [],
-  );
+  const handleOverlayKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setShowComposer(false);
+    }
+  }, []);
 
   if (showComposer) {
     return (
-      <div className="fixed inset-0 z-50 pointer-events-auto" role="dialog" aria-modal="true" aria-label="Place a soapstone sign">
+      <div
+        className="fixed inset-0 z-50 pointer-events-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Place a soapstone sign"
+      >
         {/* Clickable overlay for positioning */}
         <button
           type="button"
@@ -138,7 +140,10 @@ export default function SoapstonePlacer({ onPlaceSuccess }: SoapstonePlacerProps
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="soapstone-text" className="block text-sm font-medium text-pink-200 mb-2">
+              <label
+                htmlFor="soapstone-text"
+                className="block text-sm font-medium text-pink-200 mb-2"
+              >
                 Compose a sign…
               </label>
               <textarea
@@ -221,4 +226,3 @@ export default function SoapstonePlacer({ onPlaceSuccess }: SoapstonePlacerProps
     </button>
   );
 }
-

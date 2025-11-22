@@ -16,7 +16,7 @@ const VerifyRequestSchema = z.object({
 
 /**
  * POST /api/v1/nsfw/verify
- * 
+ *
  * Age verification endpoint for enabling NSFW content access.
  * Requires user to be 18+ and provide consent.
  * Idempotent - can be called multiple times safely.
@@ -41,10 +41,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'USER_NOT_FOUND', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'USER_NOT_FOUND', requestId }, { status: 404 });
     }
 
     // Parse and validate request body
@@ -105,4 +102,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

@@ -1,6 +1,6 @@
 /**
  * Seed Site Settings
- * 
+ *
  * Seeds initial site settings matching config/featureFlags.ts defaults.
  * Run this after migrations to ensure defaults are in place.
  */
@@ -53,4 +53,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

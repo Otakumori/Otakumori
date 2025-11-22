@@ -71,4 +71,3 @@ export function isNsfwAvatarsEnabled(): boolean {
 export function clearFlagsCache(): void {
   cachedFlags = null;
 }
-

@@ -220,11 +220,13 @@ export const FeaturedProductsResponseSchema = z.object({
   ok: z.literal(true),
   data: z.object({
     products: z.array(FeaturedProductSchema),
-    pagination: z.object({
-      currentPage: z.number().int().positive().optional(),
-      totalPages: z.number().int().positive().optional(),
-      total: z.number().int().nonnegative().optional(),
-    }).optional(),
+    pagination: z
+      .object({
+        currentPage: z.number().int().positive().optional(),
+        totalPages: z.number().int().positive().optional(),
+        total: z.number().int().nonnegative().optional(),
+      })
+      .optional(),
   }),
   source: z.string().optional(),
   timestamp: z.string().optional(),

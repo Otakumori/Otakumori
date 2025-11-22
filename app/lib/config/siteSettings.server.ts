@@ -1,6 +1,6 @@
 /**
  * Site Settings Server Helper
- * 
+ *
  * Manages DB-backed site settings (feature flags, configuration).
  * Server-side only - use from server components, API routes, server actions.
  */
@@ -61,4 +61,3 @@ export async function deleteSiteSetting(key: string): Promise<void> {
     where: { key },
   });
 }
-

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       // Remove praise (toggle) - use PetalService to spend 1 petal from author
       const { PetalService } = await import('@/app/lib/petals');
       const petalService = new PetalService();
-      
+
       const spendResult = await petalService.spendPetals(
         soapstone.authorId,
         1,
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     // Add praise - use centralized grantPetals to award petals to author
     const { grantPetals } = await import('@/app/lib/petals/grant');
-    
+
     const earnResult = await grantPetals({
       userId: soapstone.authorId,
       amount: 1,

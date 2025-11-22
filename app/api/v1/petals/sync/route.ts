@@ -8,14 +8,16 @@ export const runtime = 'nodejs';
 
 const SyncPetalsSchema = z.object({
   localBalance: z.number().min(0),
-  localTransactions: z.array(
-    z.object({
-      id: z.string(),
-      amount: z.number(),
-      source: z.string(),
-      timestamp: z.number(),
-    })
-  ).optional(),
+  localTransactions: z
+    .array(
+      z.object({
+        id: z.string(),
+        amount: z.number(),
+        source: z.string(),
+        timestamp: z.number(),
+      }),
+    )
+    .optional(),
 });
 
 /**
@@ -133,4 +135,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

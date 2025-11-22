@@ -1,6 +1,6 @@
 /**
  * Petal Sync Client Logic
- * 
+ *
  * Handles syncing petal balance across devices
  */
 
@@ -22,7 +22,7 @@ export async function syncPetalsToCloud(
     amount: number;
     source: string;
     timestamp: number;
-  }>
+  }>,
 ): Promise<SyncResult> {
   try {
     const response = await fetch('/api/v1/petals/sync', {
@@ -96,11 +96,10 @@ export function getSyncStatus(): {
  */
 export function saveSyncStatus(): void {
   if (typeof window === 'undefined') return;
-  
+
   try {
     localStorage.setItem('otm-petals-last-sync', new Date().toISOString());
   } catch (error) {
     console.warn('Failed to save sync status:', error);
   }
 }
-

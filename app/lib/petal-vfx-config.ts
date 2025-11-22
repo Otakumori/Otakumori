@@ -1,6 +1,6 @@
 /**
  * Petal VFX Configuration
- * 
+ *
  * Centralized configuration for all petal visual effects across the site.
  * Ensures consistent sizing, movement, and performance across all petal systems.
  */
@@ -9,20 +9,20 @@ export interface PetalVFXConfig {
   // Size constraints (in pixels)
   minSize: number;
   maxSize: number;
-  
+
   // Movement parameters
   baseSpeed: number;
   speedVariation: number;
   windStrength: number;
-  
+
   // Visual parameters
   minOpacity: number;
   maxOpacity: number;
-  
+
   // Performance parameters
   maxParticles: number;
   spawnInterval: number; // milliseconds
-  
+
   // Rotation
   rotationSpeed: number;
 }
@@ -32,8 +32,8 @@ export interface PetalVFXConfig {
  * Prevents random huge blobs and ensures visual consistency
  */
 export const PETAL_SIZE_RANGE = {
-  min: 4,   // Minimum petal size in pixels
-  max: 16,  // Maximum petal size in pixels
+  min: 4, // Minimum petal size in pixels
+  max: 16, // Maximum petal size in pixels
 } as const;
 
 /**
@@ -91,7 +91,7 @@ export function getPetalSize(config: PetalVFXConfig, variation: number = Math.ra
  * Get petal speed with variation
  */
 export function getPetalSpeed(config: PetalVFXConfig, variation: number = Math.random()): number {
-  return config.baseSpeed + (config.speedVariation * (variation - 0.5));
+  return config.baseSpeed + config.speedVariation * (variation - 0.5);
 }
 
 /**
@@ -100,4 +100,3 @@ export function getPetalSpeed(config: PetalVFXConfig, variation: number = Math.r
 export function getPetalOpacity(config: PetalVFXConfig, variation: number = Math.random()): number {
   return config.minOpacity + (config.maxOpacity - config.minOpacity) * variation;
 }
-

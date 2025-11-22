@@ -137,7 +137,9 @@ async function syncProductRecord(
         },
       });
     })
-    .filter((operation): operation is ReturnType<typeof tx.productImage.upsert> => Boolean(operation));
+    .filter((operation): operation is ReturnType<typeof tx.productImage.upsert> =>
+      Boolean(operation),
+    );
 
   if (imageOperations.length > 0) {
     await Promise.all(imageOperations);
@@ -162,7 +164,9 @@ async function syncProductRecord(
         const variantCostValue = (variant as { cost?: number }).cost;
         const variantCost = typeof variantCostValue === 'number' ? variantCostValue : null;
         const previewImageUrl = resolveVariantPreviewImage(product, variant.id);
-        const printProviderName = upserted.printProviderId ? String(upserted.printProviderId) : null;
+        const printProviderName = upserted.printProviderId
+          ? String(upserted.printProviderId)
+          : null;
         const updateData = {
           previewImageUrl,
           printProviderName,
@@ -286,8 +290,7 @@ export async function syncPrintifyProducts(
 
     const toHide = existingProducts
       .filter(
-        (record) =>
-          record.printifyProductId && !incomingIds.has(String(record.printifyProductId)),
+        (record) => record.printifyProductId && !incomingIds.has(String(record.printifyProductId)),
       )
       .map((record) => record.id);
 
@@ -306,4 +309,3 @@ export async function syncPrintifyProducts(
 export async function syncSinglePrintifyProduct(product: PrintifyProduct) {
   await syncProductRecord(db, product);
 }
-

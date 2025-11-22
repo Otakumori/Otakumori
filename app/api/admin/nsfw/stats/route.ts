@@ -37,12 +37,8 @@ async function handler() {
     });
   } catch (error) {
     console.error('Error fetching NSFW stats:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Failed to fetch NSFW stats' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Failed to fetch NSFW stats' }, { status: 500 });
   }
 }
 
 export const GET = withAdminAuth(handler);
-

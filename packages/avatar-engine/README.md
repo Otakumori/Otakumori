@@ -5,6 +5,7 @@ Procedural WebGL Avatar Rendering Engine for Otaku-mori mini-games.
 ## Overview
 
 The avatar engine provides a complete system for rendering avatars across all mini-games with:
+
 - Procedural texture/material generation
 - Runtime avatar assembly from modular parts
 - WebGL rendering with React Three Fiber
@@ -46,13 +47,7 @@ import { useGameAvatar } from '@om/avatar-engine/gameIntegration';
 function MyGame() {
   const { avatarConfig, representationConfig } = useGameAvatar('petal-samurai');
 
-  return (
-    <AvatarRenderer
-      profile={avatarConfig}
-      mode={representationConfig.mode}
-      size="medium"
-    />
-  );
+  return <AvatarRenderer profile={avatarConfig} mode={representationConfig.mode} size="medium" />;
 }
 ```
 
@@ -101,6 +96,7 @@ pnpm assets:scan
 ```
 
 This scans `/public/assets/**` for:
+
 - 3D models (`.glb`, `.gltf`)
 - Textures (`.png`, `.jpg`, `.ktx2`)
 
@@ -113,6 +109,7 @@ pnpm assets:curate
 ```
 
 This:
+
 - Builds registry from scan results
 - Finds safe fallbacks per slot
 - Validates fallback availability
@@ -121,6 +118,7 @@ This:
 ### Fallback Behavior
 
 If assets are missing:
+
 1. System logs a warning (development only)
 2. Procedural avatar is generated automatically
 3. Game continues without crashing
@@ -132,6 +130,7 @@ If assets are missing:
 - `NSFW_AVATARS_ENABLED`: Enable NSFW layers (default: false, feature flag controlled)
 
 Set via environment variables:
+
 ```bash
 NEXT_PUBLIC_AVATARS_ENABLED=true
 NEXT_PUBLIC_NSFW_AVATARS_ENABLED=false
@@ -154,6 +153,7 @@ Default mapping (can be overridden):
 ## Visual Style
 
 All materials use cel-shaded anime-style rendering:
+
 - Toon ramp (banded shadows, not noisy)
 - Clean specular highlights (graphic, not realistic)
 - Rim lighting (anime-style edge glow)
@@ -201,4 +201,3 @@ pnpm lint
 ## License
 
 Part of the Otaku-mori project.
-

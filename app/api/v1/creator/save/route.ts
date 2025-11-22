@@ -77,7 +77,10 @@ const CreatorSaveSchema = z.object({
     texture: z.number().min(0.0).max(1.0),
     color: z.object({
       primary: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-      secondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+      secondary: z
+        .string()
+        .regex(/^#[0-9A-Fa-f]{6}$/)
+        .optional(),
       gradient: z.boolean(),
     }),
     highlights: z.object({
@@ -303,14 +306,16 @@ export async function POST(request: NextRequest) {
       data: {
         avatarConfig: avatarConfig,
         avatarRendering: '3d',
-        avatarBundle: JSON.parse(JSON.stringify({
-          id: creatorConfig.id || `avatar-${Date.now()}`,
-          userId: creatorConfig.userId,
-          name: creatorConfig.name,
-          config: creatorConfig,
-          rendering: '3d',
-          createdAt: new Date().toISOString(),
-        })),
+        avatarBundle: JSON.parse(
+          JSON.stringify({
+            id: creatorConfig.id || `avatar-${Date.now()}`,
+            userId: creatorConfig.userId,
+            name: creatorConfig.name,
+            config: creatorConfig,
+            rendering: '3d',
+            createdAt: new Date().toISOString(),
+          }),
+        ),
       },
       select: {
         id: true,
@@ -347,4 +352,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

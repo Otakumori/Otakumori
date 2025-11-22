@@ -190,8 +190,11 @@ export function createProductSlug(title: string, productId: string): string {
  */
 export function mapPrintifyProduct(product: PrintifyProduct, shopId: string) {
   const categorySlug = normalizeCategorySlug(product);
-  const image = product.images?.find((img) => img.is_default)?.src ?? product.images?.[0]?.src ?? null;
-  const prices = (product.variants ?? []).map((variant) => variant.price).filter((price) => typeof price === 'number' && price > 0);
+  const image =
+    product.images?.find((img) => img.is_default)?.src ?? product.images?.[0]?.src ?? null;
+  const prices = (product.variants ?? [])
+    .map((variant) => variant.price)
+    .filter((price) => typeof price === 'number' && price > 0);
   const minPrice = prices.length > 0 ? Math.min(...prices) : null;
   const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
 

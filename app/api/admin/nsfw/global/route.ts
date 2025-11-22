@@ -35,10 +35,7 @@ async function handler(req: Request) {
   } catch (error) {
     console.error('Error updating global NSFW setting:', error);
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { ok: false, error: 'Invalid request data' },
-        { status: 400 },
-      );
+      return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
     return NextResponse.json(
       { ok: false, error: 'Failed to update global NSFW setting' },
@@ -48,4 +45,3 @@ async function handler(req: Request) {
 }
 
 export const POST = withAdminAuth(handler);
-

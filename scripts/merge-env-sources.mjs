@@ -64,7 +64,7 @@ function parseVercelFile(filePath) {
 
 function mergeSources() {
   const projectRoot = process.cwd();
-  
+
   // Collect from all sources (priority: .env.local > .env > .env.vercel > process.env)
   const processEnv = Object.entries(process.env)
     .filter(([, value]) => typeof value === 'string' && value.trim())
@@ -112,7 +112,7 @@ function updateEnvLocal(merged) {
 
   // Parse existing to preserve non-required vars
   const existing = parseEnvFile(envLocalPath);
-  
+
   // Merge with new merged values (preserve existing non-required vars)
   const final = {
     ...existing,
@@ -121,7 +121,7 @@ function updateEnvLocal(merged) {
 
   // Write .env.local
   const lines = [];
-  
+
   // Add header comment
   lines.push('# Environment variables merged from all sources');
   lines.push('# Sources: process.env, .env, .env.local, .env.vercel');
@@ -138,10 +138,10 @@ function updateEnvLocal(merged) {
 
   lines.push('');
   lines.push('# === Additional Variables ===');
-  
+
   // Add other variables (alphabetically sorted)
   const otherKeys = Object.keys(final)
-    .filter(key => !REQUIRED_VARS.includes(key))
+    .filter((key) => !REQUIRED_VARS.includes(key))
     .sort();
 
   for (const key of otherKeys) {
@@ -165,7 +165,7 @@ async function main() {
 
   if (present.length > 0) {
     console.log(`\n✅ Found variables:`);
-    present.forEach(key => {
+    present.forEach((key) => {
       const value = merged[key];
       const preview = value.length > 50 ? value.substring(0, 50) + '...' : value;
       console.log(`   ${key}=${preview}`);
@@ -174,7 +174,7 @@ async function main() {
 
   if (missing.length > 0) {
     console.log(`\n❌ Missing variables:`);
-    missing.forEach(key => console.log(`   ${key}`));
+    missing.forEach((key) => console.log(`   ${key}`));
     console.log(`\n⚠️  Please set these manually or pull from Vercel production environment.`);
   }
 
@@ -194,4 +194,3 @@ main().catch((error) => {
   console.error('❌ Error:', error.message);
   process.exit(1);
 });
-

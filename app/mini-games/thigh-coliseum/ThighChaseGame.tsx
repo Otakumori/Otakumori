@@ -39,7 +39,7 @@ export default function ThighChaseGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
-  
+
   // Physics renderers
   const playerRendererRef = useRef<PhysicsCharacterRenderer | null>(null);
   const pursuerRendererRef = useRef<PhysicsCharacterRenderer | null>(null);
@@ -112,10 +112,10 @@ export default function ThighChaseGame({
   // Initialize physics renderers
   useEffect(() => {
     if (!canvasRef.current) return;
-    
+
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
-    
+
     // Initialize player renderer
     if (!playerRendererRef.current) {
       playerRendererRef.current = new PhysicsCharacterRenderer(ctx, 'player', {
@@ -123,7 +123,7 @@ export default function ThighChaseGame({
         enabled: true,
       });
     }
-    
+
     // Initialize pursuer renderer (succubus-style for thighs theme)
     if (!pursuerRendererRef.current) {
       pursuerRendererRef.current = new PhysicsCharacterRenderer(ctx, 'succubus', {
@@ -131,7 +131,7 @@ export default function ThighChaseGame({
         enabled: true,
       });
     }
-    
+
     return () => {
       // Cleanup on unmount
       if (playerRendererRef.current) {
@@ -304,14 +304,14 @@ export default function ThighChaseGame({
 
         return newDistance;
       });
-      
+
       // Stage milestone rewards
       if (stage > lastMilestoneStage) {
         setLastMilestoneStage(stage);
         // Award stage milestone petals (handled in page component)
         setScore((s) => s + stage * 200); // Bonus score for stage milestone
       }
-      
+
       // Camera following player with smooth interpolation
       setCameraX((prev) => {
         const targetX = Math.max(0, player.x - CANVAS_WIDTH / 3); // Keep player in left third of screen
@@ -366,7 +366,7 @@ export default function ThighChaseGame({
           shielded: newShielded,
           speedBoost: newSpeedBoost,
         };
-        
+
         // Update player physics
         if (playerRendererRef.current) {
           const velocityX = (newX - prev.x) / (deltaTime / 1000);
@@ -377,7 +377,7 @@ export default function ThighChaseGame({
             { x: newX, y: newY },
           );
         }
-        
+
         return updatedPlayer;
       });
 
@@ -401,7 +401,7 @@ export default function ThighChaseGame({
           speed: newSpeed,
           catching: false,
         };
-        
+
         // Update pursuer physics
         if (pursuerRendererRef.current) {
           const velocityX = newSpeed;
@@ -412,7 +412,7 @@ export default function ThighChaseGame({
             { x: updatedPursuer.x, y: prev.y },
           );
         }
-        
+
         return updatedPursuer;
       });
 
@@ -442,7 +442,7 @@ export default function ThighChaseGame({
             const newX = obstacle.x - obstacle.speed;
             const distanceToPlayer = newX - player.x;
             const timeToCollision = distanceToPlayer / obstacle.speed; // Approximate time until collision
-            
+
             // Update warning time based on distance to player
             let newWarningTime = obstacle.warningTime;
             if (distanceToPlayer < 400 && distanceToPlayer > 0) {
@@ -451,7 +451,7 @@ export default function ThighChaseGame({
             } else {
               newWarningTime = 0;
             }
-            
+
             return { ...obstacle, x: newX, warningTime: newWarningTime };
           })
           .filter((obstacle) => obstacle.x > -100),
@@ -615,7 +615,7 @@ export default function ThighChaseGame({
     bgGradient.addColorStop(1, '#1a0a1a');
     ctx.fillStyle = bgGradient;
     ctx.fillRect(cameraX, 0, CANVAS_WIDTH + 200, CANVAS_HEIGHT);
-    
+
     // Moving pattern overlay
     ctx.fillStyle = '#2a2a2a';
     const bgOffset = (distance * 0.1) % 60;
@@ -640,7 +640,7 @@ export default function ThighChaseGame({
       if (obstacle.warningTime > 0) {
         const warningIntensity = Math.min(1, obstacle.warningTime / 400); // Fade as it gets closer
         const pulse = Math.sin(Date.now() / 100) * 0.3 + 0.7;
-        
+
         ctx.save();
         ctx.globalAlpha = warningIntensity * pulse * 0.5;
         ctx.fillStyle = '#ff4444';
@@ -648,7 +648,7 @@ export default function ThighChaseGame({
         ctx.shadowColor = '#ff4444';
         ctx.fillRect(obstacle.x - 10, obstacle.y - 10, obstacle.width + 20, obstacle.height + 20);
         ctx.restore();
-        
+
         // Warning indicator above obstacle
         ctx.save();
         ctx.globalAlpha = warningIntensity;
@@ -658,7 +658,7 @@ export default function ThighChaseGame({
         ctx.fillText('!', obstacle.x + obstacle.width / 2, obstacle.y - 15);
         ctx.restore();
       }
-      
+
       ctx.fillStyle = obstacle.type === 'high' ? '#8b0000' : '#654321';
       ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
 
@@ -700,11 +700,22 @@ export default function ThighChaseGame({
 
     // Draw pursuer with physics
     if (pursuerRendererRef.current) {
-      pursuerRendererRef.current.render(pursuer.x + pursuer.width / 2, pursuer.y + pursuer.height / 2, 'right');
-      
+      pursuerRendererRef.current.render(
+        pursuer.x + pursuer.width / 2,
+        pursuer.y + pursuer.height / 2,
+        'right',
+      );
+
       // Pursuer effects overlay
       if (pursuer.catching) {
-        createGlowEffect(ctx, pursuer.x + pursuer.width / 2, pursuer.y + pursuer.height / 2, 50, '#ff0000', 0.5);
+        createGlowEffect(
+          ctx,
+          pursuer.x + pursuer.width / 2,
+          pursuer.y + pursuer.height / 2,
+          50,
+          '#ff0000',
+          0.5,
+        );
       }
     } else {
       // Fallback rendering
@@ -720,8 +731,12 @@ export default function ThighChaseGame({
 
     // Draw player with physics
     if (playerRendererRef.current) {
-      playerRendererRef.current.render(player.x + player.width / 2, player.y + player.height / 2, 'right');
-      
+      playerRendererRef.current.render(
+        player.x + player.width / 2,
+        player.y + player.height / 2,
+        'right',
+      );
+
       // Player effects overlay
       if (player.invulnerable > 0) {
         ctx.save();
@@ -731,16 +746,30 @@ export default function ThighChaseGame({
         ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
         ctx.restore();
       }
-      
+
       if (player.shielded > 0) {
-        createGlowEffect(ctx, player.x + player.width / 2, player.y + player.height / 2, 30, '#00ffff', 0.4);
+        createGlowEffect(
+          ctx,
+          player.x + player.width / 2,
+          player.y + player.height / 2,
+          30,
+          '#00ffff',
+          0.4,
+        );
         ctx.strokeStyle = '#00ffff';
         ctx.lineWidth = 3;
         ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
       }
-      
+
       if (player.speedBoost > 0) {
-        createGlowEffect(ctx, player.x + player.width / 2, player.y + player.height / 2, 25, '#ffff00', 0.3);
+        createGlowEffect(
+          ctx,
+          player.x + player.width / 2,
+          player.y + player.height / 2,
+          25,
+          '#ffff00',
+          0.3,
+        );
       }
     } else {
       // Fallback rendering
@@ -760,7 +789,7 @@ export default function ThighChaseGame({
         ctx.strokeRect(player.x - 5, player.y - 5, player.width + 10, player.height + 10);
       }
     }
-    
+
     ctx.restore(); // Restore camera transform
 
     // Draw UI

@@ -63,7 +63,7 @@ export default function DungeonGame({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
   const keysRef = useRef<Set<string>>(new Set());
-  
+
   // Physics renderers for enemies (Map<enemyId, PhysicsCharacterRenderer>)
   const enemyRenderersRef = useRef<Map<number, PhysicsCharacterRenderer>>(new Map());
 
@@ -186,7 +186,7 @@ export default function DungeonGame({
     setParticles([]);
     setNextEnemyId(1);
     setRoomEnemiesSpawned(false);
-    
+
     // Cleanup physics renderers
     enemyRenderersRef.current.forEach((renderer) => renderer.dispose());
     enemyRenderersRef.current.clear();
@@ -323,32 +323,35 @@ export default function DungeonGame({
   );
 
   // Generate room layout based on floor
-  const generateRoomLayout = useCallback((floorNum: number, enemyCount: number): Array<'succubus' | 'demon_lord'> => {
-    const layout: Array<'succubus' | 'demon_lord'> = [];
-    
-    // Boss room every 5 floors
-    if (floorNum % 5 === 0 && enemyCount > 0) {
-      layout.push('demon_lord');
-      enemyCount--;
-    }
-    
-    // Mix of enemies based on floor
-    for (let i = 0; i < enemyCount; i++) {
-      const demonLordChance = Math.min(0.1 + floorNum * 0.05, 0.4); // More demon lords as floors increase
-      if (Math.random() < demonLordChance) {
+  const generateRoomLayout = useCallback(
+    (floorNum: number, enemyCount: number): Array<'succubus' | 'demon_lord'> => {
+      const layout: Array<'succubus' | 'demon_lord'> = [];
+
+      // Boss room every 5 floors
+      if (floorNum % 5 === 0 && enemyCount > 0) {
         layout.push('demon_lord');
-      } else {
-        layout.push('succubus');
+        enemyCount--;
       }
-    }
-    
-    return layout;
-  }, []);
-  
+
+      // Mix of enemies based on floor
+      for (let i = 0; i < enemyCount; i++) {
+        const demonLordChance = Math.min(0.1 + floorNum * 0.05, 0.4); // More demon lords as floors increase
+        if (Math.random() < demonLordChance) {
+          layout.push('demon_lord');
+        } else {
+          layout.push('succubus');
+        }
+      }
+
+      return layout;
+    },
+    [],
+  );
+
   // Game loop (moved after generateRoomLayout)
   useEffect(() => {
     if (gameState !== 'playing') return;
-    
+
     const gameLoop = () => {
       const deltaTime = 16; // ~60fps
       setGameTime((prev) => prev + deltaTime);
@@ -422,24 +425,24 @@ export default function DungeonGame({
         // Generate room layout based on floor
         const roomEnemyCount = Math.min(2 + floor, 6); // More enemies per floor
         const roomLayout = generateRoomLayout(floor, roomEnemyCount);
-        
+
         // Spawn enemies for this room
         roomLayout.forEach((enemyType, index) => {
           setTimeout(() => {
-            const spawnX = player.x + CANVAS_WIDTH / 2 + (index * 150) + Math.random() * 100;
+            const spawnX = player.x + CANVAS_WIDTH / 2 + index * 150 + Math.random() * 100;
             spawnEnemy(enemyType, spawnX);
           }, index * 200);
         });
-        
+
         setRoomEnemiesSpawned(true);
       }
-      
+
       // Check if room is cleared (all enemies defeated)
       if (roomEnemiesSpawned && enemies.length === 0 && gameState === 'playing') {
         // Room cleared! Check if we should advance floor
         const roomsPerFloor = 3 + Math.floor(floor / 2); // More rooms per floor as you go deeper
-        const currentRoomIndex = Math.floor((gameTime / 1000) / 30); // Approximate room index
-        
+        const currentRoomIndex = Math.floor(gameTime / 1000 / 30); // Approximate room index
+
         if (currentRoomIndex >= roomsPerFloor - 1) {
           // Floor cleared! Advance to next floor
           setFloor((f) => {
@@ -465,7 +468,7 @@ export default function DungeonGame({
           let newAttackCooldown = Math.max(0, enemy.attackCooldown - deltaTime);
           let newTelegraphTime = Math.max(0, enemy.telegraphTime - deltaTime);
           let newState = enemy.state;
-          
+
           // Update physics renderer (will be called after position update)
           // Store renderer reference for later update
 
@@ -483,7 +486,8 @@ export default function DungeonGame({
                 // Execute attack
                 newState = 'attacking';
                 if (player.invulnerable <= 0) {
-                  const hit = Math.abs(player.x - enemy.x) < 60 && Math.abs(player.y - enemy.y) < 60;
+                  const hit =
+                    Math.abs(player.x - enemy.x) < 60 && Math.abs(player.y - enemy.y) < 60;
                   if (hit) {
                     setPlayer((p) => ({
                       ...p,
@@ -495,7 +499,7 @@ export default function DungeonGame({
                 newAttackCooldown = enemy.type === 'demon_lord' ? 2000 : 1500;
                 setTimeout(() => {
                   setEnemies((prev) =>
-                    prev.map((e) => (e.id === enemy.id ? { ...e, state: 'idle' } : e))
+                    prev.map((e) => (e.id === enemy.id ? { ...e, state: 'idle' } : e)),
                   );
                 }, 400);
               }
@@ -520,7 +524,7 @@ export default function DungeonGame({
             telegraphTime: newTelegraphTime,
             state: newState,
           };
-          
+
           // Update physics renderer after position is calculated
           const renderer = enemyRenderersRef.current.get(enemy.id);
           if (renderer) {
@@ -528,7 +532,7 @@ export default function DungeonGame({
             const velocityY = 0; // Enemies stay on ground
             renderer.update(deltaTime, { x: velocityX, y: velocityY }, { x: newX, y: enemy.y });
           }
-          
+
           return updatedEnemy;
         });
       });
@@ -670,7 +674,18 @@ export default function DungeonGame({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [gameState, player, enemies, floor, gameTime, spawnEnemy, nextParticleId, roomEnemiesSpawned, onFloorChange, generateRoomLayout]);
+  }, [
+    gameState,
+    player,
+    enemies,
+    floor,
+    gameTime,
+    spawnEnemy,
+    nextParticleId,
+    roomEnemiesSpawned,
+    onFloorChange,
+    generateRoomLayout,
+  ]);
 
   // Rendering
   useEffect(() => {
@@ -685,7 +700,7 @@ export default function DungeonGame({
 
       // Draw dungeon background (parallax layers) - Enhanced
       drawDungeonBackground(ctx, camera.x);
-      
+
       // Enhanced background gradient overlay
       const bgGradient = ctx.createLinearGradient(0, 0, 0, CANVAS_HEIGHT);
       bgGradient.addColorStop(0, 'rgba(139, 92, 246, 0.1)');
@@ -717,7 +732,7 @@ export default function DungeonGame({
         if (renderer) {
           // Use physics renderer
           renderer.render(enemy.x, enemy.y, enemy.direction);
-          
+
           // Draw health bar (still needed)
           ctx.save();
           ctx.translate(enemy.x, enemy.y);
@@ -725,12 +740,14 @@ export default function DungeonGame({
           ctx.fillStyle = '#1f2937';
           ctx.fillRect(-25, -35, 50, 5);
           const healthPercent = enemy.health / enemy.maxHealth;
-          ctx.fillStyle = healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
+          ctx.fillStyle =
+            healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
           ctx.fillRect(-25, -35, 50 * healthPercent, 5);
-          
+
           // Telegraph warning
           if (enemy.state === 'telegraph') {
-            const telegraphProgress = 1 - (enemy.telegraphTime / (enemy.type === 'demon_lord' ? 1000 : 600));
+            const telegraphProgress =
+              1 - enemy.telegraphTime / (enemy.type === 'demon_lord' ? 1000 : 600);
             const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
             ctx.save();
             ctx.globalAlpha = pulse;
@@ -767,10 +784,10 @@ export default function DungeonGame({
       spells.forEach((spell) => {
         ctx.save();
         ctx.globalAlpha = spell.lifetime;
-        
+
         // Bloom effect
         createGlowEffect(ctx, spell.x, spell.y, 15, '#9333ea', 0.4);
-        
+
         // Outer glow
         const spellGradient = ctx.createRadialGradient(spell.x, spell.y, 0, spell.x, spell.y, 12);
         spellGradient.addColorStop(0, '#c084fc');
@@ -782,7 +799,7 @@ export default function DungeonGame({
         ctx.beginPath();
         ctx.arc(spell.x, spell.y, 10, 0, Math.PI * 2);
         ctx.fill();
-        
+
         // Inner core
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 8;
@@ -790,7 +807,7 @@ export default function DungeonGame({
         ctx.beginPath();
         ctx.arc(spell.x, spell.y, 5, 0, Math.PI * 2);
         ctx.fill();
-        
+
         ctx.restore();
       });
 
@@ -939,7 +956,7 @@ export default function DungeonGame({
     ctx.ellipse(0, 30, 22, 35, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
-    
+
     // Body highlight for depth
     const highlightGradient = ctx.createRadialGradient(-8, 20, 0, -8, 20, 15);
     highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
@@ -951,7 +968,7 @@ export default function DungeonGame({
 
     // Wings (bat-like) - Enhanced with membrane detail and shadows
     const wingAnimation = Math.sin(enemy.animationFrame * 2) * 10;
-    
+
     // Left wing shadow
     ctx.save();
     ctx.globalAlpha = 0.3;
@@ -963,7 +980,7 @@ export default function DungeonGame({
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-    
+
     // Left wing with gradient
     const leftWingGradient = ctx.createLinearGradient(-25, 20, -55, 30);
     leftWingGradient.addColorStop(0, 'rgba(139, 0, 139, 0.8)');
@@ -978,7 +995,7 @@ export default function DungeonGame({
     ctx.quadraticCurveTo(-50, 50 - wingAnimation, -25, 40);
     ctx.closePath();
     ctx.fill();
-    
+
     // Wing membrane detail
     ctx.strokeStyle = 'rgba(200, 0, 200, 0.4)';
     ctx.lineWidth = 1;
@@ -987,7 +1004,7 @@ export default function DungeonGame({
     ctx.quadraticCurveTo(-45, 20 + wingAnimation, -50, 30);
     ctx.stroke();
     ctx.shadowBlur = 0;
-    
+
     // Right wing shadow
     ctx.save();
     ctx.globalAlpha = 0.3;
@@ -999,7 +1016,7 @@ export default function DungeonGame({
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-    
+
     // Right wing with gradient
     const rightWingGradient = ctx.createLinearGradient(25, 20, 55, 30);
     rightWingGradient.addColorStop(0, 'rgba(139, 0, 139, 0.8)');
@@ -1014,7 +1031,7 @@ export default function DungeonGame({
     ctx.quadraticCurveTo(50, 50 - wingAnimation, 25, 40);
     ctx.closePath();
     ctx.fill();
-    
+
     // Wing membrane detail
     ctx.strokeStyle = 'rgba(200, 0, 200, 0.4)';
     ctx.lineWidth = 1;
@@ -1036,7 +1053,7 @@ export default function DungeonGame({
     ctx.arc(0, 0, 18, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
-    
+
     // Head highlight
     const headHighlight = ctx.createRadialGradient(-5, -8, 0, -5, -8, 10);
     headHighlight.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
@@ -1060,7 +1077,7 @@ export default function DungeonGame({
     ctx.lineTo(-10, -25);
     ctx.closePath();
     ctx.fill();
-    
+
     // Horn highlight
     ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.beginPath();
@@ -1069,7 +1086,7 @@ export default function DungeonGame({
     ctx.lineTo(-10, -25);
     ctx.closePath();
     ctx.fill();
-    
+
     ctx.fillStyle = hornGradient;
     ctx.beginPath();
     ctx.moveTo(12, -10);
@@ -1077,7 +1094,7 @@ export default function DungeonGame({
     ctx.lineTo(10, -25);
     ctx.closePath();
     ctx.fill();
-    
+
     // Horn highlight
     ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.beginPath();
@@ -1128,12 +1145,13 @@ export default function DungeonGame({
     const healthPercent = enemy.health / enemy.maxHealth;
     ctx.fillStyle = healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
     ctx.fillRect(-25, -35, 50 * healthPercent, 5);
-    
+
     // Telegraph warning - visual indicator before attack
     if (enemy.state === 'telegraph') {
-      const telegraphProgress = 1 - (enemy.telegraphTime / (enemy.type === 'demon_lord' ? 1000 : 600));
+      const telegraphProgress =
+        1 - enemy.telegraphTime / (enemy.type === 'demon_lord' ? 1000 : 600);
       const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
-      
+
       ctx.save();
       ctx.globalAlpha = pulse;
       ctx.strokeStyle = enemy.type === 'demon_lord' ? '#ff4444' : '#ffaa44';
@@ -1143,7 +1161,7 @@ export default function DungeonGame({
       ctx.beginPath();
       ctx.arc(0, 0, 35, 0, Math.PI * 2);
       ctx.stroke();
-      
+
       // Exclamation mark for demon lords
       if (enemy.type === 'demon_lord') {
         ctx.fillStyle = '#ff4444';
@@ -1179,7 +1197,7 @@ export default function DungeonGame({
     ctx.ellipse(0, 40, 30, 45, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
-    
+
     // Body highlight for depth
     const demonHighlight = ctx.createRadialGradient(-10, 30, 0, -10, 30, 20);
     demonHighlight.addColorStop(0, 'rgba(255, 200, 200, 0.15)');
@@ -1242,12 +1260,12 @@ export default function DungeonGame({
     const healthPercent = enemy.health / enemy.maxHealth;
     ctx.fillStyle = healthPercent > 0.5 ? '#10b981' : healthPercent > 0.2 ? '#f59e0b' : '#ef4444';
     ctx.fillRect(-35, -50, 70 * healthPercent, 6);
-    
+
     // Telegraph warning for demon lord
     if (enemy.state === 'telegraph') {
-      const telegraphProgress = 1 - (enemy.telegraphTime / 1000);
+      const telegraphProgress = 1 - enemy.telegraphTime / 1000;
       const pulse = Math.sin(telegraphProgress * Math.PI * 4) * 0.3 + 0.7;
-      
+
       ctx.save();
       ctx.globalAlpha = pulse;
       ctx.strokeStyle = '#ff4444';
@@ -1257,7 +1275,7 @@ export default function DungeonGame({
       ctx.beginPath();
       ctx.arc(0, 0, 50, 0, Math.PI * 2);
       ctx.stroke();
-      
+
       ctx.fillStyle = '#ff4444';
       ctx.font = 'bold 30px Arial';
       ctx.textAlign = 'center';

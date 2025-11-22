@@ -54,10 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'USER_NOT_FOUND', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'USER_NOT_FOUND', requestId }, { status: 404 });
     }
 
     // Validate NSFW cosmetics if cosmeticId is provided
@@ -88,7 +85,12 @@ export async function POST(req: NextRequest) {
       // Validate NSFW gating
       if (isNSFWCosmetic(cosmeticItem) && !nsfwAllowed) {
         return NextResponse.json(
-          { ok: false, error: 'NSFW_NOT_ALLOWED', message: 'NSFW cosmetics require age verification', requestId },
+          {
+            ok: false,
+            error: 'NSFW_NOT_ALLOWED',
+            message: 'NSFW cosmetics require age verification',
+            requestId,
+          },
           { status: 403 },
         );
       }
@@ -110,7 +112,12 @@ export async function POST(req: NextRequest) {
 
         if (!ownsQuake) {
           return NextResponse.json(
-            { ok: false, error: 'ITEM_NOT_OWNED', message: 'You must purchase Quake HUD first', requestId },
+            {
+              ok: false,
+              error: 'ITEM_NOT_OWNED',
+              message: 'You must purchase Quake HUD first',
+              requestId,
+            },
             { status: 403 },
           );
         }
@@ -143,7 +150,12 @@ export async function POST(req: NextRequest) {
         const cosmeticItem = getCosmeticItem(cosmetic);
         if (cosmeticItem && isNSFWCosmetic(cosmeticItem) && !nsfwAllowed) {
           return NextResponse.json(
-            { ok: false, error: 'NSFW_NOT_ALLOWED', message: 'NSFW cosmetics require age verification', requestId },
+            {
+              ok: false,
+              error: 'NSFW_NOT_ALLOWED',
+              message: 'NSFW cosmetics require age verification',
+              requestId,
+            },
             { status: 403 },
           );
         }
@@ -173,7 +185,12 @@ export async function POST(req: NextRequest) {
         const overlayItem = getCosmeticItem(overlay);
         if (overlayItem && isNSFWCosmetic(overlayItem) && !nsfwAllowed) {
           return NextResponse.json(
-            { ok: false, error: 'NSFW_NOT_ALLOWED', message: 'NSFW cosmetics require age verification', requestId },
+            {
+              ok: false,
+              error: 'NSFW_NOT_ALLOWED',
+              message: 'NSFW cosmetics require age verification',
+              requestId,
+            },
             { status: 403 },
           );
         }
@@ -192,7 +209,8 @@ export async function POST(req: NextRequest) {
       ok: true,
       data: {
         equipped: {
-          hudSkinId: hudSkinId || (updateData.activeOverlay === 'hud-quake-overlay' ? 'quake' : 'default'),
+          hudSkinId:
+            hudSkinId || (updateData.activeOverlay === 'hud-quake-overlay' ? 'quake' : 'default'),
           cosmetic: updateData.activeCosmetic || null,
           overlay: updateData.activeOverlay || null,
         },
@@ -207,4 +225,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

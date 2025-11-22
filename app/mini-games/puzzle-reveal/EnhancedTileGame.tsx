@@ -8,7 +8,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
-import { easingFunctions, createPetalBurst, updatePetalParticles, type PetalParticle } from '../_shared/vfx';
+import {
+  easingFunctions,
+  createPetalBurst,
+  updatePetalParticles,
+  type PetalParticle,
+} from '../_shared/vfx';
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
@@ -78,18 +83,20 @@ const ART_COLLECTION: ArtPiece[] = [
   // Add more art pieces here - including spicier ones as content library grows
 ];
 
-export default function EnhancedTileGame({ 
+export default function EnhancedTileGame({
   mode = 'medium',
   onScoreChange,
   onComboChange,
   onGameEnd,
   physicsAvatarRef,
-}: { 
+}: {
   mode?: GameMode;
   onScoreChange?: (score: number) => void;
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
-  physicsAvatarRef?: React.RefObject<{ applyImpact: (force: { x: number; y: number }, part: string) => void }>;
+  physicsAvatarRef?: React.RefObject<{
+    applyImpact: (force: { x: number; y: number }, part: string) => void;
+  }>;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -111,7 +118,11 @@ export default function EnhancedTileGame({
 
   const [currentArt, setCurrentArt] = useState<ArtPiece | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [completionVfx, setCompletionVfx] = useState<{ active: boolean; scale: number; opacity: number }>({ active: false, scale: 1, opacity: 0 });
+  const [completionVfx, setCompletionVfx] = useState<{
+    active: boolean;
+    scale: number;
+    opacity: number;
+  }>({ active: false, scale: 1, opacity: 0 });
   const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
 
   // Initialize game
@@ -243,7 +254,7 @@ export default function EnhancedTileGame({
   const revealTile = (tile: Tile) => {
     // Start reveal animation (progress from 0 to 1)
     tile.revealProgress = 0;
-    
+
     // Animate reveal progress
     const revealDuration = 300; // ms
     const startTime = Date.now();
@@ -251,7 +262,7 @@ export default function EnhancedTileGame({
       const elapsed = Date.now() - startTime;
       const progress = Math.min(1, elapsed / revealDuration);
       tile.revealProgress = easingFunctions.easeOutCubic(progress);
-      
+
       if (progress < 1) {
         requestAnimationFrame(animateReveal);
       } else {
@@ -277,7 +288,7 @@ export default function EnhancedTileGame({
         color: ['#ff9fbe', '#ec4899', '#ffc7d9', '#ff6bc1'][Math.floor(Math.random() * 4)],
       });
     }
-    
+
     // Create petal burst particles
     const burst = createPetalBurst(tile.x + tile.width / 2, tile.y + tile.height / 2, 8, {
       speed: 2.5,
@@ -312,7 +323,7 @@ export default function EnhancedTileGame({
       combo: newCombo,
       maxCombo: Math.max(prev.maxCombo, newCombo),
     }));
-    
+
     // Apply physics impact based on combo
     if (physicsAvatarRef?.current) {
       const impactForce = {
@@ -334,7 +345,7 @@ export default function EnhancedTileGame({
     if (gameState.tilesRevealed + 1 >= gameState.totalTiles) {
       // Trigger completion VFX
       setCompletionVfx({ active: true, scale: 1, opacity: 1 });
-      
+
       // Create massive petal burst at center
       if (canvasRef.current) {
         const burst = createPetalBurst(
@@ -344,17 +355,17 @@ export default function EnhancedTileGame({
           {
             speed: 4,
             spread: Math.PI * 2,
-          }
+          },
         );
         setPetalParticles((prev) => [...prev, ...burst]);
       }
-      
+
       // Animate completion zoom/pulse
       const startTime = Date.now();
       const animateCompletion = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(1, elapsed / 1500); // 1.5s animation
-        
+
         if (progress < 0.3) {
           // Zoom in phase
           const zoomProgress = progress / 0.3;
@@ -381,7 +392,7 @@ export default function EnhancedTileGame({
             opacity: 0.7 * (1 - fadeProgress),
           });
         }
-        
+
         if (progress < 1) {
           requestAnimationFrame(animateCompletion);
         } else {
@@ -392,22 +403,22 @@ export default function EnhancedTileGame({
       animateCompletion();
     }
   };
-  
+
   // Update petal particles
   useEffect(() => {
     if (petalParticles.length === 0) return;
-    
+
     let animationId: number | null = null;
     let lastTime = performance.now();
     let isRunning = true;
-    
+
     const updateParticles = () => {
       if (!isRunning) return;
-      
+
       const now = performance.now();
       const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
       lastTime = now;
-      
+
       setPetalParticles((prev) => {
         if (prev.length === 0) {
           return prev;
@@ -419,9 +430,9 @@ export default function EnhancedTileGame({
         return updated;
       });
     };
-    
+
     animationId = requestAnimationFrame(updateParticles);
-    
+
     return () => {
       isRunning = false;
       if (animationId !== null) {
@@ -499,23 +510,23 @@ export default function EnhancedTileGame({
       tilesRef.current.forEach((tile) => {
         const isRevealing = tile.revealProgress > 0 && tile.revealProgress < 1;
         const isFullyRevealed = tile.isRevealed || tile.revealProgress >= 1;
-        
+
         if (isFullyRevealed || isRevealing) {
           // Draw revealed portion of image with flip animation
           ctx.save();
-          
+
           // Apply flip animation
           const centerX = tile.x + tile.width / 2;
           const centerY = tile.y + tile.height / 2;
-          
+
           if (isRevealing) {
             // Animate flip: rotateY from 90deg to 0deg
-            const rotation = (1 - tile.revealProgress) * Math.PI / 2; // 90deg to 0deg
+            const rotation = ((1 - tile.revealProgress) * Math.PI) / 2; // 90deg to 0deg
             ctx.translate(centerX, centerY);
             ctx.scale(Math.cos(rotation), 1); // Perspective effect
             ctx.translate(-centerX, -centerY);
           }
-          
+
           ctx.beginPath();
           ctx.rect(tile.x, tile.y, tile.width, tile.height);
           ctx.clip();
@@ -537,7 +548,7 @@ export default function EnhancedTileGame({
           ctx.strokeStyle = `rgba(255, 155, 190, ${0.5 * glowIntensity})`;
           ctx.lineWidth = 2;
           ctx.strokeRect(tile.x, tile.y, tile.width, tile.height);
-          
+
           // Add pulse effect for newly revealed tiles
           if (isRevealing && tile.revealProgress > 0.8) {
             const pulse = Math.sin((tile.revealProgress - 0.8) * 5 * Math.PI) * 0.3;
@@ -598,14 +609,14 @@ export default function EnhancedTileGame({
           return false;
         });
       });
-      
+
       // Draw completion VFX overlay
       if (completionVfx.active) {
         ctx.save();
         ctx.globalAlpha = completionVfx.opacity * 0.3;
         ctx.fillStyle = 'rgba(236, 72, 153, 0.5)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         // Draw radial pulse
         const gradient = ctx.createRadialGradient(
           canvas.width / 2,
@@ -613,7 +624,7 @@ export default function EnhancedTileGame({
           0,
           canvas.width / 2,
           canvas.height / 2,
-          Math.max(canvas.width, canvas.height) * completionVfx.scale
+          Math.max(canvas.width, canvas.height) * completionVfx.scale,
         );
         gradient.addColorStop(0, 'rgba(236, 72, 153, 0.8)');
         gradient.addColorStop(0.5, 'rgba(236, 72, 153, 0.4)');
@@ -622,7 +633,7 @@ export default function EnhancedTileGame({
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.restore();
       }
-      
+
       // Draw petal particles overlay
       if (petalParticles.length > 0) {
         petalParticles.forEach((particle) => {

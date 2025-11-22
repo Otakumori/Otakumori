@@ -22,7 +22,9 @@ export function useRecentlyViewed() {
     if (!stored) return;
 
     try {
-      const parsed = JSON.parse(stored) as Array<Partial<RecentlyViewedProduct & { price: number }>>;
+      const parsed = JSON.parse(stored) as Array<
+        Partial<RecentlyViewedProduct & { price: number }>
+      >;
       const normalized = parsed
         .map((item) => {
           if (!item?.id || !item?.title || !item?.image) return null;

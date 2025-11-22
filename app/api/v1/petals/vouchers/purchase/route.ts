@@ -1,6 +1,6 @@
 /**
  * Purchase Discount Voucher with Petals
- * 
+ *
  * Allows users to purchase discount vouchers (5%, 10%, 15% off) using petals.
  * Vouchers are stored as CouponGrant records and can be used at checkout.
  */
@@ -67,7 +67,10 @@ export async function POST(req: NextRequest) {
     const voucherConfig = DISCOUNT_VOUCHER_TIERS[tier];
 
     if (!voucherConfig) {
-      return NextResponse.json({ ok: false, error: 'Invalid voucher tier', requestId }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Invalid voucher tier', requestId },
+        { status: 400 },
+      );
     }
 
     // Get user
@@ -83,7 +86,7 @@ export async function POST(req: NextRequest) {
     const config = getDiscountConfig();
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
+
     const vouchersThisMonth = await db.couponGrant.count({
       where: {
         userId: user.id,
@@ -203,4 +206,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

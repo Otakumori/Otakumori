@@ -56,4 +56,3 @@ export interface AssetRegistry {
   assets: Record<string, AssetMeta>;
   fallbacks: Record<'Head' | 'Torso' | 'Legs' | 'Accessory', string>;
 }
-

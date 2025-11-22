@@ -19,9 +19,7 @@ export interface SkinMaterialOptions {
  */
 export function skinMaterialProcedural(options: SkinMaterialOptions): THREE.ShaderMaterial {
   const skinTone =
-    options.skinTone instanceof THREE.Color
-      ? options.skinTone
-      : new THREE.Color(options.skinTone);
+    options.skinTone instanceof THREE.Color ? options.skinTone : new THREE.Color(options.skinTone);
 
   // Procedural skin texture would be generated here in full implementation
   // For now, we use cel-shaded base with skin tone color
@@ -41,4 +39,3 @@ export function skinMaterialProcedural(options: SkinMaterialOptions): THREE.Shad
 
   return material;
 }
-

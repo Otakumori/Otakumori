@@ -24,7 +24,9 @@ interface GameLeaderboardEntry {
 export function LeaderboardsTab() {
   const { user } = useUser();
   const [globalLeaderboard, setGlobalLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [gameLeaderboards, setGameLeaderboards] = useState<Record<string, GameLeaderboardEntry[]>>({});
+  const [gameLeaderboards, setGameLeaderboards] = useState<Record<string, GameLeaderboardEntry[]>>(
+    {},
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ export function LeaderboardsTab() {
     async function fetchLeaderboards() {
       try {
         setLoading(true);
-        
+
         // Fetch global petal leaderboard
         const globalResponse = await fetch('/api/v1/leaderboards/global-petals?limit=20');
         if (globalResponse.ok) {
@@ -58,7 +60,9 @@ export function LeaderboardsTab() {
 
         for (const gameId of games) {
           try {
-            const gameResponse = await fetch(`/api/v1/leaderboards/${gameId}?category=score&limit=10`);
+            const gameResponse = await fetch(
+              `/api/v1/leaderboards/${gameId}?category=score&limit=10`,
+            );
             if (gameResponse.ok) {
               const gameResult = await gameResponse.json();
               if (gameResult.ok && gameResult.data?.leaderboard) {
@@ -112,11 +116,13 @@ export function LeaderboardsTab() {
       <div className="bg-white/10 rounded-xl p-6 border border-white/20">
         <h2 className="text-2xl font-semibold text-white mb-4">Global Petal Leaderboard</h2>
         <p className="text-sm text-zinc-300 mb-6">Top players by lifetime petals earned</p>
-        
+
         {globalLeaderboard.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-zinc-400">Leaderboards are warming up...</p>
-            <p className="text-xs text-zinc-500 mt-2">Play games and earn petals to see rankings!</p>
+            <p className="text-xs text-zinc-500 mt-2">
+              Play games and earn petals to see rankings!
+            </p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -132,12 +138,17 @@ export function LeaderboardsTab() {
                   }`}
                 >
                   <div className="flex items-center space-x-4">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                      entry.rank === 1 ? 'bg-yellow-500 text-black' :
-                      entry.rank === 2 ? 'bg-gray-400 text-black' :
-                      entry.rank === 3 ? 'bg-orange-600 text-white' :
-                      'bg-white/10 text-white'
-                    }`}>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                        entry.rank === 1
+                          ? 'bg-yellow-500 text-black'
+                          : entry.rank === 2
+                            ? 'bg-gray-400 text-black'
+                            : entry.rank === 3
+                              ? 'bg-orange-600 text-white'
+                              : 'bg-white/10 text-white'
+                      }`}
+                    >
                       {entry.rank}
                     </div>
                     <div>
@@ -180,7 +191,7 @@ export function LeaderboardsTab() {
                 .split('-')
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ');
-              
+
               return (
                 <div key={gameId} className="border border-white/10 rounded-lg p-4 bg-white/5">
                   <h3 className="text-lg font-semibold text-white mb-3">{gameName}</h3>
@@ -194,7 +205,9 @@ export function LeaderboardsTab() {
                           className="flex items-center justify-between p-2 rounded bg-white/5"
                         >
                           <div className="flex items-center space-x-3">
-                            <span className="text-sm font-semibold text-zinc-300 w-6">#{entry.rank}</span>
+                            <span className="text-sm font-semibold text-zinc-300 w-6">
+                              #{entry.rank}
+                            </span>
                             <span className="text-sm text-white">{entry.displayName}</span>
                           </div>
                           <div className="text-sm font-semibold text-pink-300">
@@ -213,4 +226,3 @@ export function LeaderboardsTab() {
     </div>
   );
 }
-

@@ -2,84 +2,84 @@
 
 ```yaml
 - generic [active] [ref=e1]:
-  - generic [ref=e3]:
-    - banner [ref=e4]:
-      - link "Skip to main content" [ref=e5]:
-        - /url: "#main-content"
-      - navigation [ref=e6]:
-        - link "Otaku-mori" [ref=e7]:
-          - /url: /
-          - img "Otaku-mori" [ref=e9]
-        - generic [ref=e10]:
-          - link "Home" [ref=e11]:
-            - /url: /
-          - button "Shop" [ref=e13]:
-            - text: Shop
-            - img [ref=e14]
-          - button "Mini-Games" [ref=e17]:
-            - text: Mini-Games
-            - img [ref=e18]
-          - button "Blog" [ref=e21]:
-            - text: Blog
-            - img [ref=e22]
-          - link "About" [ref=e24]:
-            - /url: /about
-        - generic [ref=e25]:
-          - generic [ref=e27]:
-            - textbox "What're ya buyin' ?" [ref=e28]
-            - button [ref=e29]:
-              - img [ref=e30]
-          - button "Sign In" [ref=e32]
-    - main [ref=e33]
-    - contentinfo [ref=e50]:
-      - generic [ref=e51]:
-        - generic [ref=e54]:
-          - textbox "Leave a sign for fellow travelers..." [ref=e55]
-          - button "Carve Sign" [disabled] [ref=e56]
-        - generic [ref=e57]:
-          - generic [ref=e58]:
-            - heading "Otaku-mori" [level=3] [ref=e59]
-            - paragraph [ref=e60]: Anime x gaming — curated treasures
-          - generic [ref=e61]:
-            - heading "Explore" [level=4] [ref=e62]
-            - list [ref=e63]:
-              - listitem [ref=e64]:
-                - link "Shop" [ref=e65]:
-                  - /url: /shop
-              - listitem [ref=e66]:
-                - link "Mini-Games" [ref=e67]:
-                  - /url: /mini-games
-              - listitem [ref=e68]:
-                - 'link "Blog: Read the lore" [ref=e69]':
-                  - /url: /blog
-          - generic [ref=e70]:
-            - heading "Support" [level=4] [ref=e71]
-            - list [ref=e72]:
-              - listitem [ref=e73]:
-                - link "Help Center" [ref=e74]:
-                  - /url: /help
-              - listitem [ref=e75]:
-                - link "Privacy Policy" [ref=e76]:
-                  - /url: /privacy
-              - listitem [ref=e77]:
-                - link "Terms of Service" [ref=e78]:
-                  - /url: /terms
-          - generic [ref=e79]:
-            - heading "Connect" [level=4] [ref=e80]
-            - list [ref=e81]:
-              - listitem [ref=e82]:
-                - link "Community" [ref=e83]:
-                  - /url: /community
-              - listitem [ref=e84]:
-                - link "View All Signs" [ref=e85]:
-                  - /url: /community/soapstones
-              - listitem [ref=e86]:
-                - link "Cookie Settings" [ref=e87]:
-                  - /url: /cookies
-        - generic [ref=e89]:
-          - paragraph [ref=e90]: Otaku-mori ™ made with ♡
-          - paragraph [ref=e91]: © 2025 Otaku-mori. All rights reserved.
-  - button "Open Next.js Dev Tools" [ref=e97] [cursor=pointer]:
-    - img [ref=e98] [cursor=pointer]
-  - alert [ref=e101]
+    - generic [ref=e3]:
+        - banner [ref=e4]:
+            - link "Skip to main content" [ref=e5]:
+                - /url: '#main-content'
+            - navigation [ref=e6]:
+                - link "Otaku-mori" [ref=e7]:
+                    - /url: /
+                    - img "Otaku-mori" [ref=e9]
+                - generic [ref=e10]:
+                    - link "Home" [ref=e11]:
+                        - /url: /
+                    - button "Shop" [ref=e13]:
+                        - text: Shop
+                        - img [ref=e14]
+                    - button "Mini-Games" [ref=e17]:
+                        - text: Mini-Games
+                        - img [ref=e18]
+                    - button "Blog" [ref=e21]:
+                        - text: Blog
+                        - img [ref=e22]
+                    - link "About" [ref=e24]:
+                        - /url: /about
+                - generic [ref=e25]:
+                    - generic [ref=e27]:
+                        - textbox "What're ya buyin' ?" [ref=e28]
+                        - button [ref=e29]:
+                            - img [ref=e30]
+                    - button "Sign In" [ref=e32]
+        - main [ref=e33]
+        - contentinfo [ref=e50]:
+            - generic [ref=e51]:
+                - generic [ref=e54]:
+                    - textbox "Leave a sign for fellow travelers..." [ref=e55]
+                    - button "Carve Sign" [disabled] [ref=e56]
+                - generic [ref=e57]:
+                    - generic [ref=e58]:
+                        - heading "Otaku-mori" [level=3] [ref=e59]
+                        - paragraph [ref=e60]: Anime x gaming — curated treasures
+                    - generic [ref=e61]:
+                        - heading "Explore" [level=4] [ref=e62]
+                        - list [ref=e63]:
+                            - listitem [ref=e64]:
+                                - link "Shop" [ref=e65]:
+                                    - /url: /shop
+                            - listitem [ref=e66]:
+                                - link "Mini-Games" [ref=e67]:
+                                    - /url: /mini-games
+                            - listitem [ref=e68]:
+                                - 'link "Blog: Read the lore" [ref=e69]':
+                                    - /url: /blog
+                    - generic [ref=e70]:
+                        - heading "Support" [level=4] [ref=e71]
+                        - list [ref=e72]:
+                            - listitem [ref=e73]:
+                                - link "Help Center" [ref=e74]:
+                                    - /url: /help
+                            - listitem [ref=e75]:
+                                - link "Privacy Policy" [ref=e76]:
+                                    - /url: /privacy
+                            - listitem [ref=e77]:
+                                - link "Terms of Service" [ref=e78]:
+                                    - /url: /terms
+                    - generic [ref=e79]:
+                        - heading "Connect" [level=4] [ref=e80]
+                        - list [ref=e81]:
+                            - listitem [ref=e82]:
+                                - link "Community" [ref=e83]:
+                                    - /url: /community
+                            - listitem [ref=e84]:
+                                - link "View All Signs" [ref=e85]:
+                                    - /url: /community/soapstones
+                            - listitem [ref=e86]:
+                                - link "Cookie Settings" [ref=e87]:
+                                    - /url: /cookies
+                - generic [ref=e89]:
+                    - paragraph [ref=e90]: Otaku-mori ™ made with ♡
+                    - paragraph [ref=e91]: © 2025 Otaku-mori. All rights reserved.
+    - button "Open Next.js Dev Tools" [ref=e97] [cursor=pointer]:
+        - img [ref=e98] [cursor=pointer]
+    - alert [ref=e101]
 ```

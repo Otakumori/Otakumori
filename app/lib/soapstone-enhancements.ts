@@ -1,6 +1,6 @@
 /**
  * Soapstone Enhancement Utilities
- * 
+ *
  * Utilities for categories, replies, location-based messages, and quests
  */
 
@@ -42,7 +42,9 @@ export function getCategoryInfo(category: SoapstoneCategory) {
 /**
  * Build message thread from flat list
  */
-export function buildMessageThread(messages: SoapstoneMessageEnhanced[]): SoapstoneMessageEnhanced[] {
+export function buildMessageThread(
+  messages: SoapstoneMessageEnhanced[],
+): SoapstoneMessageEnhanced[] {
   const messageMap = new Map<string, SoapstoneMessageEnhanced>();
   const rootMessages: SoapstoneMessageEnhanced[] = [];
 
@@ -73,7 +75,7 @@ export function buildMessageThread(messages: SoapstoneMessageEnhanced[]): Soapst
  */
 export function filterByCategory(
   messages: SoapstoneMessageEnhanced[],
-  category: SoapstoneCategory | 'all'
+  category: SoapstoneCategory | 'all',
 ): SoapstoneMessageEnhanced[] {
   if (category === 'all') return messages;
   return messages.filter((msg) => msg.category === category);
@@ -85,4 +87,3 @@ export function filterByCategory(
 export function sortByAppraisals(messages: SoapstoneMessageEnhanced[]): SoapstoneMessageEnhanced[] {
   return [...messages].sort((a, b) => b.appraises - a.appraises);
 }
-

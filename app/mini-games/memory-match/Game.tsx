@@ -224,8 +224,8 @@ export default function Game({ mode }: Props) {
             }`}
             style={{
               backdropFilter: 'blur(8px)',
-              boxShadow: card.isMatched 
-                ? '0 0 20px rgba(16, 185, 129, 0.4)' 
+              boxShadow: card.isMatched
+                ? '0 0 20px rgba(16, 185, 129, 0.4)'
                 : card.isFlipped
                   ? '0 4px 12px rgba(0, 0, 0, 0.2)'
                   : '0 2px 8px rgba(236, 72, 153, 0.2)',
@@ -239,10 +239,11 @@ export default function Game({ mode }: Props) {
           >
             {/* Card back pattern (cherry blossom texture) when not flipped */}
             {!card.isFlipped && !card.isMatched && (
-              <div 
+              <div
                 className="absolute inset-0 opacity-40"
                 style={{
-                  backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.3) 0%, transparent 70%), repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(167, 139, 250, 0.1) 10px, rgba(167, 139, 250, 0.1) 20px)',
+                  backgroundImage:
+                    'radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.3) 0%, transparent 70%), repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(167, 139, 250, 0.1) 10px, rgba(167, 139, 250, 0.1) 20px)',
                   backgroundSize: '100% 100%, 20px 20px',
                 }}
               />

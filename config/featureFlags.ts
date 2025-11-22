@@ -7,7 +7,10 @@
 
 import { z } from 'zod';
 import { env } from '@/env.mjs';
-import { isAvatarsEnabled as isAvatarEngineEnabled, isNsfwAvatarsEnabled as isNsfwEngineEnabled } from '@om/avatar-engine/config/flags';
+import {
+  isAvatarsEnabled as isAvatarEngineEnabled,
+  isNsfwAvatarsEnabled as isNsfwEngineEnabled,
+} from '@om/avatar-engine/config/flags';
 
 export interface FeatureFlags {
   AVATARS_ENABLED: boolean;
@@ -82,7 +85,8 @@ function resolveFromEnv(): FeatureFlags {
       : true; // Default: true for dev
 
   // Use avatar-engine resolution if available (handles client-side flags)
-  const avatarsEnabled = typeof window !== 'undefined' ? isAvatarEngineEnabled() : envAvatarsEnabled;
+  const avatarsEnabled =
+    typeof window !== 'undefined' ? isAvatarEngineEnabled() : envAvatarsEnabled;
 
   // Resolve REQUIRE_AUTH_FOR_MINI_GAMES from validated env
   const requireAuth = toBool(
@@ -180,4 +184,3 @@ export const featureFlags: FeatureFlags = {
     return isHomepageExperimentalEnabled();
   },
 };
-

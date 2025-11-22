@@ -32,10 +32,7 @@ export async function GET(_req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'USER_NOT_FOUND', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'USER_NOT_FOUND', requestId }, { status: 404 });
     }
 
     // Get unlocked cosmetics from inventory
@@ -83,4 +80,3 @@ export async function GET(_req: NextRequest) {
     );
   }
 }
-

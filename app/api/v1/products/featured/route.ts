@@ -27,7 +27,10 @@ const QuerySchema = z.object({
     .optional()
     .transform((val) => {
       if (!val) return [];
-      return val.split(',').map((t) => t.trim()).filter(Boolean);
+      return val
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
     }),
 });
 
@@ -108,7 +111,8 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
   );
 
   const mappedPrintify = publishedProducts.map((product) => {
-    const defaultImage = product.images?.find((img) => img.is_default) ?? product.images?.[0] ?? null;
+    const defaultImage =
+      product.images?.find((img) => img.is_default) ?? product.images?.[0] ?? null;
     const defaultVariant =
       product.variants?.find((variant) => variant.is_default) ?? product.variants?.[0] ?? null;
     const priceCents = defaultVariant?.price ?? null;
@@ -177,19 +181,24 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
 
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
-  
+
   try {
     const { searchParams } = new URL(request.url);
-    
+
     // Validate query parameters
     const queryResult = QuerySchema.safeParse(Object.fromEntries(searchParams));
     if (!queryResult.success) {
       return NextResponse.json(
-        createApiError('VALIDATION_ERROR', 'Invalid query parameters', requestId, queryResult.error.issues),
-        { status: 400 }
+        createApiError(
+          'VALIDATION_ERROR',
+          'Invalid query parameters',
+          requestId,
+          queryResult.error.issues,
+        ),
+        { status: 400 },
       );
     }
-    
+
     const query = queryResult.data;
     const forcePrintify = searchParams.get('force_printify') === 'true';
 
@@ -238,7 +247,7 @@ export async function GET(request: NextRequest) {
           products: normalizedProducts,
           pagination: undefined, // Catalog results don't include pagination
         },
-        requestId
+        requestId,
       );
 
       // Validate response before returning
@@ -253,7 +262,7 @@ export async function GET(request: NextRequest) {
         // Return safe fallback
         return NextResponse.json(
           createApiSuccess({ products: [], pagination: undefined }, requestId),
-          { status: 200 }
+          { status: 200 },
         );
       }
 
@@ -283,7 +292,7 @@ export async function GET(request: NextRequest) {
               products: normalizedProducts,
               pagination: undefined, // Printify results don't include pagination
             },
-            requestId
+            requestId,
           );
 
           // Validate response
@@ -297,7 +306,7 @@ export async function GET(request: NextRequest) {
             console.error('[API] Printify response validation failed:', validated.error);
             return NextResponse.json(
               createApiSuccess({ products: [], pagination: undefined }, requestId),
-              { status: 200 }
+              { status: 200 },
             );
           }
 
@@ -310,10 +319,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Return empty array if no products found
-    const emptyResponse = createApiSuccess(
-      { products: [], pagination: undefined },
-      requestId
-    );
+    const emptyResponse = createApiSuccess({ products: [], pagination: undefined }, requestId);
 
     const validated = FeaturedProductsResponseSchema.safeParse({
       ...emptyResponse,
@@ -326,7 +332,7 @@ export async function GET(request: NextRequest) {
     console.error('[API] Featured products endpoint error:', error);
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch featured products', requestId),
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

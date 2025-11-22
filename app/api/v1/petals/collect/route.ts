@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
     const { amount, source, metadata } = validation.data;
 
     // Map legacy source names to new PetalSource types
-    const sourceMap: Record<string, 'background_petal_click' | 'mini_game' | 'daily_login' | 'achievement'> = {
+    const sourceMap: Record<
+      string,
+      'background_petal_click' | 'mini_game' | 'daily_login' | 'achievement'
+    > = {
       homepage_collection: 'background_petal_click',
       game_reward: 'mini_game',
       daily_bonus: 'daily_login',
@@ -104,7 +107,12 @@ export async function POST(req: NextRequest) {
     logger.error('[Petals Collect] Error', { requestId }, new Error(errorMessage));
 
     return NextResponse.json(
-      { ok: false, error: 'INTERNAL_ERROR', message: error.message || 'Failed to collect petals', requestId },
+      {
+        ok: false,
+        error: 'INTERNAL_ERROR',
+        message: error.message || 'Failed to collect petals',
+        requestId,
+      },
       { status: 500 },
     );
   }

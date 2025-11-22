@@ -39,9 +39,7 @@ export function StreakIndicator({ streak, showMultiplier = true }: StreakIndicat
       )}
 
       {streak.longestStreak > streak.currentStreak && (
-        <div className="text-xs text-white/40 ml-auto">
-          Best: {streak.longestStreak} days
-        </div>
+        <div className="text-xs text-white/40 ml-auto">Best: {streak.longestStreak} days</div>
       )}
     </div>
   );
@@ -91,4 +89,3 @@ export function StreakRecoveryPrompt({
     </div>
   );
 }
-

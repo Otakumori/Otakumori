@@ -112,25 +112,24 @@ export async function GET() {
       db.couponGrant.count({
         where: { redeemedAt: { not: null } },
       }),
-      db.discountReward.findMany({
-        include: {
-          _count: {
-            select: {
-              CouponGrant: true,
+      db.discountReward
+        .findMany({
+          include: {
+            _count: {
+              select: {
+                CouponGrant: true,
+              },
             },
           },
-        },
-        take: 20,
-      }).then((rewards) =>
-        rewards.sort((a, b) => b._count.CouponGrant - a._count.CouponGrant).slice(0, 10),
-      ),
+          take: 20,
+        })
+        .then((rewards) =>
+          rewards.sort((a, b) => b._count.CouponGrant - a._count.CouponGrant).slice(0, 10),
+        ),
     ]);
 
     // Cosmetic purchase statistics
-    const [
-      totalCosmeticPurchases,
-      topCosmetics,
-    ] = await Promise.all([
+    const [totalCosmeticPurchases, topCosmetics] = await Promise.all([
       db.inventoryItem.count({
         where: {
           kind: { in: ['COSMETIC', 'OVERLAY'] },
@@ -148,12 +147,7 @@ export async function GET() {
     ]);
 
     // User wallet statistics
-    const [
-      totalWallets,
-      totalBalance,
-      avgBalance,
-      topBalances,
-    ] = await Promise.all([
+    const [totalWallets, totalBalance, avgBalance, topBalances] = await Promise.all([
       db.petalWallet.count(),
       db.petalWallet.aggregate({
         _sum: { balance: true },
@@ -236,9 +230,6 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
     console.error('Error fetching economy stats:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

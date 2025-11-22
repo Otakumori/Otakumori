@@ -2,7 +2,12 @@
 
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import Link from 'next/link';
-import { cosmeticItems, type HudSkinId, filterByNSFWPolicy, isNSFWCosmetic } from '@/app/lib/cosmetics/cosmeticsConfig';
+import {
+  cosmeticItems,
+  type HudSkinId,
+  filterByNSFWPolicy,
+  isNSFWCosmetic,
+} from '@/app/lib/cosmetics/cosmeticsConfig';
 import { useNSFW } from '@/app/contexts/NSFWContext';
 
 /**
@@ -20,18 +25,19 @@ export default function CosmeticsTab() {
   };
 
   const equippedHud = hudSkinNames[hudSkin];
-  
+
   // Filter owned items by NSFW policy
   const allOwnedItems = cosmeticItems.filter((item) => unlockedIds.includes(item.id));
   const ownedItems = filterByNSFWPolicy(allOwnedItems, nsfwAllowed);
-  
+
   // Group by type
   const ownedHudSkins = ownedItems.filter((item) => item.type === 'hud-skin');
-  const ownedAvatarCosmetics = ownedItems.filter((item) => 
-    item.type === 'avatar-outfit' || 
-    item.type === 'avatar-accessory' || 
-    item.type === 'avatar-vfx' || 
-    item.type === 'avatar-overlay'
+  const ownedAvatarCosmetics = ownedItems.filter(
+    (item) =>
+      item.type === 'avatar-outfit' ||
+      item.type === 'avatar-accessory' ||
+      item.type === 'avatar-vfx' ||
+      item.type === 'avatar-overlay',
   );
 
   if (!isHydrated) {
@@ -89,7 +95,9 @@ export default function CosmeticsTab() {
                       className="rounded-lg border border-white/10 bg-white/5 p-4 text-center"
                     >
                       <div className="text-3xl mb-2">
-                        <span role="img" aria-label="Sparkle">✨</span>
+                        <span role="img" aria-label="Sparkle">
+                          ✨
+                        </span>
                       </div>
                       <div className="text-sm text-white font-medium">{item.name}</div>
                       <div className="text-xs text-zinc-400 mt-1">{item.description}</div>
@@ -117,7 +125,9 @@ export default function CosmeticsTab() {
                       className="rounded-lg border border-white/10 bg-white/5 p-4 text-center"
                     >
                       <div className="text-3xl mb-2">
-                        <span role="img" aria-label="Sparkle">✨</span>
+                        <span role="img" aria-label="Sparkle">
+                          ✨
+                        </span>
                       </div>
                       <div className="text-sm text-white font-medium">{item.name}</div>
                       <div className="text-xs text-zinc-400 mt-1">{item.description}</div>
@@ -132,4 +142,3 @@ export default function CosmeticsTab() {
     </div>
   );
 }
-

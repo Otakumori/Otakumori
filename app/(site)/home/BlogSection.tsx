@@ -61,9 +61,12 @@ export default async function BlogSection() {
       const rawPosts = data?.posts || data?.data || [];
       posts = Array.isArray(rawPosts)
         ? rawPosts
-            .filter((post): post is BlogPost => post && typeof post === 'object' && 'id' in post && 'title' in post)
+            .filter(
+              (post): post is BlogPost =>
+                post && typeof post === 'object' && 'id' in post && 'title' in post,
+            )
             .map((post) => ({
-        ...post,
+              ...post,
               imageAlt: (post as BlogPost).imageAlt ?? post.title ?? 'Blog post image',
             }))
         : [];
@@ -71,19 +74,23 @@ export default async function BlogSection() {
       console.warn('[BlogSection] Failed to map posts:', mapError);
       posts = [];
     }
-    
+
     isBlockedData = isBlocked(blogResult) && isBlocked(postsResult);
   } catch (error) {
-    handleServerError(error, {
-      section: 'blog',
-      component: 'BlogSection',
-      operation: 'fetch_posts',
-      metadata: {
-        endpoints: ['/api/v1/content/blog', '/api/blog/posts'],
+    handleServerError(
+      error,
+      {
+        section: 'blog',
+        component: 'BlogSection',
+        operation: 'fetch_posts',
+        metadata: {
+          endpoints: ['/api/v1/content/blog', '/api/blog/posts'],
+        },
       },
-    }, {
-      logLevel: 'warn',
-    });
+      {
+        logLevel: 'warn',
+      },
+    );
     posts = [];
     isBlockedData = true;
   }
@@ -107,7 +114,12 @@ export default async function BlogSection() {
           {posts.slice(0, 3).map((post) => (
             <Link
               key={post.id}
-              href={post.url || (post.type === 'communityPost' ? `/community/${post.slug}` : paths.blogPost(post.slug))}
+              href={
+                post.url ||
+                (post.type === 'communityPost'
+                  ? `/community/${post.slug}`
+                  : paths.blogPost(post.slug))
+              }
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
               <GlassCard className="flex h-full flex-col">
@@ -141,9 +153,9 @@ export default async function BlogSection() {
                         ? (() => {
                             try {
                               return new Date(post.publishedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
                               });
                             } catch {
                               return 'Recently';

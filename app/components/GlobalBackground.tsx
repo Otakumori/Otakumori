@@ -14,13 +14,13 @@ export default function GlobalBackground() {
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
-      
+
       const resizeCanvas = () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       };
       resizeCanvas();
-      
+
       // Draw static stars
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       for (let i = 0; i < 100; i++) {
@@ -33,19 +33,19 @@ export default function GlobalBackground() {
           size = 0.5; // Safe default
         }
         size = Math.max(0.5, Math.min(2.0, size));
-        
+
         // Validate coordinates are finite before drawing
         if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-        
+
         ctx.beginPath();
         ctx.arc(x, y, size, 0, Math.PI * 2);
         ctx.fill();
       }
-      
+
       window.addEventListener('resize', resizeCanvas);
       return () => window.removeEventListener('resize', resizeCanvas);
     }
-    
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -91,7 +91,7 @@ export default function GlobalBackground() {
         }
 
         // Guard: Ensure radius is never negative, NaN, or infinite to prevent IndexSizeError
-          // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
+        // The calculation (1 - star.z / canvas.width) * 1.5 can become negative when star.z > canvas.width
         // Clamp to safe range [0.5, 2.0] to ensure valid arc rendering
         let size = (1 - star.z / canvas.width) * 1.5;
         if (!Number.isFinite(size) || size <= 0) {
@@ -99,10 +99,10 @@ export default function GlobalBackground() {
         }
         size = Math.max(0.5, Math.min(2.0, size));
 
-          ctx.fillStyle = 'rgba(255,255,255,0.7)';
-          ctx.beginPath();
-          ctx.arc(px, py, size, 0, Math.PI * 2);
-          ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.arc(px, py, size, 0, Math.PI * 2);
+        ctx.fill();
       }
       requestAnimationFrame(updateStars);
     };

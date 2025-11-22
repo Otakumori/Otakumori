@@ -1,6 +1,6 @@
 /**
  * Admin Console Page
- * 
+ *
  * Secure admin interface for managing feature flags and site settings.
  * Only accessible to admin users (emails in ADMIN_EMAILS).
  */
@@ -16,9 +16,7 @@ export const runtime = 'nodejs';
 
 export default async function AdminPage() {
   // Check if Clerk is configured
-  const isClerkConfigured = Boolean(
-    env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-  );
+  const isClerkConfigured = Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   if (!isClerkConfigured) {
     // In development, allow access; in production, show disabled message
@@ -74,7 +72,9 @@ export default async function AdminPage() {
               <div className="rounded-lg bg-pink-500/20 p-3">
                 <Users className="h-6 w-6 text-pink-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">Users & Profiles</h2>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Users & Profiles
+              </h2>
             </div>
             <p className="text-sm text-zinc-400">
               View user list, petal balances, lifetime earnings, and NSFW status
@@ -89,7 +89,9 @@ export default async function AdminPage() {
               <div className="rounded-lg bg-green-500/20 p-3">
                 <BarChart3 className="h-6 w-6 text-green-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">Petal Economy</h2>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Petal Economy
+              </h2>
             </div>
             <p className="text-sm text-zinc-400">
               Monitor total petals earned/spent, top earners, and daily caps
@@ -104,7 +106,9 @@ export default async function AdminPage() {
               <div className="rounded-lg bg-purple-500/20 p-3">
                 <Palette className="h-6 w-6 text-purple-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">Cosmetics</h2>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Cosmetics
+              </h2>
             </div>
             <p className="text-sm text-zinc-400">
               Manage cosmetics config, costs, rarity, and NSFW flags
@@ -119,7 +123,9 @@ export default async function AdminPage() {
               <div className="rounded-lg bg-blue-500/20 p-3">
                 <Ticket className="h-6 w-6 text-blue-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">Discounts & Vouchers</h2>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Discounts & Vouchers
+              </h2>
             </div>
             <p className="text-sm text-zinc-400">
               View voucher usage stats and manage discount rewards
@@ -134,7 +140,9 @@ export default async function AdminPage() {
               <div className="rounded-lg bg-red-500/20 p-3">
                 <Shield className="h-6 w-6 text-red-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">NSFW Controls</h2>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                NSFW Controls
+              </h2>
             </div>
             <p className="text-sm text-zinc-400">
               Global NSFW toggle, user-level overrides, and stats
@@ -149,11 +157,11 @@ export default async function AdminPage() {
               <div className="rounded-lg bg-yellow-500/20 p-3">
                 <Flower className="h-6 w-6 text-yellow-400" />
               </div>
-              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">Feature Flags</h2>
+              <h2 className="text-xl font-semibold text-white group-hover:text-pink-300">
+                Feature Flags
+              </h2>
             </div>
-            <p className="text-sm text-zinc-400">
-              Manage feature flags and site settings
-            </p>
+            <p className="text-sm text-zinc-400">Manage feature flags and site settings</p>
           </Link>
         </div>
 

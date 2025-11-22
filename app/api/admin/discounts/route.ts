@@ -78,10 +78,7 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
     console.error('Error fetching discount rewards:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -163,10 +160,7 @@ export async function POST(req: Request) {
       );
     }
     console.error('Error saving discount reward:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -197,9 +191,6 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
     console.error('Error deleting discount reward:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

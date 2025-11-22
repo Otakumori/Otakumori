@@ -47,7 +47,7 @@ export async function GET(_req: NextRequest) {
 
     const gamesPlayed = Array.from(new Set(gameRuns.map((r) => r.gameKey)));
     const productsViewed = Array.from(
-      new Set(orders.flatMap((o) => o.OrderItem.map((item) => item.productId)))
+      new Set(orders.flatMap((o) => o.OrderItem.map((item) => item.productId))),
     );
 
     const profile: UserBehaviorProfile = {
@@ -80,4 +80,3 @@ export async function GET(_req: NextRequest) {
     );
   }
 }
-

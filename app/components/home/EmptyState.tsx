@@ -12,7 +12,7 @@ export interface EmptyStateProps {
 
 /**
  * Reusable empty state component for sections
- * 
+ *
  * Features:
  * - Consistent styling across all empty states
  * - Optional action buttons
@@ -33,9 +33,7 @@ export function EmptyState({
         {icon && <div className="mb-4 flex justify-center">{icon}</div>}
         <h3 className="text-xl font-semibold text-white mb-4">{title}</h3>
         <p className="text-gray-300 mb-6">{description}</p>
-        {(actionLabel && actionHref) && (
-          <HeaderButton href={actionHref}>{actionLabel}</HeaderButton>
-        )}
+        {actionLabel && actionHref && <HeaderButton href={actionHref}>{actionLabel}</HeaderButton>}
         {onAction && (
           <button
             onClick={onAction}
@@ -48,4 +46,3 @@ export function EmptyState({
     </div>
   );
 }
-

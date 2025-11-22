@@ -56,18 +56,18 @@ This document summarizes the comprehensive petal economy sanity and anti-exploit
 
 ### Rate Limits & Daily Caps
 
-| Source | maxPerEvent | maxPerDay | Rate Limit Window | Rate Limit Max |
-|--------|-------------|-----------|-------------------|----------------|
-| `mini_game` | 50 | 2000 | 60s | 10 req/min |
-| `background_petal_click` | 5 | 50 | 5s | 3 req/5s |
-| `purchase_reward` | 200 | 5000 | N/A | N/A |
-| `daily_login` | 25 | 25 | 24h | 1 req/day |
-| `achievement` | 100 | 3000 | 60s | 5 req/min |
-| `quest_reward` | 50 | 500 | 60s | 5 req/min |
-| `soapstone_praise` | 10 | 100 | 60s | 10 req/min |
-| `leaderboard_reward` | 100 | 500 | 60s | 5 req/min |
-| `admin_grant` | 1000 | None | N/A | N/A |
-| `other` | 50 | 500 | 60s | 10 req/min |
+| Source                   | maxPerEvent | maxPerDay | Rate Limit Window | Rate Limit Max |
+| ------------------------ | ----------- | --------- | ----------------- | -------------- |
+| `mini_game`              | 50          | 2000      | 60s               | 10 req/min     |
+| `background_petal_click` | 5           | 50        | 5s                | 3 req/5s       |
+| `purchase_reward`        | 200         | 5000      | N/A               | N/A            |
+| `daily_login`            | 25          | 25        | 24h               | 1 req/day      |
+| `achievement`            | 100         | 3000      | 60s               | 5 req/min      |
+| `quest_reward`           | 50          | 500       | 60s               | 5 req/min      |
+| `soapstone_praise`       | 10          | 100       | 60s               | 10 req/min     |
+| `leaderboard_reward`     | 100         | 500       | 60s               | 5 req/min      |
+| `admin_grant`            | 1000        | None      | N/A               | N/A            |
+| `other`                  | 50          | 500       | 60s               | 10 req/min     |
 
 ### Key Rules
 
@@ -134,6 +134,7 @@ if (rules.maxPerDay) {
 ### Supported Sources
 
 Guests can only earn from:
+
 - `background_petal_click` (with strict limits)
 - `mini_game` (with strict limits)
 
@@ -180,6 +181,7 @@ Guests can only earn from:
 ### Balance Reading
 
 **Standard Hook**: `usePetalBalance()`
+
 ```typescript
 const { balance, lifetimeEarned, isLoading, refetch } = usePetalBalance();
 ```
@@ -192,6 +194,7 @@ const { balance, lifetimeEarned, isLoading, refetch } = usePetalBalance();
 ### Petal Gain Feedback
 
 **Component**: `PetalToast`
+
 ```typescript
 <PetalToast amount={grantedAmount} position="top-right" />
 ```
@@ -202,6 +205,7 @@ const { balance, lifetimeEarned, isLoading, refetch } = usePetalBalance();
 - Consistent styling across app
 
 **Hook**: `usePetalToast()`
+
 ```typescript
 const { showToast, toasts } = usePetalToast();
 // After granting: showToast(result.granted);
@@ -297,4 +301,3 @@ The petal economy is now **hardened against exploits** with:
 - ✅ Comprehensive logging
 
 All petal grants flow through `grantPetals()` ensuring consistent behavior, proper limits, and anti-exploit protection across the entire application.
-

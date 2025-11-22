@@ -24,17 +24,17 @@ export interface GameHUDProps {
  * Shared HUD component for all games
  * Consistent styling (cel-shaded, Otaku-mori palette)
  */
-export function GameHUD({ 
-  score, 
-  timeLeft, 
-  timer, 
-  health, 
-  maxHealth, 
-  combo, 
+export function GameHUD({
+  score,
+  timeLeft,
+  timer,
+  health,
+  maxHealth,
+  combo,
   multiplier,
   lives,
   message,
-  className = '' 
+  className = '',
 }: GameHUDProps) {
   const palette = getOtakumoriPalette('combat');
   const time = timeLeft ?? timer;
@@ -141,4 +141,3 @@ export function GameHUD({
     </div>
   );
 }
-

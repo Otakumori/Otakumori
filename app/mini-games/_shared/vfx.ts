@@ -1,6 +1,6 @@
 /**
  * Shared VFX Utilities for Mini-Games
- * 
+ *
  * Provides reusable visual effects:
  * - Screen shake
  * - Petal burst particles
@@ -72,39 +72,36 @@ export function useScreenShake() {
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
 
-  const shake = useCallback(
-    (intensity: number = 0.3, duration: number = 200) => {
-      // Cancel existing shake
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+  const shake = useCallback((intensity: number = 0.3, duration: number = 200) => {
+    // Cancel existing shake
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    startTimeRef.current = Date.now();
+    const maxOffset = intensity * 10; // Max pixels
+
+    const animate = () => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const progress = Math.min(elapsed / duration, 1);
+
+      if (progress < 1) {
+        // Decay shake intensity over time
+        const decay = 1 - progress;
+        const offsetX = (Math.random() - 0.5) * maxOffset * decay;
+        const offsetY = (Math.random() - 0.5) * maxOffset * decay;
+
+        setShakeOffset({ x: offsetX, y: offsetY });
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        // Reset to center
+        setShakeOffset({ x: 0, y: 0 });
+        animationRef.current = null;
       }
+    };
 
-      startTimeRef.current = Date.now();
-      const maxOffset = intensity * 10; // Max pixels
-
-      const animate = () => {
-        const elapsed = Date.now() - startTimeRef.current;
-        const progress = Math.min(elapsed / duration, 1);
-
-        if (progress < 1) {
-          // Decay shake intensity over time
-          const decay = 1 - progress;
-          const offsetX = (Math.random() - 0.5) * maxOffset * decay;
-          const offsetY = (Math.random() - 0.5) * maxOffset * decay;
-
-          setShakeOffset({ x: offsetX, y: offsetY });
-          animationRef.current = requestAnimationFrame(animate);
-        } else {
-          // Reset to center
-          setShakeOffset({ x: 0, y: 0 });
-          animationRef.current = null;
-        }
-      };
-
-      animate();
-    },
-    [],
-  );
+    animate();
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -351,4 +348,3 @@ export function createTrailRenderer(lifetime: number = 200): TrailRenderer {
   renderer.setLifetime(lifetime);
   return renderer;
 }
-

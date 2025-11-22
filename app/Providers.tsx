@@ -24,7 +24,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const isStarfieldOn = isStarfieldEnabled();
   // Don't show GlobalBackground on home page - TreeBackgroundWrapper handles it
   const showStarfield = isStarfieldOn && pathname === '/about';
-  
+
   // Create QueryClient instance (singleton pattern for React Query)
   const [queryClient] = useState(
     () =>

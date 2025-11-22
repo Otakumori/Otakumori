@@ -16,7 +16,8 @@ export default async function CommunityPage() {
           <div className="glass-card p-8 rounded-2xl">
             <h1 className="text-3xl font-bold text-primary mb-4">Community Coming Soon</h1>
             <p className="text-secondary mb-6">
-              Community features require authentication. Once Clerk is configured, you'll be able to leave messages for fellow travelers, share avatars, and participate in discussions.
+              Community features require authentication. Once Clerk is configured, you'll be able to
+              leave messages for fellow travelers, share avatars, and participate in discussions.
             </p>
             <p className="text-muted text-sm">
               In the meantime, you can browse products and play mini-games!

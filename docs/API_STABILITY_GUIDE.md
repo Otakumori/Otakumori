@@ -7,17 +7,21 @@ This guide ensures all API endpoints are stable, consistent, and prevent Server 
 ## Core Principles
 
 ### 1. **Always Validate with Zod**
+
 - ✅ **DO**: Use Zod schemas for ALL request/response data
 - ❌ **DON'T**: Trust external APIs or database responses without validation
 - ❌ **DON'T**: Use `any` types in API routes
 
 ### 2. **Standard Response Envelope**
+
 All `/api/v1/*` routes MUST return:
+
 ```typescript
 { ok: true, data: T, requestId: string } | { ok: false, error: { code: string, message: string, details?: any }, requestId: string }
 ```
 
 ### 3. **Never Throw in Server Components**
+
 - ✅ **DO**: Catch all errors and return error envelope
 - ❌ **DON'T**: Let unhandled errors propagate from API routes
 - ❌ **DON'T**: Throw errors in Server Components that consume APIs
@@ -27,6 +31,7 @@ All `/api/v1/*` routes MUST return:
 ### For API Route Handlers (`app/api/v1/**/route.ts`)
 
 #### ✅ Step 1: Define Schemas in `app/lib/api-contracts.ts`
+
 ```typescript
 // Add to app/lib/api-contracts.ts
 export const YourEndpointRequestSchema = z.object({
@@ -46,40 +51,39 @@ export const YourEndpointResponseSchema = z.object({
 ```
 
 #### ✅ Step 2: Validate Request Data
+
 ```typescript
 import { validateRequest } from '@/app/lib/api-contracts';
 import { YourEndpointRequestSchema } from '@/app/lib/api-contracts';
 
 export async function GET(request: NextRequest) {
   const requestId = generateRequestId();
-  
+
   try {
     // Validate query params
     const { searchParams } = new URL(request.url);
-    const query = YourEndpointRequestSchema.safeParse(
-      Object.fromEntries(searchParams)
-    );
-    
+    const query = YourEndpointRequestSchema.safeParse(Object.fromEntries(searchParams));
+
     if (!query.success) {
       return NextResponse.json(
         createApiError('VALIDATION_ERROR', 'Invalid query parameters', requestId, query.error),
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     // Use validated data
     const { id, limit } = query.data;
     // ... rest of handler
   } catch (error) {
-    return NextResponse.json(
-      createApiError('INTERNAL_ERROR', 'Request failed', requestId),
-      { status: 500 }
-    );
+    return NextResponse.json(createApiError('INTERNAL_ERROR', 'Request failed', requestId), {
+      status: 500,
+    });
   }
 }
 ```
 
 #### ✅ Step 3: Validate Response Data Before Returning
+
 ```typescript
 // Before returning response, validate it matches schema
 const responseData = {
@@ -97,7 +101,7 @@ if (!validated.success) {
   console.error('[API] Response validation failed:', validated.error);
   return NextResponse.json(
     createApiError('INTERNAL_ERROR', 'Response validation failed', requestId),
-    { status: 500 }
+    { status: 500 },
   );
 }
 
@@ -105,43 +109,48 @@ return NextResponse.json(validated.data);
 ```
 
 #### ✅ Step 4: Handle External API Calls Safely
+
 ```typescript
 // When calling external APIs (Printify, Stripe, etc.)
 try {
   const externalResponse = await fetch(externalUrl, options);
-  
+
   if (!externalResponse.ok) {
     // Return error envelope, don't throw
     return NextResponse.json(
-      createApiError('EXTERNAL_API_ERROR', `External API returned ${externalResponse.status}`, requestId),
-      { status: 502 }
+      createApiError(
+        'EXTERNAL_API_ERROR',
+        `External API returned ${externalResponse.status}`,
+        requestId,
+      ),
+      { status: 502 },
     );
   }
-  
+
   const externalData = await externalResponse.json();
-  
+
   // Validate external API response
   const ExternalApiSchema = z.object({
     // Define expected structure
   });
-  
+
   const validated = ExternalApiSchema.safeParse(externalData);
   if (!validated.success) {
     console.warn('[API] External API returned unexpected structure:', validated.error);
     // Return safe fallback or error
     return NextResponse.json(
       createApiError('EXTERNAL_API_ERROR', 'Invalid response format', requestId),
-      { status: 502 }
+      { status: 502 },
     );
   }
-  
+
   // Use validated data
   const safeData = validated.data;
 } catch (error) {
   // Network errors, timeouts, etc.
   return NextResponse.json(
     createApiError('NETWORK_ERROR', 'Failed to reach external service', requestId),
-    { status: 503 }
+    { status: 503 },
   );
 }
 ```
@@ -149,23 +158,24 @@ try {
 ### For Server Components (`app/**/*.tsx`)
 
 #### ✅ Step 1: Always Validate API Responses
+
 ```typescript
 import { safeFetch, isSuccess } from '@/lib/safeFetch';
 import { YourEndpointResponseSchema } from '@/app/lib/api-contracts';
 
 export default async function YourServerComponent() {
   let data: YourDataType[] = [];
-  
+
   try {
     const result = await safeFetch<z.infer<typeof YourEndpointResponseSchema>>(
       '/api/v1/your-endpoint',
       { allowLive: true }
     );
-    
+
     if (isSuccess(result)) {
       // Validate the response structure
       const validated = YourEndpointResponseSchema.safeParse(result.data);
-      
+
       if (validated.success && validated.data.ok) {
         data = validated.data.data.items; // Type-safe access
       } else {
@@ -178,16 +188,17 @@ export default async function YourServerComponent() {
     console.warn('[ServerComponent] Failed to fetch data:', error);
     data = [];
   }
-  
+
   // Always return renderable content
   return <YourComponent data={data} />;
 }
 ```
 
 #### ✅ Step 2: Validate Data Before Mapping
+
 ```typescript
 // When mapping API data to component props
-const safeItems = Array.isArray(apiData?.items) 
+const safeItems = Array.isArray(apiData?.items)
   ? apiData.items
       .filter((item): item is ValidItemType => {
         // Type guard: validate each item
@@ -213,6 +224,7 @@ const safeItems = Array.isArray(apiData?.items)
 ## Standard Patterns
 
 ### Pattern 1: Query Parameter Validation
+
 ```typescript
 const QuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -223,19 +235,20 @@ const QuerySchema = z.object({
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = QuerySchema.safeParse(Object.fromEntries(searchParams));
-  
+
   if (!query.success) {
     return NextResponse.json(
       createApiError('VALIDATION_ERROR', 'Invalid query parameters', requestId, query.error),
-      { status: 400 }
+      { status: 400 },
     );
   }
-  
+
   // Use query.data (fully typed and validated)
 }
 ```
 
 ### Pattern 2: Request Body Validation
+
 ```typescript
 const BodySchema = z.object({
   name: z.string().min(1).max(100),
@@ -247,25 +260,25 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validated = BodySchema.safeParse(body);
-    
+
     if (!validated.success) {
       return NextResponse.json(
         createApiError('VALIDATION_ERROR', 'Invalid request body', requestId, validated.error),
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     // Use validated.data (fully typed)
   } catch (error) {
-    return NextResponse.json(
-      createApiError('VALIDATION_ERROR', 'Invalid JSON', requestId),
-      { status: 400 }
-    );
+    return NextResponse.json(createApiError('VALIDATION_ERROR', 'Invalid JSON', requestId), {
+      status: 400,
+    });
   }
 }
 ```
 
 ### Pattern 3: Database Response Validation
+
 ```typescript
 // Even database responses should be validated
 const products = await db.product.findMany(/* ... */);
@@ -276,10 +289,9 @@ const validated = ProductArraySchema.safeParse(products);
 
 if (!validated.success) {
   console.error('[API] Database response validation failed:', validated.error);
-  return NextResponse.json(
-    createApiError('INTERNAL_ERROR', 'Data validation failed', requestId),
-    { status: 500 }
-  );
+  return NextResponse.json(createApiError('INTERNAL_ERROR', 'Data validation failed', requestId), {
+    status: 500,
+  });
 }
 
 return NextResponse.json({
@@ -290,17 +302,20 @@ return NextResponse.json({
 ```
 
 ### Pattern 4: External API Response Validation
+
 ```typescript
 // Always validate external API responses
 const PrintifyProductSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string().optional(),
-  variants: z.array(z.object({
-    id: z.number(),
-    price: z.number(),
-    is_enabled: z.boolean(),
-  })),
+  variants: z.array(
+    z.object({
+      id: z.number(),
+      price: z.number(),
+      is_enabled: z.boolean(),
+    }),
+  ),
 });
 
 const printifyResponse = await fetch(printifyUrl);
@@ -325,6 +340,7 @@ const safeProduct = validated.data;
 ## Error Handling Standards
 
 ### Standard Error Codes
+
 ```typescript
 // Use these error codes consistently
 export const API_ERROR_CODES = {
@@ -340,6 +356,7 @@ export const API_ERROR_CODES = {
 ```
 
 ### Error Response Format
+
 ```typescript
 {
   ok: false,
@@ -359,6 +376,7 @@ export const API_ERROR_CODES = {
 ## Testing & Validation
 
 ### 1. **Schema Validation Tests**
+
 ```typescript
 // tests/api/your-endpoint.test.ts
 import { YourEndpointResponseSchema } from '@/app/lib/api-contracts';
@@ -370,22 +388,23 @@ describe('YourEndpointResponseSchema', () => {
       data: { items: [], total: 0 },
       requestId: 'test-123',
     };
-    
+
     expect(YourEndpointResponseSchema.safeParse(validResponse).success).toBe(true);
   });
-  
+
   it('rejects invalid response', () => {
     const invalidResponse = {
       ok: true,
       data: null, // Missing required fields
     };
-    
+
     expect(YourEndpointResponseSchema.safeParse(invalidResponse).success).toBe(false);
   });
 });
 ```
 
 ### 2. **Integration Tests**
+
 ```typescript
 // Test that API returns valid envelope
 const response = await fetch('/api/v1/your-endpoint');
@@ -419,12 +438,14 @@ For existing API routes, migrate in this order:
 ## Monitoring & Alerts
 
 ### Key Metrics to Track
+
 - Validation error rate (should be < 1%)
 - External API failure rate
 - Response time for API calls
 - Server Component render errors (should be 0)
 
 ### Logging Standards
+
 ```typescript
 // Log validation errors with context
 console.warn('[API] Validation failed:', {
@@ -474,4 +495,3 @@ console.error('[API] External API failed:', {
 4. Provide safe fallbacks for all data
 5. Never throw errors - always return renderable content
 6. Log warnings for debugging
-

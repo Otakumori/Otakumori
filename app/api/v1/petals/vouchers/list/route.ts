@@ -1,6 +1,6 @@
 /**
  * List User's Discount Vouchers
- * 
+ *
  * Returns all active (unused, non-expired) discount vouchers for the authenticated user.
  */
 
@@ -83,4 +83,3 @@ export async function GET(_req: NextRequest) {
     );
   }
 }
-

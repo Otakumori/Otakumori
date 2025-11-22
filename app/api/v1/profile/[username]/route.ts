@@ -121,7 +121,7 @@ export async function GET(request: NextRequest, { params }: { params: { username
           where: { clerkId: userId },
           select: { id: true },
         });
-        
+
         if (currentUser) {
           const follow = await db.follow.findUnique({
             where: {

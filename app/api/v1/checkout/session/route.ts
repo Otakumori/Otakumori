@@ -64,10 +64,10 @@ export async function POST(req: NextRequest) {
     let discountedLineItems: { id: string; totalDiscountCents: number }[] = [];
     if (Array.isArray(couponCodes) && couponCodes.length > 0) {
       const codes = (couponCodes as string[]).map(normalizeCode);
-      
+
       // Fetch regular Coupon records
       const couponRows = await prisma.coupon.findMany({ where: { code: { in: codes } } });
-      
+
       // Get NSFW policy for validation
       const { getPolicyFromRequest } = await import('@/app/lib/policy/fromRequest');
       const policy = getPolicyFromRequest(req);
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
         }
         return true;
       });
-      
+
       // Convert Coupon records to CouponMeta
       const couponMetas: CouponMeta[] = couponRows.map((r: any) => ({
         id: r.id,
@@ -123,14 +123,14 @@ export async function POST(req: NextRequest) {
         stackable: r.stackable,
         oneTimeCode: r.oneTimeCode,
       }));
-      
+
       // Convert CouponGrant vouchers to CouponMeta format
       const discountConfig = await getDiscountConfig();
       const grantMetas: CouponMeta[] = validGrantRows.map((g) => {
         // Validate discount percent doesn't exceed max
         const percentOff = g.percentOff || 0;
         const validPercent = Math.min(percentOff, discountConfig.maxPercent);
-        
+
         return {
           id: g.id,
           code: g.code,
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           oneTimeCode: true,
         };
       });
-      
+
       // Combine both types
       const metas: CouponMeta[] = [...couponMetas, ...grantMetas];
 

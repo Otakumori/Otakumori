@@ -1,6 +1,6 @@
 /**
  * Petal Earning Hook for Mini-Games
- * 
+ *
  * Centralized petal earning logic for all games
  * Handles API calls, event dispatching, and guest persistence
  */
@@ -83,15 +83,17 @@ export function usePetalEarn() {
         if (result.isGuest) {
           const GUEST_STORAGE_KEY = 'om_guest_petals_v1';
           const GUEST_DAILY_LIMIT = 500;
-          
+
           try {
             const stored = localStorage.getItem(GUEST_STORAGE_KEY);
             const guestData = stored ? JSON.parse(stored) : { balance: 0, lifetimePetalsEarned: 0 };
-            
+
             // Check daily limit for guests
             const today = new Date().toISOString().split('T')[0];
-            const lastUpdate = guestData.lastUpdate ? new Date(guestData.lastUpdate).toISOString().split('T')[0] : null;
-            
+            const lastUpdate = guestData.lastUpdate
+              ? new Date(guestData.lastUpdate).toISOString().split('T')[0]
+              : null;
+
             if (lastUpdate === today) {
               const todayEarned = guestData.todayEarned || 0;
               if (todayEarned + result.earned > GUEST_DAILY_LIMIT) {
@@ -100,21 +102,22 @@ export function usePetalEarn() {
                 result.dailyCapReached = allowed === 0;
               }
             }
-            
+
             // Update guest data
             const updatedBalance = (guestData.balance || 0) + result.earned;
             const updatedLifetime = (guestData.lifetimePetalsEarned || 0) + result.earned;
-            
+
             localStorage.setItem(
               GUEST_STORAGE_KEY,
               JSON.stringify({
                 balance: updatedBalance,
                 lifetimePetalsEarned: updatedLifetime,
                 lastUpdate: new Date().toISOString(),
-                todayEarned: (lastUpdate === today ? (guestData.todayEarned || 0) : 0) + result.earned,
+                todayEarned:
+                  (lastUpdate === today ? guestData.todayEarned || 0 : 0) + result.earned,
               }),
             );
-            
+
             result.balance = updatedBalance;
             result.lifetimePetalsEarned = updatedLifetime;
           } catch (err) {
@@ -165,4 +168,3 @@ export function usePetalEarn() {
 
   return { earnPetals };
 }
-

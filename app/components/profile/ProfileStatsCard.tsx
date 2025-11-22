@@ -99,13 +99,10 @@ export default function ProfileStatsCard() {
         {summary && (
           <div>
             <div className="text-xs text-zinc-400 mb-1">Today's Petals</div>
-            <div className="text-sm text-white">
-              {summary.todayEarned.toLocaleString()}
-            </div>
+            <div className="text-sm text-white">{summary.todayEarned.toLocaleString()}</div>
           </div>
         )}
       </div>
     </div>
   );
 }
-

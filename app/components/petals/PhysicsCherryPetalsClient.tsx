@@ -14,19 +14,21 @@ interface PhysicsCherryPetalsClientProps {
  */
 export default function PhysicsCherryPetalsClient({ density = 2 }: PhysicsCherryPetalsClientProps) {
   // Handle collection internally with analytics tracking
-  const handleCollect = useCallback((petalId: number) => {
-    // Track petal collection for analytics
-    trackPetalCollection({
-      petalId,
-      amount: 1,
-      source: 'physics_cherry_petals',
-      metadata: {
-        component: 'PhysicsCherryPetalsClient',
-        density,
-      },
-    });
-  }, [density]);
+  const handleCollect = useCallback(
+    (petalId: number) => {
+      // Track petal collection for analytics
+      trackPetalCollection({
+        petalId,
+        amount: 1,
+        source: 'physics_cherry_petals',
+        metadata: {
+          component: 'PhysicsCherryPetalsClient',
+          density,
+        },
+      });
+    },
+    [density],
+  );
 
   return <PhysicsCherryPetals density={density} onCollect={handleCollect} />;
 }
-

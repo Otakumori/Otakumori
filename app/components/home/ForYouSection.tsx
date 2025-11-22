@@ -152,4 +152,3 @@ export function ForYouSection() {
     </div>
   );
 }
-

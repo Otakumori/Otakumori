@@ -21,7 +21,7 @@ import { OmButton, OmPanel, OmPanelContent } from '@/app/components/ui/om';
  */
 export function saveGuestAvatar(avatar: AvatarProfile): void {
   if (typeof window === 'undefined') return;
-  
+
   try {
     localStorage.setItem('otm-guest-avatar', JSON.stringify(avatar));
   } catch (error) {
@@ -43,14 +43,18 @@ export interface AvatarPresetChoiceProps {
  */
 export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetChoiceProps) {
   const [guestAvatar, setGuestAvatar] = useState<AvatarProfile | null>(null);
-  
+
   const avatarsEnabled = isAvatarsEnabled();
   const avatarUsage = getGameAvatarUsage(gameId);
   const representationMode = getGameRepresentationMode(gameId);
-  
+
   // Load CREATOR avatar
-  const { creatorAvatar, avatarConfig, isLoading: creatorLoading } = useCreatorAvatar(avatarsEnabled);
-  
+  const {
+    creatorAvatar,
+    avatarConfig,
+    isLoading: creatorLoading,
+  } = useCreatorAvatar(avatarsEnabled);
+
   // Load guest avatar on mount
   useEffect(() => {
     if (avatarsEnabled) {
@@ -68,7 +72,7 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
   const hasGuestAvatar = guestAvatar !== null;
   const hasCreatorAvatar = avatarConfig !== null || creatorAvatar !== null;
   const hasAnyAvatar = hasGuestAvatar || hasCreatorAvatar;
-  
+
   const handlePlayWithCreator = () => {
     if (avatarConfig) {
       onChoice('creator', avatarConfig);
@@ -77,11 +81,11 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
       onChoice('creator', guestAvatar);
     }
   };
-  
+
   const handlePlayWithPreset = () => {
     onChoice('preset');
   };
-  
+
   const handleCreateTempAvatar = () => {
     // Create a simple temporary avatar
     const tempAvatar: AvatarProfile = {
@@ -97,19 +101,19 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
         accent: '#ff69b4',
       },
     };
-    
+
     saveGuestAvatar(tempAvatar);
     setGuestAvatar(tempAvatar);
     onChoice('creator', tempAvatar);
   };
-  
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <OmPanel variant="modal" size="md">
         <OmPanelContent padding="lg">
           <div className="text-center space-y-6">
             <h2 className="text-2xl font-bold text-white mb-4">Choose Your Character</h2>
-            
+
             {/* Avatar Preview */}
             {hasCreatorAvatar && avatarConfig && (
               <div className="flex justify-center mb-4">
@@ -126,18 +130,14 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
             {!hasCreatorAvatar && hasGuestAvatar && guestAvatar && (
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <AvatarRenderer
-                    profile={guestAvatar}
-                    mode={representationMode}
-                    size="small"
-                  />
+                  <AvatarRenderer profile={guestAvatar} mode={representationMode} size="small" />
                   <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs text-pink-200 bg-black/60 px-2 py-1 rounded">
                     My Avatar
                   </div>
                 </div>
               </div>
             )}
-            
+
             {/* Choice Buttons */}
             <div className="space-y-3">
               {hasAnyAvatar ? (
@@ -181,7 +181,7 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
                 </>
               )}
             </div>
-            
+
             {onCancel && (
               <OmButton variant="ghost" size="sm" onClick={onCancel}>
                 Cancel
@@ -193,4 +193,3 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
     </div>
   );
 }
-

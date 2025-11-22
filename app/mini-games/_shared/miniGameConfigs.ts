@@ -2,22 +2,22 @@
  * Central Mini-Game Configuration Mapping
  * Defines representation mode and avatar usage for all mini-games
  * Used by useGameAvatar and QA validators
- * 
+ *
  * Representation Mode Mapping:
- * 
+ *
  * - fullBody: Complete avatar display
  *   - Games: petal-samurai, otaku-beat-em-up, thigh-coliseum
  *   - Use when avatar is central to gameplay
  *   - petal-samurai: Conditional display (hide if low quality, focus on VFX)
- * 
+ *
  * - bust: Waist-up view, emphasizes face/hair/torso
  *   - Games: petal-storm-rhythm, dungeon-of-desire
  *   - Good for rhythm games and character-focused experiences
- * 
+ *
  * - portrait: Head/shoulder frame, simplified UI integration
  *   - Games: memory-match, puzzle-reveal
  *   - Used when avatar is decorative, not gameplay-critical
- * 
+ *
  * - chibi: Proportional remap with larger head, stylized
  *   - Games: bubble-girl, blossomware
  *   - Good for casual/sandbox games
@@ -81,7 +81,7 @@ export const miniGameConfigs: Record<string, MiniGameConfig> = {
     difficulty: 'easy',
     category: 'sandbox',
   },
-  'blossomware': {
+  blossomware: {
     representationMode: 'chibi',
     avatarUsage: 'avatar-or-preset',
     difficulty: 'medium',
@@ -153,14 +153,14 @@ export function shouldDisplayAvatarConditionally(
   // - Missing color palette
   // - Default/preset IDs suggest low customization
   // - Missing morph weights (procedural avatars should have these)
-  
+
   const hasValidPalette = Boolean(
-    avatarProfile.colorPalette && 
-    avatarProfile.colorPalette.skin &&
-    avatarProfile.colorPalette.hair &&
-    avatarProfile.colorPalette.eyes
+    avatarProfile.colorPalette &&
+      avatarProfile.colorPalette.skin &&
+      avatarProfile.colorPalette.hair &&
+      avatarProfile.colorPalette.eyes,
   );
-  
+
   // For petal-samurai: only show if avatar has valid palette
   // In practice, we can be more lenient - show if palette exists
   return hasValidPalette;
@@ -186,4 +186,3 @@ export function isAvatarQualitySufficient(
   // For other games, always show if avatar exists
   return true;
 }
-

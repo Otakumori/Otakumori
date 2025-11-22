@@ -187,4 +187,3 @@ function convertLegacyConfig(config: any, userId: string): CreatorAvatarConfig {
     nsfw: config.nsfw,
   };
 }
-

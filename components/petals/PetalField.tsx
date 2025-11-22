@@ -1,11 +1,11 @@
 /**
  * PetalField Component
- * 
+ *
  * Sakura-style petal field using sprite sheet (cherrysprite.png)
  * - 4x3 grid (12 petals total)
  * - Clickable and collectible petals
  * - Integrates with petal economy system
- * 
+ *
  * Configuration:
  * - petalCount: Number of petals on screen (default: 30)
  * - speedMultiplier: Animation speed (default: 0.4, slow)
@@ -65,16 +65,17 @@ export default function PetalField({
   const imageRef = useRef<HTMLImageElement | null>(null);
   const petalsRef = useRef<Petal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Get petal store - component must be wrapped in PetalProvider
   // Homepage is already wrapped in Providers (which includes PetalProvider)
   // If used elsewhere, wrap component in PetalProvider or it will throw
   const petalStore = usePetalContext();
 
   // Check for reduced motion preference
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
 
   // Load sprite sheet image
   useEffect(() => {
@@ -96,74 +97,77 @@ export default function PetalField({
   }, [enabled, prefersReducedMotion]);
 
   // Initialize petals
-  const createPetal = useCallback((canvas: HTMLCanvasElement): Petal => {
-    const seed = Math.random();
-    return {
-      x: -50, // Start off-screen left
-      y: Math.random() * canvas.height,
-      vx: (0.2 + Math.random() * 0.2) * speedMultiplier, // Initial horizontal velocity
-      vy: (0.1 + Math.random() * 0.2) * speedMultiplier, // Initial vertical velocity
-      ax: 0, // Acceleration starts at 0
-      ay: 0.05 * speedMultiplier, // Gravity pulling down
-      spriteIndex: Math.floor(Math.random() * TOTAL_SPRITES), // Random sprite (0-11)
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.02, // Slow rotation
-      scale: 0.6 + Math.random() * 0.3, // Vary size (0.6-0.9 for smaller petals)
-      alpha: 0.25 + Math.random() * 0.15,
-      collected: false,
-      popAnimationProgress: 0,
-      seed, // Store seed for wind variation
-    };
-  }, [speedMultiplier]);
+  const createPetal = useCallback(
+    (canvas: HTMLCanvasElement): Petal => {
+      const seed = Math.random();
+      return {
+        x: -50, // Start off-screen left
+        y: Math.random() * canvas.height,
+        vx: (0.2 + Math.random() * 0.2) * speedMultiplier, // Initial horizontal velocity
+        vy: (0.1 + Math.random() * 0.2) * speedMultiplier, // Initial vertical velocity
+        ax: 0, // Acceleration starts at 0
+        ay: 0.05 * speedMultiplier, // Gravity pulling down
+        spriteIndex: Math.floor(Math.random() * TOTAL_SPRITES), // Random sprite (0-11)
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.02, // Slow rotation
+        scale: 0.6 + Math.random() * 0.3, // Vary size (0.6-0.9 for smaller petals)
+        alpha: 0.25 + Math.random() * 0.15,
+        collected: false,
+        popAnimationProgress: 0,
+        seed, // Store seed for wind variation
+      };
+    },
+    [speedMultiplier],
+  );
 
   // Handle petal collection
-  const collectPetal = useCallback(async (petalIndex: number) => {
-    const petal = petalsRef.current[petalIndex];
-    if (!petal || petal.collected) return;
+  const collectPetal = useCallback(
+    async (petalIndex: number) => {
+      const petal = petalsRef.current[petalIndex];
+      if (!petal || petal.collected) return;
 
-    // Mark as collected and start pop animation
-    petal.collected = true;
-    petal.popAnimationProgress = 0;
+      // Mark as collected and start pop animation
+      petal.collected = true;
+      petal.popAnimationProgress = 0;
 
-    // Call API to record collection
-    try {
-      const response = await fetch('/api/v1/petals/collect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: 1,
-          source: 'homepage_collection',
-        }),
-      });
+      // Call API to record collection
+      try {
+        const response = await fetch('/api/v1/petals/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: 1,
+            source: 'homepage_collection',
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.ok && data.data) {
-        if (data.data.isGuest) {
-          // Handle guest petal storage
-          const currentGuestPetals = parseInt(
-            localStorage.getItem(GUEST_PETAL_KEY) || '0',
-            10,
-          );
-          const newTotal = currentGuestPetals + data.data.guestPetals;
-          localStorage.setItem(GUEST_PETAL_KEY, newTotal.toString());
-          
-          // Update Zustand store if available
-          if (petalStore) {
-            petalStore.getState().addPetals(data.data.guestPetals);
-          }
-        } else {
-          // Authenticated user - balance is updated server-side
-          // Update store with new balance
-          if (petalStore && typeof data.data.balance === 'number') {
-            petalStore.getState().setPetals(data.data.balance);
+        if (data.ok && data.data) {
+          if (data.data.isGuest) {
+            // Handle guest petal storage
+            const currentGuestPetals = parseInt(localStorage.getItem(GUEST_PETAL_KEY) || '0', 10);
+            const newTotal = currentGuestPetals + data.data.guestPetals;
+            localStorage.setItem(GUEST_PETAL_KEY, newTotal.toString());
+
+            // Update Zustand store if available
+            if (petalStore) {
+              petalStore.getState().addPetals(data.data.guestPetals);
+            }
+          } else {
+            // Authenticated user - balance is updated server-side
+            // Update store with new balance
+            if (petalStore && typeof data.data.balance === 'number') {
+              petalStore.getState().setPetals(data.data.balance);
+            }
           }
         }
+      } catch (error) {
+        console.error('Failed to collect petal:', error);
       }
-    } catch (error) {
-      console.error('Failed to collect petal:', error);
-    }
-  }, [petalStore]);
+    },
+    [petalStore],
+  );
 
   // Handle canvas click
   const handleCanvasClick = useCallback(
@@ -236,7 +240,7 @@ export default function PetalField({
     const animate = (currentTime: number) => {
       const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.033); // Cap at ~30fps minimum
       lastTime = currentTime;
-      
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       petalsRef.current.forEach((petal, index) => {
@@ -246,19 +250,19 @@ export default function PetalField({
           const windTime = currentTime * 0.001;
           const windEffect = Math.sin((windTime * 0.5 + petal.seed * 10) * 2) * 0.15;
           petal.ax = windEffect * speedMultiplier;
-          
+
           // Gravity (constant downward acceleration)
           petal.ay = 0.05 * speedMultiplier;
-          
+
           // Air resistance (damping)
           const airResistance = 0.98;
           petal.vx = (petal.vx + petal.ax * deltaTime) * airResistance;
           petal.vy = (petal.vy + petal.ay * deltaTime) * airResistance;
-          
+
           // Update position based on velocity
           petal.x += petal.vx * deltaTime * 60; // Scale for 60fps
           petal.y += petal.vy * deltaTime * 60;
-          
+
           // Rotation affected by wind
           petal.rotation += petal.rotationSpeed + windEffect * 0.01;
         }
@@ -352,4 +356,3 @@ export default function PetalField({
     />
   );
 }
-

@@ -101,7 +101,7 @@ export default function MemoryCardDock({ className = '' }: MemoryCardDockProps) 
   if (orders.length === 0) {
     return (
       <div className={`${className} text-center`} data-test="gc-memcard-dock">
-          <div className="bg-gradient-to-br from-purple-900/30 to-black/40 backdrop-blur-md border border-purple-400/20 rounded-xl p-6 text-center">
+        <div className="bg-gradient-to-br from-purple-900/30 to-black/40 backdrop-blur-md border border-purple-400/20 rounded-xl p-6 text-center">
           <div className="text-white/70 text-sm mb-2 font-medium">No memory cards yet</div>
           <div className="text-purple-200 text-xs">Make your first purchase in the Shop</div>
         </div>

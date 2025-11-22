@@ -3,6 +3,7 @@
 ## Summary
 
 Successfully refactored the entire Otakumori codebase to use:
+
 - ✅ **Checked Prisma inputs** with `connect` patterns instead of raw FK primitives
 - ✅ **CamelCase field names** in Prisma schema with `@map` to snake_case DB columns
 - ✅ **Auto-generated IDs and timestamps** using `@default(cuid())` and `@updatedAt`
@@ -18,6 +19,7 @@ Successfully refactored the entire Otakumori codebase to use:
 ### Models Updated (All 60+ models)
 
 **Standard fields added to every model:**
+
 ```prisma
 id        String   @id @default(cuid())
 createdAt DateTime @default(now())
@@ -27,6 +29,7 @@ updatedAt DateTime @updatedAt
 ### Field Mappings Added
 
 Applied `@map` for snake_case DB columns:
+
 - `display_name` → `displayName String? @map("display_name")`
 - `category_slug` → `categorySlug String? @map("category_slug")`
 - `is_approved` → `isApproved Boolean @map("is_approved")`
@@ -37,6 +40,7 @@ Applied `@map` for snake_case DB columns:
 ### New Models Added
 
 **Praise** - User-to-user praise system:
+
 ```prisma
 model Praise {
   id        String @id @default(cuid())
@@ -49,6 +53,7 @@ model Praise {
 ```
 
 **ProductSoapstone** - Product-specific soapstone messages:
+
 ```prisma
 model ProductSoapstone {
   id         String     @id @default(cuid())
@@ -64,6 +69,7 @@ model ProductSoapstone {
 ```
 
 **ProductSoapstonePraise** - Praise tracking for product soapstones:
+
 ```prisma
 model ProductSoapstonePraise {
   id          String @id @default(cuid())
@@ -78,6 +84,7 @@ model ProductSoapstonePraise {
 ### Enum Corrections
 
 **Visibility enum** - Standardized values:
+
 - ❌ Removed: `VISIBLE`, `REPORTED`
 - ✅ Valid: `PUBLIC`, `HIDDEN`, `REMOVED`
 
@@ -88,34 +95,38 @@ model ProductSoapstonePraise {
 ### Files Modified: 50+
 
 **Client Accessor Fixes:**
+
 - `prisma.userPetals` → `prisma.petalWallet`
 - `prisma.userInventoryItem` → `prisma.inventoryItem`
 - All accessors match singular model names
 
 **Field Name Conversions:**
+
 - All Prisma queries now use camelCase: `createdAt`, `updatedAt`, `displayName`, `isApproved`
 - Response DTOs may still use snake_case (e.g., `display_name` in API responses) - this is intentional for API contracts
 
 **Enum Usage Updates:**
+
 ```typescript
 // Before
-status: 'VISIBLE'
-status: 'REPORTED'
+status: 'VISIBLE';
+status: 'REPORTED';
 
 // After
 import { Visibility } from '@prisma/client';
-status: Visibility.PUBLIC
-status: Visibility.HIDDEN
+status: Visibility.PUBLIC;
+status: Visibility.HIDDEN;
 ```
 
 **Checked Input Pattern:**
+
 ```typescript
 // Before (UncheckedCreateInput)
 await prisma.order.create({
   data: {
     userId: user.id,
     productId: product.id,
-  }
+  },
 });
 
 // After (Checked CreateInput)
@@ -123,20 +134,26 @@ await prisma.order.create({
   data: {
     User: { connect: { id: user.id } },
     Product: { connect: { id: product.id } },
-  }
+  },
 });
 ```
 
 **Timestamp Handling:**
+
 ```typescript
 // Before
-create({ data: { id: uuid(), updatedAt: new Date() } })
+create({ data: { id: uuid(), updatedAt: new Date() } });
 
 // After
-create({ data: { /* Prisma handles id & updatedAt */ } })
+create({
+  data: {
+    /* Prisma handles id & updatedAt */
+  },
+});
 ```
 
 **JSON Config Access (AvatarConfiguration):**
+
 ```typescript
 // Before
 const name = config.name;
@@ -155,6 +172,7 @@ const baseModel = cfg?.baseModel;
 ### Created Files
 
 **`scripts/prisma-audit.ts`** - Schema validation script:
+
 - Checks all expected models exist
 - Validates enum values
 - Ensures field naming conventions
@@ -163,6 +181,7 @@ const baseModel = cfg?.baseModel;
 ### Updated Files
 
 **`package.json`** - Added audit script:
+
 ```json
 {
   "scripts": {
@@ -172,6 +191,7 @@ const baseModel = cfg?.baseModel;
 ```
 
 **`.husky/pre-commit`** - Enhanced validation chain:
+
 1. Prisma format & generate
 2. TypeScript typecheck (BLOCKING)
 3. Prisma audit (BLOCKING)
@@ -183,12 +203,14 @@ const baseModel = cfg?.baseModel;
 ## Phase 4: Verification ✅
 
 ### TypeScript Typecheck
+
 ```bash
 $ pnpm typecheck
 ✅ 0 errors (down from 123+)
 ```
 
 ### Production Build
+
 ```bash
 $ npm run build
 ✅ 274 routes compiled successfully
@@ -196,6 +218,7 @@ $ npm run build
 ```
 
 ### Prisma Audit
+
 ```bash
 $ pnpm prisma:audit
 ✅ All expected models present
@@ -208,11 +231,13 @@ $ pnpm prisma:audit
 ## Key Files Changed
 
 ### Schema & Configuration
+
 - `prisma/schema.prisma` - Complete normalization
 - `package.json` - Added audit script
 - `.husky/pre-commit` - Enhanced validation
 
 ### Critical API Routes
+
 - `app/lib/db.ts` - Fixed Order/OrderItem creation
 - `app/api/v1/praise/route.ts` - Praise model with proper relations
 - `app/api/v1/products/[id]/soapstones/route.ts` - ProductSoapstone
@@ -222,6 +247,7 @@ $ pnpm prisma:audit
 - `inngest/order-fulfillment.ts` - Order fulfillment logic
 
 ### Systematic Updates (15+ files each)
+
 - All `display_name` → `displayName` in selects
 - All enum values `VISIBLE` → `PUBLIC`
 - All manual IDs/timestamps removed
@@ -234,6 +260,7 @@ $ pnpm prisma:audit
 ### None! 🎉
 
 This refactor is **backward compatible** because:
+
 1. Used `@map` for DB column mapping - no DB schema changes needed
 2. All queries updated to new field names
 3. Client code uses generated types automatically
@@ -248,6 +275,7 @@ This refactor is **backward compatible** because:
 ## Testing Recommendations
 
 While all builds and type checks pass, manual testing recommended for:
+
 1. **User registration/login** - Clerk webhook integration
 2. **Order creation** - Checkout flow with OrderItems
 3. **Soapstone placement** - Product and community soapstones
@@ -262,6 +290,7 @@ While all builds and type checks pass, manual testing recommended for:
 ### Pre-Commit Hook
 
 Now enforces:
+
 ```bash
 ✅ Prisma schema formatting
 ✅ Client generation
@@ -276,6 +305,7 @@ Now enforces:
 Run manually: `pnpm prisma:audit`
 
 Validates:
+
 - Expected models exist
 - Enum values match schema
 - Field naming conventions
@@ -284,14 +314,14 @@ Validates:
 
 ## Success Metrics
 
-| Metric | Before | After |
-|--------|--------|-------|
-| TypeScript Errors | 123+ | **0** ✅ |
-| Build Status | ❌ Failed | ✅ **Success** |
+| Metric             | Before            | After              |
+| ------------------ | ----------------- | ------------------ |
+| TypeScript Errors  | 123+              | **0** ✅           |
+| Build Status       | ❌ Failed         | ✅ **Success**     |
 | Schema Consistency | Mixed conventions | **100% camelCase** |
-| Checked Inputs | ~30% | **~95%** |
-| Manual IDs | ~40 instances | **0** |
-| Enum Errors | 15+ files | **0** |
+| Checked Inputs     | ~30%              | **~95%**           |
+| Manual IDs         | ~40 instances     | **0**              |
+| Enum Errors        | 15+ files         | **0**              |
 
 ---
 
@@ -309,4 +339,3 @@ Validates:
 **Time Investment:** Well worth it! 🌸
 
 The codebase is now **type-safe, consistent, and maintainable**!
-

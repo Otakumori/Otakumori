@@ -159,4 +159,3 @@ export function createCelShadedMaterial(options: CelShadedMaterialOptions): THRE
     lights: false, // We handle lighting in the shader
   });
 }
-

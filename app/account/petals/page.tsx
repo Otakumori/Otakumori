@@ -170,7 +170,9 @@ export default function PetalStorePage() {
     }
 
     if (!reward.available) {
-      alert('This discount reward is not available. You may need to unlock a required achievement.');
+      alert(
+        'This discount reward is not available. You may need to unlock a required achievement.',
+      );
       return;
     }
 
@@ -416,93 +418,94 @@ export default function PetalStorePage() {
           )}
 
         {/* Items Grid */}
-        {(selectedCategory === 'all' || selectedCategory !== 'DISCOUNT') && filteredItems.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-            {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className={`group bg-neutral-900 rounded-xl border overflow-hidden hover:scale-105 transition-all duration-200 ${getCategoryColor(item.kind)}`}
-              >
-                {/* Item Image */}
-                <div className="aspect-square bg-neutral-800 overflow-hidden">
-                  {item.metadata.previewUrl ? (
-                    <img
-                      src={item.metadata.previewUrl}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-6xl">
-                      {getCategoryIcon(item.kind)}
-                    </div>
-                  )}
-                </div>
-
-                {/* Item Info */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-white group-hover:text-pink-400 transition-colors">
-                      {item.name}
-                    </h3>
-                    <div className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-300">
-                      {item.kind}
-                    </div>
+        {(selectedCategory === 'all' || selectedCategory !== 'DISCOUNT') &&
+          filteredItems.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className={`group bg-neutral-900 rounded-xl border overflow-hidden hover:scale-105 transition-all duration-200 ${getCategoryColor(item.kind)}`}
+                >
+                  {/* Item Image */}
+                  <div className="aspect-square bg-neutral-800 overflow-hidden">
+                    {item.metadata.previewUrl ? (
+                      <img
+                        src={item.metadata.previewUrl}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-6xl">
+                        {getCategoryIcon(item.kind)}
+                      </div>
+                    )}
                   </div>
 
-                  {item.metadata.description && (
-                    <p className="text-sm text-neutral-400 mb-3 line-clamp-2">
-                      {item.metadata.description}
-                    </p>
-                  )}
-
-                  {/* Event Tag */}
-                  {item.eventTag && (
-                    <div className="mb-3">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-pink-500/20 text-pink-400 text-xs rounded-full">
-                        <Sparkles className="h-3 w-3" />
-                        {item.eventTag}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Price and Purchase */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-pink-400">
-                      <Coins className="h-4 w-4" />
-                      <span className="font-semibold">{item.pricePetals}</span>
-                      <span className="text-sm">petals</span>
+                  {/* Item Info */}
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-white group-hover:text-pink-400 transition-colors">
+                        {item.name}
+                      </h3>
+                      <div className="text-xs px-2 py-1 bg-neutral-800 rounded-full text-neutral-300">
+                        {item.kind}
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => handlePurchase(item)}
-                      disabled={purchasing === item.id || petalBalance < item.pricePetals}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 ${
-                        petalBalance < item.pricePetals
-                          ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
-                          : purchasing === item.id
-                            ? 'bg-blue-600 text-white cursor-wait'
-                            : 'bg-pink-600 hover:bg-pink-700 text-white hover:scale-105'
-                      }`}
-                      aria-label={`Purchase ${item.name}`}
-                    >
-                      {purchasing === item.id ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          Purchasing...
-                        </>
-                      ) : (
-                        <>
-                          <ShoppingBag className="h-4 w-4" />
-                          Purchase
-                        </>
-                      )}
-                    </button>
+                    {item.metadata.description && (
+                      <p className="text-sm text-neutral-400 mb-3 line-clamp-2">
+                        {item.metadata.description}
+                      </p>
+                    )}
+
+                    {/* Event Tag */}
+                    {item.eventTag && (
+                      <div className="mb-3">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-pink-500/20 text-pink-400 text-xs rounded-full">
+                          <Sparkles className="h-3 w-3" />
+                          {item.eventTag}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Price and Purchase */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-pink-400">
+                        <Coins className="h-4 w-4" />
+                        <span className="font-semibold">{item.pricePetals}</span>
+                        <span className="text-sm">petals</span>
+                      </div>
+
+                      <button
+                        onClick={() => handlePurchase(item)}
+                        disabled={purchasing === item.id || petalBalance < item.pricePetals}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 ${
+                          petalBalance < item.pricePetals
+                            ? 'bg-neutral-700 text-neutral-500 cursor-not-allowed'
+                            : purchasing === item.id
+                              ? 'bg-blue-600 text-white cursor-wait'
+                              : 'bg-pink-600 hover:bg-pink-700 text-white hover:scale-105'
+                        }`}
+                        aria-label={`Purchase ${item.name}`}
+                      >
+                        {purchasing === item.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            Purchasing...
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingBag className="h-4 w-4" />
+                            Purchase
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
         {/* Empty State */}
         {filteredItems.length === 0 &&
@@ -512,7 +515,9 @@ export default function PetalStorePage() {
               <div className="text-6xl mb-4"></div>
               <h3 className="text-xl font-semibold text-neutral-400 mb-2">No items found</h3>
               <p className="text-neutral-500">
-                {searchQuery ? 'Try adjusting your search terms.' : 'Check back later for new items!'}
+                {searchQuery
+                  ? 'Try adjusting your search terms.'
+                  : 'Check back later for new items!'}
               </p>
             </div>
           )}

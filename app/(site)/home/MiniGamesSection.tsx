@@ -34,7 +34,8 @@ function mapGame(game: {
   category?: string;
   thumbKey?: string;
 }): ApiGame {
-  const fallbackThumbKey = game.thumbKey ?? getGameDef(game.slug)?.thumbKey ?? getGameDef(game.id)?.thumbKey;
+  const fallbackThumbKey =
+    game.thumbKey ?? getGameDef(game.slug)?.thumbKey ?? getGameDef(game.id)?.thumbKey;
   const resolvedImage =
     game.image ??
     (fallbackThumbKey ? getGameThumbnailAsset(fallbackThumbKey) : '/assets/placeholder-game.jpg');
@@ -102,16 +103,20 @@ export default async function MiniGamesSection() {
       }
     }
   } catch (error) {
-    handleServerError(error, {
-      section: 'mini-games',
-      component: 'MiniGamesSection',
-      operation: 'fetch_games',
-      metadata: {
-        endpoints: ['/api/v1/games', '/api/games', '/api/mini-games', '/api/games/featured'],
+    handleServerError(
+      error,
+      {
+        section: 'mini-games',
+        component: 'MiniGamesSection',
+        operation: 'fetch_games',
+        metadata: {
+          endpoints: ['/api/v1/games', '/api/games', '/api/mini-games', '/api/games/featured'],
+        },
       },
-    }, {
-      logLevel: 'warn',
-    });
+      {
+        logLevel: 'warn',
+      },
+    );
     // Keep registryGames as fallback
     games = registryGames;
   }
@@ -147,7 +152,7 @@ export default async function MiniGamesSection() {
                   />
                   {/* Gradient overlay for text readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
-                  
+
                   {/* Game info overlay */}
                   <div className="absolute left-4 right-4 bottom-4 flex flex-col gap-2 z-10">
                     <h3 className="font-semibold text-white text-lg transition-colors group-hover:text-pink-300 drop-shadow-lg">
@@ -162,7 +167,9 @@ export default async function MiniGamesSection() {
                 </div>
                 {game.description && (
                   <GlassCardContent className="flex-1">
-                    <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">{game.description}</p>
+                    <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">
+                      {game.description}
+                    </p>
                   </GlassCardContent>
                 )}
               </GlassCard>

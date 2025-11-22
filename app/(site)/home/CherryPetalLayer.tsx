@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 
 /**
  * Cherry Petal Layer Component
- * 
+ *
  * Sprite-based falling petals overlay for the home hero cherry tree.
  * Uses the sprite sheet at /assets/images/petal_sprite.png (4x3 grid, 12 variants).
- * 
+ *
  * Features:
  * - GPU-optimized CSS transforms only
  * - Respects prefers-reduced-motion
@@ -101,7 +101,7 @@ export default function CherryPetalLayer({
   const handlePetalInteraction = useCallback(
     (petalId: string, e: React.MouseEvent | React.KeyboardEvent) => {
       e.stopPropagation();
-      
+
       if (clickedPetalIdsRef.current.has(petalId)) return;
 
       const petal = petals.find((p) => p.id === petalId);
@@ -137,11 +137,11 @@ export default function CherryPetalLayer({
   const getSpritePosition = (frameIndex: number) => {
     const col = frameIndex % SPRITE_COLS;
     const row = Math.floor(frameIndex / SPRITE_COLS);
-    
+
     // Calculate percentage positions
     const xPercent = (col / (SPRITE_COLS - 1)) * 100;
     const yPercent = (row / (SPRITE_ROWS - 1)) * 100;
-    
+
     return { xPercent, yPercent };
   };
 
@@ -233,7 +233,8 @@ export default function CherryPetalLayer({
               backgroundSize: `${SPRITE_COLS * 100}% ${SPRITE_ROWS * 100}%`,
               backgroundPosition: `${xPercent}% ${yPercent}%`,
               opacity: isClicked ? 0 : isClickable ? 0.4 : 0.25,
-              filter: isClickable && !isClicked ? 'drop-shadow(0 0 3px rgba(236, 72, 153, 0.3))' : 'none',
+              filter:
+                isClickable && !isClicked ? 'drop-shadow(0 0 3px rgba(236, 72, 153, 0.3))' : 'none',
               transform: `translate(-50%, -50%) rotate(${petal.rotation}deg) scale(${petal.scale * 0.2})`,
               animation: isClicked
                 ? 'none'
@@ -260,4 +261,3 @@ export default function CherryPetalLayer({
     </div>
   );
 }
-

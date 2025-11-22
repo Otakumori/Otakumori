@@ -60,15 +60,15 @@ export default function ProductClient({ productId }: { productId: string }) {
           throw new Error(`Failed to fetch product: ${response.statusText}`);
         }
         const json = await response.json();
-        
+
         if (isCancelled) return;
-        
+
         if (!json.ok) {
           setError(json.error || 'Product not found');
           setLoading(false);
           return;
         }
-        
+
         const catalogProduct = json?.data as CatalogProduct | undefined;
         if (!catalogProduct) {
           setError('Product not found');
@@ -79,7 +79,11 @@ export default function ProductClient({ productId }: { productId: string }) {
         const normalizeImageValue = (value: unknown): string | null => {
           if (!value) return null;
           if (typeof value === 'string') return value;
-          if (typeof value === 'object' && value !== null && 'src' in (value as Record<string, unknown>)) {
+          if (
+            typeof value === 'object' &&
+            value !== null &&
+            'src' in (value as Record<string, unknown>)
+          ) {
             const src = (value as Record<string, unknown>).src;
             return typeof src === 'string' ? src : null;
           }
@@ -100,7 +104,9 @@ export default function ProductClient({ productId }: { productId: string }) {
 
         setProduct(normalizedProduct);
 
-        const defaultVariant = catalogProduct.variants.find((variant) => variant.isEnabled && variant.inStock);
+        const defaultVariant = catalogProduct.variants.find(
+          (variant) => variant.isEnabled && variant.inStock,
+        );
         setSelectedVariant(defaultVariant ?? catalogProduct.variants[0] ?? null);
 
         const displayPrice =
@@ -110,21 +116,24 @@ export default function ProductClient({ productId }: { productId: string }) {
             : 0);
 
         const normalizedPriceCents =
-          catalogProduct.priceCents ??
-          (displayPrice != null ? Math.round(displayPrice * 100) : 0);
+          catalogProduct.priceCents ?? (displayPrice != null ? Math.round(displayPrice * 100) : 0);
 
         // Only add to recently viewed if not cancelled
         if (!isCancelled) {
           addProduct({
             id: catalogProduct.id,
             title: catalogProduct.title,
-            image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '/assets/images/placeholder-product.jpg',
+            image:
+              normalizedProduct.image ??
+              normalizedProduct.images[0] ??
+              '/assets/images/placeholder-product.jpg',
             priceCents: normalizedPriceCents,
           });
         }
       } catch (err) {
         if (isCancelled) return;
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching the product';
+        const errorMessage =
+          err instanceof Error ? err.message : 'An error occurred while fetching the product';
         setError(errorMessage);
         console.error('Error fetching product:', err);
         showError('Failed to fetch product details. Please try again.');
@@ -154,8 +163,10 @@ export default function ProductClient({ productId }: { productId: string }) {
     const imageUrl = product.image ?? product.images?.[0] ?? '/images/products/placeholder.svg';
     const currentPriceCents =
       selectedVariant.priceCents ??
-      (product.priceRange.min != null ? Math.round(product.priceRange.min) : product.priceCents ?? null);
-    const currentPrice = currentPriceCents != null ? currentPriceCents / 100 : product.price ?? 0;
+      (product.priceRange.min != null
+        ? Math.round(product.priceRange.min)
+        : (product.priceCents ?? null));
+    const currentPrice = currentPriceCents != null ? currentPriceCents / 100 : (product.price ?? 0);
 
     addItem({
       id: product.id,
@@ -204,9 +215,10 @@ export default function ProductClient({ productId }: { productId: string }) {
   const imageUrl = product.image ?? product.images?.[0] ?? '/images/products/placeholder.svg';
   const currentPriceCents =
     selectedVariant?.priceCents ??
-    (product.priceRange.min != null ? Math.round(product.priceRange.min) : product.priceCents ?? null);
-  const currentPrice =
-    currentPriceCents != null ? currentPriceCents / 100 : product.price ?? 0;
+    (product.priceRange.min != null
+      ? Math.round(product.priceRange.min)
+      : (product.priceCents ?? null));
+  const currentPrice = currentPriceCents != null ? currentPriceCents / 100 : (product.price ?? 0);
   const currency = 'USD';
   const isNSFW = product.tags.some((tag) => tag.toLowerCase().includes('nsfw'));
 
@@ -264,9 +276,11 @@ export default function ProductClient({ productId }: { productId: string }) {
               </div>
               <PetalDiscountBadge productPrice={currentPrice} />
               <div className="space-y-4 text-zinc-300 text-lg leading-relaxed">
-                {descriptionParagraphs.length > 0
-                  ? descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
-                  : <p>Premium quality print-on-demand merchandise.</p>}
+                {descriptionParagraphs.length > 0 ? (
+                  descriptionParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
+                ) : (
+                  <p>Premium quality print-on-demand merchandise.</p>
+                )}
               </div>
             </div>
 
@@ -296,7 +310,9 @@ export default function ProductClient({ productId }: { productId: string }) {
                       className="bg-purple-900"
                     >
                       {variant.title ?? `Variant ${variant.printifyVariantId}`} - $
-                      {((variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100).toFixed(2)}
+                      {(
+                        (variant.priceCents ?? Math.round((variant.price ?? 0) * 100)) / 100
+                      ).toFixed(2)}
                       {!variant.isEnabled ? ' (Out of Stock)' : ''}
                     </option>
                   ))}
@@ -334,7 +350,8 @@ export default function ProductClient({ productId }: { productId: string }) {
               <h3 className="text-lg font-semibold text-pink-200 mb-4">Product Details</h3>
               <div className="space-y-2 text-sm text-zinc-300">
                 <p>
-                  <span className="font-medium">SKU:</span> {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}
+                  <span className="font-medium">SKU:</span>{' '}
+                  {selectedVariant?.sku || selectedVariant?.printifyVariantId || 'N/A'}
                 </p>
                 {product.category && (
                   <p>

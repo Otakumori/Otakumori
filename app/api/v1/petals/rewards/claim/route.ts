@@ -33,10 +33,7 @@ export async function POST(req: NextRequest) {
     // Find the reward
     const reward = PETAL_REWARDS.find((r) => r.threshold === threshold);
     if (!reward) {
-      return NextResponse.json(
-        { ok: false, error: 'INVALID_REWARD', requestId },
-        { status: 400 },
-      );
+      return NextResponse.json({ ok: false, error: 'INVALID_REWARD', requestId }, { status: 400 });
     }
 
     // Get user's petal balance
@@ -168,4 +165,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

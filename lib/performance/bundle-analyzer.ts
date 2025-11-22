@@ -356,8 +356,7 @@ export class CoreWebVitalsMonitor {
  */
 export function initializeBundleAnalysis(): BundleAnalyzer {
   const config: BundleAnalysisConfig = {
-    enabled:
-      clientEnv.NODE_ENV === 'development' || clientEnv.NODE_ENV === 'production',
+    enabled: clientEnv.NODE_ENV === 'development' || clientEnv.NODE_ENV === 'production',
     outputPath: '.next/analyze',
     openAnalyzer: clientEnv.NODE_ENV === 'development',
     analyzeBrowser: true,

@@ -42,28 +42,32 @@ export default function PetalSamuraiPage() {
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | null>(null);
   const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
   const [showQuakeOverlay, setShowQuakeOverlay] = useState(false);
-  
+
   // Cosmetics hook for HUD skin
   const { hudSkin, isHydrated } = useCosmetics();
-  
+
   // Get real petal balance for Quake HUD
   const { balance: petalBalance } = usePetalBalance();
-  
+
   // Game HUD integration (game component handles its own HUD)
   const { Component: _HudComponent } = useGameHud('petal-samurai');
-  
+
   // Restart handler - game component handles restart logic internally
   const _handleRestart = useCallback(() => {
     // Game component manages its own restart state
   }, []);
-  
+
   // Avatar integration - use wrapper hook with choice
   const avatarUsage = getGameAvatarUsage('petal-samurai');
-  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('petal-samurai', {
+  const {
+    avatarConfig,
+    representationConfig,
+    isLoading: avatarLoading,
+  } = useGameAvatar('petal-samurai', {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
-  
+
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
@@ -80,10 +84,14 @@ export default function PetalSamuraiPage() {
     }
     setShowAvatarChoice(false);
   }, []);
-  
+
   // Check if we should show choice on mount
-  const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
-  
+  const shouldShowChoice =
+    showAvatarChoice &&
+    avatarUsage === 'avatar-or-preset' &&
+    avatarChoice === null &&
+    isAvatarsEnabled();
+
   // Show Quake overlay on win (for demo - in production, this would be triggered by game win event)
   // TODO: Connect to actual game win state from CombatGame
 
@@ -117,24 +125,17 @@ export default function PetalSamuraiPage() {
       )}
 
       {/* Avatar Display (FullBody Mode) - MAIN CHARACTER CENTER STAGE */}
-      {!shouldShowChoice && 
-       isAvatarsEnabled() && 
-       avatarConfig && 
-       !avatarLoading && (
+      {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
           <div className="relative w-96 h-96">
-            <AvatarRenderer
-              profile={avatarConfig}
-              mode={representationConfig.mode}
-              size="large"
-            />
+            <AvatarRenderer profile={avatarConfig} mode={representationConfig.mode} size="large" />
           </div>
         </div>
       )}
 
       {/* Game */}
       {!shouldShowChoice && <SlicingGame mode="timed" />}
-      
+
       {/* Quake HUD Overlay - shown on win if Quake skin is selected */}
       {isHydrated && hudSkin === 'quake' && showQuakeOverlay && (
         <QuakeAvatarHud

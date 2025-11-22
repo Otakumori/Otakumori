@@ -74,7 +74,7 @@ export default function GameCubeHubV2() {
   const containerRef = useRef<HTMLDivElement>(null);
   const ambientAudioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
-  
+
   // Cosmetics hook for HUD skin
   const { hudSkin, isHydrated } = useCosmetics();
 
@@ -114,69 +114,74 @@ export default function GameCubeHubV2() {
     }
   }, [accessibilitySettings.volume]);
 
-
   // Memoize handlers to prevent unnecessary re-renders
-  const handleFaceAction = useCallback(async (face: FacePosition) => {
-    if (face === 'front') {
-      setShowFrontOverlay(false);
-      return;
-    }
-
-    if (isLoading) return;
-    
-    setCurrentFace(face);
-    setIsLoading(true);
-
-    const faceConfig = cubeConfig.faces[face];
-    if (!faceConfig) {
-      setIsLoading(false);
-      return;
-    }
-
-    // Add loading delay for better UX
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    // Type guard for discriminated union
-    if (faceConfig.action === 'route') {
-      // TypeScript now knows this is the route variant
-      if ('href' in faceConfig && faceConfig.href) {
-        router.push(faceConfig.href);
+  const handleFaceAction = useCallback(
+    async (face: FacePosition) => {
+      if (face === 'front') {
+        setShowFrontOverlay(false);
+        return;
       }
-    } else if (faceConfig.action === 'panel') {
-      // TypeScript now knows this is the panel variant
-      if ('panel' in faceConfig && faceConfig.panel) {
-        if (faceConfig.panel === 'games') {
-          setActivePanel('games');
-        } else if (faceConfig.panel === 'extras') {
-          setActivePanel('extras');
+
+      if (isLoading) return;
+
+      setCurrentFace(face);
+      setIsLoading(true);
+
+      const faceConfig = cubeConfig.faces[face];
+      if (!faceConfig) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Add loading delay for better UX
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Type guard for discriminated union
+      if (faceConfig.action === 'route') {
+        // TypeScript now knows this is the route variant
+        if ('href' in faceConfig && faceConfig.href) {
+          router.push(faceConfig.href);
         }
+      } else if (faceConfig.action === 'panel') {
+        // TypeScript now knows this is the panel variant
+        if ('panel' in faceConfig && faceConfig.panel) {
+          if (faceConfig.panel === 'games') {
+            setActivePanel('games');
+          } else if (faceConfig.panel === 'extras') {
+            setActivePanel('extras');
+          }
+          setIsLoading(false);
+        }
+      } else {
         setIsLoading(false);
       }
-    } else {
-      setIsLoading(false);
-    }
-  }, [isLoading, router]);
+    },
+    [isLoading, router],
+  );
 
-  const handleGameSelect = useCallback(async (game: (typeof allGames)[0]) => {
-    // Games are always available in this implementation
-    if (!game || !game.href) {
-      return;
-    }
+  const handleGameSelect = useCallback(
+    async (game: (typeof allGames)[0]) => {
+      // Games are always available in this implementation
+      if (!game || !game.href) {
+        return;
+      }
 
-    if (loadingGame) return;
-    
-    setLoadingGame(game.id);
+      if (loadingGame) return;
 
-    // Disc load animation
-    await new Promise((resolve) => setTimeout(resolve, 300));
+      setLoadingGame(game.id);
 
-    try {
-      await router.push(game.href);
-    } catch (error) {
-      console.error('Failed to navigate to game:', error);
-      setLoadingGame(null);
-    }
-  }, [loadingGame, router]);
+      // Disc load animation
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      try {
+        await router.push(game.href);
+      } catch (error) {
+        console.error('Failed to navigate to game:', error);
+        setLoadingGame(null);
+      }
+    },
+    [loadingGame, router],
+  );
 
   // Keyboard navigation for GameCube face buttons - consolidated handler
   useEffect(() => {
@@ -240,7 +245,6 @@ export default function GameCubeHubV2() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-
   const dismissOverlay = () => {
     if (cubeConfig.frontOverlay.dismissible) {
       setShowFrontOverlay(false);
@@ -262,7 +266,10 @@ export default function GameCubeHubV2() {
       <StarfieldBackground density={0.72} speed={0.62} zIndex={-10} />
 
       {/* Subtle ambient glow overlay (optional, can be removed if starfield is enough) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none" style={{ zIndex: -9 }} />
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-pink-900/10 via-transparent to-pink-900/10 pointer-events-none"
+        style={{ zIndex: -9 }}
+      />
 
       {/* Main Layout */}
       <div className="relative z-10 flex min-h-screen">
@@ -523,9 +530,20 @@ export default function GameCubeHubV2() {
               <div className="text-sm text-muted mb-6 space-y-2">
                 <p className="font-semibold text-text-link-hover">How to Navigate:</p>
                 <ul className="text-left space-y-1 list-disc list-inside">
-                  <li>Use <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Arrow Keys</kbd> or <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">WASD</kbd> to rotate the cube</li>
-                  <li>Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Enter</kbd> or <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Space</kbd> to select a face</li>
-                  <li>Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Escape</kbd> to return to front or exit</li>
+                  <li>
+                    Use <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Arrow Keys</kbd>{' '}
+                    or <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">WASD</kbd> to
+                    rotate the cube
+                  </li>
+                  <li>
+                    Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Enter</kbd> or{' '}
+                    <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Space</kbd> to select
+                    a face
+                  </li>
+                  <li>
+                    Press <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-xs">Escape</kbd> to
+                    return to front or exit
+                  </li>
                 </ul>
               </div>
               <div className="text-sm text-muted">Click anywhere or press Escape to continue</div>
@@ -607,7 +625,9 @@ export default function GameCubeHubV2() {
                     <h3 className="text-white font-semibold text-sm mb-2 group-hover:text-pink-300 transition-colors line-clamp-1">
                       {game.label}
                     </h3>
-                    <p className="text-white/70 text-xs leading-relaxed line-clamp-2 min-h-[2.5rem]">{game.desc}</p>
+                    <p className="text-white/70 text-xs leading-relaxed line-clamp-2 min-h-[2.5rem]">
+                      {game.desc}
+                    </p>
 
                     {/* Status Badge - Games are always available in this implementation */}
                     {/* Age Rating Badge */}
@@ -856,11 +876,9 @@ export default function GameCubeHubV2() {
           }
         }
       `}</style>
-      
+
       {/* Quake HUD (passive mode) - only if unlocked and selected */}
-      {isHydrated && hudSkin === 'quake' && (
-        <QuakeAvatarHud mode="passive" petals={1000} />
-      )}
+      {isHydrated && hudSkin === 'quake' && <QuakeAvatarHud mode="passive" petals={1000} />}
     </div>
   );
 }

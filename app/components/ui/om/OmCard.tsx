@@ -24,8 +24,7 @@ export function OmCard({ className, variant = 'default', children, ...props }: O
         {
           'hover:border-pink-400/40 hover:shadow-[0_20px_45px_rgba(236,72,153,0.22)]':
             variant === 'default',
-          'border-pink-400/30 shadow-[0_25px_55px_rgba(236,72,153,0.28)]':
-            variant === 'elevated',
+          'border-pink-400/30 shadow-[0_25px_55px_rgba(236,72,153,0.28)]': variant === 'elevated',
           'border-white/8 bg-white/5': variant === 'flat',
         },
         className,
@@ -68,4 +67,3 @@ export function OmCardContent({
     </div>
   );
 }
-

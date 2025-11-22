@@ -125,4 +125,3 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
     lastSyncedAt: product.lastSyncedAt ? product.lastSyncedAt.toISOString() : null,
   };
 }
-

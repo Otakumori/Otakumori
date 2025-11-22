@@ -5,7 +5,11 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useGameAvatar as useAvatarEngineAvatar, type UseGameAvatarOptions, type UseGameAvatarResult } from '@om/avatar-engine/gameIntegration';
+import {
+  useGameAvatar as useAvatarEngineAvatar,
+  type UseGameAvatarOptions,
+  type UseGameAvatarResult,
+} from '@om/avatar-engine/gameIntegration';
 import { getGameRepresentationMode, getGameAvatarUsage } from './miniGameConfigs';
 import { mapAvatarToGameRepresentation } from '@om/avatar-engine/gameIntegration/mapAvatarToGame';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
@@ -18,7 +22,7 @@ const GUEST_AVATAR_KEY = 'otm-guest-avatar';
  */
 export function loadGuestAvatar(): AvatarProfile | null {
   if (typeof window === 'undefined') return null;
-  
+
   try {
     const stored = localStorage.getItem(GUEST_AVATAR_KEY);
     if (stored) {
@@ -27,7 +31,7 @@ export function loadGuestAvatar(): AvatarProfile | null {
   } catch (error) {
     console.warn('Failed to load guest avatar from localStorage:', error);
   }
-  
+
   return null;
 }
 
@@ -52,13 +56,13 @@ export function useGameAvatar(
 ): UseGameAvatarResult {
   const [guestAvatar, setGuestAvatar] = useState<AvatarProfile | null>(null);
   const [loadedGuestAvatar, setLoadedGuestAvatar] = useState(false);
-  
+
   const { forcePreset = false, avatarProfile, ...restOptions } = options;
-  
+
   // Get representation mode from central config
   const representationMode = getGameRepresentationMode(gameId);
   const avatarsEnabled = isAvatarsEnabled();
-  
+
   // Load guest avatar from localStorage if avatars enabled and not forcing preset
   useEffect(() => {
     if (avatarsEnabled && !forcePreset && !avatarProfile && typeof window !== 'undefined') {
@@ -69,13 +73,13 @@ export function useGameAvatar(
       setLoadedGuestAvatar(true);
     }
   }, [avatarsEnabled, forcePreset, avatarProfile]);
-  
+
   // Use the avatar-engine hook
   const result = useAvatarEngineAvatar(gameId, restOptions);
-  
+
   // Determine which avatar to use
   let finalAvatar: AvatarProfile | null = null;
-  
+
   if (forcePreset) {
     // User chose preset, use preset
     finalAvatar = result.avatarConfig; // Will be preset from engine
@@ -89,7 +93,7 @@ export function useGameAvatar(
     // Fallback to engine result (preset)
     finalAvatar = result.avatarConfig;
   }
-  
+
   // Override representation config to use central config mode
   const representationConfig = finalAvatar
     ? mapAvatarToGameRepresentation(gameId, finalAvatar, representationMode)
@@ -110,7 +114,7 @@ export function useGameAvatar(
         },
         representationMode,
       );
-  
+
   return {
     avatarConfig: finalAvatar,
     representationConfig,
@@ -125,4 +129,3 @@ export function useGameAvatar(
 export function getAvatarUsage(gameId: string) {
   return getGameAvatarUsage(gameId);
 }
-

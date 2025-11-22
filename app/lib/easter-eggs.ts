@@ -1,6 +1,6 @@
 /**
  * Easter Egg System
- * 
+ *
  * Hidden interactions and secrets that reward exploration
  */
 
@@ -23,7 +23,8 @@ export const EASTER_EGGS: EasterEgg[] = [
   {
     id: 'konami_code',
     trigger: 'keyboard',
-    pattern: 'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,KeyB,KeyA',
+    pattern:
+      'ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,KeyB,KeyA',
     reward: 'feature',
     message: 'Developer mode unlocked!',
     oneTimeOnly: false,
@@ -63,7 +64,7 @@ export const EASTER_EGGS: EasterEgg[] = [
  */
 export function markEasterEggDiscovered(eggId: string): void {
   if (typeof window === 'undefined') return;
-  
+
   const discovered = getDiscoveredEasterEggs();
   discovered.add(eggId);
   localStorage.setItem('otm-easter-eggs', JSON.stringify(Array.from(discovered)));
@@ -74,7 +75,7 @@ export function markEasterEggDiscovered(eggId: string): void {
  */
 export function getDiscoveredEasterEggs(): Set<string> {
   if (typeof window === 'undefined') return new Set();
-  
+
   try {
     const stored = localStorage.getItem('otm-easter-eggs');
     if (stored) {
@@ -83,7 +84,7 @@ export function getDiscoveredEasterEggs(): Set<string> {
   } catch (error) {
     console.warn('Failed to read discovered easter eggs:', error);
   }
-  
+
   return new Set();
 }
 
@@ -99,15 +100,14 @@ export function isEasterEggDiscovered(eggId: string): boolean {
  */
 export function findEasterEggByPattern(
   trigger: EasterEggTrigger,
-  pattern: string | number[]
+  pattern: string | number[],
 ): EasterEgg | null {
   return (
     EASTER_EGGS.find(
       (egg) =>
         egg.enabled &&
         egg.trigger === trigger &&
-        JSON.stringify(egg.pattern) === JSON.stringify(pattern)
+        JSON.stringify(egg.pattern) === JSON.stringify(pattern),
     ) || null
   );
 }
-

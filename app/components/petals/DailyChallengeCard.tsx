@@ -34,9 +34,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
           <span className="text-white/60">
             {challenge.progress} / {challenge.target}
           </span>
-          <span className="text-pink-300 font-medium">
-            +{challenge.reward.petals} petals
-          </span>
+          <span className="text-pink-300 font-medium">+{challenge.reward.petals} petals</span>
         </div>
         <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
           <div
@@ -67,4 +65,3 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
     </div>
   );
 }
-

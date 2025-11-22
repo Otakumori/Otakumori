@@ -10,15 +10,16 @@ interface AvatarSkeletonProps {
 
 /**
  * AvatarSkeleton - Consistent loading state for avatars
- * 
+ *
  * Provides a subtle, branded loading animation that matches the site's aesthetic.
  * Respects prefers-reduced-motion for accessibility.
  */
 export function AvatarSkeleton({ size = 'md', className = '' }: AvatarSkeletonProps) {
   const sizeClasses = getAvatarSizeClasses(size);
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
 
   return (
     <div
@@ -38,4 +39,3 @@ export function AvatarSkeleton({ size = 'md', className = '' }: AvatarSkeletonPr
 }
 
 export default AvatarSkeleton;
-

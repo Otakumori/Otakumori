@@ -1,6 +1,6 @@
 /**
  * Server-Side Error Handling Utility
- * 
+ *
  * Comprehensive error handler for async server components with:
  * - Sentry error tracking with context
  * - Structured logging with request context
@@ -21,7 +21,7 @@ export interface ServerErrorContext {
 
 /**
  * Comprehensive server-side error handler for async server components
- * 
+ *
  * Features:
  * - Sentry error tracking with context
  * - Structured logging with request context
@@ -36,24 +36,25 @@ export function handleServerError(
     logLevel?: 'error' | 'warn' | 'info';
     throwAfterLogging?: boolean;
     requestId?: string;
-  }
+  },
 ): void {
   const { logLevel = 'error', throwAfterLogging = false, requestId } = options || {};
-  
+
   // Extract error details safely
-  const errorDetails = error instanceof Error 
-    ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        cause: error.cause,
-      }
-    : {
-        name: 'UnknownError',
-        message: String(error),
-        stack: undefined,
-        cause: undefined,
-      };
+  const errorDetails =
+    error instanceof Error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause,
+        }
+      : {
+          name: 'UnknownError',
+          message: String(error),
+          stack: undefined,
+          cause: undefined,
+        };
 
   // Build Sentry context
   const sentryContext: Record<string, unknown> = {
@@ -66,15 +67,11 @@ export function handleServerError(
 
   // Track error in Sentry with enhanced context (defensive - never throw)
   try {
-    trackError(
-      error instanceof Error ? error : new Error(String(error)),
-      sentryContext,
-      {
-        section: context.section,
-        component: context.component,
-        ...(context.operation && { operation: context.operation }),
-      }
-    );
+    trackError(error instanceof Error ? error : new Error(String(error)), sentryContext, {
+      section: context.section,
+      component: context.component,
+      ...(context.operation && { operation: context.operation }),
+    });
   } catch (sentryError) {
     // Silently fail if Sentry tracking fails - don't crash the app
     // Fallback to console.error in case Sentry is unavailable
@@ -100,14 +97,14 @@ export function handleServerError(
         logger.warn(
           `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
           logContext,
-          errorDetails
+          errorDetails,
         );
         break;
       case 'info':
         logger.info(
           `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
           logContext,
-          errorDetails
+          errorDetails,
         );
         break;
       default:
@@ -115,7 +112,7 @@ export function handleServerError(
           `[${context.component}] ${context.operation || 'Operation'} failed: ${errorDetails.message}`,
           logContext,
           errorDetails,
-          error instanceof Error ? error : undefined
+          error instanceof Error ? error : undefined,
         );
     }
   } catch (loggerError) {
@@ -139,7 +136,7 @@ export function handleServerError(
 export async function withServerErrorHandling<T>(
   operation: () => Promise<T>,
   context: ServerErrorContext,
-  fallback: T
+  fallback: T,
 ): Promise<T> {
   try {
     return await operation();
@@ -151,4 +148,3 @@ export async function withServerErrorHandling<T>(
     return fallback;
   }
 }
-

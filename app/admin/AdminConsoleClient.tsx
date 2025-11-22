@@ -2,7 +2,7 @@
 
 /**
  * Admin Console Client Component
- * 
+ *
  * Client-side UI for admin console with feature flag toggles and system status.
  */
 
@@ -162,9 +162,7 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
                     <OmTag variant="status" status={flag.effectiveValue ? 'active' : 'coming-soon'}>
                       {flag.effectiveValue ? 'On' : 'Off'}
                     </OmTag>
-                    {flag.source === 'override' && (
-                      <OmTag variant="category">DB Override</OmTag>
-                    )}
+                    {flag.source === 'override' && <OmTag variant="category">DB Override</OmTag>}
                     {flag.source === 'default' && (
                       <span className="text-xs text-zinc-400">Default</span>
                     )}
@@ -177,7 +175,11 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
                   onClick={() => toggleFlag(flag.key, flag.effectiveValue)}
                   disabled={updating === flag.key || !userId}
                 >
-                  {updating === flag.key ? 'Updating...' : flag.effectiveValue ? 'Disable' : 'Enable'}
+                  {updating === flag.key
+                    ? 'Updating...'
+                    : flag.effectiveValue
+                      ? 'Disable'
+                      : 'Enable'}
                 </OmButton>
               </div>
             </OmCard>
@@ -207,16 +209,22 @@ export default function AdminConsoleClient({ userId }: AdminConsoleClientProps) 
       <OmPanel>
         <h2 className="text-2xl font-semibold text-white mb-4">Economy (Read-only)</h2>
         <p className="text-zinc-300 text-sm mb-4">
-          Petal economy settings are configured in <code className="text-pink-300">app/config/petalTuning.ts</code>.
-          Live tuning will be available in a future update.
+          Petal economy settings are configured in{' '}
+          <code className="text-pink-300">app/config/petalTuning.ts</code>. Live tuning will be
+          available in a future update.
         </p>
         <div className="text-sm text-zinc-400">
           <p>• Daily earning caps: Games (2000), Achievements (3000), Daily Bonus (100)</p>
-          <p>• Game reward ranges: Short (40-80 win, 15-30 lose), Medium (90-150 win, 40-70 lose), Long (140-220 win, 70-120 lose)</p>
-          <p>• Achievement tiers: Small (100), Progress (250-500), Milestone (800-1500), Ultra (2000-3000)</p>
+          <p>
+            • Game reward ranges: Short (40-80 win, 15-30 lose), Medium (90-150 win, 40-70 lose),
+            Long (140-220 win, 70-120 lose)
+          </p>
+          <p>
+            • Achievement tiers: Small (100), Progress (250-500), Milestone (800-1500), Ultra
+            (2000-3000)
+          </p>
         </div>
       </OmPanel>
     </div>
   );
 }
-

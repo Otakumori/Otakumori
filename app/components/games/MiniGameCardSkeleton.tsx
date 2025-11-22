@@ -2,14 +2,15 @@
 
 /**
  * MiniGameCardSkeleton - Loading skeleton for mini-game cards
- * 
+ *
  * Provides a consistent loading state that matches the arcade aesthetic.
  * Respects prefers-reduced-motion for accessibility.
  */
 export function MiniGameCardSkeleton() {
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
-    : false;
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
 
   return (
     <div className="group block focus:outline-none">
@@ -22,7 +23,7 @@ export function MiniGameCardSkeleton() {
             <div className="w-full h-full bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-500/20 animate-pulse" />
           )}
         </div>
-        
+
         {/* Content skeleton */}
         <div className="p-4 space-y-3">
           {/* Title */}
@@ -41,4 +42,3 @@ export function MiniGameCardSkeleton() {
 }
 
 export default MiniGameCardSkeleton;
-

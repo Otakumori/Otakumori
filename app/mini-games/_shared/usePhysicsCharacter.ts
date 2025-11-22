@@ -1,6 +1,6 @@
 /**
  * Physics Character Hook
- * 
+ *
  * React hook for integrating physics character rendering into games.
  * Provides easy-to-use interface with FPS monitoring and error handling.
  */
@@ -13,10 +13,7 @@ import {
   R18_PHYSICS_PRESETS,
   CHARACTER_VISUAL_PRESETS,
 } from './PhysicsCharacterRenderer';
-import type {
-  R18PhysicsConfig,
-  CharacterVisualConfig,
-} from './PhysicsCharacterRenderer';
+import type { R18PhysicsConfig, CharacterVisualConfig } from './PhysicsCharacterRenderer';
 
 export interface UsePhysicsCharacterOptions {
   quality?: 'low' | 'medium' | 'high' | 'ultra';
@@ -30,7 +27,11 @@ export interface UsePhysicsCharacterOptions {
 
 export interface PhysicsCharacterAPI {
   render: (x: number, y: number, facing?: 'left' | 'right') => void;
-  update: (deltaTime: number, velocity: { x: number; y: number }, position: { x: number; y: number }) => void;
+  update: (
+    deltaTime: number,
+    velocity: { x: number; y: number },
+    position: { x: number; y: number },
+  ) => void;
   applyImpact: (force: { x: number; y: number }, part?: string) => void;
   enablePhysics: () => void;
   disablePhysics: () => void;
@@ -60,9 +61,11 @@ export function usePhysicsCharacter(
 
   const rendererRef = useRef<PhysicsCharacterRenderer | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [currentQuality, setCurrentQuality] = useState<'low' | 'medium' | 'high' | 'ultra'>(quality);
+  const [currentQuality, setCurrentQuality] = useState<'low' | 'medium' | 'high' | 'ultra'>(
+    quality,
+  );
   const [physicsEnabled, setPhysicsEnabled] = useState(enablePhysics);
-  
+
   // FPS monitoring
   const fpsRef = useRef<number>(targetFPS);
   const frameTimesRef = useRef<number[]>([]);
@@ -128,19 +131,22 @@ export function usePhysicsCharacter(
       if (deltaTime > 0) {
         const currentFPS = 1000 / deltaTime;
         frameTimesRef.current.push(currentFPS);
-        
+
         // Keep only last 60 frames
         if (frameTimesRef.current.length > 60) {
           frameTimesRef.current.shift();
         }
 
         // Calculate average FPS
-        const avgFPS = frameTimesRef.current.reduce((a, b) => a + b, 0) / frameTimesRef.current.length;
+        const avgFPS =
+          frameTimesRef.current.reduce((a, b) => a + b, 0) / frameTimesRef.current.length;
         fpsRef.current = avgFPS;
 
         // Auto-disable if FPS drops below threshold
         if (avgFPS < targetFPS * autoDisableThreshold) {
-          console.warn(`Physics auto-disabled: FPS ${avgFPS.toFixed(1)} < ${targetFPS * autoDisableThreshold}`);
+          console.warn(
+            `Physics auto-disabled: FPS ${avgFPS.toFixed(1)} < ${targetFPS * autoDisableThreshold}`,
+          );
           setPhysicsEnabled(false);
           if (rendererRef.current) {
             rendererRef.current.setEnabled(false);
@@ -293,4 +299,3 @@ export function usePhysicsCharacters(
 
   return characterAPIs;
 }
-

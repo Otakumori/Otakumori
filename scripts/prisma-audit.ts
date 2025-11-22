@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 /**
  * Prisma Schema Audit Script
- * 
+ *
  * Validates that:
  * 1. All expected models exist in the schema
  * 2. Enum values match schema definitions
@@ -91,4 +91,3 @@ main()
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
-

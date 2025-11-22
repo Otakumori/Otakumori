@@ -47,11 +47,7 @@ function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.P
 
   if (params.q) {
     const query = params.q.trim();
-    const existingAnd = Array.isArray(where.AND)
-      ? where.AND
-      : where.AND
-        ? [where.AND]
-        : [];
+    const existingAnd = Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
     where.AND = [
       ...existingAnd,
       {
@@ -92,7 +88,9 @@ function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.P
   return where;
 }
 
-function buildOrderBy(params: z.infer<typeof SearchParamsSchema>): Prisma.ProductOrderByWithRelationInput {
+function buildOrderBy(
+  params: z.infer<typeof SearchParamsSchema>,
+): Prisma.ProductOrderByWithRelationInput {
   const sortOrder = params.sortOrder ?? 'desc';
 
   switch (params.sortBy) {
@@ -123,7 +121,6 @@ export async function GET(request: NextRequest) {
   const params = parsed.data;
 
   try {
-
     const limit = params.limit ?? 20;
     const page = params.page ?? 1;
     const skip = (page - 1) * limit;

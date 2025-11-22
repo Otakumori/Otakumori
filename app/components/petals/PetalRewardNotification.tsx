@@ -24,10 +24,42 @@ export function PetalRewardNotification({
   useEffect(() => {
     // Check if user just reached a new threshold
     const rewards = [
-      { threshold: 100, reward: { threshold: 100, type: 'discount' as const, value: 5, description: '5% off your next purchase' } },
-      { threshold: 500, reward: { threshold: 500, type: 'unlock' as const, value: 'exclusive-avatar', description: 'Unlock exclusive avatar' } },
-      { threshold: 1000, reward: { threshold: 1000, type: 'exclusive' as const, value: 'early-access', description: 'Early access to new games' } },
-      { threshold: 2500, reward: { threshold: 2500, type: 'badge' as const, value: 'petal-master', description: 'Petal Master badge' } },
+      {
+        threshold: 100,
+        reward: {
+          threshold: 100,
+          type: 'discount' as const,
+          value: 5,
+          description: '5% off your next purchase',
+        },
+      },
+      {
+        threshold: 500,
+        reward: {
+          threshold: 500,
+          type: 'unlock' as const,
+          value: 'exclusive-avatar',
+          description: 'Unlock exclusive avatar',
+        },
+      },
+      {
+        threshold: 1000,
+        reward: {
+          threshold: 1000,
+          type: 'exclusive' as const,
+          value: 'early-access',
+          description: 'Early access to new games',
+        },
+      },
+      {
+        threshold: 2500,
+        reward: {
+          threshold: 2500,
+          type: 'badge' as const,
+          value: 'petal-master',
+          description: 'Petal Master badge',
+        },
+      },
     ];
 
     for (const { threshold, reward } of rewards) {
@@ -39,12 +71,12 @@ export function PetalRewardNotification({
         setUnlockedReward(reward);
         setShowNotification(true);
         setHasShownForThreshold((prev) => new Set(prev).add(threshold));
-        
+
         // Auto-dismiss after 5 seconds
         const timer = setTimeout(() => {
           setShowNotification(false);
         }, 5000);
-        
+
         return () => clearTimeout(timer);
       }
     }
@@ -81,15 +113,15 @@ export function PetalRewardNotification({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl" role="img" aria-label="Celebration">🎉</span>
+              <span className="text-2xl" role="img" aria-label="Celebration">
+                🎉
+              </span>
               <h3 className="text-lg font-bold text-pink-300">Reward Unlocked!</h3>
             </div>
             <p className="text-white/90 mb-1">
               You've collected {unlockedReward.threshold} petals!
             </p>
-            <p className="text-sm text-pink-200/80 mb-4">
-              {unlockedReward.description}
-            </p>
+            <p className="text-sm text-pink-200/80 mb-4">{unlockedReward.description}</p>
             <Link
               href={action.href}
               className="inline-block bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -109,12 +141,7 @@ export function PetalRewardNotification({
             className="text-white/60 hover:text-white transition-colors"
             aria-label="Dismiss notification"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -139,7 +166,10 @@ export function PetalRewardProgress({ currentPetals }: { currentPetals: number }
     return (
       <div className="text-center py-4">
         <p className="text-pink-300 font-semibold">
-          All rewards unlocked! <span role="img" aria-label="Celebration">🎉</span>
+          All rewards unlocked!{' '}
+          <span role="img" aria-label="Celebration">
+            🎉
+          </span>
         </p>
       </div>
     );
@@ -160,4 +190,3 @@ export function PetalRewardProgress({ currentPetals }: { currentPetals: number }
     </div>
   );
 }
-

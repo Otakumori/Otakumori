@@ -15,7 +15,12 @@ export type {
 } from './types/avatar';
 
 // Config
-export { resolveAvatarFlags, isAvatarsEnabled, isNsfwAvatarsEnabled, clearFlagsCache } from './config/flags';
+export {
+  resolveAvatarFlags,
+  isAvatarsEnabled,
+  isNsfwAvatarsEnabled,
+  clearFlagsCache,
+} from './config/flags';
 export type { AvatarFlags } from './config/flags';
 
 // Materials
@@ -38,4 +43,3 @@ export * from './layers';
 
 // Validation
 export * from './validation';
-

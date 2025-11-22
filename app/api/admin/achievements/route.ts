@@ -34,10 +34,6 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
     console.error('Error fetching achievements:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
-

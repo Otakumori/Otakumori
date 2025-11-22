@@ -182,7 +182,7 @@ export async function POST(req: Request) {
               data: { status: 'SUCCEEDED', clientReferenceId: order.id },
             });
           }
-          
+
           // Mark CouponGrant vouchers (petal-purchased) as redeemed
           await prisma.couponGrant.updateMany({
             where: {

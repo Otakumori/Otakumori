@@ -24,10 +24,7 @@ export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json(
-        { ok: false, error: 'Unauthorized', requestId },
-        { status: 401 },
-      );
+      return NextResponse.json({ ok: false, error: 'Unauthorized', requestId }, { status: 401 });
     }
 
     const body = await req.json();
@@ -61,10 +58,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'User not found', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'User not found', requestId }, { status: 404 });
     }
 
     // Get discount reward
@@ -245,16 +239,19 @@ export async function POST(req: NextRequest) {
       requestId,
     });
   } catch (error: any) {
-    logger.error('Error purchasing discount reward', {
-      requestId,
-      extra: {
-        error: error?.message || String(error),
+    logger.error(
+      'Error purchasing discount reward',
+      {
+        requestId,
+        extra: {
+          error: error?.message || String(error),
+        },
       },
-    }, error instanceof Error ? error : new Error(String(error)));
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       { ok: false, error: 'Internal server error', requestId },
       { status: 500 },
     );
   }
 }
-

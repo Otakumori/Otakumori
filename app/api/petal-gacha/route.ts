@@ -38,11 +38,11 @@ export async function POST() {
 
   await db.$transaction(async (tx) => {
     await tx.petalWallet.update({ where: { userId }, data: { balance: total - COST } });
-    
+
     const existing = await tx.inventoryItem.findFirst({
       where: { userId, sku: reward },
     });
-    
+
     if (existing) {
       // Already have this item - could increment count in metadata if needed
       const currentMeta = existing.metadata as any;

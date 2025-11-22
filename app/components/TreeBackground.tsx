@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 
 /**
  * Cherry Blossom Tree Background Component
- * 
- * CRITICAL: This component should ONLY be used via TreeBackgroundWrapper, 
- * which ensures it only renders on the home page. Do not import directly 
+ *
+ * CRITICAL: This component should ONLY be used via TreeBackgroundWrapper,
+ * which ensures it only renders on the home page. Do not import directly
  * in other pages.
  *
  * CRITICAL SPECIFICATIONS:
@@ -34,10 +34,10 @@ export default function TreeBackground() {
       try {
         // Find footer to determine where tree should end
         const footer = document.querySelector('footer');
-        
+
         // Calculate full page height (from top to footer or document end)
         let fullHeight = window.innerHeight; // Default to viewport
-        
+
         if (footer) {
           const footerRect = footer.getBoundingClientRect();
           fullHeight = footerRect.top + window.scrollY;
@@ -51,15 +51,15 @@ export default function TreeBackground() {
             fullHeight = Math.max(
               document.documentElement.scrollHeight,
               document.body.scrollHeight,
-              window.innerHeight
+              window.innerHeight,
             );
           }
         }
-        
+
         // Tree starts at top (behind navbar) and extends to footer
         // Use full document height to ensure it reaches the bottom
         const height = Math.max(fullHeight, window.innerHeight);
-        
+
         setDimensions({ top: 0, height });
       } catch (error) {
         // Defensive: if DOM queries fail, use viewport height
@@ -77,12 +77,12 @@ export default function TreeBackground() {
     // Update on resize and scroll
     window.addEventListener('resize', updateDimensions);
     window.addEventListener('scroll', updateDimensions, { passive: true });
-    
+
     // Also update when DOM changes (footer/header might load later)
     const observer = new MutationObserver(() => {
       updateDimensions();
     });
-    
+
     if (document.body) {
       observer.observe(document.body, {
         childList: true,
@@ -125,7 +125,8 @@ export default function TreeBackground() {
         <div
           className="absolute inset-x-0 top-0 h-24 pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, rgba(8, 6, 17, 0.4) 0%, rgba(8, 6, 17, 0.2) 50%, transparent 100%)',
+            background:
+              'linear-gradient(to bottom, rgba(8, 6, 17, 0.4) 0%, rgba(8, 6, 17, 0.2) 50%, transparent 100%)',
             zIndex: 1,
           }}
         />
@@ -134,7 +135,8 @@ export default function TreeBackground() {
         <div
           className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
           style={{
-            background: 'linear-gradient(to top, #080611 0%, #080611 30%, rgba(8, 6, 17, 0.8) 60%, transparent 100%)',
+            background:
+              'linear-gradient(to top, #080611 0%, #080611 30%, rgba(8, 6, 17, 0.8) 60%, transparent 100%)',
             zIndex: 1,
           }}
         />

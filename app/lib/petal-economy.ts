@@ -1,6 +1,6 @@
 /**
  * Petal Economy Integration
- * 
+ *
  * Connects petal collection to shop discounts, unlockables, and exclusive content
  */
 
@@ -81,7 +81,7 @@ export function getRewardProgress(currentPetals: number): {
   petalsNeeded: number;
 } {
   const nextReward = getNextReward(currentPetals);
-  
+
   if (!nextReward) {
     // User has unlocked all rewards
     return {
@@ -93,8 +93,10 @@ export function getRewardProgress(currentPetals: number): {
 
   // Find the previous reward threshold (or 0 if this is the first reward)
   const sortedRewards = [...PETAL_REWARDS].sort((a, b) => a.threshold - b.threshold);
-  const previousRewardIndex = sortedRewards.findIndex((r) => r.threshold === nextReward.threshold) - 1;
-  const previousThreshold = previousRewardIndex >= 0 ? sortedRewards[previousRewardIndex].threshold : 0;
+  const previousRewardIndex =
+    sortedRewards.findIndex((r) => r.threshold === nextReward.threshold) - 1;
+  const previousThreshold =
+    previousRewardIndex >= 0 ? sortedRewards[previousRewardIndex].threshold : 0;
 
   const range = nextReward.threshold - previousThreshold;
   const progress = (currentPetals - previousThreshold) / range;
@@ -106,4 +108,3 @@ export function getRewardProgress(currentPetals: number): {
     petalsNeeded,
   };
 }
-

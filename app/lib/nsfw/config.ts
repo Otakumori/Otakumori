@@ -18,4 +18,3 @@ export const NSFW_FILTER_ENABLED = clientEnv.NEXT_PUBLIC_NSFW_FILTER_ENABLED !==
 export function shouldFilterNSFW(): boolean {
   return NSFW_FILTER_ENABLED;
 }
-

@@ -12,4 +12,3 @@ export async function PATCH(req: Request) {
   await prisma.user.update({ where: { id: u.id }, data: { displayName } });
   return NextResponse.json({ ok: true, data: { updated: true } });
 }
-

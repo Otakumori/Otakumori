@@ -1,6 +1,6 @@
 /**
  * Soapstone User Data Utilities
- * 
+ *
  * Provides consistent user data transformation between API responses
  * and component prop formats across all soapstone components.
  */
@@ -27,7 +27,7 @@ export interface ComponentSoapstoneUser {
  * Handles null/undefined values and provides defaults
  */
 export function transformApiUserToComponent(
-  apiUser: ApiSoapstoneUser | null | undefined
+  apiUser: ApiSoapstoneUser | null | undefined,
 ): ComponentSoapstoneUser | undefined {
   if (!apiUser) {
     return undefined;
@@ -43,7 +43,7 @@ export function transformApiUserToComponent(
  * Transform component user format to API format (for reverse compatibility if needed)
  */
 export function transformComponentUserToApi(
-  componentUser: ComponentSoapstoneUser | undefined
+  componentUser: ComponentSoapstoneUser | undefined,
 ): ApiSoapstoneUser | null {
   if (!componentUser) {
     return null;
@@ -80,4 +80,3 @@ export function getUserInitials(user: ApiSoapstoneUser | null | undefined): stri
   }
   return displayName[0]?.toUpperCase() || '?';
 }
-

@@ -11,7 +11,7 @@ import { HeaderButton } from '@/components/ui/header-button';
 
 /**
  * CREATOR Page - Main avatar creation interface
- * 
+ *
  * Features:
  * - Full-screen immersive creator experience
  * - Real-time 3D preview
@@ -69,10 +69,10 @@ export default function CreatorPage() {
 
     try {
       setSaveStatus('saving');
-      
+
       // Convert AvatarConfiguration to CreatorAvatarConfig
       const creatorConfig = convertToCreatorConfig(avatarConfig, user.id);
-      
+
       const response = await fetch('/api/v1/creator/save', {
         method: 'POST',
         headers: {
@@ -87,7 +87,7 @@ export default function CreatorPage() {
       if (result.ok) {
         setSaveStatus('saved');
         setHasUnsavedChanges(false);
-        
+
         // Reset save status after 2 seconds
         setTimeout(() => {
           setSaveStatus('idle');
@@ -109,20 +109,25 @@ export default function CreatorPage() {
   }, []);
 
   // Convert CreatorAvatarConfig to AvatarConfiguration
-  const convertToAvatarConfiguration = (creatorConfig: CreatorAvatarConfig): AvatarConfiguration => {
+  const convertToAvatarConfiguration = (
+    creatorConfig: CreatorAvatarConfig,
+  ): AvatarConfiguration => {
     return {
       id: creatorConfig.id,
       userId: creatorConfig.userId,
       baseModel: creatorConfig.baseModel,
       baseModelUrl: creatorConfig.baseModelUrl,
-      parts: Object.entries(creatorConfig.parts).reduce((acc, [key, value]) => {
-        if (value) {
-          // Convert PascalCase to lowercase for AvatarPartType
-          const partType = key.toLowerCase() as AvatarPartType;
-          acc[partType] = value;
-        }
-        return acc;
-      }, {} as Partial<Record<AvatarPartType, string>>),
+      parts: Object.entries(creatorConfig.parts).reduce(
+        (acc, [key, value]) => {
+          if (value) {
+            // Convert PascalCase to lowercase for AvatarPartType
+            const partType = key.toLowerCase() as AvatarPartType;
+            acc[partType] = value;
+          }
+          return acc;
+        },
+        {} as Partial<Record<AvatarPartType, string>>,
+      ),
       morphTargets: {
         // Body morphs
         height: creatorConfig.body.height,
@@ -248,9 +253,10 @@ export default function CreatorPage() {
         mouthAngle: config.morphTargets.mouthAngle ?? 0.0,
       },
       skin: {
-        tone: typeof config.materialOverrides.skin?.value === 'string' 
-          ? config.materialOverrides.skin.value 
-          : '#fdbcb4',
+        tone:
+          typeof config.materialOverrides.skin?.value === 'string'
+            ? config.materialOverrides.skin.value
+            : '#fdbcb4',
         texture: 0.5,
         blemishes: 0.0,
         freckles: 0.0,
@@ -264,9 +270,10 @@ export default function CreatorPage() {
         volume: 1.0,
         texture: 0.5,
         color: {
-          primary: typeof config.materialOverrides.hair?.value === 'string'
-            ? config.materialOverrides.hair.value
-            : '#8B4513',
+          primary:
+            typeof config.materialOverrides.hair?.value === 'string'
+              ? config.materialOverrides.hair.value
+              : '#8B4513',
           gradient: false,
         },
         highlights: {
@@ -276,14 +283,17 @@ export default function CreatorPage() {
           pattern: 'streaks',
         },
       },
-      parts: Object.entries(config.parts).reduce((acc, [key, value]) => {
-        if (value) {
-          // Convert lowercase to PascalCase for CreatorAvatarConfig
-          const partKey = key.charAt(0).toUpperCase() + key.slice(1);
-          acc[partKey] = value;
-        }
-        return acc;
-      }, {} as Record<string, string | undefined>),
+      parts: Object.entries(config.parts).reduce(
+        (acc, [key, value]) => {
+          if (value) {
+            // Convert lowercase to PascalCase for CreatorAvatarConfig
+            const partKey = key.charAt(0).toUpperCase() + key.slice(1);
+            acc[partKey] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, string | undefined>,
+      ),
       materials: {
         shader: 'AnimeToon',
         parameters: {
@@ -357,19 +367,13 @@ export default function CreatorPage() {
             </div>
             <div className="flex items-center space-x-4">
               {/* Save Status */}
-              {saveStatus === 'saving' && (
-                <span className="text-sm text-white/60">Saving...</span>
-              )}
-              {saveStatus === 'saved' && (
-                <span className="text-sm text-emerald-400">Saved!</span>
-              )}
-              {saveStatus === 'error' && (
-                <span className="text-sm text-red-400">Save failed</span>
-              )}
+              {saveStatus === 'saving' && <span className="text-sm text-white/60">Saving...</span>}
+              {saveStatus === 'saved' && <span className="text-sm text-emerald-400">Saved!</span>}
+              {saveStatus === 'error' && <span className="text-sm text-red-400">Save failed</span>}
               {hasUnsavedChanges && saveStatus === 'idle' && (
                 <span className="text-sm text-amber-400">Unsaved changes</span>
               )}
-              
+
               {/* Save Button */}
               <HeaderButton
                 onClick={handleSave}
@@ -398,4 +402,3 @@ export default function CreatorPage() {
     </div>
   );
 }
-

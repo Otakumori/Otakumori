@@ -1,6 +1,6 @@
 /**
  * Branded Error Messages
- * 
+ *
  * Provides Dark Souls/anime-themed error messages that match the site's aesthetic
  */
 
@@ -13,13 +13,13 @@ export interface BrandedErrorMessage {
   };
 }
 
-export type ErrorType = 
-  | '404' 
-  | 'network' 
-  | 'rate_limit' 
-  | 'auth_required' 
-  | 'forbidden' 
-  | 'server_error' 
+export type ErrorType =
+  | '404'
+  | 'network'
+  | 'rate_limit'
+  | 'auth_required'
+  | 'forbidden'
+  | 'server_error'
   | 'generic';
 
 /**
@@ -30,7 +30,7 @@ export function getBrandedErrorMessage(
   context?: {
     section?: string;
     customMessage?: string;
-  }
+  },
 ): BrandedErrorMessage {
   const { section, customMessage } = context || {};
 
@@ -48,7 +48,8 @@ export function getBrandedErrorMessage(
     case 'network':
       return {
         title: 'The connection fades...',
-        message: customMessage || 'Your link to the server has been severed. Try again, brave soul.',
+        message:
+          customMessage || 'Your link to the server has been severed. Try again, brave soul.',
         cta: {
           label: 'Try Again',
           href: section ? `/${section}` : '/',
@@ -125,4 +126,3 @@ export function getErrorType(error: unknown, statusCode?: number): ErrorType {
 
   return 'generic';
 }
-

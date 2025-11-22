@@ -1,6 +1,6 @@
 /**
  * Enhanced PetalField Component
- * 
+ *
  * Sakura-style petal field with:
  * - Tree-matched color palette
  * - Sprite sheet rendering (cherrysprite2.png, 4x3 grid)
@@ -52,9 +52,10 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Check for reduced motion preference
-  const prefersReducedMotion = typeof window !== 'undefined'
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
+  const prefersReducedMotion =
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
 
   // Petal configuration based on density
   const config = {
@@ -85,105 +86,113 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
   }, [prefersReducedMotion]);
 
   // Create a new petal with wabi-sabi properties
-  const createPetal = useCallback((canvas: HTMLCanvasElement): Petal => {
-    const windSeed = Math.random();
-    const frameIndex = Math.floor(Math.random() * TOTAL_SPRITES);
+  const createPetal = useCallback(
+    (canvas: HTMLCanvasElement): Petal => {
+      const windSeed = Math.random();
+      const frameIndex = Math.floor(Math.random() * TOTAL_SPRITES);
 
-    return {
-      id: `petal-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      // Spawn from top or left side (natural entry points)
-      x: Math.random() < 0.5 ? -20 : Math.random() * canvas.width,
-      y: Math.random() < 0.5 ? Math.random() * canvas.height * 0.3 : -20,
-      // Slower, more natural velocities
-      vx: (Math.random() - 0.5) * 0.2 * speed, // Subtle horizontal drift
-      vy: (0.05 + Math.random() * 0.1) * speed, // Soft gravity
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.008, // Slow rotation
-      scale: (0.6 + Math.random() * 0.4) * size,
-      opacity: 0.3 + Math.random() * 0.4, // Subtle visibility
-      frameIndex,
-      flipX: Math.random() < 0.5 ? 1 : -1,
-      // Flutter system
-      flutterCooldown: 1000 + Math.random() * 2500, // 1-3.5s
-      flutterTime: 0,
-      // Physics
-      gravity: 0.05 + Math.random() * 0.05, // 0.05-0.1
-      windSeed,
-      collected: false,
-      collectAnimation: 0,
-    };
-  }, [speed, size]);
+      return {
+        id: `petal-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        // Spawn from top or left side (natural entry points)
+        x: Math.random() < 0.5 ? -20 : Math.random() * canvas.width,
+        y: Math.random() < 0.5 ? Math.random() * canvas.height * 0.3 : -20,
+        // Slower, more natural velocities
+        vx: (Math.random() - 0.5) * 0.2 * speed, // Subtle horizontal drift
+        vy: (0.05 + Math.random() * 0.1) * speed, // Soft gravity
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.008, // Slow rotation
+        scale: (0.6 + Math.random() * 0.4) * size,
+        opacity: 0.3 + Math.random() * 0.4, // Subtle visibility
+        frameIndex,
+        flipX: Math.random() < 0.5 ? 1 : -1,
+        // Flutter system
+        flutterCooldown: 1000 + Math.random() * 2500, // 1-3.5s
+        flutterTime: 0,
+        // Physics
+        gravity: 0.05 + Math.random() * 0.05, // 0.05-0.1
+        windSeed,
+        collected: false,
+        collectAnimation: 0,
+      };
+    },
+    [speed, size],
+  );
 
   // Handle petal collection
-  const collectPetal = useCallback(async (petalIndex: number) => {
-    const petal = petalsRef.current[petalIndex];
-    if (!petal || petal.collected) return;
+  const collectPetal = useCallback(
+    async (petalIndex: number) => {
+      const petal = petalsRef.current[petalIndex];
+      if (!petal || petal.collected) return;
 
-    // Mark as collected and start animation
-    petal.collected = true;
-    petal.collectAnimation = 0;
+      // Mark as collected and start animation
+      petal.collected = true;
+      petal.collectAnimation = 0;
 
-    // Track petal collection for analytics
-    const { trackPetalCollection } = await import('@/app/lib/analytics/petals');
-    trackPetalCollection({
-      petalId: petal.id,
-      amount: 1,
-      source: 'homepage_collection',
-      location: { x: petal.x, y: petal.y },
-      metadata: {
-        frameIndex: petal.frameIndex,
-        density,
-      },
-    });
-
-    try {
-      const response = await fetch('/api/v1/petals/collect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: 1,
-          source: 'homepage_collection',
-          metadata: {
-            petalId: petal.id,
-            frameIndex: petal.frameIndex,
-          },
-        }),
+      // Track petal collection for analytics
+      const { trackPetalCollection } = await import('@/app/lib/analytics/petals');
+      trackPetalCollection({
+        petalId: petal.id,
+        amount: 1,
+        source: 'homepage_collection',
+        location: { x: petal.x, y: petal.y },
+        metadata: {
+          frameIndex: petal.frameIndex,
+          density,
+        },
       });
 
-      const data = await response.json();
-
-      if (data.ok && data.data) {
-        const { balance, earned = 1, lifetimeEarned } = data.data;
-
-        // Track petal milestone if reached
-        if (lifetimeEarned && typeof lifetimeEarned === 'number') {
-          const milestones = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
-          const reachedMilestone = milestones.find((m) => lifetimeEarned >= m && lifetimeEarned - earned < m);
-          if (reachedMilestone) {
-            const { trackPetalMilestone } = await import('@/app/lib/analytics/petals');
-            trackPetalMilestone(reachedMilestone, lifetimeEarned, 'homepage_collection');
-          }
-        }
-
-        // Dispatch petal:earn event for HUD
-        window.dispatchEvent(
-          new CustomEvent('petal:earn', {
-            detail: {
-              balance,
-              granted: earned,
-              lifetimePetalsEarned: lifetimeEarned,
-              isGuest: data.data.isGuest || false,
+      try {
+        const response = await fetch('/api/v1/petals/collect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: 1,
+            source: 'homepage_collection',
+            metadata: {
+              petalId: petal.id,
+              frameIndex: petal.frameIndex,
             },
           }),
-        );
+        });
 
-        // Show collection effect (small +1 or sparkle)
-        // This will be handled by the collection animation
+        const data = await response.json();
+
+        if (data.ok && data.data) {
+          const { balance, earned = 1, lifetimeEarned } = data.data;
+
+          // Track petal milestone if reached
+          if (lifetimeEarned && typeof lifetimeEarned === 'number') {
+            const milestones = [10, 50, 100, 250, 500, 1000, 2500, 5000, 10000];
+            const reachedMilestone = milestones.find(
+              (m) => lifetimeEarned >= m && lifetimeEarned - earned < m,
+            );
+            if (reachedMilestone) {
+              const { trackPetalMilestone } = await import('@/app/lib/analytics/petals');
+              trackPetalMilestone(reachedMilestone, lifetimeEarned, 'homepage_collection');
+            }
+          }
+
+          // Dispatch petal:earn event for HUD
+          window.dispatchEvent(
+            new CustomEvent('petal:earn', {
+              detail: {
+                balance,
+                granted: earned,
+                lifetimePetalsEarned: lifetimeEarned,
+                isGuest: data.data.isGuest || false,
+              },
+            }),
+          );
+
+          // Show collection effect (small +1 or sparkle)
+          // This will be handled by the collection animation
+        }
+      } catch (error) {
+        console.error('Failed to collect petal:', error);
       }
-    } catch (error) {
-      console.error('Failed to collect petal:', error);
-    }
-  }, [density]);
+    },
+    [density],
+  );
 
   // Handle canvas click
   const handleCanvasClick = useCallback(

@@ -30,7 +30,7 @@ export function OmTag({
 }: OmTagProps) {
   // Determine color based on variant and specific props
   let colorClasses = '';
-  
+
   if (difficulty) {
     colorClasses = cn({
       'bg-emerald-500/20 text-emerald-200 border-emerald-400/30': difficulty === 'easy',
@@ -75,4 +75,3 @@ export function OmTag({
     </span>
   );
 }
-

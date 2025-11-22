@@ -155,7 +155,9 @@ export function FeaturedCarousel({
 
             {/* Price and CTA */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="text-2xl md:text-4xl font-bold text-text-link-hover">{priceDisplay}</div>
+              <div className="text-2xl md:text-4xl font-bold text-text-link-hover">
+                {priceDisplay}
+              </div>
               <HeaderButton
                 href={paths.product(currentProduct.id)}
                 className="group flex items-center gap-2 px-6 py-3 text-base font-semibold"

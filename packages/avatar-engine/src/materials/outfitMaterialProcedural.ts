@@ -40,4 +40,3 @@ export function outfitMaterialProcedural(options: OutfitMaterialOptions): THREE.
 
   return material;
 }
-

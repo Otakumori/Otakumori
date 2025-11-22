@@ -4,10 +4,7 @@ import { getServerEnv } from '@/env/server';
 
 export { REQUIRED_SERVER_KEYS };
 
-const optionalString = z
-  .string()
-  .min(1)
-  .optional();
+const optionalString = z.string().min(1).optional();
 
 // Environment schema for production validation
 export const envSchema = z.object({

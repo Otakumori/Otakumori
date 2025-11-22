@@ -15,10 +15,7 @@ export function GlassCard({ className, ...props }: HTMLAttributes<HTMLDivElement
   );
 }
 
-export function GlassCardContent({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) {
+export function GlassCardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
@@ -29,4 +26,3 @@ export function GlassCardContent({
     />
   );
 }
-

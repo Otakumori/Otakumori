@@ -26,7 +26,7 @@ export async function loadRegistry(): Promise<AssetRegistry> {
     }
 
     const registry = await response.json();
-    
+
     // Validate registry structure
     if (registry.version && registry.assets && registry.fallbacks) {
       cachedRegistry = registry as AssetRegistry;
@@ -108,7 +108,10 @@ export function getAsset(registry: AssetRegistry, id: string) {
 /**
  * Get fallback asset for a slot
  */
-export function getFallback(registry: AssetRegistry, slot: 'Head' | 'Torso' | 'Legs' | 'Accessory') {
+export function getFallback(
+  registry: AssetRegistry,
+  slot: 'Head' | 'Torso' | 'Legs' | 'Accessory',
+) {
   const fallbackId = registry.fallbacks[slot];
   return fallbackId ? getAsset(registry, fallbackId) : undefined;
 }
@@ -119,4 +122,3 @@ export function getFallback(registry: AssetRegistry, slot: 'Head' | 'Torso' | 'L
 export function clearRegistryCache(): void {
   cachedRegistry = null;
 }
-

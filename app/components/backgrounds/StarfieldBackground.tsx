@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 /**
  * Starfield Background Component
- * 
+ *
  * Full-screen starfield/abyss background for GameCube UI and "deep space" sections.
  * Features:
  * - Subtle parallax motion
@@ -280,4 +280,3 @@ export default function StarfieldBackground({
     />
   );
 }
-

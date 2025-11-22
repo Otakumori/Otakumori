@@ -41,7 +41,11 @@ export async function POST(req: NextRequest) {
 
     // Rate limiting
     const identifier = getClientIdentifier(req, userId);
-    const rateLimitResult = await checkRateLimit('PETAL_SHOP_PURCHASE', identifier, PURCHASE_RATE_LIMIT);
+    const rateLimitResult = await checkRateLimit(
+      'PETAL_SHOP_PURCHASE',
+      identifier,
+      PURCHASE_RATE_LIMIT,
+    );
 
     if (!rateLimitResult.success) {
       return NextResponse.json(
@@ -132,10 +136,7 @@ export async function POST(req: NextRequest) {
         where: {
           userId: user.id,
           redeemedAt: null,
-          OR: [
-            { expiresAt: null },
-            { expiresAt: { gt: new Date() } },
-          ],
+          OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
         },
       });
 
@@ -145,7 +146,8 @@ export async function POST(req: NextRequest) {
           {
             ok: false,
             error: 'TOO_MANY_VOUCHERS',
-            message: 'You have too many active vouchers. Use or let some expire before purchasing more.',
+            message:
+              'You have too many active vouchers. Use or let some expire before purchasing more.',
             requestId,
           },
           { status: 400 },
@@ -209,16 +211,23 @@ export async function POST(req: NextRequest) {
     // Type assertion needed because voucher type may not be in all CosmeticType unions
     if ((item.type as string) === 'voucher') {
       // Create CouponGrant record for voucher
-      const voucherMetadata = item.metadata as {
-        discountType?: string;
-        percentOff?: number;
-        amountOff?: number;
-        maxDiscountCents?: number;
-        minSpendCents?: number;
-        validityDays?: number;
-      } | undefined;
+      const voucherMetadata = item.metadata as
+        | {
+            discountType?: string;
+            percentOff?: number;
+            amountOff?: number;
+            maxDiscountCents?: number;
+            minSpendCents?: number;
+            validityDays?: number;
+          }
+        | undefined;
 
-      const discountType = voucherMetadata?.discountType === 'FREESHIP' ? 'PERCENT' : (voucherMetadata?.discountType === 'OFF_AMOUNT' ? 'OFF_AMOUNT' : 'PERCENT');
+      const discountType =
+        voucherMetadata?.discountType === 'FREESHIP'
+          ? 'PERCENT'
+          : voucherMetadata?.discountType === 'OFF_AMOUNT'
+            ? 'OFF_AMOUNT'
+            : 'PERCENT';
       const percentOff = voucherMetadata?.percentOff || 0;
       const amountOff = voucherMetadata?.amountOff || null;
       const minSpendCents = voucherMetadata?.minSpendCents || null;
@@ -237,7 +246,7 @@ export async function POST(req: NextRequest) {
           code: voucherCode,
           discountType: discountType as any,
           percentOff: discountType === 'PERCENT' ? percentOff : null,
-          amountOff: discountType === 'OFF_AMOUNT' ? (amountOff || 0) : null,
+          amountOff: discountType === 'OFF_AMOUNT' ? amountOff || 0 : null,
           expiresAt,
           petalCost: item.costPetals,
           minSpendCents,
@@ -325,4 +334,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

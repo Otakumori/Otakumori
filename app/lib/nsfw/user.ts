@@ -1,6 +1,6 @@
 /**
  * NSFW User Helpers
- * 
+ *
  * Server-side helpers for managing user NSFW preferences and status.
  */
 
@@ -104,4 +104,3 @@ export async function canAccessNSFWContent(
   // Future: could add rating-level restrictions
   return true;
 }
-

@@ -3,7 +3,17 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles, Flower, Zap, ChevronRight, Home, Ticket, Users, Palette, Shield } from 'lucide-react';
+import {
+  Sparkles,
+  Flower,
+  Zap,
+  ChevronRight,
+  Home,
+  Ticket,
+  Users,
+  Palette,
+  Shield,
+} from 'lucide-react';
 
 const adminRoutes = [
   {

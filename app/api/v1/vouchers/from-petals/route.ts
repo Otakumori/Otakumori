@@ -14,7 +14,7 @@ const PurchaseVoucherRequestSchema = z.object({
 
 /**
  * POST /api/v1/vouchers/from-petals
- * 
+ *
  * Purchase a discount voucher using petals.
  * Creates a CouponGrant record linked to a DiscountReward template.
  */
@@ -76,10 +76,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { ok: false, error: 'USER_NOT_FOUND', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'USER_NOT_FOUND', requestId }, { status: 404 });
     }
 
     // Get discount reward
@@ -258,4 +255,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

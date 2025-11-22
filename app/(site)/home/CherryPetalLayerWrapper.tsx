@@ -9,4 +9,3 @@ import CherryPetalLayer from './CherryPetalLayer';
 export function CherryPetalLayerWrapper() {
   return <CherryPetalLayer maxPetals={15} clickDestination="/petal-shop" enabled={true} />;
 }
-

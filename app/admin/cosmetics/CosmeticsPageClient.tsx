@@ -15,18 +15,26 @@ export default function CosmeticsPageClient() {
     return true;
   });
 
-  const typeCounts = cosmetics.reduce((acc, item) => {
-    acc[item.type] = (acc[item.type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const typeCounts = cosmetics.reduce(
+    (acc, item) => {
+      acc[item.type] = (acc[item.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const rarityCounts = cosmetics.reduce((acc, item) => {
-    const rarity = item.rarity || 'common';
-    acc[rarity] = (acc[rarity] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const rarityCounts = cosmetics.reduce(
+    (acc, item) => {
+      const rarity = item.rarity || 'common';
+      acc[rarity] = (acc[rarity] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const nsfwCount = cosmetics.filter((item) => item.contentRating && item.contentRating !== 'sfw').length;
+  const nsfwCount = cosmetics.filter(
+    (item) => item.contentRating && item.contentRating !== 'sfw',
+  ).length;
 
   return (
     <div className="p-6">
@@ -34,7 +42,9 @@ export default function CosmeticsPageClient() {
         <Palette className="h-8 w-8 text-purple-400" />
         Cosmetics Configuration
       </h1>
-      <p className="mb-6 text-neutral-300">View and manage cosmetics config, costs, rarity, and NSFW flags</p>
+      <p className="mb-6 text-neutral-300">
+        View and manage cosmetics config, costs, rarity, and NSFW flags
+      </p>
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -55,7 +65,9 @@ export default function CosmeticsPageClient() {
         <div className="rounded-xl border border-white/10 bg-black/50 p-4">
           <div className="text-sm text-neutral-400 mb-1">Avg Cost</div>
           <div className="text-2xl font-bold text-cyan-400">
-            {Math.round(cosmetics.reduce((sum, item) => sum + item.costPetals, 0) / cosmetics.length).toLocaleString()}
+            {Math.round(
+              cosmetics.reduce((sum, item) => sum + item.costPetals, 0) / cosmetics.length,
+            ).toLocaleString()}
           </div>
         </div>
       </div>
@@ -135,4 +147,3 @@ export default function CosmeticsPageClient() {
     </div>
   );
 }
-

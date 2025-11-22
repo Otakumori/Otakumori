@@ -18,9 +18,7 @@ export default function SectionErrorBoundary({
   sectionName,
 }: SectionErrorBoundaryProps) {
   const defaultFallback = (
-    <div className="text-pink-200/70 p-4 text-center">
-      Loading {sectionName}…
-    </div>
+    <div className="text-pink-200/70 p-4 text-center">Loading {sectionName}…</div>
   );
 
   return (
@@ -29,4 +27,3 @@ export default function SectionErrorBoundary({
     </ClientErrorBoundary>
   );
 }
-

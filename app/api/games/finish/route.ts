@@ -61,16 +61,16 @@ export async function POST(request: Request) {
   }
 
   const playerId = userId;
-  
+
   // Map legacy game IDs to new game IDs
   const gameIdMap: Record<string, string> = {
-    'samurai_petal_slice': 'petal-samurai',
-    'anime_memory_match': 'memory-match',
-    'bubble_pop_gacha': 'bubble-girl',
-    'rhythm_beat_em_up': 'petal-storm-rhythm',
+    samurai_petal_slice: 'petal-samurai',
+    anime_memory_match: 'memory-match',
+    bubble_pop_gacha: 'bubble-girl',
+    rhythm_beat_em_up: 'petal-storm-rhythm',
   };
   const mappedGameId = gameIdMap[body.game] || body.game;
-  
+
   // Calculate petal reward using centralized tuning config
   // Default to win=true for legacy compatibility
   const petalAmount = calculateGameReward(mappedGameId, true, score, {

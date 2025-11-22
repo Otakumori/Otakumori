@@ -128,11 +128,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
     try {
       product = await db.product.findFirst({
         where: {
-          OR: [
-            { id },
-            { printifyProductId: id },
-            { integrationRef: id },
-          ],
+          OR: [{ id }, { printifyProductId: id }, { integrationRef: id }],
           active: true,
         },
         include: {

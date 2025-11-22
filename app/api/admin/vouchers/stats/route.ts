@@ -28,10 +28,13 @@ async function handler() {
     ).length;
 
     // Get top users by voucher count
-    const userVoucherCounts = allVouchers.reduce((acc, v) => {
-      acc[v.userId] = (acc[v.userId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const userVoucherCounts = allVouchers.reduce(
+      (acc, v) => {
+        acc[v.userId] = (acc[v.userId] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const topUserIds = Object.entries(userVoucherCounts)
       .sort(([, a], [, b]) => b - a)
@@ -78,4 +81,3 @@ async function handler() {
 }
 
 export const GET = withAdminAuth(handler);
-

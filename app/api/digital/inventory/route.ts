@@ -11,4 +11,3 @@ export async function GET(request: NextRequest) {
   const res = NextResponse.json(_data);
   return withCors(res, request.headers.get('origin'));
 }
-

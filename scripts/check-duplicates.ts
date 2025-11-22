@@ -36,7 +36,7 @@ async function checkDuplicates() {
   });
 
   const printifyDupes = Array.from(printifyDuplicates.entries()).filter(
-    ([, products]) => products.length > 1
+    ([, products]) => products.length > 1,
   );
 
   if (printifyDupes.length > 0) {
@@ -45,7 +45,7 @@ async function checkDuplicates() {
       console.log(`\n  printifyProductId: ${id} (${products.length} duplicates)`);
       products.forEach((p) => {
         console.log(
-          `    - ${p.name} (id: ${p.id}, active: ${p.active}, visible: ${p.visible}, created: ${p.createdAt.toISOString()})`
+          `    - ${p.name} (id: ${p.id}, active: ${p.active}, visible: ${p.visible}, created: ${p.createdAt.toISOString()})`,
         );
       });
     });
@@ -66,7 +66,7 @@ async function checkDuplicates() {
   });
 
   const integrationDupes = Array.from(integrationDuplicates.entries()).filter(
-    ([, products]) => products.length > 1
+    ([, products]) => products.length > 1,
   );
 
   if (integrationDupes.length > 0) {
@@ -75,7 +75,7 @@ async function checkDuplicates() {
       console.log(`\n  integrationRef: ${ref} (${products.length} duplicates)`);
       products.forEach((p) => {
         console.log(
-          `    - ${p.name} (id: ${p.id}, active: ${p.active}, visible: ${p.visible}, created: ${p.createdAt.toISOString()})`
+          `    - ${p.name} (id: ${p.id}, active: ${p.active}, visible: ${p.visible}, created: ${p.createdAt.toISOString()})`,
         );
       });
     });
@@ -96,7 +96,7 @@ async function checkDuplicates() {
   });
 
   const blueprintDupes = Array.from(blueprintDuplicates.entries()).filter(
-    ([, products]) => products.length > 1
+    ([, products]) => products.length > 1,
   );
 
   if (blueprintDupes.length > 0) {
@@ -106,7 +106,7 @@ async function checkDuplicates() {
       console.log(`  blueprintId: ${id} (${products.length} products)`);
       products.forEach((p) => {
         console.log(
-          `    - ${p.name} (id: ${p.id}, printifyProductId: ${p.printifyProductId || 'N/A'}, active: ${p.active}, visible: ${p.visible})`
+          `    - ${p.name} (id: ${p.id}, printifyProductId: ${p.printifyProductId || 'N/A'}, active: ${p.active}, visible: ${p.visible})`,
         );
       });
     });
@@ -129,7 +129,7 @@ async function checkDuplicates() {
   });
 
   const nameDupes = Array.from(nameDuplicates.entries()).filter(
-    ([, products]) => products.length > 1
+    ([, products]) => products.length > 1,
   );
 
   if (nameDupes.length > 0) {
@@ -139,7 +139,7 @@ async function checkDuplicates() {
       console.log(`  Name: "${name}" (${products.length} products)`);
       products.forEach((p) => {
         console.log(
-          `    - id: ${p.id}, printifyProductId: ${p.printifyProductId || 'N/A'}, blueprintId: ${p.blueprintId || 'N/A'}, active: ${p.active}, visible: ${p.visible}`
+          `    - id: ${p.id}, printifyProductId: ${p.printifyProductId || 'N/A'}, blueprintId: ${p.blueprintId || 'N/A'}, active: ${p.active}, visible: ${p.visible}`,
         );
       });
     });
@@ -156,8 +156,12 @@ async function checkDuplicates() {
   console.log(`   Total products: ${allProducts.length}`);
   console.log(`   Active products: ${allProducts.filter((p) => p.active).length}`);
   console.log(`   Visible products: ${allProducts.filter((p) => p.visible).length}`);
-  console.log(`   Critical duplicates (printifyProductId/integrationRef): ${printifyDupes.length + integrationDupes.length}`);
-  console.log(`   Potential duplicates (blueprintId/name): ${blueprintDupes.length + nameDupes.length}`);
+  console.log(
+    `   Critical duplicates (printifyProductId/integrationRef): ${printifyDupes.length + integrationDupes.length}`,
+  );
+  console.log(
+    `   Potential duplicates (blueprintId/name): ${blueprintDupes.length + nameDupes.length}`,
+  );
 
   await prisma.$disconnect();
 }
@@ -166,4 +170,3 @@ checkDuplicates().catch((error) => {
   console.error('Error checking duplicates:', error);
   process.exit(1);
 });
-

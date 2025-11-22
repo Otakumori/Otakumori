@@ -40,16 +40,10 @@ export async function GET(req: Request) {
         enabled: true,
         AND: [
           {
-            OR: [
-              { startsAt: null },
-              { startsAt: { lte: now } },
-            ],
+            OR: [{ startsAt: null }, { startsAt: { lte: now } }],
           },
           {
-            OR: [
-              { endsAt: null },
-              { endsAt: { gte: now } },
-            ],
+            OR: [{ endsAt: null }, { endsAt: { gte: now } }],
           },
         ],
       },
@@ -65,7 +59,10 @@ export async function GET(req: Request) {
         }
 
         // Check achievement requirement
-        if (reward.requiresAchievementId && !userAchievementIds.includes(reward.requiresAchievementId)) {
+        if (
+          reward.requiresAchievementId &&
+          !userAchievementIds.includes(reward.requiresAchievementId)
+        ) {
           return null;
         }
 
@@ -122,10 +119,6 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error('Error fetching discount rewards:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Internal server error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
-

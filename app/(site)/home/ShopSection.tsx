@@ -1,4 +1,3 @@
-
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -44,15 +43,17 @@ async function getBaseUrl(): Promise<string> {
   try {
     const headersList = await headers();
     const host = headersList.get('host');
-    const protocol = headersList.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
-    
+    const protocol =
+      headersList.get('x-forwarded-proto') ||
+      (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+
     if (host && typeof host === 'string' && host.length > 0) {
       return `${protocol}://${host}`;
     }
   } catch {
     // Fallback if headers() fails - don't throw, just use env var
   }
-  
+
   // Fallback: use env var if available
   if (env.NEXT_PUBLIC_APP_URL && typeof env.NEXT_PUBLIC_APP_URL === 'string') {
     try {
@@ -62,14 +63,12 @@ async function getBaseUrl(): Promise<string> {
     } catch {
       // If URL is invalid, use as-is (might be just domain)
       const urlStr = env.NEXT_PUBLIC_APP_URL.trim();
-      return urlStr.startsWith('http') 
-        ? urlStr 
-        : `https://${urlStr}`;
+      return urlStr.startsWith('http') ? urlStr : `https://${urlStr}`;
     }
   }
-  
+
   // Last resort: use production URL or localhost
-  return process.env.NODE_ENV === 'production' 
+  return process.env.NODE_ENV === 'production'
     ? 'https://www.otaku-mori.com'
     : 'http://localhost:3000';
 }
@@ -83,11 +82,10 @@ export default async function ShopSection() {
 
   try {
     // Build exclusion query parameter - safe array operations
-    const excludeParam = HOMEPAGE_EXCLUDED_TITLES
-      .filter((t) => t && typeof t === 'string')
+    const excludeParam = HOMEPAGE_EXCLUDED_TITLES.filter((t) => t && typeof t === 'string')
       .map((t) => `excludeTitles=${encodeURIComponent(t)}`)
       .join('&');
-    
+
     // Get base URL - this should never throw due to fallbacks in getBaseUrl()
     let baseUrl: string;
     try {
@@ -95,11 +93,12 @@ export default async function ShopSection() {
     } catch (urlError) {
       // Even getBaseUrl() should never throw, but be extra safe
       console.warn('[ShopSection] getBaseUrl() failed:', urlError);
-      baseUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://www.otaku-mori.com'
-        : 'http://localhost:3000';
+      baseUrl =
+        process.env.NODE_ENV === 'production'
+          ? 'https://www.otaku-mori.com'
+          : 'http://localhost:3000';
     }
-    
+
     const apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
 
     // Fetch products - wrap in try-catch to prevent any fetch errors from throwing
@@ -121,39 +120,42 @@ export default async function ShopSection() {
     if (response.ok) {
       try {
         const result = await response.json();
-        
+
         // Validate API response structure
         // Extract the data schema from the full response schema
         const DataSchema = FeaturedProductsResponseSchema.shape.data;
         const validated = validateApiEnvelope(result, DataSchema);
-        
+
         if (validated?.ok) {
           // Response is validated and type-safe
-          const products = validated.data.products.map((product): Product => ({
-            id: product.id,
-            title: product.title,
-            description: product.description ? stripHtml(product.description) : undefined,
-            price: product.price,
-            image: product.image,
-            available: product.available,
-            slug: product.slug,
-            category: product.category ?? undefined,
-            tags: product.tags,
-          }));
-          
+          const products = validated.data.products.map(
+            (product): Product => ({
+              id: product.id,
+              title: product.title,
+              description: product.description ? stripHtml(product.description) : undefined,
+              price: product.price,
+              image: product.image,
+              available: product.available,
+              slug: product.slug,
+              category: product.category ?? undefined,
+              tags: product.tags,
+            }),
+          );
+
           // Handle pagination - only include if all required fields are present
           const pagination = validated.data.pagination;
-          const paginationData = pagination &&
+          const paginationData =
+            pagination &&
             typeof pagination.currentPage === 'number' &&
             typeof pagination.totalPages === 'number' &&
             typeof pagination.total === 'number'
-            ? {
-                currentPage: pagination.currentPage,
-                totalPages: pagination.totalPages,
-                total: pagination.total,
-              }
-            : undefined;
-          
+              ? {
+                  currentPage: pagination.currentPage,
+                  totalPages: pagination.totalPages,
+                  total: pagination.total,
+                }
+              : undefined;
+
           shopData = {
             products,
             pagination: paginationData,
@@ -175,13 +177,17 @@ export default async function ShopSection() {
     }
   } catch (error) {
     // Catch any unexpected errors - log but don't throw
-    handleServerError(error, {
-      section: 'shop',
-      component: 'ShopSection',
-      operation: 'fetch_products',
-    }, {
-      logLevel: 'warn',
-    });
+    handleServerError(
+      error,
+      {
+        section: 'shop',
+        component: 'ShopSection',
+        operation: 'fetch_products',
+      },
+      {
+        logLevel: 'warn',
+      },
+    );
     shopData = { products: [] };
   }
 
@@ -194,10 +200,7 @@ function renderShopContent(shopData: ShopData) {
 
   return (
     <div className="rounded-2xl p-8">
-      <SectionHeader
-        title="Shop"
-        description="Discover unique anime-inspired merchandise"
-      />
+      <SectionHeader title="Shop" description="Discover unique anime-inspired merchandise" />
 
       {hasProducts ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -233,11 +236,13 @@ function renderShopContent(shopData: ShopData) {
                 <GlassCardContent className="flex flex-1 flex-col justify-between">
                   <div>
                     <h3 className="font-semibold text-white transition-colors group-hover:text-pink-400">
-                    {product.title}
-                  </h3>
-                  {product.description && (
-                      <p className="mt-2 line-clamp-2 text-sm text-white/70">{product.description}</p>
-                  )}
+                      {product.title}
+                    </h3>
+                    {product.description && (
+                      <p className="mt-2 line-clamp-2 text-sm text-white/70">
+                        {product.description}
+                      </p>
+                    )}
                   </div>
 
                   <div className="mt-4 flex items-center justify-between">

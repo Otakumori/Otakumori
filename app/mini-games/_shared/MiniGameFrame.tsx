@@ -1,6 +1,6 @@
 /**
  * MiniGameFrame Component
- * 
+ *
  * Shared frame component for all mini-games that:
  * - Applies background based on GameVisualProfile
  * - Provides consistent z-index layering for HUD/Overlay
@@ -24,7 +24,11 @@ export interface MiniGameFrameProps {
 /**
  * Get CSS classes for background based on background kind
  */
-function getBackgroundClasses(kind: BackgroundStyle, _accentColor: string, _glowColor?: string): string {
+function getBackgroundClasses(
+  kind: BackgroundStyle,
+  _accentColor: string,
+  _glowColor?: string,
+): string {
   switch (kind) {
     case 'starfield':
       return 'bg-gradient-to-b from-purple-900 via-purple-800 to-black';
@@ -82,11 +86,9 @@ export function MiniGameFrame({ gameId, children, className = '' }: MiniGameFram
 
   // Get background classes for CSS gradients (fallback)
   const bgClasses = useStarfield ? '' : getBackgroundClasses(bgKind, accentColor, glowColor);
-  
+
   // Use backgroundColor from profile if available, otherwise use CSS classes
-  const backgroundStyle = profile.backgroundColor 
-    ? { background: profile.backgroundColor }
-    : {};
+  const backgroundStyle = profile.backgroundColor ? { background: profile.backgroundColor } : {};
 
   return (
     <div
@@ -99,9 +101,7 @@ export function MiniGameFrame({ gameId, children, className = '' }: MiniGameFram
       }}
     >
       {/* Starfield background (full-screen, behind everything) */}
-      {useStarfield && (
-        <StarfieldBackground density={0.72} speed={0.62} zIndex={-10} />
-      )}
+      {useStarfield && <StarfieldBackground density={0.72} speed={0.62} zIndex={-10} />}
 
       {/* Optional inner glow overlay */}
       {glowColor && !useStarfield && (
@@ -139,4 +139,3 @@ export function MiniGameFrame({ gameId, children, className = '' }: MiniGameFram
     </div>
   );
 }
-

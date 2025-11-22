@@ -1,6 +1,6 @@
 /**
  * Admin Authentication Helpers
- * 
+ *
  * Centralized admin access control for server-side routes and pages.
  * Uses email-based admin detection via ADMIN_EMAILS config.
  */
@@ -22,13 +22,16 @@ export function getAdminEmails(): readonly string[] {
 /**
  * Check if a Clerk user is an admin based on their email
  */
-export function isAdmin(user: { emailAddresses?: Array<{ emailAddress?: string | null }>; primaryEmailAddress?: { emailAddress?: string | null } | null } | null): boolean {
+export function isAdmin(
+  user: {
+    emailAddresses?: Array<{ emailAddress?: string | null }>;
+    primaryEmailAddress?: { emailAddress?: string | null } | null;
+  } | null,
+): boolean {
   if (!user) return false;
 
   const email =
-    user.primaryEmailAddress?.emailAddress ??
-    user.emailAddresses?.[0]?.emailAddress ??
-    null;
+    user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress ?? null;
 
   return isAdminEmail(email);
 }
@@ -36,7 +39,7 @@ export function isAdmin(user: { emailAddresses?: Array<{ emailAddress?: string |
 /**
  * Require admin access - throws/redirects if not admin
  * Returns the authenticated admin user
- * 
+ *
  * @throws Redirects to sign-in if not authenticated
  * @throws Redirects to /admin/unauthorized if not admin
  */
@@ -48,9 +51,7 @@ export async function requireAdmin(): Promise<{ id: string; email: string | null
   }
 
   const email =
-    user.primaryEmailAddress?.emailAddress ??
-    user.emailAddresses?.[0]?.emailAddress ??
-    null;
+    user.primaryEmailAddress?.emailAddress ?? user.emailAddresses?.[0]?.emailAddress ?? null;
 
   if (!isAdminEmail(email)) {
     redirect('/admin/unauthorized');
@@ -65,7 +66,7 @@ export async function requireAdmin(): Promise<{ id: string; email: string | null
 /**
  * Middleware wrapper for API routes that require admin access
  * Returns 403 with x-otm-reason header if not admin
- * 
+ *
  * @example
  * export const POST = withAdminAuth(async (req) => {
  *   // Admin-only logic here
@@ -97,4 +98,3 @@ export function withAdminAuth<T extends NextRequest>(
     return handler(req, context);
   };
 }
-

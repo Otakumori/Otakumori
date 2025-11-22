@@ -98,13 +98,13 @@ export function useCosmetics() {
             setUnlockedIds(data.data.unlocked || []);
             setHudSkin(data.data.equipped?.hudSkinId || 'default');
             setIsAuthenticated(true);
-            
+
             // Also sync to localStorage for fast access
             saveUnlockedIds(data.data.unlocked || []);
             if (data.data.equipped?.hudSkinId) {
               saveHudSkin(data.data.equipped.hudSkinId);
             }
-            
+
             setIsHydrated(true);
             return;
           }
@@ -132,32 +132,35 @@ export function useCosmetics() {
    * For authenticated users, backend inventory is updated by purchase API
    * This function updates local state and refetches from backend if authenticated
    */
-  const unlockItem = useCallback(async (itemId: string) => {
-    setUnlockedIds((prev) => {
-      if (prev.includes(itemId)) {
-        return prev; // Already unlocked
-      }
-      const updated = [...prev, itemId];
-      saveUnlockedIds(updated);
-      
-      // If authenticated, refetch from backend to sync (purchase API already created inventoryItem)
-      if (isAuthenticated) {
-        fetch('/api/v1/cosmetics')
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.ok && data.data) {
-              setUnlockedIds(data.data.unlocked || []);
-              saveUnlockedIds(data.data.unlocked || []);
-            }
-          })
-          .catch(() => {
-            // Sync failed - keep local update
-          });
-      }
-      
-      return updated;
-    });
-  }, [isAuthenticated]);
+  const unlockItem = useCallback(
+    async (itemId: string) => {
+      setUnlockedIds((prev) => {
+        if (prev.includes(itemId)) {
+          return prev; // Already unlocked
+        }
+        const updated = [...prev, itemId];
+        saveUnlockedIds(updated);
+
+        // If authenticated, refetch from backend to sync (purchase API already created inventoryItem)
+        if (isAuthenticated) {
+          fetch('/api/v1/cosmetics')
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.ok && data.data) {
+                setUnlockedIds(data.data.unlocked || []);
+                saveUnlockedIds(data.data.unlocked || []);
+              }
+            })
+            .catch(() => {
+              // Sync failed - keep local update
+            });
+        }
+
+        return updated;
+      });
+    },
+    [isAuthenticated],
+  );
 
   /**
    * Select a HUD skin
@@ -204,4 +207,3 @@ export function useCosmetics() {
     isUnlocked,
   };
 }
-

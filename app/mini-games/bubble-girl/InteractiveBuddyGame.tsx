@@ -76,12 +76,12 @@ const TOOLS: Tool[] = [
   { id: 'confetti', name: 'Confetti', icon: '✧', type: 'fun', cost: 25, effect: 'celebrate' },
 ];
 
-export default function InteractiveBuddyGame({ 
+export default function InteractiveBuddyGame({
   mode = 'sandbox',
   onScoreChange,
   onGameEnd: _onGameEnd, // Reserved for future win/lose conditions in stress-relief/challenge modes
   characterVariant = 'girl',
-}: { 
+}: {
   mode?: GameMode;
   onScoreChange?: (score: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
@@ -124,7 +124,7 @@ export default function InteractiveBuddyGame({
         stressRelieved: engine.getStressRelieved(),
         comboMultiplier: engine.getComboMultiplier(),
       }));
-      
+
       // Notify parent of score changes
       if (onScoreChange) {
         onScoreChange(newScore);
@@ -333,11 +333,15 @@ class PhysicsEngine {
   private readonly BOUNCE = 0.6;
 
   private characterVariant: 'girl' | 'boy';
-  
+
   // Physics character renderer
   private physicsRenderer: PhysicsCharacterRenderer | null = null;
 
-  constructor(canvas: HTMLCanvasElement, mode: GameMode, characterVariant: 'girl' | 'boy' = 'girl') {
+  constructor(
+    canvas: HTMLCanvasElement,
+    mode: GameMode,
+    characterVariant: 'girl' | 'boy' = 'girl',
+  ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.mode = mode;
@@ -449,14 +453,18 @@ class PhysicsEngine {
     if (Date.now() - this.lastHitTime > 2000) {
       this.comboMultiplier = Math.max(1, this.comboMultiplier - 0.01);
     }
-    
+
     // Update physics renderer
     if (this.physicsRenderer) {
       const centerX = torso.x;
       const centerY = torso.y;
       const velocityX = torso.vx;
       const velocityY = torso.vy;
-      this.physicsRenderer.update(deltaTime, { x: velocityX, y: velocityY }, { x: centerX, y: centerY });
+      this.physicsRenderer.update(
+        deltaTime,
+        { x: velocityX, y: velocityY },
+        { x: centerX, y: centerY },
+      );
     }
   }
 
@@ -468,7 +476,7 @@ class PhysicsEngine {
     gradient.addColorStop(1, '#0f0718');
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
+
     // Enhanced background overlay
     const overlayGradient = this.ctx.createRadialGradient(
       this.canvas.width / 2,
@@ -517,15 +525,9 @@ class PhysicsEngine {
       const { torso } = this.character;
       // Use physics renderer
       this.physicsRenderer.render(torso.x, torso.y, 'right');
-      
+
       // Draw health bars
-      this.drawHealthBar(
-        torso.x,
-        torso.y - 80,
-        torso.width,
-        torso.health,
-        torso.maxHealth,
-      );
+      this.drawHealthBar(torso.x, torso.y - 80, torso.width, torso.health, torso.maxHealth);
     } else {
       // Fallback to original rendering
       this.drawCharacter();
@@ -711,7 +713,7 @@ class PhysicsEngine {
     hitPart.vx += (dx / distance) * force * (damage || 5);
     hitPart.vy += (dy / distance) * force * (damage || 5) - 2;
     hitPart.angularVelocity += (Math.random() - 0.5) * 0.1;
-    
+
     // Apply physics impact
     if (this.physicsRenderer) {
       const impactForce = {
@@ -741,7 +743,7 @@ class PhysicsEngine {
 
     // Spawn particles - Enhanced with glow
     this.spawnParticles(x, y, tool.type);
-    
+
     // Enhanced particle effects
     if (tool.type === 'destructive') {
       createGlowEffect(this.ctx, x, y, 30, '#ef4444', 0.5);

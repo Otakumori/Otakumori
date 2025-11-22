@@ -123,10 +123,10 @@ export const clientEnv = Object.freeze(
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: runtimeEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_CLERK_PROXY_URL: runtimeEnv.NEXT_PUBLIC_CLERK_PROXY_URL,
     NEXT_PUBLIC_RUNE_GLYPH_STYLE: envRecord['NEXT_PUBLIC_RUNE_GLYPH_STYLE'] as
-    | 'emoji'
-    | 'material'
-    | 'auto'
-    | undefined,
+      | 'emoji'
+      | 'material'
+      | 'auto'
+      | undefined,
     NEXT_PUBLIC_VERCEL_ENVIRONMENT: envRecord['NEXT_PUBLIC_VERCEL_ENVIRONMENT'],
     NEXT_PUBLIC_VERCEL_ENV: envRecord['NEXT_PUBLIC_VERCEL_ENV'],
     ...optionalEnvValues, // PostHog keys are already included in optionalEnvValues
@@ -134,4 +134,3 @@ export const clientEnv = Object.freeze(
 ) as typeof clientSchema._output;
 
 export type ClientEnv = typeof clientEnv;
-

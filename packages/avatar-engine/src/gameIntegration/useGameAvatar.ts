@@ -138,4 +138,3 @@ function createPresetProfile(presetId?: string): AvatarProfile {
     },
   };
 }
-

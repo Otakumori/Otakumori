@@ -30,4 +30,3 @@ export function getSanityClient(): SanityClient | null {
   client = createClient(config);
   return client;
 }
-

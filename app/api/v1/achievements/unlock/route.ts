@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
             achievement.points,
             achievement.Reward.value,
           );
-          
+
           // Use centralized grantPetals for consistent validation, rate limiting, and daily caps
           const { grantPetals } = await import('@/app/lib/petals/grant');
           const petalResult = await grantPetals({

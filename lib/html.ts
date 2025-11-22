@@ -35,4 +35,3 @@ export function removeHtmlTables(html: string | null | undefined): string {
   if (!html) return '';
   return html.replace(/<table[\s\S]*?<\/table>/gi, '');
 }
-

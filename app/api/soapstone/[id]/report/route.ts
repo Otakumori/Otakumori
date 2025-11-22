@@ -12,7 +12,7 @@ export async function POST(_: NextRequest, { params }: { params: { id: string } 
   const id = params.id;
 
   const { Visibility } = await import('@prisma/client');
-  
+
   const msg = await db.$transaction(async (tx) => {
     const updated = await tx.soapstoneMessage.update({
       where: { id },

@@ -51,10 +51,7 @@ export async function POST(req: NextRequest) {
     // Store in database - only if we have a valid userId
     const finalUserId = userId || session.userId;
     if (!finalUserId) {
-      return NextResponse.json(
-        { ok: false, error: 'User ID is required' },
-        { status: 400 },
-      );
+      return NextResponse.json({ ok: false, error: 'User ID is required' }, { status: 400 });
     }
 
     await db.gameSession.create({
@@ -121,7 +118,8 @@ export async function GET(req: NextRequest) {
       const end = s.endTime || new Date();
       return sum + (end.getTime() - s.startTime.getTime());
     }, 0);
-    const averageScore = sessions.reduce((sum, s) => sum + (s.score ?? 0), 0) / (totalSessions || 1);
+    const averageScore =
+      sessions.reduce((sum, s) => sum + (s.score ?? 0), 0) / (totalSessions || 1);
     const highScore = Math.max(...sessions.map((s) => s.highScore ?? 0), 0);
 
     return NextResponse.json({

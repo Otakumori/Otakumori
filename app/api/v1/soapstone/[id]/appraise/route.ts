@@ -9,10 +9,7 @@ export const runtime = 'nodejs';
  * Appraise (rate) a soapstone message
  * Similar to Dark Souls message appraisal system
  */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const requestId = generateRequestId();
 
   try {
@@ -32,10 +29,7 @@ export async function POST(
     });
 
     if (!message) {
-      return NextResponse.json(
-        { ok: false, error: 'NOT_FOUND', requestId },
-        { status: 404 },
-      );
+      return NextResponse.json({ ok: false, error: 'NOT_FOUND', requestId }, { status: 404 });
     }
 
     // Check if user already appraised this message
@@ -73,4 +67,3 @@ export async function POST(
     );
   }
 }
-

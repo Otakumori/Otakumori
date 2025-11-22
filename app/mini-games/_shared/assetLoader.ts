@@ -1,6 +1,6 @@
 /**
  * Enhanced Asset Loader
- * 
+ *
  * Fallback texture generation, asset preloading system,
  * and error handling for missing assets.
  */
@@ -54,7 +54,7 @@ export async function loadImageWithFallback(
       };
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error');
-      
+
       if (attempt < retries) {
         // Wait before retry
         await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
@@ -69,15 +69,22 @@ export async function loadImageWithFallback(
   fallbackCanvas.width = 256;
   fallbackCanvas.height = 256;
   const fallbackCtx = fallbackCanvas.getContext('2d');
-  
+
   if (fallbackCtx) {
-    const imageData = generateFallbackTexture(fallbackCtx, 256, 256, fallbackType, fallbackColor1, fallbackColor2);
+    const imageData = generateFallbackTexture(
+      fallbackCtx,
+      256,
+      256,
+      fallbackType,
+      fallbackColor1,
+      fallbackColor2,
+    );
     fallbackCtx.putImageData(imageData, 0, 0);
-    
+
     // Convert canvas to image
     const fallbackImage = new Image();
     fallbackImage.src = fallbackCanvas.toDataURL();
-    
+
     return new Promise((resolve) => {
       fallbackImage.onload = () => {
         resolve({
@@ -288,4 +295,3 @@ export async function loadAssetCached(
   assetCache.set(url, asset);
   return asset;
 }
-

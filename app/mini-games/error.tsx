@@ -28,12 +28,11 @@ export default function MiniGamesError({
           Whoops, that spell misfired.
         </h1>
         <p className="text-lg text-white/70 mb-6">
-          We hit an unexpected error loading the mini-games. Refresh or head back home while it's being patched.
+          We hit an unexpected error loading the mini-games. Refresh or head back home while it's
+          being patched.
         </p>
         {error.digest && (
-          <p className="text-sm text-white/50 font-mono">
-            Error ID: {error.digest}
-          </p>
+          <p className="text-sm text-white/50 font-mono">Error ID: {error.digest}</p>
         )}
         <div className="flex gap-4 justify-center">
           <button
@@ -53,4 +52,3 @@ export default function MiniGamesError({
     </main>
   );
 }
-

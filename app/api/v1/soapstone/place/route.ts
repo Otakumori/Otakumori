@@ -194,10 +194,10 @@ async function handler(request: NextRequest) {
     // Award petals for message placement using centralized grantPetals
     const petalReward = calculatePetalReward(message, tags, messageScore);
     let petalResult = null;
-    
+
     if (petalReward > 0) {
       const { grantPetals } = await import('@/app/lib/petals/grant');
-      
+
       petalResult = await grantPetals({
         userId: user.id,
         amount: petalReward,

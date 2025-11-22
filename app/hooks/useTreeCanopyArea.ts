@@ -5,7 +5,7 @@ import { CANOPY_POINTS } from '@/app/components/tree/CherryTree';
 
 /**
  * Hook to detect tree canopy area for petal spawning
- * 
+ *
  * Calculates the bounding box of the cherry tree canopy based on
  * the tree image position and normalized canopy points.
  */
@@ -24,7 +24,9 @@ export function useTreeCanopyArea(): TreeArea | undefined {
 
     const calculateTreeArea = () => {
       // Find the tree image element
-      const treeImg = document.querySelector('img[alt="Cherry Blossom Tree"]') as HTMLImageElement | null;
+      const treeImg = document.querySelector(
+        'img[alt="Cherry Blossom Tree"]',
+      ) as HTMLImageElement | null;
       if (!treeImg) {
         // Fallback: estimate based on typical tree position (left side, ~30% width)
         const width = window.innerWidth;
@@ -38,7 +40,7 @@ export function useTreeCanopyArea(): TreeArea | undefined {
       }
 
       const rect = treeImg.getBoundingClientRect();
-      
+
       // Calculate canopy bounds from normalized points
       // CANOPY_POINTS are normalized (0-1) relative to image dimensions
       const canopyXCoords = CANOPY_POINTS.map((p) => rect.left + p.x * rect.width);
@@ -91,4 +93,3 @@ export function useTreeCanopyArea(): TreeArea | undefined {
 
   return treeArea;
 }
-

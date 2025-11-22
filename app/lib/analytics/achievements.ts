@@ -1,6 +1,6 @@
 /**
  * Achievement Analytics
- * 
+ *
  * Tracks achievement unlock events with PostHog and Sentry
  * Works in both client and server contexts
  */
@@ -12,11 +12,13 @@ function safePh(event: string, props?: Record<string, unknown>) {
   if (typeof window === 'undefined') return;
   try {
     // Dynamic import for client-side only
-    import('@/app/analytics/capture.safe').then(({ ph }) => {
-      ph(event as any, props);
-    }).catch(() => {
-      // PostHog not available - skip silently
-    });
+    import('@/app/analytics/capture.safe')
+      .then(({ ph }) => {
+        ph(event as any, props);
+      })
+      .catch(() => {
+        // PostHog not available - skip silently
+      });
   } catch {
     // PostHog not available - skip
   }
@@ -112,4 +114,3 @@ export function trackAchievementProgress(
     ...metadata,
   });
 }
-

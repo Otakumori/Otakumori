@@ -65,4 +65,3 @@ export function detectSlot(filename: string): 'Head' | 'Torso' | 'Legs' | 'Acces
 export function detectNsfw(path: string): boolean {
   return path.includes('/nsfw/') || path.includes('/adults/');
 }
-

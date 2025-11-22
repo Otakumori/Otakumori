@@ -4,31 +4,31 @@ import { type PetalTransaction, PetalTransactionSchema } from '@/app/lib/contrac
 
 /**
  * Petal System Architecture Summary
- * 
+ *
  * IMPLEMENTATION STATUS: Phase 4-6 Complete
- * 
+ *
  * ARCHITECTURE:
  * - PetalWallet is primary storage for authenticated users (has lifetimeEarned field)
  * - User.petalBalance kept in sync for backward compatibility
  * - PetalService centralizes all earn/spend operations with lifetime tracking
- * 
+ *
  * LIFETIME TRACKING:
  * - On earn: balance += earned, lifetimeEarned += earned
  * - On spend: balance -= spent, lifetimeEarned unchanged
  * - PetalWallet.lifetimeEarned is the source of truth for lifetime stats
- * 
+ *
  * DAILY LIMITS:
  * - Game earnings: 2000 petals/day
  * - Achievement earnings: 3000 petals/day
  * - Daily bonus: 100 petals/day
  * - Purchase bonus: 5000 petals/day
  * - Guests: 500 petals/day (client-side localStorage)
- * 
+ *
  * ACHIEVEMENTS:
  * - /api/v1/achievements/unlock uses PetalService for petal rewards
  * - Achievements award petals via same service (respects daily limits)
  * - Petal rewards granted only once per achievement per user
- * 
+ *
  * GUEST BEHAVIOR:
  * - Guests use localStorage for ephemeral petal tracking
  * - No DB writes for guests
@@ -105,15 +105,16 @@ export class PetalService {
       const earnedToday = todayEarnings._sum.amount || 0;
 
       // Determine limit based on source
-      const limit = source === 'game' 
-        ? DAILY_LIMITS.game 
-        : source === 'achievement'
-        ? DAILY_LIMITS.achievement
-        : source === 'daily_bonus'
-        ? DAILY_LIMITS.daily_bonus
-        : source === 'purchase_bonus'
-        ? DAILY_LIMITS.purchase_bonus
-        : DAILY_LIMITS.other;
+      const limit =
+        source === 'game'
+          ? DAILY_LIMITS.game
+          : source === 'achievement'
+            ? DAILY_LIMITS.achievement
+            : source === 'daily_bonus'
+              ? DAILY_LIMITS.daily_bonus
+              : source === 'purchase_bonus'
+                ? DAILY_LIMITS.purchase_bonus
+                : DAILY_LIMITS.other;
 
       // Check if adding this amount would exceed the limit
       if (earnedToday + amount > limit) {
@@ -150,7 +151,14 @@ export class PetalService {
     userId: string,
     reward: PetalReward,
     requestId?: string,
-  ): Promise<{ success: boolean; awarded: number; newBalance: number; lifetimePetalsEarned: number; error?: string; dailyCapReached?: boolean }> {
+  ): Promise<{
+    success: boolean;
+    awarded: number;
+    newBalance: number;
+    lifetimePetalsEarned: number;
+    error?: string;
+    dailyCapReached?: boolean;
+  }> {
     try {
       // Validate the reward data
       const validatedReward = PetalTransactionSchema.parse({
@@ -281,7 +289,12 @@ export class PetalService {
     amount: number,
     reason: string,
     requestId?: string,
-  ): Promise<{ success: boolean; newBalance: number; lifetimePetalsEarned: number; error?: string }> {
+  ): Promise<{
+    success: boolean;
+    newBalance: number;
+    lifetimePetalsEarned: number;
+    error?: string;
+  }> {
     try {
       if (amount <= 0) {
         // Try to get wallet for lifetime info
@@ -597,7 +610,7 @@ export class PetalService {
             lifetimeEarned: 0,
           },
         });
-        
+
         return {
           success: true,
           data: {

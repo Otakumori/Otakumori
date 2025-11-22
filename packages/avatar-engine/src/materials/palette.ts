@@ -71,7 +71,9 @@ export function paletteToColors(palette: OtakumoriPalette): THREE.Color[] {
 /**
  * Get color from palette by name
  */
-export function getPaletteColor(palette: OtakumoriPalette, name: keyof OtakumoriPalette): THREE.Color {
+export function getPaletteColor(
+  palette: OtakumoriPalette,
+  name: keyof OtakumoriPalette,
+): THREE.Color {
   return new THREE.Color(palette[name]);
 }
-

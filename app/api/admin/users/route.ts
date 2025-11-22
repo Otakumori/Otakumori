@@ -46,10 +46,7 @@ async function handler() {
     });
   } catch (error) {
     console.error('Error fetching users:', error);
-    return NextResponse.json(
-      { ok: false, error: 'Failed to fetch users' },
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, error: 'Failed to fetch users' }, { status: 500 });
   }
 }
 

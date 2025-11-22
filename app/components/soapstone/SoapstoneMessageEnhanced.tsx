@@ -62,9 +62,7 @@ export function SoapstoneMessageEnhanced({
       {categoryInfo && (
         <div className="flex items-center gap-2 mb-2">
           <span className="text-sm">{categoryInfo.icon}</span>
-          <span className={`text-xs font-medium ${categoryInfo.color}`}>
-            {categoryInfo.label}
-          </span>
+          <span className={`text-xs font-medium ${categoryInfo.color}`}>{categoryInfo.label}</span>
         </div>
       )}
 
@@ -75,9 +73,7 @@ export function SoapstoneMessageEnhanced({
       <div className="flex items-center justify-between text-sm mb-3">
         <div className="flex items-center gap-4">
           <span className="text-white/60">{message.author || 'Anonymous'}</span>
-          <span className="text-white/40">
-            {new Date(message.createdAt).toLocaleDateString()}
-          </span>
+          <span className="text-white/40">{new Date(message.createdAt).toLocaleDateString()}</span>
         </div>
 
         {/* Appraise Button */}
@@ -157,4 +153,3 @@ export function SoapstoneMessageEnhanced({
     </div>
   );
 }
-

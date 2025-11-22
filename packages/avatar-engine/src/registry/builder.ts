@@ -58,7 +58,12 @@ function findFallbacks(
     Accessory: '',
   };
 
-  const slots: Array<'Head' | 'Torso' | 'Legs' | 'Accessory'> = ['Head', 'Torso', 'Legs', 'Accessory'];
+  const slots: Array<'Head' | 'Torso' | 'Legs' | 'Accessory'> = [
+    'Head',
+    'Torso',
+    'Legs',
+    'Accessory',
+  ];
 
   for (const slot of slots) {
     // Find first safe (non-NSFW) asset for this slot
@@ -82,7 +87,12 @@ function validateFallbacks(
   fallbacks: Record<'Head' | 'Torso' | 'Legs' | 'Accessory', string>,
   assets: Record<string, AssetMeta>,
 ): void {
-  const slots: Array<'Head' | 'Torso' | 'Legs' | 'Accessory'> = ['Head', 'Torso', 'Legs', 'Accessory'];
+  const slots: Array<'Head' | 'Torso' | 'Legs' | 'Accessory'> = [
+    'Head',
+    'Torso',
+    'Legs',
+    'Accessory',
+  ];
 
   for (const slot of slots) {
     const fallbackId = fallbacks[slot];
@@ -102,4 +112,3 @@ function validateFallbacks(
     }
   }
 }
-

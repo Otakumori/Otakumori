@@ -41,7 +41,9 @@ export async function GET() {
       apiKeyLength: env.PRINTIFY_API_KEY?.length || 0,
       shopIdLength: env.PRINTIFY_SHOP_ID?.length || 0,
       response: responseText.substring(0, 500), // First 500 chars
-      shopIdHash: createHash('sha256').update(env.PRINTIFY_SHOP_ID ?? '').digest('hex'),
+      shopIdHash: createHash('sha256')
+        .update(env.PRINTIFY_SHOP_ID ?? '')
+        .digest('hex'),
       headers: Object.fromEntries(response.headers.entries()),
     });
   } catch (error) {

@@ -107,7 +107,9 @@ export default function UsersPageClient() {
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Email</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Username</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Display Name</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">
+                  Display Name
+                </th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-white">Balance</th>
                 <th className="px-4 py-3 text-right text-sm font-semibold text-white">Lifetime</th>
                 <th className="px-4 py-3 text-center text-sm font-semibold text-white">NSFW</th>
@@ -159,4 +161,3 @@ export default function UsersPageClient() {
     </div>
   );
 }
-

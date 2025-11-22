@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { buildMessageThread, type SoapstoneMessageEnhanced } from '@/app/lib/soapstone-enhancements';
+import {
+  buildMessageThread,
+  type SoapstoneMessageEnhanced,
+} from '@/app/lib/soapstone-enhancements';
 import { SoapstoneMessageEnhanced as SoapstoneMessageComponent } from './SoapstoneMessageEnhanced';
 
 interface LocationBasedMessagesProps {
@@ -18,9 +21,7 @@ export function LocationBasedMessages({ messages }: LocationBasedMessagesProps) 
 
   useEffect(() => {
     // Filter messages for current page
-    const pageMessages = messages.filter(
-      (msg) => msg.location?.page === pathname || !msg.location
-    );
+    const pageMessages = messages.filter((msg) => msg.location?.page === pathname || !msg.location);
 
     // Build thread structure
     const threads = buildMessageThread(pageMessages);
@@ -79,4 +80,3 @@ export function LocationBasedMessages({ messages }: LocationBasedMessagesProps) 
     </div>
   );
 }
-

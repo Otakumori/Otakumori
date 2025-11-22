@@ -22,7 +22,12 @@ interface EngineProps {
   onGameComplete?: (success: boolean, score: number, streak: number) => void;
 }
 
-export default function Engine({ playlist, mode: _mode = 'short', autoplay = true, onGameComplete }: EngineProps) {
+export default function Engine({
+  playlist,
+  mode: _mode = 'short',
+  autoplay = true,
+  onGameComplete,
+}: EngineProps) {
   const [currentGameIndex, setCurrentGameIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -30,10 +35,16 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
   const [captions, setCaptions] = useState<Caption[]>([]);
   const [showPetals, setShowPetals] = useState(false);
 
-  const { updateBestScore, updateDailyStreak, addPetalsEarned, getBestScore, progress: progressData } = useProgress();
+  const {
+    updateBestScore,
+    updateDailyStreak,
+    addPetalsEarned,
+    getBestScore,
+    progress: progressData,
+  } = useProgress();
   const { attemptReward, isSignedIn } = useRewards();
   const { earnPetals } = usePetalEarn();
-  
+
   // Track streak for milestone rewards
   const [currentStreak, setCurrentStreak] = useState(0);
   const [lastStreakMilestone, setLastStreakMilestone] = useState(0);
@@ -74,16 +85,16 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
         updateBestScore(game.id, score);
         updateDailyStreak();
         addPetalsEarned(petals);
-        
+
         // Update streak
         const newStreak = currentStreak + 1;
         setCurrentStreak(newStreak);
-        
+
         // Trigger game completion callback
         if (onGameComplete) {
           onGameComplete(true, score, newStreak);
         }
-        
+
         // Award petals using usePetalEarn (supports guests with ephemeral petals)
         earnPetals({
           gameId: 'blossomware',
@@ -98,14 +109,14 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
             // Show petal reward
             setShowPetals(true);
             setTimeout(() => setShowPetals(false), 2000);
-            
+
             // Soft CTA for guests (non-blocking)
             if (!isSignedIn) {
               pushCaption('💡 Sign in to save your petals permanently!');
             }
           }
         });
-        
+
         // Streak milestone rewards (every 5 games)
         if (newStreak > 0 && newStreak % 5 === 0 && newStreak > lastStreakMilestone) {
           setLastStreakMilestone(newStreak);
@@ -121,9 +132,13 @@ export default function Engine({ playlist, mode: _mode = 'short', autoplay = tru
             pushCaption(`🔥 ${newStreak}-game streak! Bonus petals earned!`);
           });
         }
-        
+
         // Daily streak milestone rewards (every 5 days)
-        if (progressData.dailyStreak > 0 && progressData.dailyStreak % 5 === 0 && progressData.dailyStreak > lastDailyStreakMilestone) {
+        if (
+          progressData.dailyStreak > 0 &&
+          progressData.dailyStreak % 5 === 0 &&
+          progressData.dailyStreak > lastDailyStreakMilestone
+        ) {
           setLastDailyStreakMilestone(progressData.dailyStreak);
           const dailyMilestoneReward = Math.floor(progressData.dailyStreak / 5) * 20;
           earnPetals({

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 
 /**
  * Physics-based Cherry Blossom Petals
- * 
+ *
  * Features:
  * - Realistic physics (gravity, wind, rotation)
  * - Clickable/collectible (invisible mechanic - no UI feedback)
@@ -48,10 +48,7 @@ const PETAL_COLORS = [
   '#FFB8D4', // Light pink
 ];
 
-export default function PhysicsCherryPetals({ 
-  density = 2, 
-  onCollect 
-}: PhysicsCherryPetalsProps) {
+export default function PhysicsCherryPetals({ density = 2, onCollect }: PhysicsCherryPetalsProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const petalsRef = useRef<Petal[]>([]);
@@ -139,7 +136,7 @@ export default function PhysicsCherryPetals({
     ctx.beginPath();
     ctx.ellipse(0, 0, size * 0.6, size * 1.2, 0, 0, Math.PI * 2);
     ctx.fill();
-    
+
     // Add subtle highlight
     ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     ctx.beginPath();
@@ -150,31 +147,34 @@ export default function PhysicsCherryPetals({
   }, []);
 
   // Handle click (silent collection)
-  const handleClick = useCallback((e: MouseEvent) => {
-    if (!canvasRef.current) return;
+  const handleClick = useCallback(
+    (e: MouseEvent) => {
+      if (!canvasRef.current) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
+      const rect = canvasRef.current.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
 
-    // Check if click is on any petal
-    petalsRef.current.forEach((petal) => {
-      if (petal.collected) return;
+      // Check if click is on any petal
+      petalsRef.current.forEach((petal) => {
+        if (petal.collected) return;
 
-      const dx = clickX - petal.x;
-      const dy = clickY - petal.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const petalRadius = 12 * petal.scale; // Clickable radius
+        const dx = clickX - petal.x;
+        const dy = clickY - petal.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const petalRadius = 12 * petal.scale; // Clickable radius
 
-      if (distance < petalRadius) {
-        petal.collected = true;
-        // Silent collection - no visual feedback
-        if (onCollect) {
-          onCollect(petal.id);
+        if (distance < petalRadius) {
+          petal.collected = true;
+          // Silent collection - no visual feedback
+          if (onCollect) {
+            onCollect(petal.id);
+          }
         }
-      }
-    });
-  }, [onCollect]);
+      });
+    },
+    [onCollect],
+  );
 
   // Animation loop
   useEffect(() => {
@@ -259,4 +259,3 @@ export default function PhysicsCherryPetals({
     />
   );
 }
-

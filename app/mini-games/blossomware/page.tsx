@@ -21,7 +21,11 @@ import Engine from '@/components/arcade/Engine';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
-import { getGameVisualProfile, applyVisualProfile, getGameDisplayName } from '../_shared/gameVisuals';
+import {
+  getGameVisualProfile,
+  applyVisualProfile,
+  getGameDisplayName,
+} from '../_shared/gameVisuals';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
@@ -40,7 +44,7 @@ export default function BlossomwarePage() {
   const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
   const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
   const [_gameCompletionCount, setGameCompletionCount] = useState(0);
-  
+
   // Handle game completion for physics impacts
   const handleGameComplete = useCallback((success: boolean, score: number, streak: number) => {
     if (physicsAvatarRef.current) {
@@ -61,10 +65,14 @@ export default function BlossomwarePage() {
       });
     }
   }, []);
-  
+
   // Avatar integration - use wrapper hook with choice
   const avatarUsage = getGameAvatarUsage('blossomware');
-  const { avatarConfig, representationConfig, isLoading: avatarLoading } = useGameAvatar('blossomware', {
+  const {
+    avatarConfig,
+    representationConfig,
+    isLoading: avatarLoading,
+  } = useGameAvatar('blossomware', {
     forcePreset: avatarChoice === 'preset',
     avatarProfile: avatarChoice === 'creator' ? selectedAvatar : null,
   });
@@ -72,7 +80,7 @@ export default function BlossomwarePage() {
   // Visual profile
   const visualProfile = getGameVisualProfile('blossomware');
   const { backgroundStyle } = applyVisualProfile(visualProfile);
-  
+
   // Handle avatar choice
   const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
     setAvatarChoice(choice);
@@ -81,10 +89,14 @@ export default function BlossomwarePage() {
     }
     setShowAvatarChoice(false);
   }, []);
-  
+
   // Check if we should show choice
-  const shouldShowChoice = showAvatarChoice && avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled();
-  
+  const shouldShowChoice =
+    showAvatarChoice &&
+    avatarUsage === 'avatar-or-preset' &&
+    avatarChoice === null &&
+    isAvatarsEnabled();
+
   // Restart handler - Engine component handles restart logic internally
   const _handleRestart = useCallback(() => {
     // Engine manages its own restart state
@@ -95,77 +107,77 @@ export default function BlossomwarePage() {
   return (
     <MiniGameFrame gameId="blossomware">
       <div className="relative min-h-screen" style={backgroundStyle}>
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-semibold mb-2 text-pink-400">{displayName}</h1>
-            <p className="text-sm opacity-80 text-slate-300">
-              Chaotic micro-sessions—keep your petal streak alive.
-            </p>
+        <div className="mx-auto max-w-5xl px-4 py-10">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-semibold mb-2 text-pink-400">{displayName}</h1>
+              <p className="text-sm opacity-80 text-slate-300">
+                Chaotic micro-sessions—keep your petal streak alive.
+              </p>
+            </div>
+            <Link
+              href="/mini-games"
+              className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
+            >
+              Back to Arcade
+            </Link>
           </div>
-          <Link
-            href="/mini-games"
-            className="px-4 py-2 rounded-lg bg-black/50 backdrop-blur border border-pink-500/30 text-pink-200 hover:bg-pink-500/20 transition-colors"
-          >
-            Back to Arcade
-          </Link>
-        </div>
 
-        {/* Avatar vs Preset Choice */}
-        {shouldShowChoice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <AvatarPresetChoice
-              gameId="blossomware"
-              onChoice={handleAvatarChoice}
-              onCancel={() => setShowAvatarChoice(false)}
-            />
-          </div>
-        )}
-
-        {/* Avatar Display (Chibi Mode) - MAIN CHARACTER CENTER STAGE */}
-        {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-          <div className="flex justify-center mb-8">
-            <div className="relative w-80 h-80">
-              <AvatarRenderer
-                profile={avatarConfig}
-                mode={representationConfig.mode}
-                size="large"
+          {/* Avatar vs Preset Choice */}
+          {shouldShowChoice && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+              <AvatarPresetChoice
+                gameId="blossomware"
+                onChoice={handleAvatarChoice}
+                onCancel={() => setShowAvatarChoice(false)}
               />
-              {/* Physics Avatar Overlay */}
-              <div className="absolute top-0 right-0 w-32 h-40">
+            </div>
+          )}
+
+          {/* Avatar Display (Chibi Mode) - MAIN CHARACTER CENTER STAGE */}
+          {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+            <div className="flex justify-center mb-8">
+              <div className="relative w-80 h-80">
+                <AvatarRenderer
+                  profile={avatarConfig}
+                  mode={representationConfig.mode}
+                  size="large"
+                />
+                {/* Physics Avatar Overlay */}
+                <div className="absolute top-0 right-0 w-32 h-40">
+                  <PhysicsAvatarCanvas
+                    ref={physicsAvatarRef}
+                    characterType="player"
+                    quality="high"
+                    width={128}
+                    height={160}
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Physics Avatar Standalone (when no avatar config) */}
+          {!shouldShowChoice && (!isAvatarsEnabled() || !avatarConfig) && (
+            <div className="flex justify-center mb-8">
+              <div className="relative w-80 h-80 flex items-center justify-center">
                 <PhysicsAvatarCanvas
                   ref={physicsAvatarRef}
                   characterType="player"
                   quality="high"
-                  width={128}
-                  height={160}
+                  width={160}
+                  height={200}
                   className="rounded-lg"
                 />
               </div>
             </div>
-          </div>
-        )}
-        {/* Physics Avatar Standalone (when no avatar config) */}
-        {!shouldShowChoice && (!isAvatarsEnabled() || !avatarConfig) && (
-          <div className="flex justify-center mb-8">
-            <div className="relative w-80 h-80 flex items-center justify-center">
-              <PhysicsAvatarCanvas
-                ref={physicsAvatarRef}
-                characterType="player"
-                quality="high"
-                width={160}
-                height={200}
-                className="rounded-lg"
-              />
-            </div>
-          </div>
-        )}
+          )}
 
-        <div className="rounded-2xl bg-white/5 backdrop-blur p-4 ring-1 ring-white/10">
-          <Engine playlist={GAMES} mode="long" autoplay onGameComplete={handleGameComplete} />
+          <div className="rounded-2xl bg-white/5 backdrop-blur p-4 ring-1 ring-white/10">
+            <Engine playlist={GAMES} mode="long" autoplay onGameComplete={handleGameComplete} />
+          </div>
         </div>
-      </div>
       </div>
     </MiniGameFrame>
   );

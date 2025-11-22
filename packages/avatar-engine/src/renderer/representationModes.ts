@@ -114,4 +114,3 @@ export function getRepresentationTransform(mode: RepresentationMode): Representa
       return getRepresentationTransform('fullBody');
   }
 }
-

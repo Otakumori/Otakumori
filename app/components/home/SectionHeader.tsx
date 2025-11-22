@@ -24,7 +24,7 @@ export interface SectionHeaderProps {
 
 /**
  * Standardized section header component for homepage sections
- * 
+ *
  * Features:
  * - Consistent styling across all sections
  * - Accessibility support (proper heading hierarchy)
@@ -41,34 +41,20 @@ export function SectionHeader({
   id,
 }: SectionHeaderProps) {
   return (
-    <header 
-      className={cn('mb-6', className)}
-      id={id}
-    >
+    <header className={cn('mb-6', className)} id={id}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <h2 
-            className="text-2xl md:text-3xl font-bold"
-            style={{ color: titleColor }}
-          >
+          <h2 className="text-2xl md:text-3xl font-bold" style={{ color: titleColor }}>
             {title}
           </h2>
           {description && (
-            <p 
-              className="mt-2"
-              style={{ color: titleColor, opacity: 0.7 }}
-            >
+            <p className="mt-2" style={{ color: titleColor, opacity: 0.7 }}>
               {description}
             </p>
           )}
         </div>
-        {action && (
-          <div className="flex-shrink-0">
-            {action}
-          </div>
-        )}
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
     </header>
   );
 }
-

@@ -19,7 +19,9 @@ export interface QAOverlayProps {
  * QA Overlay - Only visible in development mode
  */
 export function QAOverlay({ gameSlug, scene, enabled = true }: QAOverlayProps) {
-  const [violations] = useState<Array<{ objectName: string; violationType: string; suggestion: string }>>([]);
+  const [violations] = useState<
+    Array<{ objectName: string; violationType: string; suggestion: string }>
+  >([]);
 
   useEffect(() => {
     if (!enabled || process.env.NODE_ENV !== 'development') {
@@ -51,4 +53,3 @@ export function QAOverlay({ gameSlug, scene, enabled = true }: QAOverlayProps) {
     </div>
   );
 }
-

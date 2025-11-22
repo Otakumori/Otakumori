@@ -201,8 +201,8 @@ export default function AdminDiscountsPage() {
                           : `$${(reward.amountOff || 0) / 100} off`}
                       </div>
                       <div>
-                        <span className="font-medium">Cost:</span> {reward.petalCost.toLocaleString()}{' '}
-                        petals
+                        <span className="font-medium">Cost:</span>{' '}
+                        {reward.petalCost.toLocaleString()} petals
                       </div>
                       <div>
                         <span className="font-medium">Valid:</span> {reward.validityDays} days

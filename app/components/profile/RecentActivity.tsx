@@ -32,10 +32,7 @@ export default function RecentActivity() {
         ))
       )}
       {/* TODO: Wire into real activity API endpoint */}
-      <p className="text-xs text-zinc-500 italic mt-4">
-        Activity feed coming soon
-      </p>
+      <p className="text-xs text-zinc-500 italic mt-4">Activity feed coming soon</p>
     </div>
   );
 }
-
