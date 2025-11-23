@@ -1,0 +1,87 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg4" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#B0FFB0;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#98FB98;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#90EE90;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="frogBody" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#ADFF2F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#90EE90;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="frogEye" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0F8FF;stop-opacity:1" />
+    </radialGradient>
+    <filter id="glow4">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow4">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture4" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+      <circle cx="25" cy="25" r="1.5" fill="#228B22" opacity="0.1"/>
+      <circle cx="12" cy="12" r="0.8" fill="#32CD32" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg4)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture4)" rx="20" opacity="0.3"/>
+  
+  <!-- Cute Frog -->
+  <g transform="translate(200, 280)" filter="url(#shadow4)">
+    <!-- Body with gradient -->
+    <ellipse cx="0" cy="20" rx="60" ry="70" fill="url(#frogBody)" stroke="#228B22" stroke-width="5" filter="url(#glow4)"/>
+    <ellipse cx="0" cy="18" rx="55" ry="65" fill="none" stroke="#32CD32" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Head with highlight -->
+    <ellipse cx="0" cy="-40" rx="55" ry="50" fill="url(#frogBody)" stroke="#228B22" stroke-width="4"/>
+    <ellipse cx="0" cy="-45" rx="40" ry="35" fill="#ADFF2F" opacity="0.3"/>
+    
+    <!-- Eyes with depth -->
+    <circle cx="-25" cy="-50" r="22" fill="url(#frogEye)" stroke="#228B22" stroke-width="4"/>
+    <circle cx="25" cy="-50" r="22" fill="url(#frogEye)" stroke="#228B22" stroke-width="4"/>
+    <circle cx="-25" cy="-50" r="15" fill="#000"/>
+    <circle cx="25" cy="-50" r="15" fill="#000"/>
+    <circle cx="-23" cy="-52" r="7" fill="#FFF"/>
+    <circle cx="27" cy="-52" r="7" fill="#FFF"/>
+    <circle cx="-21" cy="-54" r="4" fill="#000"/>
+    <circle cx="29" cy="-54" r="4" fill="#000"/>
+    <circle cx="-20" cy="-55" r="2" fill="#FFF" opacity="0.9"/>
+    <circle cx="30" cy="-55" r="2" fill="#FFF" opacity="0.9"/>
+    
+    <!-- Mouth with detail -->
+    <path d="M -20 -20 Q 0 -8 20 -20" stroke="#228B22" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M -18 -18 Q 0 -6 18 -18" stroke="#32CD32" stroke-width="2" fill="none" opacity="0.6"/>
+    
+    <!-- Spots with depth -->
+    <circle cx="-30" cy="30" r="10" fill="#228B22" opacity="0.7"/>
+    <circle cx="-30" cy="30" r="6" fill="#32CD32" opacity="0.5"/>
+    <circle cx="30" cy="40" r="10" fill="#228B22" opacity="0.7"/>
+    <circle cx="30" cy="40" r="6" fill="#32CD32" opacity="0.5"/>
+    <circle cx="0" cy="60" r="10" fill="#228B22" opacity="0.7"/>
+    <circle cx="0" cy="60" r="6" fill="#32CD32" opacity="0.5"/>
+    
+    <!-- Belly highlight -->
+    <ellipse cx="0" cy="25" rx="35" ry="40" fill="#ADFF2F" opacity="0.2"/>
+  </g>
+  
+  <!-- Enhanced leaves -->
+  <g opacity="0.7" filter="url(#glow4)">
+    <ellipse cx="100" cy="150" rx="18" ry="28" fill="#228B22" transform="rotate(-30 100 150)"/>
+    <path d="M 100 150 L 95 140 L 100 135 L 105 140 Z" fill="#32CD32"/>
+    <ellipse cx="300" cy="480" rx="18" ry="28" fill="#228B22" transform="rotate(45 300 480)"/>
+    <path d="M 300 480 L 295 470 L 300 465 L 305 470 Z" fill="#32CD32"/>
+  </g>
+</svg>

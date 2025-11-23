@@ -1,10 +1,25 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import CharacterEditor from '@/app/components/avatar/CharacterEditor';
 import type { AvatarConfiguration, AvatarPartType } from '@/app/lib/3d/avatar-parts';
+
+const CharacterEditor = dynamic(
+  () => import('@/app/components/avatar/CharacterEditor'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center text-white/80">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p>Loading avatar editor…</p>
+        </div>
+      </div>
+    ),
+  },
+);
 import type { CreatorAvatarConfig } from '@/app/lib/creator/types';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';

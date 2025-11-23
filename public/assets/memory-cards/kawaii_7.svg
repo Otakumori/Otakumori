@@ -1,0 +1,105 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg7" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#FFF0F5;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFE4E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB6C1;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="bearHead" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#F5DEB3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="bearEar" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#DEB887;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B4513;stop-opacity:0.6" />
+    </radialGradient>
+    <radialGradient id="bowGrad7" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FF1493;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+    </radialGradient>
+    <filter id="glow7">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow7">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture7" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#FFF" opacity="0.1"/>
+      <circle cx="10" cy="10" r="0.5" fill="#FFB6C1" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg7)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture7)" rx="20" opacity="0.3"/>
+  
+  <!-- Cute Bear -->
+  <g transform="translate(200, 280)" filter="url(#shadow7)">
+    <!-- Head with gradient -->
+    <circle cx="0" cy="0" r="70" fill="url(#bearHead)" stroke="#8B4513" stroke-width="5" filter="url(#glow7)"/>
+    <circle cx="0" cy="0" r="65" fill="none" stroke="#F5DEB3" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Ears with detailed shading -->
+    <circle cx="-50" cy="-50" r="25" fill="url(#bearHead)" stroke="#8B4513" stroke-width="4"/>
+    <circle cx="50" cy="-50" r="25" fill="url(#bearHead)" stroke="#8B4513" stroke-width="4"/>
+    <circle cx="-50" cy="-50" r="17" fill="url(#bearEar)"/>
+    <circle cx="50" cy="-50" r="17" fill="url(#bearEar)"/>
+    <circle cx="-50" cy="-55" r="8" fill="#8B4513" opacity="0.4"/>
+    <circle cx="50" cy="-55" r="8" fill="#8B4513" opacity="0.4"/>
+    
+    <!-- Eyes with depth -->
+    <circle cx="-20" cy="-10" r="14" fill="#000"/>
+    <circle cx="20" cy="-10" r="14" fill="#000"/>
+    <circle cx="-20" cy="-8" r="10" fill="#1a1a2e"/>
+    <circle cx="20" cy="-8" r="10" fill="#1a1a2e"/>
+    <circle cx="-18" cy="-12" r="7" fill="#FFF"/>
+    <circle cx="22" cy="-12" r="7" fill="#FFF"/>
+    <circle cx="-16" cy="-14" r="4" fill="#000"/>
+    <circle cx="24" cy="-14" r="4" fill="#000"/>
+    <circle cx="-15" cy="-15" r="2" fill="#FFF" opacity="0.9"/>
+    <circle cx="25" cy="-15" r="2" fill="#FFF" opacity="0.9"/>
+    
+    <!-- Nose with highlight -->
+    <ellipse cx="0" cy="15" rx="9" ry="7" fill="#8B4513"/>
+    <ellipse cx="0" cy="14" rx="6" ry="5" fill="#A0522D"/>
+    <ellipse cx="-1" cy="13" rx="2" ry="2" fill="#FFF" opacity="0.6"/>
+    
+    <!-- Mouth with detail -->
+    <path d="M -15 25 Q 0 38 15 25" stroke="#8B4513" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M -12 27 Q 0 35 12 27" stroke="#A0522D" stroke-width="2" fill="none" opacity="0.7"/>
+    
+    <!-- Cheeks -->
+    <radialGradient id="blush7" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#FFB6C1;stop-opacity:0" />
+    </radialGradient>
+    <circle cx="-40" cy="10" r="15" fill="url(#blush7)"/>
+    <circle cx="40" cy="10" r="15" fill="url(#blush7)"/>
+    
+    <!-- Bow with detailed gradient -->
+    <path d="M -40 30 L -30 20 L -30 40 Z" fill="url(#bowGrad7)" stroke="#FF1493" stroke-width="2" filter="url(#glow7)"/>
+    <path d="M 40 30 L 30 20 L 30 40 Z" fill="url(#bowGrad7)" stroke="#FF1493" stroke-width="2" filter="url(#glow7)"/>
+    <circle cx="0" cy="30" r="10" fill="url(#bowGrad7)" stroke="#FF1493" stroke-width="2" filter="url(#glow7)"/>
+    <circle cx="0" cy="30" r="6" fill="#FFF"/>
+    <circle cx="0" cy="30" r="3" fill="url(#bowGrad7)"/>
+  </g>
+  
+  <!-- Enhanced honey drops -->
+  <g opacity="0.8" filter="url(#glow7)">
+    <ellipse cx="120" cy="160" rx="10" ry="15" fill="#FFD700"/>
+    <ellipse cx="120" cy="158" rx="7" ry="10" fill="#FFFACD"/>
+    <ellipse cx="120" cy="155" rx="3" ry="5" fill="#FFD700" opacity="0.6"/>
+    <ellipse cx="280" cy="460" rx="10" ry="15" fill="#FFD700"/>
+    <ellipse cx="280" cy="458" rx="7" ry="10" fill="#FFFACD"/>
+  </g>
+</svg>

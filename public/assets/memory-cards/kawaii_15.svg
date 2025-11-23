@@ -1,0 +1,108 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg15" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#FFF8DC;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFE4B5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="beeBody" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#FFFACD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="wingGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#F0F8FF;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#E0F6FF;stop-opacity:0.7" />
+    </radialGradient>
+    <filter id="glow15">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow15">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture15" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="15" cy="15" r="0.8" fill="#FFF" opacity="0.15"/>
+      <circle cx="8" cy="8" r="0.4" fill="#FFD700" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg15)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture15)" rx="20" opacity="0.4"/>
+  
+  <!-- Cute Bee -->
+  <g transform="translate(200, 280)" filter="url(#shadow15)">
+    <!-- Body with gradient -->
+    <ellipse cx="0" cy="20" rx="47" ry="62" fill="url(#beeBody)" stroke="#FFA500" stroke-width="5" filter="url(#glow15)"/>
+    <ellipse cx="0" cy="18" rx="43" ry="58" fill="none" stroke="#FFFACD" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Stripes with depth -->
+    <rect x="-47" y="-10" width="94" height="16" fill="#000"/>
+    <rect x="-47" y="-8" width="94" height="12" fill="#1a1a1a"/>
+    <rect x="-47" y="15" width="94" height="16" fill="#000"/>
+    <rect x="-47" y="17" width="94" height="12" fill="#1a1a1a"/>
+    <rect x="-47" y="40" width="94" height="16" fill="#000"/>
+    <rect x="-47" y="42" width="94" height="12" fill="#1a1a1a"/>
+    
+    <!-- Head with highlight -->
+    <circle cx="0" cy="-40" r="37" fill="url(#beeBody)" stroke="#FFA500" stroke-width="4"/>
+    <circle cx="0" cy="-42" r="30" fill="#FFFACD" opacity="0.3"/>
+    
+    <!-- Wings with gradient -->
+    <ellipse cx="-25" cy="-10" rx="22" ry="32" fill="url(#wingGrad)" stroke="#87CEEB" stroke-width="3" filter="url(#glow15)"/>
+    <ellipse cx="25" cy="-10" rx="22" ry="32" fill="url(#wingGrad)" stroke="#87CEEB" stroke-width="3" filter="url(#glow15)"/>
+    <!-- Wing details -->
+    <ellipse cx="-25" cy="-8" rx="15" ry="22" fill="#FFF" opacity="0.4"/>
+    <ellipse cx="25" cy="-8" rx="15" ry="22" fill="#FFF" opacity="0.4"/>
+    
+    <!-- Face with depth -->
+    <circle cx="-15" cy="-45" r="10" fill="#000"/>
+    <circle cx="15" cy="-45" r="10" fill="#000"/>
+    <circle cx="-15" cy="-43" r="7" fill="#1a1a2e"/>
+    <circle cx="15" cy="-43" r="7" fill="#1a1a2e"/>
+    <circle cx="-13" cy="-47" r="5" fill="#FFF"/>
+    <circle cx="17" cy="-47" r="5" fill="#FFF"/>
+    <circle cx="-11" cy="-49" r="3" fill="#000"/>
+    <circle cx="19" cy="-49" r="3" fill="#000"/>
+    <circle cx="-10" cy="-50" r="1.5" fill="#FFF" opacity="0.9"/>
+    <circle cx="20" cy="-50" r="1.5" fill="#FFF" opacity="0.9"/>
+    
+    <!-- Mouth -->
+    <path d="M -10 -30 Q 0 -23 10 -30" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/>
+    
+    <!-- Antennae with detail -->
+    <circle cx="-10" cy="-70" r="5" fill="#000"/>
+    <circle cx="10" cy="-70" r="5" fill="#000"/>
+    <circle cx="-10" cy="-70" r="3" fill="#FFD700"/>
+    <circle cx="10" cy="-70" r="3" fill="#FFD700"/>
+    <line x1="-10" y1="-70" x2="-15" y2="-88" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <line x1="10" y1="-70" x2="15" y2="-88" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="-15" cy="-88" r="3" fill="#000"/>
+    <circle cx="15" cy="-88" r="3" fill="#000"/>
+  </g>
+  
+  <!-- Enhanced flowers -->
+  <g opacity="0.9" filter="url(#glow15)">
+    <circle cx="120" cy="160" r="14" fill="#FF69B4"/>
+    <circle cx="120" cy="160" r="8" fill="#FFB6C1" opacity="0.7"/>
+    <circle cx="120" cy="160" r="7" fill="#FFD700"/>
+    <circle cx="120" cy="160" r="4" fill="#FFFACD"/>
+    <!-- Petals -->
+    <ellipse cx="120" cy="150" rx="4" ry="8" fill="#FF69B4" opacity="0.8"/>
+    <ellipse cx="120" cy="170" rx="4" ry="8" fill="#FF69B4" opacity="0.8"/>
+    <ellipse cx="110" cy="160" rx="8" ry="4" fill="#FF69B4" opacity="0.8"/>
+    <ellipse cx="130" cy="160" rx="8" ry="4" fill="#FF69B4" opacity="0.8"/>
+    <circle cx="280" cy="480" r="14" fill="#98FB98"/>
+    <circle cx="280" cy="480" r="7" fill="#FFD700"/>
+    <circle cx="280" cy="480" r="4" fill="#FFFACD"/>
+  </g>
+</svg>

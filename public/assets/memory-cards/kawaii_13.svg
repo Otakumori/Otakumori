@@ -1,0 +1,102 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg13" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#FFF8F8;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFE4E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB6C1;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="pandaEar" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="pandaEye" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000;stop-opacity:1" />
+    </radialGradient>
+    <filter id="glow13">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow13">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture13" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#FFF" opacity="0.1"/>
+      <circle cx="10" cy="10" r="0.5" fill="#FFB6C1" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg13)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture13)" rx="20" opacity="0.3"/>
+  
+  <!-- Cute Panda -->
+  <g transform="translate(200, 280)" filter="url(#shadow13)">
+    <!-- Head with highlight -->
+    <circle cx="0" cy="0" r="72" fill="#FFF" stroke="#000" stroke-width="5" filter="url(#glow13)"/>
+    <circle cx="0" cy="0" r="68" fill="none" stroke="#F5F5F5" stroke-width="1" opacity="0.4"/>
+    
+    <!-- Ears with gradient -->
+    <circle cx="-50" cy="-50" r="27" fill="url(#pandaEar)" filter="url(#glow13)"/>
+    <circle cx="50" cy="-50" r="27" fill="url(#pandaEar)" filter="url(#glow13)"/>
+    <circle cx="-50" cy="-52" r="15" fill="#333" opacity="0.5"/>
+    <circle cx="50" cy="-52" r="15" fill="#333" opacity="0.5"/>
+    
+    <!-- Eye patches with gradient -->
+    <ellipse cx="-25" cy="-10" rx="22" ry="27" fill="url(#pandaEye)" filter="url(#glow13)"/>
+    <ellipse cx="25" cy="-10" rx="22" ry="27" fill="url(#pandaEye)" filter="url(#glow13)"/>
+    <ellipse cx="-25" cy="-8" rx="18" ry="22" fill="#1a1a1a"/>
+    <ellipse cx="25" cy="-8" rx="18" ry="22" fill="#1a1a1a"/>
+    
+    <!-- Eyes with depth -->
+    <circle cx="-25" cy="-5" r="10" fill="#FFF"/>
+    <circle cx="25" cy="-5" r="10" fill="#FFF"/>
+    <circle cx="-25" cy="-7" r="6" fill="#000"/>
+    <circle cx="25" cy="-7" r="6" fill="#000"/>
+    <circle cx="-23" cy="-9" r="3" fill="#FFF"/>
+    <circle cx="27" cy="-9" r="3" fill="#FFF"/>
+    <circle cx="-22" cy="-10" r="1.5" fill="#000"/>
+    <circle cx="28" cy="-10" r="1.5" fill="#000"/>
+    
+    <!-- Nose with highlight -->
+    <ellipse cx="0" cy="15" rx="9" ry="7" fill="#000"/>
+    <ellipse cx="0" cy="14" rx="6" ry="5" fill="#1a1a1a"/>
+    <ellipse cx="-1" cy="13" rx="2" ry="2" fill="#FFF" opacity="0.6"/>
+    
+    <!-- Mouth with detail -->
+    <path d="M -15 25 Q 0 38 15 25" stroke="#000" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M -12 27 Q 0 35 12 27" stroke="#333" stroke-width="2" fill="none" opacity="0.7"/>
+    
+    <!-- Cheeks -->
+    <radialGradient id="blush13" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#FFB6C1;stop-opacity:0" />
+    </radialGradient>
+    <circle cx="-40" cy="10" r="15" fill="url(#blush13)"/>
+    <circle cx="40" cy="10" r="15" fill="url(#blush13)"/>
+  </g>
+  
+  <!-- Enhanced bamboo -->
+  <g opacity="0.8" filter="url(#glow13)">
+    <rect x="110" y="150" width="10" height="35" fill="#228B22" rx="5"/>
+    <rect x="112" y="152" width="6" height="31" fill="#32CD32" opacity="0.6"/>
+    <!-- Bamboo segments -->
+    <line x1="110" y1="165" x2="120" y2="165" stroke="#32CD32" stroke-width="1" opacity="0.5"/>
+    <line x1="110" y1="175" x2="120" y2="175" stroke="#32CD32" stroke-width="1" opacity="0.5"/>
+    <!-- Leaves -->
+    <path d="M 120 150 Q 130 145 125 140" fill="#32CD32" opacity="0.7"/>
+    <rect x="282" y="460" width="10" height="35" fill="#228B22" rx="5"/>
+    <rect x="284" y="462" width="6" height="31" fill="#32CD32" opacity="0.6"/>
+    <line x1="282" y1="475" x2="292" y2="475" stroke="#32CD32" stroke-width="1" opacity="0.5"/>
+    <path d="M 292 460 Q 302 455 297 450" fill="#32CD32" opacity="0.7"/>
+  </g>
+</svg>

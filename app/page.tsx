@@ -21,6 +21,7 @@ import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
 import { PetalFlowOverlayWrapper } from './components/home/PetalFlowOverlayWrapper';
 import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapper';
 import HomePetalSystemWrapper from './components/home/HomePetalSystemWrapper';
+import StarfieldBackground from './components/backgrounds/StarfieldBackground';
 
 export const revalidate = 60;
 
@@ -79,16 +80,22 @@ export default async function HomePage() {
           {/* Background Layer Stack - Unified Z-Index Strategy */}
           {/* 
             Z-Index Layering (from back to front):
-            -10: TreeBackground (deepest background)
+            -11: StarfieldBackground (deepest background, animated starfield)
+            -10: TreeBackground (cherry blossom tree image)
             -8:  CherryPetalLayer (atmospheric petals)
             -7:  PetalFlowOverlay (legacy, can be removed)
             -5:  PetalSystem (interactive collection)
-            0:   GlobalBackground (starfield, only on /about)
             10+: Main content (above all backgrounds)
           */}
           {isHomepageExperimentalEnabled && (
             <div className="relative">
-              {/* Tree hero - deepest layer, behind everything */}
+        {/* Starfield background - deepest layer, behind everything */ }
+        < SafeSection name = "StarfieldBackground" fallback = { null} >
+          <StarfieldBackground density={ 0.72 } speed = { 0.62} zIndex = {- 11
+    } />
+      </SafeSection>
+
+    {/* Tree hero - above starfield, behind petals */ }
               <SafeSection name="TreeBackground" fallback={null}>
                 <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -10 }}>
                   <TreeBackgroundWrapper />

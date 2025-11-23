@@ -5,10 +5,21 @@
   "singleQuote": true,
   "tabWidth": 2,
   "useTabs": false,
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "jsxSingleQuote": false,
   "overrides": [
     {
       "files": ["scripts/no-inline/extract-inline-styles.cjs"],
       "options": { "parser": "babel" }
+    },
+    {
+      "files": ["app/components/avatar/CharacterEditor/index.tsx"],
+      "options": {
+        "printWidth": 120,
+        "tabWidth": 2
+      }
     }
   ]
 }

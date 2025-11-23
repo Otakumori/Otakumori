@@ -54,16 +54,21 @@ model Appraisal {
 }
 
 model AvatarConfiguration {
-  id                      String                    @id @default(cuid())
-  userId                  String
-  configurationData       Json
-  exportFormat            String?
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime                  @updatedAt
-  User                    User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  AvatarConfigurationPart AvatarConfigurationPart[]
-  AvatarMaterialOverride  AvatarMaterialOverride[]
-  AvatarMorphTarget       AvatarMorphTarget[]
+  id                       String                    @id @default(cuid())
+  userId                   String
+  configurationData        Json
+  exportFormat             String?
+  qualityPreset            String?
+  celShadingConfig         Json?
+  physicsConfig            Json?
+  nsfwAnatomyConfig        Json?
+  advancedMaterialSettings Json?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  User                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  AvatarConfigurationPart  AvatarConfigurationPart[]
+  AvatarMaterialOverride   AvatarMaterialOverride[]
+  AvatarMorphTarget        AvatarMorphTarget[]
 
   @@index([userId])
 }
@@ -187,6 +192,24 @@ model CharacterPreset {
 
   @@index([category])
   @@index([rarity])
+}
+
+model AvatarQualityPreset {
+  id                    String   @id @default(cuid())
+  name                  String
+  description           String?
+  textureSize           Int      @default(2048)
+  shadowMapSize         Int      @default(4096)
+  samples               Int      @default(4)
+  enablePhysics         Boolean  @default(true)
+  enableAdvancedShaders Boolean  @default(true)
+  celShadingSteps       Int      @default(3)
+  rimLightIntensity     Float    @default(0.5)
+  isDefault             Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([isDefault])
 }
 
 model CharacterReaction {

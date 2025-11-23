@@ -1,0 +1,89 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg14" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#F0E6FF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#E0E0FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9370DB;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="octopusGrad" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#FF91C4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF69B4;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="tentacleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF91C4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF1493;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow14">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow14">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture14" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#FFF" opacity="0.1"/>
+      <circle cx="10" cy="10" r="0.5" fill="#9370DB" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg14)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture14)" rx="20" opacity="0.3"/>
+  
+  <!-- Cute Octopus -->
+  <g transform="translate(200, 300)" filter="url(#shadow14)">
+    <!-- Head with gradient -->
+    <circle cx="0" cy="-20" r="52" fill="url(#octopusGrad)" stroke="#FF1493" stroke-width="5" filter="url(#glow14)"/>
+    <circle cx="0" cy="-22" r="45" fill="#FFB6C1" opacity="0.3"/>
+    
+    <!-- Tentacles with gradient -->
+    <ellipse cx="-40" cy="30" rx="17" ry="42" fill="url(#tentacleGrad)" stroke="#FF1493" stroke-width="3"/>
+    <ellipse cx="-20" cy="40" rx="14" ry="47" fill="url(#tentacleGrad)" stroke="#FF1493" stroke-width="3"/>
+    <ellipse cx="0" cy="45" rx="12" ry="52" fill="url(#tentacleGrad)" stroke="#FF1493" stroke-width="3"/>
+    <ellipse cx="20" cy="40" rx="14" ry="47" fill="url(#tentacleGrad)" stroke="#FF1493" stroke-width="3"/>
+    <ellipse cx="40" cy="30" rx="17" ry="42" fill="url(#tentacleGrad)" stroke="#FF1493" stroke-width="3"/>
+    <!-- Tentacle highlights -->
+    <ellipse cx="-40" cy="35" rx="10" ry="25" fill="#FFB6C1" opacity="0.5"/>
+    <ellipse cx="40" cy="35" rx="10" ry="25" fill="#FFB6C1" opacity="0.5"/>
+    <!-- Suckers -->
+    <circle cx="-35" cy="45" r="4" fill="#FF1493" opacity="0.6"/>
+    <circle cx="-15" cy="55" r="4" fill="#FF1493" opacity="0.6"/>
+    <circle cx="15" cy="55" r="4" fill="#FF1493" opacity="0.6"/>
+    <circle cx="35" cy="45" r="4" fill="#FF1493" opacity="0.6"/>
+    
+    <!-- Face with depth -->
+    <circle cx="-20" cy="-25" r="12" fill="#FFF"/>
+    <circle cx="20" cy="-25" r="12" fill="#FFF"/>
+    <circle cx="-20" cy="-23" r="8" fill="#1a1a2e"/>
+    <circle cx="20" cy="-23" r="8" fill="#1a1a2e"/>
+    <circle cx="-18" cy="-27" r="6" fill="#FFF"/>
+    <circle cx="22" cy="-27" r="6" fill="#FFF"/>
+    <circle cx="-16" cy="-29" r="4" fill="#000"/>
+    <circle cx="24" cy="-29" r="4" fill="#000"/>
+    <circle cx="-15" cy="-30" r="2" fill="#FFF" opacity="0.9"/>
+    <circle cx="25" cy="-30" r="2" fill="#FFF" opacity="0.9"/>
+    
+    <!-- Mouth with detail -->
+    <path d="M -15 -10 Q 0 -3 15 -10" stroke="#000" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M -12 -8 Q 0 -1 12 -8" stroke="#FF1493" stroke-width="2" fill="none" opacity="0.7"/>
+  </g>
+  
+  <!-- Enhanced bubbles -->
+  <g opacity="0.85" filter="url(#glow14)">
+    <circle cx="120" cy="160" r="10" fill="#FFF" opacity="0.7" stroke="#87CEEB" stroke-width="3"/>
+    <circle cx="120" cy="160" r="6" fill="#E0F6FF" opacity="0.5"/>
+    <circle cx="118" cy="158" r="2" fill="#FFF" opacity="0.8"/>
+    <circle cx="280" cy="480" r="8" fill="#FFF" opacity="0.7" stroke="#87CEEB" stroke-width="2"/>
+    <circle cx="280" cy="480" r="5" fill="#E0F6FF" opacity="0.5"/>
+    <circle cx="278" cy="478" r="1.5" fill="#FFF" opacity="0.8"/>
+  </g>
+</svg>

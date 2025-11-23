@@ -1079,6 +1079,7 @@ function GameViewport({ gameKey }: { gameKey?: string }) {
     'dungeon-of-desire': dynamic(() => import('../dungeon-of-desire/InCard'), { ssr: false }),
     'maid-cafe-manager': dynamic(() => import('../maid-cafe-manager/InCard'), { ssr: false }),
     'thigh-coliseum': dynamic(() => import('../thigh-coliseum/InCard'), { ssr: false }),
+    'anime-arena': dynamic(() => import('../anime-arena/Scene'), { ssr: false }),
   } as const;
 
   const Comp = Map[gameKey];

@@ -1,0 +1,88 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg8" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#E6E6FA;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#E0E0FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9370DB;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="moonGrad" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#FFFACD;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="moonEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow8">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow8">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feOffset in="blur" dx="3" dy="3" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture8" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#FFF" opacity="0.1"/>
+      <circle cx="10" cy="10" r="0.5" fill="#9370DB" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg8)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture8)" rx="20" opacity="0.3"/>
+  
+  <!-- Cute Moon -->
+  <g transform="translate(200, 280)" filter="url(#shadow8)">
+    <!-- Moon with gradient -->
+    <path d="M -60 0 A 60 60 0 1 1 60 0 A 40 40 0 1 0 -60 0 Z" 
+          fill="url(#moonGrad)" stroke="url(#moonEdge)" stroke-width="6" filter="url(#glow8)"/>
+    <!-- Inner moon highlight -->
+    <path d="M -40 0 A 40 40 0 1 1 40 0 A 25 25 0 1 0 -40 0 Z" 
+          fill="#FFFACD" opacity="0.4"/>
+    <!-- Moon center glow -->
+    <ellipse cx="0" cy="0" rx="20" ry="25" fill="#FFD700" opacity="0.3" filter="url(#glow8)"/>
+    
+    <!-- Face with depth -->
+    <circle cx="-20" cy="-15" r="12" fill="#000"/>
+    <circle cx="20" cy="-15" r="12" fill="#000"/>
+    <circle cx="-20" cy="-13" r="8" fill="#1a1a2e"/>
+    <circle cx="20" cy="-13" r="8" fill="#1a1a2e"/>
+    <circle cx="-18" cy="-17" r="6" fill="#FFF"/>
+    <circle cx="22" cy="-17" r="6" fill="#FFF"/>
+    <circle cx="-16" cy="-19" r="4" fill="#000"/>
+    <circle cx="24" cy="-19" r="4" fill="#000"/>
+    <circle cx="-15" cy="-20" r="2" fill="#FFF" opacity="0.9"/>
+    <circle cx="25" cy="-20" r="2" fill="#FFF" opacity="0.9"/>
+    
+    <!-- Mouth with detail -->
+    <path d="M -15 10 Q 0 22 15 10" stroke="#000" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M -12 12 Q 0 20 12 12" stroke="#FF8C00" stroke-width="2" fill="none" opacity="0.6"/>
+    
+    <!-- Stars around with glow -->
+    <circle cx="-70" cy="-30" r="4" fill="#FFF" filter="url(#glow8)"/>
+    <circle cx="-70" cy="-30" r="2" fill="#FFD700"/>
+    <circle cx="70" cy="-30" r="4" fill="#FFF" filter="url(#glow8)"/>
+    <circle cx="70" cy="-30" r="2" fill="#FFD700"/>
+    <circle cx="-50" cy="40" r="4" fill="#FFF" filter="url(#glow8)"/>
+    <circle cx="-50" cy="40" r="2" fill="#FFD700"/>
+    <circle cx="50" cy="40" r="4" fill="#FFF" filter="url(#glow8)"/>
+    <circle cx="50" cy="40" r="2" fill="#FFD700"/>
+  </g>
+  
+  <!-- Enhanced stars -->
+  <g opacity="0.95" filter="url(#glow8)">
+    <path d="M 100 140 L 103 150 L 113 150 L 105 157 L 108 167 L 100 160 L 92 167 L 95 157 L 87 150 L 97 150 Z" fill="#FFF"/>
+    <circle cx="100" cy="153" r="2" fill="#FFD700"/>
+    <path d="M 300 480 L 303 490 L 313 490 L 305 497 L 308 507 L 300 500 L 292 507 L 295 497 L 287 490 L 297 490 Z" fill="#FFD700"/>
+    <circle cx="300" cy="493" r="2" fill="#FFF"/>
+  </g>
+</svg>

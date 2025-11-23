@@ -17,5 +17,6 @@
       "**/.turbo/**": true,
       "**/packages/**/dist/**": true,
     },
+    "prisma.pinToPrisma6": true,
   },
 }

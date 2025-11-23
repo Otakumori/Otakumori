@@ -35,6 +35,8 @@ import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useUser } from '@clerk/nextjs';
 import {
   createPetalBurst,
   updatePetalParticles,
@@ -44,23 +46,10 @@ import {
 
 interface Card {
   id: number;
-  value: string;
+  imageUrl: string;
   isFlipped: boolean;
   isMatched: boolean;
-  character: string;
-  series: string;
 }
-
-const CHARACTERS = [
-  { value: 'senku', character: 'Senku Ishigami', series: 'Dr. Stone' },
-  { value: 'edward', character: 'Edward Elric', series: 'Fullmetal Alchemist' },
-  { value: 'tanjiro', character: 'Tanjiro Kamado', series: 'Demon Slayer' },
-  { value: 'rimuru', character: 'Rimuru Tempest', series: 'Tensura' },
-  { value: 'ainz', character: 'Ainz Ooal Gown', series: 'Overlord' },
-  { value: 'saitama', character: 'Saitama', series: 'One Punch Man' },
-  { value: 'natsu', character: 'Natsu Dragneel', series: 'Fairy Tail' },
-  { value: 'ichigo', character: 'Ichigo Kurosaki', series: 'Bleach' },
-];
 
 export default function MemoryMatchGame() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -104,12 +93,15 @@ export default function MemoryMatchGame() {
   const { balance: petalBalance } = usePetalBalance();
   const { earnPetals } = usePetalEarn();
 
+  // Get Clerk user for avatar display
+  const { user } = useUser();
+
   // Game configuration - difficulty tuning parameters
   const GAME_CONFIG = {
     DIFFICULTY_SETTINGS: {
-      easy: { pairs: 6, timeBonus: 2, baseScore: 1000, gridCols: 3, gridRows: 4 }, // 3×4 = 12 cards = 6 pairs
+      easy: { pairs: 6, timeBonus: 2, baseScore: 1000, gridCols: 4, gridRows: 3 }, // 4×3 = 12 cards = 6 pairs
       normal: { pairs: 8, timeBonus: 1.5, baseScore: 1500, gridCols: 4, gridRows: 4 }, // 4×4 = 16 cards = 8 pairs
-      hard: { pairs: 15, timeBonus: 1, baseScore: 2000, gridCols: 5, gridRows: 6 }, // 5×6 = 30 cards = 15 pairs
+      hard: { pairs: 18, timeBonus: 1, baseScore: 2000, gridCols: 6, gridRows: 6 }, // 6×6 = 36 cards = 18 pairs
     },
     MOVE_BONUS_MULTIPLIER: 50,
     STREAK_BONUS_MULTIPLIER: 25,
@@ -124,19 +116,25 @@ export default function MemoryMatchGame() {
 
   // Initialize game
   const initializeGame = useCallback(() => {
-    const selectedChars = CHARACTERS.slice(0, settings.pairs);
-    const cardPairs = [...selectedChars, ...selectedChars];
+    // Generate image paths for the selected number of pairs
+    const imagePaths: string[] = [];
+    for (let i = 1; i <= settings.pairs; i++) {
+      const imagePath = `/assets/memory-cards/kawaii_${i}.svg`;
+      imagePaths.push(imagePath);
+    }
 
-    const shuffledCards = cardPairs
-      .map((char, index) => ({
-        id: index,
-        value: char.value,
-        character: char.character,
-        series: char.series,
-        isFlipped: false,
-        isMatched: false,
-      }))
-      .sort(() => Math.random() - 0.5);
+    // Create pairs of cards with the same imageUrl
+    const cardPairs: Card[] = [];
+    let idCounter = 0;
+    imagePaths.forEach((imageUrl) => {
+      cardPairs.push(
+        { id: idCounter++, imageUrl, isFlipped: false, isMatched: false },
+        { id: idCounter++, imageUrl, isFlipped: false, isMatched: false },
+      );
+    });
+
+    // Shuffle cards using Fisher-Yates algorithm
+    const shuffledCards = cardPairs.sort(() => Math.random() - 0.5);
 
     setCards(shuffledCards);
     setFlippedCards([]);
@@ -266,7 +264,7 @@ export default function MemoryMatchGame() {
         const firstCard = cards[firstId];
         const secondCard = cards[secondId];
 
-        if (firstCard.value === secondCard.value) {
+        if (firstCard.imageUrl === secondCard.imageUrl) {
           // Match found! - Add to matched set for glow effect
           setMatchedCardIds((prev) => new Set([...prev, firstId, secondId]));
 
@@ -408,7 +406,20 @@ export default function MemoryMatchGame() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex-1" />
+    <div className="flex-1 flex items-center" >
+      {/* Clerk User Avatar */ }
+  {
+    user?.imageUrl && (
+      <Image
+                    src={ user.imageUrl }
+    alt = { user.fullName || user.firstName || 'User Avatar' }
+    width = { 50}
+    height = { 50}
+    className = "rounded-full border-2 border-pink-400/50"
+      />
+                )
+  }
+  </div>
               <div className="flex-1 text-center">
                 <h1 className="text-4xl font-bold text-pink-400 mb-2">{displayName}</h1>
                 <p className="text-slate-300 italic">"Recall the faces bound by fate."</p>
@@ -555,15 +566,25 @@ export default function MemoryMatchGame() {
                           }}
                         >
                           {/* Card Back */}
-                          <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl border-2 border-pink-400/50 flex items-center justify-center">
-                            <div className="text-4xl"></div>
+  < div className = "absolute inset-0 backface-hidden rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20" >
+    <Image
+                              src="/assets/memory-cards/card-back.svg"
+alt = "Card back"
+fill
+className = "object-cover"
+sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
+  {/* Subtle texture overlay for depth */ }
+  < div className = "absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1)_0%,transparent_70%)] opacity-60" />
+    <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(139,92,246,0.05)_0%,transparent_50%)] opacity-40" />
                           </div>
                           {/* Card Front */}
                           <motion.div
-                            className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 p-2 flex flex-col items-center justify-center text-center ${
+                            className={
+  `absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 overflow-hidden ${
                               card.isMatched
-                                ? 'bg-green-600/80 border-green-400'
-                                : 'bg-slate-800/90 border-slate-600'
+    ? 'border-green-400'
+    : 'border-slate-600'
                             }`}
                             animate={
                               isMatched
@@ -578,27 +599,13 @@ export default function MemoryMatchGame() {
                                 : {}
                             }
                           >
-                            <div className="text-2xl mb-1">
-                              {card.character === 'Senku Ishigami'
-                                ? ''
-                                : card.character === 'Edward Elric'
-                                  ? ''
-                                  : card.character === 'Tanjiro Kamado'
-                                    ? ''
-                                    : card.character === 'Rimuru Tempest'
-                                      ? ''
-                                      : card.character === 'Ainz Ooal Gown'
-                                        ? ''
-                                        : card.character === 'Saitama'
-                                          ? ''
-                                          : card.character === 'Natsu Dragneel'
-                                            ? ''
-                                            : card.character === 'Ichigo Kurosaki'
-                                              ? '†'
-                                              : ''}
-                            </div>
-                            <div className="text-xs text-white font-medium">{card.character}</div>
-                            <div className="text-xs text-slate-400">{card.series}</div>
+  <Image
+                              src={ card.imageUrl }
+alt = "Card"
+fill
+className = "object-cover"
+sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
                           </motion.div>
                         </motion.div>
                       </motion.div>

@@ -94,5 +94,11 @@
     "name": "Petal Samurai",
     "icon": "swords",
     "desc": "Slash petals with style. Master storm and endless modes."
+  },
+  {
+    "slug": "anime-arena",
+    "name": "Anime Arena",
+    "icon": "stadium",
+    "desc": "Enter the 3D arena. Battle waves of enemies with your custom avatar."
   }
 ]

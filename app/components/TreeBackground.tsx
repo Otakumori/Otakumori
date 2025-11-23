@@ -98,6 +98,9 @@ export default function TreeBackground() {
     };
   }, [isMounted]);
 
+  // Ensure we render even if dimensions aren't calculated yet
+  const displayHeight = dimensions.height > 0 ? `${dimensions.height}px` : '100vh';
+
   return (
     <>
       {/* Absolute tree background - starts at top (behind navbar), extends to footer */}
@@ -105,7 +108,7 @@ export default function TreeBackground() {
         className="fixed inset-x-0 pointer-events-none"
         style={{
           top: 0,
-          height: dimensions.height > 0 ? `${dimensions.height}px` : '100vh',
+      height: displayHeight,
           zIndex: -10,
         }}
         aria-hidden="true"
@@ -116,8 +119,10 @@ export default function TreeBackground() {
           style={{
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
             backgroundSize: 'cover',
-            backgroundPosition: 'center center',
+    backgroundPosition: 'left center',
             backgroundRepeat: 'no-repeat',
+    opacity: isMounted ? 1 : 0,
+      transition: 'opacity 0.3s ease-in',
           }}
         />
 

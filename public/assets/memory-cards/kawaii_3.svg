@@ -1,0 +1,86 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg3" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#FFE87C;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="starGrad" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#FFFACD;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="starEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow3">
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow3">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feOffset in="blur" dx="3" dy="3" result="offsetBlur"/>
+      <feComponentTransfer in="offsetBlur" result="shadow">
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="texture3" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="15" cy="15" r="0.8" fill="#FFF" opacity="0.15"/>
+      <circle cx="8" cy="8" r="0.4" fill="#FFD700" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="600" fill="url(#bg3)" rx="20"/>
+  <rect width="400" height="600" fill="url(#texture3)" rx="20" opacity="0.4"/>
+  
+  <!-- Cute Star -->
+  <g transform="translate(200, 300)" filter="url(#shadow3)">
+    <!-- Main Star with gradient -->
+    <path d="M 0 -80 L 20 -20 L 80 -20 L 30 10 L 50 70 L 0 40 L -50 70 L -30 10 L -80 -20 L -20 -20 Z" 
+          fill="url(#starGrad)" stroke="url(#starEdge)" stroke-width="6" filter="url(#glow3)"/>
+    <!-- Inner star highlight -->
+    <path d="M 0 -60 L 15 -15 L 60 -15 L 22 8 L 38 53 L 0 30 L -38 53 L -22 8 L -60 -15 L -15 -15 Z" 
+          fill="#FFFACD" opacity="0.4"/>
+    <!-- Star center glow -->
+    <circle cx="0" cy="0" r="25" fill="#FFD700" opacity="0.3" filter="url(#glow3)"/>
+    
+    <!-- Face with depth -->
+    <circle cx="-15" cy="-10" r="10" fill="#000"/>
+    <circle cx="15" cy="-10" r="10" fill="#000"/>
+    <circle cx="-15" cy="-8" r="7" fill="#1a1a2e"/>
+    <circle cx="15" cy="-8" r="7" fill="#1a1a2e"/>
+    <circle cx="-13" cy="-12" r="5" fill="#FFF"/>
+    <circle cx="17" cy="-12" r="5" fill="#FFF"/>
+    <circle cx="-11" cy="-14" r="3" fill="#000"/>
+    <circle cx="19" cy="-14" r="3" fill="#000"/>
+    <circle cx="-10" cy="-15" r="1.5" fill="#FFF" opacity="0.9"/>
+    <circle cx="20" cy="-15" r="1.5" fill="#FFF" opacity="0.9"/>
+    
+    <!-- Mouth with detail -->
+    <path d="M -15 10 Q 0 22 15 10" stroke="#000" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M -12 12 Q 0 20 12 12" stroke="#FF8C00" stroke-width="2" fill="none" opacity="0.6"/>
+    
+    <!-- Cheeks -->
+    <radialGradient id="blush3" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFB6C1;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#FFB6C1;stop-opacity:0" />
+    </radialGradient>
+    <circle cx="-35" cy="5" r="12" fill="url(#blush3)"/>
+    <circle cx="35" cy="5" r="12" fill="url(#blush3)"/>
+  </g>
+  
+  <!-- Enhanced sparkles -->
+  <g opacity="0.95" filter="url(#glow3)">
+    <path d="M 120 150 L 123 160 L 133 160 L 125 167 L 128 177 L 120 170 L 112 177 L 115 167 L 107 160 L 117 160 Z" fill="#FFF"/>
+    <circle cx="120" cy="163" r="2" fill="#FFD700"/>
+    <circle cx="280" cy="470" r="4" fill="#FFD700"/>
+    <path d="M 280 470 L 282 475 L 287 475 L 284 480 L 286 485 L 280 480 L 274 485 L 276 480 L 273 475 L 278 475 Z" fill="#FFD700" opacity="0.8"/>
+  </g>
+</svg>

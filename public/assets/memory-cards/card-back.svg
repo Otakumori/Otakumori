@@ -1,0 +1,137 @@
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Dark glass background gradient -->
+    <radialGradient id="card-bg" cx="50%" cy="40%" r="80%">
+      <stop offset="0%" style="stop-color:#1a0a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f0c1a;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Pink-purple border gradient -->
+    <linearGradient id="border-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.8" />
+      <stop offset="25%" style="stop-color:#8b5cf6;stop-opacity:0.9" />
+      <stop offset="50%" style="stop-color:#ec4899;stop-opacity:0.8" />
+      <stop offset="75%" style="stop-color:#f472b6;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <!-- Inner glow -->
+    <radialGradient id="inner-glow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0" />
+    </radialGradient>
+    
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Soft glow filter -->
+    <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Sakura petal pattern -->
+    <pattern id="sakura-pattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <!-- Petal dots -->
+      <circle cx="20" cy="20" r="2" fill="#ec4899" opacity="0.15"/>
+      <circle cx="60" cy="20" r="2" fill="#8b5cf6" opacity="0.15"/>
+      <circle cx="40" cy="40" r="2.5" fill="#f472b6" opacity="0.2"/>
+      <circle cx="20" cy="60" r="2" fill="#8b5cf6" opacity="0.15"/>
+      <circle cx="60" cy="60" r="2" fill="#ec4899" opacity="0.15"/>
+      <!-- Subtle rings -->
+      <circle cx="40" cy="40" r="15" fill="none" stroke="#ec4899" stroke-width="0.3" opacity="0.1"/>
+      <circle cx="40" cy="40" r="25" fill="none" stroke="#8b5cf6" stroke-width="0.3" opacity="0.08"/>
+    </pattern>
+    
+    <!-- Diagonal texture pattern -->
+    <pattern id="diagonal-texture" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="20" y2="20" stroke="#ec4899" stroke-width="0.2" opacity="0.05"/>
+    </pattern>
+    
+    <!-- Corner decoration pattern -->
+    <pattern id="corner-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1.5" fill="#ec4899" opacity="0.3"/>
+      <circle cx="20" cy="20" r="4" fill="none" stroke="#8b5cf6" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+  </defs>
+  
+  <!-- Card background with rounded corners -->
+  <rect width="400" height="600" rx="24" ry="24" fill="url(#card-bg)" stroke="url(#border-gradient)" stroke-width="4"/>
+  
+  <!-- Inner glow overlay -->
+  <rect x="8" y="8" width="384" height="584" rx="20" ry="20" fill="url(#inner-glow)" opacity="0.6"/>
+  
+  <!-- Sakura pattern overlay -->
+  <rect x="12" y="12" width="376" height="576" rx="18" ry="18" fill="url(#sakura-pattern)" opacity="0.4"/>
+  
+  <!-- Diagonal texture -->
+  <rect x="12" y="12" width="376" height="576" rx="18" ry="18" fill="url(#diagonal-texture)" opacity="0.3"/>
+  
+  <!-- Central decorative circle -->
+  <circle cx="200" cy="250" r="80" fill="#1a0a2e" stroke="#ec4899" stroke-width="3" opacity="0.6" filter="url(#glow)"/>
+  <circle cx="200" cy="250" r="70" fill="none" stroke="#8b5cf6" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Cherry blossom center design -->
+  <g transform="translate(200, 250)">
+    <!-- Outer petals -->
+    <g fill="#ec4899" opacity="0.7" filter="url(#soft-glow)">
+      <ellipse cx="0" cy="-35" rx="12" ry="18" transform="rotate(0)"/>
+      <ellipse cx="0" cy="-35" rx="12" ry="18" transform="rotate(72)"/>
+      <ellipse cx="0" cy="-35" rx="12" ry="18" transform="rotate(144)"/>
+      <ellipse cx="0" cy="-35" rx="12" ry="18" transform="rotate(216)"/>
+      <ellipse cx="0" cy="-35" rx="12" ry="18" transform="rotate(288)"/>
+    </g>
+    <!-- Inner petals -->
+    <g fill="#f472b6" opacity="0.6">
+      <ellipse cx="0" cy="-25" rx="8" ry="12" transform="rotate(36)"/>
+      <ellipse cx="0" cy="-25" rx="8" ry="12" transform="rotate(108)"/>
+      <ellipse cx="0" cy="-25" rx="8" ry="12" transform="rotate(180)"/>
+      <ellipse cx="0" cy="-25" rx="8" ry="12" transform="rotate(252)"/>
+      <ellipse cx="0" cy="-25" rx="8" ry="12" transform="rotate(324)"/>
+    </g>
+    <!-- Center -->
+    <circle cx="0" cy="0" r="8" fill="#8b5cf6" opacity="0.8" filter="url(#glow)"/>
+    <circle cx="0" cy="0" r="5" fill="#ec4899" opacity="0.9"/>
+  </g>
+  
+  <!-- Brand text with glow -->
+  <text x="200" y="380" font-size="32" font-weight="bold" font-family="Arial, sans-serif" text-anchor="middle" fill="#ec4899" filter="url(#glow)" opacity="0.9">OTAKU</text>
+  <text x="200" y="420" font-size="32" font-weight="bold" font-family="Arial, sans-serif" text-anchor="middle" fill="#8b5cf6" filter="url(#glow)" opacity="0.9">MORI</text>
+  
+  <!-- Decorative corner elements -->
+  <g opacity="0.6">
+    <!-- Top-left corner -->
+    <circle cx="40" cy="40" r="6" fill="#ec4899" filter="url(#soft-glow)"/>
+    <circle cx="40" cy="40" r="12" fill="none" stroke="#8b5cf6" stroke-width="1.5" opacity="0.5"/>
+    
+    <!-- Top-right corner -->
+    <circle cx="360" cy="40" r="6" fill="#8b5cf6" filter="url(#soft-glow)"/>
+    <circle cx="360" cy="40" r="12" fill="none" stroke="#ec4899" stroke-width="1.5" opacity="0.5"/>
+    
+    <!-- Bottom-left corner -->
+    <circle cx="40" cy="560" r="6" fill="#8b5cf6" filter="url(#soft-glow)"/>
+    <circle cx="40" cy="560" r="12" fill="none" stroke="#ec4899" stroke-width="1.5" opacity="0.5"/>
+    
+    <!-- Bottom-right corner -->
+    <circle cx="360" cy="560" r="6" fill="#ec4899" filter="url(#soft-glow)"/>
+    <circle cx="360" cy="560" r="12" fill="none" stroke="#8b5cf6" stroke-width="1.5" opacity="0.5"/>
+  </g>
+  
+  <!-- Side decorative lines -->
+  <line x1="20" y1="100" x2="20" y2="500" stroke="url(#border-gradient)" stroke-width="2" opacity="0.3"/>
+  <line x1="380" y1="100" x2="380" y2="500" stroke="url(#border-gradient)" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Subtle shine effect -->
+  <ellipse cx="200" cy="150" rx="120" ry="80" fill="url(#inner-glow)" opacity="0.2" transform="rotate(-15 200 150)"/>
+</svg>
+

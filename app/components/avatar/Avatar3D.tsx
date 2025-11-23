@@ -38,6 +38,23 @@ export interface Avatar3DProps {
   // NEW: Procedural avatar support
   proceduralConfig?: ProceduralAvatarConfig;
   useProcedural?: boolean;
+  // Cel-shading and physics configs from configuration
+  celShadingConfig?: {
+    enabled: boolean;
+    shadowSteps: number;
+    rimLightColor: string;
+    rimLightIntensity: number;
+    outlineWidth: number;
+    outlineColor: string;
+  };
+  physicsConfig?: {
+    hairPhysics: boolean;
+    clothPhysics: boolean;
+    bodyPhysics: boolean;
+    physicsQuality: 'low' | 'medium' | 'high' | 'ultra';
+    springStiffness: number;
+    damping: number;
+  };
 }
 
 interface AvatarPartMesh {
@@ -62,6 +79,8 @@ export default function Avatar3D({
   onError,
   proceduralConfig,
   useProcedural = false,
+  celShadingConfig,
+  physicsConfig,
 }: Avatar3DProps) {
   const { scene, gl, camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
@@ -87,6 +106,18 @@ export default function Avatar3D({
   );
 
   const currentQuality = qualitySettings[quality];
+
+  // Cel-shading configuration (anime-style rendering)
+  const celShading = celShadingConfig ?? configuration.celShadingConfig;
+
+  // Physics configuration
+  const physics = physicsConfig ?? configuration.physicsConfig;
+
+  // Use cel-shading and physics configs (will be used for rendering)
+
+  const _celShadingEnabled = celShading?.enabled ?? true;
+
+  const _physicsEnabled = (physics?.hairPhysics ?? true) || (physics?.clothPhysics ?? true);
 
   // Initialize lighting system
   useEffect(() => {

@@ -216,6 +216,46 @@ export const NSFW_MORPH_TARGETS: Record<string, MorphTarget> = {
     category: 'anatomy',
     adultContent: true,
   },
+  clitoris_size: {
+    name: 'Clitoris Size',
+    min: 0.5,
+    max: 2,
+    defaultValue: 1,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  breast_firmness: {
+    name: 'Breast Firmness',
+    min: 0.3,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  breast_sag: {
+    name: 'Breast Sag',
+    min: 0,
+    max: 1,
+    defaultValue: 0.2,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  areola_texture: {
+    name: 'Areola Texture',
+    min: 0.5,
+    max: 2,
+    defaultValue: 1,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  pubic_hair: {
+    name: 'Pubic Hair',
+    min: 0,
+    max: 1,
+    defaultValue: 0.5,
+    category: 'anatomy',
+    adultContent: true,
+  },
 
   // Male anatomy
   penis_length: {
@@ -239,6 +279,30 @@ export const NSFW_MORPH_TARGETS: Record<string, MorphTarget> = {
     min: 0.7,
     max: 1.5,
     defaultValue: 1,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  penis_curve: {
+    name: 'Penis Curve',
+    min: -0.5,
+    max: 0.5,
+    defaultValue: 0,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  penis_head_size: {
+    name: 'Penis Head Size',
+    min: 0.8,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'anatomy',
+    adultContent: true,
+  },
+  pubic_hair_male: {
+    name: 'Pubic Hair',
+    min: 0,
+    max: 1,
+    defaultValue: 0.5,
     category: 'anatomy',
     adultContent: true,
   },
@@ -276,6 +340,164 @@ export const NSFW_MORPH_TARGETS: Record<string, MorphTarget> = {
     category: 'body',
     adultContent: false,
   },
+  // Facial features (anime-style)
+  eye_size: {
+    name: 'Eye Size',
+    min: 0.8,
+    max: 1.8,
+    defaultValue: 1.2,
+    category: 'face',
+    adultContent: false,
+  },
+  eye_shape: {
+    name: 'Eye Shape',
+    min: 0.5,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'face',
+    adultContent: false,
+  },
+  cheekbones: {
+    name: 'Cheekbone Height',
+    min: 0.5,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'face',
+    adultContent: false,
+  },
+  jawline: {
+    name: 'Jawline Definition',
+    min: 0.5,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'face',
+    adultContent: false,
+  },
+  lip_size: {
+    name: 'Lip Size',
+    min: 0.7,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'face',
+    adultContent: false,
+  },
+  nose_size: {
+    name: 'Nose Size',
+    min: 0.7,
+    max: 1.3,
+    defaultValue: 1,
+    category: 'face',
+    adultContent: false,
+  },
+  // Body proportions (anime-style)
+  shoulder_width: {
+    name: 'Shoulder Width',
+    min: 0.7,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'body',
+    adultContent: false,
+  },
+  arm_length: {
+    name: 'Arm Length',
+    min: 0.8,
+    max: 1.2,
+    defaultValue: 1,
+    category: 'body',
+    adultContent: false,
+  },
+  leg_length: {
+    name: 'Leg Length',
+    min: 0.8,
+    max: 1.3,
+    defaultValue: 1,
+    category: 'body',
+    adultContent: false,
+  },
+  body_fat: {
+    name: 'Body Fat',
+    min: 0.3,
+    max: 1.5,
+    defaultValue: 1,
+    category: 'body',
+    adultContent: false,
+  },
+  height: {
+    name: 'Height',
+    min: 0.8,
+    max: 1.2,
+    defaultValue: 1,
+    category: 'body',
+    adultContent: false,
+  },
+};
+
+// Quality presets for ultra-high quality anime rendering
+export const QUALITY_PRESETS: Record<string, QualityPreset> = {
+  low: {
+    id: 'low',
+    name: 'Low Quality',
+    textureSize: 512,
+    shadowMapSize: 1024,
+    samples: 1,
+    enablePhysics: false,
+    enableAdvancedShaders: false,
+    celShadingSteps: 2,
+    rimLightIntensity: 0.3,
+  },
+  medium: {
+    id: 'medium',
+    name: 'Medium Quality',
+    textureSize: 1024,
+    shadowMapSize: 2048,
+    samples: 2,
+    enablePhysics: true,
+    enableAdvancedShaders: true,
+    celShadingSteps: 3,
+    rimLightIntensity: 0.5,
+  },
+  high: {
+    id: 'high',
+    name: 'High Quality',
+    textureSize: 2048,
+    shadowMapSize: 4096,
+    samples: 4,
+    enablePhysics: true,
+    enableAdvancedShaders: true,
+    celShadingSteps: 4,
+    rimLightIntensity: 0.7,
+  },
+  ultra: {
+    id: 'ultra',
+    name: 'Ultra Quality',
+    textureSize: 4096,
+    shadowMapSize: 8192,
+    samples: 8,
+    enablePhysics: true,
+    enableAdvancedShaders: true,
+    celShadingSteps: 5,
+    rimLightIntensity: 1.0,
+  },
+};
+
+// Default cel-shading configuration
+export const DEFAULT_CEL_SHADING_CONFIG: CelShadingConfig = {
+  enabled: true,
+  shadowSteps: 3,
+  rimLightColor: '#ffffff',
+  rimLightIntensity: 0.5,
+  outlineWidth: 0.02,
+  outlineColor: '#000000',
+};
+
+// Default physics configuration
+export const DEFAULT_PHYSICS_CONFIG: PhysicsConfig = {
+  hairPhysics: true,
+  clothPhysics: true,
+  bodyPhysics: false,
+  physicsQuality: 'high',
+  springStiffness: 0.8,
+  damping: 0.9,
 };
 
 // Adult clothing and accessory categories
@@ -546,6 +768,47 @@ export const DEFAULT_AVATAR_PARTS: Partial<Record<AvatarPartType, AvatarPart[]>>
 };
 
 // Avatar configuration interface with NSFW options
+// Quality preset configuration
+export interface QualityPreset {
+  id: string;
+  name: string;
+  textureSize: 512 | 1024 | 2048 | 4096;
+  shadowMapSize: 1024 | 2048 | 4096 | 8192;
+  samples: 1 | 2 | 4 | 8;
+  enablePhysics: boolean;
+  enableAdvancedShaders: boolean;
+  celShadingSteps: 2 | 3 | 4 | 5; // Number of shadow steps for cel-shading
+  rimLightIntensity: number; // Rim lighting strength
+}
+
+// Cel-shading configuration
+export interface CelShadingConfig {
+  enabled: boolean;
+  shadowSteps: number;
+  rimLightColor: string;
+  rimLightIntensity: number;
+  outlineWidth: number;
+  outlineColor: string;
+}
+
+// Physics configuration
+export interface PhysicsConfig {
+  hairPhysics: boolean;
+  clothPhysics: boolean;
+  bodyPhysics: boolean;
+  physicsQuality: 'low' | 'medium' | 'high' | 'ultra';
+  springStiffness: number;
+  damping: number;
+}
+
+// NSFW anatomy configuration
+export interface NSFWAnatomyConfig {
+  enabled: boolean;
+  detailed: boolean;
+  maleOptions: Record<string, number>;
+  femaleOptions: Record<string, number>;
+}
+
 export interface AvatarConfiguration {
   id: string;
   userId: string;
@@ -575,6 +838,13 @@ export interface AvatarConfiguration {
   // Export settings
   allowExport: boolean;
   exportFormat: 'glb' | 'gltf' | 'fbx';
+
+  // Quality and rendering settings
+  qualityPreset?: string;
+  celShadingConfig?: CelShadingConfig;
+  physicsConfig?: PhysicsConfig;
+  nsfwAnatomyConfig?: NSFWAnatomyConfig;
+  advancedMaterialSettings?: Record<string, unknown>;
 
   createdAt: Date;
   updatedAt: Date;
@@ -826,6 +1096,16 @@ export class AvatarPartManager {
       idleAnimations: ['idle', 'idle_2'],
       allowExport: false,
       exportFormat: 'glb',
+      qualityPreset: 'high',
+      celShadingConfig: { ...DEFAULT_CEL_SHADING_CONFIG },
+      physicsConfig: { ...DEFAULT_PHYSICS_CONFIG },
+      nsfwAnatomyConfig: {
+        enabled: false,
+        detailed: false,
+        maleOptions: {},
+        femaleOptions: {},
+      },
+      advancedMaterialSettings: {},
       createdAt: new Date(),
       updatedAt: new Date(),
     };
