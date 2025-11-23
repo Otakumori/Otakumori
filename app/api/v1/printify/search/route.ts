@@ -42,22 +42,9 @@ function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.P
           visible: true, // Only require visible when publishedOnly filter is explicitly enabled
         }
       : {}),
-    // Exclude placeholder products - allow products with either primaryImageUrl OR ProductImage
-    // We'll filter out products without images in the serialization step instead
-    // Exclude products with placeholder in image URL or test/draft titles
+    // Exclude placeholder products - we'll filter these in serialization step
+    // Only exclude obvious test/draft products by name or integrationRef
     NOT: [
-      {
-        primaryImageUrl: {
-          contains: 'placeholder',
-          mode: 'insensitive',
-        },
-      },
-      {
-        primaryImageUrl: {
-          contains: 'seed:',
-          mode: 'insensitive',
-        },
-      },
       {
         integrationRef: {
           startsWith: 'seed:',
