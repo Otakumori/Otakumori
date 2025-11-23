@@ -141,17 +141,25 @@ export default function ShopTeaser() {
                     {(product as any).visible !== undefined && (
                       <div
                         className={`text-xs px-2 py-1 rounded-lg font-medium ${
-                          (product as any).visible && (product as any).active
-                            ? 'bg-green-500/80 text-white'
-                            : 'bg-yellow-500/80 text-white'
+                          (product as any).isLocked
+                            ? 'bg-blue-500/80 text-white'
+                            : (product as any).visible && (product as any).active
+                              ? 'bg-green-500/80 text-white'
+                              : 'bg-yellow-500/80 text-white'
                         }`}
                         title={
-                          (product as any).visible && (product as any).active
-                            ? 'Published'
-                            : 'Unpublished'
+                          (product as any).isLocked
+                            ? 'Publishing'
+                            : (product as any).visible && (product as any).active
+                              ? 'Published'
+                              : 'Unpublished'
                         }
                       >
-                        {(product as any).visible && (product as any).active ? '✓' : '⚠'}
+                        {(product as any).isLocked
+                          ? '⏳'
+                          : (product as any).visible && (product as any).active
+                            ? '✓'
+                            : '⚠'}
                       </div>
                     )}
                   </div>

@@ -123,6 +123,7 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
       available: dto.available,
       visible: dto.visible ?? true,
       active: dto.active ?? true,
+      isLocked: dto.isLocked ?? false,
       category: dto.category ?? undefined,
       slug: dto.slug,
       integrationRef: dto.integrationRef,
@@ -188,6 +189,7 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
       available: (defaultVariant?.is_enabled ?? false) && product.visible,
       visible: product.visible ?? true,
       active: product.visible ?? true, // In Printify, visible means published/active
+      isLocked: product.is_locked ?? false, // Track Printify "Publishing" status
       category: product.tags?.[0],
       slug: undefined,
       integrationRef: product.id,

@@ -303,19 +303,27 @@ export default function ProductClient({ productId }: { productId: string }) {
                 {product.visible !== undefined && (
                   <div
                     className={`text-sm px-3 py-1.5 rounded-lg font-medium ${
-                      product.visible && product.active
-                        ? 'bg-green-500/80 text-white'
-                        : 'bg-yellow-500/80 text-white'
+                      product.isLocked
+                        ? 'bg-blue-500/80 text-white'
+                        : product.visible && product.active
+                          ? 'bg-green-500/80 text-white'
+                          : 'bg-yellow-500/80 text-white'
                     }`}
                     title={
-                      product.visible && product.active
-                        ? 'Published - Visible to customers'
-                        : !product.visible
-                          ? 'Unpublished - Hidden from customers'
-                          : 'Inactive - Not available'
+                      product.isLocked
+                        ? 'Publishing - Locked for publishing in Printify'
+                        : product.visible && product.active
+                          ? 'Published - Visible to customers'
+                          : !product.visible
+                            ? 'Unpublished - Hidden from customers'
+                            : 'Inactive - Not available'
                     }
                   >
-                    {product.visible && product.active ? '✓ Published' : '⚠ Unpublished'}
+                    {product.isLocked
+                      ? '⏳ Publishing'
+                      : product.visible && product.active
+                        ? '✓ Published'
+                        : '⚠ Unpublished'}
                   </div>
                 )}
               </div>

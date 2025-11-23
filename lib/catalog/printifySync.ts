@@ -71,6 +71,7 @@ async function syncProductRecord(
     safetyInformation: product.safety_information ?? null,
     salesChannelProperties: product.sales_channel_properties ?? null,
     views: product.views ?? null,
+    is_locked: product.is_locked ?? false, // Track Printify "Publishing" status
   };
 
   const upserted = await tx.product.upsert({

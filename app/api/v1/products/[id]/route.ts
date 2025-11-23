@@ -117,6 +117,7 @@ function mapPrintifyProductToCatalog(product: PrintifyProduct): CatalogProduct {
     printProviderId: product.print_provider_id ?? null,
     visible: product.visible ?? true,
     active: product.visible ?? true, // In Printify, visible means published/active
+    isLocked: product.is_locked ?? false, // Track Printify "Publishing" status
     lastSyncedAt: null,
   };
 }

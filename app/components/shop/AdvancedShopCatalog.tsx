@@ -71,19 +71,27 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
             {product.visible !== undefined && (
               <div
                 className={`text-xs px-2 py-1 rounded-lg font-medium ${
-                  product.visible && product.active
-                    ? 'bg-green-500/80 text-white'
-                    : 'bg-yellow-500/80 text-white'
+                  product.isLocked
+                    ? 'bg-blue-500/80 text-white'
+                    : product.visible && product.active
+                      ? 'bg-green-500/80 text-white'
+                      : 'bg-yellow-500/80 text-white'
                 }`}
                 title={
-                  product.visible && product.active
-                    ? 'Published - Visible to customers'
-                    : !product.visible
-                      ? 'Unpublished - Hidden from customers'
-                      : 'Inactive - Not available'
+                  product.isLocked
+                    ? 'Publishing - Locked for publishing in Printify'
+                    : product.visible && product.active
+                      ? 'Published - Visible to customers'
+                      : !product.visible
+                        ? 'Unpublished - Hidden from customers'
+                        : 'Inactive - Not available'
                 }
               >
-                {product.visible && product.active ? '✓ Published' : '⚠ Unpublished'}
+                {product.isLocked
+                  ? '⏳ Publishing'
+                  : product.visible && product.active
+                    ? '✓ Published'
+                    : '⚠ Unpublished'}
               </div>
             )}
           </div>
@@ -99,19 +107,27 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
             {product.visible !== undefined && (
               <div
                 className={`text-xs px-2 py-1 rounded-lg font-medium ${
-                  product.visible && product.active
-                    ? 'bg-green-500/80 text-white'
-                    : 'bg-yellow-500/80 text-white'
+                  product.isLocked
+                    ? 'bg-blue-500/80 text-white'
+                    : product.visible && product.active
+                      ? 'bg-green-500/80 text-white'
+                      : 'bg-yellow-500/80 text-white'
                 }`}
                 title={
-                  product.visible && product.active
-                    ? 'Published - Visible to customers'
-                    : !product.visible
-                      ? 'Unpublished - Hidden from customers'
-                      : 'Inactive - Not available'
+                  product.isLocked
+                    ? 'Publishing - Locked for publishing in Printify'
+                    : product.visible && product.active
+                      ? 'Published - Visible to customers'
+                      : !product.visible
+                        ? 'Unpublished - Hidden from customers'
+                        : 'Inactive - Not available'
                 }
               >
-                {product.visible && product.active ? '✓ Published' : '⚠ Unpublished'}
+                {product.isLocked
+                  ? '⏳ Publishing'
+                  : product.visible && product.active
+                    ? '✓ Published'
+                    : '⚠ Unpublished'}
               </div>
             )}
           </div>
@@ -646,12 +662,16 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                 {filters.category && <p className="text-zinc-400 text-sm">in {filters.category}</p>}
                 {/* Published status summary */}
                 {products.length > 0 && (
-                  <div className="flex items-center gap-3 mt-2 text-sm">
-                    <span className="text-zinc-400">
-                      {products.filter((p) => p.visible && p.active).length} published
+                  <div className="flex items-center gap-3 mt-2 text-sm flex-wrap">
+                    <span className="text-green-400">
+                      {products.filter((p) => p.visible && p.active && !p.isLocked).length} published
                     </span>
                     <span className="text-zinc-500">•</span>
-                    <span className="text-zinc-400">
+                    <span className="text-blue-400">
+                      {products.filter((p) => p.isLocked).length} publishing
+                    </span>
+                    <span className="text-zinc-500">•</span>
+                    <span className="text-yellow-400">
                       {products.filter((p) => !p.visible || !p.active).length} unpublished
                     </span>
                   </div>

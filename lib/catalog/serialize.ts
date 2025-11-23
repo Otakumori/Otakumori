@@ -28,6 +28,7 @@ export interface CatalogProduct {
   available: boolean;
   visible: boolean;
   active: boolean;
+  isLocked?: boolean; // Printify "Publishing" status
   variants: Array<{
     id: string;
     title: string | null;
@@ -94,6 +95,10 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
   const priceRange = computePriceRange(product.ProductVariant);
   const slugSource = product.printifyProductId ?? product.id;
 
+  // Extract is_locked from specs JSON if it exists
+  const specs = (product.specs as any) ?? {};
+  const isLocked = specs.is_locked ?? false;
+
   return {
     id: product.id,
     title: product.name,
@@ -110,6 +115,7 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
     available: product.ProductVariant.some((variant) => variant.isEnabled && variant.inStock),
     visible: product.visible ?? true,
     active: product.active ?? true,
+    isLocked,
     variants: product.ProductVariant.map((variant) => ({
       id: variant.id,
       title: variant.title ?? null,

@@ -41,6 +41,11 @@ async function syncPrintify() {
 
       // Use printifyProductId as unique identifier for upsert, generate separate DB ID
       // This prevents duplicates when syncing the same Printify product multiple times
+      const isLocked = printifyProduct.is_locked ?? false;
+      const specs = {
+        is_locked: isLocked, // Track Printify "Publishing" status
+      };
+      
       const dbProduct = await db.product.upsert({
         where: { printifyProductId },
         update: {
@@ -49,6 +54,8 @@ async function syncPrintify() {
           category: `${mapCategory(printifyProduct)}:${subcategory}`, // Combine category and subcategory
           primaryImageUrl: imageUrl,
           active: visible,
+          visible: printifyProduct.visible ?? visible,
+          specs,
           printifyProductId,
         },
         create: {
@@ -58,6 +65,8 @@ async function syncPrintify() {
           category: `${mapCategory(printifyProduct)}:${subcategory}`, // Combine category and subcategory
           primaryImageUrl: imageUrl,
           active: visible,
+          visible: printifyProduct.visible ?? visible,
+          specs,
           printifyProductId,
         },
         select: {
