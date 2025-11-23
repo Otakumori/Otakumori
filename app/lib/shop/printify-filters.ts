@@ -22,14 +22,9 @@ export interface PrintifyProductLike {
  */
 function isTestOrDraftProduct(title: string): boolean {
     const lowerTitle = title.toLowerCase().trim();
-    const testIndicators = [
-        'test',
-        'draft',
-        'placeholder',
-        'sample',
-        'example',
-        'temp',
-        'temporary',
+    // Only filter if title explicitly starts with test indicators or is exactly these values
+    // Don't filter products that contain these words naturally (e.g., "Test Shirt" could be a real product)
+    const exactTestIndicators = [
         '[test]',
         '[draft]',
         '[placeholder]',
@@ -37,8 +32,18 @@ function isTestOrDraftProduct(title: string): boolean {
         'new product',
         'product name',
     ];
-
-    return testIndicators.some((indicator) => lowerTitle.includes(indicator));
+    
+    // Check for exact matches at start
+    if (exactTestIndicators.some((indicator) => lowerTitle.startsWith(indicator))) {
+        return true;
+    }
+    
+    // Only filter if title is exactly "test", "draft", "placeholder", etc. (very short titles)
+    if (lowerTitle.length < 10 && ['test', 'draft', 'placeholder', 'sample', 'example', 'temp'].includes(lowerTitle)) {
+        return true;
+    }
+    
+    return false;
 }
 
 /**

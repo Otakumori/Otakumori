@@ -12,7 +12,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { type Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
-import { serializeProduct } from '@/lib/catalog/serialize';
+import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
 
 export const runtime = 'nodejs';
@@ -165,22 +165,22 @@ export async function GET(request: NextRequest) {
   try {
     const limit = params.limit ?? 20;
     const page = params.page ?? 1;
-    const skip = (page - 1) * limit;
 
     const where = buildProductWhere(params);
     const orderBy = buildOrderBy(params);
 
-    const [total, products, priceAggregate, categories] = await Promise.all([
-      db.product.count({ where }),
+    // Get ALL products first (or a large batch), then filter and paginate
+    // This ensures accurate counts after filtering/deduplication
+    const [allProducts, priceAggregate, categories] = await Promise.all([
       db.product.findMany({
         where,
         include: {
           ProductVariant: true,
           ProductImage: true,
         },
-        skip,
-        take: limit,
         orderBy,
+        // Get more products to account for filtering/deduplication
+        take: 500, // Reasonable limit for filtering
       }),
       db.productVariant.aggregate({
         _min: { priceCents: true },
@@ -204,16 +204,20 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    const totalPages = Math.max(1, Math.ceil(total / limit));
-    let serialized = products.map(serializeProduct);
+    let serialized = allProducts.map(serializeProduct);
 
     // Filter out invalid/placeholder products - check image and integrationRef
-    serialized = serialized.filter((product) => {
+    // Only filter obvious placeholders, not products that might have "test" or "draft" in their actual name
+    serialized = serialized.filter((product: CatalogProduct) => {
       const imageUrl = product.image ?? product.images?.[0];
       if (!imageUrl || imageUrl.trim() === '') return false;
       if (typeof imageUrl === 'string' && (imageUrl.includes('placeholder') || imageUrl.includes('seed:'))) return false;
       if (product.integrationRef?.startsWith('seed:')) return false;
-      if (product.title && (product.title.toLowerCase().includes('[test]') || product.title.toLowerCase().includes('[draft]'))) return false;
+      // Only filter if title explicitly starts with [test] or [draft] - not if it contains the word
+      const lowerTitle = product.title?.toLowerCase() || '';
+      if (lowerTitle.startsWith('[test]') || lowerTitle.startsWith('[draft]') || lowerTitle.startsWith('[placeholder]')) {
+        return false;
+      }
       return true;
     });
 
@@ -224,21 +228,27 @@ export async function GET(request: NextRequest) {
     });
 
     if (params.sortBy === 'price') {
-      serialized = serialized.sort((a, b) => {
+      serialized = serialized.sort((a: CatalogProduct, b: CatalogProduct) => {
         const aPrice = a.priceRange.min ?? a.priceCents ?? Number.MAX_SAFE_INTEGER;
         const bPrice = b.priceRange.min ?? b.priceCents ?? Number.MAX_SAFE_INTEGER;
         return (params.sortOrder === 'asc' ? 1 : -1) * (aPrice - bPrice);
       });
     }
 
+    // Now paginate from the filtered/deduplicated results
+    const total = serialized.length;
+    const skip = (page - 1) * limit;
+    const paginatedProducts = serialized.slice(skip, skip + limit);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
     return NextResponse.json({
       ok: true,
       data: {
-        products: serialized,
+        products: paginatedProducts,
         pagination: {
           page,
           totalPages,
-          total,
+          total, // Total after filtering and deduplication
           limit,
         },
         filters: {
