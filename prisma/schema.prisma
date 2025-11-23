@@ -177,6 +177,7 @@ model CharacterPreset {
   meshData            Json
   textureData         Json
   colorPalette        Json
+  configData          Json?                 // Full AvatarConfiguration JSON
   rarity              String                @default("common")
   unlockCondition     Json?
   isDefault           Boolean               @default(false)

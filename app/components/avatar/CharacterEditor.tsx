@@ -16,6 +16,8 @@ interface CharacterEditorProps {
   initialConfiguration?: AvatarConfiguration;
   onConfigurationChange?: (config: AvatarConfiguration) => void;
   onSave?: (config: AvatarConfiguration) => void;
+  onUseInGame?: (config: AvatarConfiguration) => void;
+  isGuest?: boolean;
   className?: string;
 }
 
@@ -392,6 +394,8 @@ export default function CharacterEditor({
   initialConfiguration,
   onConfigurationChange,
   onSave,
+  onUseInGame,
+  isGuest = false,
   className = '',
 }: CharacterEditorProps) {
   const [configuration, setConfiguration] = useState<AvatarConfiguration>(() => {
@@ -921,6 +925,121 @@ export default function CharacterEditor({
           {/* Tab Content */}
           {activeTab === 'parts' && (
             <div id="panel-parts" role="tabpanel" aria-labelledby="tab-parts" className="space-y-4">
+              {/* 90s Anime Presets */}
+              <CustomizationPanel title="90s Anime Presets" collapsible defaultCollapsed={false}>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    {
+                      id: 'sailor-moon',
+                      name: 'Sailor Moon',
+                      description: 'Magical girl style',
+                      config: {
+                        baseModel: 'female' as const,
+                        parts: {
+                          hair: 'hair_twin_tails',
+                          clothing: 'clothing_sailor_uniform',
+                        },
+                        morphTargets: {
+                          eyeSize: 1.5,
+                          eyeShape: 1.0,
+                          cheekbones: 0.7,
+                        },
+                        materialOverrides: {
+                          hair: { slot: 'hair', type: 'color' as const, value: '#FFD700' },
+                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#4169E1' },
+                        },
+                      },
+                    },
+                    {
+                      id: 'sakura-kinomoto',
+                      name: 'Sakura',
+                      description: 'Cardcaptor style',
+                      config: {
+                        baseModel: 'female' as const,
+                        parts: {
+                          hair: 'hair_short_bob',
+                          clothing: 'clothing_school_uniform',
+                        },
+                        morphTargets: {
+                          eyeSize: 1.4,
+                          eyeShape: 0.9,
+                          cheekbones: 0.6,
+                        },
+                        materialOverrides: {
+                          hair: { slot: 'hair', type: 'color' as const, value: '#8B4513' },
+                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#FF69B4' },
+                        },
+                      },
+                    },
+                    {
+                      id: 'anime-warrior',
+                      name: 'Anime Warrior',
+                      description: 'Fierce fighter',
+                      config: {
+                        baseModel: 'female' as const,
+                        parts: {
+                          hair: 'hair_long_pink',
+                          clothing: 'clothing_samurai',
+                        },
+                        morphTargets: {
+                          eyeSize: 1.3,
+                          eyeShape: 0.8,
+                          cheekbones: 0.5,
+                        },
+                        materialOverrides: {
+                          hair: { slot: 'hair', type: 'color' as const, value: '#FF69B4' },
+                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#8B0000' },
+                        },
+                      },
+                    },
+                    {
+                      id: 'cute-idol',
+                      name: 'Cute Idol',
+                      description: 'Pop star style',
+                      config: {
+                        baseModel: 'female' as const,
+                        parts: {
+                          hair: 'hair_long_flowing',
+                          clothing: 'clothing_dance_outfit',
+                        },
+                        morphTargets: {
+                          eyeSize: 1.6,
+                          eyeShape: 1.0,
+                          cheekbones: 0.8,
+                        },
+                        materialOverrides: {
+                          hair: { slot: 'hair', type: 'color' as const, value: '#FF1493' },
+                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#9370DB' },
+                        },
+                      },
+                    },
+                  ].map((preset) => (
+                    <button
+                      key={preset.id}
+                      onClick={() => {
+                        const newConfig = {
+                          ...configuration,
+                          ...preset.config,
+                          parts: { ...configuration.parts, ...preset.config.parts },
+                          morphTargets: { ...configuration.morphTargets, ...preset.config.morphTargets },
+                          materialOverrides: {
+                            ...configuration.materialOverrides,
+                            ...preset.config.materialOverrides,
+                          },
+                        };
+                        setConfiguration(newConfig);
+                        setIsDirty(true);
+                        onConfigurationChange?.(newConfig);
+                      }}
+                      className="p-3 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 text-left transition-colors"
+                    >
+                      <div className="text-sm font-medium text-white">{preset.name}</div>
+                      <div className="text-xs text-white/60 mt-1">{preset.description}</div>
+                    </button>
+                  ))}
+                </div>
+              </CustomizationPanel>
+
               <CustomizationPanel title="Base Model">
                 <div className="space-y-2">
                   {(['male', 'female'] as const).map((model) => (
@@ -1458,11 +1577,19 @@ export default function CharacterEditor({
 
           {/* Action Buttons */}
           <div className="mt-6 space-y-3">
+            {onUseInGame && (
+              <button
+                onClick={() => onUseInGame(configuration)}
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+              >
+                🎮 Use in Game
+              </button>
+            )}
             <button
               onClick={handleSave}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
             >
-              {isDirty ? 'ðŸ’¾ Save Character*' : 'ðŸ’¾ Save Character'}
+              {isDirty ? '💾 Save Character*' : isGuest ? '💾 Save Temporarily' : '💾 Save Character'}
             </button>
             <button
               onClick={() => {
@@ -1475,7 +1602,7 @@ export default function CharacterEditor({
               }}
               className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-4 rounded-lg transition-colors border border-white/20"
             >
-              ðŸ”„ Reset to Default
+              🔄 Reset to Default
             </button>
           </div>
         </div>

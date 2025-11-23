@@ -15,6 +15,8 @@ import { useCreatorAvatar } from './useCreatorAvatar';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import { OmButton, OmPanel, OmPanelContent } from '@/app/components/ui/om';
+import { getAllGuestCharacters, getMostRecentGuestCharacter } from '@/app/lib/avatar/guest-storage';
+import { avatarConfigToProfile } from './characterConverter';
 
 /**
  * Save guest avatar to localStorage
@@ -43,6 +45,7 @@ export interface AvatarPresetChoiceProps {
  */
 export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetChoiceProps) {
   const [guestAvatar, setGuestAvatar] = useState<AvatarProfile | null>(null);
+  const [guestCharacters, setGuestCharacters] = useState<Array<{ id: string; name: string; config: AvatarConfiguration }>>([]);
 
   const avatarsEnabled = isAvatarsEnabled();
   const avatarUsage = getGameAvatarUsage(gameId);
@@ -55,11 +58,23 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
     isLoading: creatorLoading,
   } = useCreatorAvatar(avatarsEnabled);
 
-  // Load guest avatar on mount
+  // Load guest characters on mount
   useEffect(() => {
     if (avatarsEnabled) {
-      const loaded = loadGuestAvatar();
-      setGuestAvatar(loaded);
+      // Try loading from new guest storage system first
+      const guestChars = getAllGuestCharacters();
+      if (guestChars.length > 0) {
+        setGuestCharacters(guestChars);
+        const recent = getMostRecentGuestCharacter();
+        if (recent) {
+          const profile = avatarConfigToProfile(recent.config);
+          setGuestAvatar(profile);
+        }
+      } else {
+        // Fallback to old guest avatar format
+        const loaded = loadGuestAvatar();
+        setGuestAvatar(loaded);
+      }
     }
   }, [avatarsEnabled]);
 
@@ -76,8 +91,14 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
   const handlePlayWithCreator = () => {
     if (avatarConfig) {
       onChoice('creator', avatarConfig);
+    } else if (guestCharacters.length > 0) {
+      // Use most recent guest character
+      const recent = getMostRecentGuestCharacter();
+      if (recent) {
+        onChoice('creator', recent.config);
+      }
     } else if (guestAvatar) {
-      // Fallback to guest avatar if CREATOR avatar not available
+      // Fallback to old guest avatar format
       onChoice('creator', guestAvatar);
     }
   };
@@ -87,24 +108,8 @@ export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetC
   };
 
   const handleCreateTempAvatar = () => {
-    // Create a simple temporary avatar
-    const tempAvatar: AvatarProfile = {
-      id: 'temp-' + Date.now(),
-      head: 'head_default',
-      torso: 'torso_default',
-      legs: 'legs_default',
-      colorPalette: {
-        skin: '#ffdbac',
-        hair: '#3d2817',
-        eyes: '#4a5568',
-        outfit: '#666666',
-        accent: '#ff69b4',
-      },
-    };
-
-    saveGuestAvatar(tempAvatar);
-    setGuestAvatar(tempAvatar);
-    onChoice('creator', tempAvatar);
+    // Navigate to character editor to create a character
+    window.location.href = '/character-editor';
   };
 
   return (
