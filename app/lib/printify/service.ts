@@ -305,6 +305,39 @@ export class PrintifyService {
     });
   }
 
+  /**
+   * Mark product publishing as succeeded - unlocks the product
+   * Call this after successfully adding a product to your store
+   */
+  async publishingSucceeded(productId: string): Promise<{ success: boolean }> {
+    return this.makeRequest<{ success: boolean }>(
+      `/shops/${this.shopId}/products/${productId}/publishing_succeeded.json`,
+      {
+        method: 'POST',
+      },
+    );
+  }
+
+  /**
+   * Mark product publishing as failed - unlocks the product with failure status
+   * Call this if adding a product to your store failed
+   */
+  async publishingFailed(productId: string, reason?: string): Promise<{ success: boolean }> {
+    return this.makeRequest<{ success: boolean }>(
+      `/shops/${this.shopId}/products/${productId}/publishing_failed.json`,
+      {
+        method: 'POST',
+        body: reason ? JSON.stringify({ reason }) : undefined,
+      },
+    );
+  }
+
+  async publishProductOld(productId: string): Promise<{ status: string } | any> {
+    return this.makeRequest(`/shops/${this.shopId}/products/${productId}/publish.json`, {
+      method: 'POST',
+    });
+  }
+
   async createOrder(orderData: PrintifyOrderData): Promise<{ id: string; status: string }> {
     try {
       const { logger } = await import('@/app/lib/logger');

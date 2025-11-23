@@ -2,7 +2,7 @@
 // app/api/admin/printify-sync/route.ts  (admin-only)
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { db } from '@/lib/db';
-import { printifyService } from '@/app/lib/printify/client';
+import { getPrintifyService } from '@/app/lib/printify/service';
 import { randomUUID } from 'crypto';
 import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 
@@ -16,6 +16,7 @@ export async function POST() {
 
 async function syncPrintify() {
   try {
+    const printifyService = getPrintifyService();
     // Get products from Printify (returns array directly from client)
     const allProducts = await printifyService.getProducts();
     console.warn(`Sync retrieved ${Array.isArray(allProducts) ? allProducts.length : 0} products from Printify`);
@@ -23,6 +24,9 @@ async function syncPrintify() {
     // Filter out invalid/placeholder products before syncing
     const products = Array.isArray(allProducts) ? filterValidPrintifyProducts(allProducts) : [];
     console.warn(`After filtering: ${products.length} valid products to sync`);
+
+    let unlockedCount = 0;
+    const unlockErrors: string[] = [];
 
     for (const product of products) {
       // Type assertion - we know these are PrintifyProduct after filtering
@@ -100,12 +104,27 @@ async function syncPrintify() {
           },
         });
       }
+
+      // If product was locked (Publishing status), unlock it after successful sync
+      if (isLocked) {
+        try {
+          await printifyService.publishingSucceeded(printifyProductId);
+          unlockedCount++;
+          console.warn(`Unlocked product ${printifyProductId} (${printifyProduct.title})`);
+        } catch (unlockError) {
+          const errorMsg = `Failed to unlock product ${printifyProductId}: ${String(unlockError)}`;
+          console.error(errorMsg);
+          unlockErrors.push(errorMsg);
+        }
+      }
     }
 
     return {
       upserted: 0, // result.upserted,
       hidden: 0, // result.hidden,
       count: products.length, // result.count,
+      unlocked: unlockedCount,
+      unlockErrors,
       errors: [], // result.errors,
     };
   } catch (error) {
