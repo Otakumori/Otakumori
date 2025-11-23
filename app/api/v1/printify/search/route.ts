@@ -14,7 +14,6 @@ import { type Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import { serializeProduct } from '@/lib/catalog/serialize';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
-import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 
 export const runtime = 'nodejs';
 
