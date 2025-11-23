@@ -121,6 +121,8 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
         previewImageUrl: variant.previewImageUrl,
       })),
       available: dto.available,
+      visible: dto.visible ?? true,
+      active: dto.active ?? true,
       category: dto.category ?? undefined,
       slug: dto.slug,
       integrationRef: dto.integrationRef,
@@ -184,6 +186,8 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
           previewImageUrl: defaultImage?.src ?? null,
         })) ?? [],
       available: (defaultVariant?.is_enabled ?? false) && product.visible,
+      visible: product.visible ?? true,
+      active: product.visible ?? true, // In Printify, visible means published/active
       category: product.tags?.[0],
       slug: undefined,
       integrationRef: product.id,

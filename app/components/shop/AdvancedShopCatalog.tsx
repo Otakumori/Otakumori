@@ -62,19 +62,59 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
             sizes="(max-width:768px) 100vw, (max-width:1024px) 50vw, 33vw"
             loading="lazy"
           />
-          {!product.available && (
-            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
-              Out of Stock
-            </div>
-          )}
+          <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+            {!product.available && (
+              <div className="bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
+                Out of Stock
+              </div>
+            )}
+            {product.visible !== undefined && (
+              <div
+                className={`text-xs px-2 py-1 rounded-lg font-medium ${
+                  product.visible && product.active
+                    ? 'bg-green-500/80 text-white'
+                    : 'bg-yellow-500/80 text-white'
+                }`}
+                title={
+                  product.visible && product.active
+                    ? 'Published - Visible to customers'
+                    : !product.visible
+                      ? 'Unpublished - Hidden from customers'
+                      : 'Inactive - Not available'
+                }
+              >
+                {product.visible && product.active ? '✓ Published' : '⚠ Unpublished'}
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="relative aspect-square bg-white/5 overflow-hidden flex items-center justify-center">
-          {!product.available && (
-            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg z-10">
-              Out of Stock
-            </div>
-          )}
+          <div className="absolute top-2 right-2 flex flex-col gap-1 items-end z-10">
+            {!product.available && (
+              <div className="bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
+                Out of Stock
+              </div>
+            )}
+            {product.visible !== undefined && (
+              <div
+                className={`text-xs px-2 py-1 rounded-lg font-medium ${
+                  product.visible && product.active
+                    ? 'bg-green-500/80 text-white'
+                    : 'bg-yellow-500/80 text-white'
+                }`}
+                title={
+                  product.visible && product.active
+                    ? 'Published - Visible to customers'
+                    : !product.visible
+                      ? 'Unpublished - Hidden from customers'
+                      : 'Inactive - Not available'
+                }
+              >
+                {product.visible && product.active ? '✓ Published' : '⚠ Unpublished'}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -263,6 +303,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
       minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
       maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
       inStock: searchParams.inStock === 'true',
+      publishedOnly: searchParams.publishedOnly === 'true',
       sortBy: (searchParams.sortBy as string) || 'relevance',
       sortOrder: (searchParams.sortOrder as string) || 'desc',
       page: Number(searchParams.page) || 1,
@@ -307,6 +348,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         if (filters.minPrice !== undefined) params.append('minPrice', filters.minPrice.toString());
         if (filters.maxPrice !== undefined) params.append('maxPrice', filters.maxPrice.toString());
         if (filters.inStock) params.append('inStock', 'true');
+        if (filters.publishedOnly) params.append('publishedOnly', 'true');
         params.append('sortBy', filters.sortBy);
         params.append('sortOrder', filters.sortOrder);
         params.append('page', filters.page.toString());
@@ -582,6 +624,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                     minPrice: undefined,
                     maxPrice: undefined,
                     inStock: false,
+                    publishedOnly: false,
                   })
                 }
                 className="w-full bg-red-500/20 hover:bg-red-500/30 text-red-300 px-4 py-2 rounded-xl transition-colors text-sm"
@@ -601,6 +644,18 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                   {filters.q && <span className="text-zinc-300"> for "{filters.q}"</span>}
                 </p>
                 {filters.category && <p className="text-zinc-400 text-sm">in {filters.category}</p>}
+                {/* Published status summary */}
+                {products.length > 0 && (
+                  <div className="flex items-center gap-3 mt-2 text-sm">
+                    <span className="text-zinc-400">
+                      {products.filter((p) => p.visible && p.active).length} published
+                    </span>
+                    <span className="text-zinc-500">•</span>
+                    <span className="text-zinc-400">
+                      {products.filter((p) => !p.visible || !p.active).length} unpublished
+                    </span>
+                  </div>
+                )}
               </div>
 
               <ProductSort
@@ -615,13 +670,23 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
             {/* Products Grid */}
             {products.filter((product) => {
               const imageUrl = product.image ?? product.images?.[0];
-              return imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('seed:') && imageUrl.trim() !== '';
+              const hasValidImage = imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('seed:') && imageUrl.trim() !== '';
+              // If publishedOnly filter is on, also filter by visible/active
+              if (filters.publishedOnly && hasValidImage) {
+                return product.visible !== false && product.active !== false;
+              }
+              return hasValidImage;
             }).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
                 {products
                   .filter((product) => {
                     const imageUrl = product.image ?? product.images?.[0];
-                    return imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('seed:') && imageUrl.trim() !== '';
+                    const hasValidImage = imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('seed:') && imageUrl.trim() !== '';
+                    // If publishedOnly filter is on, also filter by visible/active
+                    if (filters.publishedOnly && hasValidImage) {
+                      return product.visible !== false && product.active !== false;
+                    }
+                    return hasValidImage;
                   })
                   .map((product) => (
                     <CatalogProductCard key={product.id} product={product} />
@@ -642,6 +707,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                         minPrice: undefined,
                         maxPrice: undefined,
                         inStock: false,
+                        publishedOnly: false,
                       })
                     }
                     className="bg-primary/20 hover:bg-primary/30 text-text-link-hover px-6 py-3 rounded-xl transition-colors"

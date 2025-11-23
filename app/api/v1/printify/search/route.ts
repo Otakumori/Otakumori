@@ -25,6 +25,7 @@ const SearchParamsSchema = z.object({
   colors: z.string().optional(), // comma-separated (future use)
   sizes: z.string().optional(), // comma-separated (future use)
   inStock: z.enum(['true', 'false']).optional(),
+  publishedOnly: z.enum(['true', 'false']).optional(),
   sortBy: z.enum(['title', 'price', 'created_at', 'relevance']).optional(),
   sortOrder: z.enum(['asc', 'desc']).optional(),
   page: z.coerce.number().min(1).optional(),
@@ -33,8 +34,13 @@ const SearchParamsSchema = z.object({
 
 function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {
-    active: true,
-    visible: true,
+    // Only filter by active/visible if publishedOnly is true, otherwise show all
+    ...(params.publishedOnly === 'true'
+      ? {
+          active: true,
+          visible: true,
+        }
+      : {}),
     // Exclude placeholder products
     primaryImageUrl: {
       not: null,

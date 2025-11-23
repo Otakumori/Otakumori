@@ -130,12 +130,31 @@ export default function ShopTeaser() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   />
 
-                  {/* Stock status badge */}
-                  {!product.available && (
-                    <div className="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
-                      Out of Stock
-                    </div>
-                  )}
+                  {/* Status badges */}
+                  <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                    {!product.available && (
+                      <div className="bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
+                        Out of Stock
+                      </div>
+                    )}
+                    {/* Published status - show if we have the data */}
+                    {(product as any).visible !== undefined && (
+                      <div
+                        className={`text-xs px-2 py-1 rounded-lg font-medium ${
+                          (product as any).visible && (product as any).active
+                            ? 'bg-green-500/80 text-white'
+                            : 'bg-yellow-500/80 text-white'
+                        }`}
+                        title={
+                          (product as any).visible && (product as any).active
+                            ? 'Published'
+                            : 'Unpublished'
+                        }
+                      >
+                        {(product as any).visible && (product as any).active ? '✓' : '⚠'}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <h3 className="text-white font-semibold mb-2 line-clamp-2">{product.title}</h3>

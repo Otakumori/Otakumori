@@ -26,6 +26,8 @@ export interface CatalogProduct {
   priceCents: number | null;
   priceRange: { min: number | null; max: number | null };
   available: boolean;
+  visible: boolean;
+  active: boolean;
   variants: Array<{
     id: string;
     title: string | null;
@@ -106,6 +108,8 @@ export function serializeProduct(product: ProductWithRelations): CatalogProduct 
     priceCents: priceRange.min,
     priceRange,
     available: product.ProductVariant.some((variant) => variant.isEnabled && variant.inStock),
+    visible: product.visible ?? true,
+    active: product.active ?? true,
     variants: product.ProductVariant.map((variant) => ({
       id: variant.id,
       title: variant.title ?? null,

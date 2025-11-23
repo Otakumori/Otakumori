@@ -115,6 +115,8 @@ function mapPrintifyProductToCatalog(product: PrintifyProduct): CatalogProduct {
     printifyProductId: String(product.id),
     blueprintId: product.blueprint_id ?? null,
     printProviderId: product.print_provider_id ?? null,
+    visible: product.visible ?? true,
+    active: product.visible ?? true, // In Printify, visible means published/active
     lastSyncedAt: null,
   };
 }

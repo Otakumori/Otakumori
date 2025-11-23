@@ -297,7 +297,28 @@ export default function ProductClient({ productId }: { productId: string }) {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-4xl font-bold text-pink-200 mb-4">{product.title}</h1>
+              <div className="flex items-start justify-between mb-4">
+                <h1 className="text-4xl font-bold text-pink-200">{product.title}</h1>
+                {/* Published status badge */}
+                {product.visible !== undefined && (
+                  <div
+                    className={`text-sm px-3 py-1.5 rounded-lg font-medium ${
+                      product.visible && product.active
+                        ? 'bg-green-500/80 text-white'
+                        : 'bg-yellow-500/80 text-white'
+                    }`}
+                    title={
+                      product.visible && product.active
+                        ? 'Published - Visible to customers'
+                        : !product.visible
+                          ? 'Unpublished - Hidden from customers'
+                          : 'Inactive - Not available'
+                    }
+                  >
+                    {product.visible && product.active ? '✓ Published' : '⚠ Unpublished'}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center gap-4 mb-6">
                 <p className="text-3xl font-bold text-pink-400">
                   {currency === 'USD' ? '$' : currency}
