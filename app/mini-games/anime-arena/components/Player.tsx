@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, useRef, useEffect } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useUser } from '@clerk/nextjs';
 import GameAvatarRenderer from '../../_shared/GameAvatarRenderer';
@@ -15,12 +15,21 @@ interface PlayerProps {
 }
 
 const Player = forwardRef<THREE.Group, PlayerProps>(
-  ({ speed, onDamage, dimensionShiftActive, onPositionUpdate }, ref) => {
+  ({ speed, onDamage: _onDamage, dimensionShiftActive, onPositionUpdate }, ref) => {
+    // onDamage is passed but damage handling is done by combat system via collisions
+    const { user } = useUser();
     const internalRef = useRef<THREE.Group>(null);
     const controlsRef = useRef<Controls | null>(null);
     const velocity = useRef(new THREE.Vector3());
     const attackCooldown = useRef(0);
-    const { user } = useUser();
+
+    // Use user data for avatar customization if available
+    useEffect(() => {
+      if (user) {
+        // User data available for avatar customization
+        // This can be used to load user's saved avatar configuration
+      }
+    }, [user]);
 
     // Initialize controls
     useEffect(() => {

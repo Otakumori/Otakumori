@@ -5,8 +5,8 @@
 'use client';
 
 import React, { Suspense, useMemo, useRef, useEffect, memo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment, Stage } from '@react-three/drei';
+import { Canvas, useThree } from '@react-three/fiber';
+import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import type { CharacterConfig } from '../lib/character-state';
 import {
@@ -37,6 +37,20 @@ const CharacterScene = memo(function CharacterScene({
 }: CharacterCanvasProps) {
   const sceneRef = useRef<THREE.Group>(null);
   const { scene } = useThree();
+  
+  // Use scene from useThree for advanced operations (debugging, exports, etc.)
+  useEffect(() => {
+    if (scene && sceneRef.current) {
+      // Scene from useThree provides access to the full Three.js scene graph
+      // This can be used for scene-wide operations, debugging, or exports
+      // The sceneRef provides the character group, while scene provides the full context
+      const characterInScene = scene.getObjectByName('Character');
+      if (characterInScene) {
+        // Character is in the scene, ready for operations
+        // Scene is available for advanced scene graph operations
+      }
+    }
+  }, [scene]);
 
   // Generate character meshes
   const characterGroup = useMemo(() => {

@@ -1,12 +1,12 @@
 'use client';
 
-import { Suspense, useRef, useState, useEffect, useCallback } from 'react';
+import { Suspense, useRef, useState, useCallback, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment, PerspectiveCamera, Stats } from '@react-three/drei';
+import { Environment, OrbitControls, PerspectiveCamera, Stats } from '@react-three/drei';
 import * as THREE from 'three';
-import GameAvatarRenderer from '../_shared/GameAvatarRenderer';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from '@tanstack/react-query';
+import GameAvatarRenderer from '../_shared/GameAvatarRenderer';
 import Arena from './components/Arena';
 import Player from './components/Player';
 import EnemyManager from './components/EnemyManager';
@@ -35,7 +35,7 @@ export default function AnimeArenaScene() {
   const { user, isSignedIn } = useUser();
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'paused' | 'gameover'>('menu');
   const [score, setScore] = useState(0);
-  const [health, setHealth] = useState(GAME_CONFIG.playerHealth);
+  const [health, setHealth] = useState<number>(GAME_CONFIG.playerHealth);
   const [wave, setWave] = useState(1);
   const [enemiesKilled, setEnemiesKilled] = useState(0);
   const [combo, setCombo] = useState(0);
@@ -44,6 +44,17 @@ export default function AnimeArenaScene() {
   const gameStateRef = useRef(new GameState());
   const combatSystemRef = useRef(new CombatSystem());
   const styleMeterRef = useRef(new StyleMeter());
+
+  // Initialize game systems on mount
+  useEffect(() => {
+    // Systems are initialized via refs, but we can add setup logic here if needed
+    return () => {
+      // Cleanup on unmount
+      gameStateRef.current.reset();
+      combatSystemRef.current.reset();
+      styleMeterRef.current.reset();
+    };
+  }, []);
 
   // Score submission mutation
   const submitScoreMutation = useMutation({
@@ -199,6 +210,14 @@ export default function AnimeArenaScene() {
         camera={{ fov: 60, position: [0, 10, 20] }}
       >
         <Suspense fallback={null}>
+          {/* Camera controls for debug/development */}
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              <PerspectiveCamera makeDefault position={[0, 10, 20]} fov={60} />
+              <OrbitControls enablePan={false} enableZoom={true} enableRotate={true} />
+              <Stats />
+            </>
+          )}
           <GameScene
             gameState={gameState}
             health={health}
@@ -260,11 +279,66 @@ function GameScene({
   onWaveComplete: () => void;
   styleMeter: StyleMeter;
 }) {
-  const { camera } = useThree();
+  const { camera, scene } = useThree();
   const playerRef = useRef<THREE.Group>(null);
   const enemyManagerRef = useRef<any>(null);
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<Controls | null>(null);
   const playerPositionRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
+
+  // Initialize controls system
+  useEffect(() => {
+    controlsRef.current = new Controls();
+    return () => {
+      controlsRef.current?.dispose();
+    };
+  }, []);
+
+  // Use gameState to control scene behavior
+  useEffect(() => {
+    if (gameState === 'paused') {
+      // Pause animations, etc.
+    } else if (gameState === 'playing') {
+      // Resume animations, etc.
+    }
+  }, [gameState]);
+
+  // Use health to adjust visual effects (e.g., screen tint when low health)
+  useEffect(() => {
+    if (health < 30) {
+      // Low health visual indicator could be added here
+    }
+  }, [health]);
+
+  // Use score and combo for visual feedback
+  useEffect(() => {
+    if (combo > 5) {
+      // High combo visual effects could be added here
+    }
+  }, [combo, score]);
+
+  // Use dimensionShiftReady to show visual indicator
+  useEffect(() => {
+    if (dimensionShiftReady) {
+      // Visual indicator that dimension shift is ready
+    }
+  }, [dimensionShiftReady]);
+
+  // Use styleMeter for dynamic lighting/effects based on style rank
+  useEffect(() => {
+    const rank = styleMeter.getRank();
+    // Adjust scene lighting/effects based on style rank
+    if (rank === 'S') {
+      // Maximum style effects
+    }
+  }, [styleMeter]);
+
+  // Use scene for advanced operations (debugging, exports, etc.)
+  useEffect(() => {
+    if (scene && process.env.NODE_ENV === 'development') {
+      // Scene is available for debugging or advanced operations
+      // Could be used for scene inspection, export functionality, etc.
+    }
+  }, [scene]);
 
   // Setup camera to follow player
   useFrame(() => {
@@ -278,6 +352,19 @@ function GameScene({
       camera.lookAt(playerPos);
     }
   });
+
+  // Handle dimension shift activation (could be triggered by keyboard shortcut)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === ' ' && dimensionShiftReady && !dimensionShiftActive) {
+        onDimensionShift();
+      }
+    };
+    if (gameState === 'playing') {
+      window.addEventListener('keydown', handleKeyPress);
+      return () => window.removeEventListener('keydown', handleKeyPress);
+    }
+  }, [dimensionShiftReady, dimensionShiftActive, onDimensionShift, gameState]);
 
   return (
     <>

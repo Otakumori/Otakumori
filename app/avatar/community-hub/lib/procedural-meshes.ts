@@ -317,8 +317,8 @@ function generateCasualOutfit(
   group: THREE.Group,
   primaryColor: THREE.Color,
   secondaryColor: THREE.Color,
-  physique: CharacterConfig['physique'],
-  gender: string,
+  _physique: CharacterConfig['physique'],
+  _gender: string,
 ) {
   // Simple shirt/top
   const topGeometry = new THREE.CylinderGeometry(0.13, 0.12, 0.35, 16);
@@ -339,7 +339,7 @@ function generateSchoolOutfit(
   group: THREE.Group,
   primaryColor: THREE.Color,
   secondaryColor: THREE.Color,
-  physique: CharacterConfig['physique'],
+  _physique: CharacterConfig['physique'],
   gender: string,
 ) {
   // School uniform - blazer and skirt/pants
@@ -377,8 +377,8 @@ function generateDressOutfit(
   group: THREE.Group,
   primaryColor: THREE.Color,
   secondaryColor: THREE.Color,
-  physique: CharacterConfig['physique'],
-  gender: string,
+  _physique: CharacterConfig['physique'],
+  _gender: string,
 ) {
   // Dress - single piece
   const dressTopGeometry = new THREE.CylinderGeometry(0.13, 0.12, 0.25, 16);
@@ -399,8 +399,8 @@ function generateSportyOutfit(
   group: THREE.Group,
   primaryColor: THREE.Color,
   secondaryColor: THREE.Color,
-  physique: CharacterConfig['physique'],
-  gender: string,
+  _physique: CharacterConfig['physique'],
+  _gender: string,
 ) {
   // Sporty - tank top and shorts
   const topGeometry = new THREE.CylinderGeometry(0.12, 0.11, 0.3, 16);

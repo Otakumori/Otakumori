@@ -54,7 +54,7 @@ export async function exportGLB(
         {
           binary: true,
           includeCustomExtensions: false,
-        },
+        } as any,
       );
     });
 
@@ -82,7 +82,7 @@ export async function exportGLTF(
   try {
     const exporter = new GLTFExporter();
     
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<any>((resolve) => {
       exporter.parse(
         scene,
         (data) => {
@@ -91,7 +91,7 @@ export async function exportGLTF(
         {
           binary: false,
           includeCustomExtensions: false,
-        },
+        } as any,
       );
     });
 
@@ -143,7 +143,7 @@ export async function exportZIP(
         {
           binary: true,
           includeCustomExtensions: false,
-        },
+        } as any,
       );
     });
 

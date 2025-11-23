@@ -22,7 +22,7 @@ export function CameraTab({
   setCameraZoom,
   cameraRotation,
   setCameraRotation,
-  resetCamera,
+  resetCamera: _resetCamera,
 }: CameraTabProps) {
   return (
     <div

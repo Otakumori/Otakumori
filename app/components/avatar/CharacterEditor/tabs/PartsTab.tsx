@@ -11,7 +11,7 @@ interface PartsTabProps {
   showNsfwContent: boolean;
   searchQuery: string;
   selectedCategory: string;
-  filteredParts: (partType: AvatarPartType) => ReturnType<typeof import('@/app/lib/3d/avatar-parts').avatarPartManager.getPartsByType>;
+  filteredParts: (partType: AvatarPartType) => ReturnType<typeof import('@/app/lib/3d/avatar-parts').avatarPartManager.getPartsByType>; // eslint-disable-line @typescript-eslint/consistent-type-imports
   onConfigurationChange?: (config: AvatarConfiguration) => void;
 }
 

@@ -188,7 +188,7 @@ EnemyManager.displayName = 'EnemyManager';
 // Individual Enemy Component
 function Enemy({
   enemy,
-  onDamage,
+  onDamage: _onDamage, // Passed to component but damage handling is done in EnemyManager
   dimensionShiftActive,
 }: {
   enemy: Enemy;
@@ -218,7 +218,9 @@ function Enemy({
   useFrame(() => {
     if (meshRef.current) {
       meshRef.current.position.copy(enemy.position);
-      meshRef.current.rotation.y += 0.01;
+      // Slow rotation when dimension shift is active
+      const rotationSpeed = dimensionShiftActive ? 0.005 : 0.01;
+      meshRef.current.rotation.y += rotationSpeed;
     }
   });
 

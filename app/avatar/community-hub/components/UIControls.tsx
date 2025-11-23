@@ -31,6 +31,16 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
   const [activeTab, setActiveTab] = useState('body');
   const [isExporting, setIsExporting] = useState(false);
 
+  // Memoize export filename generation to avoid recalculation on each render
+  const exportFilename = useMemo(() => {
+    const timestamp = Date.now();
+    return {
+      json: generateFilename('avatar', 'json'),
+      glb: generateFilename('avatar', 'glb'),
+      zip: generateFilename('avatar-export', 'zip'),
+    };
+  }, []);
+
   const updateConfig = useCallback(
     (updates: Partial<CharacterConfig>) => {
       const newConfig = cloneConfig(config);
@@ -59,7 +69,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
   const handleExportJSON = () => {
     try {
-      exportJSON(config, generateFilename('avatar', 'json'));
+      exportJSON(config, exportFilename.json);
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export JSON. Check console for details.');
@@ -74,7 +84,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
     setIsExporting(true);
     try {
-      await exportGLB(sceneRef.current, generateFilename('avatar', 'glb'));
+      await exportGLB(sceneRef.current, exportFilename.glb);
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export GLB. Check console for details.');
@@ -91,7 +101,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
     setIsExporting(true);
     try {
-      await exportZIP(config, sceneRef.current, generateFilename('avatar-export', 'zip'));
+      await exportZIP(config, sceneRef.current, exportFilename.zip);
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export ZIP. Check console for details.');
@@ -146,31 +156,33 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           <Tabs.Content value="body" className="space-y-4">
             <div className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-white/90">Gender</label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => updateConfig({ gender: 'male' })}
-                    className={cn(
-                      'flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
-                      config.gender === 'male'
-                        ? 'border-pink-500 bg-pink-500/20 text-white'
-                        : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10',
-                    )}
-                  >
-                    Male
-                  </button>
-                  <button
-                    onClick={() => updateConfig({ gender: 'female' })}
-                    className={cn(
-                      'flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
-                      config.gender === 'female'
-                        ? 'border-pink-500 bg-pink-500/20 text-white'
-                        : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10',
-                    )}
-                  >
-                    Female
-                  </button>
-                </div>
+                <fieldset>
+                  <legend className="mb-2 block text-sm font-medium text-white/90">Gender</legend>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => updateConfig({ gender: 'male' })}
+                      className={cn(
+                        'flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+                        config.gender === 'male'
+                          ? 'border-pink-500 bg-pink-500/20 text-white'
+                          : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10',
+                      )}
+                    >
+                      Male
+                    </button>
+                    <button
+                      onClick={() => updateConfig({ gender: 'female' })}
+                      className={cn(
+                        'flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors',
+                        config.gender === 'female'
+                          ? 'border-pink-500 bg-pink-500/20 text-white'
+                          : 'border-white/20 bg-white/5 text-white/70 hover:bg-white/10',
+                      )}
+                    >
+                      Female
+                    </button>
+                  </div>
+                </fieldset>
               </div>
 
               <ColorPicker
@@ -236,8 +248,9 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           {/* Face Tab */}
           <Tabs.Content value="face" className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-white/90">Face Preset</label>
+              <label htmlFor="face-preset-select" className="mb-2 block text-sm font-medium text-white/90">Face Preset</label>
               <select
+                id="face-preset-select"
                 value={config.faceId}
                 onChange={(e) => updateConfig({ faceId: parseInt(e.target.value) })}
                 className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white focus:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500/50"
@@ -251,7 +264,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white/90">Left Eye Color</label>
+              <label htmlFor="left-eye-color" className="mb-2 block text-sm font-medium text-white/90">Left Eye Color</label>
               <ColorPicker
                 value={config.eyes.colorLeft}
                 onChange={(color) =>
@@ -264,7 +277,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-white/90">
+              <label htmlFor="right-eye-color" className="mb-2 block text-sm font-medium text-white/90">
                 Right Eye Color
               </label>
               <ColorPicker
@@ -282,8 +295,9 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           {/* Hair Tab */}
           <Tabs.Content value="hair" className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-white/90">Hair Style</label>
+              <label htmlFor="hair-style-select" className="mb-2 block text-sm font-medium text-white/90">Hair Style</label>
               <select
+                id="hair-style-select"
                 value={config.hair.style}
                 onChange={(e) =>
                   updateConfig({
@@ -334,8 +348,9 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
           {/* Outfit Tab */}
           <Tabs.Content value="outfit" className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-white/90">Outfit Style</label>
+              <label htmlFor="outfit-style-select" className="mb-2 block text-sm font-medium text-white/90">Outfit Style</label>
               <select
+                id="outfit-style-select"
                 value={config.outfit.id}
                 onChange={(e) =>
                   updateConfig({
@@ -431,8 +446,8 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
                       ...config.accessories,
                       {
                         id: 'horn_01',
-                        pos: [0, 1.5, 0],
-                        rot: [0, 0, 0],
+                        pos: [0, 1.5, 0] as [number, number, number],
+                        rot: [0, 0, 0] as [number, number, number],
                         scale: 1,
                       },
                     ];

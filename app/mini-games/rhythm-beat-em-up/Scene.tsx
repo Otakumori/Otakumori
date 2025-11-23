@@ -135,7 +135,7 @@ export default function Scene({ mapUrl }: SceneProps) {
         avatarImg.src = user.imageUrl;
         avatarImgRef.current = avatarImg;
         assetsToLoad.push(
-          new Promise((resolve, reject) => {
+          new Promise((resolve) => {
             avatarImg.onload = () => resolve();
             avatarImg.onerror = () => {
               // Fallback to sprite if avatar fails
@@ -472,8 +472,8 @@ export default function Scene({ mapUrl }: SceneProps) {
     return () => window.removeEventListener('resize', resizeCanvas);
   }, []);
 
-  // Overlay styles
-  const overlayStyle: React.CSSProperties = {
+  // Overlay styles (unused but kept for future use)
+  const _overlayStyle: React.CSSProperties = {
     position: 'absolute',
     top: 0,
     left: 0,

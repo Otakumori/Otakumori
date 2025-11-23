@@ -54,13 +54,11 @@ export function createCelShadedMaterial(
     rimLight = true,
     rimColor = new THREE.Color(0xffffff),
     rimIntensity = 0.5,
-    gloss = 0.5,
   } = options;
 
   const material = new THREE.MeshToonMaterial({
     color: typeof color === 'string' || typeof color === 'number' ? color : color.getHex(),
     gradientMap: createGradientTexture(toonSteps),
-    shininess: gloss * 100,
   });
 
   // Store rim light properties for custom shader if needed
@@ -75,7 +73,7 @@ export function createCelShadedMaterial(
  * Create outline material (black, back-facing)
  */
 export function createOutlineMaterial(
-  outlineWidth: number = 0.02,
+  _outlineWidth: number = 0.02,
   outlineColor: THREE.Color | number | string = 0x000000,
 ): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
@@ -98,8 +96,6 @@ export function applyMaterialToMesh(mesh: THREE.Mesh, config: {
   outfitSecondaryColor?: string;
 }): void {
   if (!mesh.material) return;
-
-  const material = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
 
   // Determine material type from userData
   if (mesh.userData.isBodyPart) {

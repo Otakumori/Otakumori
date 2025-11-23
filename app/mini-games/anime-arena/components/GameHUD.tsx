@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { StyleMeter, StyleRank } from '../systems/StyleMeter';
+import type { StyleRank } from '../systems/StyleMeter';
+import { StyleMeter } from '../systems/StyleMeter';
 
 interface GameHUDProps {
   health: number;
@@ -28,8 +29,8 @@ export default function GameHUD({
   onDimensionShift,
   onPause,
 }: GameHUDProps) {
-  const [cooldownProgress, setCooldownProgress] = useState(1);
   const [styleProgress, setStyleProgress] = useState(0);
+  const [cooldownProgress, setCooldownProgress] = useState(1);
 
   // Update cooldown progress
   useEffect(() => {
@@ -38,14 +39,18 @@ export default function GameHUD({
       return;
     }
 
+    const startTime = Date.now();
     const interval = setInterval(() => {
-      // This would need to track actual cooldown time
-      // For now, just show ready state
-      setCooldownProgress(1);
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / dimensionShiftCooldown, 1);
+      setCooldownProgress(progress);
+      if (progress >= 1) {
+        clearInterval(interval);
+      }
     }, 100);
 
     return () => clearInterval(interval);
-  }, [dimensionShiftReady]);
+  }, [dimensionShiftReady, dimensionShiftCooldown]);
 
   // Update style meter progress
   useEffect(() => {
@@ -130,10 +135,22 @@ export default function GameHUD({
           }`}
         >
           <div className="text-center">
-            <div className="mb-2 text-2xl">⏱️</div>
+            <div className="mb-2 text-2xl">
+              <span role="img" aria-label="Dimension Shift">⏱️</span>
+            </div>
             <div className="text-sm font-semibold text-purple-200">Dimension Shift</div>
             {!dimensionShiftReady && (
-              <div className="mt-1 text-xs text-purple-300">Cooldown...</div>
+              <>
+                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-800">
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-100"
+                    style={{ width: `${cooldownProgress * 100}%` }}
+                  />
+                </div>
+                <div className="mt-1 text-xs text-purple-300">
+                  {Math.ceil((1 - cooldownProgress) * dimensionShiftCooldown / 1000)}s
+                </div>
+              </>
             )}
           </div>
         </button>
@@ -144,8 +161,9 @@ export default function GameHUD({
         <button
           onClick={onPause}
           className="pointer-events-auto rounded-lg bg-black/50 p-2 backdrop-blur-sm transition-all hover:bg-gray-700/50"
+          aria-label="Pause game"
         >
-          <span className="text-white">⏸️</span>
+          <span role="img" aria-label="Pause" className="text-white">⏸️</span>
         </button>
       </div>
     </div>

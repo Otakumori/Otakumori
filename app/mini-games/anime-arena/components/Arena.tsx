@@ -72,13 +72,15 @@ export default function Arena({ size }: ArenaProps) {
         }
 
         // Update instance matrix
-        const matrix = new THREE.Matrix4();
-        matrix.compose(
-          petal.position,
-          new THREE.Quaternion().setFromEuler(petal.rotation),
-          new THREE.Vector3(0.1, 0.1, 0.1),
-        );
-        petalsRef.current.setMatrixAt(i, matrix);
+        if (petalsRef.current) {
+          const matrix = new THREE.Matrix4();
+          matrix.compose(
+            petal.position,
+            new THREE.Quaternion().setFromEuler(petal.rotation),
+            new THREE.Vector3(0.1, 0.1, 0.1),
+          );
+          petalsRef.current.setMatrixAt(i, matrix);
+        }
       });
       petalsRef.current.instanceMatrix.needsUpdate = true;
     }
