@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { StyleRank } from '../systems/StyleMeter';
-import { StyleMeter } from '../systems/StyleMeter';
+import type { StyleRank, StyleMeter } from '../systems/StyleMeter';
 
 interface GameHUDProps {
   health: number;

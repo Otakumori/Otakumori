@@ -43,7 +43,7 @@ const PLAYER_SIZE = 50;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
-export default function Scene({ mapUrl }: SceneProps) {
+export default function Scene({ mapUrl: _mapUrl }: SceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { user } = useUser();
 
@@ -51,7 +51,7 @@ export default function Scene({ mapUrl }: SceneProps) {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [score, setScore] = useState(0);
+  const [_score, setScore] = useState(0);
 
   // Game state refs (mutable state that doesn't trigger re-renders)
   const playerRef = useRef<Player>({

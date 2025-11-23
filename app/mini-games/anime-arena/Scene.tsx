@@ -6,7 +6,6 @@ import { Environment, OrbitControls, PerspectiveCamera, Stats } from '@react-thr
 import * as THREE from 'three';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from '@tanstack/react-query';
-import GameAvatarRenderer from '../_shared/GameAvatarRenderer';
 import Arena from './components/Arena';
 import Player from './components/Player';
 import EnemyManager from './components/EnemyManager';

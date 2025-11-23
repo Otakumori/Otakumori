@@ -33,7 +33,6 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
   // Memoize export filename generation to avoid recalculation on each render
   const exportFilename = useMemo(() => {
-    const timestamp = Date.now();
     return {
       json: generateFilename('avatar', 'json'),
       glb: generateFilename('avatar', 'glb'),
