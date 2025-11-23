@@ -15,7 +15,6 @@ import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
-import { getMostRecentGuestCharacter } from '@/app/lib/avatar/guest-storage';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
@@ -41,7 +40,9 @@ const SlicingGame = dynamic(() => import('./Game'), {
 export default function PetalSamuraiPage() {
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
-  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | AvatarConfiguration | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | AvatarConfiguration | null>(
+    null,
+  );
   const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
   const [showQuakeOverlay, setShowQuakeOverlay] = useState(false);
 
@@ -67,20 +68,29 @@ export default function PetalSamuraiPage() {
     isLoading: avatarLoading,
   } = useGameAvatar('petal-samurai', {
     forcePreset: avatarChoice === 'preset',
-    avatarProfile: avatarChoice === 'creator' && selectedAvatar && 'head' in selectedAvatar ? selectedAvatar as AvatarProfile : null,
-    avatarConfiguration: avatarChoice === 'creator' && selectedAvatar && 'baseModel' in selectedAvatar ? selectedAvatar as AvatarConfiguration : null,
+    avatarProfile:
+      avatarChoice === 'creator' && selectedAvatar && 'head' in selectedAvatar
+        ? (selectedAvatar as AvatarProfile)
+        : null,
+    avatarConfiguration:
+      avatarChoice === 'creator' && selectedAvatar && 'baseModel' in selectedAvatar
+        ? (selectedAvatar as AvatarConfiguration)
+        : null,
   });
 
   // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | AvatarConfiguration) => {
-    setAvatarChoice(choice);
-    if (choice === 'creator' && avatar) {
-      setSelectedAvatar(avatar);
-    } else if (choice === 'preset') {
-      setSelectedAvatar(null);
-    }
-    setShowAvatarChoice(false);
-  }, []);
+  const handleAvatarChoice = useCallback(
+    (choice: AvatarChoice, avatar?: AvatarProfile | AvatarConfiguration) => {
+      setAvatarChoice(choice);
+      if (choice === 'creator' && avatar) {
+        setSelectedAvatar(avatar);
+      } else if (choice === 'preset') {
+        setSelectedAvatar(null);
+      }
+      setShowAvatarChoice(false);
+    },
+    [],
+  );
 
   // Check if we should show choice on mount
   const shouldShowChoice =

@@ -7,7 +7,6 @@ import CharacterEditor from '@/app/components/avatar/CharacterEditor';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import {
   saveGuestCharacter,
-  loadGuestCharacter,
   getAllGuestCharacters,
   getMostRecentGuestCharacter,
   type GuestCharacter,
@@ -92,7 +91,8 @@ export default function CharacterEditorPage() {
       {/* Guest Mode Indicator */}
       {isGuest && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-pink-500/20 backdrop-blur-lg border border-pink-500/30 rounded-lg px-4 py-2 text-pink-200 text-sm">
-          <span className="font-semibold">Guest Mode:</span> Your characters will be saved temporarily for 7 days.{' '}
+          <span className="font-semibold">Guest Mode:</span> Your characters will be saved
+          temporarily for 7 days.{' '}
           <button
             onClick={() => router.push('/sign-in?redirect_url=/character-editor')}
             className="underline hover:text-pink-100"

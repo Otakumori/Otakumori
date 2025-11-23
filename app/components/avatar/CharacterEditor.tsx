@@ -946,7 +946,11 @@ export default function CharacterEditor({
                         },
                         materialOverrides: {
                           hair: { slot: 'hair', type: 'color' as const, value: '#FFD700' },
-                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#4169E1' },
+                          clothing_primary: {
+                            slot: 'clothing',
+                            type: 'color' as const,
+                            value: '#4169E1',
+                          },
                         },
                       },
                     },
@@ -967,7 +971,11 @@ export default function CharacterEditor({
                         },
                         materialOverrides: {
                           hair: { slot: 'hair', type: 'color' as const, value: '#8B4513' },
-                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#FF69B4' },
+                          clothing_primary: {
+                            slot: 'clothing',
+                            type: 'color' as const,
+                            value: '#FF69B4',
+                          },
                         },
                       },
                     },
@@ -988,7 +996,11 @@ export default function CharacterEditor({
                         },
                         materialOverrides: {
                           hair: { slot: 'hair', type: 'color' as const, value: '#FF69B4' },
-                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#8B0000' },
+                          clothing_primary: {
+                            slot: 'clothing',
+                            type: 'color' as const,
+                            value: '#8B0000',
+                          },
                         },
                       },
                     },
@@ -1009,7 +1021,11 @@ export default function CharacterEditor({
                         },
                         materialOverrides: {
                           hair: { slot: 'hair', type: 'color' as const, value: '#FF1493' },
-                          clothing_primary: { slot: 'clothing', type: 'color' as const, value: '#9370DB' },
+                          clothing_primary: {
+                            slot: 'clothing',
+                            type: 'color' as const,
+                            value: '#9370DB',
+                          },
                         },
                       },
                     },
@@ -1021,7 +1037,10 @@ export default function CharacterEditor({
                           ...configuration,
                           ...preset.config,
                           parts: { ...configuration.parts, ...preset.config.parts },
-                          morphTargets: { ...configuration.morphTargets, ...preset.config.morphTargets },
+                          morphTargets: {
+                            ...configuration.morphTargets,
+                            ...preset.config.morphTargets,
+                          },
                           materialOverrides: {
                             ...configuration.materialOverrides,
                             ...preset.config.materialOverrides,
@@ -1582,14 +1601,20 @@ export default function CharacterEditor({
                 onClick={() => onUseInGame(configuration)}
                 className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
               >
-                🎮 Use in Game
+                <span role="img" aria-label="Game controller">
+                  🎮
+                </span>{' '}
+                Use in Game
               </button>
             )}
             <button
               onClick={handleSave}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
             >
-              {isDirty ? '💾 Save Character*' : isGuest ? '💾 Save Temporarily' : '💾 Save Character'}
+              <span role="img" aria-label="Floppy disk">
+                💾
+              </span>{' '}
+              {isDirty ? 'Save Character*' : isGuest ? 'Save Temporarily' : 'Save Character'}
             </button>
             <button
               onClick={() => {

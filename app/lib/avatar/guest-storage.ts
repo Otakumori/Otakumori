@@ -246,4 +246,3 @@ export function getMostRecentGuestCharacter(): GuestCharacter | null {
 export function hasGuestCharacters(): boolean {
   return getAllGuestCharacters().length > 0;
 }
-

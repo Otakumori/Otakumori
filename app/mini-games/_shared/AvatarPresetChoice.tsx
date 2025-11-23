@@ -45,7 +45,9 @@ export interface AvatarPresetChoiceProps {
  */
 export function AvatarPresetChoice({ gameId, onChoice, onCancel }: AvatarPresetChoiceProps) {
   const [guestAvatar, setGuestAvatar] = useState<AvatarProfile | null>(null);
-  const [guestCharacters, setGuestCharacters] = useState<Array<{ id: string; name: string; config: AvatarConfiguration }>>([]);
+  const [guestCharacters, setGuestCharacters] = useState<
+    Array<{ id: string; name: string; config: AvatarConfiguration }>
+  >([]);
 
   const avatarsEnabled = isAvatarsEnabled();
   const avatarUsage = getGameAvatarUsage(gameId);

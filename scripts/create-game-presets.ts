@@ -227,7 +227,10 @@ async function createPreset(
   category: string,
   config: Partial<AvatarConfiguration>,
 ) {
-  const fullConfig = avatarPartManager.createConfiguration('preset-system', config.baseModel || 'female');
+  const fullConfig = avatarPartManager.createConfiguration(
+    'preset-system',
+    config.baseModel || 'female',
+  );
   const mergedConfig: AvatarConfiguration = {
     ...fullConfig,
     ...config,
@@ -312,4 +315,3 @@ if (require.main === module) {
 }
 
 export { createPreset, GAME_PRESETS };
-

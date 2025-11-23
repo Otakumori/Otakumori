@@ -16,7 +16,6 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import { avatarConfigToProfile, normalizeAvatarConfiguration } from './characterConverter';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
-import { getMostRecentGuestCharacter } from '@/app/lib/avatar/guest-storage';
 
 const GUEST_AVATAR_KEY = 'otm-guest-avatar';
 
@@ -72,7 +71,13 @@ export function useGameAvatar(
 
   // Load guest avatar from localStorage if avatars enabled and not forcing preset
   useEffect(() => {
-    if (avatarsEnabled && !forcePreset && !avatarProfile && !avatarConfiguration && typeof window !== 'undefined') {
+    if (
+      avatarsEnabled &&
+      !forcePreset &&
+      !avatarProfile &&
+      !avatarConfiguration &&
+      typeof window !== 'undefined'
+    ) {
       const loaded = loadGuestAvatar();
       setGuestAvatar(loaded);
       setLoadedGuestAvatar(true);

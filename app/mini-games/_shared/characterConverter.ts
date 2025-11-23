@@ -92,7 +92,10 @@ export function avatarConfigToProfile(config: AvatarConfiguration): AvatarProfil
  * Convert AvatarProfile to AvatarConfiguration (partial)
  * This is used when loading existing profiles into the editor
  */
-export function avatarProfileToConfig(profile: AvatarProfile, userId: string): Partial<AvatarConfiguration> {
+export function avatarProfileToConfig(
+  profile: AvatarProfile,
+  userId: string,
+): Partial<AvatarConfiguration> {
   const materialOverrides: Record<string, any> = {};
 
   // Set skin color
@@ -233,4 +236,3 @@ export function normalizeAvatarConfiguration(
     updatedAt: config.updatedAt || now,
   };
 }
-
