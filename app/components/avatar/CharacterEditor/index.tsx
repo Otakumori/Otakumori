@@ -498,7 +498,7 @@ export default function CharacterEditor({
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="fixed top-4 left-4 z-50 bg-pink-500 hover:bg-pink-600 text-white p-3 rounded-lg shadow-lg transition-colors"
           aria-label="Toggle menu"
-          aria-expanded={!sidebarCollapsed}
+          aria-expanded={!sidebarCollapsed ? 'true' : 'false'}
         >
           {sidebarCollapsed ? '☰' : '✕'}
         </button>
@@ -556,7 +556,7 @@ export default function CharacterEditor({
                   ? 'bg-pink-500 text-white'
                   : 'bg-white/10 text-white/80 hover:bg-white/20'
                   }`}
-                aria-pressed={selectedCategory === category}
+                aria-pressed={selectedCategory === category ? 'true' : 'false'}
               >
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </button>
@@ -618,7 +618,7 @@ export default function CharacterEditor({
               : 'text-white/60 hover:text-white hover:bg-white/10'
               }`}
             aria-label={`${tab.label} tab (${tab.shortcut})`}
-            aria-selected={activeTab === tab.id}
+            aria-selected={activeTab === tab.id ? 'true' : 'false'}
             role="tab"
             id={`tab-${tab.id}`}
             aria-controls={`panel-${tab.id}`}
