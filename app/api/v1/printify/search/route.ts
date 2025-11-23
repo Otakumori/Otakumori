@@ -34,17 +34,16 @@ const SearchParamsSchema = z.object({
 
 function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {
-    // Only filter by active/visible if publishedOnly is true, otherwise show all
+    // Only filter by active/visible if publishedOnly is true, otherwise show all active products
+    // (active: true is minimum requirement, visible is optional unless publishedOnly is true)
+    active: true, // Always require active products
     ...(params.publishedOnly === 'true'
       ? {
-          active: true,
-          visible: true,
+          visible: true, // Only require visible when publishedOnly filter is explicitly enabled
         }
       : {}),
-    // Exclude placeholder products
-    primaryImageUrl: {
-      not: null,
-    },
+    // Exclude placeholder products - allow products with either primaryImageUrl OR ProductImage
+    // We'll filter out products without images in the serialization step instead
     // Exclude products with placeholder in image URL or test/draft titles
     NOT: [
       {
@@ -182,7 +181,9 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           ProductVariant: true,
-          ProductImage: true,
+          ProductImage: {
+            orderBy: { isDefault: 'desc' },
+          },
         },
         orderBy,
         // Get more products to account for filtering/deduplication
