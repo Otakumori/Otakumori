@@ -33,7 +33,7 @@ export default function CharacterEditorPage() {
     }
   }, [user, isLoaded]);
 
-  const handleConfigurationChange = (config: AvatarConfiguration) => {
+  const handleConfigurationChange = (_config: AvatarConfiguration) => {
     // Configuration changes are handled by the editor component
   };
 
