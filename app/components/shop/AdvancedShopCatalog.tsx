@@ -14,6 +14,11 @@ import { stripHtml } from '@/lib/html';
 function CatalogProductCard({ product }: { product: CatalogProduct }) {
   const displayImage = product.image ?? product.images?.[0] ?? '';
 
+  // Don't render products without images
+  if (!displayImage || displayImage.includes('placeholder') || displayImage.includes('seed:') || displayImage.trim() === '') {
+    return null;
+  }
+
   const summary = useMemo(() => stripHtml(product.description || ''), [product.description]);
 
   const minPriceCents = product.priceRange.min ?? product.priceCents ?? null;
@@ -608,11 +613,19 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
             </div>
 
             {/* Products Grid */}
-            {products.length > 0 ? (
+            {products.filter((product) => {
+              const imageUrl = product.image ?? product.images?.[0];
+              return imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('seed:') && imageUrl.trim() !== '';
+            }).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-                {products.map((product) => (
-                  <CatalogProductCard key={product.id} product={product} />
-                ))}
+                {products
+                  .filter((product) => {
+                    const imageUrl = product.image ?? product.images?.[0];
+                    return imageUrl && !imageUrl.includes('placeholder') && !imageUrl.includes('seed:') && imageUrl.trim() !== '';
+                  })
+                  .map((product) => (
+                    <CatalogProductCard key={product.id} product={product} />
+                  ))}
               </div>
             ) : (
               <div className="text-center py-12">

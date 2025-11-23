@@ -4,6 +4,7 @@ import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { db } from '@/lib/db';
 import { printifyService } from '@/app/lib/printify/client';
 import { randomUUID } from 'crypto';
+import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 
 export const runtime = 'nodejs';
 
@@ -15,33 +16,47 @@ export async function POST() {
 
 async function syncPrintify() {
   try {
-    // Get products from Printify (returns array directly)
-    const products = await printifyService.getProducts();
-    console.warn(`Sync retrieved ${products.length || 0} products from Printify`);
+    // Get products from Printify (returns array directly from client)
+    const allProducts = await printifyService.getProducts();
+    console.warn(`Sync retrieved ${Array.isArray(allProducts) ? allProducts.length : 0} products from Printify`);
+
+    // Filter out invalid/placeholder products before syncing
+    const products = Array.isArray(allProducts) ? filterValidPrintifyProducts(allProducts) : [];
+    console.warn(`After filtering: ${products.length} valid products to sync`);
 
     for (const product of products) {
-      const visible = product.variants?.some((v: any) => v.available) ?? false;
-      const subcategory = mapSubcategory(product);
-      const printifyProductId = String(product.id);
+      // Type assertion - we know these are PrintifyProduct after filtering
+      const printifyProduct = product as any;
+      
+      const visible = printifyProduct.variants?.some((v: any) => v.is_enabled || v.is_available) ?? false;
+      const subcategory = mapSubcategory(printifyProduct);
+      const printifyProductId = String(printifyProduct.id);
+
+      // Get image URL
+      let imageUrl: string | null = null;
+      if (printifyProduct.images && printifyProduct.images.length > 0) {
+        const firstImage = printifyProduct.images[0];
+        imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.src || null;
+      }
 
       // Use printifyProductId as unique identifier for upsert, generate separate DB ID
       // This prevents duplicates when syncing the same Printify product multiple times
       const dbProduct = await db.product.upsert({
         where: { printifyProductId },
         update: {
-          name: product.title,
-          description: product.description ?? '',
-          category: `${mapCategory(product)}:${subcategory}`, // Combine category and subcategory
-          primaryImageUrl: product.images?.[0] ?? null,
+          name: printifyProduct.title,
+          description: printifyProduct.description ?? '',
+          category: `${mapCategory(printifyProduct)}:${subcategory}`, // Combine category and subcategory
+          primaryImageUrl: imageUrl,
           active: visible,
           printifyProductId,
         },
         create: {
           id: randomUUID(), // Generate unique DB ID
-          name: product.title,
-          description: product.description ?? '',
-          category: `${mapCategory(product)}:${subcategory}`, // Combine category and subcategory
-          primaryImageUrl: product.images?.[0] ?? null,
+          name: printifyProduct.title,
+          description: printifyProduct.description ?? '',
+          category: `${mapCategory(printifyProduct)}:${subcategory}`, // Combine category and subcategory
+          primaryImageUrl: imageUrl,
           active: visible,
           printifyProductId,
         },
@@ -53,7 +68,7 @@ async function syncPrintify() {
       // Use the DB product ID (not Printify ID) for variants
       const dbProductId = dbProduct.id;
 
-      for (const variant of product.variants || []) {
+      for (const variant of printifyProduct.variants || []) {
         await db.productVariant.upsert({
           where: {
             productId_printifyVariantId: {
@@ -63,16 +78,16 @@ async function syncPrintify() {
           },
           update: {
             priceCents: toCents(variant.price),
-            isEnabled: variant.available,
-            inStock: variant.available,
+            isEnabled: variant.is_enabled ?? variant.is_available ?? false,
+            inStock: variant.is_available ?? variant.is_enabled ?? false,
           },
           create: {
             id: randomUUID(), // Generate unique variant ID
             productId: dbProductId, // Use DB product ID, not Printify ID
             printifyVariantId: variant.id,
             priceCents: toCents(variant.price),
-            isEnabled: variant.available,
-            inStock: variant.available,
+            isEnabled: variant.is_enabled ?? variant.is_available ?? false,
+            inStock: variant.is_available ?? variant.is_enabled ?? false,
           },
         });
       }

@@ -37,10 +37,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   const images =
     product.images && product.images.length > 0
-      ? product.images
-      : product.image
+      ? product.images.filter((img) => img && !img.includes('placeholder') && !img.includes('seed:') && img.trim() !== '')
+      : product.image && !product.image.includes('placeholder') && !product.image.includes('seed:') && product.image.trim() !== ''
         ? [product.image]
-        : ['/assets/images/placeholder-product.jpg'];
+        : [];
+  
+  // Don't render if no valid images
+  if (images.length === 0) {
+    return null;
+  }
   const currentPrice = selectedVariant?.price || product.price;
   const isInStock = selectedVariant?.inStock ?? product.inStock ?? true;
 
@@ -74,7 +79,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       <div className="space-y-4">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
           <Image
-            src={images[selectedImage] ?? images[0] ?? '/placeholder.png'}
+            src={images[selectedImage] ?? images[0]}
             alt={product.name}
             fill
             sizes="(max-width:1024px) 100vw, 50vw"

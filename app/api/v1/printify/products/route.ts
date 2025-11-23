@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { stripHtml } from '@/lib/html';
 import { z } from 'zod';
+import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
+import { deduplicateProducts } from '@/app/lib/shop/catalog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -88,26 +90,37 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Filter out invalid/placeholder products first
+    const validProducts = filterValidPrintifyProducts(result.data);
+
     // Transform products to match expected format
-    const products = result.data.map((product: any) => ({
-      id: product.id,
-      title: product.title,
-      description: stripHtml(product.description || ''),
-      price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0, // Convert cents to dollars
-      image: product.images?.[0]?.src || '/assets/images/placeholder-product.jpg',
-      tags: product.tags || [],
-      variants:
-        product.variants?.map((v: any) => ({
-          id: v.id,
-          price: v.price / 100, // Convert cents to dollars
-          is_enabled: v.is_enabled,
-          in_stock: v.in_stock,
-        })) || [],
-      available: product.variants?.some((v: any) => v.is_enabled && v.in_stock) || false,
-      visible: product.visible,
-      createdAt: product.created_at,
-      updatedAt: product.updated_at,
-    }));
+    const products = validProducts
+      .map((product: any) => ({
+        id: product.id,
+        title: product.title,
+        description: stripHtml(product.description || ''),
+        price: product.variants?.[0]?.price ? product.variants[0].price / 100 : 0, // Convert cents to dollars
+        image: product.images?.[0]?.src || '',
+        tags: product.tags || [],
+        variants:
+          product.variants?.map((v: any) => ({
+            id: v.id,
+            price: v.price / 100, // Convert cents to dollars
+            is_enabled: v.is_enabled,
+            in_stock: v.in_stock,
+          })) || [],
+        available: product.variants?.some((v: any) => v.is_enabled && v.in_stock) || false,
+        visible: product.visible,
+        createdAt: product.created_at,
+        updatedAt: product.updated_at,
+        blueprintId: product.blueprint_id ?? null,
+        printifyProductId: String(product.id),
+      }));
+
+    // Deduplicate by blueprintId and printifyProductId
+    const deduplicated = deduplicateProducts(products, {
+      deduplicateBy: 'both',
+    });
 
     // Success with cache headers
     const duration = Date.now() - startTime;
@@ -115,7 +128,7 @@ export async function GET(request: NextRequest) {
       {
         ok: true,
         data: {
-          products,
+          products: deduplicated,
           pagination: {
             currentPage: query.page,
             totalPages: result.last_page,

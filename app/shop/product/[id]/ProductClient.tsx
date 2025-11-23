@@ -100,6 +100,19 @@ export default function ProductClient({ productId }: { productId: string }) {
           images: normalizedImages,
         };
 
+        // Filter out products without images or with placeholder images
+        const finalImage = normalizedProduct.image;
+        if (
+          !finalImage ||
+          finalImage.includes('placeholder') ||
+          finalImage.includes('seed:') ||
+          finalImage.trim() === ''
+        ) {
+          setError('Product image not available');
+          setLoading(false);
+          return;
+        }
+
         if (isCancelled) return;
 
         setProduct(normalizedProduct);
@@ -119,14 +132,11 @@ export default function ProductClient({ productId }: { productId: string }) {
           catalogProduct.priceCents ?? (displayPrice != null ? Math.round(displayPrice * 100) : 0);
 
         // Only add to recently viewed if not cancelled
-        if (!isCancelled) {
+        if (!isCancelled && normalizedProduct.image) {
           addProduct({
             id: catalogProduct.id,
             title: catalogProduct.title,
-            image:
-              normalizedProduct.image ??
-              normalizedProduct.images[0] ??
-              '/assets/images/placeholder-product.jpg',
+            image: normalizedProduct.image ?? normalizedProduct.images[0] ?? '',
             priceCents: normalizedPriceCents,
           });
         }
@@ -160,7 +170,11 @@ export default function ProductClient({ productId }: { productId: string }) {
       return;
     }
 
-    const imageUrl = product.image ?? product.images?.[0] ?? '/images/products/placeholder.svg';
+    const imageUrl = product.image ?? product.images?.[0];
+    if (!imageUrl) {
+      showError('Product image not available');
+      return;
+    }
     const currentPriceCents =
       selectedVariant.priceCents ??
       (product.priceRange.min != null
@@ -212,7 +226,24 @@ export default function ProductClient({ productId }: { productId: string }) {
     );
   }
 
-  const imageUrl = product.image ?? product.images?.[0] ?? '/images/products/placeholder.svg';
+  const imageUrl = product.image ?? product.images?.[0];
+  if (!imageUrl) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center glass-panel rounded-2xl p-8">
+            <h1 className="text-3xl font-bold text-pink-200 mb-4">Product Image Not Available</h1>
+            <p className="text-zinc-300 mb-6">This product is missing required images.</p>
+            <Link href={paths.shop()}>
+              <Button className="bg-gradient-to-r from-pink-500 to-purple-500">
+                Return to Shop
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const currentPriceCents =
     selectedVariant?.priceCents ??
     (product.priceRange.min != null

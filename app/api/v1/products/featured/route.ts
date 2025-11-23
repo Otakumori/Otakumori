@@ -4,6 +4,7 @@ import { db } from '@/app/lib/db';
 import { serializeProduct } from '@/lib/catalog/serialize';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
+import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 import {
   generateRequestId,
   createApiError,
@@ -44,6 +45,40 @@ async function fetchCatalogProducts(limit: number, forcePrintify = false) {
     where: {
       active: true,
       visible: true,
+      primaryImageUrl: {
+        not: null,
+      },
+      NOT: [
+        {
+          primaryImageUrl: {
+            contains: 'placeholder',
+            mode: 'insensitive',
+          },
+        },
+        {
+          primaryImageUrl: {
+            contains: 'seed:',
+            mode: 'insensitive',
+          },
+        },
+        {
+          integrationRef: {
+            startsWith: 'seed:',
+          },
+        },
+        {
+          name: {
+            contains: '[test]',
+            mode: 'insensitive',
+          },
+        },
+        {
+          name: {
+            contains: '[draft]',
+            mode: 'insensitive',
+          },
+        },
+      ],
       ProductVariant: {
         some: {
           isEnabled: true,
@@ -106,11 +141,20 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
   // Fetch more products than needed to account for deduplication and exclusions
   const fetchLimit = Math.max(limit * 3, 50);
   const printifyResult = await printifyClient.getProducts(1, fetchLimit);
-  const publishedProducts = (printifyResult.data || []).filter((product) =>
-    product?.variants?.some((variant) => variant.is_enabled),
-  );
+  
+  // First filter for visible products with enabled variants
+  const publishedProducts = (printifyResult.data || []).filter((product) => {
+    // Must be visible
+    if (!product.visible) return false;
+    // Must have at least one enabled variant
+    if (!product?.variants?.some((variant) => variant.is_enabled)) return false;
+    return true;
+  });
 
-  const mappedPrintify = publishedProducts.map((product) => {
+  // Apply comprehensive filtering before mapping
+  const validProducts = filterValidPrintifyProducts(publishedProducts);
+
+  const mappedPrintify = validProducts.map((product) => {
     const defaultImage =
       product.images?.find((img) => img.is_default) ?? product.images?.[0] ?? null;
     const defaultVariant =
@@ -148,20 +192,12 @@ async function fetchPrintifyProducts(limit: number, excludeTitles: string[] = []
     };
   });
 
-  // Filter out placeholder/fake products
+  // Additional filtering after mapping - products already filtered before mapping, but double-check
   const filtered = mappedPrintify.filter((product) => {
-    // Exclude products with placeholder images
-    if (product.image?.includes('placeholder') || product.image?.includes('seed:')) {
-      return false;
-    }
-    // Exclude products with seed: integrationRef
-    if (product.integrationRef?.startsWith('seed:')) {
-      return false;
-    }
-    // Exclude products with no image or empty image
-    if (!product.image || product.image.trim() === '') {
-      return false;
-    }
+    if (!product.image || product.image.trim() === '') return false;
+    if (product.image.includes('placeholder') || product.image.includes('seed:')) return false;
+    if (product.integrationRef?.startsWith('seed:')) return false;
+    if (product.title && (product.title.toLowerCase().includes('[test]') || product.title.toLowerCase().includes('[draft]'))) return false;
     return true;
   });
 
@@ -235,7 +271,7 @@ export async function GET(request: NextRequest) {
         title: String(product.title || 'Untitled Product'),
         description: product.description ? String(product.description) : null,
         price: typeof product.price === 'number' ? Math.max(0, product.price) : 0,
-        image: String(product.image || '/assets/images/placeholder-product.jpg'),
+        image: String(product.image || ''),
         available: product.available !== false,
         slug: product.slug ? String(product.slug) : String(product.id || ''),
         category: product.category ? String(product.category) : null,
@@ -274,13 +310,13 @@ export async function GET(request: NextRequest) {
       try {
         const printifyResult = await fetchPrintifyProducts(query.limit, query.excludeTitles);
         if (printifyResult && printifyResult.data.products.length > 0) {
-          // Normalize Printify products
-          const normalizedProducts = printifyResult.data.products.map((product) => ({
+          // Normalize Printify products - they're already filtered and deduplicated
+          const normalizedProducts = printifyResult.data.products.map((product: any) => ({
             id: String(product.id || ''),
             title: String(product.title || 'Untitled Product'),
             description: product.description ? String(product.description) : null,
             price: typeof product.price === 'number' ? Math.max(0, product.price) : 0,
-            image: String(product.image || '/assets/images/placeholder-product.jpg'),
+            image: String(product.image || ''),
             available: product.available !== false,
             slug: product.slug ? String(product.slug) : String(product.id || ''),
             category: product.category ? String(product.category) : null,

@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 import { type NextRequest, NextResponse } from 'next/server';
+import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
+import { deduplicateProducts } from '@/app/lib/shop/catalog';
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,31 +25,42 @@ export async function GET(request: NextRequest) {
       throw new Error(data.error || 'Failed to fetch products');
     }
 
+    // Filter out invalid/placeholder products first
+    const validProducts = filterValidPrintifyProducts(data.data.products);
+
     // Transform products for frontend consumption
-    const transformedProducts = data.data.products.map((product: any) => ({
-      id: product.id,
-      title: product.title,
-      description: product.description,
-      price: product.price || 0,
-      images: product.image ? [product.image] : ['/assets/images/placeholder-product.jpg'],
-      variants: product.variants || [],
-      category: product.tags?.[0] || 'Other',
-      tags: product.tags || [],
-      metadata: {
-        printify_id: product.id,
-        published: true,
-        created_at: product.createdAt || new Date().toISOString(),
-        updated_at: product.updatedAt || new Date().toISOString(),
-      },
-    }));
+    const transformedProducts = validProducts
+      .map((product: any) => ({
+        id: product.id,
+        title: product.title,
+        description: product.description,
+        price: product.price || 0,
+        images: product.image ? [product.image] : product.images || [],
+        variants: product.variants || [],
+        category: product.tags?.[0] || 'Other',
+        tags: product.tags || [],
+        metadata: {
+          printify_id: product.id,
+          published: true,
+          created_at: product.createdAt || new Date().toISOString(),
+          updated_at: product.updatedAt || new Date().toISOString(),
+        },
+        blueprintId: product.blueprintId ?? null,
+        printifyProductId: product.printifyProductId ?? String(product.id),
+      }));
+
+    // Deduplicate by blueprintId and printifyProductId
+    const deduplicated = deduplicateProducts(transformedProducts, {
+      deduplicateBy: 'both',
+    });
 
     // Shop API: Transformed products from v1 Printify API
 
     return NextResponse.json(
       {
-        products: transformedProducts,
+        products: deduplicated,
         source: 'v1-api',
-        count: transformedProducts.length,
+        count: deduplicated.length,
         timestamp: new Date().toISOString(),
       },
       { status: 200 },

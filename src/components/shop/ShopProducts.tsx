@@ -162,14 +162,23 @@ export default function ShopProducts({ category, query, page, sort }: ShopProduc
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => {
+      {
+        products
+          .filter((product) => {
           const defaultVariant = product.variants[0];
           const imageUrl =
-            product.primaryImageUrl ||
-            defaultVariant?.previewImageUrl ||
-            '/images/products/placeholder.svg';
+              product.primaryImageUrl || defaultVariant?.previewImageUrl;
+            return imageUrl && !imageUrl.includes('placeholder') && imageUrl.trim() !== '';
+          })
+            .map((product) => {
+              const defaultVariant = product.variants[0];
+              const imageUrl =
+                product.primaryImageUrl || defaultVariant?.previewImageUrl;
 
-          return (
+              // Type guard - should never happen due to filter, but TypeScript needs it
+              if (!imageUrl) return null;
+
+              return (
             <div key={product.id} className="group glass neon-edge p-4 rounded-lg">
               <Link href={`/shop/product/${product.id}`} className="block">
                 {/* Product Image */}

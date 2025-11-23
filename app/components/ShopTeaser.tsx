@@ -34,18 +34,27 @@ export default function ShopTeaser() {
 
           if (data.products && Array.isArray(data.products)) {
             // Transform Printify products to display format and limit to 4
-            const transformedProducts = data.products.slice(0, 4).map((product: any) => ({
-              id: product.id,
-              title: product.title,
-              description: product.description,
-              image:
-                product.images?.[0]?.src ||
-                product.images?.[0] ||
-                '/assets/images/placeholder-product.jpg',
-              price: product.variants?.[0]?.price || product.price || 0,
-              available: product.variants?.some((v: any) => v.is_enabled && v.is_available) || true,
-              slug: product.id,
-            }));
+            // Filter out products without images or with placeholder images
+            const transformedProducts = data.products
+              .filter((product: any) => {
+                const imageUrl = product.images?.[0]?.src || product.images?.[0];
+                return (
+                  imageUrl &&
+                  !imageUrl.includes('placeholder') &&
+                  !imageUrl.includes('seed:') &&
+                  imageUrl.trim() !== ''
+                );
+              })
+              .slice(0, 4)
+              .map((product: any) => ({
+                id: product.id,
+                title: product.title,
+                description: product.description,
+                image: product.images?.[0]?.src || product.images?.[0],
+                price: product.variants?.[0]?.price || product.price || 0,
+                available: product.variants?.some((v: any) => v.is_enabled && v.is_available) || true,
+                slug: product.id,
+              }));
 
             setProducts(transformedProducts);
           } else {

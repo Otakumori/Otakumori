@@ -14,6 +14,7 @@ import { type Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import { serializeProduct } from '@/lib/catalog/serialize';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
+import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 
 export const runtime = 'nodejs';
 
@@ -35,6 +36,48 @@ function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.P
   const where: Prisma.ProductWhereInput = {
     active: true,
     visible: true,
+    // Exclude placeholder products
+    primaryImageUrl: {
+      not: null,
+    },
+    // Exclude products with placeholder in image URL or test/draft titles
+    NOT: [
+      {
+        primaryImageUrl: {
+          contains: 'placeholder',
+          mode: 'insensitive',
+        },
+      },
+      {
+        primaryImageUrl: {
+          contains: 'seed:',
+          mode: 'insensitive',
+        },
+      },
+      {
+        integrationRef: {
+          startsWith: 'seed:',
+        },
+      },
+      {
+        name: {
+          contains: '[test]',
+          mode: 'insensitive',
+        },
+      },
+      {
+        name: {
+          contains: '[draft]',
+          mode: 'insensitive',
+        },
+      },
+      {
+        name: {
+          contains: '[placeholder]',
+          mode: 'insensitive',
+        },
+      },
+    ],
   };
 
   if (params.category) {
@@ -164,6 +207,16 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.max(1, Math.ceil(total / limit));
     let serialized = products.map(serializeProduct);
+
+    // Filter out invalid/placeholder products - check image and integrationRef
+    serialized = serialized.filter((product) => {
+      const imageUrl = product.image ?? product.images?.[0];
+      if (!imageUrl || imageUrl.trim() === '') return false;
+      if (typeof imageUrl === 'string' && (imageUrl.includes('placeholder') || imageUrl.includes('seed:'))) return false;
+      if (product.integrationRef?.startsWith('seed:')) return false;
+      if (product.title && (product.title.toLowerCase().includes('[test]') || product.title.toLowerCase().includes('[draft]'))) return false;
+      return true;
+    });
 
     // Deduplicate by blueprintId and printifyProductId to prevent duplicate product cards
     // This handles cases where products were synced multiple times with different IDs
