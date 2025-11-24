@@ -14,6 +14,8 @@ import { type Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
+import { logger } from '@/app/lib/logger';
+import { generateRequestId, createApiSuccess, createApiError } from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
 
@@ -110,31 +112,32 @@ function buildOrderBy(
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const parsed = SearchParamsSchema.safeParse(Object.fromEntries(searchParams));
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: 'Invalid search parameters',
-        details: parsed.error.issues,
-      },
-      { status: 400 },
-    );
-  }
-
-  const params = parsed.data;
-
+  const requestId = generateRequestId();
   try {
-    const limit = params.limit ?? 20;
-    const page = params.page ?? 1;
+    const { searchParams } = new URL(request.url);
+    const parsed = SearchParamsSchema.safeParse(Object.fromEntries(searchParams));
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        createApiError('VALIDATION_ERROR', 'Invalid search parameters', requestId, parsed.error.issues),
+        { status: 400 },
+      );
+    }
+
+    const params = parsed.data;
+
+    // ✅ Proper pagination limits
+    const limit = Math.min(params.limit ?? 20, 100); // Max 100 per page
+    const page = Math.max(1, params.page ?? 1); // Min page 1
+    const skip = (page - 1) * limit;
 
     const where = buildProductWhere(params);
     const orderBy = buildOrderBy(params);
 
-    // Get ALL products first (or a large batch), then filter and paginate
-    // This ensures accurate counts after filtering/deduplication
+    // ✅ Parallel queries with proper pagination
+    // Note: We fetch a slightly larger batch to account for filtering/deduplication,
+    // but with a reasonable cap to avoid performance issues
+    const fetchLimit = Math.min(limit * 3, 100); // Fetch up to 3 pages worth, max 100
     const [allProducts, priceAggregate, categories] = await Promise.all([
       db.product.findMany({
         where,
@@ -142,11 +145,11 @@ export async function GET(request: NextRequest) {
           ProductVariant: true,
           ProductImage: {
             orderBy: { isDefault: 'desc' },
+            take: 1, // Only first image for list view
           },
         },
         orderBy,
-        // Get more products to account for filtering/deduplication
-        take: 500, // Reasonable limit for filtering
+        take: fetchLimit, // Reasonable limit for filtering/deduplication
       }),
       db.productVariant.aggregate({
         _min: { priceCents: true },
@@ -170,6 +173,7 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
+    // ✅ Serialize products
     let serialized = allProducts.map(serializeProduct);
 
     // Filter out invalid/placeholder products - check image and integrationRef
@@ -193,6 +197,7 @@ export async function GET(request: NextRequest) {
       deduplicateBy: 'both', // Deduplicates by blueprintId, printifyProductId, and id
     });
 
+    // ✅ Handle price sorting if needed
     if (params.sortBy === 'price') {
       serialized = serialized.sort((a: CatalogProduct, b: CatalogProduct) => {
         const aPrice = a.priceRange.min ?? a.priceCents ?? Number.MAX_SAFE_INTEGER;
@@ -201,61 +206,60 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Now paginate from the filtered/deduplicated results
+    // ✅ Calculate pagination from filtered/deduplicated results
     const total = serialized.length;
-    const skip = (page - 1) * limit;
     const paginatedProducts = serialized.slice(skip, skip + limit);
     const totalPages = Math.max(1, Math.ceil(total / limit));
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        products: paginatedProducts,
-        pagination: {
-          page,
-          totalPages,
-          total, // Total after filtering and deduplication
-          limit,
-        },
-        filters: {
-          availableCategories: categories
-            .map((entry) => entry.categorySlug)
-            .filter((value): value is string => Boolean(value)),
-          priceRange: {
-            min: priceAggregate._min.priceCents ?? 0,
-            max: priceAggregate._max.priceCents ?? 0,
-          },
-          availableColors: [],
-          availableSizes: [],
-        },
-        searchQuery: params.q || '',
-        appliedFilters: {
-          ...params,
-        },
-      },
+    logger.info('Printify search completed', { requestId, route: '/api/v1/printify/search' }, {
+      page,
+      limit,
+      total,
+      totalPages,
+      query: params.q,
     });
-  } catch (error) {
-    console.error('Catalog search error:', error);
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        products: [],
-        pagination: {
-          page: 1,
-          totalPages: 0,
-          total: 0,
-          limit: params.limit ?? 20,
+    return NextResponse.json(
+      createApiSuccess(
+        {
+          products: paginatedProducts,
+          pagination: {
+            currentPage: page,
+            totalPages,
+            total, // Total after filtering and deduplication
+            perPage: limit,
+          },
+          filters: {
+            availableCategories: categories
+              .map((entry) => entry.categorySlug)
+              .filter((value): value is string => Boolean(value)),
+            priceRange: {
+              min: priceAggregate._min.priceCents ?? 0,
+              max: priceAggregate._max.priceCents ?? 0,
+            },
+            availableColors: [],
+            availableSizes: [],
+          },
+          searchQuery: params.q || '',
+          appliedFilters: {
+            ...params,
+          },
         },
-        filters: {
-          availableCategories: [],
-          priceRange: { min: 0, max: 0 },
-          availableColors: [],
-          availableSizes: [],
+        requestId
+      ),
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
         },
-        searchQuery: params.q || '',
-        appliedFilters: params,
-      },
-    });
+      }
+    );
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error('Catalog search error', { requestId, route: '/api/v1/printify/search' }, undefined, err);
+
+    return NextResponse.json(
+      createApiError('INTERNAL_ERROR', 'Failed to search products', requestId),
+      { status: 500 }
+    );
   }
 }

@@ -4,6 +4,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ShoppingCart, Search } from 'lucide-react';
+import { paths } from '@/lib/paths';
 
 export const Header: React.FC = () => {
   return (
@@ -44,7 +45,7 @@ export const Header: React.FC = () => {
             >
               <Search className="h-5 w-5" />
             </button>
-            <Link href="/shop/cart" className="text-gray-300 transition-colors hover:text-white">
+            <Link href={paths.cart()} className="text-gray-300 transition-colors hover:text-white">
               <ShoppingCart className="h-5 w-5" />
             </Link>
             <Link

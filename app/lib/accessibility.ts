@@ -27,26 +27,66 @@ export function announceToScreenReader(message: string): void {
 }
 
 // Focus management utilities
-export function trapFocus(element: HTMLElement): () => void {
-  const focusableElements = element.querySelectorAll(
-    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-  );
+/**
+ * Get all focusable elements within a container
+ */
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  const selector = [
+    'button:not([disabled])',
+    '[href]',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+    '[contenteditable="true"]',
+  ].join(', ');
 
-  const firstElement = focusableElements[0] as HTMLElement;
-  const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+  return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
+    (el) => {
+      // Filter out hidden elements
+      const style = window.getComputedStyle(el);
+      return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    },
+  );
+}
+
+/**
+ * Trap focus within an element (for modals)
+ * Returns cleanup function
+ */
+export function trapFocus(element: HTMLElement, returnFocusTo?: HTMLElement): () => void {
+  const focusableElements = getFocusableElements(element);
+  
+  if (focusableElements.length === 0) {
+    // No focusable elements, focus the container itself
+    element.setAttribute('tabindex', '-1');
+    element.focus();
+    return () => {
+      element.removeAttribute('tabindex');
+      returnFocusTo?.focus();
+    };
+  }
+
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+
+  // Focus first element
+  firstElement.focus();
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Tab') {
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          lastElement.focus();
-          e.preventDefault();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          firstElement.focus();
-          e.preventDefault();
-        }
+    if (e.key !== 'Tab') return;
+
+    if (e.shiftKey) {
+      // Shift + Tab
+      if (document.activeElement === firstElement) {
+        lastElement.focus();
+        e.preventDefault();
+      }
+    } else {
+      // Tab
+      if (document.activeElement === lastElement) {
+        firstElement.focus();
+        e.preventDefault();
       }
     }
   };
@@ -56,6 +96,7 @@ export function trapFocus(element: HTMLElement): () => void {
   // Return cleanup function
   return () => {
     element.removeEventListener('keydown', handleKeyDown);
+    returnFocusTo?.focus();
   };
 }
 
@@ -73,10 +114,51 @@ export function createSkipLink(targetId: string, text: string = 'Skip to main co
 }
 
 // Color contrast utilities
-export function getContrastRatio(_color1: string, _color2: string): number {
-  // Simplified contrast ratio calculation
-  // In production, use a proper color contrast library
-  return 4.5; // Placeholder - always passes AA
+/**
+ * Calculate relative luminance of a color (0-1)
+ * Based on WCAG 2.1 formula
+ */
+function getLuminance(color: string): number {
+  // Convert hex to RGB
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+  // Apply gamma correction
+  const [rs, gs, bs] = [r, g, b].map((val) => {
+    return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+  });
+
+  // Calculate relative luminance
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+/**
+ * Calculate contrast ratio between two colors
+ * Returns a value between 1 and 21
+ * WCAG AA requires 4.5:1 for normal text, 3:1 for large text
+ */
+export function getContrastRatio(color1: string, color2: string): number {
+  const lum1 = getLuminance(color1);
+  const lum2 = getLuminance(color2);
+
+  const lighter = Math.max(lum1, lum2);
+  const darker = Math.min(lum1, lum2);
+
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * Check if contrast ratio meets WCAG AA standards
+ * @param color1 - First color (hex format)
+ * @param color2 - Second color (hex format)
+ * @param isLargeText - Whether text is large (18pt+ or 14pt+ bold)
+ * @returns true if meets WCAG AA (4.5:1 for normal, 3:1 for large)
+ */
+export function meetsWCAGAA(color1: string, color2: string, isLargeText = false): boolean {
+  const ratio = getContrastRatio(color1, color2);
+  return isLargeText ? ratio >= 3 : ratio >= 4.5;
 }
 
 // Motion preference utilities

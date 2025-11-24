@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '@clerk/nextjs';
 
 interface CartItem {
   id: string;
@@ -30,6 +31,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [total, setTotal] = useState(0);
   const [itemCount, setItemCount] = useState(0);
+  const { isSignedIn, userId } = useAuth();
 
   useEffect(() => {
     // Load cart from localStorage on mount (client-side only)
@@ -47,6 +49,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, []);
+
+  // Sync cart to Prisma on sign-in
+  useEffect(() => {
+    if (isSignedIn && userId && items.length > 0) {
+      syncCartToPrisma(userId, items).catch((error) => {
+        console.error('Failed to sync cart to Prisma:', error);
+      });
+    }
+  }, [isSignedIn, userId, items.length]);
 
   useEffect(() => {
     // Save cart to localStorage whenever it changes (client-side only)
@@ -134,4 +145,35 @@ export function useCart() {
     );
   }
   return context;
+}
+
+// Sync cart items to Prisma database
+async function syncCartToPrisma(userId: string, cartItems: CartItem[]) {
+  try {
+    const response = await fetch('/api/v1/cart/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        items: cartItems.map((item) => ({
+          productId: item.id,
+          variantId: item.selectedVariant?.id,
+          quantity: item.quantity,
+        })),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to sync cart');
+    }
+
+    const result = await response.json();
+    if (!result.ok) {
+      throw new Error(result.error || 'Failed to sync cart');
+    }
+  } catch (error) {
+    // Silently fail - cart will remain in localStorage
+    console.error('Cart sync error:', error);
+  }
 }

@@ -9,6 +9,12 @@ type SyncOptions = {
   hideMissing?: boolean;
 };
 
+/**
+ * Staleness threshold for product sync (2 hours in milliseconds)
+ * Products older than this threshold are considered stale
+ */
+export const SYNC_STALENESS_THRESHOLD_MS = 2 * 60 * 60 * 1000; // 2 hours
+
 type OptionValue = {
   option: string;
   value: string;
@@ -307,6 +313,206 @@ export async function syncPrintifyProducts(
   return stats;
 }
 
+/**
+ * Check if sync is stale (older than threshold)
+ * @param thresholdHours - Number of hours before sync is considered stale (default: 2)
+ * @returns true if sync is stale or no sync has occurred
+ */
+export async function isSyncStale(thresholdHours = 2): Promise<boolean> {
+  const threshold = new Date();
+  threshold.setHours(threshold.getHours() - thresholdHours);
+
+  const mostRecentSync = await db.product.findFirst({
+    where: {
+      lastSyncedAt: { not: null },
+    },
+    orderBy: {
+      lastSyncedAt: 'desc',
+    },
+    select: {
+      lastSyncedAt: true,
+    },
+  });
+
+  if (!mostRecentSync?.lastSyncedAt) {
+    return true; // No sync has occurred
+  }
+
+  return mostRecentSync.lastSyncedAt < threshold;
+}
+
+/**
+ * Get the last sync time
+ * @returns ISO string of last sync time, or null if no sync has occurred
+ */
+export async function getLastSyncTime(): Promise<string | null> {
+  const mostRecentSync = await db.product.findFirst({
+    where: {
+      lastSyncedAt: { not: null },
+    },
+    orderBy: {
+      lastSyncedAt: 'desc',
+    },
+    select: {
+      lastSyncedAt: true,
+    },
+  });
+
+  return mostRecentSync?.lastSyncedAt?.toISOString() ?? null;
+}
+
+/**
+ * Get sync statistics
+ * @returns Object with sync stats
+ */
+export async function getSyncStats() {
+  const [totalProducts, syncedProducts, staleProducts] = await Promise.all([
+    db.product.count(),
+    db.product.count({
+      where: {
+        lastSyncedAt: { not: null },
+      },
+    }),
+    db.product.count({
+      where: {
+        lastSyncedAt: {
+          lt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        },
+      },
+    }),
+  ]);
+
+  const lastSyncTime = await getLastSyncTime();
+  const isStale = await isSyncStale(2);
+
+  return {
+    totalProducts,
+    syncedProducts,
+    staleProducts,
+    lastSyncTime,
+    isStale,
+  };
+}
+
 export async function syncSinglePrintifyProduct(product: PrintifyProduct) {
   await syncProductRecord(db, product);
+}
+
+/**
+ * Get the last sync time for a specific product
+ * @param productId - Product ID (internal or Printify ID)
+ * @returns Last sync timestamp or null if product not found or never synced
+ */
+export async function getProductLastSyncTime(productId: string): Promise<Date | null> {
+  const product = await db.product.findFirst({
+    where: {
+      OR: [{ id: productId }, { printifyProductId: productId }],
+    },
+    select: {
+      lastSyncedAt: true,
+    },
+  });
+
+  return product?.lastSyncedAt ?? null;
+}
+
+/**
+ * Get the most recent sync time across all products
+ * @returns Last sync timestamp or null if no products have been synced
+ */
+export async function getGlobalLastSyncTime(): Promise<Date | null> {
+  const product = await db.product.findFirst({
+    where: {
+      lastSyncedAt: { not: null },
+    },
+    orderBy: {
+      lastSyncedAt: 'desc',
+    },
+    select: {
+      lastSyncedAt: true,
+    },
+  });
+
+  return product?.lastSyncedAt ?? null;
+}
+
+/**
+ * Check if a product's sync is stale
+ * @param productId - Product ID (internal or Printify ID)
+ * @param thresholdMs - Optional custom threshold in milliseconds (defaults to SYNC_STALENESS_THRESHOLD_MS)
+ * @returns true if product is stale or not found, false if fresh
+ */
+export async function isProductSyncStale(
+  productId: string,
+  thresholdMs: number = SYNC_STALENESS_THRESHOLD_MS,
+): Promise<boolean> {
+  const lastSync = await getProductLastSyncTime(productId);
+
+  if (!lastSync) {
+    // Product not found or never synced - consider it stale
+    return true;
+  }
+
+  const now = new Date();
+  const ageMs = now.getTime() - lastSync.getTime();
+
+  return ageMs > thresholdMs;
+}
+
+/**
+ * Check if the global product catalog sync is stale
+ * @param thresholdMs - Optional custom threshold in milliseconds (defaults to SYNC_STALENESS_THRESHOLD_MS)
+ * @returns true if catalog is stale or no products exist, false if fresh
+ */
+export async function isCatalogSyncStale(
+  thresholdMs: number = SYNC_STALENESS_THRESHOLD_MS,
+): Promise<boolean> {
+  const lastSync = await getGlobalLastSyncTime();
+
+  if (!lastSync) {
+    // No products synced - consider catalog stale
+    return true;
+  }
+
+  const now = new Date();
+  const ageMs = now.getTime() - lastSync.getTime();
+
+  return ageMs > thresholdMs;
+}
+
+/**
+ * Get staleness information for a product
+ * @param productId - Product ID (internal or Printify ID)
+ * @param thresholdMs - Optional custom threshold in milliseconds (defaults to SYNC_STALENESS_THRESHOLD_MS)
+ * @returns Object with staleness status and metadata
+ */
+export async function getProductSyncStatus(
+  productId: string,
+  thresholdMs: number = SYNC_STALENESS_THRESHOLD_MS,
+): Promise<{
+  isStale: boolean;
+  lastSyncedAt: Date | null;
+  ageMs: number | null;
+  thresholdMs: number;
+}> {
+  const lastSync = await getProductLastSyncTime(productId);
+
+  if (!lastSync) {
+    return {
+      isStale: true,
+      lastSyncedAt: null,
+      ageMs: null,
+      thresholdMs,
+    };
+  }
+
+  const now = new Date();
+  const ageMs = now.getTime() - lastSync.getTime();
+
+  return {
+    isStale: ageMs > thresholdMs,
+    lastSyncedAt: lastSync,
+    ageMs,
+    thresholdMs,
+  };
 }

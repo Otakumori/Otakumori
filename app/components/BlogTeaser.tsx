@@ -1,37 +1,36 @@
 // DEPRECATED: This component is a duplicate. Use components\hero\BlogTeaser.tsx instead.
 import GlassPanel from './GlassPanel';
 import Link from 'next/link';
+import { db } from '@/lib/db';
 
 type Post = { id: string; slug: string; title: string; excerpt?: string; publishedAt?: string };
 
-// Mock blog posts for now until blog API is properly implemented
-const SAMPLE_POSTS: Post[] = [
-  {
-    id: '1',
-    slug: 'welcome-to-otaku-mori',
-    title: 'Welcome to Otaku-mori: Your New Digital Haven',
-    excerpt: 'Discover what makes our community special and how to get started on your journey.',
-    publishedAt: '2024-09-20',
-  },
-  {
-    id: '2',
-    slug: 'mini-games-guide',
-    title: 'Mini-Games Hub: Complete Guide for Beginners',
-    excerpt: 'Learn the ins and outs of our GameCube-inspired gaming experience.',
-    publishedAt: '2024-09-18',
-  },
-  {
-    id: '3',
-    slug: 'community-guidelines',
-    title: 'Building a Positive Community Together',
-    excerpt: 'Our approach to creating safe, welcoming spaces for all travelers.',
-    publishedAt: '2024-09-15',
-  },
-];
+async function getBlogPosts(): Promise<Post[]> {
+  try {
+    const posts = await db.contentPage.findMany({
+      where: {
+        published: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 3,
+    });
+
+    return posts.map((post) => ({
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt || undefined,
+      publishedAt: post.createdAt.toISOString().split('T')[0],
+    }));
+  } catch {
+    return [];
+  }
+}
 
 export default async function BlogTeaser() {
-  // Use sample posts for now, later replace with real blog service
-  const posts = SAMPLE_POSTS;
+  const posts = await getBlogPosts();
 
   return (
     <section id="blog" className="relative z-10 mx-auto max-w-7xl px-4 md:px-6">

@@ -343,17 +343,29 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         params.append('page', filters.page.toString());
         params.append('limit', filters.limit.toString());
 
-        const response = await fetch(`/api/v1/printify/search?${params.toString()}`, {
+        // Try Prisma API first, fallback to Printify if needed
+        let response = await fetch(`/api/v1/products?${params.toString()}`, {
           credentials: 'same-origin',
           headers: {
             Accept: 'application/json',
           },
         });
 
+        // Fallback to Printify API if Prisma API fails
+        if (!response.ok) {
+          console.warn(`Prisma API returned ${response.status}, falling back to Printify`);
+          response = await fetch(`/api/v1/printify/search?${params.toString()}`, {
+            credentials: 'same-origin',
+            headers: {
+              Accept: 'application/json',
+            },
+          });
+        }
+
         if (!response.ok) {
           // Handle HTTP errors gracefully
           const errorText = await response.text();
-          console.warn(`Printify API returned ${response.status}: ${errorText}`);
+          console.warn(`Product API returned ${response.status}: ${errorText}`);
           setSearchResult({
             products: [],
             total: 0,
@@ -381,7 +393,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
           setSearchResult({
             products,
             total: data.pagination?.total ?? data.total ?? 0,
-            page: data.pagination?.page ?? data.page ?? 1,
+            page: data.pagination?.currentPage ?? data.pagination?.page ?? data.page ?? 1,
             totalPages: data.pagination?.totalPages ?? data.totalPages ?? 0,
             filters: data.filters ?? {
               availableCategories: [],

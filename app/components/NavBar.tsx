@@ -4,6 +4,7 @@ import GlassPanel from './GlassPanel';
 import { auth } from '@clerk/nextjs/server';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env';
+import { paths } from '@/lib/paths';
 
 async function getCartCount() {
   try {
@@ -55,7 +56,7 @@ export default async function NavBar() {
               </Link>
             </li>
             <li>
-              <Link className="hover:text-white/90 transition-colors" href="/cart">
+              <Link className="hover:text-white/90 transition-colors" href={paths.cart()}>
                 {t('cart', 'gatherGear')}
                 {count > 0 ? ` (${count})` : ''}
               </Link>

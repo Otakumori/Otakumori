@@ -1,182 +1,89 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { db } from '@/lib/db';
+import { db } from '@/app/lib/db';
 import { logger } from '@/app/lib/logger';
-import { SearchSuggestionRequestSchema, type SearchSuggestionRequest } from '@/app/lib/contracts';
-import { auth } from '@clerk/nextjs/server';
+import {
+  generateRequestId,
+  createApiSuccess,
+  createApiError,
+} from '@/app/lib/api-contracts';
 
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-    }
+const QuerySchema = z.object({
+  q: z.string().min(1).max(100),
+});
 
-    const body = await request.json();
-    const suggestionRequest = SearchSuggestionRequestSchema.parse(body);
-
-    logger.info('Search suggestions request received', {
-      userId,
-      extra: { query: suggestionRequest.query, searchType: suggestionRequest.searchType },
-    });
-
-    const suggestions = await getSearchSuggestions(suggestionRequest);
-
-    logger.info('Search suggestions completed', {
-      userId,
-      extra: {
-        query: suggestionRequest.query,
-        suggestionCount: suggestions.length,
-      },
-    });
-
-    return NextResponse.json({ ok: true, data: { suggestions } });
-  } catch (error) {
-    logger.error('Search suggestions request failed', {
-      extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
-
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ ok: false, error: 'Invalid request parameters' }, { status: 400 });
-    }
-
-    return NextResponse.json({ ok: false, error: 'Failed to get suggestions' }, { status: 500 });
-  }
-}
-
-async function getSearchSuggestions(request: SearchSuggestionRequest) {
-  const { query, searchType, limit } = request;
-
-  // Get existing suggestions from database
-  const whereClause: any = { query: { contains: query, mode: 'insensitive' } };
-  if (searchType !== 'all') whereClause.suggestionType = searchType;
-  const existingSuggestions = await db.searchSuggestion.findMany({
-    where: whereClause,
-    orderBy: [{ popularity: 'desc' }, { lastUsed: 'desc' }],
-    take: limit,
-  });
-
-  // Generate dynamic suggestions based on search type
-  const dynamicSuggestions = await generateDynamicSuggestions(query, searchType, limit);
-
-  // Combine and deduplicate suggestions
-  const allSuggestions = [...existingSuggestions, ...dynamicSuggestions];
-  const uniqueSuggestions = allSuggestions.filter(
-    (suggestion, index, self) =>
-      index ===
-      self.findIndex(
-        (s) => s.query === suggestion.query && s.suggestionType === suggestion.suggestionType,
-      ),
-  );
-
-  // Sort by relevance and return top results
-  return uniqueSuggestions
-    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-    .slice(0, limit);
-}
-
-async function generateDynamicSuggestions(query: string, searchType: string, limit: number) {
-  const suggestions: any[] = [];
+export async function GET(request: NextRequest) {
+  const requestId = generateRequestId();
 
   try {
-    // Generate user suggestions
-    if (searchType === 'people' || searchType === 'all') {
-      const userSuggestions = await db.user.findMany({
-        where: {
-          OR: [
-            { username: { contains: query, mode: 'insensitive' } },
-            { displayName: { contains: query, mode: 'insensitive' } },
-          ],
-          visibility: { not: 'PRIVATE' },
-        },
-        select: {
-          id: true,
-          username: true,
-          displayName: true,
-        },
-        take: Math.ceil(limit / 2),
-      });
+    const { searchParams } = new URL(request.url);
+    const parsed = QuerySchema.safeParse({
+      q: searchParams.get('q') || '',
+    });
 
-      suggestions.push(
-        ...userSuggestions.map((user) => ({
-          query: user.displayName || user.username,
-          suggestionType: 'user',
-          targetId: user.id,
-          targetType: 'user',
-          popularity: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        })),
+    if (!parsed.success) {
+      return NextResponse.json(
+        createApiError('VALIDATION_ERROR', 'Invalid query', requestId),
+        { status: 400 },
       );
     }
 
-    // Generate product suggestions
-    if (searchType === 'products' || searchType === 'all') {
-      const productSuggestions = await db.product.findMany({
+    const { q } = parsed.data;
+    const query = q.trim().toLowerCase();
+
+    // Get suggestions from products, games, and blog posts
+    const [products, posts] = await Promise.all([
+      db.product.findMany({
         where: {
-          name: { contains: query, mode: 'insensitive' },
           active: true,
+          visible: true,
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { tags: { hasSome: [query] } },
+          ],
         },
-        select: {
-          id: true,
-          name: true,
+        select: { name: true },
+        take: 3,
+      }),
+      db.contentPage.findMany({
+        where: {
+          published: true,
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { slug: { contains: query, mode: 'insensitive' } },
+          ],
         },
-        take: Math.ceil(limit / 2),
-      });
+        select: { title: true },
+        take: 2,
+      }),
+    ]);
 
-      suggestions.push(
-        ...productSuggestions.map((product) => ({
-          query: product.name,
-          suggestionType: 'product',
-          targetId: product.id,
-          targetType: 'product',
-          popularity: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        })),
-      );
-    }
+    const suggestions = [
+      ...products.map((p) => p.name),
+      ...posts.map((p) => p.title),
+    ].slice(0, 5);
 
-    // Generate tag suggestions
-    const tagSuggestions = await db.product.findMany({
-      where: {
-        category: { contains: query, mode: 'insensitive' },
-        active: true,
+    return NextResponse.json(
+      createApiSuccess({ suggestions }, requestId),
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
       },
-      select: {
-        category: true,
-      },
-      take: 10,
-    });
-
-    const uniqueTags = new Set<string>();
-    tagSuggestions.forEach((product) => {
-      if (product.category && product.category.toLowerCase().includes(query.toLowerCase())) {
-        uniqueTags.add(product.category);
-      }
-    });
-
-    suggestions.push(
-      ...Array.from(uniqueTags)
-        .slice(0, 3)
-        .map((tag) => ({
-          query: tag,
-          suggestionType: 'tag',
-          targetId: null,
-          targetType: null,
-          popularity: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        })),
     );
   } catch (error) {
-    logger.warn('Failed to generate dynamic suggestions', {
-      extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error(
+      'Search suggestions error',
+      { requestId, route: '/api/v1/search/suggestions' },
+      undefined,
+      err,
+    );
+    return NextResponse.json(
+      createApiError('INTERNAL_ERROR', 'Failed to fetch suggestions', requestId),
+      { status: 500 },
+    );
   }
-
-  return suggestions;
 }

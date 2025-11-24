@@ -88,18 +88,15 @@ export default async function HomePage() {
             10+: Main content (above all backgrounds)
           */}
           {isHomepageExperimentalEnabled && (
-            <div className="relative">
-        {/* Starfield background - deepest layer, behind everything */ }
-        < SafeSection name = "StarfieldBackground" fallback = { null} >
-          <StarfieldBackground density={ 0.72 } speed = { 0.62} zIndex = {- 11
-    } />
-      </SafeSection>
+            <>
+              {/* Starfield background - deepest layer, behind everything */}
+              <SafeSection name="StarfieldBackground" fallback={null}>
+                <StarfieldBackground density={0.72} speed={0.62} zIndex={-11} />
+              </SafeSection>
 
-    {/* Tree hero - above starfield, behind petals */ }
+              {/* Tree hero - above starfield, behind petals, scrolls with page */}
               <SafeSection name="TreeBackground" fallback={null}>
-                <div className="fixed inset-0 pointer-events-none" style={{ zIndex: -10 }}>
-                  <TreeBackgroundWrapper />
-                </div>
+                <TreeBackgroundWrapper />
               </SafeSection>
 
               {/* Atmospheric petal layers - above tree, below content */}
@@ -115,7 +112,7 @@ export default async function HomePage() {
                   <PetalFlowOverlayWrapper />
                 </div>
               </SafeSection>
-            </div>
+            </>
           )}
 
           {/* Interactive petal system - clickable, collectible petals with tree-matched colors */}

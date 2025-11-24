@@ -28,6 +28,9 @@ export const paths = {
   profile: (username?: string) => (username ? `/profile/${username}` : '/profile'),
   achievements: () => '/profile/achievements',
 
+  // Account
+  account: () => '/account',
+
   // Legal & Help
   terms: () => '/terms',
   privacy: () => '/privacy',

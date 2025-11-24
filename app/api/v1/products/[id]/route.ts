@@ -1,233 +1,183 @@
+/**
+ * Single Product API - Prisma-based product lookup
+ *
+ * Gets a single product by ID from Prisma cache
+ * Falls back to Printify if not found in Prisma
+ */
+
 import { type NextRequest, NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
-import { getPrintifyService, type PrintifyProduct } from '@/app/lib/printify/service';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
-import { normalizeCategorySlug, createProductSlug } from '@/lib/catalog/mapPrintify';
+import {
+  generateRequestId,
+  createApiError,
+  createApiSuccess,
+} from '@/app/lib/api-contracts';
+import { getPrintifyService } from '@/app/lib/printify/service';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
-type OptionValue = {
-  option?: string;
-  value?: string;
-  colors?: string[];
-};
-
-function buildOptionValueMap(product: PrintifyProduct): Map<number, OptionValue> {
-  const map = new Map<number, OptionValue>();
-
-  for (const option of product.options ?? []) {
-    const optionName = option.name;
-    for (const value of option.values ?? []) {
-      if (value?.id == null) continue;
-      map.set(value.id, {
-        option: optionName,
-        value: value?.title,
-        colors: value?.colors,
-      });
-    }
-  }
-
-  return map;
-}
-
-function resolveVariantOptionValues(
-  product: PrintifyProduct,
-  variantOptions: number[] | undefined,
-): OptionValue[] {
-  if (!variantOptions || variantOptions.length === 0) {
-    return [];
-  }
-
-  const optionValueMap = buildOptionValueMap(product);
-  return variantOptions
-    .map((optionId) => optionValueMap.get(optionId))
-    .filter((value): value is OptionValue => Boolean(value));
-}
-
-function resolveVariantPreviewImage(product: PrintifyProduct, variantId: number): string | null {
-  const match = product.images?.find((image) => image.variant_ids?.includes(variantId));
-  if (match?.src) {
-    return match.src;
-  }
-
-  const defaultImage = product.images?.find((image) => image.is_default);
-  if (defaultImage?.src) {
-    return defaultImage.src;
-  }
-
-  return product.images?.[0]?.src ?? null;
-}
-
-function mapPrintifyProductToCatalog(product: PrintifyProduct): CatalogProduct {
-  const images = (product.images ?? [])
-    .map((image) => image?.src)
-    .filter((src): src is string => Boolean(src));
-
-  const variants = product.variants ?? [];
-  const prices = variants
-    .map((variant) => (typeof variant.price === 'number' ? Math.round(variant.price) : null))
-    .filter((price): price is number => price != null && price > 0);
-  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
-  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
-  const categorySlug = normalizeCategorySlug(product);
-
-  return {
-    id: String(product.id),
-    title: product.title,
-    slug: createProductSlug(product.title ?? 'product', String(product.id)),
-    description: product.description ?? '',
-    image: images[0] ?? null,
-    images,
-    tags: product.tags ?? [],
-    category: product.tags?.[0] ?? null,
-    categorySlug,
-    price: minPrice != null ? minPrice / 100 : null,
-    priceCents: minPrice,
-    priceRange: {
-      min: minPrice,
-      max: maxPrice ?? minPrice,
-    },
-    available: variants.some(
-      (variant) =>
-        (variant.is_enabled ?? true) && (variant.is_available ?? variant.is_enabled ?? true),
-    ),
-    variants: variants.map((variant) => {
-      const priceCents =
-        typeof variant.price === 'number' && !Number.isNaN(variant.price)
-          ? Math.round(variant.price)
-          : null;
-      return {
-        id: String(variant.id),
-        title: variant.title ?? null,
-        sku: variant.sku ?? null,
-        price: priceCents != null ? priceCents / 100 : null,
-        priceCents,
-        inStock: variant.is_available ?? variant.is_enabled ?? true,
-        isEnabled: variant.is_enabled ?? true,
-        printifyVariantId: variant.id,
-        optionValues: resolveVariantOptionValues(product, variant.options),
-        previewImageUrl: resolveVariantPreviewImage(product, variant.id),
-      };
-    }),
-    integrationRef: String(product.id),
-    printifyProductId: String(product.id),
-    blueprintId: product.blueprint_id ?? null,
-    printProviderId: product.print_provider_id ?? null,
-    visible: product.visible ?? true,
-    active: product.visible ?? true, // In Printify, visible means published/active
-    isLocked: product.is_locked ?? false, // Track Printify "Publishing" status
-    lastSyncedAt: null,
-  };
-}
-
-export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const requestId = generateRequestId();
 
   try {
-    let product = null;
+    const { id } = await params;
 
-    try {
-      product = await db.product.findFirst({
-        where: {
-          OR: [{ id }, { printifyProductId: id }, { integrationRef: id }],
-          active: true,
-        },
-        include: {
-          ProductVariant: true,
-          ProductImage: true,
-        },
-      });
-    } catch (prismaError) {
-      if (
-        prismaError instanceof Prisma.PrismaClientKnownRequestError &&
-        prismaError.code === 'P2022'
-      ) {
-        console.warn(
-          '[products/:id] Prisma schema mismatch detected, falling back to Printify',
-          prismaError.message,
-        );
-      } else {
-        throw prismaError;
-      }
+    if (!id || typeof id !== 'string') {
+      return NextResponse.json(
+        createApiError('VALIDATION_ERROR', 'Invalid product ID', requestId),
+        { status: 400 },
+      );
     }
 
-    if (!product) {
-      try {
-        // Check if Printify is configured before attempting to fetch
-        const { env } = await import('@/env');
-        if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID) {
-          return NextResponse.json(
-            {
-              ok: false,
-              error: 'Product temporarily unavailable. Printify integration not configured.',
-            },
-            { status: 503 },
-          );
-        }
-
-        const printifyService = getPrintifyService();
-        const printifyProduct = await printifyService.getProduct(id);
-        const dto = mapPrintifyProductToCatalog(printifyProduct);
-
-        return NextResponse.json({
-          ok: true,
-          data: {
-            id: dto.id,
-            title: dto.title,
-            description: dto.description,
-            images: dto.images.map((src) => ({ src })),
-            price: dto.price ?? 0,
-            priceCents: dto.priceCents ?? null,
-            category: dto.categorySlug ?? dto.category ?? undefined,
-            variants: dto.variants,
-            available: dto.available,
-            visible: printifyProduct.visible ?? true,
-            slug: dto.slug,
-            tags: dto.tags,
-            integrationRef: dto.integrationRef,
-            source: 'printify',
-          },
-        });
-      } catch (printifyError) {
-        if (
-          printifyError instanceof Error &&
-          /Printify API error\s*\(404\)/.test(printifyError.message)
-        ) {
-          return NextResponse.json({ ok: false, error: 'Product not found' }, { status: 404 });
-        }
-        throw printifyError;
-      }
-    }
-
-    const dto = serializeProduct(product);
-
-    return NextResponse.json({
-      ok: true,
-      data: {
-        id: dto.id,
-        title: dto.title,
-        description: dto.description,
-        images: dto.images.map((src) => ({ src })),
-        price: dto.price ?? 0,
-        priceCents: dto.priceCents ?? null,
-        category: dto.categorySlug ?? dto.category ?? undefined,
-        variants: dto.variants,
-        available: dto.available,
-        visible: product.visible,
-        slug: dto.slug,
-        tags: dto.tags,
-        integrationRef: dto.integrationRef,
+    // Try to find product in Prisma first
+    const product = await db.product.findUnique({
+      where: { id },
+      include: {
+        ProductVariant: true,
+        ProductImage: {
+          orderBy: { position: 'asc' },
+        },
       },
     });
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    return NextResponse.json(
-      {
-        ok: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch product',
+
+    if (product) {
+      // Product found in Prisma cache
+      const serialized = serializeProduct(product);
+
+      // Return product directly in data to match expected format
+      return NextResponse.json(
+        createApiSuccess(serialized, requestId),
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+            'X-OTM-Source': 'prisma-cache',
+            'X-OTM-Last-Synced': product.lastSyncedAt?.toISOString() ?? '',
+          },
+        },
+      );
+    }
+
+    // Product not found in Prisma - try Printify fallback
+    // Check if it's a Printify product ID
+    const printifyProductId = id;
+    const printifyProduct = await db.product.findFirst({
+      where: {
+        printifyProductId: printifyProductId,
       },
+      include: {
+        ProductVariant: true,
+        ProductImage: {
+          orderBy: { position: 'asc' },
+        },
+      },
+    });
+
+    if (printifyProduct) {
+      // Found by Printify ID
+      const serialized = serializeProduct(printifyProduct);
+
+      // Return product directly in data to match expected format
+      return NextResponse.json(
+        createApiSuccess(serialized, requestId),
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+            'X-OTM-Source': 'prisma-cache',
+            'X-OTM-Last-Synced': printifyProduct.lastSyncedAt?.toISOString() ?? '',
+          },
+        },
+      );
+    }
+
+    // Try fetching from Printify API as last resort
+    // Note: This is a fallback - ideally products should be synced to Prisma first
+    try {
+      const printifyService = getPrintifyService();
+      const printifyProductData = await printifyService.getProduct(printifyProductId);
+
+      if (printifyProductData) {
+        // Transform Printify product to CatalogProduct format
+        const primaryImage = printifyProductData.images?.find((img) => img.is_default) 
+          ?? printifyProductData.images?.[0];
+        const priceRange = printifyProductData.variants?.length 
+          ? {
+              min: Math.min(...printifyProductData.variants.map((v) => v.price)),
+              max: Math.max(...printifyProductData.variants.map((v) => v.price)),
+            }
+          : { min: null, max: null };
+
+        const catalogProduct: CatalogProduct = {
+          id: String(printifyProductData.id),
+          title: printifyProductData.title,
+          slug: `product-${printifyProductData.id}`, // Basic slug
+          description: printifyProductData.description ?? '',
+          image: primaryImage?.src ?? null,
+          images: printifyProductData.images?.map((img) => img.src) ?? [],
+          tags: printifyProductData.tags ?? [],
+          category: printifyProductData.tags?.[0] ?? null,
+          categorySlug: null,
+          price: priceRange.min ? priceRange.min / 100 : null,
+          priceCents: priceRange.min,
+          priceRange: {
+            min: priceRange.min,
+            max: priceRange.max,
+          },
+          available: printifyProductData.variants?.some((v) => v.is_available && v.is_enabled) ?? false,
+          visible: printifyProductData.visible ?? true,
+          active: true,
+          isLocked: printifyProductData.is_locked ?? false,
+          variants: printifyProductData.variants?.map((v) => ({
+            id: String(v.id),
+            title: v.title ?? null,
+            sku: v.sku ?? null,
+            price: v.price ? v.price / 100 : null,
+            priceCents: v.price,
+            inStock: v.is_available ?? true,
+            isEnabled: v.is_enabled ?? true,
+            printifyVariantId: v.id,
+            optionValues: [],
+            previewImageUrl: null,
+          })) ?? [],
+          integrationRef: null,
+          printifyProductId: String(printifyProductData.id),
+          blueprintId: printifyProductData.blueprint_id ?? null,
+          printProviderId: printifyProductData.print_provider_id ?? null,
+          lastSyncedAt: null,
+        };
+
+        return NextResponse.json(
+          createApiSuccess(catalogProduct, requestId),
+          {
+            headers: {
+              'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+              'X-OTM-Source': 'printify-api',
+            },
+          },
+        );
+      }
+    } catch (printifyError) {
+      // Printify fetch failed, continue to 404
+      console.warn('[Products API] Printify fallback failed:', printifyError);
+    }
+
+    // Product not found
+    return NextResponse.json(
+      createApiError('NOT_FOUND', `Product with ID ${id} not found`, requestId),
+      { status: 404 },
+    );
+  } catch (error) {
+    console.error('[Products API] Error:', error);
+    return NextResponse.json(
+      createApiError(
+        'INTERNAL_ERROR',
+        'Failed to fetch product',
+        requestId,
+        error instanceof Error ? error.message : String(error),
+      ),
       { status: 500 },
     );
   }

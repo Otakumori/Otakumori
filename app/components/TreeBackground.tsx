@@ -103,45 +103,43 @@ export default function TreeBackground() {
 
   return (
     <>
-      {/* Absolute tree background - starts at top (behind navbar), extends to footer */}
+      {/* Absolute tree background - starts at top (behind navbar), extends to footer, scrolls with page */}
       <div
-        className="fixed inset-x-0 pointer-events-none"
+        className="absolute inset-x-0 pointer-events-none"
         style={{
           top: 0,
-      height: displayHeight,
+          height: displayHeight,
           zIndex: -10,
         }}
         aria-hidden="true"
       >
-        {/* Tree image - natural flow with page */}
+        {/* Tree image - scrolls with page content */}
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
             backgroundSize: 'cover',
-    backgroundPosition: 'left center',
+            backgroundPosition: 'left center',
             backgroundRepeat: 'no-repeat',
-    opacity: isMounted ? 1 : 0,
-      transition: 'opacity 0.3s ease-in',
+            opacity: isMounted ? 1 : 0,
+            transition: 'opacity 0.3s ease-in',
           }}
         />
 
-        {/* Top fade gradient - subtle fade behind navbar (tree visible but subtle) */}
+        {/* Top fade gradient - blends with header */}
         <div
-          className="absolute inset-x-0 top-0 h-24 pointer-events-none"
+          className="absolute inset-x-0 top-0 h-32 pointer-events-none"
           style={{
-            background:
-              'linear-gradient(to bottom, rgba(8, 6, 17, 0.4) 0%, rgba(8, 6, 17, 0.2) 50%, transparent 100%)',
+            background: 'linear-gradient(to bottom, #080611 0%, rgba(8, 6, 17, 0.8) 50%, transparent 100%)',
             zIndex: 1,
           }}
         />
 
-        {/* Bottom fade gradient - clear boundary where tree ends (before footer) */}
+        {/* Bottom fade gradient - blends with footer */}
         <div
           className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
           style={{
-            background:
-              'linear-gradient(to top, #080611 0%, #080611 30%, rgba(8, 6, 17, 0.8) 60%, transparent 100%)',
+            background: 'linear-gradient(to top, #080611 0%, #080611 30%, rgba(8, 6, 17, 0.8) 60%, transparent 100%)',
             zIndex: 1,
           }}
         />

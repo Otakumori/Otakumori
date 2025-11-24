@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { X, HelpCircle } from 'lucide-react';
+import { trapFocus } from '@/app/lib/accessibility';
 
 interface HowToProps {
   children: React.ReactNode;
@@ -16,22 +17,24 @@ export default function HowTo({ children, className = '' }: HowToProps) {
   const toggleModal = () => setIsOpen(!isOpen);
   const closeModal = () => setIsOpen(false);
 
-  // Handle ESC key
+  // Handle ESC key and focus trapping
   useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         closeModal();
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      // Focus the modal for accessibility
-      modalRef.current?.focus();
-    }
+    document.addEventListener('keydown', handleEscape);
+    
+    // Trap focus within modal
+    const cleanup = trapFocus(modalRef.current, buttonRef.current || undefined);
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
+      cleanup();
     };
   }, [isOpen]);
 

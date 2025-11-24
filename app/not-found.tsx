@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Head from 'next/head';
+import { Empty404Icon } from '@/app/components/empty-states/icons';
 
 // Remove duplicate gtag declaration - already defined in lib/ga.ts
 
@@ -152,31 +152,42 @@ export default function LRoom404() {
 
     return (
       <main className="relative min-h-screen bg-[#080611] text-zinc-100 flex items-center justify-center">
-        <Head>
-          <meta name="robots" content="noindex, nofollow" />
-        </Head>
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_circle_at_50%_35%,#1a0f2a,#120b1f_40%,#080611_100%)]" />
 
         <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
-          <h1 className="text-3xl font-bold md:text-5xl mb-4">{errorMessage.title}</h1>
-          <p className="mt-3 text-zinc-300/90 mb-8">{errorMessage.message}</p>
+          {/* ✅ ADD stroke icon */}
+          <div className="mb-6">
+            <Empty404Icon />
+          </div>
+
+          <h1 className="text-4xl font-bold md:text-6xl mb-4 bg-gradient-to-r from-pink-400 via-pink-500 to-purple-400 bg-clip-text text-transparent">
+            You've gone hollow, traveler.
+          </h1>
+          <p className="text-lg text-zinc-300/90 mb-8 max-w-md">
+            This path doesn't exist. The bonfire has faded.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/"
+              className="rounded-xl bg-gradient-to-r from-pink-500/90 via-pink-500 to-pink-400 px-6 py-3 text-white font-semibold hover:from-pink-500 hover:via-pink-400 hover:to-pink-300 transition-all shadow-[0_12px_30px_rgba(236,72,153,0.3)]"
+            >
+              Return to Home
+            </Link>
           <Link
-            href={errorMessage.cta.href}
-            className="rounded-xl bg-pink-500/90 px-6 py-3 text-white hover:bg-pink-500 transition-colors"
+              href="/shop"
+              className="rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-white font-semibold hover:bg-white/10 transition-all"
           >
-            {errorMessage.cta.label}
+              Browse Shop
           </Link>
+          </div>
         </section>
       </main>
     );
   }
 
   return (
-    <main className="relative min-h-screen bg-black text-white overflow-hidden">
-      <Head>
-        <meta name="robots" content="noindex, nofollow" />
-      </Head>
-
+    <main className= "relative min-h-screen bg-black text-white overflow-hidden" >
       {/* L-Room atmosphere */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800" />
 

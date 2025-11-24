@@ -14,6 +14,7 @@ import {
 } from '@/app/lib/contracts';
 import { t } from '@/lib/microcopy';
 import { cn } from '@/lib/utils';
+import { EmptySearch } from '../empty-states/EmptySearch';
 
 const HISTORY_STORAGE_KEY = 'search-history';
 const HISTORY_LIMIT = 10;
@@ -278,22 +279,27 @@ export default function SearchInterface() {
           </div>
 
           <div className="flex gap-2 text-sm">
-            {(['all', 'products', 'posts', 'games'] as const).map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  'rounded-full px-4 py-2 transition-colors',
-                  activeTab === tab
+            {(['all', 'products', 'posts', 'games'] as const).map((tab) => {
+              const isPressed = activeTab === tab;
+              return (
+                <button
+                  key= { tab }
+              type = "button"
+              onClick = {() => setActiveTab(tab)
+            }
+                  className = {
+                cn(
+                    'rounded-full px-4 py-2 transition-colors',
+                  isPressed
                     ? 'bg-fuchsia-600 text-white'
-                    : 'bg-white/10 text-white/60 hover:bg-white/20',
-                )}
-                aria-pressed={activeTab === tab}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+                      : 'bg-white/10 text-white/60 hover:bg-white/20',
+                    )
+                  }
+                  >
+                  { tab.charAt(0).toUpperCase() + tab.slice(1) }
+                  </button>
+  );
+            })}
           </div>
 
           <button
@@ -414,17 +420,7 @@ export default function SearchInterface() {
               ))}
             </div>
           ) : (
-            <GlassPanel className="p-8 text-center">
-              <h3 className="mb-4 text-xl font-semibold text-white">No results found</h3>
-              <p className="text-zinc-400">
-                Try searching for something else or check your spelling.
-              </p>
-              <ul className="mt-4 space-y-1 text-sm text-zinc-500">
-                <li>- Try different keywords</li>
-                <li>- Check your spelling</li>
-                <li>- Use more general terms</li>
-              </ul>
-            </GlassPanel>
+            <EmptySearch query= { activeQuery } />
           )}
         </div>
       )}

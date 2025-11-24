@@ -8,6 +8,7 @@ import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { useCart } from '../cart/CartProvider';
 import GlassPanel from '../GlassPanel';
+import { paths } from '@/lib/paths';
 
 const EnhancedNavbar: React.FC = () => {
   const { isSignedIn } = useUser();
@@ -136,7 +137,7 @@ const EnhancedNavbar: React.FC = () => {
 
             {/* Cart */}
             <Link
-              href="/cart"
+              href={paths.cart()}
               className="relative p-2 text-zinc-200 hover:text-white transition-colors duration-200"
             >
               <ShoppingCart className="w-5 h-5" />

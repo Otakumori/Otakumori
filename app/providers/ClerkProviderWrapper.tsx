@@ -27,10 +27,11 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
   // Dynamic props based on environment
   const clerkProps: any = {
     publishableKey,
-    // Use fallbackRedirectUrl instead of deprecated afterSignInUrl/afterSignUpUrl
+    signInUrl: '/sign-in',
+    signUpUrl: '/sign-up',
+    afterSignInUrl: '/',
+    afterSignUpUrl: '/',
     fallbackRedirectUrl: '/',
-    signInUrl: clientEnv.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
-    signUpUrl: clientEnv.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
     nonce,
   };
 

@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { useUser, useAuth } from '@clerk/nextjs';
 import { type User } from '@clerk/nextjs/server';
 import { useRouter } from 'next/navigation';
+import { OnboardingModal } from '@/app/components/onboarding/OnboardingModal';
 
 interface AuthModalState {
   isOpen: boolean;
@@ -26,6 +27,10 @@ interface AuthContextType {
   authModal: AuthModalState;
   openAuthModal: (action: 'sign-in' | 'sign-up', redirectUrl?: string, message?: string) => void;
   closeAuthModal: () => void;
+
+  // Onboarding state
+  showOnboarding: boolean;
+  setShowOnboarding: (show: boolean) => void;
 
   // Actions
   requireAuth: (action: () => void, fallbackMessage?: string) => void;
@@ -64,6 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isOpen: false,
     action: null,
   });
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Session-based deduplication to prevent modal spam
   const [shownThisSession, setShownThisSession] = useState<Set<string>>(new Set());
@@ -83,6 +89,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setShownThisSession(new Set()); // Clear session deduplication on auth change
     }
   }, [user?.id, isLoaded]); // Reset when user ID changes
+
+  // Check if user should see onboarding on first sign-in
+  useEffect(() => {
+    if (isLoaded && user && !isLoading) {
+      // Check if this is a new user (created in last 5 minutes) or hasn't seen onboarding
+      const hasSeenOnboarding = typeof window !== 'undefined' && 
+        localStorage.getItem('otm-onboarding-completed') === 'true';
+      
+      if (!hasSeenOnboarding) {
+        // Check if user was created recently (within last 5 minutes)
+        const createdAt = user.createdAt ? new Date(user.createdAt).getTime() : 0;
+        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+        
+        if (createdAt > fiveMinutesAgo) {
+          setShowOnboarding(true);
+        }
+      }
+    }
+  }, [isLoaded, user, isLoading]);
 
   const openAuthModal = useCallback(
     (action: 'sign-in' | 'sign-up', redirectUrl?: string, message?: string) => {
@@ -233,6 +258,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authModal,
     openAuthModal,
     closeAuthModal,
+    showOnboarding,
+    setShowOnboarding,
     requireAuth,
     requireRole,
     requireAuthForSoapstone,
@@ -246,6 +273,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider value={value}>
       {children}
       <AuthModal />
+      {showOnboarding && (
+        <OnboardingModal
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
     </AuthContext.Provider>
   );
 }

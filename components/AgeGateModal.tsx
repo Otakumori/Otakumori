@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { trapFocus } from '@/app/lib/accessibility';
 
 interface AgeGateModalProps {
   targetPath: string;
@@ -13,8 +14,12 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
   const [reducedMotion, setReducedMotion] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement as HTMLElement;
+
     // Check for reduced motion preference
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mediaQuery.matches);
@@ -27,9 +32,6 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
       return;
     }
 
-    // Focus trap: focus the close button on mount
-    closeButtonRef.current?.focus();
-
     // Handle escape key
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -38,7 +40,17 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
     };
 
     document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    
+    // Trap focus within modal
+    let cleanup: (() => void) | undefined;
+    if (dialogRef.current) {
+      cleanup = trapFocus(dialogRef.current, previousActiveElement.current || undefined);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      cleanup?.();
+    };
   }, [targetPath, router, onClose]);
 
   const handleContinue = () => {
@@ -113,7 +125,7 @@ export default function AgeGateModal({ targetPath, onClose }: AgeGateModalProps)
         <div className="flex gap-3">
           <button
             onClick={handleContinue}
-            className="flex-1 rounded-xl bg-pink-500 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-transparent"
+            className="flex-1 rounded-xl bg-pink-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-transparent"
             aria-label="Continue to age verification"
           >
             Continue

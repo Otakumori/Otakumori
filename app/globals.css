@@ -1506,12 +1506,12 @@ footer::after {
   --star: rgba(255, 255, 255, 0.9);
   --star-dim: rgba(255, 255, 255, 0.35);
 
-  /* Primary Colors - Pink (using "off pink" pink-400 from header) */
-  --color-primary: #f472b6;
-  --color-primary-hover: #fb7185;
-  --color-primary-active: #f472b6;
-  --color-primary-disabled: rgba(244, 114, 182, 0.4);
-  --color-primary-focus: rgba(244, 114, 182, 0.6);
+  /* Primary Colors - Pink (using pink-600 for WCAG AA contrast with white text) */
+  --color-primary: #db2777; /* pink-600: 4.60:1 contrast with white text (meets WCAG AA) */
+  --color-primary-hover: #be185d; /* pink-700: even better contrast */
+  --color-primary-active: #db2777;
+  --color-primary-disabled: rgba(219, 39, 119, 0.4);
+  --color-primary-focus: rgba(219, 39, 119, 0.6);
 
   /* Accent Colors - Purple */
   --color-accent: #8b5cf6;
@@ -1521,7 +1521,7 @@ footer::after {
   --color-text-primary: #ffffff;
   --color-text-secondary: #d4d4d8;
   --color-text-muted: rgba(255, 255, 255, 0.6);
-  --color-text-link: #835d75;
+  --color-text-link: #c08497; /* Improved contrast: 4.5:1 on base background */
   --color-text-link-hover: #f472b6;
 
   /* Background Colors */
@@ -2096,4 +2096,34 @@ textarea,
 
 .animate-petal-float-delayed {
   animation: petal-float-delayed 3s ease-out infinite 0.5s;
+}
+
+/* ========================================
+   EMPTY STATE ICON ANIMATIONS
+   Animated stroke drawing effect for empty states
+   ======================================== */
+.empty-icon-stroke {
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 170;
+  stroke-dashoffset: 170;
+  animation: empty-icon-stroke-draw 1.05s ease-out forwards;
+}
+
+@keyframes empty-icon-stroke-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .empty-icon-stroke {
+    animation: none;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
 }
