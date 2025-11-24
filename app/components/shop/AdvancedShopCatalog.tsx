@@ -5,7 +5,6 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import type { CatalogProduct } from '@/lib/catalog/serialize';
 import { FeaturedCarousel } from './FeaturedCarousel';
-import { RecentlyViewed } from './RecentlyViewed';
 import Link from 'next/link';
 import { paths } from '@/lib/paths';
 import { stripHtml } from '@/lib/html';
@@ -66,32 +65,6 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
             {!product.available && (
               <div className="bg-red-500/80 text-white text-xs px-2 py-1 rounded-lg">
                 Out of Stock
-              </div>
-            )}
-            {product.visible !== undefined && (
-              <div
-                className={`text-xs px-2 py-1 rounded-lg font-medium ${
-                  product.isLocked
-                    ? 'bg-blue-500/80 text-white'
-                    : product.visible && product.active
-                      ? 'bg-green-500/80 text-white'
-                      : 'bg-yellow-500/80 text-white'
-                }`}
-                title={
-                  product.isLocked
-                    ? 'Publishing - Locked for publishing in Printify'
-                    : product.visible && product.active
-                      ? 'Published - Visible to customers'
-                      : !product.visible
-                        ? 'Unpublished - Hidden from customers'
-                        : 'Inactive - Not available'
-                }
-              >
-                {product.isLocked
-                  ? '⏳ Publishing'
-                  : product.visible && product.active
-                    ? '✓ Published'
-                    : '⚠ Unpublished'}
               </div>
             )}
           </div>
@@ -251,7 +224,7 @@ function ProductSort({
           const [newSortBy, newSortOrder] = e.target.value.split('-');
           onSortChange(newSortBy, newSortOrder);
         }}
-        className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white text-sm"
+        className="bg-black/80 backdrop-blur-lg border border-white/20 rounded-xl px-3 py-2 text-white text-sm"
       >
         <option value="relevance-desc">Relevance</option>
         <option value="price-asc">Price: Low to High</option>
@@ -542,9 +515,6 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         </section>
       )}
 
-      {/* Recently Viewed Products */}
-      <RecentlyViewed />
-
       {/* Main Catalog Section */}
       <div className="container mx-auto px-4 py-0">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -660,22 +630,6 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
                   {filters.q && <span className="text-zinc-300"> for "{filters.q}"</span>}
                 </p>
                 {filters.category && <p className="text-zinc-400 text-sm">in {filters.category}</p>}
-                {/* Published status summary */}
-                {products.length > 0 && (
-                  <div className="flex items-center gap-3 mt-2 text-sm flex-wrap">
-                    <span className="text-green-400">
-                      {products.filter((p) => p.visible && p.active && !p.isLocked).length} published
-                    </span>
-                    <span className="text-zinc-500">•</span>
-                    <span className="text-blue-400">
-                      {products.filter((p) => p.isLocked).length} publishing
-                    </span>
-                    <span className="text-zinc-500">•</span>
-                    <span className="text-yellow-400">
-                      {products.filter((p) => !p.visible || !p.active).length} unpublished
-                    </span>
-                  </div>
-                )}
               </div>
 
               <ProductSort

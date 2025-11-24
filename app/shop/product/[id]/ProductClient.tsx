@@ -13,6 +13,7 @@ import { useRecentlyViewed } from '@/app/hooks/useRecentlyViewed';
 import { useToastContext } from '@/app/contexts/ToastContext';
 import { ProductSoapstoneWall } from '@/app/components/shop/ProductSoapstoneWall';
 import { HeaderButton } from '@/components/ui/header-button';
+import { RecentlyViewed } from '@/app/components/shop/RecentlyViewed';
 import { removeHtmlTables, stripHtml } from '@/lib/html';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalDiscountBadge } from '@/app/components/shop/PetalDiscountBadge';
@@ -299,33 +300,6 @@ export default function ProductClient({ productId }: { productId: string }) {
             <div>
               <div className="flex items-start justify-between mb-4">
                 <h1 className="text-4xl font-bold text-pink-200">{product.title}</h1>
-                {/* Published status badge */}
-                {product.visible !== undefined && (
-                  <div
-                    className={`text-sm px-3 py-1.5 rounded-lg font-medium ${
-                      product.isLocked
-                        ? 'bg-blue-500/80 text-white'
-                        : product.visible && product.active
-                          ? 'bg-green-500/80 text-white'
-                          : 'bg-yellow-500/80 text-white'
-                    }`}
-                    title={
-                      product.isLocked
-                        ? 'Publishing - Locked for publishing in Printify'
-                        : product.visible && product.active
-                          ? 'Published - Visible to customers'
-                          : !product.visible
-                            ? 'Unpublished - Hidden from customers'
-                            : 'Inactive - Not available'
-                    }
-                  >
-                    {product.isLocked
-                      ? '⏳ Publishing'
-                      : product.visible && product.active
-                        ? '✓ Published'
-                        : '⚠ Unpublished'}
-                  </div>
-                )}
               </div>
               <div className="flex items-center gap-4 mb-6">
                 <p className="text-3xl font-bold text-pink-400">
@@ -430,6 +404,11 @@ export default function ProductClient({ productId }: { productId: string }) {
         {/* Soapstone Messages from fellow travelers */}
         <div className="mt-12">
           <ProductSoapstoneWall productId={product.id} />
+        </div>
+
+        {/* Recently Viewed Products */}
+        <div className="mt-12">
+          <RecentlyViewed excludeProductId={product.id} />
         </div>
       </div>
     </div>
