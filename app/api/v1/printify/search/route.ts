@@ -34,41 +34,13 @@ const SearchParamsSchema = z.object({
 
 function buildProductWhere(params: z.infer<typeof SearchParamsSchema>): Prisma.ProductWhereInput {
   const where: Prisma.ProductWhereInput = {
-    // Only filter by active/visible if publishedOnly is true, otherwise show all active products
-    // (active: true is minimum requirement, visible is optional unless publishedOnly is true)
     active: true, // Always require active products
     ...(params.publishedOnly === 'true'
       ? {
           visible: true, // Only require visible when publishedOnly filter is explicitly enabled
         }
       : {}),
-    // Exclude placeholder products - we'll filter these in serialization step
-    // Only exclude obvious test/draft products by name or integrationRef
-    NOT: [
-      {
-        integrationRef: {
-          startsWith: 'seed:',
-        },
-      },
-      {
-        name: {
-          contains: '[test]',
-          mode: 'insensitive',
-        },
-      },
-      {
-        name: {
-          contains: '[draft]',
-          mode: 'insensitive',
-        },
-      },
-      {
-        name: {
-          contains: '[placeholder]',
-          mode: 'insensitive',
-        },
-      },
-    ],
+    // Don't filter placeholders here - we'll do it in the application layer
   };
 
   if (params.category) {
