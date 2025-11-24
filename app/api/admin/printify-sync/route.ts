@@ -17,12 +17,12 @@ export async function POST() {
 async function syncPrintify() {
   try {
     const printifyService = getPrintifyService();
-    // Get products from Printify (returns array directly from client)
-    const allProducts = await printifyService.getProducts();
-    console.warn(`Sync retrieved ${Array.isArray(allProducts) ? allProducts.length : 0} products from Printify`);
+    // Get all products from Printify (getAllProducts returns array directly)
+    const allProducts = await printifyService.getAllProducts();
+    console.warn(`Sync retrieved ${allProducts.length} products from Printify`);
 
     // Filter out invalid/placeholder products before syncing
-    const products = Array.isArray(allProducts) ? filterValidPrintifyProducts(allProducts) : [];
+    const products = filterValidPrintifyProducts(allProducts);
     console.warn(`After filtering: ${products.length} valid products to sync`);
 
     let unlockedCount = 0;
