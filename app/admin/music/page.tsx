@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+
 import AdminMusicClient from './page.client';
 
 export const dynamic = 'force-dynamic';

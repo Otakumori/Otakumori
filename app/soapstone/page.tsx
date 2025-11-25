@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+
 import SoapstoneComposer from '@/app/components/soapstone/Composer';
 import SoapstoneList from '@/app/components/soapstone/List';
 

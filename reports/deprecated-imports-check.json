@@ -1,0 +1,3186 @@
+{
+  "summary": {
+    "deprecatedFilesChecked": 300,
+    "filesWithImports": 635,
+    "uniqueDeprecatedFiles": 71,
+    "uniqueImportingFiles": 349,
+    "timestamp": "2025-11-25T16:13:51.721Z"
+  },
+  "imports": [
+    {
+      "importingFile": "app\\(client)\\bonfire\\page.tsx",
+      "deprecatedFile": "components\\ui\\LoadingBonfire.tsx",
+      "importPath": "../../components/ui/LoadingBonfire"
+    },
+    {
+      "importingFile": "app\\admin\\cosmetics\\CosmeticsPageClient.tsx",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\admin\\external-sync\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "../../../components/ui/button"
+    },
+    {
+      "importingFile": "app\\admin\\printify\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "../../../components/ui/button"
+    },
+    {
+      "importingFile": "app\\admin\\printify\\page.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "../../../components/ui/card"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\api\\equip\\route.ts",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\api\\inventory\\equip\\route.ts",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\api\\profile\\equip\\route.ts",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\components\\admin\\QuickActions.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\components\\ui\\badge.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\components\\ui\\input.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\components\\ui\\LoadingBonfire.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "app\\trade\\ui\\Shop.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "components\\admin\\QuickActions.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "components\\ui\\LoadingBonfire.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "components\\ui\\select.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "components\\ui\\tabs.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\admin\\soapstones\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "./ui"
+    },
+    {
+      "importingFile": "app\\api\\account\\display-name\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\achievements\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\burst\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\coupons\\grants\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\admin\\dashboard\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\discounts\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\economy\\stats\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\flags\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\admin\\music\\playlists\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\music\\playlists\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\music\\playlists\\[id]\\tracks\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\music\\tracks\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\nsfw\\global\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\nsfw\\stats\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\nsfw\\stats\\route.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\api\\admin\\petal-shop\\items\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\admin\\printify-sync\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\printify-sync\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\admin\\printify-sync\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/printify-filters"
+    },
+    {
+      "importingFile": "app\\api\\admin\\printify-unlock\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\admin\\printify-unlock\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\reviews\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\reviews\\[id]\\approve\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\reviews\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\rewards\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\runes\\combos\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\runes\\combos\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\runes\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\runes\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\seed-blog\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\site-config\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\admin\\users\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\admin\\vouchers\\stats\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\avatar\\thumbnail\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\blog\\posts\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\checkout\\route.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "app\\api\\checkout\\session\\route.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "app\\api\\checkout\\session\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\community\\emote\\perform\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\community\\emotes\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\community\\quests\\complete\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\community\\training\\confirm\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\contact\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\coupons\\attach\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\coupons\\preview\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\cron\\route.js",
+      "deprecatedFile": "app\\api\\prefs\\nsfw\\affirm\\route.ts",
+      "importPath": "fs"
+    },
+    {
+      "importingFile": "app\\api\\cron\\route.js",
+      "deprecatedFile": "app\\api\\clerk-proxy\\[...path]\\route.ts",
+      "importPath": "path"
+    },
+    {
+      "importingFile": "app\\api\\gacha\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\games\\finish\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\games\\finish\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\health\\comprehensive\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\health\\comprehensive\\route.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "app\\api\\mini-games\\session\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\mini-games\\submit\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\mini-games\\submit\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\orders\\by-session\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\orders\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petal-gacha\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petal-shop\\catalog\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\petal-shop\\catalog\\route.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\api\\petal-shop\\purchase\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\petals\\balance\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petals\\click\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petals\\collect\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petals\\merge\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petals\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\petals\\wallet\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\products\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\products\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\quests\\claim\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\quests\\track\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\reviews\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\reviews\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\runes\\unlock\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\shop\\products\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/printify-filters"
+    },
+    {
+      "importingFile": "app\\api\\shop\\products\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/catalog"
+    },
+    {
+      "importingFile": "app\\api\\soapstone\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\soapstone\\[id]\\admin\\visibility\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\soapstone\\[id]\\appraise\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\soapstone\\[id]\\report\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\soapstones\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\soapstones\\[id]\\like\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\storage\\delete\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\stripe\\webhook\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\stripe\\webhook\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\stripe\\webhook\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify"
+    },
+    {
+      "importingFile": "app\\api\\trade\\fuse\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\trade\\inventory\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\trade\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\user\\avatar\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\achievements\\unlock\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\analytics\\session\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\avatar\\export\\route.safe.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\avatar\\load\\route.safe.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\avatar\\save\\route.safe.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cart\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cart\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\character\\config\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\character\\presets\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\character\\presets\\unlock\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\checkout\\order\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\checkout\\order\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/printifyClient"
+    },
+    {
+      "importingFile": "app\\api\\v1\\checkout\\order\\route.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "@/app/lib/printify/types"
+    },
+    {
+      "importingFile": "app\\api\\v1\\checkout\\order\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/types"
+    },
+    {
+      "importingFile": "app\\api\\v1\\checkout\\session\\route.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "app\\api\\v1\\checkout\\session\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\comments\\like\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\comments\\report\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\comments\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\comments\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\content\\blog\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\content\\blog\\[slug]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\coop\\sessions\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\coop\\sessions\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\coop\\sessions\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\coop\\sessions\\[id]\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cosmetics\\equip\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cosmetics\\equip\\route.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cosmetics\\list\\route.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cosmetics\\list\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\cosmetics\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\creator\\load\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\creator\\save\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\discount-rewards\\purchase\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\discount-rewards\\purchase\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\discount-rewards\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\discounts\\available\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\feed\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\game-saves\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\games\\achievements\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\games\\coupons\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\games\\stats\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\leaderboard\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\leaderboard\\submit\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\leaderboards\\global-petals\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\leaderboards\\[gameId]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\notifications\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\nsfw\\verify\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\orders\\recent\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\orders\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/printifyClient"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\invitations\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\invitations\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\invitations\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\invitations\\[id]\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\parties\\[id]\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\collect\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\earn\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\grant\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\grant-daily\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\purchase\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\rewards\\claim\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\shop\\discounts\\purchase\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\shop\\discounts\\purchase\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\shop\\discounts\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\shop\\purchase\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\shop\\purchase\\route.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\shop\\purchase\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\summary\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\sync\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\transactions\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\vouchers\\list\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\vouchers\\purchase\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\petals\\wallet\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\praise\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\presence\\friends\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\presence\\heartbeat\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\diagnostic\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\enhanced-sync\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/enhanced-service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\health\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\inventory\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/advanced-service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\inventory\\sync\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/advanced-service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\products\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\products\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/printify-filters"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\products\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/catalog"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\recommendations\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/advanced-service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\search\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\search\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/catalog"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\search\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\printify\\sync\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\featured\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\featured\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\featured\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/catalog"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\featured\\route.ts",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/printify-filters"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\soapstones\\[id]\\praise\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\[id]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\[id]\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\api\\v1\\products\\[id]\\soapstones\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\profile\\update\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\profile\\[username]\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\recommendations\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\safety\\block\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\safety\\block\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\safety\\settings\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\safety\\settings\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\analytics\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\analytics\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\history\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\history\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\suggestions\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\search\\suggestions\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\settings\\games\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\settings\\games\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\settings\\privacy\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\settings\\privacy\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\settings\\user\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\v1\\settings\\user\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\soapstone\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\soapstone\\[id]\\appraise\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\social\\follow\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\vouchers\\from-petals\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\vouchers\\redeem\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\api\\admin\\reviews\\[id]\\approve\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\api\\admin\\reviews\\[id]\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\api\\newsletter\\signup\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\api\\products\\[id]\\reviews\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\api\\reviews\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\api\\reviews\\upload\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\admin\\reviews\\page.tsx",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\websocket\\route.ts",
+      "deprecatedFile": "app\\admin\\reviews\\page.tsx",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\api\\v1\\wishlist\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\webhooks\\clerk\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\webhooks\\printify\\route.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\api\\webhooks\\printify\\route.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/advanced-service"
+    },
+    {
+      "importingFile": "app\\api\\webhooks\\stripe\\route.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "app\\api\\webhooks\\stripe\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\api\\_health\\route.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\avatar\\community-hub\\components\\ColorPicker.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\avatar\\community-hub\\components\\SliderControl.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\avatar\\community-hub\\components\\UIControls.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\avatar\\community-hub\\page.tsx",
+      "deprecatedFile": "components\\ErrorBoundary.tsx",
+      "importPath": "./components/ErrorBoundary"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementCard.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementCard.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementDetails.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementDetails.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementList.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementList.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementCard.tsx",
+      "importPath": "./AchievementCard"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementNotification.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementNotificationManager.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementNotificationManager.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementProgress.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\achievements\\AchievementProgress.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\Achievements.tsx",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "./achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\components\\analytics\\AnalyticsDashboard.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "@/components/ui/card"
+    },
+    {
+      "importingFile": "app\\components\\analytics\\AnalyticsDashboard.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\components\\animations\\ButtonHover.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\animations\\CardHover.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\ColorPicker.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\ColorPicker.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\ColorPicker.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\ColorPicker.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\ColorPicker.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\ColorPicker.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\constants.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\constants.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\constants.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\constants.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\constants.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\constants.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\CustomizationPanel.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\CustomizationPanel.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\CustomizationPanel.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\CustomizationPanel.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\CustomizationPanel.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\CustomizationPanel.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\index.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\index.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\index.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\index.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\index.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\index.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\PartSelector.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\PartSelector.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\PartSelector.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\PartSelector.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\PartSelector.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\PartSelector.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\SliderControl.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\SliderControl.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\SliderControl.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\SliderControl.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\SliderControl.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\avatar\\CharacterEditor\\SliderControl.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\components\\AvatarCreator.tsx",
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "importPath": "@/lib/hooks/useAchievements"
+    },
+    {
+      "importingFile": "app\\components\\BlogTeaser.tsx",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\components\\community\\EchoWell.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\components\\community\\Petalnotes.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\components\\components\\CherryBlossomTree.tsx",
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "importPath": "@/lib/hooks/useAchievements"
+    },
+    {
+      "importingFile": "app\\components\\components\\CherryBlossomTree.tsx",
+      "deprecatedFile": "lib\\hooks\\useAudio.ts",
+      "importPath": "@/lib/hooks/useAudio"
+    },
+    {
+      "importingFile": "app\\components\\components\\RunicText.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\components\\RunicText.tsx",
+      "deprecatedFile": "lib\\hooks\\useAudio.ts",
+      "importPath": "@/lib/hooks/useAudio"
+    },
+    {
+      "importingFile": "app\\components\\home\\SectionHeader.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\i18n\\LanguageSwitcher.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\components\\mobile\\MobileNavigation.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\components\\notifications\\Toast.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\profile\\CosmeticsTab.tsx",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\components\\ReportButton.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ReportButton.tsx",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\components\\search\\GlobalSearch.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\search\\SearchAutocomplete.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\search\\SearchInterface.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\search\\SearchInterface.tsx",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\components\\SearchBar.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\SearchBar.tsx",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\components\\SearchResults.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\SearchResults.tsx",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\components\\shop\\AddToBottomlessBag.tsx",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/buildCheckoutLink"
+    },
+    {
+      "importingFile": "app\\components\\shop\\ProductCard.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "@/app/lib/shop/types"
+    },
+    {
+      "importingFile": "app\\components\\shop\\ProductCard.tsx",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/types"
+    },
+    {
+      "importingFile": "app\\components\\shop\\ProductCard.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "@/app/lib/shop/types"
+    },
+    {
+      "importingFile": "app\\components\\shop\\ProductCard.tsx",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/types"
+    },
+    {
+      "importingFile": "app\\components\\shop\\ProductGrid.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "@/app/lib/shop/types"
+    },
+    {
+      "importingFile": "app\\components\\shop\\ProductGrid.tsx",
+      "deprecatedFile": "lib\\shop.ts",
+      "importPath": "@/app/lib/shop/types"
+    },
+    {
+      "importingFile": "app\\components\\ui\\badge.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\bubble-text.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\Button_backup.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\Button_backup.tsx",
+      "deprecatedFile": "lib\\hooks\\useAudio.ts",
+      "importPath": "@/lib/hooks/useAudio"
+    },
+    {
+      "importingFile": "app\\components\\ui\\card.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\Dialog.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\GlassButton.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\GlassCard.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\input.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\label.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\LoadingSkeleton.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\MotionButton.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\MotionCard.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\om\\OmButton.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\om\\OmCard.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\om\\OmPanel.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\om\\OmTag.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\progress.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\select.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\slider.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\tabs.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "app\\components\\ui\\ToastContainer.tsx",
+      "deprecatedFile": "app\\components\\notifications\\Toast.tsx",
+      "importPath": "./Toast"
+    },
+    {
+      "importingFile": "app\\components\\ui\\ToastContainer.tsx",
+      "deprecatedFile": "components\\Toast.tsx",
+      "importPath": "./Toast"
+    },
+    {
+      "importingFile": "app\\hooks\\useAchievementTracking.ts",
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "importPath": "./hooks/useAchievements"
+    },
+    {
+      "importingFile": "app\\hooks\\useCommunityAchievements.ts",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "../components/achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\hooks\\useLoreAchievements.ts",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "../components/achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\hooks\\useProfileAchievements.ts",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "../components/achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\hooks\\useSeasonalAchievements.ts",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "../components/achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\hooks\\useShoppingAchievements.ts",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "../components/achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\hooks\\useSpecialAchievements.ts",
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "importPath": "../components/achievements/AchievementProvider"
+    },
+    {
+      "importingFile": "app\\hub\\_scene\\AvatarPerch.tsx",
+      "deprecatedFile": "app\\panel\\petal-store\\page.tsx",
+      "importPath": "./store"
+    },
+    {
+      "importingFile": "app\\hub\\_scene\\AvatarPerch.tsx",
+      "deprecatedFile": "app\\panel\\petal-store\\page.tsx",
+      "importPath": "./store"
+    },
+    {
+      "importingFile": "app\\hub\\_scene\\FrontSelector.tsx",
+      "deprecatedFile": "app\\panel\\petal-store\\page.tsx",
+      "importPath": "./store"
+    },
+    {
+      "importingFile": "app\\hub\\_scene\\FrontSelector.tsx",
+      "deprecatedFile": "app\\panel\\petal-store\\page.tsx",
+      "importPath": "./store"
+    },
+    {
+      "importingFile": "app\\hub\\_scene\\useInput.ts",
+      "deprecatedFile": "app\\panel\\petal-store\\page.tsx",
+      "importPath": "./store"
+    },
+    {
+      "importingFile": "app\\hub\\_scene\\useInput.ts",
+      "deprecatedFile": "app\\panel\\petal-store\\page.tsx",
+      "importPath": "./store"
+    },
+    {
+      "importingFile": "app\\layout.js",
+      "deprecatedFile": "app\\context\\context\\AuthContext.js",
+      "importPath": "./context/AuthContext"
+    },
+    {
+      "importingFile": "app\\layout.tsx",
+      "deprecatedFile": "app\\api\\admin\\flags\\route.ts",
+      "importPath": "./flags"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\curate.ts",
+      "deprecatedFile": "app\\api\\prefs\\nsfw\\affirm\\route.ts",
+      "importPath": "fs"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "app\\lib\\manifest.ts",
+      "importPath": "./manifest.ts"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\index.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\manifest.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\manifest.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\manifest.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\manifest.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\manifest.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\manifest.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\assets\\scan.ts",
+      "deprecatedFile": "app\\api\\clerk-proxy\\[...path]\\route.ts",
+      "importPath": "path"
+    },
+    {
+      "importingFile": "app\\lib\\auth-middleware.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "./db"
+    },
+    {
+      "importingFile": "app\\lib\\authz.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "./db"
+    },
+    {
+      "importingFile": "app\\lib\\avatar\\validate.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "./db"
+    },
+    {
+      "importingFile": "app\\lib\\cache-strategies.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "./db"
+    },
+    {
+      "importingFile": "app\\lib\\config\\siteSettings.server.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\lib\\cosmetics\\types.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "./cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\lib\\cosmetics\\useCosmetics.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "./cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\user.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\api\\user\\files\\route.ts",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\api\\user\\profile\\route.ts",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\api\\user\\state\\route.ts",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\api\\user\\titles\\route.ts",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\api\\v1\\profile\\[username]\\route.ts",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\profile\\[username]\\page.tsx",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "app\\profile\\[username]\\page.tsx",
+      "importPath": "./user"
+    },
+    {
+      "importingFile": "app\\lib\\nsfw\\visibility.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "app\\lib\\petals\\grant.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\lib\\petals\\grant.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\petals\\index.ts",
+      "deprecatedFile": "app\\api\\v1\\petals\\grant-daily\\route.ts",
+      "importPath": "./grant"
+    },
+    {
+      "importingFile": "app\\lib\\petals.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "app\\lib\\petals.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\advanced-service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\advanced-service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\advanced-service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\advanced-service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\advanced-service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\advanced-service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\client.ts",
+      "deprecatedFile": "lib\\assets\\schema.ts",
+      "importPath": "./schema"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\printifyClient.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify\\service.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\printify.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\server-error-handler.ts",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\lib\\shop\\printify-adapter.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\shop\\printify-adapter.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\shop\\printify-adapter.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\shop\\printify-adapter.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\shop\\printify-adapter.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\shop\\printify-adapter.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "app\\lib\\stripe.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "app\\lib\\upload.ts",
+      "deprecatedFile": "app\\api\\clerk-proxy\\[...path]\\route.ts",
+      "importPath": "path"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\api\\admin\\reviews\\[id]\\approve\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\api\\admin\\reviews\\[id]\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\api\\newsletter\\signup\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\api\\products\\[id]\\reviews\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\api\\reviews\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\api\\reviews\\upload\\route.ts",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\admin\\reviews\\page.tsx",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\lib\\websocket-manager.ts",
+      "deprecatedFile": "app\\admin\\reviews\\page.tsx",
+      "importPath": "ws"
+    },
+    {
+      "importingFile": "app\\mini-games\\anime-arena\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\anime-arena\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\anime-arena\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\anime-arena\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-girl\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-girl\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-girl\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-ragdoll\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-ragdoll\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-ragdoll\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\bubble-ragdoll\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\components\\CubeHub.tsx",
+      "deprecatedFile": "app\\lib\\state\\games.ts",
+      "importPath": "@/app/lib/state/games"
+    },
+    {
+      "importingFile": "app\\mini-games\\HubClient.tsx",
+      "deprecatedFile": "components\\ErrorBoundary.tsx",
+      "importPath": "@/components/ErrorBoundary3D"
+    },
+    {
+      "importingFile": "app\\mini-games\\layout.tsx",
+      "deprecatedFile": "lib\\fonts.ts",
+      "importPath": "@/lib/fonts"
+    },
+    {
+      "importingFile": "app\\mini-games\\memory-match\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\memory-match\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\memory-match\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\petal-samurai\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\petal-samurai\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\petal-samurai\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\petal-samurai\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\petal-samurai\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\petal-samurai\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\puzzle-reveal\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\puzzle-reveal\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\puzzle-reveal\\InCard.tsx",
+      "deprecatedFile": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "importPath": "./Game"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\QuickMathWrapper.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\QuickMathWrapper.tsx",
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\QuickMathWrapper.tsx",
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\quick-math\\QuickMathWrapper.tsx",
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\rhythm-beat-em-up\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\rhythm-beat-em-up\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\rhythm-beat-em-up\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\rhythm-beat-em-up\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\samurai-petal-slice\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\samurai-petal-slice\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\samurai-petal-slice\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\samurai-petal-slice\\page.tsx",
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "importPath": "./Scene"
+    },
+    {
+      "importingFile": "app\\mini-games\\_components\\GameCubeHubV2.tsx",
+      "deprecatedFile": "components\\ErrorBoundary.tsx",
+      "importPath": "@/components/ErrorBoundary3D"
+    },
+    {
+      "importingFile": "app\\mini-games\\_shared\\gameVisuals.ts",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\orders\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\orders\\page.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "@/components/ui/card"
+    },
+    {
+      "importingFile": "app\\page.tsx",
+      "deprecatedFile": "app\\components\\BlogTeaser.tsx",
+      "importPath": "./components/BlogTeaser"
+    },
+    {
+      "importingFile": "app\\pages\\FAQ.jsx",
+      "deprecatedFile": "app\\components\\ContactForm.js",
+      "importPath": "../../app/components/ContactForm"
+    },
+    {
+      "importingFile": "app\\pages\\Home.jsx",
+      "deprecatedFile": "app\\components\\ContactForm.js",
+      "importPath": "../../app/components/ContactForm"
+    },
+    {
+      "importingFile": "app\\panel\\petal-store\\page.tsx",
+      "deprecatedFile": "app\\account\\petals\\page.tsx",
+      "importPath": "@/app/account/petals/page"
+    },
+    {
+      "importingFile": "app\\panel\\petal-store\\page.tsx",
+      "deprecatedFile": "app\\account\\petals\\page.tsx",
+      "importPath": "@/app/account/petals/page"
+    },
+    {
+      "importingFile": "app\\petal-shop\\page.tsx",
+      "deprecatedFile": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "importPath": "@/app/lib/cosmetics/cosmeticsConfig"
+    },
+    {
+      "importingFile": "app\\Providers.tsx",
+      "deprecatedFile": "app\\api\\admin\\flags\\route.ts",
+      "importPath": "./flags"
+    },
+    {
+      "importingFile": "app\\shop\\cart\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\shop\\checkout\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\shop\\checkout\\page.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "@/components/ui/card"
+    },
+    {
+      "importingFile": "app\\shop\\checkout\\page.tsx",
+      "deprecatedFile": "app\\components\\ui\\input.tsx",
+      "importPath": "@/app/components/ui/input"
+    },
+    {
+      "importingFile": "app\\shop\\checkout\\success\\page.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\shop\\checkout\\success\\page.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "@/components/ui/card"
+    },
+    {
+      "importingFile": "app\\shop\\page.tsx",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "app\\shop\\product\\[id]\\ProductClient.tsx",
+      "deprecatedFile": "components\\ui\\button.tsx",
+      "importPath": "@/components/ui/button"
+    },
+    {
+      "importingFile": "app\\trade\\page.tsx",
+      "deprecatedFile": "app\\trade\\ui\\Shop.tsx",
+      "importPath": "./ui/Shop"
+    },
+    {
+      "importingFile": "app\\trade\\ui\\Shop.tsx",
+      "deprecatedFile": "app\\components\\shop\\ProductFilters.tsx",
+      "importPath": "./Filters"
+    },
+    {
+      "importingFile": "app\\utils\\utils\\printifyAPI.js",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "app\\[slug]\\page.tsx",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "components\\achievements\\AchievementCard.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "../../app/types/achievements"
+    },
+    {
+      "importingFile": "components\\arcade\\Engine.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\Engine.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\Engine.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\Engine.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\Engine.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\Engine.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\registry.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\registry.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\registry.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\registry.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\registry.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\registry.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\useProgress.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\useProgress.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\useProgress.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\useProgress.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\useProgress.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\arcade\\useProgress.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "components\\games\\PetalCatch.tsx",
+      "deprecatedFile": "components\\Toast.tsx",
+      "importPath": "@/components/Toast"
+    },
+    {
+      "importingFile": "components\\games\\PetalCatch.tsx",
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "importPath": "@/lib/hooks/useAchievements"
+    },
+    {
+      "importingFile": "components\\graphics\\AchievementBadge.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\graphics\\CategoryBanner.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\graphics\\FramedBadge.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\graphics\\TierFrame.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\hero\\FeaturedProducts.tsx",
+      "deprecatedFile": "lib\\logger.ts",
+      "importPath": "@/app/lib/logger"
+    },
+    {
+      "importingFile": "components\\monitoring\\MonitoringDashboard.tsx",
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "importPath": "@/components/ui/card"
+    },
+    {
+      "importingFile": "components\\monitoring\\MonitoringDashboard.tsx",
+      "deprecatedFile": "components\\ui\\tabs.tsx",
+      "importPath": "@/components/ui/tabs"
+    },
+    {
+      "importingFile": "components\\ReactiveAvatar.tsx",
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "importPath": "@/lib/hooks/useAchievements"
+    },
+    {
+      "importingFile": "components\\soapstone\\SoapstoneMessageCard.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\Tutorial.tsx",
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "importPath": "@/lib/hooks/useAchievements"
+    },
+    {
+      "importingFile": "components\\ui\\alert.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\badge.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\card.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\glass-card.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\header-button.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\separator.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\skeleton.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "components\\ui\\tabs.tsx",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "@/lib/utils"
+    },
+    {
+      "importingFile": "lib\\api\\printify.ts",
+      "deprecatedFile": "lib\\api\\http.ts",
+      "importPath": "./http"
+    },
+    {
+      "importingFile": "lib\\api\\stripe.ts",
+      "deprecatedFile": "app\\api\\stripe\\webhook\\route.ts",
+      "importPath": "stripe"
+    },
+    {
+      "importingFile": "lib\\assets\\asset-optimizer.ts",
+      "deprecatedFile": "app\\api\\clerk-proxy\\[...path]\\route.ts",
+      "importPath": "path"
+    },
+    {
+      "importingFile": "lib\\assets\\loader.ts",
+      "deprecatedFile": "lib\\assets\\schema.ts",
+      "importPath": "@/lib/assets/schema"
+    },
+    {
+      "importingFile": "lib\\catalog\\mapPrintify.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "lib\\catalog\\printifySync.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "lib\\catalog\\printifySync.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "lib\\catalog\\printifySync.ts",
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "importPath": "@/app/lib/printify/service"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\config.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\config.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\config.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\config.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\config.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\config.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\providers\\cart.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\providers\\petals.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "./utils"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\providers\\cart.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "app\\providers\\petals.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\index.ts",
+      "deprecatedFile": "lib\\utils.ts",
+      "importPath": "./utils"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\provider.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\provider.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\provider.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\provider.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\provider.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\provider.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\providers\\cart.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\react.tsx",
+      "deprecatedFile": "app\\providers\\petals.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\types\\auth.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "importPath": "./types"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\providers\\cart.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\feature-flags\\utils.ts",
+      "deprecatedFile": "app\\providers\\petals.tsx",
+      "importPath": "./provider"
+    },
+    {
+      "importingFile": "lib\\hooks\\useAchievements.ts",
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "importPath": "@/app/types/achievements"
+    },
+    {
+      "importingFile": "lib\\petal-wallet.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "lib\\petals-db.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/app/lib/db"
+    },
+    {
+      "importingFile": "lib\\rails.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    },
+    {
+      "importingFile": "lib\\runes.ts",
+      "deprecatedFile": "lib\\db.ts",
+      "importPath": "@/lib/db"
+    }
+  ]
+}

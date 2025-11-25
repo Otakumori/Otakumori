@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react';
 
 import { paths } from '../../../lib/paths';
+import { EmptyCart } from '@/app/components/empty-states';
 interface CartItem {
   id: string;
   name: string;
@@ -29,12 +30,8 @@ export default function CartPage() {
     return (
       <main className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black pt-20">
         <div className="container mx-auto px-4 py-16">
-          <div className="glass-card p-8 text-center max-w-md mx-auto">
-            <h1 className="mb-4 text-2xl font-bold text-primary">Your Cart is Empty</h1>
-            <p className="mb-8 text-secondary">Add some items to your cart to start shopping</p>
-            <Link href={paths.shop()}>
-              <Button className="btn-primary">Continue Shopping</Button>
-            </Link>
+          <div className="text-center">
+            <EmptyCart />
           </div>
         </div>
       </main>

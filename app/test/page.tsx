@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+
 import { env } from '@/env.mjs';
 
 export default function TestPage() {

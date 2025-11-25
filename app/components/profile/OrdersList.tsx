@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import GlassPanel from '../GlassPanel';
-import { t } from '@/lib/microcopy';
+import { EmptyOrders } from '@/app/components/empty-states';
 
 type Order = {
   id: string;
@@ -60,16 +60,7 @@ export default function OrdersList({ orders }: OrdersListProps) {
   if (orders.length === 0) {
     return (
       <div className="text-center py-12">
-        <GlassPanel className="p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">No orders yet</h2>
-          <p className="text-zinc-400 mb-6">{t('status', 'emptyInventory')}</p>
-          <Link
-            href="/shop"
-            className="inline-block rounded-xl bg-fuchsia-500/90 px-6 py-3 text-white hover:bg-fuchsia-500 transition-colors"
-          >
-            Start Shopping
-          </Link>
-        </GlassPanel>
+        <EmptyOrders />
       </div>
     );
   }

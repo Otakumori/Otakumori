@@ -1,0 +1,1074 @@
+{
+  "summary": {
+    "total": 206,
+    "safeToDelete": 201,
+    "needsReview": 5,
+    "suspicious": 0,
+    "timestamp": "2025-11-25T16:20:03.540Z"
+  },
+  "safeToDelete": [
+    {
+      "file": "app\\(client)\\profile\\ProfileHeader.tsx",
+      "replacement": "app/profile/ui/ProfileHeader.tsx",
+      "originalReplacement": "app\\profile\\ui\\ProfileHeader.tsx"
+    },
+    {
+      "file": "app\\abyss\\games\\layout.js",
+      "replacement": "app/components/components/Layout.jsx",
+      "originalReplacement": "app\\components\\components\\Layout.jsx"
+    },
+    {
+      "file": "app\\abyss\\layout.js",
+      "replacement": "app/components/components/Layout.jsx",
+      "originalReplacement": "app\\components\\components\\Layout.jsx"
+    },
+    {
+      "file": "app\\api\\admin\\cache\\clear\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\flags\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\maintenance\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\moderation\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\music\\playlists\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\music\\playlists\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\music\\playlists\\[id]\\tracks\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\music\\tracks\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\notifications\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\printify-sync\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\reviews\\[id]\\approve\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\reviews\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\rewards\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\runes\\combos\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\runes\\combos\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\runes\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\runes\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\seed-blog\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\admin\\shop\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\blog\\posts\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\checkout\\coupons\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\checkout\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\checkout\\session\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\clerk\\webhook\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\clerk-proxy\\[...path]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\community\\posts\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\contact\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\cron\\route.js",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\debug-env-simple\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\digital\\inventory\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\ds-messages\\[slug]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\ds-messages\\[slug]\\vote\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\equip\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\gacha\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\health\\comprehensive\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\inventory\\equip\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\leaderboard\\[game]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\me\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\metrics\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\music\\playlist\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\newsletter\\signup\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\orders\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\orders\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\click\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\collect\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\earn\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\ledger\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\ledger.csv\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\merge\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\petals\\spend\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\prefs\\nsfw\\affirm\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\printify\\health\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\products\\featured\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\products\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\products\\[id]\\reviews\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\profile\\equip\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\profile\\me\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\profile\\presets\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\quests\\list\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\reviews\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\reviews\\upload\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\runes\\unlock\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\search\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\orders\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\orders\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\products\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\products\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\purchase\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\shop\\test-connection\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstone\\[id]\\admin\\visibility\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstone\\[id]\\appraise\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstone\\[id]\\report\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstones\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstones\\[id]\\flag\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstones\\[id]\\like\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\soapstones\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\storage\\upload-url\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\stripe\\webhook\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\system-check\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\test-simple\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\test-supabase\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\titles\\award\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\trade\\offer\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\trade\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\user\\files\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\user\\profile\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\user\\state\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\user\\titles\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\account\\display-name\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\account\\me\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\achievements\\unlock\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\cart\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\cart\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\character\\presets\\unlock\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\checkout\\session\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\comments\\like\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\comments\\report\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\comments\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\comments\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\coop\\sessions\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\coop\\sessions\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\feed\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\games\\achievements\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\games\\coupons\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\games\\inventory\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\games\\start\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\games\\stats\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\leaderboard\\submit\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\parties\\invitations\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\parties\\invitations\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\parties\\[id]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\petals\\grant-daily\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\petals\\ledger\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\petals\\shop\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\petals\\spend\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\petals\\transactions\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\profile\\update\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\profile\\[username]\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\safety\\block\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\search\\analytics\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\search\\history\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\search\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\shop\\products\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\v1\\social\\follow\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\webhooks\\printify\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\api\\webhooks\\printify\\test\\route.ts",
+      "replacement": "app/api/webhooks/stripe/route.ts",
+      "originalReplacement": "app\\api\\webhooks\\stripe\\route.ts"
+    },
+    {
+      "file": "app\\components\\admin\\MessageManager.tsx",
+      "replacement": "app/components/components/admin/MessageManager.tsx",
+      "originalReplacement": "app\\components\\components\\admin\\MessageManager.tsx"
+    },
+    {
+      "file": "app\\components\\admin\\QuickActions.tsx",
+      "replacement": "app/components/components/admin/QuickActions.tsx",
+      "originalReplacement": "app\\components\\components\\admin\\QuickActions.tsx"
+    },
+    {
+      "file": "app\\components\\animations\\InteractiveCherryBlossom.tsx",
+      "replacement": "components/animations/InteractiveCherryBlossom.tsx",
+      "originalReplacement": "components\\animations\\InteractiveCherryBlossom.tsx"
+    },
+    {
+      "file": "app\\components\\AvatarCreator.tsx",
+      "replacement": "app/components/profile/AvatarCreator.tsx",
+      "originalReplacement": "app\\components\\profile\\AvatarCreator.tsx"
+    },
+    {
+      "file": "app\\components\\BlogTeaser.tsx",
+      "replacement": "components/hero/BlogTeaser.tsx",
+      "originalReplacement": "components\\hero\\BlogTeaser.tsx"
+    },
+    {
+      "file": "app\\components\\components\\SoundSettings.tsx",
+      "replacement": "components/SoundSettings.tsx",
+      "originalReplacement": "components\\SoundSettings.tsx"
+    },
+    {
+      "file": "app\\components\\ContactForm.js",
+      "replacement": "app/components/ContactForm.jsx",
+      "originalReplacement": "app\\components\\ContactForm.jsx"
+    },
+    {
+      "file": "app\\components\\NavBar.tsx",
+      "replacement": "app/components/layout/Navbar.tsx",
+      "originalReplacement": "app\\components\\layout\\Navbar.tsx"
+    },
+    {
+      "file": "app\\components\\notifications\\Toast.tsx",
+      "replacement": "app/components/Toast.tsx",
+      "originalReplacement": "app\\components\\Toast.tsx"
+    },
+    {
+      "file": "app\\components\\shop\\ProductFilters.tsx",
+      "replacement": "components/shop/ProductFilters.tsx",
+      "originalReplacement": "components\\shop\\ProductFilters.tsx"
+    },
+    {
+      "file": "app\\components\\shop\\ProductGrid.tsx",
+      "replacement": "components/shop/ProductGrid.tsx",
+      "originalReplacement": "components\\shop\\ProductGrid.tsx"
+    },
+    {
+      "file": "app\\components\\SoundSettings.tsx",
+      "replacement": "components/SoundSettings.tsx",
+      "originalReplacement": "components\\SoundSettings.tsx"
+    },
+    {
+      "file": "app\\components\\ui\\badge.tsx",
+      "replacement": "components/ui/badge.tsx",
+      "originalReplacement": "components\\ui\\badge.tsx"
+    },
+    {
+      "file": "app\\components\\ui\\input.tsx",
+      "replacement": "components/ui/input.tsx",
+      "originalReplacement": "components\\ui\\input.tsx"
+    },
+    {
+      "file": "app\\components\\ui\\LoadingBonfire.tsx",
+      "replacement": "app/components/components/ui/LoadingBonfire.tsx",
+      "originalReplacement": "app\\components\\components\\ui\\LoadingBonfire.tsx"
+    },
+    {
+      "file": "app\\context\\context\\AuthContext.js",
+      "replacement": "contexts/AuthContext.tsx",
+      "originalReplacement": "contexts\\AuthContext.tsx"
+    },
+    {
+      "file": "app\\layout.js",
+      "replacement": "app/components/components/Layout.jsx",
+      "originalReplacement": "app\\components\\components\\Layout.jsx"
+    },
+    {
+      "file": "app\\lib\\assets\\index.ts",
+      "replacement": "app/types/index.ts",
+      "originalReplacement": "app\\types\\index.ts"
+    },
+    {
+      "file": "app\\lib\\assets\\style-map.ts",
+      "replacement": "app/lib/style-map.ts",
+      "originalReplacement": "app\\lib\\style-map.ts"
+    },
+    {
+      "file": "app\\lib\\assets\\types.ts",
+      "replacement": "app/types.ts",
+      "originalReplacement": "app\\types.ts"
+    },
+    {
+      "file": "app\\lib\\manifest.ts",
+      "replacement": "app/lib/assets/manifest.ts",
+      "originalReplacement": "app\\lib\\assets\\manifest.ts"
+    },
+    {
+      "file": "app\\lib\\printify\\types.ts",
+      "replacement": "app/types.ts",
+      "originalReplacement": "app\\types.ts"
+    },
+    {
+      "file": "app\\lib\\printify.ts",
+      "replacement": "app/abyss/shop/api/printify.js",
+      "originalReplacement": "app\\abyss\\shop\\api\\printify.js"
+    },
+    {
+      "file": "app\\lib\\shop\\types.ts",
+      "replacement": "app/types.ts",
+      "originalReplacement": "app\\types.ts"
+    },
+    {
+      "file": "app\\lib\\state\\games.ts",
+      "replacement": "app/lib/games.ts",
+      "originalReplacement": "app\\lib\\games.ts"
+    },
+    {
+      "file": "app\\loading.tsx",
+      "replacement": "app/components/ui/loading.tsx",
+      "originalReplacement": "app\\components\\ui\\loading.tsx"
+    },
+    {
+      "file": "app\\mini-games\\layout.tsx",
+      "replacement": "app/components/components/Layout.jsx",
+      "originalReplacement": "app\\components\\components\\Layout.jsx"
+    },
+    {
+      "file": "app\\mini-games\\loading.tsx",
+      "replacement": "app/components/ui/loading.tsx",
+      "originalReplacement": "app\\components\\ui\\loading.tsx"
+    },
+    {
+      "file": "app\\mini-games\\memory-match\\Game.tsx",
+      "replacement": "app/mini-games/bubble-girl/Game.tsx",
+      "originalReplacement": "app\\mini-games\\bubble-girl\\Game.tsx"
+    },
+    {
+      "file": "app\\mini-games\\memory-match\\Scene.tsx",
+      "replacement": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "originalReplacement": "app\\mini-games\\bubble-ragdoll\\Scene.tsx"
+    },
+    {
+      "file": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "replacement": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "originalReplacement": "app\\mini-games\\bubble-ragdoll\\Scene.tsx"
+    },
+    {
+      "file": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "replacement": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "originalReplacement": "app\\mini-games\\bubble-ragdoll\\Scene.tsx"
+    },
+    {
+      "file": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "replacement": "app/mini-games/bubble-girl/Game.tsx",
+      "originalReplacement": "app\\mini-games\\bubble-girl\\Game.tsx"
+    },
+    {
+      "file": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "replacement": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "originalReplacement": "app\\mini-games\\bubble-ragdoll\\Scene.tsx"
+    },
+    {
+      "file": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "replacement": "app/components/GameCubeBoot.js",
+      "originalReplacement": "app\\components\\GameCubeBoot.js"
+    },
+    {
+      "file": "app\\pages\\ContactForm.js",
+      "replacement": "app/components/ContactForm.jsx",
+      "originalReplacement": "app\\components\\ContactForm.jsx"
+    },
+    {
+      "file": "app\\providers\\cart.tsx",
+      "replacement": "src/lib/cart.ts",
+      "originalReplacement": "src\\lib\\cart.ts"
+    },
+    {
+      "file": "app\\providers\\petals.tsx",
+      "replacement": "app/lib/petals.ts",
+      "originalReplacement": "app\\lib\\petals.ts"
+    },
+    {
+      "file": "app\\trade\\ui\\Shop.tsx",
+      "replacement": "app/pages/Shop.jsx",
+      "originalReplacement": "app\\pages\\Shop.jsx"
+    },
+    {
+      "file": "app\\types\\achievements.ts",
+      "replacement": "app/components/Achievements.tsx",
+      "originalReplacement": "app\\components\\Achievements.tsx"
+    },
+    {
+      "file": "app\\types\\auth.ts",
+      "replacement": "app/lib/auth.ts",
+      "originalReplacement": "app\\lib\\auth.ts"
+    },
+    {
+      "file": "components\\achievements\\AchievementCard.tsx",
+      "replacement": "app/components/achievements/AchievementCard.tsx",
+      "originalReplacement": "app\\components\\achievements\\AchievementCard.tsx"
+    },
+    {
+      "file": "components\\achievements\\AchievementProvider.tsx",
+      "replacement": "app/components/achievements/AchievementProvider.tsx",
+      "originalReplacement": "app\\components\\achievements\\AchievementProvider.tsx"
+    },
+    {
+      "file": "components\\admin\\MessageManager.tsx",
+      "replacement": "app/components/components/admin/MessageManager.tsx",
+      "originalReplacement": "app\\components\\components\\admin\\MessageManager.tsx"
+    },
+    {
+      "file": "components\\admin\\QuickActions.tsx",
+      "replacement": "app/components/components/admin/QuickActions.tsx",
+      "originalReplacement": "app\\components\\components\\admin\\QuickActions.tsx"
+    },
+    {
+      "file": "components\\animations\\SoapstoneMessage.tsx",
+      "replacement": "app/components/components/SoapstoneMessage.tsx",
+      "originalReplacement": "app\\components\\components\\SoapstoneMessage.tsx"
+    },
+    {
+      "file": "components\\arcade\\types.ts",
+      "replacement": "app/types.ts",
+      "originalReplacement": "app\\types.ts"
+    },
+    {
+      "file": "components\\ErrorBoundary.tsx",
+      "replacement": "components/dev/ErrorBoundary.tsx",
+      "originalReplacement": "components\\dev\\ErrorBoundary.tsx"
+    },
+    {
+      "file": "components\\FriendActivity.tsx",
+      "replacement": "app/components/FriendActivity.tsx",
+      "originalReplacement": "app\\components\\FriendActivity.tsx"
+    },
+    {
+      "file": "components\\FriendChat.tsx",
+      "replacement": "app/components/FriendChat.tsx",
+      "originalReplacement": "app\\components\\FriendChat.tsx"
+    },
+    {
+      "file": "components\\FriendList.tsx",
+      "replacement": "app/components/FriendList.tsx",
+      "originalReplacement": "app\\components\\FriendList.tsx"
+    },
+    {
+      "file": "components\\games\\CherryBlossomTree.tsx",
+      "replacement": "app/components/components/CherryBlossomTree.tsx",
+      "originalReplacement": "app\\components\\components\\CherryBlossomTree.tsx"
+    },
+    {
+      "file": "components\\games\\index.ts",
+      "replacement": "app/types/index.ts",
+      "originalReplacement": "app\\types\\index.ts"
+    },
+    {
+      "file": "components\\shop\\FeaturedProducts.tsx",
+      "replacement": "components/hero/FeaturedProducts.tsx",
+      "originalReplacement": "components\\hero\\FeaturedProducts.tsx"
+    },
+    {
+      "file": "components\\Toast.tsx",
+      "replacement": "app/components/Toast.tsx",
+      "originalReplacement": "app\\components\\Toast.tsx"
+    },
+    {
+      "file": "components\\ui\\card.tsx",
+      "replacement": "app/components/ui/card.tsx",
+      "originalReplacement": "app\\components\\ui\\card.tsx"
+    },
+    {
+      "file": "components\\ui\\LoadingBonfire.tsx",
+      "replacement": "app/components/components/ui/LoadingBonfire.tsx",
+      "originalReplacement": "app\\components\\components\\ui\\LoadingBonfire.tsx"
+    },
+    {
+      "file": "components\\ui\\select.tsx",
+      "replacement": "app/components/ui/select.tsx",
+      "originalReplacement": "app\\components\\ui\\select.tsx"
+    },
+    {
+      "file": "components\\ui\\tabs.tsx",
+      "replacement": "app/components/ui/tabs.tsx",
+      "originalReplacement": "app\\components\\ui\\tabs.tsx"
+    },
+    {
+      "file": "lib\\api\\http.ts",
+      "replacement": "app/lib/http.ts",
+      "originalReplacement": "app\\lib\\http.ts"
+    },
+    {
+      "file": "lib\\api\\printify.ts",
+      "replacement": "app/abyss/shop/api/printify.js",
+      "originalReplacement": "app\\abyss\\shop\\api\\printify.js"
+    },
+    {
+      "file": "lib\\assets\\schema.ts",
+      "replacement": "drizzle/schema.ts",
+      "originalReplacement": "drizzle\\schema.ts"
+    },
+    {
+      "file": "lib\\db.ts",
+      "replacement": "app/lib/db.ts",
+      "originalReplacement": "app\\lib\\db.ts"
+    },
+    {
+      "file": "lib\\fonts.ts",
+      "replacement": "app/fonts.ts",
+      "originalReplacement": "app\\fonts.ts"
+    },
+    {
+      "file": "lib\\hooks\\useAchievements.ts",
+      "replacement": "app/hooks/hooks/useAchievements.ts",
+      "originalReplacement": "app\\hooks\\hooks\\useAchievements.ts"
+    },
+    {
+      "file": "lib\\hooks\\useAudio.ts",
+      "replacement": "app/hooks/hooks/useAudio.ts",
+      "originalReplacement": "app\\hooks\\hooks\\useAudio.ts"
+    },
+    {
+      "file": "lib\\logger.ts",
+      "replacement": "app/lib/logger.ts",
+      "originalReplacement": "app\\lib\\logger.ts"
+    },
+    {
+      "file": "lib\\shop.ts",
+      "replacement": "app/pages/Shop.jsx",
+      "originalReplacement": "app\\pages\\Shop.jsx"
+    },
+    {
+      "file": "lib\\utils.ts",
+      "replacement": "app/lib/lib/utils.ts",
+      "originalReplacement": "app\\lib\\lib\\utils.ts"
+    }
+  ],
+  "needsReview": [
+    {
+      "file": "app\\components\\layout\\Header.tsx",
+      "claimedReplacement": "app\\components\\Header.js",
+      "attemptedPaths": [
+        "app/components/Header.js",
+        "app\\components\\layout\\app\\components\\Header.js",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\components\\Header.js",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\components\\Header.js"
+      ],
+      "firstLine": "// DEPRECATED: This component is a duplicate. Use app\\components\\Header.js instead."
+    },
+    {
+      "file": "app\\lib\\cosmetics\\cosmeticsConfig.ts",
+      "claimedReplacement": "avatar-cosmetic",
+      "attemptedPaths": [
+        "avatar-cosmetic",
+        "app\\lib\\cosmetics\\avatar-cosmetic",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\avatar-cosmetic",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\avatar-cosmetic"
+      ],
+      "firstLine": ""
+    },
+    {
+      "file": "app\\mini-games\\components\\CubeHub.tsx",
+      "claimedReplacement": "app\\hub\\_scene\\CubeHub.tsx",
+      "attemptedPaths": [
+        "app/hub/_scene/CubeHub.tsx",
+        "app\\mini-games\\components\\app\\hub\\_scene\\CubeHub.tsx",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\hub\\_scene\\CubeHub.tsx",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\hub\\_scene\\CubeHub.tsx"
+      ],
+      "firstLine": "// DEPRECATED: This component is a duplicate. Use app\\hub\\_scene\\CubeHub.tsx instead."
+    },
+    {
+      "file": "components\\ui\\button.tsx",
+      "claimedReplacement": "app\\components\\ui\\button.tsx",
+      "attemptedPaths": [
+        "app/components/ui/button.tsx",
+        "components\\ui\\app\\components\\ui\\button.tsx",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\components\\ui\\button.tsx",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\components\\ui\\button.tsx"
+      ],
+      "firstLine": "// DEPRECATED: This component is a duplicate. Use app\\components\\ui\\button.tsx instead."
+    },
+    {
+      "file": "lib\\env.ts",
+      "claimedReplacement": "app\\lib\\env.ts",
+      "attemptedPaths": [
+        "app/lib/env.ts",
+        "lib\\app\\lib\\env.ts",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\lib\\env.ts",
+        "C:\\Users\\ap190\\Contacts\\Desktop\\Documents\\GitHub\\Otakumori\\app\\lib\\env.ts"
+      ],
+      "firstLine": "// DEPRECATED: This component is a duplicate. Use app\\lib\\env.ts instead."
+    }
+  ],
+  "suspicious": []
+}

@@ -1,0 +1,299 @@
+{
+  "timestamp": "2025-11-25T16:19:52.651Z",
+  "changes": [
+    {
+      "file": "app\\(client)\\bonfire\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\(shop)\\products\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\about\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\community\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\gallery\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\games\\mini-games\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\games\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\games\\petal-collection\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\abyss\\shop\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\account\\petals\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\account\\storage\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\admin\\music\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\admin\\reviews\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\admin\\soapstones\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\api\\account\\display-name\\route.ts",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\api\\webhooks\\stripe\\route.ts instead.",
+      "reason": "Active file"
+    },
+    {
+      "file": "app\\api\\admin\\backup\\route.ts",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\api\\webhooks\\stripe\\route.ts instead.",
+      "reason": "Active file"
+    },
+    {
+      "file": "app\\api\\admin\\blog\\route.ts",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\api\\webhooks\\stripe\\route.ts instead.",
+      "reason": "Active file"
+    },
+    {
+      "file": "app\\api\\admin\\dashboard\\route.ts",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\api\\webhooks\\stripe\\route.ts instead.",
+      "reason": "Active file"
+    },
+    {
+      "file": "app\\collab\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\data-deletion\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\debug\\world\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\faq\\page.js",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\games\\[slug]\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\health\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\hub\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\login\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\mini-games\\bubble-ragdoll\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\mini-games\\leaderboard\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\mini-games\\list\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\mini-games\\trade-hall\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\orders\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Active file"
+    },
+    {
+      "file": "app\\panel\\community\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\panel\\mini-games\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\panel\\music\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\panel\\petal-store\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\panel\\trade\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\panel\\[slug]\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\parties\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\profile\\[username]\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\safety\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\soapstone\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\starter-pack\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\test\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\test-visual\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\thank-you\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Active file"
+    },
+    {
+      "file": "app\\too-many-requests\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\trade\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    },
+    {
+      "file": "app\\[slug]\\page.tsx",
+      "action": "removed",
+      "deprecatedLine": "// DEPRECATED: This component is a duplicate. Use app\\sign-in\\[[...sign-in]]\\page.tsx instead.",
+      "reason": "Suspicious replacement"
+    }
+  ]
+}

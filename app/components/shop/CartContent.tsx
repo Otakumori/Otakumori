@@ -7,6 +7,7 @@ import GlassPanel from '../GlassPanel';
 import { t } from '@/lib/microcopy';
 import { useCart } from '@/app/components/cart/CartProvider';
 import { PetalBalanceDisplay } from './PetalBalanceDisplay';
+import { EmptyCart } from '@/app/components/empty-states';
 
 export default function CartContent() {
   const { items, updateQuantity, removeItem } = useCart();
@@ -92,16 +93,7 @@ export default function CartContent() {
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <GlassPanel className="p-8">
-          <h2 className="text-xl font-semibold text-white mb-4">{t('cart', 'empty')}</h2>
-          <p className="text-zinc-400 mb-6">Time for some side quests to fill your inventory!</p>
-          <Link
-            href="/shop"
-            className="inline-block rounded-xl bg-fuchsia-500/90 px-6 py-3 text-white hover:bg-fuchsia-500 transition-colors"
-          >
-            Start Shopping
-          </Link>
-        </GlassPanel>
+    <EmptyCart />
       </div>
     );
   }

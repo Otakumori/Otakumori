@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Package, Truck, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { EmptyOrders } from '@/app/components/empty-states';
 
 interface OrderItem {
   id: string;
@@ -155,14 +156,9 @@ export default function OrdersPage() {
         </div>
 
         {orders.length === 0 ? (
-          <Card className="border-pink-500/30 bg-white/10 p-8 text-center backdrop-blur-lg">
-            <Package className="h-16 w-16 text-pink-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-white mb-2">No Orders Yet</h2>
-            <p className="text-pink-200 mb-6">Start shopping to see your orders here</p>
-            <Link href="/shop">
-              <Button className="bg-pink-500 hover:bg-pink-600">Browse Shop</Button>
-            </Link>
-          </Card>
+          <div className="text-center py-12">
+            <EmptyOrders />
+          </div>
         ) : (
           <div className="space-y-6">
             {orders.map((order) => (

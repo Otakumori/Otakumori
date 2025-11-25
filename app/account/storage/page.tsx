@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\sign-in\[[...sign-in]]\page.tsx instead.
+
 import StorageManager from '@/components/account/StorageManager';
 
 export const metadata = {
