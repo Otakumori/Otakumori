@@ -147,6 +147,8 @@
     "webhooks:setup": "node scripts/setup-printify-webhooks.mjs",
     "webhooks:setup:dry-run": "node scripts/setup-printify-webhooks.mjs --dry-run",
     "verify:production": "bash scripts/verify-production-ready.sh",
+    "fix:all": "node scripts/fix-and-verify-all.mjs --execute",
+    "fix:all:dry-run": "node scripts/fix-and-verify-all.mjs --dry-run",
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:reset": "prisma migrate reset -f",

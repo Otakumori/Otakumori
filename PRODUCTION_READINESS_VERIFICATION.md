@@ -4,6 +4,29 @@ Complete checklist and verification plan for ensuring Otakumori is production-re
 
 ---
 
+## **🚀 Quick Start: Master Script**
+
+**Run all fixes and verifications in one command:**
+
+```bash
+# Preview changes first (recommended)
+npm run fix:all:dry-run
+
+# Apply all fixes and verify
+npm run fix:all
+```
+
+This master script will:
+1. Fix console.log statements
+2. Add metadata to pages
+3. Fix accessibility issues
+4. Standardize loading/empty states
+5. Verify TypeScript, linting, and build
+
+**Or run individual steps below for more control.**
+
+---
+
 ## **Phase 1: Critical Fixes (Run First)**
 
 ### **1.1 Accessibility Fixes**
