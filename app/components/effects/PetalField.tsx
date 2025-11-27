@@ -102,7 +102,7 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
         rotation: Math.random() * Math.PI * 2,
         rotationSpeed: (Math.random() - 0.5) * 0.008, // Slow rotation
         scale: (0.6 + Math.random() * 0.4) * size,
-        opacity: 0.3 + Math.random() * 0.4, // Subtle visibility
+        opacity: 0.4 + Math.random() * 0.2, // Subtle, discoverable opacity (0.4-0.6)
         frameIndex,
         flipX: Math.random() < 0.5 ? 1 : -1,
         // Flutter system
@@ -416,7 +416,7 @@ export default function PetalField({ density = 'site' }: PetalFieldProps) {
       className="fixed inset-0 pointer-events-auto z-0"
       style={{
         background: 'transparent',
-        cursor: 'pointer',
+      cursor: 'default', // No obvious clickability cue - discoverable through interaction
       }}
       aria-label="Interactive sakura petal field - click petals to collect them"
     />

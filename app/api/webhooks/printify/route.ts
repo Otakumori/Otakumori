@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 import { logger } from '@/app/lib/logger';
@@ -100,6 +100,25 @@ export async function POST(req: NextRequest) {
           route,
           extra: { productId: payload.data?.id },
         });
+        // Trigger product sync via Inngest
+        try {
+          const { inngest } = await import('@/inngest/client');
+          await inngest.send({
+            name: 'printify/product-changed',
+            data: { productId: payload.data?.id },
+          });
+          logger.info('product sync triggered', {
+            requestId,
+            route,
+            extra: { productId: payload.data?.id },
+          });
+        } catch (error) {
+          logger.error('failed to trigger product sync', {
+            requestId,
+            route,
+            extra: { productId: payload.data?.id, error: String(error) },
+          });
+        }
         break;
       case 'inventory:updated':
         logger.info('inventory updated', {

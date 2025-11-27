@@ -3,28 +3,42 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Cherry Blossom Tree Background Component
+ * Enhanced Cherry Blossom Tree Background Component
  *
  * CRITICAL: This component should ONLY be used via TreeBackgroundWrapper,
  * which ensures it only renders on the home page. Do not import directly
  * in other pages.
  *
- * CRITICAL SPECIFICATIONS:
- * - Starts behind header (header is sticky, ~80px height)
- * - Ends at footer begin (footer starts where content ends)
- * - Visual boundaries: clear fade gradients at top/bottom
- * - Works same on mobile and desktop
+ * ENHANCED SPECIFICATIONS:
+ * - Spans header to footer with mild overlap
+ * - Parallax scroll effect (30% scroll speed)
+ * - Left offset positioning (-100px)
+ * - Smooth fade gradients at top/bottom
+ * - Updates on scroll/resize
  * - Proper z-index layering (z-index: -10, behind header z-20, footer z-50)
  * - 60fps performance optimized
  */
 export default function TreeBackground() {
   const [dimensions, setDimensions] = useState({ top: 0, height: 0 });
+  const [scrollY, setScrollY] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     // Mark as mounted to prevent SSR issues
     setIsMounted(true);
   }, []);
+
+  // Track scroll position for parallax
+  useEffect(() => {
+    if (!isMounted || typeof window === 'undefined') return;
+
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isMounted]);
 
   useEffect(() => {
     // Only run on client side
@@ -58,7 +72,8 @@ export default function TreeBackground() {
 
         // Tree starts at top (behind navbar) and extends to footer
         // Use full document height to ensure it reaches the bottom
-        const height = Math.max(fullHeight, window.innerHeight);
+        // Add extra height for parallax overlap
+        const height = Math.max(fullHeight, window.innerHeight) + 200;
 
         setDimensions({ top: 0, height });
       } catch (error) {
@@ -101,9 +116,12 @@ export default function TreeBackground() {
   // Ensure we render even if dimensions aren't calculated yet
   const displayHeight = dimensions.height > 0 ? `${dimensions.height}px` : '100vh';
 
+  // Calculate parallax offset (30% of scroll speed)
+  const parallaxOffset = scrollY * 0.3;
+
   return (
     <>
-      {/* Absolute tree background - starts at top (behind navbar), extends to footer, scrolls with page */}
+    {/* Absolute tree background - starts at top (behind navbar), extends to footer, with parallax */ }
       <div
         className="absolute inset-x-0 pointer-events-none"
         style={{
@@ -113,7 +131,7 @@ export default function TreeBackground() {
         }}
         aria-hidden="true"
       >
-        {/* Tree image - scrolls with page content */}
+          {/* Tree image - parallax scroll effect (30% speed) with left offset */ }
         <div
           className="absolute inset-0"
           style={{
@@ -123,10 +141,12 @@ export default function TreeBackground() {
             backgroundRepeat: 'no-repeat',
             opacity: isMounted ? 1 : 0,
             transition: 'opacity 0.3s ease-in',
+    transform: `translate3d(-100px, ${parallaxOffset}px, 0)`, // Left offset + parallax
+      willChange: 'transform',
           }}
         />
 
-        {/* Top fade gradient - blends with header */}
+{/* Top fade gradient - blends with header (120px overlap) */ }
         <div
           className="absolute inset-x-0 top-0 h-32 pointer-events-none"
           style={{
@@ -135,7 +155,7 @@ export default function TreeBackground() {
           }}
         />
 
-        {/* Bottom fade gradient - blends with footer */}
+{/* Bottom fade gradient - blends with footer (200px overlap) */ }
         <div
           className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
           style={{

@@ -21,7 +21,7 @@ import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
 import { PetalFlowOverlayWrapper } from './components/home/PetalFlowOverlayWrapper';
 import { CherryPetalLayerWrapper } from '@/app/(site)/home/CherryPetalLayerWrapper';
 import HomePetalSystemWrapper from './components/home/HomePetalSystemWrapper';
-import StarfieldBackground from './components/backgrounds/StarfieldBackground';
+import EnhancedStarfieldBackground from './components/backgrounds/EnhancedStarfieldBackground';
 
 export const revalidate = 60;
 
@@ -89,9 +89,10 @@ export default async function HomePage() {
           */}
           {isHomepageExperimentalEnabled && (
             <>
-              {/* Starfield background - deepest layer, behind everything */}
+      {/* Enhanced starfield background - deepest layer, behind everything */ }
               <SafeSection name="StarfieldBackground" fallback={null}>
-                <StarfieldBackground density={0.72} speed={0.62} zIndex={-11} />
+        <EnhancedStarfieldBackground density={ 0.5 } speed = { 0.4} zIndex = {- 11
+    } />
               </SafeSection>
 
               {/* Tree hero - above starfield, behind petals, scrolls with page */}
@@ -129,8 +130,14 @@ export default async function HomePage() {
             <section className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
               <div className="text-center">
                 <h1
-                  className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight"
-                  style={{ color: '#835D75' }}
+                  className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight animate-pulse"
+style = {{
+  background: 'linear-gradient(135deg, #ec4899, #8b5cf6, #ec4899)',
+    WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+          filter: 'drop-shadow(0 0 20px rgba(236, 72, 153, 0.3))',
+                  }}
                 >
                   Welcome Home, Traveler
                 </h1>

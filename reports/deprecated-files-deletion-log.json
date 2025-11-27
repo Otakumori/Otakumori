@@ -1,0 +1,137 @@
+{
+  "timestamp": "2025-11-25T16:24:30.348Z",
+  "deleted": [
+    {
+      "file": "app\\(client)\\profile\\ProfileHeader.tsx",
+      "replacement": "app/profile/ui/ProfileHeader.tsx",
+      "deletedAt": "2025-11-25T16:24:30.349Z"
+    },
+    {
+      "file": "app\\abyss\\games\\layout.js",
+      "replacement": "app/components/components/Layout.jsx",
+      "deletedAt": "2025-11-25T16:24:30.349Z"
+    },
+    {
+      "file": "app\\abyss\\layout.js",
+      "replacement": "app/components/components/Layout.jsx",
+      "deletedAt": "2025-11-25T16:24:30.349Z"
+    },
+    {
+      "file": "app\\components\\admin\\MessageManager.tsx",
+      "replacement": "app/components/components/admin/MessageManager.tsx",
+      "deletedAt": "2025-11-25T16:24:30.350Z"
+    },
+    {
+      "file": "app\\components\\animations\\InteractiveCherryBlossom.tsx",
+      "replacement": "components/animations/InteractiveCherryBlossom.tsx",
+      "deletedAt": "2025-11-25T16:24:30.350Z"
+    },
+    {
+      "file": "app\\components\\AvatarCreator.tsx",
+      "replacement": "app/components/profile/AvatarCreator.tsx",
+      "deletedAt": "2025-11-25T16:24:30.351Z"
+    },
+    {
+      "file": "app\\components\\components\\SoundSettings.tsx",
+      "replacement": "components/SoundSettings.tsx",
+      "deletedAt": "2025-11-25T16:24:30.351Z"
+    },
+    {
+      "file": "app\\components\\NavBar.tsx",
+      "replacement": "app/components/layout/Navbar.tsx",
+      "deletedAt": "2025-11-25T16:24:30.352Z"
+    },
+    {
+      "file": "app\\components\\shop\\ProductGrid.tsx",
+      "replacement": "components/shop/ProductGrid.tsx",
+      "deletedAt": "2025-11-25T16:24:30.352Z"
+    },
+    {
+      "file": "app\\components\\SoundSettings.tsx",
+      "replacement": "components/SoundSettings.tsx",
+      "deletedAt": "2025-11-25T16:24:30.353Z"
+    },
+    {
+      "file": "app\\layout.js",
+      "replacement": "app/components/components/Layout.jsx",
+      "deletedAt": "2025-11-25T16:24:30.353Z"
+    },
+    {
+      "file": "app\\lib\\assets\\index.ts",
+      "replacement": "app/types/index.ts",
+      "deletedAt": "2025-11-25T16:24:30.353Z"
+    },
+    {
+      "file": "app\\lib\\assets\\style-map.ts",
+      "replacement": "app/lib/style-map.ts",
+      "deletedAt": "2025-11-25T16:24:30.354Z"
+    },
+    {
+      "file": "app\\loading.tsx",
+      "replacement": "app/components/ui/loading.tsx",
+      "deletedAt": "2025-11-25T16:24:30.354Z"
+    },
+    {
+      "file": "app\\mini-games\\layout.tsx",
+      "replacement": "app/components/components/Layout.jsx",
+      "deletedAt": "2025-11-25T16:24:30.354Z"
+    },
+    {
+      "file": "app\\mini-games\\loading.tsx",
+      "replacement": "app/components/ui/loading.tsx",
+      "deletedAt": "2025-11-25T16:24:30.355Z"
+    },
+    {
+      "file": "app\\pages\\ContactForm.js",
+      "replacement": "app/components/ContactForm.jsx",
+      "deletedAt": "2025-11-25T16:24:30.355Z"
+    },
+    {
+      "file": "components\\admin\\MessageManager.tsx",
+      "replacement": "app/components/components/admin/MessageManager.tsx",
+      "deletedAt": "2025-11-25T16:24:30.355Z"
+    },
+    {
+      "file": "components\\animations\\SoapstoneMessage.tsx",
+      "replacement": "app/components/components/SoapstoneMessage.tsx",
+      "deletedAt": "2025-11-25T16:24:30.356Z"
+    },
+    {
+      "file": "components\\FriendActivity.tsx",
+      "replacement": "app/components/FriendActivity.tsx",
+      "deletedAt": "2025-11-25T16:24:30.356Z"
+    },
+    {
+      "file": "components\\FriendChat.tsx",
+      "replacement": "app/components/FriendChat.tsx",
+      "deletedAt": "2025-11-25T16:24:30.357Z"
+    },
+    {
+      "file": "components\\FriendList.tsx",
+      "replacement": "app/components/FriendList.tsx",
+      "deletedAt": "2025-11-25T16:24:30.357Z"
+    },
+    {
+      "file": "components\\games\\CherryBlossomTree.tsx",
+      "replacement": "app/components/components/CherryBlossomTree.tsx",
+      "deletedAt": "2025-11-25T16:24:30.357Z"
+    },
+    {
+      "file": "components\\games\\index.ts",
+      "replacement": "app/types/index.ts",
+      "deletedAt": "2025-11-25T16:24:30.358Z"
+    },
+    {
+      "file": "components\\shop\\FeaturedProducts.tsx",
+      "replacement": "components/hero/FeaturedProducts.tsx",
+      "deletedAt": "2025-11-25T16:24:30.358Z"
+    },
+    {
+      "file": "lib\\api\\printify.ts",
+      "replacement": "app/abyss/shop/api/printify.js",
+      "deletedAt": "2025-11-25T16:24:30.358Z"
+    }
+  ],
+  "errors": [],
+  "skipped": []
+}

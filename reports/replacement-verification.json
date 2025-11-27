@@ -1,0 +1,2147 @@
+{
+  "summary": {
+    "total": 72,
+    "safe": 57,
+    "unsafe": 15,
+    "withWarnings": 22,
+    "withErrors": 15,
+    "notFound": 0
+  },
+  "safe": [
+    {
+      "deprecatedFile": "app\\abyss\\games\\layout.js",
+      "replacementFile": "app/components/components/Layout.jsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\abyss\\layout.js",
+      "replacementFile": "app/components/components/Layout.jsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\animations\\InteractiveCherryBlossom.tsx",
+      "replacementFile": "components/animations/InteractiveCherryBlossom.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\BlogTeaser.tsx",
+      "replacementFile": "components/hero/BlogTeaser.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [
+          "BlogTeaser"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\components\\SoundSettings.tsx",
+      "replacementFile": "components/SoundSettings.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "SoundSettings"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [
+          "SoundSettings"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\NavBar.tsx",
+      "replacementFile": "app/components/layout/Navbar.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\notifications\\Toast.tsx",
+      "replacementFile": "app/components/Toast.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "useToast",
+          "ToastProvider",
+          "useToastHelpers"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "ToastProvider",
+          "useToast",
+          "Toast"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [
+        {
+          "name": "children",
+          "optional": false,
+          "type": "ReactNode"
+        }
+      ],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: useToastHelpers",
+        "Deprecated has props interface but replacement does not"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\shop\\ProductGrid.tsx",
+      "replacementFile": "components/shop/ProductGrid.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [
+        {
+          "name": "products",
+          "optional": false,
+          "type": "Product[]"
+        }
+      ],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\SoundSettings.tsx",
+      "replacementFile": "components/SoundSettings.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "SoundSettings"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [
+          "SoundSettings"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\ui\\badge.tsx",
+      "replacementFile": "components/ui/badge.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "BadgeProps"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "BadgeProps"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\ui\\input.tsx",
+      "replacementFile": "components/ui/input.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "InputProps"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: InputProps"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\components\\ui\\LoadingBonfire.tsx",
+      "replacementFile": "app/components/components/ui/LoadingBonfire.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\context\\context\\AuthContext.js",
+      "replacementFile": "contexts/AuthContext.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "AuthContext",
+          "AuthProvider"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "AuthProvider",
+          "useAuth"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: AuthContext"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\layout.js",
+      "replacementFile": "app/components/components/Layout.jsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [
+          "metadata"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: metadata"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\assets\\index.ts",
+      "replacementFile": "app/types/index.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Petal",
+          "Progress",
+          "Product",
+          "BlogPost",
+          "SocialLink",
+          "ButtonProps",
+          "CardProps",
+          "CardHeaderProps",
+          "CardTitleProps",
+          "CardDescriptionProps",
+          "CardContentProps",
+          "CardFooterProps"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\assets\\style-map.ts",
+      "replacementFile": "app/lib/style-map.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "Vibe",
+          "avatarVibes",
+          "getVibeForAvatar"
+        ],
+        "types": [
+          "Vibe"
+        ]
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Vibe",
+          "avatarVibes",
+          "getVibeForAvatar",
+          "pickPresetForGame",
+          "vibePresets"
+        ],
+        "types": [
+          "Vibe"
+        ]
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\assets\\types.ts",
+      "replacementFile": "app/types.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "AssetType",
+          "AssetConfigItem",
+          "AssetRecord",
+          "AssetMap",
+          "AssetLookup"
+        ],
+        "types": [
+          "AssetType",
+          "AssetMap"
+        ]
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Petal",
+          "Product",
+          "BlogPost",
+          "SocialLink"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: AssetType, AssetConfigItem, AssetRecord, AssetMap, AssetLookup"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\manifest.ts",
+      "replacementFile": "app/lib/assets/manifest.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "AssetEntry"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "ASSETS",
+          "getAsset",
+          "getGame"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: AssetEntry"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\printify\\types.ts",
+      "replacementFile": "app/types.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "PrintifyAddress",
+          "PrintifyLineItem",
+          "PrintifyOrder",
+          "PrintifyOrderPayload"
+        ],
+        "types": [
+          "PrintifyAddress",
+          "PrintifyLineItem",
+          "PrintifyOrder",
+          "PrintifyOrderPayload"
+        ]
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Petal",
+          "Product",
+          "BlogPost",
+          "SocialLink"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: PrintifyAddress, PrintifyLineItem, PrintifyOrder, PrintifyOrderPayload"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\printify.ts",
+      "replacementFile": "app/abyss/shop/api/printify.js",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "PrintifyOrderItem",
+          "PrintifyShippingAddress",
+          "PrintifyOrderData",
+          "PrintifyProduct",
+          "PrintifySyncResult",
+          "PrintifyService",
+          "printifyService"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: PrintifyOrderItem, PrintifyShippingAddress, PrintifyOrderData, PrintifyProduct, PrintifySyncResult, PrintifyService, printifyService"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\lib\\shop\\types.ts",
+      "replacementFile": "app/types.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "Product",
+          "PETAL_TO_USD"
+        ],
+        "types": [
+          "Product"
+        ]
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Petal",
+          "Product",
+          "BlogPost",
+          "SocialLink"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: PETAL_TO_USD"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\loading.tsx",
+      "replacementFile": "app/components/ui/loading.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\layout.tsx",
+      "replacementFile": "app/components/components/Layout.jsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\loading.tsx",
+      "replacementFile": "app/components/ui/loading.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\memory-match\\Game.tsx",
+      "replacementFile": "app/mini-games/bubble-girl/Game.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\memory-match\\Scene.tsx",
+      "replacementFile": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\otaku-beat-em-up\\Scene.tsx",
+      "replacementFile": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [
+        {
+          "name": "mapUrl",
+          "optional": true,
+          "type": "string"
+        }
+      ],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Deprecated has props interface but replacement does not"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\petal-collection\\Scene.tsx",
+      "replacementFile": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\puzzle-reveal\\Game.tsx",
+      "replacementFile": "app/mini-games/bubble-girl/Game.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\samurai-petal-slice\\Scene.tsx",
+      "replacementFile": "app/mini-games/bubble-ragdoll/Scene.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\mini-games\\_shared\\GameCubeBoot.tsx",
+      "replacementFile": "app/components/GameCubeBoot.js",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [
+        {
+          "name": "onBootComplete",
+          "optional": false,
+          "type": "() => void"
+        }
+      ],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Deprecated has props interface but replacement does not"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\providers\\cart.tsx",
+      "replacementFile": "src/lib/cart.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "CartProvider",
+          "useCart"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Implement actual cart storage when Prisma migration is complete"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Implement actual cart retrieval"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Implement actual cart removal when Prisma migration is complete"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Implement actual cart update"
+        }
+      ],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: CartProvider, useCart"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\providers\\petals.tsx",
+      "replacementFile": "app/lib/petals.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "PetalProvider",
+          "usePetals"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "PetalReward",
+          "PetalBalance",
+          "PetalService",
+          "petalService"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Implement streak tracking"
+        }
+      ],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: PetalProvider, usePetals"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\trade\\ui\\Shop.tsx",
+      "replacementFile": "app/pages/Shop.jsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\types\\achievements.ts",
+      "replacementFile": "app/components/Achievements.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "AchievementCategory",
+          "AchievementReward",
+          "Achievement",
+          "AchievementProgress",
+          "AchievementContextType",
+          "PetalTier",
+          "PETAL_TIERS"
+        ],
+        "types": [
+          "AchievementCategory"
+        ]
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: AchievementCategory, AchievementReward, Achievement, AchievementProgress, AchievementContextType, PetalTier, PETAL_TIERS"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "app\\types\\auth.ts",
+      "replacementFile": "app/lib/auth.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "User",
+          "AgeVerification",
+          "AuthResponse",
+          "LoginCredentials",
+          "RegisterCredentials",
+          "PasswordResetRequest",
+          "PasswordReset"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: User, AgeVerification, AuthResponse, LoginCredentials, RegisterCredentials, PasswordResetRequest, PasswordReset"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\achievements\\AchievementCard.tsx",
+      "replacementFile": "app/components/achievements/AchievementCard.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [
+        {
+          "name": "achievement",
+          "optional": false,
+          "type": "Achievement"
+        }
+      ],
+      "replacementProps": [
+        {
+          "name": "achievement",
+          "optional": false,
+          "type": "Achievement"
+        }
+      ],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\achievements\\AchievementProvider.tsx",
+      "replacementFile": "app/components/achievements/AchievementProvider.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "Achievement",
+          "useAchievements",
+          "AchievementProvider"
+        ],
+        "types": [
+          "Achievement"
+        ]
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Achievement",
+          "AchievementProvider",
+          "useAchievements"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\animations\\SoapstoneMessage.tsx",
+      "replacementFile": "app/components/components/SoapstoneMessage.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [
+        {
+          "name": "message",
+          "optional": false,
+          "type": "{\n    id: string"
+        },
+        {
+          "name": "content",
+          "optional": false,
+          "type": "string"
+        },
+        {
+          "name": "author",
+          "optional": false,
+          "type": "string"
+        },
+        {
+          "name": "created_at",
+          "optional": false,
+          "type": "string"
+        },
+        {
+          "name": "rating",
+          "optional": false,
+          "type": "number"
+        }
+      ],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Replace with Prisma when implementing message rating"
+        }
+      ],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\arcade\\types.ts",
+      "replacementFile": "app/types.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "EngineGame",
+          "GameProps",
+          "ProgressData",
+          "Caption",
+          "GameResult"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Petal",
+          "Product",
+          "BlogPost",
+          "SocialLink"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [
+        {
+          "name": "onComplete",
+          "optional": false,
+          "type": "(score: number, petals: number) => void"
+        },
+        {
+          "name": "onFail",
+          "optional": false,
+          "type": "() => void"
+        },
+        {
+          "name": "duration",
+          "optional": false,
+          "type": "number"
+        },
+        {
+          "name": "_onFail",
+          "optional": true,
+          "type": "() => void"
+        },
+        {
+          "name": "_duration",
+          "optional": true,
+          "type": "number"
+        }
+      ],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: EngineGame, GameProps, ProgressData, Caption, GameResult",
+        "Deprecated has props interface but replacement does not"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\ErrorBoundary.tsx",
+      "replacementFile": "components/dev/ErrorBoundary.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "ErrorBoundary",
+          "useErrorHandler",
+          "withErrorBoundary"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "ErrorBoundary"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: useErrorHandler, withErrorBoundary"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\FriendActivity.tsx",
+      "replacementFile": "app/components/FriendActivity.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "FriendActivity"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "FriendActivity"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\games\\CherryBlossomTree.tsx",
+      "replacementFile": "app/components/components/CherryBlossomTree.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "CherryBlossomTree"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "CherryBlossomTree"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\games\\index.ts",
+      "replacementFile": "app/types/index.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "gamesRegistry"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "Petal",
+          "Progress",
+          "Product",
+          "BlogPost",
+          "SocialLink",
+          "ButtonProps",
+          "CardProps",
+          "CardHeaderProps",
+          "CardTitleProps",
+          "CardDescriptionProps",
+          "CardContentProps",
+          "CardFooterProps"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: gamesRegistry"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\Toast.tsx",
+      "replacementFile": "app/components/Toast.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "ToastProvider",
+          "useToast"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "ToastProvider",
+          "useToast",
+          "Toast"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\ui\\card.tsx",
+      "replacementFile": "app/components/ui/card.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\ui\\LoadingBonfire.tsx",
+      "replacementFile": "app/components/components/ui/LoadingBonfire.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "components\\ui\\tabs.tsx",
+      "replacementFile": "app/components/ui/tabs.tsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\api\\http.ts",
+      "replacementFile": "app/lib/http.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "http"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "HttpOptions",
+          "HttpResponse",
+          "HttpError",
+          "httpClient",
+          "http",
+          "gameApi",
+          "adminApi",
+          "getRequestId"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\api\\printify.ts",
+      "replacementFile": "app/abyss/shop/api/printify.js",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "PrintifyImageSchema",
+          "PrintifyVariantSchema",
+          "PrintifyProductSchema",
+          "PrintifyCatalogSchema",
+          "PrintifyShopSchema"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: PrintifyImageSchema, PrintifyVariantSchema, PrintifyProductSchema, PrintifyCatalogSchema, PrintifyShopSchema"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\db.ts",
+      "replacementFile": "app/lib/db.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "db",
+          "DatabaseAccess"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\fonts.ts",
+      "replacementFile": "app/fonts.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "optimusPrinceps"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "medievalFont"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: optimusPrinceps"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\hooks\\useAchievements.ts",
+      "replacementFile": "app/hooks/hooks/useAchievements.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "useAchievements"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "useAchievements"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\hooks\\useAudio.ts",
+      "replacementFile": "app/hooks/hooks/useAudio.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "useAudio"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "useAudio"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [
+        {
+          "name": "src",
+          "optional": false,
+          "type": "string"
+        },
+        {
+          "name": "volume",
+          "optional": true,
+          "type": "number"
+        },
+        {
+          "name": "loop",
+          "optional": true,
+          "type": "boolean"
+        }
+      ],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\logger.ts",
+      "replacementFile": "app/lib/logger.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "log"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "LogLevel",
+          "LogCtx",
+          "LogEntry",
+          "logger",
+          "log"
+        ],
+        "types": [
+          "LogLevel",
+          "LogCtx"
+        ]
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "In production, you might want to send to external logging service"
+        }
+      ],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\shop.ts",
+      "replacementFile": "app/pages/Shop.jsx",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "getProducts",
+          "getProduct"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": true,
+        "named": [],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [
+        "Missing named exports: getProducts, getProduct"
+      ],
+      "errors": []
+    },
+    {
+      "deprecatedFile": "lib\\utils.ts",
+      "replacementFile": "app/lib/lib/utils.ts",
+      "deprecatedExists": true,
+      "replacementExists": true,
+      "deprecatedExports": {
+        "default": false,
+        "named": [
+          "cn"
+        ],
+        "types": []
+      },
+      "replacementExports": {
+        "default": false,
+        "named": [
+          "cn"
+        ],
+        "types": []
+      },
+      "deprecatedProps": [],
+      "replacementProps": [],
+      "deprecatedImports": [],
+      "replacementImports": [],
+      "completeness": [],
+      "compatible": true,
+      "safe": true,
+      "warnings": [],
+      "errors": []
+    }
+  ],
+  "unsafe": [
+    {
+      "file": "app\\(client)\\profile\\ProfileHeader.tsx",
+      "replacement": "app/profile/ui/ProfileHeader.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\components\\admin\\MessageManager.tsx",
+      "replacement": "app/components/components/admin/MessageManager.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\components\\admin\\QuickActions.tsx",
+      "replacement": "app/components/components/admin/QuickActions.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Navigate to user management page"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Navigate to content management page"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Navigate to analytics dashboard"
+        },
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\components\\AvatarCreator.tsx",
+      "replacement": "app/components/profile/AvatarCreator.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [
+        "Deprecated has props interface but replacement does not"
+      ],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\components\\ContactForm.js",
+      "replacement": "app/components/ContactForm.jsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\components\\shop\\ProductFilters.tsx",
+      "replacement": "components/shop/ProductFilters.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\lib\\state\\games.ts",
+      "replacement": "app/lib/games.ts",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "app\\pages\\ContactForm.js",
+      "replacement": "app/components/ContactForm.jsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "components\\admin\\MessageManager.tsx",
+      "replacement": "app/components/components/admin/MessageManager.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "components\\admin\\QuickActions.tsx",
+      "replacement": "app/components/components/admin/QuickActions.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Navigate to user management page"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Navigate to content management page"
+        },
+        {
+          "type": "incomplete",
+          "severity": "medium",
+          "message": "Navigate to analytics dashboard"
+        },
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "components\\FriendChat.tsx",
+      "replacement": "app/components/FriendChat.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "components\\FriendList.tsx",
+      "replacement": "app/components/FriendList.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "components\\shop\\FeaturedProducts.tsx",
+      "replacement": "components/hero/FeaturedProducts.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "components\\ui\\select.tsx",
+      "replacement": "app/components/ui/select.tsx",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    },
+    {
+      "file": "lib\\assets\\schema.ts",
+      "replacement": "drizzle/schema.ts",
+      "errors": [
+        "Replacement has high-severity completeness issues"
+      ],
+      "warnings": [],
+      "deprecatedImports": 0,
+      "completeness": [
+        {
+          "type": "stub",
+          "severity": "high",
+          "message": "File appears to be a placeholder or stub"
+        }
+      ]
+    }
+  ],
+  "notFound": []
+}

@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+
 import { NextResponse } from 'next/server';
 
 function uniq<T>(arr: T[], key: (x: T) => string) {

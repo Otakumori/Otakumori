@@ -6,6 +6,15 @@
 'use client';
 
 import { getOtakumoriPalette } from '@om/avatar-engine/materials/palette';
+import {
+  formatScore,
+  formatTimer,
+  getTimerColor,
+  getHealthBarColor,
+  getHealthPercentage,
+  getComboMultiplierText,
+  shouldShowComboCelebration,
+} from '@/app/lib/enhancements/hud';
 
 export interface GameHUDProps {
   score?: number;
@@ -49,7 +58,7 @@ export function GameHUD({
         >
           <div className="text-xs text-zinc-400">Score</div>
           <div className="text-2xl font-bold" style={{ color: palette.accent }}>
-            {score.toLocaleString()}
+            { formatScore(score, 'comma') }
           </div>
         </div>
       )}
@@ -61,8 +70,26 @@ export function GameHUD({
           style={{ border: `1px solid ${palette.deepPurple}40` }}
         >
           <div className="text-xs text-zinc-400">Time</div>
-          <div className="text-xl font-bold" style={{ color: palette.deepPurple }}>
-            {Math.floor(time)}s
+  < div
+className = "text-xl font-bold"
+style = {{
+  color: getTimerColor({
+    time,
+    showMilliseconds: false,
+    urgencyThreshold: 10,
+    urgencyColor: '#ef4444',
+    normalColor: palette.deepPurple,
+  }),
+            }}
+          >
+{
+  formatTimer({
+    time,
+    showMilliseconds: false,
+    urgencyThreshold: 10,
+    urgencyColor: '#ef4444',
+    normalColor: palette.deepPurple,
+})}
           </div>
         </div>
       )}
@@ -116,8 +143,8 @@ export function GameHUD({
             <div
               className="h-full transition-all duration-300 rounded-full"
               style={{
-                width: `${(health / maxHealth) * 100}%`,
-                backgroundColor: palette.softPink,
+  width: `${getHealthPercentage({ maxHealth, currentHealth: health, showPercentage: false, color: '', backgroundColor: '', animated: true })}%`,
+    backgroundColor: getHealthBarColor(getHealthPercentage({ maxHealth, currentHealth: health, showPercentage: false, color: '', backgroundColor: '', animated: true })),
               }}
             />
           </div>
@@ -130,11 +157,21 @@ export function GameHUD({
       {/* Combo Display */}
       {combo !== undefined && combo > 0 && (
         <div
-          className="absolute left-1/2 top-8 -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 backdrop-blur animate-pulse"
+          className={
+    `absolute left-1/2 top-8 -translate-x-1/2 rounded-lg bg-black/50 px-4 py-2 backdrop-blur ${shouldShowComboCelebration({
+      count: combo,
+      multiplier: multiplier || 1,
+      showCelebration: true,
+      celebrationThreshold: 5,
+    })
+      ? 'animate-pulse scale-110'
+      : ''
+    }`
+  }
           style={{ border: `1px solid ${palette.petals}80` }}
         >
           <div className="text-lg font-bold" style={{ color: palette.petals }}>
-            {combo}x Combo!
+  { getComboMultiplierText(multiplier || 1) || `${combo}x Combo!`}
           </div>
         </div>
       )}

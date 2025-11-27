@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+
 import { type NextRequest } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';

@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import type { Achievement } from './AchievementProvider';
-import { AchievementCard } from './AchievementCard';
+import AchievementCard from './AchievementCard';
 
 interface AchievementListProps {
   achievements: Achievement[];

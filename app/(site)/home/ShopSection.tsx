@@ -24,17 +24,6 @@ interface ShopData {
   };
 }
 
-// Products to exclude from homepage preview (can still appear in full shop)
-const HOMEPAGE_EXCLUDED_TITLES = [
-  'Memory Match T-shirt',
-  'Petal Samurai Hoodie',
-  'Soapstone Mug',
-  'Guardian Rune Pin',
-  'Abyss T-Shirt',
-  'Cherry Blossom Hoodie',
-  'Otakumori Poster',
-];
-
 /**
  * Safely get base URL for API calls with multiple fallbacks.
  * This function NEVER throws - it always returns a valid URL string.
@@ -81,11 +70,6 @@ export default async function ShopSection() {
   let shopData: ShopData = { products: [] };
 
   try {
-    // Build exclusion query parameter - safe array operations
-    const excludeParam = HOMEPAGE_EXCLUDED_TITLES.filter((t) => t && typeof t === 'string')
-      .map((t) => `excludeTitles=${encodeURIComponent(t)}`)
-      .join('&');
-
     // Get base URL - this should never throw due to fallbacks in getBaseUrl()
     let baseUrl: string;
     try {
@@ -99,7 +83,7 @@ export default async function ShopSection() {
           : 'http://localhost:3000';
     }
 
-    const apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8&${excludeParam}`;
+    const apiUrl = `${baseUrl}/api/v1/products/featured?force_printify=true&limit=8`;
 
     // Fetch products - wrap in try-catch to prevent any fetch errors from throwing
     let response: Response;

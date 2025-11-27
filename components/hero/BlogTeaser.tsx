@@ -165,3 +165,6 @@ export function BlogTeaser() {
     </section>
   );
 }
+
+// Default export for backward compatibility
+export default BlogTeaser;

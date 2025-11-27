@@ -299,6 +299,124 @@ export class PrintifyService {
     return this.makeRequest<PrintifyProduct>(`/shops/${this.shopId}/products/${productId}.json`);
   }
 
+  /**
+   * Create a new product in Printify
+   * @param productData - Product creation data
+   * @returns Created product
+   */
+  async createProduct(productData: {
+    title: string;
+    description: string;
+    blueprint_id: number;
+    print_provider_id: number;
+    variants: Array<{
+      id: number;
+      price: number;
+      is_enabled: boolean;
+    }>;
+    print_areas: Array<{
+      variant_ids: number[];
+      placeholders: Array<{
+        position: string;
+        images: string[];
+      }>;
+    }>;
+    tags?: string[];
+    visible?: boolean;
+  }): Promise<PrintifyProduct> {
+    try {
+      const { logger } = await import('@/app/lib/logger');
+      logger.info('printify_product_creation_started', undefined, {
+        title: productData.title,
+        blueprintId: productData.blueprint_id,
+      });
+
+      const result = await this.makeRequest<PrintifyProduct>(
+        `/shops/${this.shopId}/products.json`,
+        {
+          method: 'POST',
+          body: JSON.stringify(productData),
+        },
+      );
+
+      logger.info('printify_product_created_success', undefined, {
+        productId: result.id,
+        title: result.title,
+      });
+
+      return result;
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_product_creation_failed', undefined, {
+        title: productData.title,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing product in Printify
+   * @param productId - Product ID to update
+   * @param updates - Partial product data to update
+   * @returns Updated product
+   */
+  async updateProduct(
+    productId: string,
+    updates: Partial<PrintifyProduct>,
+  ): Promise<PrintifyProduct> {
+    try {
+      const { logger } = await import('@/app/lib/logger');
+      logger.info('printify_product_update_started', undefined, { productId });
+
+      const result = await this.makeRequest<PrintifyProduct>(
+        `/shops/${this.shopId}/products/${productId}.json`,
+        {
+          method: 'PUT',
+          body: JSON.stringify(updates),
+        },
+      );
+
+      logger.info('printify_product_updated_success', undefined, {
+        productId: result.id,
+        title: result.title,
+      });
+
+      return result;
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_product_update_failed', undefined, {
+        productId,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a product from Printify
+   * @param productId - Product ID to delete
+   */
+  async deleteProduct(productId: string): Promise<void> {
+    try {
+      const { logger } = await import('@/app/lib/logger');
+      logger.info('printify_product_deletion_started', undefined, { productId });
+
+      await this.makeRequest(`/shops/${this.shopId}/products/${productId}.json`, {
+        method: 'DELETE',
+      });
+
+      logger.info('printify_product_deleted_success', undefined, { productId });
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_product_deletion_failed', undefined, {
+        productId,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
   async publishProduct(productId: string): Promise<{ status: string } | any> {
     return this.makeRequest(`/shops/${this.shopId}/products/${productId}/publish.json`, {
       method: 'POST',
@@ -375,6 +493,99 @@ export class PrintifyService {
     return this.makeRequest(`/shops/${this.shopId}/orders/${orderId}.json`);
   }
 
+  /**
+   * List all orders with pagination
+   * @param page - Page number (default: 1)
+   * @param limit - Items per page (default: 50, max: 100)
+   * @returns Paginated orders response
+   */
+  async getOrders(
+    page = 1,
+    limit = 50,
+  ): Promise<{
+    data: any[];
+    total: number;
+    last_page: number;
+    current_page: number;
+    per_page: number;
+    from: number;
+    to: number;
+    first_page_url?: string;
+    prev_page_url?: string;
+    next_page_url?: string;
+    last_page_url?: string;
+  }> {
+    try {
+      const actualLimit = Math.min(limit, 100); // Printify max is 100
+
+      const result = await this.makeRequest<{
+        data: any[];
+        total: number;
+        last_page: number;
+        current_page: number;
+        per_page: number;
+        from: number;
+        to: number;
+        first_page_url?: string;
+        prev_page_url?: string;
+        next_page_url?: string;
+        last_page_url?: string;
+      }>(`/shops/${this.shopId}/orders.json?page=${page}&limit=${actualLimit}`);
+
+      return {
+        data: result.data || [],
+        total: result.total || 0,
+        last_page: result.last_page || 1,
+        current_page: result.current_page || page,
+        per_page: result.per_page || actualLimit,
+        from: result.from || 0,
+        to: result.to || 0,
+        first_page_url: result.first_page_url,
+        prev_page_url: result.prev_page_url,
+        next_page_url: result.next_page_url,
+        last_page_url: result.last_page_url,
+      };
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_orders_fetch_failed', undefined, {
+        page,
+        limit,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Cancel an order
+   * @param orderId - Order ID to cancel
+   * @returns Success status
+   */
+  async cancelOrder(orderId: string): Promise<{ success: boolean }> {
+    try {
+      const { logger } = await import('@/app/lib/logger');
+      logger.info('printify_order_cancellation_started', undefined, { orderId });
+
+      const result = await this.makeRequest<{ success: boolean }>(
+        `/shops/${this.shopId}/orders/${orderId}/cancel.json`,
+        {
+          method: 'POST',
+        },
+      );
+
+      logger.info('printify_order_cancelled_success', undefined, { orderId });
+
+      return result;
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_order_cancellation_failed', undefined, {
+        orderId,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
   async getShippingMethods(): Promise<any[]> {
     try {
       const result = await this.makeRequest<{ data: any[] }>(`/shops/${this.shopId}/shipping.json`);
@@ -382,6 +593,64 @@ export class PrintifyService {
     } catch (error) {
       const { logger } = await import('@/app/lib/logger');
       logger.error('printify_shipping_fetch_failed', undefined, { error: String(error) });
+      throw error;
+    }
+  }
+
+  /**
+   * Get shipping methods using V2 Catalog API
+   * Provides better shipping data with handling times and more detailed variant information
+   * @param blueprintId - Blueprint ID
+   * @param printProviderId - Print provider ID
+   * @param method - Shipping method type
+   * @returns Shipping method details with handling times
+   */
+  async getShippingMethodsV2(
+    blueprintId: number,
+    printProviderId: number,
+    method: 'standard' | 'priority' | 'express' | 'economy',
+  ): Promise<any> {
+    try {
+      // V2 API uses different base URL
+      const v2BaseUrl = 'https://api.printify.com/v2';
+      const url = `${v2BaseUrl}/catalog/blueprints/${blueprintId}/print_providers/${printProviderId}/shipping/${method}.json`;
+
+      const headers = {
+        Authorization: `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json;charset=utf-8',
+        'User-Agent': this.userAgent,
+      };
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Printify V2 API error (${response.status}): ${errorText}`);
+        }
+
+        return response.json();
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_shipping_v2_fetch_failed', undefined, {
+        blueprintId,
+        printProviderId,
+        method,
+        error: String(error),
+      });
       throw error;
     }
   }
@@ -451,6 +720,70 @@ export class PrintifyService {
         blueprintId,
         printProviderId,
         showOutOfStock,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get event history for the shop
+   * Tracks order/product changes and other events
+   * @param page - Page number (default: 1)
+   * @param limit - Items per page (default: 50, max: 100)
+   * @returns Paginated events response
+   */
+  async getEvents(
+    page = 1,
+    limit = 50,
+  ): Promise<{
+    data: any[];
+    total: number;
+    last_page: number;
+    current_page: number;
+    per_page: number;
+    from: number;
+    to: number;
+    first_page_url?: string;
+    prev_page_url?: string;
+    next_page_url?: string;
+    last_page_url?: string;
+  }> {
+    try {
+      const actualLimit = Math.min(limit, 100); // Printify max is 100
+
+      const result = await this.makeRequest<{
+        data: any[];
+        total: number;
+        last_page: number;
+        current_page: number;
+        per_page: number;
+        from: number;
+        to: number;
+        first_page_url?: string;
+        prev_page_url?: string;
+        next_page_url?: string;
+        last_page_url?: string;
+      }>(`/shops/${this.shopId}/events.json?page=${page}&limit=${actualLimit}`);
+
+      return {
+        data: result.data || [],
+        total: result.total || 0,
+        last_page: result.last_page || 1,
+        current_page: result.current_page || page,
+        per_page: result.per_page || actualLimit,
+        from: result.from || 0,
+        to: result.to || 0,
+        first_page_url: result.first_page_url,
+        prev_page_url: result.prev_page_url,
+        next_page_url: result.next_page_url,
+        last_page_url: result.last_page_url,
+      };
+    } catch (error) {
+      const { logger } = await import('@/app/lib/logger');
+      logger.error('printify_events_fetch_failed', undefined, {
+        page,
+        limit,
         error: String(error),
       });
       throw error;

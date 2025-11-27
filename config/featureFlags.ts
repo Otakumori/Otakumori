@@ -108,12 +108,13 @@ function resolveFromEnv(): FeatureFlags {
   const nsfwEnabled = typeof window !== 'undefined' ? isNsfwEngineEnabled() : envNsfwEnabled;
 
   // Resolve HOMEPAGE_EXPERIMENTAL_ENABLED from validated env
-  // Defaults to false in production, true in development for safety
+  // Defaults to true to enable visual enhancements on live site
+  // Can be disabled by setting NEXT_PUBLIC_FEATURE_HOMEPAGE_EXPERIMENTAL_ENABLED=false
   const homepageExperimental = toBool(
     typeof process !== 'undefined' && process.env
       ? process.env.NEXT_PUBLIC_FEATURE_HOMEPAGE_EXPERIMENTAL_ENABLED
       : undefined,
-    process.env.NODE_ENV === 'development', // Safe default: off in production
+    true, // Default: enabled for visual enhancements
   );
 
   return {

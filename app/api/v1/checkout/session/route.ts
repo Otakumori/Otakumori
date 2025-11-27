@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+
 export const runtime = 'nodejs';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';

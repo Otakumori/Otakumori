@@ -25,7 +25,7 @@ const rewardLabel = (achievement: Achievement) => {
   return String(achievement.reward.value);
 };
 
-export function AchievementCard({ achievement }: AchievementCardProps) {
+export default function AchievementCard({ achievement }: AchievementCardProps) {
   const { unlockAchievement } = useAchievements();
   const { progress, total, unlocked } = achievement;
   const ratio = total > 0 ? Math.min(100, Math.round((progress / total) * 100)) : 0;
@@ -101,3 +101,6 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
     </motion.div>
   );
 }
+
+// Named export for backward compatibility
+export { AchievementCard as AchievementCardNamed };

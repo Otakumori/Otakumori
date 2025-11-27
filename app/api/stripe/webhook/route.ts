@@ -1,4 +1,4 @@
-// DEPRECATED: This component is a duplicate. Use app\api\webhooks\stripe\route.ts instead.
+
 import { type NextRequest, NextResponse } from 'next/server';
 import {
   verifyWebhookSignature,

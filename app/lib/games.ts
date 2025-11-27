@@ -1,3 +1,4 @@
+import { create } from 'zustand';
 import { env } from '@/env.mjs';
 import { isEnabled as isGameEnabledFromConfig } from '@/config/games';
 
@@ -255,3 +256,36 @@ export function getEnabledGames(): GameDefinition[] {
 export function getGameBySlug(slug: string): GameDefinition | null {
   return Object.values(games).find((game) => game.key === slug) || null;
 }
+
+// Export HubPanel type and useGamesStore from deprecated file for backward compatibility
+export type HubPanel = 'mini-games' | 'trade-hall' | 'achievements' | 'profile' | null;
+
+interface GamesState {
+  activePanel: HubPanel;
+  isPanelOpen: boolean;
+  setActivePanel: (panel: HubPanel) => void;
+  openPanel: (panel: HubPanel) => void;
+  closePanel: () => void;
+  resetHub: () => void;
+}
+
+export const useGamesStore = create<GamesState>((set) => ({
+  activePanel: null,
+  isPanelOpen: false,
+  setActivePanel: (panel) => set({ activePanel: panel }),
+  openPanel: (panel) =>
+    set({
+      activePanel: panel,
+      isPanelOpen: true,
+    }),
+  closePanel: () =>
+    set({
+      isPanelOpen: false,
+      activePanel: null,
+    }),
+  resetHub: () =>
+    set({
+      activePanel: null,
+      isPanelOpen: false,
+    }),
+}));

@@ -114,3 +114,6 @@ export {
   SelectItem,
   SelectSeparator,
 };
+
+// Default export for backward compatibility
+export default Select;

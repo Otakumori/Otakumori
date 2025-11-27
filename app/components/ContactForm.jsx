@@ -33,8 +33,32 @@ export default function ContactForm() {
     setLoading(true);
 
     try {
-      // TODO: Implement file upload to Vercel Blob when ready
-      // For now, just submit the form data
+      let imageUrl = null;
+
+      // Upload file to Vercel Blob if provided
+      if (formData.file) {
+        try {
+          const formDataToSend = new FormData();
+          formDataToSend.append('file', formData.file);
+
+          const uploadResponse = await fetch('/api/upload', {
+            method: 'POST',
+            body: formDataToSend,
+          });
+
+          if (uploadResponse.ok) {
+            const uploadData = await uploadResponse.json();
+            imageUrl = uploadData.url;
+          } else {
+            // File upload failed, but continue with form submission
+            console.warn('File upload failed, continuing without image');
+          }
+        } catch (uploadError) {
+          // File upload error, but continue with form submission
+          console.warn('File upload error:', uploadError);
+        }
+      }
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
@@ -44,7 +68,7 @@ export default function ContactForm() {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          // imageUrl: uploadedImageUrl, // Will be implemented later
+          imageUrl: imageUrl,
         }),
       });
 
@@ -64,7 +88,10 @@ export default function ContactForm() {
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      setStatus({ type: 'error', message: 'Failed to send message. Please try again.' });
+      setStatus({
+        type: 'error',
+        message: error.message || 'Failed to send message. Please try again.',
+      });
     } finally {
       setLoading(false);
     }
