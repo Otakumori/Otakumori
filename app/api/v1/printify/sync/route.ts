@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '@/inngest/client';
 import { getPrintifyService } from '@/app/lib/printify/service';
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Printify sync API error:', error);
+    logger.error('Printify sync API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

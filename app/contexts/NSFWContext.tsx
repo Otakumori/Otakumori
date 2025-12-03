@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NSFWContextType {
@@ -33,7 +34,7 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         await fetch('/api/policy/age', { method: 'POST' });
       } catch (error) {
-        console.error('Failed to set server-side age verification:', error);
+        logger.error('Failed to set server-side age verification:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     } else {
       setIsNSFWAllowed(false);
@@ -51,7 +52,7 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await fetch('/api/policy/age', { method: 'DELETE' });
     } catch (error) {
-      console.error('Failed to clear server-side age verification:', error);
+      logger.error('Failed to clear server-side age verification:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -72,6 +73,7 @@ export const NSFWProvider: React.FC<{ children: React.ReactNode }> = ({ children
               className="mb-4 w-20 rounded bg-pink-400/10 px-2 text-pink-100"
               onKeyDown={(e) => e.stopPropagation()}
               onChange={(e) => verifyAge(Number(e.target.value))}
+              aria-label="Enter your age"
             />
             <button
               onClick={() => setShowModal(false)}

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
@@ -94,7 +95,12 @@ export async function POST(request: NextRequest) {
       url: session.url,
     });
   } catch (error) {
-    console.error('Checkout API error:', error);
+    logger.error(
+      'Checkout API error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

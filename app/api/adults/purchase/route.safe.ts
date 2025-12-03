@@ -9,6 +9,7 @@
  * @since 1.0.0
  */
 
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -53,7 +54,12 @@ async function checkIdempotency(key: string): Promise<string | null> {
     const cached = await redis.get(`purchase:${key}`);
     return cached;
   } catch (error) {
-    console.error('Idempotency check failed:', error);
+    logger.error(
+      'Idempotency check failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return null;
   }
 }
@@ -62,7 +68,12 @@ async function storeIdempotencyResponse(key: string, response: any): Promise<voi
   try {
     await redis.set(`purchase:${key}`, JSON.stringify(response), { ex: 3600 }); // 1 hour TTL
   } catch (error) {
-    console.error('Failed to store idempotency response:', error);
+    logger.error(
+      'Failed to store idempotency response:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
   }
 }
 
@@ -107,7 +118,12 @@ async function purchaseWithPetals(
 
     return true;
   } catch (error) {
-    console.error('Petals purchase failed:', error);
+    logger.error(
+      'Petals purchase failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return false;
   }
 }
@@ -161,7 +177,12 @@ async function purchaseWithStripe(
       checkoutUrl: session.url || '',
     };
   } catch (error) {
-    console.error('Stripe checkout session creation failed:', error);
+    logger.error(
+      'Stripe checkout session creation failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     throw new Error('Failed to create checkout session');
   }
 }
@@ -311,7 +332,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Purchase API error:', error);
+    logger.error(
+      'Purchase API error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -1,6 +1,7 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ShoppingBag, Gamepad2, Users, Music, Info } from 'lucide-react';
@@ -95,6 +96,15 @@ const PANEL_CONFIGS: Record<string, PanelConfig> = {
   },
 };
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\panel\:slug\page.tsx',
+  });
+}
 export default function PanelPage() {
   const params = useParams();
   const slug = params.slug as string;

@@ -1,9 +1,17 @@
+import { generateSEO } from '@/app/lib/seo';
 import Link from 'next/link';
 import { Shield } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Access Denied',
+    description: 'You do not have permission to access this page.',
+    url: '/admin/unauthorized',
+  });
+}
 export default function UnauthorizedPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black flex items-center justify-center p-8">

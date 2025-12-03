@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { generateRequestId } from '../../../../lib/request-id';
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
       requestId,
     });
   } catch (error) {
-    console.error('Avatar generation error:', error);
+    logger.error('Avatar generation error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Generation failed', requestId }, { status: 500 });
   }
 }
@@ -52,7 +54,7 @@ interface GenerationOptions {
 function generateProceduralAvatar(options: GenerationOptions) {
   const { theme, gender, age, style } = options;
 
-  console.warn('Generating avatar with style:', style, 'theme:', theme);
+  logger.warn('Generating avatar with style:', undefined, { style, theme });
 
   // Random generators
   const random = (min: number, max: number) => Math.random() * (max - min) + min;

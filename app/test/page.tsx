@@ -1,6 +1,14 @@
 
+import { generateSEO } from '@/app/lib/seo';
 import { env } from '@/env.mjs';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/test',
+  });
+}
 export default function TestPage() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>

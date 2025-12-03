@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
@@ -30,7 +32,7 @@ export async function POST(request: NextRequest) {
   const body = JSON.parse(payload);
 
   // Log webhook event type for debugging
-  console.warn('Clerk webhook payload type:', body.type || 'unknown');
+  logger.warn('Clerk webhook payload type:', undefined, { value: body.type || 'unknown' });
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       'svix-signature': svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error('Error verifying webhook:', err);
+    logger.error('Error verifying webhook:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     return new NextResponse('Error occured', {
       status: 400,
     });
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
 
       // `User profile created for ${id}`
     } catch (error) {
-      console.error('Error creating user profile:', error);
+      logger.error('Error creating user profile:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       // Don't throw error to avoid webhook retry
     }
   }
@@ -93,7 +95,7 @@ export async function POST(request: NextRequest) {
 
       // `User profile updated for ${id}`
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      logger.error('Error updating user profile:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -111,7 +113,7 @@ export async function POST(request: NextRequest) {
 
       // `User profile soft deleted for ${id}`
     } catch (error) {
-      console.error('Error soft deleting user profile:', error);
+      logger.error('Error soft deleting user profile:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

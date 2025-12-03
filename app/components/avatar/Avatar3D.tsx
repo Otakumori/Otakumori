@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
@@ -169,7 +170,7 @@ export default function Avatar3D({
         onLoad();
       }
     } catch (err) {
-      console.error('Failed to generate procedural avatar:', err);
+      logger.error('Failed to generate procedural avatar:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       setError(err as Error);
       setIsLoading(false);
       if (onError) {
@@ -218,7 +219,7 @@ export default function Avatar3D({
             // Get part definition
             const part = avatarPartManager.getPart(partId);
             if (!part) {
-              console.warn(`Part not found: ${partId}`);
+              logger.warn(`Part not found: ${partId}`);
               continue;
             }
 
@@ -228,7 +229,7 @@ export default function Avatar3D({
               configuration.id,
             );
             if (!compatibility.compatible) {
-              console.warn(
+              logger.warn(
                 `Part incompatible: ${partId}, conflicts: ${compatibility.conflicts.join(', ')}`,
               );
               continue;
@@ -297,7 +298,7 @@ export default function Avatar3D({
 
             setLoadingProgress(((i + 1) / totalParts) * 100);
           } catch (partError) {
-            console.error(`Failed to load part ${partId}:`, partError);
+            logger.error(`Failed to load part ${partId}:`, undefined, undefined, partError instanceof Error ? partError : new Error(String(partError)));
             if (onError) {
               onError(partError as Error);
             }
@@ -311,7 +312,7 @@ export default function Avatar3D({
           onLoad();
         }
       } catch (error) {
-        console.error('Failed to load avatar:', error);
+        logger.error('Failed to load avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setError(error as Error);
         setIsLoading(false);
         if (onError) {
@@ -373,7 +374,7 @@ export default function Avatar3D({
     if (config.materialOverrides) {
       Object.entries(config.materialOverrides).forEach(([overrideKey, override]) => {
         // Log material override application for debugging
-        console.warn(`Applying material override for ${overrideKey}:`, override.type);
+        logger.warn(`Applying material override for ${overrideKey}:`, undefined, { value: override.type });
 
         switch (override.type) {
           case 'color':
@@ -383,7 +384,7 @@ export default function Avatar3D({
             break;
           case 'texture':
             // Load and apply custom texture
-            console.warn(`Texture override for ${overrideKey}:`, override.value);
+            logger.warn(`Texture override for ${overrideKey}:`, undefined, { value: override.value });
             break;
         }
       });

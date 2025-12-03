@@ -217,7 +217,7 @@ export function AvatarGallery() {
               {/* Stats */}
               <div className="flex justify-between items-center text-sm text-zinc-400">
                 <div className="flex items-center space-x-1">
-                  <span>️</span>
+                  <span><span role="img" aria-label="emoji">️</span></span>
                   <span>{avatar.likes}</span>
                 </div>
                 <div className="flex items-center space-x-1">

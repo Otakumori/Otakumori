@@ -1,5 +1,7 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '../../../components/admin/AdminNav';
 import { Flower, ShoppingBag, Ticket, Users } from 'lucide-react';
@@ -41,6 +43,13 @@ interface EconomyStats {
   };
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\economy\page.tsx',
+  });
+}
 export default function AdminEconomyPage() {
   const [stats, setStats] = useState<EconomyStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +65,7 @@ export default function AdminEconomyPage() {
           }
         }
       } catch (err) {
-        console.error('Failed to load economy stats:', err);
+        logger.error('Failed to load economy data', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoading(false);
       }

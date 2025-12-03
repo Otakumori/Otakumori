@@ -3,6 +3,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -76,7 +77,12 @@ export async function GET() {
     };
     return NextResponse.json({ ok: true, data });
   } catch (err) {
-    console.error('user/avatar GET error', err);
+    logger.error(
+      'user/avatar GET error',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json(
       { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
       { status: 500 },
@@ -140,7 +146,12 @@ export async function POST(req: Request) {
       data: { avatar: avatarUser?.avatarUrl ? { url: avatarUser.avatarUrl } : undefined, prefs },
     });
   } catch (err) {
-    console.error('user/avatar POST error', err);
+    logger.error(
+      'user/avatar POST error',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json(
       { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
       { status: 500 },

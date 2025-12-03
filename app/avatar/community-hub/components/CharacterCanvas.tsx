@@ -4,6 +4,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { Suspense, useMemo, useRef, useEffect, memo } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
@@ -103,7 +104,7 @@ const CharacterScene = memo(function CharacterScene({
               const outline = createOutlineMesh(child, 0.02, 0x000000);
               outlineGroup.add(outline);
             } catch (error) {
-              console.warn('Failed to create outline for mesh:', error);
+              logger.warn('Failed to create outline for mesh:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
             }
           }
         });
@@ -112,7 +113,7 @@ const CharacterScene = memo(function CharacterScene({
 
       return group;
     } catch (error) {
-      console.warn('Failed to generate character, using fallback:', error);
+      logger.warn('Failed to generate character, using fallback:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       // Fallback - simple box
       const fallbackGroup = new THREE.Group();
       const geometry = new THREE.BoxGeometry(0.5, 1.5, 0.5);

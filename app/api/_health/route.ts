@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -65,7 +66,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Health check failed:', error);
+    logger.error('Health check error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

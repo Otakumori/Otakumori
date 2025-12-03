@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { Ticket } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export default function VouchersPageClient() {
           }
         }
       } catch (err) {
-        console.error('Failed to load voucher stats:', err);
+        logger.error('Failed to load vouchers', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoading(false);
       }

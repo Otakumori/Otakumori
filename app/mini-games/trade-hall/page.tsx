@@ -2,6 +2,7 @@
 // @ts-nocheck
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { COPY } from '../../lib/copy';
@@ -29,6 +30,13 @@ interface TradeOffer {
   createdAt: Date;
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Scarlet Bazaar',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\trade-hall\page.tsx',
+  });
+}
 export default function TradeHallPage() {
   const [activeTab, setActiveTab] = useState<'inventory' | 'crafting' | 'trading' | 'market'>(
     'inventory',
@@ -181,7 +189,7 @@ export default function TradeHallPage() {
         <div className="flex gap-2 mb-6">
           {[
             { id: 'inventory', label: 'Inventory', icon: '' },
-            { id: 'crafting', label: 'Crafting', icon: '️' },
+            { id: 'crafting', label: 'Crafting', icon: '<span role="img" aria-label="emoji">️</span>' },
             { id: 'trading', label: 'Trading', icon: '' },
             { id: 'market', label: 'Market', icon: '' },
           ].map((tab) => (

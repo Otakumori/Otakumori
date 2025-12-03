@@ -4,6 +4,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useState, useCallback, useMemo } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { cn } from '@/lib/utils';
@@ -70,7 +71,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     try {
       exportJSON(config, exportFilename.json);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Failed to export JSON. Check console for details.');
     }
   };
@@ -85,7 +86,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     try {
       await exportGLB(sceneRef.current, exportFilename.glb);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Failed to export GLB. Check console for details.');
     } finally {
       setIsExporting(false);
@@ -102,7 +103,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
     try {
       await exportZIP(config, sceneRef.current, exportFilename.zip);
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Failed to export ZIP. Check console for details.');
     } finally {
       setIsExporting(false);

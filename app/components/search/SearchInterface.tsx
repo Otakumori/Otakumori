@@ -1,5 +1,6 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -283,22 +284,19 @@ export default function SearchInterface() {
               const isPressed = activeTab === tab;
               return (
                 <button
-                  key= { tab }
-              type = "button"
-              onClick = {() => setActiveTab(tab)
-            }
-                  className = {
-                cn(
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
                     'rounded-full px-4 py-2 transition-colors',
-                  isPressed
-                    ? 'bg-fuchsia-600 text-white'
+                    isPressed
+                      ? 'bg-fuchsia-600 text-white'
                       : 'bg-white/10 text-white/60 hover:bg-white/20',
-                    )
-                  }
-                  >
-                  { tab.charAt(0).toUpperCase() + tab.slice(1) }
-                  </button>
-  );
+                  )}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              );
             })}
           </div>
 
@@ -343,11 +341,7 @@ export default function SearchInterface() {
         <div className="space-y-4">
           {isLoading ? (
             <div className="py-12 text-center">
-              <div
-                className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-fuchsia-500"
-                aria-label="Loading"
-              />
-              <p className="text-zinc-400">Searching...</p>
+              <Skeleton />
             </div>
           ) : error ? (
             <GlassPanel className="p-6 text-sm text-amber-300">{error}</GlassPanel>
@@ -420,7 +414,7 @@ export default function SearchInterface() {
               ))}
             </div>
           ) : (
-            <EmptySearch query= { activeQuery } />
+            <EmptySearch query={activeQuery} />
           )}
         </div>
       )}

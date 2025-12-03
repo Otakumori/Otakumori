@@ -1,3 +1,6 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+
 /**
  * Micro-Interactions System
  *
@@ -226,7 +229,7 @@ export class MicroInteractionSystem {
       source.connect(this.audioContext.destination);
       source.start();
     } catch (error) {
-      console.warn('Failed to play sound:', error);
+      logger.warn('Failed to play sound:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     }
   }
 

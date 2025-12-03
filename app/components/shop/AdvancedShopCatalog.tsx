@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
@@ -97,10 +98,10 @@ function CatalogProductCard({ product }: { product: CatalogProduct }) {
                 }
               >
                 {product.isLocked
-                  ? '⏳ Publishing'
+                  ? '<span role="img" aria-label="hourglass">⏳</span> Publishing'
                   : product.visible && product.active
                     ? '✓ Published'
-                    : '⚠ Unpublished'}
+                    : '<span role="img" aria-label="emoji">⚠</span> Unpublished'}
               </div>
             )}
           </div>
@@ -316,7 +317,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
           setFeaturedProducts(featured);
         }
       } catch (err) {
-        console.warn('Failed to load featured products:', err);
+        logger.warn('Failed to load featured products:', undefined, { error: err instanceof Error ? err : new Error(String(err)) });
       }
     }
 
@@ -353,7 +354,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
 
         // Fallback to Printify API if Prisma API fails
         if (!response.ok) {
-          console.warn(`Prisma API returned ${response.status}, falling back to Printify`);
+          logger.warn(`Prisma API returned ${response.status}, falling back to Printify`);
           response = await fetch(`/api/v1/printify/search?${params.toString()}`, {
             credentials: 'same-origin',
             headers: {
@@ -365,7 +366,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
         if (!response.ok) {
           // Handle HTTP errors gracefully
           const errorText = await response.text();
-          console.warn(`Product API returned ${response.status}: ${errorText}`);
+          logger.warn(`Product API returned ${response.status}: ${errorText}`);
           setSearchResult({
             products: [],
             total: 0,
@@ -421,7 +422,7 @@ export default function AdvancedShopCatalog({ searchParams }: AdvancedShopCatalo
           setError('No products found. Please try different search criteria.');
         }
       } catch (err) {
-        console.warn('Shop catalog fetch error:', err);
+        logger.warn('Shop catalog fetch error:', undefined, { error: err instanceof Error ? err : new Error(String(err)) });
         setSearchResult({
           products: [],
           total: 0,

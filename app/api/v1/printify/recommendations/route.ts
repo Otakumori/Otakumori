@@ -8,6 +8,7 @@
  * - Trending products (popularity-based)
  */
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
 import { auth } from '@clerk/nextjs/server';
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Printify recommendations error:', error);
+    logger.error('Printify recommendations error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

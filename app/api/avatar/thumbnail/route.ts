@@ -3,6 +3,7 @@
  * Generates deterministic SVG thumbnails with NSFW policy enforcement
  */
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { resolvePolicy, validateAvatar } from '@om/avatar';
@@ -129,7 +130,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Thumbnail generation error:', error);
+    logger.error(
+      'Thumbnail generation error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,
@@ -228,7 +234,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Thumbnail generation error:', error);
+    logger.error(
+      'Thumbnail generation error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,

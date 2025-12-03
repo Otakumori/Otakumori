@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const ok = await verifySignature(raw, signature, env.PRINTIFY_WEBHOOK_SECRET);
     if (!ok) {
-      logger.warn('signature verification failed', { requestId, route });
+      logger.warn('signature verification failed', undefined, { requestId, route });
       return NextResponse.json({ ok: false, error: 'invalid signature' }, { status: 401 });
     }
 
@@ -113,11 +113,11 @@ export async function POST(req: NextRequest) {
             extra: { productId: payload.data?.id },
           });
         } catch (error) {
-          logger.error('failed to trigger product sync', {
+          logger.error('failed to trigger product sync', undefined, {
             requestId,
             route,
             extra: { productId: payload.data?.id, error: String(error) },
-          });
+          }, undefined);
         }
         break;
       case 'inventory:updated':
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
         });
         break;
       default:
-        logger.warn('unhandled topic', { requestId, route, extra: { topic } });
+        logger.warn('unhandled topic', undefined, { requestId, route, extra: { topic } });
         break;
     }
 

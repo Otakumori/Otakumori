@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
@@ -8,7 +9,7 @@ export async function GET(req: Request) {
   try {
     await requireAdmin();
   } catch (error) {
-    console.error('Admin auth failed for reviews GET:', error);
+    logger.error('Reviews fetch error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

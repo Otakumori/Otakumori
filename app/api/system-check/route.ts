@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { env } from '@/env';
 
@@ -18,7 +19,12 @@ export async function GET() {
       nodeEnv: env.NODE_ENV,
     });
   } catch (error) {
-    console.error('System check failed:', error);
+    logger.error(
+      'System check failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         status: 'error',

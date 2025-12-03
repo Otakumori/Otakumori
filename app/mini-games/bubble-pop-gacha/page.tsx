@@ -1,8 +1,16 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useState } from 'react';
 import GameShell from '../_shared/GameShell';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\bubble-pop-gacha\page.tsx',
+  });
+}
 export default function BubblePopGachaPage() {
   const [shards, setShards] = useState(0);
   const [perks, setPerks] = useState<string[]>([]);

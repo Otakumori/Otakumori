@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { COLLECTION } from '@/app/lib/petals/constants';
 import { trackPetalCollection, trackPetalMilestone } from '@/app/lib/analytics/petals';
@@ -91,14 +93,14 @@ export function usePetalCollection() {
         const errorData = await response.json().catch(() => ({}));
         if (errorData.error === 'RATE_LIMITED' || errorData.error === 'DAILY_LIMIT_REACHED') {
           // Don't re-add to pending - limits are intentional
-          console.warn('Petal collection limited:', errorData.error);
+          logger.warn('Petal collection limited:', undefined, { value: errorData.error });
         } else {
           // Re-add failed collections to try again for other errors
           pendingCollections.current.push(...collections);
         }
       }
     } catch (error) {
-      console.error('Failed to submit petal collection:', error);
+      logger.error('Failed to submit petal collection:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       // Re-add failed collections to try again
       pendingCollections.current.push(...collections);
     }

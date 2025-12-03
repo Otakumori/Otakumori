@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { useCallback } from 'react';
 
 type QuestEventType =
@@ -29,7 +30,7 @@ export function useQuests() {
         return result;
       }
     } catch (error) {
-      console.error('Failed to track quest:', error);
+      logger.error('Failed to track quest:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
     return null;
   }, []);

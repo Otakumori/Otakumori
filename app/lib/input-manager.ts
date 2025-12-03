@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+
 export interface InputEvent {
   type: 'keydown' | 'keyup' | 'gamepad' | 'touchstart' | 'touchend' | 'touchmove';
   action: string;
@@ -295,7 +297,7 @@ export class InputManager {
         try {
           callback(event);
         } catch (error) {
-          console.error('Error in input callback:', error);
+          logger.error('Error in input callback:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       });
     }

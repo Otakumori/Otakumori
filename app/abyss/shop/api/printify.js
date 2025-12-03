@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { prisma } from '../../../lib/prisma';
 import { env } from '@/env.mjs';
 
@@ -72,7 +73,7 @@ export async function getAbyssProducts() {
 
     return abyssProducts;
   } catch (error) {
-    console.error('Error fetching Abyss products:', error);
+    logger.error('Error fetching Abyss products:', error);
     throw error;
   }
 }
@@ -94,7 +95,7 @@ export async function getProductDetails(productId) {
     const product = await response.json();
     return product;
   } catch (error) {
-    console.error('Error fetching product details:', error);
+    logger.error('Error fetching product details:', error);
     throw error;
   }
 }
@@ -126,7 +127,7 @@ export async function createOrder(productId, variantId, quantity, shippingAddres
     const order = await response.json();
     return order;
   } catch (error) {
-    console.error('Error creating order:', error);
+    logger.error('Error creating order:', error);
     throw error;
   }
 }
@@ -139,7 +140,7 @@ export async function getCachedAbyssProducts() {
       orderBy: { updatedAt: 'desc' },
     });
   } catch (error) {
-    console.error('Error fetching cached Abyss products:', error);
+    logger.error('Error fetching cached Abyss products:', error);
     throw error;
   }
 }
@@ -154,7 +155,7 @@ export async function updateProductCache(productId, updateData) {
       },
     });
   } catch (error) {
-    console.error('Error updating product cache:', error);
+    logger.error('Error updating product cache:', error);
     throw error;
   }
 }
@@ -166,7 +167,7 @@ export async function deactivateProduct(productId) {
       data: { isActive: false },
     });
   } catch (error) {
-    console.error('Error deactivating product:', error);
+    logger.error('Error deactivating product:', error);
     throw error;
   }
 }
@@ -198,7 +199,7 @@ export async function searchAbyssProducts(query, tags = []) {
       orderBy: { updatedAt: 'desc' },
     });
   } catch (error) {
-    console.error('Error searching Abyss products:', error);
+    logger.error('Error searching Abyss products:', error);
     throw error;
   }
 }

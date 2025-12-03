@@ -1,9 +1,12 @@
+'use client';
+
+import React from 'react';
+
 /**
  * Accessible Emoji Component
  * Properly wraps emojis for screen reader accessibility
+ * Uses ASCII characters instead of colored emojis
  */
-
-import React from 'react';
 
 interface AccessibleEmojiProps {
   symbol: string;
@@ -11,7 +14,11 @@ interface AccessibleEmojiProps {
   className?: string;
 }
 
-export default function AccessibleEmoji({ symbol, label, className = '' }: AccessibleEmojiProps) {
+export default function AccessibleEmoji({
+  symbol,
+  label,
+  className = '',
+}: AccessibleEmojiProps) {
   return (
     <span role="img" aria-label={label} className={className}>
       {symbol}
@@ -19,30 +26,30 @@ export default function AccessibleEmoji({ symbol, label, className = '' }: Acces
   );
 }
 
-// Common emoji shortcuts for convenience
+// Common emoji shortcuts for convenience - using ASCII characters
 export const Emojis = {
   Trophy: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="🏆︎" label="Trophy" className={className} />
+    <AccessibleEmoji symbol= "[T]" label="Trophy" className={ className } />
   ),
   Star: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="★" label="Star" className={className} />
+  <AccessibleEmoji symbol= "*" label = "Star" className = { className } />
   ),
   Sparkles: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="✨︎" label="Sparkles" className={className} />
+  <AccessibleEmoji symbol= "*" label = "Sparkles" className = { className } />
   ),
   Fire: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="🔥︎" label="Fire" className={className} />
+  <AccessibleEmoji symbol= "^" label = "Fire" className = { className } />
   ),
   Heart: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="❤" label="Heart" className={className} />
+  <AccessibleEmoji symbol= "<3" label = "Heart" className = { className } />
   ),
   Camera: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="📸" label="Camera" className={className} />
+  <AccessibleEmoji symbol= "[C]" label = "Camera" className = { className } />
   ),
   Movie: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="🎬" label="Movie camera" className={className} />
+  <AccessibleEmoji symbol= "[M]" label = "Movie camera" className = { className } />
   ),
   Sakura: ({ className }: { className?: string }) => (
-    <AccessibleEmoji symbol="🌸" label="Cherry blossom" className={className} />
+  <AccessibleEmoji symbol= "*" label = "Cherry blossom" className = { className } />
   ),
 };

@@ -5,6 +5,8 @@
  * message queuing, and reconnection logic.
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { WebSocket } from 'ws';
 import { redisPool } from './redis-connection-pool';
 
@@ -176,7 +178,7 @@ export class WebSocketManager {
 
       // Validate message
       if (!message.type || !message.data) {
-        console.warn('Invalid message format:', message);
+        logger.warn('Invalid message format:', undefined, { value: message });
         return;
       }
 
@@ -203,10 +205,10 @@ export class WebSocketManager {
           this.handleLeaveRoom(connectionId, message);
           break;
         default:
-          console.warn('Unknown message type:', message.type);
+          logger.warn('Unknown message type:', undefined, { value: message.type });
       }
     } catch (error) {
-      console.error('Error handling message:', error);
+      logger.error('Error handling message:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -288,7 +290,7 @@ export class WebSocketManager {
     try {
       connection.ws.send(JSON.stringify(message));
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       this.handleDisconnect(connectionId);
     }
   }

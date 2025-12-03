@@ -4,6 +4,7 @@ export const runtime = 'nodejs'; // keep on Node runtime (not edge)
 export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
 export const maxDuration = 10; // optional guard
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
@@ -22,7 +23,12 @@ export async function GET() {
 
     return NextResponse.json({ ok: true, files });
   } catch (err) {
-    console.error('Files error:', err);
+    logger.error(
+      'Files error:',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json({ ok: false, error: 'FILES_ERROR' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
@@ -5,11 +6,14 @@ import FooterDark from '../components/FooterDark';
 import CheckoutContent from '../components/shop/CheckoutContent';
 import { t } from '@/lib/microcopy';
 
-export const metadata: Metadata = {
-  title: 'Checkout — Otaku-mori',
-  description: 'Complete your purchase securely.',
-};
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/checkout',
+  });
+}
 export default async function CheckoutPage() {
   const { userId } = await auth();
 

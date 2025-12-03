@@ -1,4 +1,13 @@
+import { generateSEO } from '@/app/lib/seo';
 
+
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\list\page.tsx',
+  });
+}
 export default function MiniGamesListPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">

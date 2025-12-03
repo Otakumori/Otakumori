@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -47,7 +48,7 @@ export async function POST(_req: NextRequest) {
     const response = PetalTransactionSchema.parse(transaction);
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    console.error('Error granting daily petals:', error);
+    logger.error('Error granting daily petals:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

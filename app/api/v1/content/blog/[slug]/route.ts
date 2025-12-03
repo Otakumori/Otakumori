@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Blog post API error:', error);
+    logger.error('Blog post API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

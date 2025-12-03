@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 
 const featuredProducts = [
@@ -65,7 +66,12 @@ export async function GET() {
 
     return NextResponse.json(featuredProducts);
   } catch (error) {
-    console.error('Error fetching featured products:', error);
+    logger.error(
+      'Error fetching featured products:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Failed to fetch featured products' }, { status: 500 });
   }
 }

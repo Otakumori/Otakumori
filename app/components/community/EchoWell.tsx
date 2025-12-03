@@ -86,7 +86,7 @@ export default function EchoWell({ className }: EchoWellProps) {
       {
         id: '3',
         content:
-          'Working on a new fan art piece inspired by Studio Ghibli. The process is so therapeutic! Anyone else love drawing anime characters? ️',
+          'Working on a new fan art piece inspired by Studio Ghibli. The process is so therapeutic! Anyone else love drawing anime characters? <span role="img" aria-label="emoji">️</span>',
         author: {
           id: 'user3',
           username: 'ArtOtaku',

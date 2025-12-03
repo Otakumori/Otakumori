@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest) {
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
   } catch (error) {
-    console.error('Catalog API error:', error);
+    logger.error('Catalog error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

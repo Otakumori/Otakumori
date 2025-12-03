@@ -1,3 +1,6 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+
 // import { put, del, list } from '@vercel/blob';
 
 export interface AssetManifest {
@@ -219,7 +222,7 @@ class AssetManager {
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + duration);
       } catch (error) {
-        console.warn('Could not generate fallback audio:', error);
+        logger.warn('Could not generate fallback audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       }
     }
 
@@ -236,7 +239,7 @@ class AssetManager {
       audio.volume = this.volume;
       await audio.play();
     } catch (error) {
-      console.warn('Could not play SFX:', key, error);
+      logger.warn('Could not play SFX:', undefined, { value: key, error });
     }
   }
 
@@ -257,7 +260,7 @@ class AssetManager {
       this.musicCache.set(key, audio);
       return audio;
     } catch (error) {
-      console.warn('Could not load music:', key, error);
+      logger.warn('Could not load music:', undefined, { value: key, error });
       // Return a silent audio element
       const silentAudio = new Audio();
       silentAudio.src =

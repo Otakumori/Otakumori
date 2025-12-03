@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/authz';
 import { put } from '@vercel/blob';
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
   try {
     await requireAdmin();
   } catch (error) {
-    console.error('Admin auth failed for blob upload token:', error);
+    logger.error('Blob upload token error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

@@ -2,6 +2,7 @@
 // DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-girl\Game.tsx instead.
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { GameAvatarIntegration } from '../_shared/GameAvatarIntegration';
@@ -184,7 +185,7 @@ export default function Game({ mode }: Props) {
             }),
           });
         } catch (error) {
-          console.error('Failed to submit score:', error);
+          logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       };
       submitScore();
@@ -354,7 +355,7 @@ class GameEngine {
     },
     {
       name: 'eternal-rune',
-      runes: ['', '', '️', '', '️', '', '', '️'],
+      runes: ['', '', '<span role="img" aria-label="emoji">️</span>', '', '<span role="img" aria-label="emoji">️</span>', '', '', '<span role="img" aria-label="emoji">️</span>'],
       theme: 'Elemental Forces',
       rarity: 'rare',
     },

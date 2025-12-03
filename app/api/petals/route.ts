@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -75,7 +76,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error earning petals:', error);
+    logger.error(
+      'Error earning petals:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
@@ -86,7 +92,9 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Log petal balance request for analytics
-    console.warn('Petal balance requested from:', request.headers.get('user-agent'));
+    logger.warn('Petal balance requested from:', undefined, {
+      userAgent: request.headers.get('user-agent'),
+    });
 
     const { userId } = await auth();
     if (!userId) {
@@ -139,7 +147,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching petal data:', error);
+    logger.error(
+      'Error fetching petal data:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

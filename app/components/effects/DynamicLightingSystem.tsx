@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   DynamicLightingEngine,
@@ -138,7 +139,7 @@ export default function DynamicLightingSystem({
             addBurst: addLightBurst,
           });
         } catch (error) {
-          console.error('Failed to initialize lighting engine:', error);
+          logger.error('Failed to initialize lighting engine:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       }
     };

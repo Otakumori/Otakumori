@@ -1,9 +1,17 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { motion } from 'framer-motion';
 import SafetySettings from '../components/SafetySettings';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/safety',
+  });
+}
 export default function SafetyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">

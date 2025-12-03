@@ -5,6 +5,8 @@
  * Falls back to Printify if not found in Prisma
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { serializeProduct, type CatalogProduct } from '@/lib/catalog/serialize';
@@ -161,7 +163,7 @@ export async function GET(
       }
     } catch (printifyError) {
       // Printify fetch failed, continue to 404
-      console.warn('[Products API] Printify fallback failed:', printifyError);
+      logger.warn('[Products API] Printify fallback failed:', undefined, { value: printifyError });
     }
 
     // Product not found
@@ -170,7 +172,7 @@ export async function GET(
       { status: 404 },
     );
   } catch (error) {
-    console.error('[Products API] Error:', error);
+    logger.error('[Products API] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError(
         'INTERNAL_ERROR',

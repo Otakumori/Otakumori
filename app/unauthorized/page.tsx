@@ -1,10 +1,18 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import Link from 'next/link';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/unauthorized',
+  });
+}
 export default function UnauthorizedPage() {
   const { isSignedIn, isAdmin } = useAuth();
   const router = useRouter();

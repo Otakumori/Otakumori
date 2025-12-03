@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 // import { Ratelimit } from "@upstash/ratelimit"; // Disabled due to Redis config issues
@@ -114,7 +115,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, updated: updates.length, quests: summaries });
   } catch (error) {
-    console.error('Quest track error', error);
+    logger.error(
+      'Quest track error',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'internal' }, { status: 500 });
   }
 }

@@ -1,9 +1,17 @@
+import { generateSEO } from '@/app/lib/seo';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
 import OneTapGamertagWrapper from './OneTapGamertagWrapper';
 
 const db = new PrismaClient();
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/settings',
+  });
+}
 export default async function SettingsPage() {
   const { userId } = await auth();
   if (!userId) return null;

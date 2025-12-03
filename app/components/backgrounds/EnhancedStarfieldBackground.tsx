@@ -5,19 +5,19 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * Enhanced Starfield Background Component
  *
- * Pixel-style starfield with purple shooting stars for home page.
+ * Pixel-style starfield with sakura pink shooting stars for home page.
  * Features:
  * - Pixel-style star rendering (1-2px squares, no anti-aliasing)
- * - Purple shooting stars (occasional, ~1 every 8-10 seconds)
- * - Deep space background (pure black, not purple)
+ * - Sakura pink shooting stars (occasional, ~1 every 8-10 seconds)
+ * - Deep space background (dark gray, no purple)
  * - Subtle depth gradient
  * - Lower opacity so petals are clearly visible
  * - Performance optimized
  *
  * Key specifications:
  * - Stars: Pixel-style (1-2px squares), white/lavender
- * - Shooting stars: Purple (#a855f7, #ec4899), ~1 every 8-10 seconds
- * - Background: Pure black (#000000) with subtle gradient
+ * - Shooting stars: Sakura pink (#f3b7c2, #f4c1cb, #eaa4b4), ~1 every 8-10 seconds
+ * - Background: Dark gray (#171819) with subtle gradient
  * - Opacity: Reduced so petals are clearly visible
  * - Density: 0.5 (reduced from 0.72)
  * - Speed: 0.4 (slower, more subtle)
@@ -157,8 +157,8 @@ export default function EnhancedStarfieldBackground({
       const angle = Math.random() * Math.PI * 0.3 + Math.PI * 0.15; // 15-45 degrees
       const velocity = 2 + Math.random() * 3; // 2-5 pixels per frame
 
-      // Choose purple color (violet or pink)
-      const colors = ['#a855f7', '#ec4899']; // Purple and pink
+      // Choose sakura pink color
+      const colors = ['#f3b7c2', '#f4c1cb', '#eaa4b4']; // Sakura pink variants
       const color = colors[Math.floor(Math.random() * colors.length)];
 
       return {
@@ -179,7 +179,7 @@ export default function EnhancedStarfieldBackground({
     const animate = (currentTime: number) => {
       if (!isVisible || prefersReducedMotion) {
         // Draw static frame for reduced motion
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = '#171819'; // --om-bg-root
         ctx.fillRect(0, 0, w, h);
 
         // Draw static stars
@@ -198,8 +198,8 @@ export default function EnhancedStarfieldBackground({
       const deltaTime = Math.min((currentTime - lastTime) / 16.67, 2); // Cap at 2x for lag
       lastTime = currentTime;
 
-      // Clear canvas with pure black background
-      ctx.fillStyle = '#000000';
+      // Clear canvas with dark gray background
+      ctx.fillStyle = '#171819'; // --om-bg-root
       ctx.fillRect(0, 0, w, h);
 
       // Subtle depth gradient (very subtle, almost imperceptible)
@@ -212,7 +212,7 @@ export default function EnhancedStarfieldBackground({
         Math.max(w, h) * 0.8,
       );
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      gradient.addColorStop(1, 'rgba(8, 6, 17, 0.3)'); // Very subtle purple tint at edges
+      gradient.addColorStop(1, 'rgba(23, 24, 25, 0.3)'); // Very subtle dark gray tint at edges
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, w, h);
 

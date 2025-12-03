@@ -1,6 +1,6 @@
+import { logger } from '@/app/lib/logger';
 import { safeFetch, isSuccess } from '@/lib/safeFetch';
 import Link from 'next/link';
-import Image from 'next/image';
 import { getEnabledGames, getGameDef, getGameThumbnailAsset } from '@/app/lib/games';
 import { paths } from '@/lib/paths';
 import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
@@ -69,7 +69,7 @@ export default async function MiniGamesSection() {
         }),
       );
   } catch (registryError) {
-    console.warn('[MiniGamesSection] Failed to get registry games:', registryError);
+    logger.warn('[MiniGamesSection] Failed to get registry games', undefined, registryError);
     registryGames = [];
   }
 
@@ -83,7 +83,7 @@ export default async function MiniGamesSection() {
         const rawGames = gamesResult.data?.games || [];
         games = Array.isArray(rawGames) ? rawGames.map(mapGame) : registryGames;
       } catch (mapError) {
-        console.warn('[MiniGamesSection] Failed to map games from API:', mapError);
+        logger.warn('[MiniGamesSection] Failed to map games from API', undefined, mapError);
         games = registryGames;
       }
     } else {
@@ -142,36 +142,26 @@ export default async function MiniGamesSection() {
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-transform duration-200 hover:scale-[1.02]"
             >
               <GlassCard className="flex h-full flex-col overflow-hidden">
-                <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-purple-900/20 to-pink-900/20">
-                  <Image
-                    src={game.image ?? '/assets/placeholder-game.jpg'}
-                    alt={game.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  {/* Gradient overlay for text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
-
-                  {/* Game info overlay */}
-                  <div className="absolute left-4 right-4 bottom-4 flex flex-col gap-2 z-10">
-                    <h3 className="font-semibold text-white text-lg transition-colors group-hover:text-pink-300 drop-shadow-lg">
+          <GlassCardContent className="flex-1 pt-6" >
+          <div className="flex flex-col gap-3" >
+          <h3 className="font-semibold text-white text-lg transition-colors group-hover:text-pink-300" >
                       {game.title}
                     </h3>
                     {game.category && (
                       <span className="self-start rounded-full bg-pink-500/30 backdrop-blur-sm border border-pink-400/20 px-3 py-1 text-xs font-medium text-pink-100">
                         {game.category}
                       </span>
-                    )}
-                  </div>
-                </div>
-                {game.description && (
-                  <GlassCardContent className="flex-1">
-                    <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">
-                      {game.description}
-                    </p>
-                  </GlassCardContent>
-                )}
+                    )
+    }
+                    {
+    game.description && (
+      <p className="text-sm text-white/70 line-clamp-3 leading-relaxed" >
+        { game.description }
+        </p>
+                    )
+  }
+  </div>
+    </GlassCardContent>
               </GlassCard>
             </Link>
           ))}
@@ -188,8 +178,9 @@ export default async function MiniGamesSection() {
       {enabledGames.length > 0 && (
         <div className="text-center mt-8">
           <HeaderButton href={paths.games()}>View All Games</HeaderButton>
-        </div>
-      )}
-    </div>
+            </div>
+      )
+}
+</div>
   );
 }

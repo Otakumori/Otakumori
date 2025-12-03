@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 // import { createRateLimitMiddleware } from '@/app/api/rate-limit';
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
   // if (rateLimitResult) return rateLimitResult;
 
   // Log request for audit purposes
-  console.warn('Feature flags requested from:', req.headers.get('user-agent'));
+  logger.warn('Feature flags requested', undefined, { userAgent: req.headers.get('user-agent') ?? undefined });
 
   try {
     const { userId } = await auth();

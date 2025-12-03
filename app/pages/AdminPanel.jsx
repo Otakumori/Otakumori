@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -14,7 +15,7 @@ export default function AdminPanel() {
           router.push('/login');
         }
       } catch (error) {
-        console.error('Error checking admin status:', error);
+        logger.error('Error checking admin status:', error);
         router.push('/login');
       }
     };

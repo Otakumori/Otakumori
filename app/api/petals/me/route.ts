@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
@@ -12,7 +13,12 @@ export async function GET() {
     const row = await db.petalWallet.findUnique({ where: { userId } });
     return NextResponse.json({ total: row?.balance ?? 0 });
   } catch (error) {
-    console.error('Error fetching user petals:', error);
+    logger.error(
+      'Error fetching user petals:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ total: 0 });
   }
 }
@@ -39,7 +45,12 @@ export async function POST() {
 
     return NextResponse.json({ total: row.balance });
   } catch (error) {
-    console.error('Error incrementing user petals:', error);
+    logger.error(
+      'Error incrementing user petals:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Failed to increment petals' }, { status: 500 });
   }
 }

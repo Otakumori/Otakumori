@@ -7,6 +7,8 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import {
   PhysicsCharacterRenderer,
@@ -107,7 +109,7 @@ export function usePhysicsCharacter(
       rendererRef.current = renderer;
       setIsReady(true);
     } catch (error) {
-      console.error('Failed to initialize PhysicsCharacterRenderer:', error);
+      logger.error('Failed to initialize PhysicsCharacterRenderer:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       setIsReady(false);
     }
 
@@ -144,7 +146,7 @@ export function usePhysicsCharacter(
 
         // Auto-disable if FPS drops below threshold
         if (avgFPS < targetFPS * autoDisableThreshold) {
-          console.warn(
+          logger.warn(
             `Physics auto-disabled: FPS ${avgFPS.toFixed(1)} < ${targetFPS * autoDisableThreshold}`,
           );
           setPhysicsEnabled(false);
@@ -168,7 +170,7 @@ export function usePhysicsCharacter(
       try {
         rendererRef.current.render(x, y, facing);
       } catch (error) {
-        console.error('Error rendering physics character:', error);
+        logger.error('Error rendering physics character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [isReady],
@@ -181,7 +183,7 @@ export function usePhysicsCharacter(
       try {
         rendererRef.current.update(deltaTime, velocity, position);
       } catch (error) {
-        console.error('Error updating physics character:', error);
+        logger.error('Error updating physics character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [isReady, physicsEnabled],
@@ -194,7 +196,7 @@ export function usePhysicsCharacter(
       try {
         rendererRef.current.applyImpact(force, part);
       } catch (error) {
-        console.error('Error applying impact:', error);
+        logger.error('Error applying impact:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [isReady, physicsEnabled],

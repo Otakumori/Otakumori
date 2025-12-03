@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -33,7 +34,7 @@ export async function GET() {
       data: { runes },
     });
   } catch (error) {
-    console.error('Runes fetch error:', error);
+    logger.error('Runes error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,
@@ -135,7 +136,7 @@ export async function POST(request: NextRequest) {
       data: { rune },
     });
   } catch (error) {
-    console.error('Rune save error:', error);
+    logger.error('Runes error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

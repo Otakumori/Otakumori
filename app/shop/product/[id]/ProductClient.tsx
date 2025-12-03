@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -146,7 +147,7 @@ export default function ProductClient({ productId }: { productId: string }) {
         const errorMessage =
           err instanceof Error ? err.message : 'An error occurred while fetching the product';
         setError(errorMessage);
-        console.error('Error fetching product:', err);
+        logger.error('Error fetching product:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
         showError('Failed to fetch product details. Please try again.');
       } finally {
         if (!isCancelled) {

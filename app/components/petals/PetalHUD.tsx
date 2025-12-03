@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -66,7 +67,7 @@ export default function PetalHUD() {
       const j = await fetch('/api/petals/me').then((r) => r.json());
       setMe(j.total);
     } catch (error) {
-      console.error('Failed to sync petal balance:', error);
+      logger.error('Failed to sync petal balance:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }, []);
 

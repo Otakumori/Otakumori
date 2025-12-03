@@ -112,7 +112,7 @@ export default function Engine({
 
             // Soft CTA for guests (non-blocking)
             if (!isSignedIn) {
-              pushCaption('💡 Sign in to save your petals permanently!');
+              pushCaption('<span role="img" aria-label="emoji">�</span>� Sign in to save your petals permanently!');
             }
           }
         });
@@ -129,7 +129,7 @@ export default function Engine({
               milestoneValue: newStreak,
             },
           }).then(() => {
-            pushCaption(`🔥 ${newStreak}-game streak! Bonus petals earned!`);
+            pushCaption(`<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span> ${newStreak}-game streak! Bonus petals earned!`);
           });
         }
 
@@ -149,7 +149,7 @@ export default function Engine({
               milestoneValue: progressData.dailyStreak,
             },
           }).then(() => {
-            pushCaption(`⭐ ${progressData.dailyStreak}-day streak! Daily bonus!`);
+            pushCaption(`<span role="img" aria-label="star">⭐</span> ${progressData.dailyStreak}-day streak! Daily bonus!`);
           });
         }
       } else {

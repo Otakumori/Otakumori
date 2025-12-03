@@ -1,5 +1,6 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -285,10 +286,7 @@ export default function SearchBar({
 
         {isLoading && (
           <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-            <div
-              className="h-4 w-4 animate-spin rounded-full border-b-2 border-pink-500"
-              aria-label="Loading"
-            />
+            <Skeleton />
           </div>
         )}
       </div>

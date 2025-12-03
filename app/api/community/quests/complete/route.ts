@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const fetchCache = 'force-no-store';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
     });
   } catch (e: unknown) {
     const error = e instanceof Error ? e : new Error(String(e));
-    console.error('Quest completion failed:', error.message, error.stack);
+    logger.error('Quest completion failed:', undefined, { stack: error.stack }, error);
     return NextResponse.json(
       { ok: false, code: 'SERVER_ERROR', message: 'Internal error' },
       { status: 500 },

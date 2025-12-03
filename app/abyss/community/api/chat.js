@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { prisma } from '../../../lib/prisma';
 
 export async function getChatMessages(limit = 50) {
@@ -19,7 +20,7 @@ export async function getChatMessages(limit = 50) {
 
     return messages;
   } catch (error) {
-    console.error('Error fetching chat messages:', error);
+    logger.error('Error fetching chat messages:', error);
     throw error;
   }
 }
@@ -45,7 +46,7 @@ export async function sendChatMessage(userId, content) {
 
     return message;
   } catch (error) {
-    console.error('Error sending chat message:', error);
+    logger.error('Error sending chat message:', error);
     throw error;
   }
 }
@@ -80,7 +81,7 @@ export async function deleteChatMessage(messageId, userId) {
 
     return true;
   } catch (error) {
-    console.error('Error deleting chat message:', error);
+    logger.error('Error deleting chat message:', error);
     throw error;
   }
 }
@@ -100,7 +101,7 @@ export async function reportChatMessage(messageId, userId, reason) {
 
     return true;
   } catch (error) {
-    console.error('Error reporting chat message:', error);
+    logger.error('Error reporting chat message:', error);
     throw error;
   }
 }
@@ -171,7 +172,7 @@ export async function moderateChatMessage(messageId, action, moderatorId) {
 
     return true;
   } catch (error) {
-    console.error('Error moderating chat message:', error);
+    logger.error('Error moderating chat message:', error);
     throw error;
   }
 }
@@ -207,7 +208,7 @@ export async function getUserWarnings(userId, requesterId) {
 
     return warnings;
   } catch (error) {
-    console.error('Error fetching user warnings:', error);
+    logger.error('Error fetching user warnings:', error);
     throw error;
   }
 }
@@ -233,7 +234,7 @@ export async function getUserBanStatus(userId) {
 
     return activeBan;
   } catch (error) {
-    console.error('Error fetching user ban status:', error);
+    logger.error('Error fetching user ban status:', error);
     throw error;
   }
 }
@@ -266,7 +267,7 @@ export async function getActiveReports(requesterId) {
 
     return reports;
   } catch (error) {
-    console.error('Error fetching active reports:', error);
+    logger.error('Error fetching active reports:', error);
     throw error;
   }
 }

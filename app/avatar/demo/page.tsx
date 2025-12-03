@@ -1,5 +1,6 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import Avatar3D from '@/app/components/avatar/Avatar3D';
@@ -7,6 +8,13 @@ import type { BodyParameters } from '@/app/lib/3d/procedural-body';
 import type { HairParameters } from '@/app/lib/3d/procedural-hair';
 import * as THREE from 'three';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\avatar\demo\page.tsx',
+  });
+}
 export default function AvatarDemoPage() {
   const [bodyParams, setBodyParams] = useState<BodyParameters>({
     height: 1.0,

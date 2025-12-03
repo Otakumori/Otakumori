@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { ClerkProvider } from '@clerk/nextjs';
 import { clientEnv } from '@/env/client';
 
@@ -13,7 +14,7 @@ export default function ClerkProviderWrapper({ children, nonce }: ClerkProviderW
   const publishableKey = clientEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
-    console.error(' NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
+    logger.error(' NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
     return <div>Authentication configuration error</div>;
   }
 

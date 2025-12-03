@@ -174,7 +174,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
 
   // Validation: amount must be finite, integer, positive, within max
   if (!Number.isFinite(amount) || !Number.isInteger(amount)) {
-    logger.warn('[Petals] Invalid amount', {
+    logger.warn('[Petals] Invalid amount', undefined, {
       userId: userId || 'guest',
       extra: { amount, source },
     });
@@ -189,7 +189,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
   }
 
   if (amount <= 0) {
-    logger.warn('[Petals] Negative or zero amount', {
+    logger.warn('[Petals] Negative or zero amount', undefined, {
       userId: userId || 'guest',
       extra: { amount, source },
     });
@@ -204,7 +204,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
   }
 
   if (amount > MAX_PETALS_PER_GRANT) {
-    logger.warn('[Petals] Amount exceeds max per grant', {
+    logger.warn('[Petals] Amount exceeds max per grant', undefined, {
       userId: userId || 'guest',
       extra: { amount, max: MAX_PETALS_PER_GRANT, source },
     });
@@ -282,7 +282,7 @@ export async function grantPetals(input: GrantPetalsInput): Promise<GrantPetalsR
     );
 
     if (!rateLimitResult.success) {
-      logger.warn('[Petals] Rate limited', {
+      logger.warn('[Petals] Rate limited', undefined, {
         userId,
         extra: { source, identifier },
       });

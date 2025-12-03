@@ -86,7 +86,7 @@ export default function Leaderboard({ gameId, maxEntries = 10, className = '' }:
       <div className="mb-4 flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-xl font-bold text-white">
           <span className="text-2xl" role="img" aria-label="trophy">
-            🏆
+            <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
           </span>
           Top Players
         </h3>

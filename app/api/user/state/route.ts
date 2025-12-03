@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -10,7 +11,7 @@ export const maxDuration = 10;
 export async function GET(req: NextRequest) {
   try {
     // Log user state request for analytics
-    console.warn('User state requested from:', req.headers.get('user-agent'));
+    logger.warn('User state requested from:', undefined, { userAgent: req.headers.get('user-agent') });
 
     const { userId } = await auth();
 
@@ -63,7 +64,12 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching user state:', error);
+    logger.error(
+      'Error fetching user state:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -5,6 +5,8 @@
  * This prevents Server Component render errors from malformed API data.
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { z } from 'zod';
 import { type ApiResponse, type ApiSuccess, type ApiError } from './api-contracts';
 
@@ -31,7 +33,7 @@ export function validateApiResponse<T>(response: unknown, schema: z.ZodSchema<T>
       return validated.data;
     }
 
-    console.warn('[API Response Validator] Validation failed:', {
+    logger.warn('[API Response Validator] Validation failed:', undefined, {
       error: validated.error,
       response:
         typeof response === 'object' ? JSON.stringify(response).substring(0, 200) : response,
@@ -39,7 +41,7 @@ export function validateApiResponse<T>(response: unknown, schema: z.ZodSchema<T>
 
     return null;
   } catch (error) {
-    console.error('[API Response Validator] Unexpected error:', error);
+    logger.error('[API Response Validator] Unexpected error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -72,7 +74,7 @@ export function validateApiEnvelope<T>(
 
   const envelopeCheck = EnvelopeSchema.safeParse(response);
   if (!envelopeCheck.success) {
-    console.warn('[API Response Validator] Not a valid API envelope:', envelopeCheck.error);
+    logger.warn('[API Response Validator] Not a valid API envelope:', undefined, { value: envelopeCheck.error });
     return null;
   }
 
@@ -81,7 +83,7 @@ export function validateApiEnvelope<T>(
   if (!envelope.ok) {
     // Error response - log but don't fail validation
     const error = envelope as ApiError;
-    console.warn('[API Response Validator] API returned error:', {
+    logger.warn('[API Response Validator] API returned error:', undefined, {
       code: error.error.code,
       message: error.error.message,
       requestId: error.requestId,
@@ -94,7 +96,7 @@ export function validateApiEnvelope<T>(
   const dataValidation = dataSchema.safeParse(success.data);
 
   if (!dataValidation.success) {
-    console.warn('[API Response Validator] Data validation failed:', {
+    logger.warn('[API Response Validator] Data validation failed:', undefined, {
       error: dataValidation.error,
       requestId: success.requestId,
     });

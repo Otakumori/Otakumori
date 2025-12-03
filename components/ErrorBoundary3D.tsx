@@ -34,7 +34,7 @@ export default class ErrorBoundary3D extends Component<Props, State> {
             <div className="text-center p-6">
               <div className="text-red-400 text-lg mb-2">
                 <span role="img" aria-label="Warning">
-                  ⚠️
+                  <span role="img" aria-label="emoji">⚠</span><span role="img" aria-label="emoji">️</span>
                 </span>
               </div>
               <h3 className="text-white font-medium mb-2">3D Component Error</h3>

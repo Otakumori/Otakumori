@@ -7,6 +7,7 @@
  * Note: This is separate from /api/inngest which serves Inngest functions.
  * This route acts as a webhook receiver that triggers Inngest events.
  */
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { inngest } from '../../../../inngest/client';
 import { headers } from 'next/headers';
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
       message: `Webhook ${eventType} processed successfully`,
     });
   } catch (error) {
-    console.error('Error processing webhook:', error);
+    logger.error('Error processing webhook:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

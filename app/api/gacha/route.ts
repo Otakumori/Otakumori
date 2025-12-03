@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -13,7 +14,9 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   try {
     // Log request for analytics
-    console.warn('Gacha pull requested from:', request.headers.get('user-agent'));
+    logger.warn('Gacha pull requested from:', undefined, {
+      userAgent: request.headers.get('user-agent'),
+    });
 
     // Verify authentication
     const { userId } = await auth();
@@ -133,7 +136,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in gacha:', error);
+    logger.error(
+      'Error in gacha:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

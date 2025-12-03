@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
@@ -77,7 +78,7 @@ export async function GET() {
     if (error.message === 'FORBIDDEN') {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
-    console.error('Error fetching discount rewards:', error);
+    logger.error('Error fetching discount rewards:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -159,7 +160,7 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-    console.error('Error saving discount reward:', error);
+    logger.error('Error saving discount reward:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -190,7 +191,7 @@ export async function DELETE(req: Request) {
     if (error.message === 'FORBIDDEN') {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
-    console.error('Error deleting discount reward:', error);
+    logger.error('Error deleting discount reward:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

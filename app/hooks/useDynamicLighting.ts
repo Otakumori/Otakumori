@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   DynamicLightingEngine,
@@ -43,7 +44,7 @@ export function useDynamicLighting({
 
         return engineRef.current;
       } catch (error) {
-        console.error('Failed to initialize lighting engine:', error);
+        logger.error('Failed to initialize lighting engine:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         return null;
       }
     },

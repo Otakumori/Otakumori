@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getGameDef, getGameThumbnailAsset } from '@/app/lib/games';
 
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Game detail API error:', error);
+    logger.error('Game detail API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

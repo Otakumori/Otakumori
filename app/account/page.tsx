@@ -1,7 +1,15 @@
+import { generateSEO } from '@/app/lib/seo';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { UserProfile } from '@clerk/nextjs';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/account',
+  });
+}
 export default async function AccountPage() {
   const { userId } = await auth();
 

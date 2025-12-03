@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   return withRateLimit(req, rateLimitConfigs.api, async () => {
     // Check if Stripe is configured
     if (!env.STRIPE_SECRET_KEY) {
-      console.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
+      logger.error('[checkout/session] Stripe not configured - missing STRIPE_SECRET_KEY');
       return NextResponse.json(
         { ok: false, error: 'Checkout temporarily unavailable. Please contact support.' },
         { status: 503 },
@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
       // Safety guard: Ensure discount never exceeds 100% of subtotal
       const maxAllowedDiscount = subtotalCents;
       if (discountTotalCents > maxAllowedDiscount) {
-        logger.error('Discount exceeds subtotal - capping discount', {
+        logger.error('Discount exceeds subtotal - capping discount', undefined, {
           userId: user.id,
           extra: {
             discountTotalCents,
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
             maxAllowedDiscount,
             appliedCodes,
           },
-        });
+        }, undefined);
         discountTotalCents = maxAllowedDiscount;
       }
 

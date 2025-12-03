@@ -41,6 +41,11 @@ export function KeyboardShortcuts() {
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={() => setIsOpen(false)}
         aria-hidden="true"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click();
+        }}
       />
 
       {/* Modal */}

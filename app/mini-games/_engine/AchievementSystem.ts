@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 // Achievement Types
 export interface Achievement {
   id: string;
@@ -529,7 +530,7 @@ export class AchievementSystem {
         });
       }
     } catch (error) {
-      console.error('Failed to import achievements data:', error);
+      logger.error('Failed to import achievements data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

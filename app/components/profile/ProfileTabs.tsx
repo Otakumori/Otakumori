@@ -25,10 +25,10 @@ export default function ProfileTabs({
   const [activeTab, setActiveTab] = useState<TabId>('overview');
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'achievements', label: 'Achievements', icon: '🏆' },
-    { id: 'games', label: 'Games', icon: '🎮' },
-    { id: 'cosmetics', label: 'Cosmetics', icon: '✨' },
+    { id: 'overview', label: 'Overview', icon: '<span role="img" aria-label="emoji">�</span>�' },
+    { id: 'achievements', label: 'Achievements', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
+    { id: 'games', label: 'Games', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
+    { id: 'cosmetics', label: 'Cosmetics', icon: '<span role="img" aria-label="sparkles">✨</span>' },
   ];
 
   const handleKeyDown = (e: React.KeyboardEvent, tabId: TabId) => {

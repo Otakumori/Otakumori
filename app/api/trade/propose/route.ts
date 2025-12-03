@@ -3,6 +3,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse, type NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -16,7 +17,12 @@ export async function POST(_req: NextRequest) {
       message: 'Peer trade is disabled in this environment.',
     });
   } catch (err) {
-    console.error('trade/propose error', err);
+    logger.error(
+      'trade/propose error',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json({ ok: false, code: 'SERVER_ERROR' }, { status: 500 });
   }
 }

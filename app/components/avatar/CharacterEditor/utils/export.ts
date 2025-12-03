@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import type { CameraPreset, PosePreset, BackgroundPreset } from '../types';
 
@@ -12,7 +14,7 @@ export async function captureScreenshot(): Promise<void> {
     link.href = dataURL;
     link.click();
   } catch (error) {
-    console.error('Failed to capture screenshot:', error);
+    logger.error('Failed to capture screenshot:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -21,10 +23,10 @@ export async function exportGLB(): Promise<void> {
   try {
     // This would integrate with the model loader to export the current configuration
     // as a GLB file with all parts and materials applied
-    console.warn('GLB export functionality would be implemented here');
+    logger.warn('GLB export functionality would be implemented here');
     alert('GLB export feature coming soon!');
   } catch (error) {
-    console.error('Failed to export GLB:', error);
+    logger.error('Failed to export GLB:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -57,7 +59,7 @@ export async function sharePreset(
       alert('Preset link copied to clipboard!');
     }
   } catch (error) {
-    console.error('Failed to share preset:', error);
+    logger.error('Failed to share preset:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

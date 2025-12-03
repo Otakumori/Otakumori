@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -9,7 +10,9 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   try {
     // Log merge request for analytics
-    console.warn('Petal merge requested from:', request.headers.get('user-agent'));
+    logger.warn('Petal merge requested from:', undefined, {
+      userAgent: request.headers.get('user-agent'),
+    });
 
     const { userId } = await auth();
 
@@ -145,7 +148,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Guest merge error:', error);
+    logger.error(
+      'Guest merge error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,

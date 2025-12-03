@@ -1,6 +1,7 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import RuneGlyph from '@/components/runes/RuneGlyph';
 import { useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -26,6 +27,13 @@ interface OrderResult {
   }>;
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/thank-you',
+  });
+}
 export default function ThankYouPage() {
   const searchParams = useSearchParams();
   const { isSignedIn } = useUser();

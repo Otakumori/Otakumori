@@ -1,3 +1,6 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+
 /**
  * Petal Sync Client Logic
  *
@@ -53,7 +56,7 @@ export async function syncPetalsToCloud(
       throw new Error(result.error || 'Sync failed');
     }
   } catch (error) {
-    console.error('Failed to sync petals:', error);
+    logger.error('Failed to sync petals:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return {
       synced: false,
       cloudTotal: 0,
@@ -85,7 +88,7 @@ export function getSyncStatus(): {
       };
     }
   } catch (error) {
-    console.warn('Failed to read sync status:', error);
+    logger.warn('Failed to read sync status:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return { lastSyncedAt: null, needsSync: true };
@@ -100,6 +103,6 @@ export function saveSyncStatus(): void {
   try {
     localStorage.setItem('otm-petals-last-sync', new Date().toISOString());
   } catch (error) {
-    console.warn('Failed to save sync status:', error);
+    logger.warn('Failed to save sync status:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 }

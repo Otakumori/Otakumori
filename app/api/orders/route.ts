@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -14,7 +15,9 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     // Log orders request for analytics
-    console.warn('Orders requested from:', req.headers.get('user-agent'));
+    logger.warn('Orders requested from:', undefined, {
+      userAgent: req.headers.get('user-agent'),
+    });
 
     const { userId } = await auth();
     if (!userId) {
@@ -85,7 +88,12 @@ export async function GET(req: NextRequest) {
       data: { orders: transformedOrders },
     });
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    logger.error(
+      'Error fetching orders:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

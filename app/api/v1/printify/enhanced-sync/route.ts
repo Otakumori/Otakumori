@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest } from 'next/server';
 import { enhancedPrintifyService } from '@/app/lib/printify/enhanced-service';
 import { requireAdminOrThrow } from '@/lib/adminGuard';
@@ -15,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
     const { validateLinks = true, fullSync = true } = body;
 
-    console.warn('Starting enhanced Printify sync...', { validateLinks, fullSync });
+    logger.warn('Starting enhanced Printify sync...', undefined, { validateLinks, fullSync });
 
     let result;
 
@@ -27,14 +29,14 @@ export async function POST(request: NextRequest) {
       result = await enhancedPrintifyService.validateAllProductLinks();
     }
 
-    console.warn('Enhanced Printify sync completed:', result);
+    logger.warn('Enhanced Printify sync completed:', undefined, { value: result });
 
     return Response.json({
       ok: true,
       data: result,
     });
   } catch (error) {
-    console.error('Enhanced Printify sync failed:', error);
+    logger.error('Enhanced Printify sync failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return Response.json(
       {
@@ -65,7 +67,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Failed to get sync status:', error);
+    logger.error('Failed to get sync status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return Response.json(
       {

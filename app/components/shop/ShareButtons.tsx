@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { Share2, Twitter, MessageCircle, Link as LinkIcon, Check } from 'lucide-react';
 import { useToastContext } from '@/app/contexts/ToastContext';
@@ -27,7 +28,7 @@ export function ShareButtons({ productTitle, productId }: ShareButtonsProps) {
     // Discord doesn't have a share URL, but we can copy a formatted message
     const discordMessage = `${shareText}\n${productUrl}`;
     navigator.clipboard.writeText(discordMessage);
-    success('Discord message copied! Paste it in your server 🎮');
+    success('Discord message copied! Paste it in your server <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>');
     setIsOpen(false);
   };
 
@@ -41,7 +42,7 @@ export function ShareButtons({ productTitle, productId }: ShareButtonsProps) {
         setIsOpen(false);
       }, 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logger.error('Failed to copy:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -59,7 +60,16 @@ export function ShareButtons({ productTitle, productId }: ShareButtonsProps) {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click();
+            }}
+          />
 
           {/* Share menu */}
           <div className="absolute right-0 mt-2 z-50 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl shadow-lg p-2 min-w-[200px]">

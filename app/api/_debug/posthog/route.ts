@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('PostHog debug error:', error);
+    logger.error('PostHog debug error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

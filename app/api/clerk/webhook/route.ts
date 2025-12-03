@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest } from 'next/server';
 import { Webhook } from 'svix';
 import { headers } from 'next/headers';
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
   // Get the body
   const payload = await req.text();
   const body = JSON.parse(payload);
-  console.warn(`Clerk webhook received: ${body.type}`);
+  logger.warn(`Clerk webhook received: ${body.type}`);
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET!);
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       'svix-signature': svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error('Error verifying webhook:', err);
+    logger.error('Error verifying webhook', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     return new Response('Error occured', {
       status: 400,
     });
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   if (eventType === 'user.created') {
     const { id, email_addresses, public_metadata } = evt.data;
-    console.warn(`Creating user ${id} with ${email_addresses?.length || 0} email addresses`);
+    logger.warn(`Creating user ${id} with ${email_addresses?.length || 0} email addresses`);
 
     // New user created
 
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
 
         // Set default avatar preset for user
       } catch (error) {
-        console.error('Error setting avatar preset:', error);
+        logger.error('Error setting avatar preset', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         // Don't fail the webhook if avatar preset setting fails
       }
     }
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
 
   if (eventType === 'user.updated') {
     const { id, public_metadata } = evt.data;
-    console.warn(`Updating user ${id} metadata`);
+    logger.warn(`Updating user ${id} metadata`);
     // User updated
 
     // Log avatar preset changes for debugging

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -118,7 +119,7 @@ export default function AnalyticsDashboard() {
         setData(mockData);
         setLoading(false);
       } catch (error) {
-        console.error('Error loading analytics:', error);
+        logger.error('Error loading analytics:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setLoading(false);
       }
     };

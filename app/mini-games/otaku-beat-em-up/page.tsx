@@ -14,6 +14,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import GameShell from '../_shared/GameShell';
@@ -38,6 +40,13 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\otaku-beat-em-up\page.tsx',
+  });
+}
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [score, setScore] = useState(0);
@@ -128,7 +137,7 @@ export default function RhythmBeatEmUpPage() {
           }),
         });
       } catch (error) {
-        console.error('Failed to submit score:', error);
+        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [selectedMode, combo, earnPetals, hasAwardedPetals],

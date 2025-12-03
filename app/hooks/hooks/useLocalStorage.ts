@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useState } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
@@ -12,7 +14,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      logger.warn(`Error reading localStorage key "${key}":`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       return initialValue;
     }
   });
@@ -32,7 +34,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
+      logger.warn(`Error setting localStorage key "${key}":`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     }
   };
 

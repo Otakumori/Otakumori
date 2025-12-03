@@ -5,6 +5,7 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
@@ -23,6 +24,13 @@ const AvatarRenderer3D = dynamic(() => import('@/app/components/avatar/AvatarRen
   ),
 });
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\avatar\editor\page.tsx',
+  });
+}
 export default function AvatarEditorPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-black">
@@ -68,13 +76,13 @@ export default function AvatarEditorPage() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <button className="rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-white/10">
                   <span role="img" aria-label="Camera">
-                    📸
+                    <span role="img" aria-label="emoji">�</span>�
                   </span>{' '}
                   Take Screenshot
                 </button>
                 <button className="rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm font-medium text-white transition-all hover:bg-white/10">
                   <span role="img" aria-label="Movie camera">
-                    🎬
+                    <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                   </span>{' '}
                   Record Animation
                 </button>
@@ -110,7 +118,7 @@ export default function AvatarEditorPage() {
           <div className="rounded-xl border border-white/20 bg-white/5 p-6 backdrop-blur-lg">
             <div className="mb-3 text-3xl">
               <span role="img" aria-label="Art palette">
-                🎨
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
             </div>
             <h3 className="mb-2 text-lg font-bold text-white">Procedural Textures</h3>
@@ -122,7 +130,7 @@ export default function AvatarEditorPage() {
           <div className="rounded-xl border border-white/20 bg-white/5 p-6 backdrop-blur-lg">
             <div className="mb-3 text-3xl">
               <span role="img" aria-label="Theater masks">
-                🎭
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
             </div>
             <h3 className="mb-2 text-lg font-bold text-white">Context Adaptation</h3>
@@ -134,7 +142,7 @@ export default function AvatarEditorPage() {
           <div className="rounded-xl border border-white/20 bg-white/5 p-6 backdrop-blur-lg">
             <div className="mb-3 text-3xl">
               <span role="img" aria-label="Lock">
-                🔒
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
             </div>
             <h3 className="mb-2 text-lg font-bold text-white">NSFW Support</h3>

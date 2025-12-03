@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -53,7 +54,7 @@ export async function GET() {
       data: { config: rewardsConfig },
     });
   } catch (error) {
-    console.error('Rewards config fetch error:', error);
+    logger.error('Rewards error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,
@@ -256,7 +257,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Rewards config save error:', error);
+    logger.error('Rewards error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

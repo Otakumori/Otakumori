@@ -4,6 +4,8 @@
  * Automatically adjusts quality settings based on performance
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type PerformanceMetrics } from './performance-monitor';
 import { QUALITY_PRESETS, type QualitySettings } from './character-creator';
 
@@ -67,7 +69,7 @@ export class AdaptiveQualitySystem {
     if (avgFPS < this.config.minFPS && this.currentQualityIndex < this.config.qualitySteps.length - 1) {
       // Performance is poor, lower quality
       this.currentQualityIndex++;
-      console.log(
+      logger.info(
         `[AdaptiveQuality] Lowering quality to ${this.config.qualitySteps[this.currentQualityIndex]} (FPS: ${avgFPS.toFixed(1)})`,
       );
     } else if (
@@ -77,7 +79,7 @@ export class AdaptiveQualitySystem {
     ) {
       // Performance is good, try increasing quality
       this.currentQualityIndex--;
-      console.log(
+      logger.info(
         `[AdaptiveQuality] Increasing quality to ${this.config.qualitySteps[this.currentQualityIndex]} (FPS: ${avgFPS.toFixed(1)})`,
       );
     }

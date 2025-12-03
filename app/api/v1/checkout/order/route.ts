@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -107,7 +109,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.warn(
+    logger.warn(
       `[Printify] Order ${orderId} synced successfully. Printify ID: ${printifyOrder.id}`,
     );
 
@@ -116,7 +118,7 @@ export async function POST(req: NextRequest) {
       data: { printifyOrder },
     });
   } catch (error) {
-    console.error('[Printify] Order submission failed:', error);
+    logger.error('[Printify] Order submission failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
@@ -136,7 +138,7 @@ export async function POST(req: NextRequest) {
         });
       }
     } catch (dbError) {
-      console.error('[Printify] Failed to log error to database:', dbError);
+      logger.error('[Printify] Failed to log error to database:', undefined, undefined, dbError instanceof Error ? dbError : new Error(String(dbError)));
     }
 
     return NextResponse.json({ ok: false, error: errorMessage }, { status: 500 });
@@ -174,7 +176,7 @@ export async function GET(req: NextRequest) {
       data: syncRecord,
     });
   } catch (error) {
-    console.error('[Printify] Failed to get order sync status:', error);
+    logger.error('[Printify] Failed to get order sync status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

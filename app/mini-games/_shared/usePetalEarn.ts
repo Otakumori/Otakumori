@@ -7,6 +7,8 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useCallback } from 'react';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 
@@ -121,7 +123,7 @@ export function usePetalEarn() {
             result.balance = updatedBalance;
             result.lifetimePetalsEarned = updatedLifetime;
           } catch (err) {
-            console.warn('Failed to persist guest petal data:', err);
+            logger.warn('Failed to persist guest petal data:', undefined, { err: err instanceof Error ? err : new Error(String(err)) });
           }
         }
 
@@ -152,7 +154,7 @@ export function usePetalEarn() {
 
         return result;
       } catch (error) {
-        console.error('Error earning petals:', error);
+        logger.error('Error earning petals:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         return {
           success: false,
           earned: 0,

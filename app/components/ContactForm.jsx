@@ -1,4 +1,6 @@
 'use client';
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 
@@ -51,11 +53,11 @@ export default function ContactForm() {
             imageUrl = uploadData.url;
           } else {
             // File upload failed, but continue with form submission
-            console.warn('File upload failed, continuing without image');
+            logger.warn('File upload failed, continuing without image');
           }
         } catch (uploadError) {
           // File upload error, but continue with form submission
-          console.warn('File upload error:', uploadError);
+          logger.warn('File upload error:', uploadError);
         }
       }
 
@@ -87,7 +89,7 @@ export default function ContactForm() {
         });
       }
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
       setStatus({
         type: 'error',
         message: error.message || 'Failed to send message. Please try again.',

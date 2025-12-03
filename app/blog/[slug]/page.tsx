@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       };
     }
   } catch (error) {
-    console.error('Error generating metadata for blog post:', error);
+    logger.error('Error generating metadata for blog post:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
   }
 
   return {
@@ -156,7 +157,7 @@ export default async function BlogPost({ params }: { params: { slug: string } })
       </div>
     );
   } catch (error) {
-    console.error('Error fetching blog post:', error);
+    logger.error('Error fetching blog post:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return notFound();
   }
 }

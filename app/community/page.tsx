@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { CommunityHub } from './_components/CommunityHub';
@@ -5,6 +6,13 @@ import { env } from '@/env';
 
 export const dynamic = 'force-dynamic';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/community',
+  });
+}
 export default async function CommunityPage() {
   // Check if Clerk is configured
   const isClerkConfigured = Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);

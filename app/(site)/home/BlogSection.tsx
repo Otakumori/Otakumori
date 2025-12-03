@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -71,7 +72,7 @@ export default async function BlogSection() {
             }))
         : [];
     } catch (mapError) {
-      console.warn('[BlogSection] Failed to map posts:', mapError);
+      logger.warn('[BlogSection] Failed to map posts', undefined, mapError);
       posts = [];
     }
 

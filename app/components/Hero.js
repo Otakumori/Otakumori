@@ -1,4 +1,6 @@
 'use client';
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import Image from 'next/image';
@@ -13,7 +15,7 @@ export default function Hero() {
   useEffect(() => {
     if (isLoaded && user) {
       setUserId(user.id);
-      console.warn('Hero component initialized for user:', user.id);
+      logger.warn('Hero component initialized for user:', user.id);
       // Only fetch if we have a userId
       if (user.id) {
         fetchPetalData();
@@ -29,7 +31,7 @@ export default function Hero() {
         setCollected(result.data?.user?.petalBalance || 0);
       }
     } catch (error) {
-      console.error('Error fetching petal data:', error);
+      logger.error('Error fetching petal data:', error);
     }
   };
 
@@ -38,7 +40,7 @@ export default function Hero() {
 
     // Require user to be signed in
     if (!userId) {
-      console.warn('User must be signed in to collect petals');
+      logger.warn('User must be signed in to collect petals');
       return;
     }
 
@@ -74,7 +76,7 @@ export default function Hero() {
         }, 2000);
       }
     } catch (error) {
-      console.error('Error collecting petal:', error);
+      logger.error('Error collecting petal:', error);
     } finally {
       setLoading(false);
     }

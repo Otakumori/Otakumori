@@ -197,7 +197,7 @@ export default function HomePage({ products, blogPosts }: HomePageProps) {
           <p className="text-xs text-gray-600">
             &copy; {new Date().getFullYear()} Otaku-mori. Made with{' '}
             <span role="img" aria-label="Red heart">
-              ️
+              <span role="img" aria-label="emoji">️</span>
             </span>
           </p>
         </div>

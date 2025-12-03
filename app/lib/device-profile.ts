@@ -1,3 +1,6 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+
 /**
  * Device profile detection for performance optimization
  */
@@ -33,7 +36,7 @@ export function detectDeviceProfile(): DeviceProfile {
       else if (extensions.length > 10) score += 1;
     }
   } catch (error) {
-    console.warn('WebGL check failed:', error);
+    logger.warn('WebGL check failed:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   // Check hardware concurrency (CPU cores)

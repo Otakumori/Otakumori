@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(limitedGames);
   } catch (error) {
-    console.error('Error fetching games:', error);
+    logger.error('Error fetching games:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json([], { status: 500 });
   }
 }

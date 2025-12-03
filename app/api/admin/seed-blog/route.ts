@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -57,7 +58,7 @@ const samplePosts = [
 export async function POST(request: NextRequest) {
   try {
     // Log request for audit trail
-    console.warn('Blog seeding requested from:', request.headers.get('user-agent'));
+    logger.warn('Blog seeding requested', undefined, { userAgent: request.headers.get('user-agent') ?? undefined });
 
     // Seeding blog posts...
 
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       data: { message: 'Blog posts seeded successfully!', count: samplePosts.length },
     });
   } catch (error) {
-    console.error('Error seeding blog posts:', error);
+    logger.error('Error seeding blog posts', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

@@ -302,7 +302,7 @@ export default function PetalLick({ onComplete, onFail, _duration }: GameProps) 
           {!showElements
             ? 'Cherry blossom season...'
             : !isCaught
-              ? '🌸 CATCH THE PETAL! 🌸'
+              ? '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span> CATCH THE PETAL! <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>'
               : 'Petal secured!'}
         </p>
         {!isCaught && showElements && (

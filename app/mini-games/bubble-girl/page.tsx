@@ -14,6 +14,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -49,6 +51,13 @@ const InteractiveBuddyGame = dynamic(() => import('./InteractiveBuddyGame'), {
 
 type GameMode = 'sandbox' | 'stress-relief' | 'challenge';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\bubble-girl\page.tsx',
+  });
+}
 export default function InteractiveBuddyPage() {
   const [mode, setMode] = useState<GameMode>('sandbox');
   const [key, setKey] = useState(0); // Force remount on mode change
@@ -166,7 +175,7 @@ export default function InteractiveBuddyPage() {
           }),
         });
       } catch (error) {
-        console.error('Failed to submit score:', error);
+        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [mode, earnPetals, hasAwardedPetals],
@@ -250,7 +259,7 @@ export default function InteractiveBuddyPage() {
                         idempotencyKey: `bubble-boy-${Date.now()}-${Math.random()}`,
                       }),
                     }).catch((error) => {
-                      console.error('Failed to unlock Bubble Boy achievement:', error);
+                      logger.error('Failed to unlock Bubble Boy achievement:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
                     });
                   }
                 }}

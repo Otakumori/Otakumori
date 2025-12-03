@@ -1,4 +1,5 @@
 // Admin endpoint to unlock stuck Printify products
+import { logger } from '@/app/lib/logger';
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { db } from '@/lib/db';
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
       message: `Product ${productId} unlocked successfully`,
     });
   } catch (error) {
-    console.error('Unlock failed:', error);
+    logger.error('Printify unlock error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return Response.json(
       { ok: false, error: String(error) },
       { status: 500 },

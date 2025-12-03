@@ -107,22 +107,22 @@ export async function POST(request: Request) {
           },
         });
       } else {
-        logger.error('petals_grant_failed', {
+        logger.error('petals_grant_failed', undefined, {
           userId: playerId,
           game: body.game,
           extra: {
             error: result.error,
             dailyCapReached: result.dailyCapReached,
           },
-        });
+        }, undefined);
         petalsGranted = 0;
       }
     } catch (error) {
-      logger.error('petals_grant_error', {
+      logger.error('petals_grant_error', undefined, {
         userId: playerId,
         game: body.game,
         extra: { error },
-      });
+      }, undefined);
       petalsGranted = 0;
     }
   }
@@ -199,7 +199,7 @@ export async function POST(request: Request) {
       }
     }
   } catch (error) {
-    logger.error('leaderboard upsert error', { extra: { error } });
+    logger.error('leaderboard upsert error', undefined, { extra: { error } }, undefined);
   }
 
   const top = await db.leaderboardScore.findMany({

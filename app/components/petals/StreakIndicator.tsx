@@ -19,7 +19,7 @@ export function StreakIndicator({ streak, showMultiplier = true }: StreakIndicat
     <div className="flex items-center gap-3 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl px-4 py-3">
       <div className="flex items-center gap-2">
         <span className="text-2xl" role="img" aria-label="Fire">
-          🔥
+          <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
         </span>
         <div>
           <div className="text-sm text-white/60">Streak</div>
@@ -63,7 +63,7 @@ export function StreakRecoveryPrompt({
     <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-lg border border-amber-500/30 rounded-xl p-6">
       <div className="flex items-start gap-4">
         <span className="text-3xl" role="img" aria-label="Warning">
-          ⚠️
+          <span role="img" aria-label="emoji">⚠</span><span role="img" aria-label="emoji">️</span>
         </span>
         <div className="flex-1">
           <h3 className="text-lg font-bold text-amber-300 mb-2">Streak Broken!</h3>

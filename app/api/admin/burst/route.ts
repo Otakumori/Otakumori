@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse, type NextRequest } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -102,7 +103,7 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
     }
 
-    console.error('Burst config fetch error', error);
+    logger.error('Burst failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -180,7 +181,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Burst config save error', error);
+    logger.error('Burst error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -6,6 +6,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
@@ -27,7 +28,7 @@ export function saveGuestAvatar(avatar: AvatarProfile): void {
   try {
     localStorage.setItem('otm-guest-avatar', JSON.stringify(avatar));
   } catch (error) {
-    console.warn('Failed to save guest avatar to localStorage:', error);
+    logger.warn('Failed to save guest avatar to localStorage:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 }
 

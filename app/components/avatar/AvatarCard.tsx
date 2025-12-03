@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 
@@ -46,7 +47,7 @@ export function AvatarCard({
   const outfitColor = config?.outfit?.primary?.color || '#FF6B9D';
 
   // Log avatar characteristics for debugging
-  console.warn('AvatarCard rendering:', { gender, age, hairColor });
+  logger.warn('AvatarCard rendering:', undefined, { gender, age, hairColor });
 
   // Convert skin tone to hex
   const getSkinToneHex = (tone: number) => {

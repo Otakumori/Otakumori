@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 
@@ -78,7 +79,7 @@ export function useAvatarBundle() {
           setAvatarBundle(defaultAvatarBundle);
         }
       } catch (error) {
-        console.error('Failed to load avatar settings:', error);
+        logger.error('Failed to load avatar settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setAvatarBundle(defaultAvatarBundle);
       } finally {
         setLoading(false);
@@ -100,7 +101,7 @@ export function useAvatarBundle() {
         }
       }
     } catch (error) {
-      console.error('Failed to load avatar bundle:', error);
+      logger.error('Failed to load avatar bundle:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
     return null;
   };
@@ -125,7 +126,7 @@ export function useAvatarBundle() {
         }
       }
     } catch (error) {
-      console.error('Failed to update avatar settings:', error);
+      logger.error('Failed to update avatar settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
     return false;
   };
@@ -158,7 +159,7 @@ export function useAvatarBundle() {
         }
       }
     } catch (error) {
-      console.error('Failed to set active avatar:', error);
+      logger.error('Failed to set active avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
     return false;
   };

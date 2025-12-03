@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -16,7 +18,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     const soapstoneId = params.id;
 
     // Log reply for debugging
-    console.warn('Soapstone reply requested for ID:', soapstoneId);
+    logger.warn('Soapstone reply requested for ID:', undefined, { value: soapstoneId });
 
     // In production, this would:
     // 1. Find the soapstone by ID
@@ -31,7 +33,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       glowLevel: Math.floor(Math.random() * 5) + 1, // Random glow increase
     });
   } catch (error) {
-    console.error('Error replying to soapstone:', error);
+    logger.error(
+      'Error replying to soapstone:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Failed to reply' }, { status: 500 });
   }
 }

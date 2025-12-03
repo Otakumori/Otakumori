@@ -114,7 +114,7 @@ export function PetalRewardNotification({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl" role="img" aria-label="Celebration">
-                🎉
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
               <h3 className="text-lg font-bold text-pink-300">Reward Unlocked!</h3>
             </div>
@@ -168,7 +168,7 @@ export function PetalRewardProgress({ currentPetals }: { currentPetals: number }
         <p className="text-pink-300 font-semibold">
           All rewards unlocked!{' '}
           <span role="img" aria-label="Celebration">
-            🎉
+            <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
           </span>
         </p>
       </div>

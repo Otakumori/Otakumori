@@ -1,5 +1,7 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -32,10 +34,10 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
         setNotifications(result.data.notifications);
         setUnreadCount(result.data.unreadCount);
       } else {
-        console.error('Failed to load notifications:', result.error);
+        logger.error('Failed to load notifications:', result.error);
       }
     } catch (error) {
-      console.error('Notifications error:', error);
+      logger.error('Notifications error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +63,7 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
         setUnreadCount((prev) => Math.max(0, prev - notificationIds.length));
       }
     } catch (error) {
-      console.error('Mark as read error:', error);
+      logger.error('Mark as read error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -183,7 +185,7 @@ export default function NotificationBell({ className = '' }: NotificationBellPro
               {isLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin w-6 h-6 border-2 border-pink-400 border-t-transparent rounded-full mx-auto"></div>
-                  <p className="text-pink-300/70 mt-2 text-sm">Loading...</p>
+                  <Skeleton />
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="text-center py-8">

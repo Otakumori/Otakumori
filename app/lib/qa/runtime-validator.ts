@@ -4,6 +4,8 @@
  * Logs warnings/errors to console and can show debug overlay
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { validateCelShadedCompliance, logStyleViolations } from '@om/avatar-engine/validation';
 import { env } from '@/env.mjs';
 import type * as THREE from 'three';
@@ -29,7 +31,7 @@ export function validateGameRuntime(
   const { checkMaterials = true, checkAvatar = true, showOverlay = false } = options;
 
   if (!scene) {
-    console.warn(`[QA] ${gameSlug}: Scene not available for validation`);
+    logger.warn(`[QA] ${gameSlug}: Scene not available for validation`);
     return;
   }
 
@@ -38,13 +40,13 @@ export function validateGameRuntime(
     try {
       const violations = validateCelShadedCompliance(scene);
       if (violations.length > 0) {
-        console.warn(`[QA] ${gameSlug}: Material style violations detected:`);
+        logger.warn(`[QA] ${gameSlug}: Material style violations detected:`);
         logStyleViolations(violations);
       } else {
-        console.warn(`[QA] ${gameSlug}: ✅ Material compliance passed`);
+        logger.warn(`[QA] ${gameSlug}: ✅ Material compliance passed`);
       }
     } catch (error) {
-      console.error(`[QA] ${gameSlug}: Error validating materials:`, error);
+      logger.error(`[QA] ${gameSlug}: Error validating materials:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

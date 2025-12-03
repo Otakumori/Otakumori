@@ -1,5 +1,7 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -23,6 +25,13 @@ interface WishlistItem {
   };
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/wishlist',
+  });
+}
 export default function WishlistPage() {
   const { isSignedIn, userId } = useAuth();
   const router = useRouter();
@@ -54,7 +63,7 @@ export default function WishlistPage() {
       }
     } catch (err) {
       setError('Failed to load wishlist');
-      console.error('Wishlist fetch error:', err);
+      logger.error('Wishlist fetch error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
@@ -82,7 +91,7 @@ export default function WishlistPage() {
       }
     } catch (err) {
       setError('Failed to remove item');
-      console.error('Remove wishlist error:', err);
+      logger.error('Remove wishlist error:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setRemoving((prev) => {
         const next = new Set(prev);

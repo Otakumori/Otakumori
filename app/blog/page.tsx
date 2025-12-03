@@ -1,17 +1,21 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import BlogIndex from '../components/blog/BlogIndex';
 import { t } from '@/lib/microcopy';
 
-export const metadata: Metadata = {
-  title: 'Blog — Otaku-mori',
-  description: 'Discover the latest insights, stories, and community highlights.',
-};
 
 // Force dynamic rendering to prevent timeout during static generation
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/blog',
+  });
+}
 export default function BlogPage() {
   return (
     <main className="relative min-h-screen vignette">

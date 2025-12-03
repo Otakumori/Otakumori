@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('Failed to fetch recent orders:', error);
+    logger.error('Failed to fetch recent orders:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

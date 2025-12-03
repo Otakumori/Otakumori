@@ -1,6 +1,7 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,13 @@ interface Order {
   items: OrderItem[];
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/orders',
+  });
+}
 export default function OrdersPage() {
   const { isSignedIn, userId } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -55,10 +56,10 @@ export default function ActivityFeed({
         setHasMore(result.data.hasMore);
         setNextCursor(result.data.nextCursor);
       } else {
-        console.error('Failed to load activities:', result.error);
+        logger.error('Failed to load activities:', result.error);
       }
     } catch (error) {
-      console.error('Activity feed error:', error);
+      logger.error('Activity feed error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }

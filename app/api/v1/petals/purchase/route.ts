@@ -1,5 +1,6 @@
-﻿export const runtime = 'nodejs';
+export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { InventoryKind } from '@prisma/client';
@@ -131,7 +132,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }
 
-    console.error('Error processing petal purchase', error);
+    logger.error('Error processing petal purchase', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -190,7 +191,7 @@ export async function GET(request: NextRequest, { params }: { params: { username
 
     return NextResponse.json({ ok: true, data: validatedData });
   } catch (error) {
-    console.error('Profile fetch error:', error);
+    logger.error('Profile fetch error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

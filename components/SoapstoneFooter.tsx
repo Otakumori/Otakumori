@@ -303,7 +303,7 @@ export function SoapstoneFooter() {
             <p className="text-neutral-500 text-sm">
               © 2024 Otaku-mori. Made with{' '}
               <span role="img" aria-label="Red heart">
-                ️
+                <span role="img" aria-label="emoji">️</span>
               </span>{' '}
               for the otaku community.
             </p>

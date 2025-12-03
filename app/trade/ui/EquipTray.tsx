@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Star, Zap, Heart } from 'lucide-react';
@@ -39,7 +40,7 @@ export default function EquipTray() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch equipped state:', error);
+      logger.error('Failed to fetch equipped state:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -108,7 +109,7 @@ export default function EquipTray() {
                   className="w-8 h-8 object-contain"
                 />
               ) : (
-                <span className="text-2xl">️</span>
+                <span className="text-2xl"><span role="img" aria-label="emoji">️</span></span>
               )}
             </div>
             <div className="flex-1">

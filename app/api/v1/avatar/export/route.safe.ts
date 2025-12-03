@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     const { format, quality, includeAssets } = body;
 
     // Log export request for analytics
-    console.warn('Avatar export requested:', {
+    logger.warn('Avatar export requested:', undefined, {
       format,
       quality,
       includeAssets: includeAssets || false,
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
       requestId,
     });
   } catch (error) {
-    console.error('Avatar export error:', error);
+    logger.error('Avatar export error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Export failed', requestId }, { status: 500 });
   }
 }
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
 // Asset generation functions (these would integrate with actual 3D rendering)
 async function generateGLBExport(config: any, quality: string) {
   // This would integrate with Three.js GLTFExporter or similar
-  console.warn('Generating GLB export with quality:', quality, 'config keys:', Object.keys(config));
+  logger.warn('Generating GLB export with quality:', undefined, { quality, configKeys: Object.keys(config) });
   const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
     buffer: Buffer.from(`mock-glb-data-${JSON.stringify(config).substring(0, 50)}`),
@@ -113,7 +114,7 @@ async function generateGLBExport(config: any, quality: string) {
 
 async function generateFBXExport(config: any, quality: string) {
   // This would integrate with FBX exporter
-  console.warn('Generating FBX export with quality:', quality);
+  logger.warn('Generating FBX export with quality:', undefined, { value: quality });
   const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
     buffer: Buffer.from(`mock-fbx-data-${config.gender || 'female'}`),
@@ -124,7 +125,7 @@ async function generateFBXExport(config: any, quality: string) {
 
 async function generateOBJExport(config: any, quality: string) {
   // This would generate OBJ file with MTL
-  console.warn('Generating OBJ export with quality:', quality);
+  logger.warn('Generating OBJ export with quality:', undefined, { value: quality });
   const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
     buffer: Buffer.from(`mock-obj-data-${config.outfit?.type || 'casual'}`),
@@ -135,7 +136,7 @@ async function generateOBJExport(config: any, quality: string) {
 
 async function generatePNGExport(config: any, quality: string) {
   // This would render avatar to PNG using Three.js or Canvas
-  console.warn('Generating PNG export with quality:', quality);
+  logger.warn('Generating PNG export with quality:', undefined, { value: quality });
   const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
     buffer: Buffer.from(`mock-png-data-${config.hair?.color || 'pink'}`),
@@ -146,7 +147,7 @@ async function generatePNGExport(config: any, quality: string) {
 
 async function generateJPGExport(config: any, quality: string) {
   // This would render avatar to JPG
-  console.warn('Generating JPG export with quality:', quality);
+  logger.warn('Generating JPG export with quality:', undefined, { value: quality });
   const qualityMultiplier = quality === 'high' ? 2 : quality === 'low' ? 0.5 : 1;
   return {
     buffer: Buffer.from(`mock-jpg-data-${config.face?.eyes?.color || 'blue'}`),
@@ -157,7 +158,7 @@ async function generateJPGExport(config: any, quality: string) {
 
 async function generateSVGExport(config: any) {
   // This would generate SVG representation
-  console.warn('Generating SVG export, config gender:', config.gender || 'female');
+  logger.warn('Generating SVG export, config gender:', undefined, { value: config.gender || 'female' });
   return {
     buffer: Buffer.from(`<svg><!-- Avatar SVG for ${config.gender || 'female'} --></svg>`),
     size: 64 * 1024,
@@ -167,7 +168,7 @@ async function generateSVGExport(config: any) {
 
 async function createDownloadUrl(exportData: any, format: string, username: string) {
   // In a real implementation, this would upload to cloud storage
-  console.warn(`Creating download URL for ${username}, format: ${format}`);
+  logger.warn(`Creating download URL for ${username}, format: ${format}`);
   const base64 = exportData.buffer.toString('base64');
   const dataUrl = `data:${exportData.mimeType};base64,${base64}`;
 

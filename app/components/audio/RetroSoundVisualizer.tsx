@@ -5,6 +5,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useRef, useEffect, useState } from 'react';
 import { useAudioStore } from '@/app/stores/audioStore';
 
@@ -57,7 +58,7 @@ export default function RetroSoundVisualizer({
         // In a real implementation, you'd connect it properly to your audio graph
         setAnalyser(analyserNode);
       } catch (error) {
-        console.error('Failed to connect analyser:', error);
+        logger.error('Failed to connect analyser:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }
 

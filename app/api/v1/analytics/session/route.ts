@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -73,7 +74,12 @@ export async function POST(req: NextRequest) {
       data: { sessionId: session.id },
     });
   } catch (error) {
-    console.error('Session analytics error:', error);
+    logger.error(
+      'Session analytics error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,
@@ -139,7 +145,12 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Session stats error:', error);
+    logger.error(
+      'Session stats error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Failed to fetch stats' }, { status: 500 });
   }
 }

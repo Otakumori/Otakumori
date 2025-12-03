@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 
 // Mock data for moderation
@@ -162,7 +163,7 @@ export async function GET(request: NextRequest) {
         });
     }
   } catch (error) {
-    console.error('Moderation API Error:', error);
+    logger.error('Moderation error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
-    console.error('Moderation API Error:', error);
+    logger.error('Moderation error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

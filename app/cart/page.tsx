@@ -1,13 +1,17 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 import FooterDark from '../components/FooterDark';
 import CartContent from '../components/shop/CartContent';
 import { t } from '@/lib/microcopy';
 
-export const metadata: Metadata = {
-  title: 'Cart — Otaku-mori',
-  description: 'Review your items before checkout.',
-};
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/cart',
+  });
+}
 export default async function CartPage() {
   return (
     <>

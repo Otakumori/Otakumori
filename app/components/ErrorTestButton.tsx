@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React from 'react';
 import * as Sentry from '@sentry/nextjs';
 
@@ -22,7 +23,7 @@ export default function ErrorTestButton() {
       data.property; // This will throw a TypeError
     } catch (error) {
       Sentry.captureException(error);
-      console.error('Custom error captured by Sentry:', error);
+      logger.error('Custom error captured by Sentry:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Custom error captured by Sentry. Check your Sentry dashboard.');
     }
   };

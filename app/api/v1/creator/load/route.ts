@@ -3,6 +3,7 @@
  * Handles loading avatar configurations for the CREATOR system
  */
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -64,7 +65,7 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('CREATOR load error:', error);
+    logger.error('CREATOR load error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

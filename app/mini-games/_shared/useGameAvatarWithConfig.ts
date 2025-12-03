@@ -4,6 +4,8 @@
  * Supports guest avatar loading from localStorage
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
 import {
   useGameAvatar as useAvatarEngineAvatar,
@@ -31,7 +33,7 @@ export function loadGuestAvatar(): AvatarProfile | null {
       return JSON.parse(stored) as AvatarProfile;
     }
   } catch (error) {
-    console.warn('Failed to load guest avatar from localStorage:', error);
+    logger.warn('Failed to load guest avatar from localStorage:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return null;

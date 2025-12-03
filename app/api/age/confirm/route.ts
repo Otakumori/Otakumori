@@ -1,4 +1,5 @@
-﻿import { NextResponse } from 'next/server';
+﻿import { logger } from '@/app/lib/logger';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { env } from '@/env';
 
@@ -53,7 +54,12 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error) {
-    console.error('Failed to confirm age', error);
+    logger.error(
+      'Failed to confirm age',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,

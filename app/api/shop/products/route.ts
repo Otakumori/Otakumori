@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { filterValidPrintifyProducts } from '@/app/lib/shop/printify-filters';
 import { deduplicateProducts } from '@/app/lib/shop/catalog';
@@ -14,14 +15,16 @@ export async function GET(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch from v1 Printify API:', response.status);
+      logger.error('Failed to fetch from v1 Printify API:', undefined, {
+        status: response.status,
+      });
       throw new Error(`Printify API error: ${response.status}`);
     }
 
     const data = await response.json();
 
     if (!data.ok) {
-      console.error('Printify API returned error:', data.error);
+      logger.error('Printify API returned error:', undefined, { error: data.error }, undefined);
       throw new Error(data.error || 'Failed to fetch products');
     }
 
@@ -66,7 +69,12 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    console.error('Shop products API error:', error);
+    logger.error(
+      'Shop products API error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     // Return empty products with 200 status for graceful degradation
     return NextResponse.json(

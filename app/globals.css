@@ -1014,6 +1014,19 @@ html {
   .animate-spin-slow {
     animation: spin 3s linear infinite;
   }
+  
+  /* Text color utilities for header links */
+  .text-text-link {
+    color: var(--color-text-link);
+  }
+  
+  .text-text-link-hover:hover {
+    color: var(--color-text-link-hover);
+  }
+  
+  .hover\:text-text-link-hover:hover {
+    color: var(--color-text-link-hover);
+  }
 
   .text-balance {
     text-wrap: balance;
@@ -1214,7 +1227,8 @@ body {
 
 body {
   position: relative;
-  color: #e7e7ea;
+  color: var(--om-text-ivory);
+  background-color: var(--om-bg-root);
 }
 
 /* Tree is now handled by the Canopy component */
@@ -1506,6 +1520,16 @@ footer::after {
   --star: rgba(255, 255, 255, 0.9);
   --star-dim: rgba(255, 255, 255, 0.35);
 
+  /* Sakura Theme Colors - Dark Gray + Ivory + Sakura Pink */
+  --om-bg-root: #171819; /* dark charcoal gray base */
+  --om-bg-surface: #1f2021; /* surface cards/panels */
+  --om-border-soft: #4c433d; /* soft borders */
+  --om-border-strong: #d4c2a4; /* strong borders for frames */
+  --om-text-ivory: #f2e6d2; /* warm ivory text */
+  --om-accent-pink: #f3b7c2; /* primary sakura pink */
+  --om-accent-pink-2: #f4c1cb; /* secondary sakura pink */
+  --om-accent-pink-3: #eaa4b4; /* tertiary sakura pink */
+
   /* Primary Colors - Pink (using pink-600 for WCAG AA contrast with white text) */
   --color-primary: #db2777; /* pink-600: 4.60:1 contrast with white text (meets WCAG AA) */
   --color-primary-hover: #be185d; /* pink-700: even better contrast */
@@ -1513,9 +1537,9 @@ footer::after {
   --color-primary-disabled: rgba(219, 39, 119, 0.4);
   --color-primary-focus: rgba(219, 39, 119, 0.6);
 
-  /* Accent Colors - Purple */
-  --color-accent: #8b5cf6;
-  --color-accent-hover: #a78bfa;
+  /* Accent Colors - Sakura Pink (replaced purple) */
+  --color-accent: #f3b7c2; /* sakura pink */
+  --color-accent-hover: #f4c1cb; /* lighter sakura pink */
 
   /* Text Colors (matching header) */
   --color-text-primary: #ffffff;
@@ -1525,8 +1549,8 @@ footer::after {
   --color-text-link-hover: #f472b6;
 
   /* Background Colors */
-  --color-bg-base: #080611;
-  --color-bg-surface: rgba(0, 0, 0, 0.8);
+  --color-bg-base: #171819; /* Use sakura theme root */
+  --color-bg-surface: #1f2021; /* Use sakura theme surface */
   --color-bg-glass: rgba(255, 255, 255, 0.1);
 
   /* Border Colors */
@@ -1546,6 +1570,8 @@ footer::after {
   --text-primary: var(--color-text-primary);
   --text-secondary: var(--color-text-secondary);
   --text-muted: var(--color-text-muted);
+  --text-link: var(--color-text-link);
+  --text-link-hover: var(--color-text-link-hover);
 
   /* Motion timing - 120-300ms, easeOut/easeInOut only */
   --motion-fast: 120ms;
@@ -1560,12 +1586,9 @@ footer::after {
   --glow-pink-focus: rgba(244, 114, 182, 0.6);
 }
 
-/* Otaku-mori v0 Background System */
+/* Otaku-mori v0 Background System - Updated to remove purple gradients */
 .bg-otaku-space {
-  background:
-    radial-gradient(1200px 800px at 10% 10%, rgba(48, 16, 74, 0.3) 0%, transparent 60%),
-    radial-gradient(1000px 700px at 80% 20%, rgba(106, 43, 180, 0.2) 0%, transparent 60%),
-    linear-gradient(180deg, var(--space-from), var(--space-to));
+  background: var(--om-bg-root); /* Flat dark background, no purple gradients */
   position: relative;
   isolation: isolate;
 }

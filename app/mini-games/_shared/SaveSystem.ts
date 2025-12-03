@@ -1,3 +1,6 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+
 export interface GameSaveData {
   gameId: string;
   score?: number;
@@ -47,7 +50,7 @@ export class GameSaveSystem {
       }
       return false;
     } catch (error) {
-      console.warn('Failed to initialize save system:', error);
+      logger.warn('Failed to initialize save system:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       return false;
     }
   }
@@ -59,7 +62,7 @@ export class GameSaveSystem {
     data: Omit<GameSaveData, 'gameId' | 'timestamp' | 'saveVersion'>,
   ): Promise<boolean> {
     if (!this.userId) {
-      console.warn('Cannot save: user not authenticated');
+      logger.warn('Cannot save: user not authenticated');
       return false;
     }
 
@@ -91,7 +94,7 @@ export class GameSaveSystem {
 
       return response.ok;
     } catch (error) {
-      console.error('Failed to save game:', error);
+      logger.error('Failed to save game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -101,7 +104,7 @@ export class GameSaveSystem {
    */
   async loadGame(): Promise<GameSaveData | null> {
     if (!this.userId) {
-      console.warn('Cannot load: user not authenticated');
+      logger.warn('Cannot load: user not authenticated');
       return null;
     }
 
@@ -116,7 +119,7 @@ export class GameSaveSystem {
 
       return latest.data;
     } catch (error) {
-      console.error('Failed to load game:', error);
+      logger.error('Failed to load game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -142,7 +145,7 @@ export class GameSaveSystem {
         updatedAt: new Date(save.updatedAt),
       }));
     } catch (error) {
-      console.error('Failed to load save slots:', error);
+      logger.error('Failed to load save slots:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }

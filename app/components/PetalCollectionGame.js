@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAbyss } from '@/context/AbyssContext';
@@ -32,7 +33,7 @@ export default function PetalCollectionGame() {
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 2000);
     } catch (error) {
-      console.error('Error collecting petal:', error);
+      logger.error('Error collecting petal:', error);
       setNotificationMessage('Failed to collect petal');
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 2000);

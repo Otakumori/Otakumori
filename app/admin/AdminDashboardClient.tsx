@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Flower, ShoppingBag, Settings, Sparkles, BarChart3 } from 'lucide-react';
@@ -38,7 +39,7 @@ export function AdminDashboardClient() {
         setStats(data.stats || stats);
       }
     } catch (error) {
-      console.error('Failed to load dashboard stats:', error);
+      logger.error('Failed to load dashboard data', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }

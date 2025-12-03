@@ -1,13 +1,12 @@
+import { logger } from '@/app/lib/logger';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import Image from 'next/image';
 import { paths } from '@/lib/paths';
-import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
 import { stripHtml } from '@/lib/html';
 import { handleServerError } from '@/app/lib/server-error-handler';
 import { env } from '@/env.mjs';
-import { SectionHeader } from '@/app/components/home/SectionHeader';
 import { EmptyState } from '@/app/components/home/EmptyState';
 import { validateApiEnvelope } from '@/app/lib/api-response-validator';
 import { FeaturedProductsResponseSchema, type FeaturedProduct } from '@/app/lib/api-contracts';
@@ -76,7 +75,7 @@ export default async function ShopSection() {
       baseUrl = await getBaseUrl();
     } catch (urlError) {
       // Even getBaseUrl() should never throw, but be extra safe
-      console.warn('[ShopSection] getBaseUrl() failed:', urlError);
+      logger.warn('[ShopSection] getBaseUrl() failed', undefined, urlError);
       baseUrl =
         process.env.NODE_ENV === 'production'
           ? 'https://www.otaku-mori.com'
@@ -96,7 +95,7 @@ export default async function ShopSection() {
       });
     } catch (fetchError) {
       // Network error - log but don't throw
-      console.warn('[ShopSection] Fetch failed:', fetchError);
+      logger.warn('[ShopSection] Fetch failed', undefined, fetchError);
       shopData = { products: [] };
       return renderShopContent(shopData);
     }
@@ -146,17 +145,17 @@ export default async function ShopSection() {
           };
         } else {
           // Validation failed - log and use empty state
-          console.warn('[ShopSection] API response validation failed for', apiUrl);
+          logger.warn('[ShopSection] API response validation failed', undefined, { apiUrl });
           shopData = { products: [] };
         }
       } catch (parseError) {
         // JSON parse error - log but don't throw
-        console.warn('[ShopSection] Failed to parse response:', parseError);
+        logger.warn('[ShopSection] Failed to parse response', undefined, parseError);
         shopData = { products: [] };
       }
     } else {
       // API returned error status - log but don't throw
-      console.warn(`[ShopSection] API returned ${response.status} for ${apiUrl}`);
+      logger.warn(`[ShopSection] API returned ${response.status} for ${apiUrl}`);
       shopData = { products: [] };
     }
   } catch (error) {
@@ -183,8 +182,11 @@ function renderShopContent(shopData: ShopData) {
   const hasProducts = products.length > 0;
 
   return (
-    <div className="rounded-2xl p-8">
-      <SectionHeader title="Shop" description="Discover unique anime-inspired merchandise" />
+    <div className="mx-auto mt-12 max-w-6xl px-4">
+      {/* Shop Header */}
+      <div className="border border-[var(--om-border-strong)] py-3 text-center text-2xl font-serif tracking-wide text-[var(--om-text-ivory)] mb-8">
+        Shop
+      </div>
 
       {hasProducts ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -192,9 +194,9 @@ function renderShopContent(shopData: ShopData) {
             <Link
               key={product.id}
               href={product.slug ? paths.product(product.slug) : paths.shop()}
-              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--om-accent-pink)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--om-bg-root)]"
             >
-              <GlassCard className="flex h-full flex-col">
+              <div className="flex h-full flex-col bg-[var(--om-bg-surface)] border border-[var(--om-border-soft)] rounded-xl overflow-hidden">
                 {product.image ? (
                   <div className="relative aspect-square overflow-hidden">
                     <Image
@@ -205,46 +207,31 @@ function renderShopContent(shopData: ShopData) {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
-                    <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-200 backdrop-blur">
-                      {product.available ? 'Featured' : 'Coming Soon'}
-                    </span>
                   </div>
                 ) : (
-                  <div className="relative aspect-square overflow-hidden bg-white/5 flex items-center justify-center">
+                  <div className="relative aspect-square overflow-hidden bg-[var(--om-bg-surface)] flex items-center justify-center">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
-                    <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-200 backdrop-blur">
-                      {product.available ? 'Featured' : 'Coming Soon'}
-                    </span>
                   </div>
                 )}
-                <GlassCardContent className="flex flex-1 flex-col justify-between">
+                <div className="flex flex-1 flex-col justify-between p-4">
                   <div>
-                    <h3 className="font-semibold text-white transition-colors group-hover:text-pink-400">
+                    <h3 className="font-semibold text-[var(--om-text-ivory)] transition-colors group-hover:text-[var(--om-accent-pink)]">
                       {product.title}
                     </h3>
                     {product.description && (
-                      <p className="mt-2 line-clamp-2 text-sm text-white/70">
+                      <p className="mt-2 line-clamp-2 text-sm text-[var(--om-text-ivory)]/70">
                         {product.description}
                       </p>
                     )}
                   </div>
 
                   <div className="mt-4 flex items-center justify-between">
-                    <span className="text-lg font-bold text-pink-300">
+                    <span className="text-lg font-bold text-[var(--om-accent-pink)]">
                       ${product.price.toFixed(2)}
                     </span>
-                    <span
-                      className={`rounded-full px-2 py-1 text-xs ${
-                        product.available
-                          ? 'bg-emerald-500/15 text-emerald-200'
-                          : 'bg-amber-500/15 text-amber-200'
-                      }`}
-                    >
-                      {product.available ? 'In Stock' : 'Notify Me'}
-                    </span>
                   </div>
-                </GlassCardContent>
-              </GlassCard>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -27,7 +28,7 @@ export default function FriendsButton({ className = '' }: FriendsButtonProps) {
           setOnlineCount(online);
         }
       } catch (error) {
-        console.error('Failed to fetch online friends:', error);
+        logger.error('Failed to fetch online friends:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     };
 

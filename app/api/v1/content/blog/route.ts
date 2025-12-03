@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
         });
       }
     } catch (error) {
-      console.error('Sanity blog content fetch failed:', error);
+      logger.error('Sanity blog content fetch failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Blog content API error:', error);
+    logger.error('Blog content API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

@@ -1,4 +1,6 @@
 // lib/redis.ts
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { assertServer } from './server-only';
 import { env } from '@/env.mjs';
 import type { Redis } from 'ioredis';
@@ -17,7 +19,7 @@ export async function getRedis() {
   const token = env.UPSTASH_REDIS_REST_TOKEN?.trim().replace(/\r?\n/g, '');
 
   if (!url || !token) {
-    console.warn(
+    logger.warn(
       'Redis not configured - UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN missing',
     );
     throw new Error('Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN');

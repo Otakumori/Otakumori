@@ -3,6 +3,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -90,7 +91,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });
     }
 
-    console.error('Character presets fetch error', error);
+    logger.error('Character presets fetch error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

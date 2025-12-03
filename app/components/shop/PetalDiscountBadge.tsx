@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { PETAL_REWARDS, hasReachedThreshold } from '@/app/lib/petal-economy';
@@ -37,7 +38,7 @@ export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch petal balance:', error);
+        logger.error('Failed to fetch petal balance:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     };
 
@@ -55,7 +56,7 @@ export function PetalDiscountBadge({ productPrice }: PetalDiscountBadgeProps) {
     <div className="mt-2 p-3 bg-gradient-to-br from-pink-500/20 to-purple-500/20 backdrop-blur-lg border border-pink-500/30 rounded-lg">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg" role="img" aria-label="Discount">
-          💰
+          <span role="img" aria-label="emoji">�</span>�
         </span>
         <span className="text-sm font-semibold text-pink-300">Petal Discount Available!</span>
       </div>

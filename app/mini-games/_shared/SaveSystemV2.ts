@@ -11,6 +11,8 @@
  * - Analytics tracking
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { clientEnv } from '@/env/client';
 
 export interface GameSaveDataV2 {
@@ -120,7 +122,7 @@ export class GameSaveSystemV2 {
       }
       return false;
     } catch (error) {
-      console.warn('Save system initialization failed:', error);
+      logger.warn('Save system initialization failed:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       return false;
     }
   }
@@ -162,7 +164,7 @@ export class GameSaveSystemV2 {
 
       return true;
     } catch (error) {
-      console.error('Save failed:', error);
+      logger.error('Save failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       this.trackSaveEvent('save_error', data as GameSaveDataV2, error);
       return false;
     }
@@ -185,7 +187,7 @@ export class GameSaveSystemV2 {
       const localData = await this.loadLocal(slot);
       return localData ? this.processSaveData(localData) : null;
     } catch (error) {
-      console.error('Load failed:', error);
+      logger.error('Load failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       this.trackSaveEvent('load_error', null, error);
       return null;
     }
@@ -250,7 +252,7 @@ export class GameSaveSystemV2 {
       this.trackSaveEvent('save_deleted', null);
       return true;
     } catch (error) {
-      console.error('Delete failed:', error);
+      logger.error('Delete failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -291,7 +293,7 @@ export class GameSaveSystemV2 {
       this.trackSaveEvent('saves_imported', null);
       return true;
     } catch (error) {
-      console.error('Import failed:', error);
+      logger.error('Import failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -369,7 +371,7 @@ export class GameSaveSystemV2 {
 
       return true;
     } catch (error) {
-      console.error('Local save failed:', error);
+      logger.error('Local save failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -396,14 +398,14 @@ export class GameSaveSystemV2 {
 
       // Validate checksum
       if (!(await this.validateChecksum(data))) {
-        console.warn('Save data checksum mismatch, attempting recovery');
+        logger.warn('Save data checksum mismatch, attempting recovery');
         this.metrics.corruptions++;
         return await this.attemptRecovery(saveSlot);
       }
 
       return data;
     } catch (error) {
-      console.error('Local load failed:', error);
+      logger.error('Local load failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -432,7 +434,7 @@ export class GameSaveSystemV2 {
       // Return most recent save
       return gameSaves.sort((a: any, b: any) => b.timestamp - a.timestamp)[0]?.data || null;
     } catch (error) {
-      console.error('Cloud load failed:', error);
+      logger.error('Cloud load failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -469,7 +471,7 @@ export class GameSaveSystemV2 {
 
       return false;
     } catch (error) {
-      console.error('Cloud upload failed:', error);
+      logger.error('Cloud upload failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -485,7 +487,7 @@ export class GameSaveSystemV2 {
 
       return response.ok;
     } catch (error) {
-      console.error('Cloud delete failed:', error);
+      logger.error('Cloud delete failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }

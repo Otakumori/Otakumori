@@ -13,6 +13,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@clerk/nextjs';
@@ -116,7 +117,7 @@ export default function LeaderboardSystemV2({
         setUserEntry(data.userEntry || null);
       }
     } catch (error) {
-      console.error('Failed to load leaderboard:', error);
+      logger.error('Failed to load leaderboard:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -136,7 +137,7 @@ export default function LeaderboardSystemV2({
         setAchievements(data.achievements || []);
       }
     } catch (error) {
-      console.error('Failed to load achievements:', error);
+      logger.error('Failed to load achievements:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }, [gameId, isSignedIn]);
 
@@ -197,7 +198,7 @@ export default function LeaderboardSystemV2({
 
         return false;
       } catch (error) {
-        console.error('Failed to submit score:', error);
+        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         return false;
       } finally {
         setSubmitting(false);
@@ -281,6 +282,7 @@ export default function LeaderboardSystemV2({
             value={filters.timeframe}
             onChange={(e) => setFilters((prev) => ({ ...prev, timeframe: e.target.value as any }))}
             className="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            aria-label="Select timeframe"
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -292,6 +294,7 @@ export default function LeaderboardSystemV2({
             value={filters.category}
             onChange={(e) => setFilters((prev) => ({ ...prev, category: e.target.value as any }))}
             className="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-white text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            aria-label="Select category"
           >
             <option value="score">Score</option>
             <option value="playtime">Playtime</option>

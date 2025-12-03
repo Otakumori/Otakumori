@@ -3,6 +3,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -19,7 +20,12 @@ export async function GET() {
     const balance = user?.petalBalance ?? 0;
     return NextResponse.json({ ok: true, balance });
   } catch (err) {
-    console.error('petals/balance error', err);
+    logger.error(
+      'petals/balance error',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json({ ok: false, code: 'SERVER_ERROR' }, { status: 500 });
   }
 }

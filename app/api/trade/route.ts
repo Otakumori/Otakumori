@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { log } from '@/lib/logger';
@@ -9,7 +10,7 @@ export const maxDuration = 10;
 export async function GET(req: NextRequest) {
   try {
     // Log trade list request
-    console.warn('Trade list requested from:', req.headers.get('user-agent'));
+    logger.warn('Trade list requested from:', undefined, { userAgent: req.headers.get('user-agent') });
 
     // TODO: fetch trades from database
     const trades: any[] = [];

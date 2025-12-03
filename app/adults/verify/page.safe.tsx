@@ -1,5 +1,7 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -48,7 +50,7 @@ export default function AdultsVerifyPage() {
         router.push('/adults');
       }, 3000);
     } catch (error) {
-      console.error('Verification failed:', error);
+      logger.error('Verification failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       setIsVerifying(false);
     }
   };
@@ -56,7 +58,7 @@ export default function AdultsVerifyPage() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+    <Skeleton />
       </div>
     );
   }

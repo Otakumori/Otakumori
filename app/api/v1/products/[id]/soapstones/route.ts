@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -58,7 +60,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021') {
-      console.warn('ProductSoapstone table missing. Returning empty soapstone list.');
+      logger.warn('ProductSoapstone table missing. Returning empty soapstone list.');
       return NextResponse.json({
         ok: true,
         data: {
@@ -67,7 +69,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         },
       });
     }
-    console.error('Failed to fetch product soapstones:', error);
+    logger.error('Failed to fetch product soapstones:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to fetch soapstones' }, { status: 500 });
   }
 }
@@ -147,7 +149,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2021') {
-      console.warn('ProductSoapstone table missing. Unable to create soapstone.');
+      logger.warn('ProductSoapstone table missing. Unable to create soapstone.');
       return NextResponse.json(
         {
           ok: false,
@@ -156,7 +158,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         { status: 503 },
       );
     }
-    console.error('Failed to create product soapstone:', error);
+    logger.error('Failed to create product soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to create soapstone' }, { status: 500 });
   }
 }

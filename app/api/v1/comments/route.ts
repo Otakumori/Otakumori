@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import {
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: validatedResponse });
   } catch (error) {
-    console.error('Comments fetch error:', error);
+    logger.error('Comments fetch error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });
@@ -217,7 +218,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    console.error('Comment creation error:', error);
+    logger.error('Comment creation error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });

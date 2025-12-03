@@ -6,6 +6,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -125,7 +126,7 @@ export default function GameShellV2({
   // Error handler
   const handleError = useCallback(
     (error: Error) => {
-      console.error(`[GameShell:${gameKey}] Error:`, error);
+      logger.error(`[GameShell:${gameKey}] Error:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       setGameState((prev) => ({ ...prev, hasError: true, isPlaying: false }));
 
       if (onError) {

@@ -10,6 +10,8 @@
  * - Petal economy integration
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -274,7 +276,7 @@ async function handler(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Soapstone placement error:', error);
+    logger.error('Soapstone placement error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     await metricsCollector.track('soapstone_placement_error', {
       value: 1,
@@ -345,7 +347,7 @@ async function checkUserRateLimits(userId: string) {
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
   // Log rate limit check for debugging
-  console.warn('Checking rate limits for user:', userId, { oneHourAgo, oneDayAgo });
+  logger.warn('Checking rate limits for user:', undefined, { userId, oneHourAgo, oneDayAgo });
 
   // Mock counts for now - in production would query soapstones by userId and time range
   const hourlyCount = 0;
@@ -374,7 +376,7 @@ async function checkUserRateLimits(userId: string) {
 
 async function checkForDuplicates(userId: string, message: string, page: string) {
   // Log duplicate check for debugging
-  console.warn('Checking for duplicates:', { userId, messagelength: message.length, page });
+  logger.warn('Checking for duplicates:', undefined, { userId, messagelength: message.length, page });
 
   // Mock implementation - in production would query recent soapstones
   return {
@@ -385,7 +387,7 @@ async function checkForDuplicates(userId: string, message: string, page: string)
 
 async function checkLocationCooldown(userId: string, page: string, section?: string) {
   // Log cooldown check for debugging
-  console.warn('Checking location cooldown:', { userId, page, section: section || 'none' });
+  logger.warn('Checking location cooldown:', undefined, { userId, page, section: section || 'none' });
 
   // Mock implementation - in production would check recent soapstones at this location
   return {
@@ -431,7 +433,7 @@ function calculatePetalReward(message: string, tags: string[], score: number): n
 
 async function updateUserSoapstoneStats(userId: string) {
   // Log user stats update
-  console.warn(`Updated soapstone stats for user ${userId}`);
+  logger.warn(`Updated soapstone stats for user ${userId}`);
 
   // Simplified user update - removing updatedAt since it may not exist
   // await db.user.update({
@@ -444,7 +446,7 @@ async function updateUserSoapstoneStats(userId: string) {
 
 async function getSoapstoneCount(userId: string): Promise<number> {
   // Log soapstone count query
-  console.warn('Getting soapstone count for user:', userId);
+  logger.warn('Getting soapstone count for user:', undefined, { value: userId });
 
   // Mock implementation - in production would query soapstones table
   return 1;
@@ -459,7 +461,7 @@ function getQualityTier(score: number): string {
 
 async function checkSoapstoneAchievements(userId: string, message: any) {
   // Check achievements for soapstone milestones
-  console.warn(
+  logger.warn(
     `Soapstone message placed by user ${userId}, checking achievements for message:`,
     message.text?.substring(0, 50),
   );

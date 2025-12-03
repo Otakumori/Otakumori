@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { env } from '@/env';
 
@@ -51,7 +52,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ orderId: order.id });
   } catch (error) {
-    console.error('Error creating order:', error);
+    logger.error(
+      'Error creating order:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to create order' },
       { status: 500 },

@@ -1,8 +1,9 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -66,7 +67,7 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'Invalid data' }, { status: 400 });
     }
 
-    console.error('Friends presence error', error);
+    logger.error('Friends presence error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -7,6 +7,7 @@
  *
  * Not meant for production use.
  */
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { inngest } from '../../../inngest/client';
 import { env } from '@/env';
@@ -37,7 +38,12 @@ export async function GET() {
       result: result || 'Event sent',
     });
   } catch (error) {
-    console.error('Error testing Inngest:', error);
+    logger.error(
+      'Error testing Inngest:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     // Provide more detailed error information
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -78,7 +84,12 @@ export async function POST(request: Request) {
       result: result || 'Event sent',
     });
   } catch (error) {
-    console.error('Error sending custom event:', error);
+    logger.error(
+      'Error sending custom event:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         success: false,

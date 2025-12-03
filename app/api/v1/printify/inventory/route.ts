@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
 import { auth } from '@clerk/nextjs/server';
@@ -13,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     // Log inventory sync request
-    console.warn('Printify inventory sync requested from:', request.headers.get('user-agent'));
+    logger.warn('Printify inventory sync requested from:', undefined, { value: request.headers.get('user-agent') });
 
     // Verify authentication and admin role
     const { userId } = await auth();
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
     // For now, allow any authenticated user to trigger sync
 
     const advancedService = getAdvancedPrintifyService();
-    console.warn('Advanced Printify service initialized for sync');
+    logger.warn('Advanced Printify service initialized for sync');
     const inventoryStatuses = await advancedService.syncInventory();
 
     return NextResponse.json({
@@ -42,7 +44,7 @@ export async function POST(request: NextRequest) {
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
   } catch (error) {
-    console.error('Inventory sync API error:', error);
+    logger.error('Inventory sync API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {
@@ -62,7 +64,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Log inventory status request
-    console.warn('Printify inventory status requested from:', request.headers.get('user-agent'));
+    logger.warn('Printify inventory status requested from:', undefined, { value: request.headers.get('user-agent') });
 
     const { userId } = await auth();
     if (!userId) {
@@ -76,7 +78,7 @@ export async function GET(request: NextRequest) {
 
     // Get actual inventory status from advanced service
     const serviceStatus = await advancedService.getInventoryStatus().catch((error) => {
-      console.error('Failed to get inventory status:', error);
+      logger.error('Failed to get inventory status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return null;
     });
 
@@ -94,7 +96,7 @@ export async function GET(request: NextRequest) {
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
   } catch (error) {
-    console.error('Inventory status API error:', error);
+    logger.error('Inventory status API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

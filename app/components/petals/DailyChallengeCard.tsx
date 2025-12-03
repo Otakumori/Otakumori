@@ -24,7 +24,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
         </div>
         {completed && (
           <span className="text-2xl" role="img" aria-label="Completed">
-            ✅
+            <span role="img" aria-label="check mark">✅</span>
           </span>
         )}
       </div>

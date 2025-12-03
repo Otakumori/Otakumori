@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { env } from '@/env';
@@ -43,7 +44,12 @@ export async function GET() {
       message: 'Profile retrieved successfully',
     });
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    logger.error(
+      'Error fetching user profile:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -87,7 +93,12 @@ export async function PUT(request: NextRequest) {
       message: 'Profile updated successfully',
     });
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    logger.error(
+      'Error updating user profile:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

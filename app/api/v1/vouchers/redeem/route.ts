@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -109,7 +110,7 @@ export async function POST(req: NextRequest) {
       requestId,
     });
   } catch (error) {
-    console.error('[Voucher Redeem] Error:', error);
+    logger.error('[Voucher Redeem] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
@@ -252,7 +254,7 @@ export class AssetManifestManager {
 
   private async loadModel(_asset: AssetEntry): Promise<GLTF> {
     // This would integrate with the ModelLoader
-    console.warn('Model loading would be implemented here');
+    logger.warn('Model loading would be implemented here');
     return {} as GLTF;
   }
 
@@ -273,19 +275,19 @@ export class AssetManifestManager {
 
   private async loadAnimation(_asset: AssetEntry): Promise<THREE.AnimationClip> {
     // Animation loading would be implemented here
-    console.warn('Animation loading would be implemented here');
+    logger.warn('Animation loading would be implemented here');
     return {} as THREE.AnimationClip;
   }
 
   private async loadAudio(_asset: AssetEntry): Promise<AudioBuffer> {
     // Audio loading would be implemented here
-    console.warn('Audio loading would be implemented here');
+    logger.warn('Audio loading would be implemented here');
     return {} as AudioBuffer;
   }
 
   private async loadEnvironment(_asset: AssetEntry): Promise<THREE.CubeTexture> {
     // Environment loading would be implemented here
-    console.warn('Environment loading would be implemented here');
+    logger.warn('Environment loading would be implemented here');
     return {} as THREE.CubeTexture;
   }
 

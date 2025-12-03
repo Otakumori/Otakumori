@@ -19,7 +19,7 @@ const THEMES = [
       secondary: '#f472b6',
       accent: '#fbbf24',
     },
-    preview: '🌸',
+    preview: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>',
   },
   {
     id: 'sakura',
@@ -30,7 +30,7 @@ const THEMES = [
       secondary: '#f1f5f9',
       accent: '#e2e8f0',
     },
-    preview: '🌸',
+    preview: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>',
   },
   {
     id: 'autumn',
@@ -41,7 +41,7 @@ const THEMES = [
       secondary: '#d97706',
       accent: '#b45309',
     },
-    preview: '🍂',
+    preview: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>',
   },
   {
     id: 'night',
@@ -52,7 +52,7 @@ const THEMES = [
       secondary: '#2d1b3d',
       accent: '#4c1d4d',
     },
-    preview: '🌙',
+    preview: '<span role="img" aria-label="emoji">�</span>�',
   },
   {
     id: 'sunset',
@@ -63,7 +63,7 @@ const THEMES = [
       secondary: '#ea580c',
       accent: '#dc2626',
     },
-    preview: '🌅',
+    preview: '<span role="img" aria-label="emoji">�</span>�',
   },
 ];
 

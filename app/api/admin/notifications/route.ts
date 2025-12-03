@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 // import { redis } from '../../../lib/redis';
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       timestamp: notification.timestamp,
     });
   } catch (error) {
-    console.error('Notification error:', error);
+    logger.error('Notification error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Failed to send notification' }, { status: 500 });
   }
 }
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       total: notifications.length,
     });
   } catch (error) {
-    console.error('Notification history error:', error);
+    logger.error('Notification error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Failed to retrieve notifications' }, { status: 500 });
   }
 }
@@ -96,7 +97,7 @@ export async function DELETE(request: NextRequest) {
       message: notificationId ? 'Notification deleted' : 'All notifications cleared',
     });
   } catch (error) {
-    console.error('Notification delete error:', error);
+    logger.error('Notification error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Failed to delete notification' }, { status: 500 });
   }
 }

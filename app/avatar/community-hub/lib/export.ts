@@ -3,6 +3,7 @@
  * Supports JSON, GLB, and ZIP exports
  */
 
+import { logger } from '@/app/lib/logger';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import JSZip from 'jszip';
 import type { CharacterConfig } from './character-state';
@@ -24,7 +25,7 @@ export function exportJSON(config: CharacterConfig, filename: string = 'avatar-c
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Failed to export JSON:', error);
+    logger.error('Failed to export JSON:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -67,7 +68,7 @@ export async function exportGLB(
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Failed to export GLB:', error);
+    logger.error('Failed to export GLB:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -106,7 +107,7 @@ export async function exportGLTF(
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Failed to export GLTF:', error);
+    logger.error('Failed to export GLTF:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -161,7 +162,7 @@ export async function exportZIP(
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Failed to export ZIP:', error);
+    logger.error('Failed to export ZIP:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -175,7 +176,7 @@ export async function copyJSONToClipboard(config: CharacterConfig): Promise<bool
     await navigator.clipboard.writeText(jsonString);
     return true;
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
+    logger.error('Failed to copy to clipboard:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }

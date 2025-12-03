@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env';
 
@@ -30,7 +31,12 @@ export async function GET(request: NextRequest, { params }: { params: { path: st
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Clerk proxy error:', error);
+    logger.error(
+      'Clerk proxy error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -62,7 +68,12 @@ export async function POST(request: NextRequest, { params }: { params: { path: s
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Clerk proxy error:', error);
+    logger.error(
+      'Clerk proxy error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

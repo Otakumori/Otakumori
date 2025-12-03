@@ -3,6 +3,8 @@
  * Uses Three.js primitives to construct stylized anime-style characters
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import type { CharacterConfig } from './character-state';
 
@@ -83,7 +85,7 @@ export function generateBaseBody(config: CharacterConfig): THREE.Group {
 
     return group;
   } catch (error) {
-    console.warn('Failed to generate base body, using fallback:', error);
+    logger.warn('Failed to generate base body, using fallback:', undefined, { value: error });
     return createFallbackBody();
   }
 }
@@ -125,7 +127,7 @@ export function generateHair(config: CharacterConfig): THREE.Group {
 
     return group;
   } catch (error) {
-    console.warn('Failed to generate hair, using fallback:', error);
+    logger.warn('Failed to generate hair, using fallback:', undefined, { value: error });
     return createFallbackHair();
   }
 }
@@ -308,7 +310,7 @@ export function generateOutfit(config: CharacterConfig): THREE.Group {
 
     return group;
   } catch (error) {
-    console.warn('Failed to generate outfit, using fallback:', error);
+    logger.warn('Failed to generate outfit, using fallback:', undefined, { value: error });
     return createFallbackOutfit();
   }
 }
@@ -477,7 +479,7 @@ export function generateAccessory(
 
     return group;
   } catch (error) {
-    console.warn(`Failed to generate accessory ${id}, using fallback:`, error);
+    logger.warn(`Failed to generate accessory ${id}, using fallback:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     return createFallbackAccessory(position, rotation, scale);
   }
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
@@ -249,7 +251,7 @@ export class GameEngine {
       const buffer = await this.audioLoader.loadAsync(url);
       this.audio.sounds.set(name, buffer);
     } catch (error) {
-      console.warn(`Failed to load sound: ${name}`, error);
+      logger.warn(`Failed to load sound: ${name}`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     }
   }
 
@@ -272,7 +274,7 @@ export class GameEngine {
       const buffer = await this.audioLoader.loadAsync(url);
       this.audio.music.set(name, buffer);
     } catch (error) {
-      console.warn(`Failed to load music: ${name}`, error);
+      logger.warn(`Failed to load music: ${name}`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     }
   }
 
@@ -564,7 +566,7 @@ export class GameEngine {
       const gltf = await this.loader.loadAsync(url);
       return gltf.scene;
     } catch (error) {
-      console.error('Failed to load model:', error);
+      logger.error('Failed to load model:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }

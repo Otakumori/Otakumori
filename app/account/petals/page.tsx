@@ -1,6 +1,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { ShoppingBag, Sparkles, Coins, Search, Gamepad2 } from 'lucide-react';
@@ -52,6 +54,13 @@ const CATEGORIES = [
   { id: 'DISCOUNT', name: 'Discount Vouchers', icon: '' },
 ];
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\account\petals\page.tsx',
+  });
+}
 export default function PetalStorePage() {
   const { user } = useUser();
   const [items, setItems] = useState<ShopItem[]>([]);
@@ -92,7 +101,7 @@ export default function PetalStorePage() {
       }
     } catch (err) {
       setError('Failed to fetch shop items');
-      console.error('Error fetching shop items:', err);
+      logger.error('Error fetching shop items', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
@@ -113,7 +122,7 @@ export default function PetalStorePage() {
         }
       }
     } catch (err) {
-      console.error('Error fetching discount rewards:', err);
+      logger.error('Error fetching discount rewards', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -125,7 +134,7 @@ export default function PetalStorePage() {
         if (typeof data.balance === 'number') setPetalBalance(data.balance);
       }
     } catch (err) {
-      console.error('Error fetching petal balance:', err);
+      logger.error('Error fetching petal balance', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -156,7 +165,7 @@ export default function PetalStorePage() {
       }
     } catch (err) {
       alert('Purchase failed. Please try again.');
-      console.error('Error purchasing item:', err);
+      logger.error('Error purchasing item', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setPurchasing(null);
     }
@@ -200,7 +209,7 @@ export default function PetalStorePage() {
       }
     } catch (err) {
       alert('Purchase failed. Please try again.');
-      console.error('Error purchasing discount reward:', err);
+      logger.error('Error purchasing discount reward', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setPurchasing(null);
     }

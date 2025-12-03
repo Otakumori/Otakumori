@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React from 'react';
 import { useGameAvatar, drawGameAvatar } from './GameAvatarRenderer';
 
@@ -75,7 +76,7 @@ export function GameAvatarIntegration({
       >
         <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
           <span role="img" aria-label="Loading avatar" className="text-white text-lg">
-            ⏳
+            <span role="img" aria-label="hourglass">⏳</span>
           </span>
         </div>
       </div>
@@ -93,7 +94,7 @@ export function GameAvatarIntegration({
       >
         <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
           <span role="img" aria-label="Avatar unavailable" className="text-white text-lg">
-            🚫
+            <span role="img" aria-label="emoji">�</span>�
           </span>
         </div>
       </div>
@@ -123,7 +124,7 @@ export function GameAvatarIntegration({
           />
         ) : (
           <span role="img" aria-label="Avatar placeholder" className="text-white text-lg">
-            🎮
+            <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
           </span>
         )}
       </div>
@@ -151,7 +152,7 @@ export const GameAvatarUtils = {
         return data.ok ? data.data : null;
       }
     } catch (fetchError) {
-      console.error('Failed to fetch avatar config:', fetchError);
+      logger.error('Failed to fetch avatar config:', undefined, undefined, fetchError instanceof Error ? fetchError : new Error(String(fetchError)));
     }
     return null;
   },
@@ -172,7 +173,7 @@ export const GameAvatarUtils = {
         return data.ok ? data.data : null;
       }
     } catch (saveError) {
-      console.error('Failed to save avatar config:', saveError);
+      logger.error('Failed to save avatar config:', undefined, undefined, saveError instanceof Error ? saveError : new Error(String(saveError)));
     }
     return null;
   },

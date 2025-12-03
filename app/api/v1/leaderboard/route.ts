@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Leaderboard error:', error);
+    logger.error('Leaderboard error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to fetch leaderboard' }, { status: 500 });
   }
 }

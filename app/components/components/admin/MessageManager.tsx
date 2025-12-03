@@ -1,6 +1,7 @@
 'use client';
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -35,7 +36,7 @@ export default function MessageManager() {
       const data = await response.json();
       setMessages(data.messages || []);
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      logger.error('Error fetching messages:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +55,7 @@ export default function MessageManager() {
 
       setMessages(messages.filter((msg) => msg.id !== id));
     } catch (error) {
-      console.error('Error deleting message:', error);
+      logger.error('Error deleting message:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -144,7 +145,7 @@ export default function MessageManager() {
                     onClick={() => deleteMessage(message.id)}
                     className="p-2 text-red-400 transition-colors hover:text-red-300"
                   >
-                    ️
+                    <span role="img" aria-label="emoji">️</span>
                   </button>
                 </div>
               </motion.div>

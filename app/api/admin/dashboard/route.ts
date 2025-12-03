@@ -4,6 +4,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -87,7 +88,7 @@ export async function GET() {
       data: { stats },
     });
   } catch (error) {
-    console.error('Dashboard stats fetch error:', error);
+    logger.error('Dashboard error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

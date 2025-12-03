@@ -155,7 +155,7 @@ export default function LRoom404() {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_circle_at_50%_35%,#1a0f2a,#120b1f_40%,#080611_100%)]" />
 
         <section className="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
-          {/* ✅ ADD stroke icon */}
+          {/* <span role="img" aria-label="check mark">✅</span> ADD stroke icon */}
           <div className="mb-6">
             <Empty404Icon />
           </div>

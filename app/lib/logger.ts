@@ -75,30 +75,30 @@ class Logger {
       const requestInfo = ctx?.requestId ? ` ${colors.debug}[${ctx.requestId}]${colors.reset}` : '';
 
       // Use console.warn for info/debug in development (allowed by linter)
-      console.warn(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
+      logger.warn(`${prefix} ${timestamp}${routeInfo}${requestInfo} ${msg}`);
 
       if (data) {
-        console.warn(`${colors.debug}Data:${colors.reset}`, data);
+        logger.warn(`${colors.debug}Data:${colors.reset}`, undefined, { value: data });
       }
 
       if (error) {
-        console.error(`${colors.error}Error:${colors.reset}`, error);
+        logger.error(`${colors.error}Error:${colors.reset}`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     } else {
       // Production logging - structured JSON only
       switch (level) {
         case 'error':
-          console.error(line);
+          logger.error(line);
           break;
         case 'warn':
-          console.warn(line);
+          logger.warn(line);
           break;
         case 'debug':
-          if (!this.isTest) console.warn(line);
+          if (!this.isTest) logger.warn(line);
           break;
         default:
           // Use console.warn for unknown log levels
-          console.warn(line);
+          logger.warn(line);
       }
     }
 

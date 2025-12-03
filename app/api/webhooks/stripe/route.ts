@@ -1,4 +1,6 @@
-﻿import { headers } from 'next/headers';
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { db as prisma } from '@/lib/db';
@@ -73,7 +75,7 @@ async function simulatePrintifyOrderCreate(order: any, session: Stripe.Checkout.
   };
 
   // Log the simulated Printify order creation
-  console.warn('Simulated Printify order creation:', {
+  logger.warn('Simulated Printify order creation:', undefined, {
     orderId: order.id,
     printifyData: printifyOrderData,
     timestamp: new Date().toISOString(),
@@ -106,7 +108,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(raw, sig, secret);
   } catch (err) {
-    console.error('Invalid Stripe signature', err);
+    logger.error('Invalid Stripe signature', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     return new NextResponse('Invalid signature', { status: 400 });
   }
 
@@ -196,14 +198,14 @@ export async function POST(req: Request) {
           });
         }
       } catch (e) {
-        console.warn('Coupon redemption update failed', e);
+        logger.warn('Coupon redemption update failed', undefined, { value: e });
       }
 
       // Simulate Printify order creation
       try {
         await simulatePrintifyOrderCreate(order, fullSession);
       } catch (printifyError) {
-        console.error('Printify order creation failed:', printifyError);
+        logger.error('Printify order creation failed:', undefined, undefined, printifyError instanceof Error ? printifyError : new Error(String(printifyError)));
         // Don't fail the webhook - log and continue
       }
 
@@ -242,7 +244,7 @@ export async function POST(req: Request) {
 
     case 'charge.refunded':
     case 'charge.dispute.funds_withdrawn': {
-      // Handle refunds / disputes â†’ negative ledger + status update
+      // Handle refunds / disputes → negative ledger + status update
       const obj: any = event.data.object;
       const paymentIntentId = obj.payment_intent ?? obj.id ?? null;
       if (!paymentIntentId) return NextResponse.json({ ok: true });

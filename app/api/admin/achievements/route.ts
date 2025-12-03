@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
@@ -33,7 +34,7 @@ export async function GET() {
     if (error.message === 'FORBIDDEN') {
       return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 });
     }
-    console.error('Error fetching achievements:', error);
+    logger.error('Error fetching achievements:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

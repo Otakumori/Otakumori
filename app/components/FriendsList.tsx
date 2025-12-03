@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -30,10 +31,10 @@ export default function FriendsList({ className = '' }: FriendsListProps) {
       if (result.ok) {
         setFriends(result.data.friends);
       } else {
-        console.error('Failed to load friends:', result.error);
+        logger.error('Failed to load friends:', result.error);
       }
     } catch (error) {
-      console.error('Friends load error:', error);
+      logger.error('Friends load error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +95,7 @@ export default function FriendsList({ className = '' }: FriendsListProps) {
           <button
             onClick={loadFriends}
             className="text-pink-300/70 hover:text-pink-300 transition-colors"
+            aria-label="Refresh friends list"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

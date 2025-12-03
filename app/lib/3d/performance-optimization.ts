@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 
@@ -93,7 +95,7 @@ export class PerformanceOptimizer {
     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
     if (debugInfo) {
       const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-      console.warn('GPU:', renderer);
+      logger.warn('GPU:', undefined, { value: renderer });
 
       // Adjust settings based on GPU
       if (renderer.includes('Intel')) {
@@ -366,7 +368,7 @@ export class PerformanceOptimizer {
         break;
     }
 
-    console.warn(`Quality reduced to ${this.settings.quality} due to performance`);
+    logger.warn(`Quality reduced to ${this.settings.quality} due to performance`);
   }
 
   private increaseQuality() {
@@ -388,7 +390,7 @@ export class PerformanceOptimizer {
         break;
     }
 
-    console.warn(`Quality increased to ${this.settings.quality} due to good performance`);
+    logger.warn(`Quality increased to ${this.settings.quality} due to good performance`);
   }
 
   private canIncreaseQuality(): boolean {

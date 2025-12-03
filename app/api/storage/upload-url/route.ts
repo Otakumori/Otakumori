@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
@@ -47,7 +48,12 @@ export async function POST(req: NextRequest) {
       file: { url, key, size: file.size, mimeType: file.type },
     });
   } catch (err) {
-    console.error('upload error', err);
+    logger.error(
+      'upload error',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json({ ok: false, error: 'UPLOAD_ERROR' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
@@ -39,6 +40,13 @@ async function getPetalsData() {
   }
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Profile',
+    description: 'View user profile',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\profile\petals\page.tsx',
+  });
+}
 export default async function PetalsPage() {
   const { userId } = await auth();
 

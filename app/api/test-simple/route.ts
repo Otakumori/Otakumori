@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -11,7 +12,12 @@ export async function GET() {
       environment: env.NODE_ENV || 'unknown',
     });
   } catch (error) {
-    console.error('Error in simple test:', error);
+    logger.error(
+      'Error in simple test:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         success: false,

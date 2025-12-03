@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { requireUserId } from '@/app/lib/auth';
 import { petalService } from '@/app/lib/petals';
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
     const { amount, reason, metadata } = await req.json();
 
     // Log spend with metadata for analytics/debugging
-    console.warn('Petal spend request:', { userId, amount, reason, metadata: metadata || {} });
+    logger.warn('Petal spend request:', undefined, { userId, amount, reason, metadata: metadata || {} });
 
     const result = await petalService.spendPetals(
       userId,

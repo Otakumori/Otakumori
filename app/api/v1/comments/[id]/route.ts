@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { CommentUpdateSchema } from '@/app/lib/contracts';
@@ -92,7 +93,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    console.error('Comment update error:', error);
+    logger.error(
+      'Comment update error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });
@@ -156,7 +162,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     return NextResponse.json({ ok: true, data: { success: true } });
   } catch (error) {
-    console.error('Comment deletion error:', error);
+    logger.error('Comment deletion error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

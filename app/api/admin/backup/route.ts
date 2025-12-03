@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 // import { redis } from '../../../lib/redis';
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Backup error:', error);
+    logger.error('Backup failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Backup failed' }, { status: 500 });
   }
 }
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
       ),
     });
   } catch (error) {
-    console.error('Backup list error:', error);
+    logger.error('Backup error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Failed to retrieve backups' }, { status: 500 });
   }
 }

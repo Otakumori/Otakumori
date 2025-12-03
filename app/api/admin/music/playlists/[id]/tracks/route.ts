@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { requireAdmin } from '@/app/lib/authz';
@@ -9,9 +10,9 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.warn(`Admin ${admin.id} adding track to playlist ${params.id}`);
+    logger.warn(`Admin ${admin.id} adding track to playlist ${params.id}`);
   } catch (error) {
-    console.error('Admin auth failed for track addition:', error);
+    logger.error('Admin auth failed for track addition', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
@@ -40,9 +41,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.warn(`Admin ${admin.id} reordering tracks in playlist ${params.id}`);
+    logger.warn(`Admin ${admin.id} reordering tracks in playlist ${params.id}`);
   } catch (error) {
-    console.error('Admin auth failed for track reordering:', error);
+    logger.error('Admin auth failed for track reordering', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

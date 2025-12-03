@@ -432,7 +432,7 @@ export default function SakuraPetalBackground({
       style={{ zIndex: -5 }}
       onClick={handleContainerClick}
       aria-hidden="true"
-    >
+     role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }}>
       {/* 
         Layering strategy for non-blocking petal collection:
         - Container has pointer-events-auto to receive clicks (z-index: -5, below main content)

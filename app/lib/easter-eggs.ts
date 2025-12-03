@@ -1,3 +1,6 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
+
 /**
  * Easter Egg System
  *
@@ -82,7 +85,7 @@ export function getDiscoveredEasterEggs(): Set<string> {
       return new Set(JSON.parse(stored));
     }
   } catch (error) {
-    console.warn('Failed to read discovered easter eggs:', error);
+    logger.warn('Failed to read discovered easter eggs:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return new Set();

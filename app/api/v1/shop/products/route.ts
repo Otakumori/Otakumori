@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env';
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     if (!printifyResponse.ok) {
       const errorText = await printifyResponse.text();
-      console.error(' Printify API error:', printifyResponse.status, errorText);
+      logger.error('Printify API error:', undefined, { status: printifyResponse.status, text: errorText }, undefined);
       return NextResponse.json(
         { ok: false, error: `Printify API error: ${printifyResponse.status}` },
         { status: 500 },
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error(' Error fetching products:', error);
+    logger.error(' Error fetching products:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

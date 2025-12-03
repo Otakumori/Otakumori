@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -50,7 +51,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
       audioRef.current.volume = 0.3;
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
-      console.warn('Boot audio not available:', err.message);
+      logger.warn('Boot audio not available:', undefined, { message: err.message });
     }
 
     // Boot sequence timing
@@ -62,7 +63,7 @@ export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBo
           await audioRef.current.play();
         } catch (error: unknown) {
           const err = error instanceof Error ? error : new Error(String(error));
-          console.warn('Audio play failed:', err.message);
+          logger.warn('Audio play failed:', undefined, { message: err.message });
         }
       }
 

@@ -2,6 +2,7 @@
  * Rate limiting utilities for API endpoints
  */
 
+import { logger } from '@/app/lib/logger';
 import { getRedis } from './redis';
 
 export interface RateLimitConfig {
@@ -61,7 +62,7 @@ export async function checkRateLimit(
       resetTime: now + config.windowMs,
     };
   } catch (error) {
-    console.error('Rate limit check failed:', error);
+    logger.error('Rate limit check failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     // Fail open - allow request if Redis is down
     return {
       allowed: true,

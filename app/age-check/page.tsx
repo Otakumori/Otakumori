@@ -1,8 +1,16 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/age-check',
+  });
+}
 export default function AgeCheckPage() {
   const searchParams = useSearchParams();
   const router = useRouter();

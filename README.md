@@ -2,6 +2,8 @@
 
 A comprehensive Next.js application with production-grade features including Clerk authentication, Printify integration, interactive petals, secret runes, and Microsoft Edge compatibility.
 
+<!-- Deployment trigger -->
+
 ## 🚀 Quick Start
 
 ```bash

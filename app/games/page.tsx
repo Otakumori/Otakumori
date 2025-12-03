@@ -1,5 +1,6 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -7,6 +8,13 @@ import Navbar from '../components/layout/Navbar';
 import FooterDark from '../components/FooterDark';
 import GlassPanel from '../components/GlassPanel';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/games',
+  });
+}
 export default function GameCubePage() {
   const [bootComplete, setBootComplete] = useState(false);
   const [showBootSequence, setShowBootSequence] = useState(true);

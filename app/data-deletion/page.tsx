@@ -1,4 +1,13 @@
+import { generateSEO } from '@/app/lib/seo';
 
+
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/data-deletion',
+  });
+}
 export default function DataDeletionPage() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100 py-10">

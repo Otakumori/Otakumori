@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,7 +35,7 @@ export default function GameCubeBoot({ onBootComplete }) {
   const audioRef = useRef(null);
 
   // Log boot state for debugging
-  console.warn('GameCube boot initialized:', { isLoaded, stage, bootProgress });
+  logger.warn('GameCube boot initialized:', { isLoaded, stage, bootProgress });
 
   // Determine current season
   useEffect(() => {

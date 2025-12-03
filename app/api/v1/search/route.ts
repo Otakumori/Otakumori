@@ -1,4 +1,5 @@
 
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
@@ -85,9 +86,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    logger.error('Search request failed', {
+    logger.error('Search request failed', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid search parameters' }, { status: 400 });
@@ -205,7 +206,7 @@ async function searchContent(
   const results: SearchResult[] = [];
 
   // Log search for analytics
-  console.warn('Search query:', { query, userId: currentUserId, filters: filters || {} });
+  logger.warn('Search query:', undefined, { query, userId: currentUserId, filters: filters || {} });
 
   // Search comments
   const comments = await db.comment.findMany({
@@ -381,7 +382,7 @@ async function saveSearchHistory(
     });
   } catch (error) {
     // Don't fail the search if history saving fails
-    logger.warn('Failed to save search history', {
+    logger.warn('Failed to save search history', undefined, {
       userId,
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
     });
@@ -400,7 +401,7 @@ async function getSearchSuggestions(query: string, searchType: string) {
 
     return suggestions;
   } catch (error) {
-    logger.warn('Failed to get search suggestions', {
+    logger.warn('Failed to get search suggestions', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
     });
     return [];

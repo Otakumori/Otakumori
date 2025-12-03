@@ -3,6 +3,8 @@
  * Run with: pnpm assets:scan
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { createHash } from 'crypto';
 import { readFile, writeFile } from 'fs/promises';
 import { glob } from 'glob';
@@ -32,14 +34,14 @@ const ASSET_ROOT = 'public/assets';
  * Main scan function
  */
 async function scanAssets(): Promise<ScanResults> {
-  console.warn('🔍 Scanning assets...');
+  logger.warn('🔍 Scanning assets...');
 
   // Find all supported files
   const extensionPattern = SUPPORTED_EXTENSIONS.map((ext) => ext.slice(1)).join(',');
   const pattern = `${ASSET_ROOT}/**/*.{${extensionPattern}}`;
   const files = await glob(pattern, { nodir: true });
 
-  console.warn(`Found ${files.length} asset files`);
+  logger.warn(`Found ${files.length} asset files`);
 
   const assets: ScannedAsset[] = [];
 
@@ -50,7 +52,7 @@ async function scanAssets(): Promise<ScanResults> {
         assets.push(asset);
       }
     } catch (error) {
-      console.error(`Error processing ${filePath}:`, error);
+      logger.error(`Error processing ${filePath}:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -117,10 +119,10 @@ function detectSlot(filename: string): string | null {
 async function saveScanResults(results: ScanResults): Promise<void> {
   const outputPath = 'app/lib/assets/scan-results.json';
   await writeFile(outputPath, JSON.stringify(results, null, 2));
-  console.warn(`✅ Scan results saved to ${outputPath}`);
-  console.warn(`   Total assets: ${results.totalAssets}`);
-  console.warn(`   NSFW: ${results.assets.filter((a) => a.nsfw).length}`);
-  console.warn(`   Safe: ${results.assets.filter((a) => !a.nsfw).length}`);
+  logger.warn(`✅ Scan results saved to ${outputPath}`);
+  logger.warn(`   Total assets: ${results.totalAssets}`);
+  logger.warn(`   NSFW: ${results.assets.filter((a) => a.nsfw).length}`);
+  logger.warn(`   Safe: ${results.assets.filter((a) => !a.nsfw).length}`);
 }
 
 /**
@@ -131,7 +133,7 @@ async function main() {
     const results = await scanAssets();
     await saveScanResults(results);
   } catch (error) {
-    console.error('❌ Scan failed:', error);
+    logger.error('❌ Scan failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     process.exit(1);
   }
 }

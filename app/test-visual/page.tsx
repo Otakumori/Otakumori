@@ -1,4 +1,13 @@
+import { generateSEO } from '@/app/lib/seo';
 
+
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/test-visual',
+  });
+}
 export default function VisualTest() {
   return (
     <div className="min-h-[120vh] grid place-items-center text-center">

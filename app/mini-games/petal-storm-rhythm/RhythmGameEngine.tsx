@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState } from 'react';
 import { useGameSave } from '../_shared/SaveSystem';
 
@@ -117,7 +118,7 @@ export default function RhythmGameEngine({
         },
       });
     } catch (error) {
-      console.error('Failed to save rhythm game results:', error);
+      logger.error('Failed to save rhythm game results:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

@@ -20,8 +20,8 @@ export function CommunityHub() {
 
   const tabs = [
     { id: 'showcase' as const, label: 'Avatar Showcase', icon: '' },
-    { id: 'gallery' as const, label: 'Community Gallery', icon: '️' },
-    { id: 'leaderboards' as const, label: 'Leaderboards', icon: '🏆' },
+    { id: 'gallery' as const, label: 'Community Gallery', icon: '<span role="img" aria-label="emoji">️</span>' },
+    { id: 'leaderboards' as const, label: 'Leaderboards', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
     { id: 'settings' as const, label: 'Community Settings', icon: '' },
     ...(isAdultVerified ? [{ id: 'gated' as const, label: 'Gated Content', icon: '' }] : []),
   ];
@@ -141,7 +141,7 @@ function AvatarShowcase() {
           </div>
           <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm">️</span>
+              <span className="text-white text-sm"><span role="img" aria-label="emoji">️</span></span>
             </div>
             <div className="flex-1">
               <p className="text-white text-sm">Someone liked your avatar design</p>

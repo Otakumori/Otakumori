@@ -3,6 +3,8 @@
  * Run with: pnpm assets:curate
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import type { ScanResults, ScannedAsset } from './scan';
@@ -27,7 +29,7 @@ interface AssetRegistry {
  * Main curate function
  */
 async function curateAssets(): Promise<AssetRegistry> {
-  console.warn('🎨 Curating assets...');
+  logger.warn('🎨 Curating assets...');
 
   // Load scan results
   const scanPath = 'app/lib/assets/scan-results.json';
@@ -38,7 +40,7 @@ async function curateAssets(): Promise<AssetRegistry> {
   const scanData = await readFile(scanPath, 'utf-8');
   const scanResults: ScanResults = JSON.parse(scanData);
 
-  console.warn(`Processing ${scanResults.totalAssets} assets...`);
+  logger.warn(`Processing ${scanResults.totalAssets} assets...`);
 
   // Filter valid assets (must have slot)
   const validAssets = scanResults.assets.filter((a) => a.slot !== null);
@@ -72,7 +74,7 @@ async function curateAssets(): Promise<AssetRegistry> {
     fallbacks,
   };
 
-  console.warn(`✅ Created registry with ${Object.keys(assets).length} assets`);
+  logger.warn(`✅ Created registry with ${Object.keys(assets).length} assets`);
 
   return registry;
 }
@@ -126,8 +128,8 @@ function validateFallbacks(fallbacks: Record<string, string>): void {
   }
 
   if (missing.length > 0) {
-    console.warn(`⚠️  Missing safe fallbacks for slots: ${missing.join(', ')}`);
-    console.warn('   Assets in these slots will not be usable without fallbacks.');
+    logger.warn(`⚠️  Missing safe fallbacks for slots: ${missing.join(', ')}`);
+    logger.warn('   Assets in these slots will not be usable without fallbacks.');
   }
 }
 
@@ -170,7 +172,7 @@ async function saveRegistry(registry: AssetRegistry): Promise<void> {
   // Save registry JSON
   const registryPath = 'app/lib/assets/registry.json';
   await writeFile(registryPath, JSON.stringify(registry, null, 2));
-  console.warn(`✅ Registry saved to ${registryPath}`);
+  logger.warn(`✅ Registry saved to ${registryPath}`);
 
   // Create thumbs directory
   const thumbsDir = 'app/lib/assets/thumbs';
@@ -187,7 +189,7 @@ async function saveRegistry(registry: AssetRegistry): Promise<void> {
     thumbCount++;
   }
 
-  console.warn(`✅ Generated ${thumbCount} SVG thumbnails in ${thumbsDir}/`);
+  logger.warn(`✅ Generated ${thumbCount} SVG thumbnails in ${thumbsDir}/`);
 }
 
 /**
@@ -197,9 +199,9 @@ async function main() {
   try {
     const registry = await curateAssets();
     await saveRegistry(registry);
-    console.warn('\n✨ Asset curation complete!');
+    logger.warn('\n✨ Asset curation complete!');
   } catch (error) {
-    console.error('❌ Curation failed:', error);
+    logger.error('❌ Curation failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     process.exit(1);
   }
 }

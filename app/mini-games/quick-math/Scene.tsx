@@ -2,6 +2,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getAsset } from '../_shared/assets-resolver';
 import { play } from '../_shared/audio-bus';
@@ -265,7 +266,7 @@ export default function QuickMath() {
         }),
       });
     } catch (error) {
-      console.error('Failed to submit score:', error);
+      logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
 
     (window as any).__gameEnd?.({

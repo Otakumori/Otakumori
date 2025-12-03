@@ -1,5 +1,8 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '../../../components/admin/AdminNav';
 import type { DiscountType } from '@prisma/client';
@@ -28,6 +31,13 @@ interface DiscountReward {
   };
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\discounts\page.tsx',
+  });
+}
 export default function AdminDiscountsPage() {
   const [rewards, setRewards] = useState<DiscountReward[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +54,7 @@ export default function AdminDiscountsPage() {
         setRewards(j.data.rewards);
       }
     } catch (err) {
-      console.error('Failed to load discount rewards:', err);
+      logger.error('Failed to load discount rewards', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
@@ -58,7 +68,7 @@ export default function AdminDiscountsPage() {
         setAchievements(j.data.achievements);
       }
     } catch (err) {
-      console.error('Failed to load achievements:', err);
+      logger.error('Failed to load achievements', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -92,7 +102,7 @@ export default function AdminDiscountsPage() {
       }
     } catch (err) {
       setMsg('Save failed');
-      console.error('Error saving discount reward:', err);
+      logger.error('Error saving discount reward', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -113,7 +123,7 @@ export default function AdminDiscountsPage() {
       }
     } catch (err) {
       setMsg('Delete failed');
-      console.error('Error deleting discount reward:', err);
+      logger.error('Error deleting discount reward', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -160,7 +170,7 @@ export default function AdminDiscountsPage() {
         </div>
 
         {loading ? (
-          <div className="text-neutral-400">Loading...</div>
+    <Skeleton />
         ) : rewards.length === 0 ? (
           <div className="rounded-lg border border-white/15 bg-white/5 p-3 text-sm text-zinc-300">
             No discount rewards yet. Create one to get started.

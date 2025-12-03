@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -29,7 +31,7 @@ export function MemoryCubeBoot({ onBootComplete, isFirstVisit }: MemoryCubeBootP
   // Easter egg: Track secret phrase
   useEffect(() => {
     if (secretPhrase === 'konami') {
-      console.warn('Secret phrase activated!');
+      logger.warn('Secret phrase activated!');
       router.push('/mini-games?unlock=true');
     }
   }, [secretPhrase, router]);

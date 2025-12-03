@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
     );
 
     if (!spendResult.success) {
-      logger.error('Discount reward purchase failed - insufficient petals', {
+      logger.error('Discount reward purchase failed - insufficient petals', undefined, {
         requestId,
         userId,
         extra: {
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
           petalCost: discountReward.petalCost,
           error: spendResult.error,
         },
-      });
+      }, undefined);
       return NextResponse.json(
         { ok: false, error: spendResult.error || 'Insufficient petals', requestId },
         { status: 400 },

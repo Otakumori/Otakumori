@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 
 /**
@@ -10,35 +11,22 @@ import { useEffect, useState } from 'react';
  * in other pages.
  *
  * ENHANCED SPECIFICATIONS:
- * - Spans header to footer with mild overlap
- * - Parallax scroll effect (30% scroll speed)
- * - Left offset positioning (-100px)
+ * - Spans header to footer (full page height)
+ * - Fixed positioning - entire image always visible
+ * - Right side positioning (100px offset)
  * - Smooth fade gradients at top/bottom
- * - Updates on scroll/resize
+ * - Updates on resize
  * - Proper z-index layering (z-index: -10, behind header z-20, footer z-50)
  * - 60fps performance optimized
  */
 export default function TreeBackground() {
   const [dimensions, setDimensions] = useState({ top: 0, height: 0 });
-  const [scrollY, setScrollY] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     // Mark as mounted to prevent SSR issues
     setIsMounted(true);
   }, []);
-
-  // Track scroll position for parallax
-  useEffect(() => {
-    if (!isMounted || typeof window === 'undefined') return;
-
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMounted]);
 
   useEffect(() => {
     // Only run on client side
@@ -70,16 +58,15 @@ export default function TreeBackground() {
           }
         }
 
-        // Tree starts at top (behind navbar) and extends to footer
-        // Use full document height to ensure it reaches the bottom
-        // Add extra height for parallax overlap
-        const height = Math.max(fullHeight, window.innerHeight) + 200;
+        // Tree starts at top (0) and ends exactly at footer
+        // No extra height - tree should end where footer begins
+        const height = fullHeight;
 
         setDimensions({ top: 0, height });
       } catch (error) {
         // Defensive: if DOM queries fail, use viewport height
-        if (typeof console !== 'undefined' && console.error) {
-          console.error('[TreeBackground] Error updating dimensions:', error);
+        if (typeof console !== 'undefined' && typeof console.error === 'function') {
+          logger.error('[TreeBackground] Error updating dimensions:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
         setDimensions({ top: 0, height: window.innerHeight });
       }
@@ -116,46 +103,46 @@ export default function TreeBackground() {
   // Ensure we render even if dimensions aren't calculated yet
   const displayHeight = dimensions.height > 0 ? `${dimensions.height}px` : '100vh';
 
-  // Calculate parallax offset (30% of scroll speed)
-  const parallaxOffset = scrollY * 0.3;
+  // No parallax needed - tree stays fixed, entire image always visible
+  // (removed parallaxOffset calculation)
 
   return (
     <>
-    {/* Absolute tree background - starts at top (behind navbar), extends to footer, with parallax */ }
+      {/* Fixed tree background - entire image always visible across full page height */}
       <div
-        className="absolute inset-x-0 pointer-events-none"
+        className="fixed inset-x-0 pointer-events-none"
         style={{
           top: 0,
-          height: displayHeight,
-          zIndex: -10,
+          height: displayHeight, // Full page height (top to footer)
+          zIndex: -10, // Behind header (z-50) but above starfield (z-11)
         }}
         aria-hidden="true"
       >
-          {/* Tree image - parallax scroll effect (30% speed) with left offset */ }
+        {/* Tree image - covers full height, no movement */}
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: 'url(/assets/images/cherry-tree.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'left center',
+            backgroundSize: 'cover', // Cover full height
+            backgroundPosition: 'right center', // Centered vertically, positioned on right
             backgroundRepeat: 'no-repeat',
             opacity: isMounted ? 1 : 0,
             transition: 'opacity 0.3s ease-in',
-    transform: `translate3d(-100px, ${parallaxOffset}px, 0)`, // Left offset + parallax
-      willChange: 'transform',
+            transform: 'translate3d(100px, 0, 0)', // Right offset, no parallax
+            willChange: 'auto', // No transform animation needed
           }}
         />
 
-{/* Top fade gradient - blends with header (120px overlap) */ }
+        {/* Minimal top fade - tree should be visible under header */}
         <div
-          className="absolute inset-x-0 top-0 h-32 pointer-events-none"
+          className="absolute inset-x-0 top-0 h-20 pointer-events-none"
           style={{
-            background: 'linear-gradient(to bottom, #080611 0%, rgba(8, 6, 17, 0.8) 50%, transparent 100%)',
+            background: 'linear-gradient(to bottom, rgba(8, 6, 17, 0.3) 0%, transparent 100%)',
             zIndex: 1,
           }}
         />
 
-{/* Bottom fade gradient - blends with footer (200px overlap) */ }
+        {/* Bottom fade gradient - blends with footer */}
         <div
           className="absolute inset-x-0 bottom-0 h-48 pointer-events-none"
           style={{

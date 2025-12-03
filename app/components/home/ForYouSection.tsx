@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -65,7 +66,7 @@ export function ForYouSection() {
         const recs = generateRecommendations(profile, products, games, posts);
         setRecommendations(recs);
       } catch (error) {
-        console.error('Failed to fetch recommendations:', error);
+        logger.error('Failed to fetch recommendations:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }

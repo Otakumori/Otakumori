@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { getBrandedErrorMessage, getErrorType } from '@/app/lib/branded-errors';
@@ -14,7 +15,7 @@ export default function Error({
   useEffect(() => {
     // Enhanced error logging for development
     if (process.env.NODE_ENV === 'development') {
-      console.error('[Error Boundary] Full error details:', {
+      logger.error('[Error Boundary] Full error details:', undefined, {
         message: error.message,
         stack: error.stack,
         digest: error.digest,
@@ -28,10 +29,14 @@ export default function Error({
         ),
       });
     } else {
-      console.error(
+      logger.error(
         '[Error Boundary]',
-        error.message,
-        error.digest ? `(digest: ${error.digest})` : '',
+        undefined,
+        { 
+          message: error.message,
+          digest: error.digest ? `(digest: ${error.digest})` : ''
+        },
+        undefined
       );
     }
   }, [error]);

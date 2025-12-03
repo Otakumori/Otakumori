@@ -218,7 +218,7 @@ export default function AvatarEditorPanel() {
                   {/* Placeholder icon */}
                   <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-purple-400">
                     <span className="text-2xl" role="img" aria-label="Sparkles">
-                      ✨
+                      <span role="img" aria-label="sparkles">✨</span>
                     </span>
                   </div>
                   <span className="text-sm font-medium text-white">{part.name}</span>

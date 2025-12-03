@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AvatarCard } from './AvatarCard';
@@ -18,15 +19,15 @@ export function RandomAvatarGenerator({ onGenerate, className = '' }: RandomAvat
   const themes = [
     { id: 'anime', name: 'Anime', icon: '', description: 'Classic anime style' },
     { id: 'cyberpunk', name: 'Cyberpunk', icon: '', description: 'Futuristic tech aesthetic' },
-    { id: 'fantasy', name: 'Fantasy', icon: '‍️', description: 'Magical fantasy world' },
+    { id: 'fantasy', name: 'Fantasy', icon: '‍<span role="img" aria-label="emoji">️</span>', description: 'Magical fantasy world' },
     { id: 'kawaii', name: 'Kawaii', icon: '', description: 'Cute and colorful' },
     { id: 'gothic', name: 'Gothic', icon: '', description: 'Dark and mysterious' },
   ];
 
   const genders = [
     { id: 'random', name: 'Random', icon: '' },
-    { id: 'male', name: 'Male', icon: '️' },
-    { id: 'female', name: 'Female', icon: '️' },
+    { id: 'male', name: 'Male', icon: '<span role="img" aria-label="emoji">️</span>' },
+    { id: 'female', name: 'Female', icon: '<span role="img" aria-label="emoji">️</span>' },
   ];
 
   const handleGenerate = async () => {
@@ -58,7 +59,7 @@ export function RandomAvatarGenerator({ onGenerate, className = '' }: RandomAvat
         throw new Error(result.error);
       }
     } catch (error) {
-      console.error('Generation error:', error);
+      logger.error('Generation error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Generation failed. Please try again.');
     } finally {
       setIsGenerating(false);

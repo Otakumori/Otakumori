@@ -155,7 +155,7 @@ export default function LightingDemo() {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">
               <span role="img" aria-label="Light bulb" className="mr-2 inline-block">
-                💡
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Lighting Demo
             </h3>
@@ -225,7 +225,7 @@ export default function LightingDemo() {
               type="button"
             >
               <span role="img" aria-label="Sparkles" className="mr-2 inline-block">
-                ✨
+                <span role="img" aria-label="sparkles">✨</span>
               </span>
               Light Burst
             </button>
@@ -236,7 +236,7 @@ export default function LightingDemo() {
               type="button"
             >
               <span role="img" aria-label="Glowing star" className="mr-2 inline-block">
-                🌟
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Pulsing Lights
             </button>
@@ -247,7 +247,7 @@ export default function LightingDemo() {
               type="button"
             >
               <span role="img" aria-label="Broom" className="mr-2 inline-block">
-                🧹
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Reset Lights
             </button>
@@ -261,17 +261,17 @@ export default function LightingDemo() {
             <div>Status: {lighting.isRunning ? 'Running' : 'Stopped'}</div>
             <div className="mt-2 text-white/40">
               <span role="img" aria-label="Light bulb" className="mr-2 inline-block">
-                💡
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Move mouse for dynamic lighting
               <br />
               <span role="img" aria-label="Computer mouse" className="mr-2 inline-block">
-                🖱️
+                <span role="img" aria-label="emoji">�</span>�<span role="img" aria-label="emoji">️</span>
               </span>
               Click anywhere for light burst
               <br />
               <span role="img" aria-label="Artist palette" className="mr-2 inline-block">
-                🎨
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
               Try different themes and presets
             </div>
@@ -288,7 +288,7 @@ export default function LightingDemo() {
           aria-label="Show lighting controls"
         >
           <span role="img" aria-label="Light bulb">
-            💡
+            <span role="img" aria-label="emoji">�</span>�
           </span>
         </button>
       )}
@@ -308,7 +308,7 @@ export default function LightingDemo() {
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
               <div className="text-4xl mb-3">
                 <span role="img" aria-label="Glowing star">
-                  🌟
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>
               </div>
               <h3 className="text-lg font-semibold mb-2 text-yellow-300">Real-time Shadows</h3>
@@ -320,7 +320,7 @@ export default function LightingDemo() {
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
               <div className="text-4xl mb-3">
                 <span role="img" aria-label="Foggy weather">
-                  🌫️
+                  <span role="img" aria-label="emoji">�</span>�<span role="img" aria-label="emoji">️</span>
                 </span>
               </div>
               <h3 className="text-lg font-semibold mb-2 text-blue-300">Volumetric Effects</h3>
@@ -332,7 +332,7 @@ export default function LightingDemo() {
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 transform hover:scale-105 transition-all">
               <div className="text-4xl mb-3">
                 <span role="img" aria-label="Artist palette">
-                  🎨
+                  <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                 </span>
               </div>
               <h3 className="text-lg font-semibold mb-2 text-purple-300">Theme Integration</h3>
@@ -363,7 +363,7 @@ export default function LightingDemo() {
             >
               <div className="text-6xl mb-4">
                 <span role="img" aria-label="Crossed swords">
-                  ⚔️
+                  ⚔<span role="img" aria-label="emoji">️</span>
                 </span>
               </div>
               <h3 className="text-xl font-bold text-red-300">Action</h3>
@@ -376,7 +376,7 @@ export default function LightingDemo() {
             >
               <div className="text-6xl mb-4">
                 <span role="img" aria-label="Puzzle piece">
-                  🧩
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>
               </div>
               <h3 className="text-xl font-bold text-blue-300">Puzzle</h3>
@@ -389,7 +389,7 @@ export default function LightingDemo() {
             >
               <div className="text-6xl mb-4">
                 <span role="img" aria-label="Bullseye">
-                  🎯
+                  <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                 </span>
               </div>
               <h3 className="text-xl font-bold text-green-300">Strategy</h3>

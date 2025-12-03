@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -136,7 +137,7 @@ export async function GET(request: NextRequest) {
         defaultCharacterId: cfg?.baseModel,
       });
     } catch (error) {
-      console.error('Failed to fetch character config:', error);
+      logger.error('Failed to fetch character config:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { ok: false, error: 'Failed to fetch character configuration' },
         { status: 500 },
@@ -301,7 +302,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('Failed to save character config:', error);
+      logger.error('Failed to save character config:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         { ok: false, error: 'Failed to save character configuration' },
         { status: 500 },

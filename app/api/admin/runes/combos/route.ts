@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -33,7 +34,7 @@ export async function GET() {
       data: { combos },
     });
   } catch (error) {
-    console.error('Combos fetch error:', error);
+    logger.error('Rune combo error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
       data: { combo },
     });
   } catch (error) {
-    console.error('Combo save error:', error);
+    logger.error('Rune combo error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { SliderControl } from './SliderControl.safe';
 
 interface OutfitSelectorProps {
@@ -10,7 +11,7 @@ interface OutfitSelectorProps {
 
 export function OutfitSelector({ config, onChange, gender }: OutfitSelectorProps) {
   // Log gender context for outfit recommendations
-  console.warn('OutfitSelector initialized for gender:', gender);
+  logger.warn('OutfitSelector initialized', undefined, { gender });
 
   const updateConfig = (path: string, value: any) => {
     const newConfig = { ...config };

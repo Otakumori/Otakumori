@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { type NextRequest } from 'next/server';
@@ -203,7 +204,7 @@ export async function getFileInfo(filepath: string): Promise<{
       };
       info.type = metadata.format;
     } catch (error) {
-      console.error('Failed to get image metadata:', error);
+      logger.error('Failed to get image metadata:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

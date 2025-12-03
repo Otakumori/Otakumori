@@ -83,9 +83,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       data: transformedParty,
     });
   } catch (error) {
-    logger.error('Failed to fetch party', {
+    logger.error('Failed to fetch party', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to fetch party' }, { status: 500 });
   }
 }
@@ -166,9 +166,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       data: transformedParty,
     });
   } catch (error) {
-    logger.error('Failed to update party', {
+    logger.error('Failed to update party', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to update party' }, { status: 500 });
   }
 }
@@ -208,9 +208,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       data: { message: 'Party deleted successfully' },
     });
   } catch (error) {
-    logger.error('Failed to delete party', {
+    logger.error('Failed to delete party', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to delete party' }, { status: 500 });
   }
 }

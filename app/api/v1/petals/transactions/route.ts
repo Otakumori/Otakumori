@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
     const response = transactions.map((tx) => PetalTransactionSchema.parse(tx));
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    console.error('Error fetching petal transactions:', error);
+    logger.error('Error fetching petal transactions:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { Component, type ReactNode } from 'react';
 
 interface Props {
@@ -27,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Avatar Creator Error:', error, errorInfo);
+    logger.error('Avatar Creator Error:', undefined, { errorInfo }, error);
   }
 
   render() {

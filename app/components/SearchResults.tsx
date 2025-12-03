@@ -1,5 +1,6 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -307,11 +308,7 @@ export default function SearchResults({
 
       {isLoading && results.length === 0 && (
         <div className="py-12 text-center">
-          <div
-            className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-pink-500"
-            aria-label="Loading"
-          />
-          <p className="text-gray-500">Searching...</p>
+          <Skeleton />
         </div>
       )}
     </div>

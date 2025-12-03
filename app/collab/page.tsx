@@ -1,18 +1,15 @@
 
+import { generateSEO } from '@/app/lib/seo';
 import { type Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Creator Collaboration - Otaku-mori',
-  description:
-    'Join our creator collaboration program. Get custom assets, build your audience, and be part of the Otaku-mori community.',
-  openGraph: {
-    title: 'Creator Collaboration - Otaku-mori',
-    description:
-      'Join our creator collaboration program. Get custom assets, build your audience, and be part of the Otaku-mori community.',
-    type: 'website',
-  },
-};
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/collab',
+  });
+}
 export default function CollabPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-cube-900 via-cube-800 to-slate-900">

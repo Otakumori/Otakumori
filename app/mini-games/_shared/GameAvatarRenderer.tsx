@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useRef, useEffect, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
@@ -266,7 +267,7 @@ export default function GameAvatarRenderer({
           defaultCharacterId: 'default_female',
         };
       } catch (error) {
-        console.error('Failed to load avatar:', error);
+        logger.error('Failed to load avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         throw error;
       }
     },
@@ -323,7 +324,7 @@ export default function GameAvatarRenderer({
               animationState={animationState}
               onLoad={onLoad}
               onError={(error) => {
-                console.warn('3D avatar failed, falling back to 2D:', error);
+                logger.warn('3D avatar failed, falling back to 2D:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
                 if (fallbackTo2D) {
                   setUse3D(false);
                 }
@@ -376,7 +377,7 @@ export function useGameAvatar(gameId: string, gameMode?: string) {
           return data.ok ? data.data : null;
         }
       } catch (error) {
-        console.error('Failed to fetch avatar data:', error);
+        logger.error('Failed to fetch avatar data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
       return null;
     },
@@ -408,7 +409,7 @@ export function drawGameAvatar(
     ctx.font = `${Math.min(width, height) / 3}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('👤', 0, 0);
+    ctx.fillText('<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>', 0, 0);
     ctx.restore();
     return;
   }

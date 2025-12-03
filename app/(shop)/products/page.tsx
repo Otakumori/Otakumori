@@ -1,6 +1,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -37,7 +39,7 @@ async function fetchProducts(): Promise<Product[]> {
     const data: ProductsResponse = await response.json();
     return data.ok ? data.data.products : [];
   } catch (error) {
-    console.error('Error fetching products:', error);
+    logger.error('Error fetching products', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -138,6 +140,13 @@ function ProductsSkeleton() {
   );
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Shop',
+    description: 'Browse our anime and gaming merchandise',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\(shop)\products\page.tsx',
+  });
+}
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +157,7 @@ export default function ProductsPage() {
         const fetchedProducts = await fetchProducts();
         setProducts(fetchedProducts);
       } catch (error) {
-        console.error('Failed to load products:', error);
+        logger.error('Failed to load products', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }

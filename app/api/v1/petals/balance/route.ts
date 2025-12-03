@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -43,7 +44,7 @@ export async function GET(_req: NextRequest) {
       requestId,
     });
   } catch (error) {
-    console.error('Error fetching petal balance:', error);
+    logger.error('Error fetching petal balance:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { ok: false, error: 'Internal server error', requestId },
       { status: 500 },

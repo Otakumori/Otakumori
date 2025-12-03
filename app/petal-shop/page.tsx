@@ -6,6 +6,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
@@ -17,6 +19,13 @@ import {
 import { DISCOUNT_VOUCHER_TIERS } from '@/app/config/petalTuning';
 import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Shop',
+    description: 'Browse our anime and gaming merchandise',
+    url: '/petal-shop',
+  });
+}
 export default function PetalShopPage() {
   const {
     unlockedIds: _unlockedIds,
@@ -70,7 +79,7 @@ export default function PetalShopPage() {
           setDiscountEnabled(false);
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
+        logger.error('Failed to fetch data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setPetalBalance(0);
       } finally {
         setLoading(false);
@@ -135,7 +144,7 @@ export default function PetalShopPage() {
         throw new Error(data.error || 'Purchase failed');
       }
     } catch (error: any) {
-      console.error('Purchase error:', error);
+      logger.error('Purchase error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert(error.message || 'Purchase failed. Please try again.');
     } finally {
       setPurchasing(null);
@@ -201,7 +210,7 @@ export default function PetalShopPage() {
         throw new Error(data.error || 'Purchase failed');
       }
     } catch (error: any) {
-      console.error('Voucher purchase error:', error);
+      logger.error('Voucher purchase error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert(error.message || 'Purchase failed. Please try again.');
     } finally {
       setPurchasingVoucher(null);

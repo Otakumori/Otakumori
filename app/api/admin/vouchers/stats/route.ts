@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { db } from '@/app/lib/db';
@@ -72,7 +73,7 @@ async function handler() {
       },
     });
   } catch (error) {
-    console.error('Error fetching voucher stats:', error);
+    logger.error('Vouchers stats error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { ok: false, error: 'Failed to fetch voucher stats' },
       { status: 500 },

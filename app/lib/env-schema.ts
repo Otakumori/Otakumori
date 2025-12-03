@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { z } from 'zod';
 import { REQUIRED_SERVER_KEYS } from './env-keys';
 import { getServerEnv } from '@/env/server';
@@ -70,19 +72,19 @@ export function validateEnv(runtimeEnv: Record<string, unknown>): EnvSchema {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.issues.map((issue) => issue.path.join('.')).join(', ') || 'unknown';
-      console.error(`Environment validation failed. Missing or invalid: ${missingVars}`);
+      logger.error(`Environment validation failed. Missing or invalid: ${missingVars}`);
 
       if (normalized.NODE_ENV === 'production') {
         throw new Error(`Environment validation failed: ${missingVars}`);
       }
     } else {
-      console.error('Unexpected environment validation error:', error);
+      logger.error('Unexpected environment validation error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       if (normalized.NODE_ENV === 'production') {
         throw error;
       }
     }
 
-    console.warn('Environment validation failed, continuing with partial config');
+    logger.warn('Environment validation failed, continuing with partial config');
     return normalized as EnvSchema;
   }
 }

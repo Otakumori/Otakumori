@@ -5,6 +5,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
@@ -491,7 +492,7 @@ export default function EnhancedTileGame({
         }),
       });
     } catch (error) {
-      console.error('Failed to submit score:', error);
+      logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

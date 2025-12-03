@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'otm_recently_viewed';
@@ -47,7 +48,7 @@ export function useRecentlyViewed() {
 
       setRecentlyViewed(normalized);
     } catch (err) {
-      console.error('Failed to parse recently viewed:', err);
+      logger.error('Failed to parse recently viewed:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   }, []);
 

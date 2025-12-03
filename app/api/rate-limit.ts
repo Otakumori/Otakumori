@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { getRedis } from '../lib/redis';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -38,7 +39,11 @@ export async function rateLimit(
       resetTime: now + config.windowMs,
     };
   } catch (error) {
-    console.warn('Redis rate limit failed, falling back to memory:', error);
+    logger.warn(
+      'Redis rate limit failed, falling back to memory:',
+      undefined,
+      { error: error instanceof Error ? error : new Error(String(error)) }
+    );
   }
 
   // In-memory fallback

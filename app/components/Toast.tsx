@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 interface ToastMessage {
@@ -20,8 +21,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const toast = useCallback((message: ToastMessage) => {
     setCurrentToast(message);
-    // eslint-disable-next-line no-console
-    console.log('Toast:', message.title, message.description);
+     
+    logger.info('Toast:', undefined, { title: message.title, description: message.description });
   }, []);
 
   const clear = useCallback(() => setCurrentToast(null), []);

@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       },
     });
   } catch (error) {
-    console.error('Failed to praise soapstone:', error);
+    logger.error('Failed to praise soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Failed to process praise' }, { status: 500 });
   }
 }

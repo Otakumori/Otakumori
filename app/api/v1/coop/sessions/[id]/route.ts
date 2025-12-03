@@ -60,9 +60,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       data: transformedSession,
     });
   } catch (error) {
-    logger.error('Failed to fetch coop session', {
+    logger.error('Failed to fetch coop session', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to fetch coop session' }, { status: 500 });
   }
 }
@@ -166,9 +166,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       data: transformedSession,
     });
   } catch (error) {
-    logger.error('Failed to update coop session', {
+    logger.error('Failed to update coop session', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to update coop session' },
       { status: 500 },
@@ -221,9 +221,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       data: { message: 'Session deleted successfully' },
     });
   } catch (error) {
-    logger.error('Failed to delete coop session', {
+    logger.error('Failed to delete coop session', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to delete coop session' },
       { status: 500 },

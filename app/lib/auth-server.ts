@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest } from 'next/server';
 
@@ -28,7 +29,7 @@ export async function requireAuth(): Promise<AuthResult> {
       role,
     };
   } catch (error) {
-    console.error('Auth error:', error);
+    logger.error('Auth error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return {
       isAuthenticated: false,
       error: 'Authentication failed',

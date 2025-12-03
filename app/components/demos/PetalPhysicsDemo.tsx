@@ -66,7 +66,7 @@ export default function PetalPhysicsDemo() {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold">
               <span role="img" aria-label="Cherry blossom" className="mr-2 inline-block">
-                🌸
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
               Physics Demo
             </h3>
@@ -130,7 +130,7 @@ export default function PetalPhysicsDemo() {
               type="button"
             >
               <span role="img" aria-label="Cherry blossom" className="mr-2 inline-block">
-                🌸
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
               Spawn Burst
             </button>
@@ -141,7 +141,7 @@ export default function PetalPhysicsDemo() {
               type="button"
             >
               <span role="img" aria-label="Box" className="mr-2 inline-block">
-                📦
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Add Obstacle
             </button>
@@ -152,7 +152,7 @@ export default function PetalPhysicsDemo() {
               type="button"
             >
               <span role="img" aria-label="Broom" className="mr-2 inline-block">
-                🧹
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Clear All
             </button>
@@ -165,22 +165,22 @@ export default function PetalPhysicsDemo() {
             <div>Season: {season}</div>
             <div className="mt-2 text-white/40">
               <span role="img" aria-label="Light bulb" className="mr-2 inline-block">
-                💡
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Move mouse to create wind
               <br />
               <span role="img" aria-label="Computer mouse" className="mr-2 inline-block">
-                🖱️
+                <span role="img" aria-label="emoji">�</span>�<span role="img" aria-label="emoji">️</span>
               </span>
               Click petals for wind burst
               <br />
               <span role="img" aria-label="Scroll" className="mr-2 inline-block">
-                📜
+                <span role="img" aria-label="emoji">�</span>�
               </span>
               Scroll for wind effects
               <br />
               <span role="img" aria-label="Keyboard" className="mr-2 inline-block">
-                ⌨️
+                ⌨<span role="img" aria-label="emoji">️</span>
               </span>
               Ctrl+D for debug mode
             </div>
@@ -197,7 +197,7 @@ export default function PetalPhysicsDemo() {
           aria-label="Show petal controls"
         >
           <span role="img" aria-label="Settings gear">
-            ⚙️
+            ⚙<span role="img" aria-label="emoji">️</span>
           </span>
         </button>
       )}
@@ -216,7 +216,7 @@ export default function PetalPhysicsDemo() {
             <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold mb-2 text-pink-300">
                 <span role="img" aria-label="Tornado" className="mr-2 inline-block">
-                  🌪️
+                  <span role="img" aria-label="emoji">�</span>�<span role="img" aria-label="emoji">️</span>
                 </span>
                 Wind Physics
               </h3>
@@ -228,7 +228,7 @@ export default function PetalPhysicsDemo() {
             <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold mb-2 text-purple-300">
                 <span role="img" aria-label="Collision" className="mr-2 inline-block">
-                  💥
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>
                 Collisions
               </h3>
@@ -240,7 +240,7 @@ export default function PetalPhysicsDemo() {
             <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
               <h3 className="text-lg font-semibold mb-2 text-blue-300">
                 <span role="img" aria-label="Sparkles" className="mr-2 inline-block">
-                  ✨
+                  <span role="img" aria-label="sparkles">✨</span>
                 </span>
                 Visual Effects
               </h3>

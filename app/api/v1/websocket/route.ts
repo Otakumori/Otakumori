@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest } from 'next/server';
 import { WebSocketServer } from 'ws';
 import { wsManager } from '@/app/lib/websocket-manager';
@@ -9,7 +11,7 @@ let wss: WebSocketServer | null = null;
 
 export async function GET(request: NextRequest) {
   // Log WebSocket connection request
-  console.warn('WebSocket server requested from:', request.headers.get('user-agent'));
+  logger.warn('WebSocket server requested from:', undefined, { value: request.headers.get('user-agent') });
 
   if (!wss) {
     // Create WebSocket server
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     return Response.json({ ok: true, data: { message } });
   } catch (error) {
-    console.error('WebSocket API error:', error);
+    logger.error('WebSocket API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return Response.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

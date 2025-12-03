@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export interface Achievement {
@@ -111,7 +112,7 @@ const loadInitialAchievements = (): Achievement[] => {
       }));
     }
   } catch (error) {
-    console.warn('Unable to load achievements from storage', error);
+    logger.warn('Unable to load achievements from storage', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return defaultAchievements;

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
       },
     });
 
-    console.warn('Rune unlocked:', { userId, slug, unlockId: unlock.id });
+    logger.warn('Rune unlocked:', undefined, { userId, slug, unlockId: unlock.id });
 
     // Log the unlock for telemetry
     // Rune unlocked
@@ -110,7 +111,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Rune unlock failed:', error);
+    logger.error(
+      'Rune unlock failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });

@@ -15,6 +15,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sessionTracker } from '@/lib/analytics/session-tracker';
@@ -51,6 +53,13 @@ interface Card {
   isMatched: boolean;
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\memory-match\page.tsx',
+  });
+}
 export default function MemoryMatchGame() {
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -235,7 +244,7 @@ export default function MemoryMatchGame() {
         }),
       });
     } catch (error) {
-      console.error('Failed to submit score:', error);
+      logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }, [timeElapsed, moves, matches, streak, settings, difficulty, earnPetals, hasAwardedPetals]);
 

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
@@ -146,7 +147,12 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (error) {
-      console.error('Error creating checkout session:', error);
+      logger.error(
+        'Error creating checkout session:',
+        undefined,
+        undefined,
+        error instanceof Error ? error : new Error(String(error)),
+      );
       return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
     }
   });

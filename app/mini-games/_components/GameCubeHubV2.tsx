@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -176,7 +177,7 @@ export default function GameCubeHubV2() {
       try {
         await router.push(game.href);
       } catch (error) {
-        console.error('Failed to navigate to game:', error);
+        logger.error('Failed to navigate to game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setLoadingGame(null);
       }
     },
@@ -776,7 +777,7 @@ export default function GameCubeHubV2() {
                       >
                         <div className="text-lg mb-1">
                           <span role="img" aria-label="Community">
-                            💬
+                            <span role="img" aria-label="emoji">�</span>�
                           </span>
                         </div>
                         <div className="text-sm font-medium">Community</div>

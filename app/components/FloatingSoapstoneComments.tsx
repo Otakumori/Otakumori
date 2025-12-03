@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 // import { createClient } from '@supabase/supabase-js';
 
@@ -25,7 +26,7 @@ export default function FloatingSoapstoneComments() {
 
   if (true) {
     // Use state to prevent warnings during migration
-    console.warn('Soapstone comments disabled during migration', {
+    logger.warn('Soapstone comments disabled during migration', undefined, {
       hasComments: comments.length > 0,
       isLoading,
       readyForMigration,

@@ -131,9 +131,9 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    logger.error('Failed to start coop session', {
+    logger.error('Failed to start coop session', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to start coop session' }, { status: 500 });
   }
 }
@@ -196,9 +196,9 @@ export async function GET(request: NextRequest) {
       data: transformedSessions,
     });
   } catch (error) {
-    logger.error('Failed to fetch coop sessions', {
+    logger.error('Failed to fetch coop sessions', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to fetch coop sessions' },
       { status: 500 },

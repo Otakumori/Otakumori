@@ -166,19 +166,19 @@ const CharacterPreview = memo(function CharacterPreview({
             <div className="flex justify-center space-x-4">
               <span>
                 <span role="img" aria-label="Pointing up">
-                  👆
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>{' '}
                 Tap to select
               </span>
               <span>
                 <span role="img" aria-label="Waving hand">
-                  👋
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>{' '}
                 Swipe to rotate
               </span>
               <span>
                 <span role="img" aria-label="Pinching fingers">
-                  🤏
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>{' '}
                 Pinch to zoom
               </span>
@@ -729,7 +729,7 @@ export default function CharacterEditor({
           aria-label="Save for comparison"
         >
           <span role="img" aria-label="Camera">
-            📸
+            <span role="img" aria-label="emoji">�</span>�
           </span>{' '}
           Save for Compare
         </button>
@@ -755,7 +755,7 @@ export default function CharacterEditor({
             aria-label="Capture screenshot"
           >
             <span role="img" aria-label="Camera">
-              📸
+              <span role="img" aria-label="emoji">�</span>�
             </span>{' '}
             Screenshot
           </button>
@@ -767,7 +767,7 @@ export default function CharacterEditor({
             aria-label="Export as GLB"
           >
             <span role="img" aria-label="Package">
-              📦
+              <span role="img" aria-label="emoji">�</span>�
             </span>{' '}
             Export GLB
           </button>
@@ -780,7 +780,7 @@ export default function CharacterEditor({
           aria-label="Share preset"
         >
           <span role="img" aria-label="Link">
-            🔗
+            <span role="img" aria-label="emoji">�</span>�
           </span>{' '}
           Share Preset
         </button>
@@ -796,7 +796,7 @@ export default function CharacterEditor({
             aria-label="Use character in game"
           >
             <span role="img" aria-label="Game controller">
-              🎮
+              <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
             </span>{' '}
             Use in Game
           </button>
@@ -809,7 +809,7 @@ export default function CharacterEditor({
           aria-label="Save character"
         >
           <span role="img" aria-label="Floppy disk">
-            💾
+            <span role="img" aria-label="emoji">�</span>�
           </span>{' '}
           {isDirty
             ? 'Save Character*'
@@ -825,7 +825,7 @@ export default function CharacterEditor({
           aria-label="Reset to default"
         >
           <span role="img" aria-label="Reset">
-            🔄
+            <span role="img" aria-label="emoji">�</span>�
           </span>{' '}
           Reset to Default
         </button>

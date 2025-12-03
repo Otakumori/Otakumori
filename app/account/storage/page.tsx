@@ -1,4 +1,5 @@
 
+import { generateSEO } from '@/app/lib/seo';
 import StorageManager from '@/components/account/StorageManager';
 
 export const metadata = {
@@ -6,6 +7,13 @@ export const metadata = {
   description: 'Upload and manage your files in your personal storage space.',
 };
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Storage',
+    description: 'Manage your storage',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\account\storage\page.tsx',
+  });
+}
 export default function StoragePage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">

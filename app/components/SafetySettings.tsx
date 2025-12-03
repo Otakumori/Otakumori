@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { Shield, MessageSquare, Bell, Filter, UserX } from 'lucide-react';
 import GlassCard from './ui/GlassCard';
@@ -32,10 +33,10 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
             loadBlockedUsers(result.data.blockedUsers);
           }
         } else {
-          console.error('Failed to load safety settings:', result.error);
+          logger.error('Failed to load safety settings:', result.error);
         }
       } catch (error) {
-        console.error('Error loading safety settings:', error);
+        logger.error('Error loading safety settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }
@@ -49,7 +50,7 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
       // For now, we'll just show the IDs
       setBlockedUsers(userIds.map((id) => ({ id, username: id })));
     } catch (error) {
-      console.error('Error loading blocked users:', error);
+      logger.error('Error loading blocked users:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -69,10 +70,10 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
       if (result.ok) {
         setSettings(result.data);
       } else {
-        console.error('Failed to update safety settings:', result.error);
+        logger.error('Failed to update safety settings:', result.error);
       }
     } catch (error) {
-      console.error('Error updating safety settings:', error);
+      logger.error('Error updating safety settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setSaving(false);
     }
@@ -104,10 +105,10 @@ export default function SafetySettings({ className = '' }: SafetySettingsProps) 
           });
         }
       } else {
-        console.error('Failed to unblock user:', result.error);
+        logger.error('Failed to unblock user:', result.error);
       }
     } catch (error) {
-      console.error('Error unblocking user:', error);
+      logger.error('Error unblocking user:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

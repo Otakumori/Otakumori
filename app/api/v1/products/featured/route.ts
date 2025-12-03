@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/app/lib/db';
@@ -300,7 +302,7 @@ export async function GET(request: NextRequest) {
       });
 
       if (!validated.success) {
-        console.error('[API] Response validation failed:', validated.error);
+        logger.error('[API] Response validation failed:', undefined, { error: validated.error }, undefined);
         // Return safe fallback
         return NextResponse.json(
           createApiSuccess({ products: [], pagination: undefined }, requestId),
@@ -345,7 +347,7 @@ export async function GET(request: NextRequest) {
           });
 
           if (!validated.success) {
-            console.error('[API] Printify response validation failed:', validated.error);
+            logger.error('[API] Printify response validation failed:', undefined, { error: validated.error }, undefined);
             return NextResponse.json(
               createApiSuccess({ products: [], pagination: undefined }, requestId),
               { status: 200 },
@@ -355,7 +357,7 @@ export async function GET(request: NextRequest) {
           return NextResponse.json(validated.data);
         }
       } catch (error) {
-        console.warn('[API] Printify fetch failed:', error);
+        logger.warn('[API] Printify fetch failed:', undefined, { value: error });
         // Fall through to empty response
       }
     }
@@ -371,7 +373,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(validated.success ? validated.data : emptyResponse);
   } catch (error) {
-    console.error('[API] Featured products endpoint error:', error);
+    logger.error('[API] Featured products endpoint error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch featured products', requestId),
       { status: 500 },

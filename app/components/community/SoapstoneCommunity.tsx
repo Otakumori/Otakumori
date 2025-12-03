@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import GlassPanel from '../GlassPanel';
@@ -71,7 +72,7 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
         setCharacterCount(0);
       }
     } catch (error) {
-      console.error('Failed to post soapstone:', error);
+      logger.error('Failed to post soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsSubmitting(false);
     }
@@ -106,7 +107,7 @@ export default function SoapstoneCommunity({ initialSoapstones }: SoapstoneCommu
         }, 2000);
       }
     } catch (error) {
-      console.error('Failed to reply to soapstone:', error);
+      logger.error('Failed to reply to soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSanityClient, isSanityConfigured } from '@/lib/sanity/client';
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Community content API error:', error);
+    logger.error('Community content API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

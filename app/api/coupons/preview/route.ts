@@ -1,3 +1,4 @@
+import { newRequestId } from '@/app/lib/requestId';
 import { rateLimit } from '@/app/api/rate-limit';
 import { logger } from '@/app/lib/logger';
 import { prisma } from '@/app/lib/prisma';
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
     const codes = parsed.data.codes.map(normalizeCode).filter((c) => !!c);
     const items = parsed.data.cart.items;
     const shipping = parsed.data.cart.shipping ?? { provider: 'stripe' as const, fee: 0 };
-    console.warn(`Coupon preview requested for ${items?.length || 0} items`);
+    logger.warn(`Coupon preview requested for ${items?.length || 0} items`);
 
     // Fetch coupons metadata, cached briefly
     const metas: CouponMeta[] = [];

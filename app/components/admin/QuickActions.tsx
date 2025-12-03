@@ -1,4 +1,5 @@
 // DEPRECATED: This component is a duplicate. Use app\components\components\admin\QuickActions.tsx instead.
+import { logger } from '@/app/lib/logger';
 import React, { useEffect, useState } from 'react';
 import { PUBLIC_KEYS } from '@/constants.client';
 
@@ -21,7 +22,7 @@ const QuickActions: React.FC = () => {
         setMaintenance(!!data.maintenance);
       } catch (err: unknown) {
         const error = err instanceof Error ? err : new Error(String(err));
-        console.error('Failed to fetch maintenance status:', error);
+        logger.error('Failed to fetch maintenance status:', undefined, undefined, error);
         setError('Failed to fetch maintenance status');
       } finally {
         setLoading(false);
@@ -43,7 +44,7 @@ const QuickActions: React.FC = () => {
       setMaintenance(!!data.maintenance);
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
-      console.error('Failed to update maintenance status:', error);
+      logger.error('Failed to update maintenance status:', undefined, undefined, error);
       setError('Failed to update maintenance status');
     } finally {
       setLoading(false);

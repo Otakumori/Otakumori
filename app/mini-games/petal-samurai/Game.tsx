@@ -14,6 +14,8 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
@@ -371,7 +373,7 @@ export default function Game({ mode }: Props) {
             }),
           });
         } catch (error) {
-          console.error('Failed to submit score:', error);
+          logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       };
       submitScore();
@@ -589,7 +591,7 @@ class GameEngine {
       this.spriteSheetLoaded = true;
     };
     img.onerror = () => {
-      console.warn('Failed to load petal sprite sheet, falling back to canvas drawing');
+      logger.warn('Failed to load petal sprite sheet, falling back to canvas drawing');
       this.spriteSheetLoaded = false;
     };
   }

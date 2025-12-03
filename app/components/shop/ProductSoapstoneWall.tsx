@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useToastContext } from '@/app/contexts/ToastContext';
@@ -60,7 +61,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
         setSoapstones(result.data?.soapstones || []);
       }
     } catch (err) {
-      console.error('Failed to load soapstones:', err);
+      logger.error('Failed to load soapstones:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
@@ -99,7 +100,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
         showError(result.error || 'Failed to place sign');
       }
     } catch (err) {
-      console.error('Failed to place sign', err);
+      logger.error('Failed to place sign', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       showError('Failed to place sign');
     } finally {
       setSubmitting(false);
@@ -137,7 +138,7 @@ export function ProductSoapstoneWall({ productId }: ProductSoapstoneWallProps) {
         );
       }
     } catch (err) {
-      console.error('Failed to praise:', err);
+      logger.error('Failed to praise:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 

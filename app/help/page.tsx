@@ -1,11 +1,15 @@
+import { generateSEO } from '@/app/lib/seo';
 import { type Metadata } from 'next';
 import { sanitizeContent } from '../lib/content-sanitizer';
 
-export const metadata: Metadata = {
-  title: 'Help Center — Otaku-mori',
-  description: 'Find answers to common questions about Otaku-mori gaming and shopping.',
-};
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/help',
+  });
+}
 export default function HelpCenter() {
   const faqs = [
     {

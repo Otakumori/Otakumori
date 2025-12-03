@@ -1,5 +1,7 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -50,6 +52,13 @@ const DEFAULT_FLAGS: FeatureFlag[] = [
   },
 ];
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\flags\page.tsx',
+  });
+}
 export default function AdminFlagsPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -68,7 +77,7 @@ export default function AdminFlagsPage() {
         setFlags(data.flags);
       }
     } catch (error) {
-      console.error('Failed to load flags', error);
+      logger.error('Failed to load flags', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -107,7 +116,7 @@ export default function AdminFlagsPage() {
         current.map((flag) => (flag.id === flagId ? { ...flag, enabled: !flag.enabled } : flag)),
       );
     } catch (error) {
-      console.error('Failed to toggle flag', error);
+      logger.error('Failed to toggle flag', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setSaving(false);
     }
@@ -132,7 +141,7 @@ export default function AdminFlagsPage() {
 
       setFlags(DEFAULT_FLAGS);
     } catch (error) {
-      console.error('Failed to reset flags', error);
+      logger.error('Failed to reset flags', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setSaving(false);
     }

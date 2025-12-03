@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -136,7 +137,7 @@ export async function POST(req: NextRequest) {
 
     return rateLimitedHandler(req);
   } catch (error) {
-    console.error('Error creating praise:', error);
+    logger.error('Error creating praise:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to send praise', requestId), {
       status: 500,
     });
@@ -212,7 +213,7 @@ export async function GET(req: NextRequest) {
       ),
     );
   } catch (error) {
-    console.error('Error fetching praises:', error);
+    logger.error('Error fetching praises:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch praises', requestId),
       { status: 500 },

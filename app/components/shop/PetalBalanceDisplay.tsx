@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getNextReward, getRewardProgress } from '@/app/lib/petal-economy';
@@ -30,7 +31,7 @@ export function PetalBalanceDisplay() {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch petal balance:', error);
+        logger.error('Failed to fetch petal balance:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       } finally {
         setLoading(false);
       }
@@ -71,7 +72,7 @@ export function PetalBalanceDisplay() {
           <p className="text-2xl font-bold text-pink-300">{balance?.toLocaleString() || 0}</p>
         </div>
         <span className="text-3xl" role="img" aria-label="Petals">
-          🌸
+          <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
         </span>
       </div>
 

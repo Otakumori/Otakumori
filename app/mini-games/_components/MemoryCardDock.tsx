@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 
@@ -43,7 +44,7 @@ export default function MemoryCardDock({ className = '' }: MemoryCardDockProps) 
         }
       }
     } catch (error) {
-      console.error('Failed to fetch orders:', error);
+      logger.error('Failed to fetch orders:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }

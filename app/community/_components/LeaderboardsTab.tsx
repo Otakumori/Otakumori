@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 
@@ -70,7 +71,7 @@ export function LeaderboardsTab() {
               }
             }
           } catch (err) {
-            console.warn(`Failed to fetch leaderboard for ${gameId}:`, err);
+            logger.warn(`Failed to fetch leaderboard for ${gameId}:`, undefined, { error: err instanceof Error ? err : new Error(String(err)) });
           }
         }
 
@@ -78,7 +79,7 @@ export function LeaderboardsTab() {
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load leaderboards');
-        console.error('Error fetching leaderboards:', err);
+        logger.error('Error fetching leaderboards:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoading(false);
       }

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -85,7 +86,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       data: { message: 'Rune deleted successfully' },
     });
   } catch (error) {
-    console.error('Rune delete error:', error);
+    logger.error('Rune operation error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

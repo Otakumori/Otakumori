@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 // Save System Types
 export interface SaveData {
   id: string;
@@ -170,7 +172,7 @@ export class SaveSystem {
 
     // Verify checksum
     if (!this.verifyChecksum(save)) {
-      console.warn('Save data checksum verification failed');
+      logger.warn('Save data checksum verification failed');
     }
 
     return save;
@@ -260,7 +262,7 @@ export class SaveSystem {
         const save = await this.createSave(slotId, data, {});
         this.onAutoSave?.(save);
       } catch (error) {
-        console.error('Auto-save failed:', error);
+        logger.error('Auto-save failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }, this.config.autoSaveInterval);
   }
@@ -334,7 +336,7 @@ export class SaveSystem {
       this.onSaveCreated?.(save);
       return save;
     } catch (error) {
-      console.error('Failed to import save data:', error);
+      logger.error('Failed to import save data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -377,7 +379,7 @@ export class SaveSystem {
       // Save to localStorage
       this.saveToLocalStorage();
     } catch (error) {
-      console.error('Failed to restore from backup:', error);
+      logger.error('Failed to restore from backup:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -478,7 +480,7 @@ export class SaveSystem {
       };
       localStorage.setItem('otaku_mori_saves', JSON.stringify(data));
     } catch (error) {
-      console.error('Failed to save to localStorage:', error);
+      logger.error('Failed to save to localStorage:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -506,7 +508,7 @@ export class SaveSystem {
         Object.assign(this.config, parsed.config);
       }
     } catch (error) {
-      console.error('Failed to load from localStorage:', error);
+      logger.error('Failed to load from localStorage:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

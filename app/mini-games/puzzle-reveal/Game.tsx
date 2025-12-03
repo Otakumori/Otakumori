@@ -2,6 +2,7 @@
 // @ts-nocheck
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
@@ -157,7 +158,7 @@ export default function Game({ mode }: Props) {
             }),
           });
         } catch (error) {
-          console.error('Failed to submit score:', error);
+          logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       };
       submitScore();
@@ -252,7 +253,7 @@ export default function Game({ mode }: Props) {
               </p>
               <p className="text-pink-200 text-lg mt-4">
                 <span role="img" aria-label="Cherry blossom petal">
-                  🌸
+                  <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                 </span>{' '}
                 Petals Earned: <span className="font-bold">{Math.floor(gameState.score / 15)}</span>
               </p>

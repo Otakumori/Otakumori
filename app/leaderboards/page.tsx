@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 import StarfieldPurple from '../components/StarfieldPurple';
 import Navbar from '../components/layout/Navbar';
@@ -5,10 +6,6 @@ import FooterDark from '../components/FooterDark';
 import LeaderboardInterface from '../components/community/LeaderboardInterface';
 import { t } from '@/lib/microcopy';
 
-export const metadata: Metadata = {
-  title: 'Leaderboards — Otaku-mori',
-  description: 'See how you rank among other travelers.',
-};
 
 // Force dynamic rendering to prevent timeout during static generation
 export const dynamic = 'force-dynamic';
@@ -33,6 +30,13 @@ async function getLeaderboardData() {
   }
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/leaderboards',
+  });
+}
 export default async function LeaderboardPage() {
   const leaderboardData = await getLeaderboardData();
 

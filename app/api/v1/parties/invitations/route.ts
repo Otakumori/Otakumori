@@ -133,9 +133,9 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    logger.error('Failed to send party invitation', {
+    logger.error('Failed to send party invitation', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to send party invitation' },
       { status: 500 },
@@ -211,9 +211,9 @@ export async function GET(request: NextRequest) {
       data: transformedInvitations,
     });
   } catch (error) {
-    logger.error('Failed to fetch party invitations', {
+    logger.error('Failed to fetch party invitations', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to fetch party invitations' },
       { status: 500 },

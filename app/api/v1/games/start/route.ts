@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Game start error:', error);
+    logger.error('Game start error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   } finally {

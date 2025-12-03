@@ -13,6 +13,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { clientEnv } from '@/env/client';
 
 export interface GameEvent {
@@ -379,7 +380,7 @@ export class GameTelemetryV2 {
         // Flushed events
       }
     } catch (error) {
-      console.error('Failed to send telemetry events:', error);
+      logger.error('Failed to send telemetry events:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
       // Re-queue events for retry (with limit)
       if (events.length < this.config.batchSize * 2) {
@@ -545,7 +546,7 @@ export class GameTelemetryV2 {
         body: JSON.stringify({ session: this.currentSession }),
       });
     } catch (error) {
-      console.error('Failed to send session summary:', error);
+      logger.error('Failed to send session summary:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

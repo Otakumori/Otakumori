@@ -1,6 +1,14 @@
+import { generateSEO } from '@/app/lib/seo';
 import Head from 'next/head';
 import Link from 'next/link';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/insiders',
+  });
+}
 export default function InsidersPage() {
   return (
     <main className="min-h-screen bg-[#080611] pt-24 text-zinc-100">

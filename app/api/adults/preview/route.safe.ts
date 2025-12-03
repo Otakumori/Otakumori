@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -242,7 +243,7 @@ export async function GET(request: NextRequest) {
         userSliders = JSON.parse(slidersParam);
       } catch (error) {
         // Invalid JSON, use empty object
-        console.error('Failed to parse sliders JSON:', error);
+        logger.error('Preview error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }
 
@@ -303,7 +304,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Preview API error:', error);
+    logger.error(
+      'Preview API error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(

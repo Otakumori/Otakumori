@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 import StarfieldPurple from '../components/StarfieldPurple';
 import Navbar from '../components/layout/Navbar';
@@ -5,11 +6,14 @@ import FooterDark from '../components/FooterDark';
 import SearchInterface from '../components/search/SearchInterface';
 import { t } from '@/lib/microcopy';
 
-export const metadata: Metadata = {
-  title: 'Search — Otaku-mori',
-  description: 'Search for products, posts, and games.',
-};
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/search',
+  });
+}
 export default function SearchPage() {
   return (
     <>

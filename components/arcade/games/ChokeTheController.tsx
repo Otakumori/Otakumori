@@ -194,7 +194,7 @@ export default function ChokeTheController({ onComplete, _onFail, _duration }: G
           >
             <div className="text-6xl mb-2">
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
             </div>
             <p className="text-pink-200 text-2xl font-bold drop-shadow-[0_0_10px_rgba(236,72,153,0.8)]">

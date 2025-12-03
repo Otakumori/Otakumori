@@ -1,5 +1,6 @@
-﻿export const runtime = 'nodejs';
+export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -86,7 +87,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });
     }
 
-    console.error('Notifications fetch error', error);
+    logger.error('Notifications fetch error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -123,7 +124,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid request' }, { status: 400 });
     }
 
-    console.error('Mark notifications read error', error);
+    logger.error('Mark notifications read error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

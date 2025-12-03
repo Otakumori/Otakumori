@@ -75,8 +75,8 @@ export function handleServerError(
   } catch (sentryError) {
     // Silently fail if Sentry tracking fails - don't crash the app
     // Fallback to console.error in case Sentry is unavailable
-    if (typeof console !== 'undefined' && console.error) {
-      console.error('[handleServerError] Failed to track error in Sentry:', sentryError);
+    if (typeof console !== 'undefined' && typeof console.error === 'function') {
+      logger.error('[handleServerError] Failed to track error in Sentry:', undefined, undefined, sentryError instanceof Error ? sentryError : new Error(String(sentryError)));
     }
   }
 
@@ -118,9 +118,9 @@ export function handleServerError(
   } catch (loggerError) {
     // Silently fail if logger fails - don't crash the app
     // Fallback to console.error in case logger is unavailable
-    if (typeof console !== 'undefined' && console.error) {
-      console.error('[handleServerError] Failed to log error:', loggerError);
-      console.error('[handleServerError] Original error:', errorDetails);
+    if (typeof console !== 'undefined' && typeof console.error === 'function') {
+      logger.error('[handleServerError] Failed to log error:', undefined, undefined, loggerError instanceof Error ? loggerError : new Error(String(loggerError)));
+      logger.error('[handleServerError] Original error:', undefined, undefined, errorDetails instanceof Error ? errorDetails : new Error(String(errorDetails)));
     }
   }
 

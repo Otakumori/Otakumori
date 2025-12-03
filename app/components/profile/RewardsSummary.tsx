@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 
@@ -48,7 +49,7 @@ export default function RewardsSummary() {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error fetching petal summary:', err);
+        logger.error('Error fetching petal summary:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoading(false);
       }

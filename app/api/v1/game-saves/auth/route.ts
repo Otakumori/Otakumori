@@ -1,10 +1,12 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 export async function GET(request: NextRequest) {
   try {
     // Log game save auth check
-    console.warn('Game save auth check from:', request.headers.get('user-agent'));
+    logger.warn('Game save auth check from:', undefined, { value: request.headers.get('user-agent') });
 
     const { userId } = await auth();
 
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
       requestId: `auth_${Date.now()}`,
     });
   } catch (error) {
-    console.error('Auth check error:', error);
+    logger.error('Auth check error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

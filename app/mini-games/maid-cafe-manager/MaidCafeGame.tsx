@@ -96,7 +96,7 @@ export default function MaidCafeGame() {
   // Avatar options
   const avatarOptions = {
     classic: { emoji: '‍', outfit: 'Classic Maid' },
-    gothic: { emoji: '‍️', outfit: 'Gothic Lolita' },
+    gothic: { emoji: '‍<span role="img" aria-label="emoji">️</span>', outfit: 'Gothic Lolita' },
     modern: { emoji: '‍', outfit: 'Modern Casual' },
   };
 
@@ -367,7 +367,7 @@ export default function MaidCafeGame() {
 
           <div className="text-sm text-gray-400 space-y-1">
             <p> Click customers to take orders</p>
-            <p>️ Click ready orders to serve</p>
+            <p><span role="img" aria-label="emoji">️</span> Click ready orders to serve</p>
             <p> Click dirty tables to clean</p>
             <p> Earn money and tips for good service</p>
           </div>
@@ -478,7 +478,7 @@ export default function MaidCafeGame() {
                     {order.item.emoji} {order.item.name}
                   </span>
                   <span className="text-xs">
-                    {order.status === 'ready' ? ' Ready!' : '⏱️ Cooking...'}
+                    {order.status === 'ready' ? ' Ready!' : '⏱<span role="img" aria-label="emoji">️</span> Cooking...'}
                   </span>
                 </div>
               </div>
@@ -533,7 +533,7 @@ export default function MaidCafeGame() {
               {/* Customer */}
               <div className="text-2xl mb-1">
                 {customer.status === 'waiting'
-                  ? '‍️'
+                  ? '‍<span role="img" aria-label="emoji">️</span>'
                   : customer.status === 'ordering'
                     ? ''
                     : customer.status === 'eating'

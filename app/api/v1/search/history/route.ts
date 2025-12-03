@@ -58,9 +58,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    logger.error('Search history request failed', {
+    logger.error('Search history request failed', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid request parameters' }, { status: 400 });
@@ -106,9 +106,9 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: { success: true } });
   } catch (error) {
-    logger.error('Search history deletion failed', {
+    logger.error('Search history deletion failed', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
 
     return NextResponse.json(
       { ok: false, error: 'Failed to delete search history' },

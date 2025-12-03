@@ -5,6 +5,7 @@
  * Ensures the homepage never crashes the entire site, even if individual sections fail.
  */
 
+import { logger } from '@/app/lib/logger';
 import { Suspense, type ReactNode } from 'react';
 import { headers } from 'next/headers';
 import { handleServerError } from '@/app/lib/server-error-handler';
@@ -108,10 +109,10 @@ export default async function HomePageSafe({ children }: HomePageSafeProps) {
       });
     } catch (sentryError) {
       // Silently fail if Sentry is unavailable
-      if (typeof console !== 'undefined' && console.error) {
-        console.error('[HomePageSafe] Failed to capture error in Sentry:', sentryError);
-        console.error('[HomePageSafe] Original error:', error);
-        console.error('[HomePageSafe] Request ID:', requestId);
+      if (typeof console !== 'undefined') {
+        logger.error('[HomePageSafe] Failed to capture error in Sentry', undefined, undefined, sentryError instanceof Error ? sentryError : new Error(String(sentryError)));
+        logger.error('[HomePageSafe] Original error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
+        logger.error('[HomePageSafe] Request ID', undefined, { requestId });
       }
     }
 

@@ -1,5 +1,7 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -21,7 +23,7 @@ export default function AvatarEditorPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading...</p>
+            < Skeleton />
         </div>
       </div>
     );
@@ -78,7 +80,7 @@ export default function AvatarEditorPage() {
   // Handle avatar preview
   const handlePreview = (config: any) => {
     // Update preview with new config (trigger re-render with config change)
-    console.warn('Preview updated with config:', {
+    logger.warn('Preview updated', undefined, {
       gender: config.gender,
       hasPhysics: !!config.physics?.softBody?.enable,
     });

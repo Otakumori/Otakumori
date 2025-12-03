@@ -1,10 +1,12 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import manifest from '@/public/assets/manifest.json';
 import roles from '@/assets-roles.json';
 
 function normalize(p?: string | null): string | null {
   if (!p) return null;
   if (!p.startsWith('/assets/')) {
-    console.warn('[assets] Non-standard path detected (forcing /assets prefix):', p);
+    logger.warn('[assets] Non-standard path detected (forcing /assets prefix):', undefined, { value: p });
   }
   return p.startsWith('/assets/') ? p : `/assets/${p.replace(/^\/+/, '')}`;
 }

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 
@@ -17,7 +18,12 @@ export async function GET() {
 
     return NextResponse.json({ ok: true, playlist: pl ?? null });
   } catch (error) {
-    console.error('Music playlist API error:', error);
+    logger.error(
+      'Music playlist API error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     // Return empty playlist to prevent errors
     return NextResponse.json({
       ok: true,

@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import { type GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 import { AnimationMixer, type AnimationClip, type AnimationAction, LoopRepeat } from 'three';
@@ -259,7 +261,7 @@ export class AnimationController {
   // State management
   setState(stateName: string, fadeTime?: number): boolean {
     if (!this.hasState(stateName)) {
-      console.warn(`Animation state '${stateName}' not found`);
+      logger.warn(`Animation state '${stateName}' not found`);
       return false;
     }
 
@@ -545,7 +547,7 @@ export function createAnimationController(
   options: AnimationControllerOptions = {},
 ): AnimationController | null {
   if (!gltf.animations || gltf.animations.length === 0) {
-    console.warn('No animations found in GLTF');
+    logger.warn('No animations found in GLTF');
     return null;
   }
 

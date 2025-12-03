@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Environment, Html } from '@react-three/drei';
@@ -74,7 +75,7 @@ function Profile3DScene({
         // Check if performance tier is high (assuming it has a tier property)
         const currentTier = (performanceOptimizer.current as any).currentTier || 'medium';
         if (currentTier === 'high') {
-          console.warn(`Performance warning: FPS dropped to ${fps.toFixed(1)}`);
+          logger.warn(`Performance warning: FPS dropped to ${fps.toFixed(1)}`);
         }
       }
     }
@@ -86,7 +87,7 @@ function Profile3DScene({
   };
 
   const handleAvatarError = (error: Error) => {
-    console.error('Profile 3D Avatar load error:', error);
+    logger.error('Profile 3D Avatar load error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     onError?.(error);
   };
 
@@ -152,7 +153,7 @@ function useProfileAvatar(userId?: string) {
           return data.ok ? data.data : null;
         }
       } catch (error) {
-        console.error('Failed to fetch profile avatar:', error);
+        logger.error('Failed to fetch profile avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
       return null;
     },
@@ -238,7 +239,7 @@ export default function Profile3DViewer({
         <div className="flex flex-col items-center space-y-2 text-center">
           <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center">
             <span className="text-white text-lg" role="img" aria-label="User avatar">
-              👤
+              <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
             </span>
           </div>
           <span className="text-sm text-gray-400">Avatar unavailable</span>
@@ -256,7 +257,7 @@ export default function Profile3DViewer({
         <div className="flex flex-col items-center space-y-2 text-center">
           <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full flex items-center justify-center">
             <span className="text-white text-lg" role="img" aria-label="User avatar">
-              👤
+              <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
             </span>
           </div>
           <span className="text-sm text-gray-400">No avatar configured</span>

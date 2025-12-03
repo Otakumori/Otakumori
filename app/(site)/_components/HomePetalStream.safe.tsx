@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { createEngine, type EngineCallbacks } from '@/app/mini-games/_engine/Engine.safe';
 import { createTextureFromUrl } from '@/app/mini-games/_engine/glTexture.safe';
@@ -154,7 +155,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
       const texture = await createTextureFromUrl(gl, '/assets/petals-atlas.png');
       textureRef.current = texture;
     } catch {
-      console.warn('Failed to load petal texture, using fallback');
+      logger.warn('Failed to load petal texture, using fallback');
       // Create a simple colored texture as fallback
       textureRef.current = createFallbackTexture(gl);
     }
@@ -177,7 +178,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error('Shader program linking error:', gl.getProgramInfoLog(program));
+      logger.error('Shader program linking error', undefined, gl.getProgramInfoLog(program) ?? undefined);
       gl.deleteProgram(program);
       return null;
     }
@@ -193,7 +194,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+      logger.error('Shader compilation error', undefined, gl.getShaderInfoLog(shader) ?? undefined);
       gl.deleteShader(shader);
       return null;
     }
@@ -330,7 +331,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
         setDailyCapReached(true);
         // Daily petal collection cap reached
       } else {
-        console.error('Failed to collect petals:', error);
+        logger.error('Failed to collect petals', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }
   }, [onBalanceUpdate]);

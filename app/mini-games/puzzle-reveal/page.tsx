@@ -14,6 +14,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
@@ -50,6 +52,13 @@ const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\puzzle-reveal\page.tsx',
+  });
+}
 export default function PuzzleRevealPage() {
   const [mode, setMode] = useState<GameMode>('medium');
   const [key, setKey] = useState(0); // Force remount on mode change
@@ -171,7 +180,7 @@ export default function PuzzleRevealPage() {
           }),
         });
       } catch (error) {
-        console.error('Failed to submit score:', error);
+        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [mode, combo, earnPetals, hasAwardedPetals],
@@ -214,10 +223,10 @@ export default function PuzzleRevealPage() {
                       : 'bg-black/30 border border-white/20 text-zinc-300 hover:bg-black/50 hover:border-white/40'
                   }`}
                 >
-                  {difficulty === 'easy' && '🟢 Easy (4×3)'}
-                  {difficulty === 'medium' && '🟡 Medium (6×5)'}
-                  {difficulty === 'hard' && '🟠 Hard (8×6)'}
-                  {difficulty === 'expert' && '🔴 Expert (10×8)'}
+                  {difficulty === 'easy' && '<span role="img" aria-label="emoji">�</span>� Easy (4×3)'}
+                  {difficulty === 'medium' && '<span role="img" aria-label="emoji">�</span>� Medium (6×5)'}
+                  {difficulty === 'hard' && '<span role="img" aria-label="emoji">�</span>� Hard (8×6)'}
+                  {difficulty === 'expert' && '<span role="img" aria-label="emoji">�</span>� Expert (10×8)'}
                 </button>
               ))}
             </div>

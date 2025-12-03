@@ -59,9 +59,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: { success: true } });
   } catch (error) {
-    logger.error('Search analytics request failed', {
+    logger.error('Search analytics request failed', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid analytics data' }, { status: 400 });
@@ -106,7 +106,7 @@ async function updateSuggestionPopularity(analyticsRequest: SearchAnalyticsReque
     }
   } catch (error) {
     // Don't fail the analytics request if suggestion update fails
-    logger.warn('Failed to update suggestion popularity', {
+    logger.warn('Failed to update suggestion popularity', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
     });
   }

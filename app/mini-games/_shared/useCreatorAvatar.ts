@@ -3,6 +3,7 @@
  * Provides option to use CREATOR-made avatars vs preset characters
  */
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
@@ -31,7 +32,7 @@ async function loadCreatorAvatar(): Promise<CreatorAvatarConfig | null> {
 
     return null;
   } catch (error) {
-    console.error('Failed to load CREATOR avatar:', error);
+    logger.error('Failed to load CREATOR avatar:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three-stdlib';
 import { DRACOLoader } from 'three-stdlib';
@@ -126,7 +128,7 @@ export class ModelLoader {
 
       return result;
     } catch (error) {
-      console.error('Failed to load model:', error);
+      logger.error('Failed to load model:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   }
@@ -138,7 +140,7 @@ export class ModelLoader {
         url,
         (gltf) => resolve(gltf),
         (progress) => {
-          console.warn('Loading progress:', (progress.loaded / progress.total) * 100 + '%');
+          logger.warn('Loading progress:', undefined, { value: (progress.loaded / progress.total) * 100 + '%' });
         },
         (error) => reject(error),
       );
@@ -382,7 +384,7 @@ export class ModelLoader {
   ): THREE.BufferGeometry {
     // This is a placeholder - you'd use a library like three-mesh-bvh or similar
     // for actual geometry simplification
-    console.warn('Geometry simplification not implemented - returning original geometry');
+    logger.warn('Geometry simplification not implemented - returning original geometry');
     return geometry;
   }
 

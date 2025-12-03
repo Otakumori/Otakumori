@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import * as Sentry from '@sentry/nextjs';
 
@@ -83,7 +84,7 @@ export default function ErrorTestButton() {
 
       alert('Test message sent to Sentry! Check your Sentry dashboard.');
     } catch (error) {
-      console.error('Error sending test message:', error);
+      logger.error('Error sending test message:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }

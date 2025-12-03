@@ -1,5 +1,6 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { motion } from 'framer-motion';
 import GlassCard from '@/app/components/ui/GlassCard';
 import GlassButton from '@/app/components/ui/GlassButton';
@@ -13,6 +14,13 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
   </GlassCard>
 );
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/terms',
+  });
+}
 export default function TermsOfService() {
   return (
     <main

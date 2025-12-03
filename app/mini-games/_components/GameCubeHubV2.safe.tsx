@@ -218,7 +218,7 @@ export default function GameCubeHubV2() {
               <div className="text-center">
                 <div className="text-lg mb-1">
                   <span role="img" aria-label="Trade Center">
-                    🏪
+                    <span role="img" aria-label="emoji">�</span>�
                   </span>
                 </div>
                 <div className="text-xs">{cubeConfig.faces.up.label}</div>
@@ -239,7 +239,7 @@ export default function GameCubeHubV2() {
               <div className="text-center">
                 <div className="text-lg mb-1">
                   <span role="img" aria-label="Mini-Games">
-                    🎮
+                    <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                   </span>
                 </div>
                 <div className="text-xs">{cubeConfig.faces.left.label}</div>
@@ -260,7 +260,7 @@ export default function GameCubeHubV2() {
               <div className="text-center">
                 <div className="text-lg mb-1">
                   <span role="img" aria-label="Avatar Community">
-                    👤
+                    <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                   </span>
                 </div>
                 <div className="text-xs">{cubeConfig.faces.right.label}</div>
@@ -281,7 +281,7 @@ export default function GameCubeHubV2() {
               <div className="text-center">
                 <div className="text-lg mb-1">
                   <span role="img" aria-label="Music Extras">
-                    🎵
+                    <span role="img" aria-label="emoji">�</span>�
                   </span>
                 </div>
                 <div className="text-xs">{cubeConfig.faces.down.label}</div>
@@ -498,7 +498,7 @@ export default function GameCubeHubV2() {
                     <div className="text-center mb-4">
                       <div className="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
                         <span className="text-2xl" role="img" aria-label="Character Avatar">
-                          👤
+                          <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                         </span>
                       </div>
                       <h4 className="text-primary font-medium">Ultra Detailed Character Creator</h4>
@@ -522,7 +522,7 @@ export default function GameCubeHubV2() {
                       >
                         <div className="text-lg mb-1">
                           <span role="img" aria-label="Profile">
-                            👤
+                            <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                           </span>
                         </div>
                         <div className="text-sm font-medium">View Profile</div>
@@ -533,7 +533,7 @@ export default function GameCubeHubV2() {
                       >
                         <div className="text-lg mb-1">
                           <span role="img" aria-label="Community">
-                            💬
+                            <span role="img" aria-label="emoji">�</span>�
                           </span>
                         </div>
                         <div className="text-sm font-medium">Community</div>

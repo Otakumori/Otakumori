@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getPrintifyService } from '@/app/lib/printify/service';
 import { stripHtml } from '@/lib/html';
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
     // Check if Printify is configured
     const { env } = await import('@/env');
     if (!env.PRINTIFY_API_KEY || !env.PRINTIFY_SHOP_ID) {
-      console.warn('[printify/products] Printify not configured - missing API key or shop ID');
+      logger.warn('[printify/products] Printify not configured - missing API key or shop ID');
       return NextResponse.json(
         {
           ok: true,
@@ -59,7 +61,7 @@ export async function GET(request: NextRequest) {
     if (query.sync) {
       // Don't await this - let it run in background
       syncProductsInBackground().catch((error) => {
-        console.error('Background sync failed:', error);
+        logger.error('Background sync failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       });
     }
 
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
     try {
       result = await getPrintifyService().getProducts(query.page, query.per_page);
     } catch (serviceError) {
-      console.error('Printify service error:', serviceError);
+      logger.error('Printify service error:', undefined, undefined, serviceError instanceof Error ? serviceError : new Error(String(serviceError)));
 
       // Return empty result instead of 500
       return NextResponse.json(
@@ -147,7 +149,7 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (error) {
-    console.error('Printify products API error:', error);
+    logger.error('Printify products API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     // Check if it's a known upstream failure (Printify API issues)
     const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
@@ -205,11 +207,11 @@ export async function GET(request: NextRequest) {
 async function syncProductsInBackground() {
   try {
     const products = await getPrintifyService().getAllProducts();
-    console.warn(`Background sync completed: ${products.length} products fetched`);
+    logger.warn(`Background sync completed: ${products.length} products fetched`);
 
     // Here you would save to your database
     // await saveProductsToDatabase(products);
   } catch (error) {
-    console.error('Background sync failed:', error);
+    logger.error('Background sync failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
   }
 }

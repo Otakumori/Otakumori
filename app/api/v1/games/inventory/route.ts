@@ -4,13 +4,15 @@ export const runtime = 'nodejs'; // keep on Node runtime (not edge)
 export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
 export const maxDuration = 10; // optional guard
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
-    console.warn('Game inventory requested from:', req.headers.get('user-agent'));
+    logger.warn('Game inventory requested from:', undefined, { value: req.headers.get('user-agent') });
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {
@@ -49,7 +51,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching inventory:', error);
+    logger.error('Error fetching inventory:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

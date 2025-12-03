@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -14,7 +15,7 @@ export function AssetDownloader({ config, className = '' }: AssetDownloaderProps
   const [exportQuality, setExportQuality] = useState<'low' | 'medium' | 'high'>('medium');
 
   // Log config for debugging export process
-  console.warn('AssetDownloader initialized with config keys:', Object.keys(config));
+  logger.warn('AssetDownloader initialized with config keys:', undefined, { value: Object.keys(config) });
 
   const formats = [
     {
@@ -33,9 +34,9 @@ export function AssetDownloader({ config, className = '' }: AssetDownloaderProps
       id: 'obj',
       name: 'OBJ (3D Model)',
       description: 'Simple 3D format for 3D printing',
-      icon: '️',
+      icon: '<span role="img" aria-label="emoji">️</span>',
     },
-    { id: 'png', name: 'PNG (Image)', description: 'High-quality 2D render', icon: '️' },
+    { id: 'png', name: 'PNG (Image)', description: 'High-quality 2D render', icon: '<span role="img" aria-label="emoji">️</span>' },
     { id: 'jpg', name: 'JPG (Image)', description: 'Compressed 2D render', icon: '' },
     { id: 'svg', name: 'SVG (Vector)', description: 'Scalable vector graphics', icon: '' },
   ];
@@ -75,7 +76,7 @@ export function AssetDownloader({ config, className = '' }: AssetDownloaderProps
         throw new Error(result.error);
       }
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Export failed. Please try again.');
     } finally {
       setIsExporting(false);

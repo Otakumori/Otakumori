@@ -1,6 +1,7 @@
 // DEPRECATED: This component is a duplicate. Use app\mini-games\bubble-ragdoll\Scene.tsx instead.
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState } from 'react';
 import { getAsset } from '../_shared/assets-resolver';
 import { play } from '../_shared/audio-bus';
@@ -375,7 +376,7 @@ export default function SamuraiSlice() {
           },
         });
       } catch (error) {
-        console.error('Failed to save game on exit:', error);
+        logger.error('Failed to save game on exit:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
 
       // Also send to legacy endpoint for compatibility

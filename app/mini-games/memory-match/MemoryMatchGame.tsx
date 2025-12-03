@@ -32,9 +32,9 @@ export default function MemoryMatchGame({ deck, pairs, timeLimit }: MemoryMatchG
 
   // Card symbols for different decks
   const deckSymbols = {
-    anime: ['‍', '‍', '‍', '', '', '‍️', '‍️', '‍️', '‍️', '', '', ''],
-    gaming: ['', '️', '', '', '', '', '️', '️', '️', '️', '🃝', ''],
-    runes: ['', '', '', '️', '', '', '️', '️', '', '◆', '', ''],
+    anime: ['‍', '‍', '‍', '', '', '‍<span role="img" aria-label="emoji">️</span>', '‍<span role="img" aria-label="emoji">️</span>', '‍<span role="img" aria-label="emoji">️</span>', '‍<span role="img" aria-label="emoji">️</span>', '', '', ''],
+    gaming: ['', '<span role="img" aria-label="emoji">️</span>', '', '', '', '', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">�</span>�', ''],
+    runes: ['', '', '', '<span role="img" aria-label="emoji">️</span>', '', '', '<span role="img" aria-label="emoji">️</span>', '<span role="img" aria-label="emoji">️</span>', '', '◆', '', ''],
   };
 
   // Initialize game

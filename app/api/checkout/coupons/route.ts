@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { couponCode } = await req.json();
-    console.warn(`Coupon validation requested for: ${couponCode}`);
+    logger.warn(`Coupon validation requested for: ${couponCode}`);
 
     // TODO: Implement coupon validation logic
     return NextResponse.json({
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error validating coupon:', error);
+    logger.error('Error validating coupon', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

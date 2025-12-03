@@ -1,5 +1,6 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
@@ -30,7 +31,7 @@ export default function AdultsIndexPage() {
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+        <Skeleton />
       </div>
     );
   }

@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import type { Metadata } from 'next';
 import { env } from '@/env';
 
@@ -68,7 +70,7 @@ export function generateSEO({
   // Add product metadata if price is provided
   if (type === 'product') {
     if (price === undefined) {
-      console.warn('SEO: Product type requires price parameter');
+      logger.warn('SEO: Product type requires price parameter');
       // Use default price for products without explicit pricing
       metadata.other = {
         'product:price:amount': '0.00',

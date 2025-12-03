@@ -168,17 +168,17 @@ export default function AvatarContextAdapter({
             <div className="absolute inset-0">
               <div className="absolute animate-sparkle-1" style={{ top: '10%', left: '20%' }}>
                 <span role="img" aria-label="sparkle">
-                  ✨
+                  <span role="img" aria-label="sparkles">✨</span>
                 </span>
               </div>
               <div className="absolute animate-sparkle-2" style={{ top: '60%', left: '70%' }}>
                 <span role="img" aria-label="sparkle">
-                  ✨
+                  <span role="img" aria-label="sparkles">✨</span>
                 </span>
               </div>
               <div className="absolute animate-sparkle-3" style={{ top: '30%', left: '90%' }}>
                 <span role="img" aria-label="sparkle">
-                  ✨
+                  <span role="img" aria-label="sparkles">✨</span>
                 </span>
               </div>
             </div>
@@ -188,7 +188,7 @@ export default function AvatarContextAdapter({
             <div className="absolute inset-0 opacity-50">
               <div className="absolute animate-petal-float" style={{ top: '10%', left: '30%' }}>
                 <span role="img" aria-label="floating petal">
-                  🌸
+                  <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                 </span>
               </div>
               <div
@@ -196,7 +196,7 @@ export default function AvatarContextAdapter({
                 style={{ top: '50%', left: '60%' }}
               >
                 <span role="img" aria-label="floating petal">
-                  🌸
+                  <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
                 </span>
               </div>
             </div>

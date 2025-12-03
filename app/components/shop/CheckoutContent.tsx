@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -50,7 +51,7 @@ export default function CheckoutContent() {
           }
         }
       } catch (err) {
-        console.error('Error fetching available discounts:', err);
+        logger.error('Error fetching available discounts:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoadingDiscounts(false);
       }
@@ -185,7 +186,7 @@ export default function CheckoutContent() {
         window.location.href = url;
       }
     } catch (error) {
-      console.error('Checkout failed:', error);
+      logger.error('Checkout failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsProcessing(false);
     }

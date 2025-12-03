@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       requestId,
     });
   } catch (error: any) {
-    console.error('[Soapstone Appraise] Error:', error);
+    logger.error('[Soapstone Appraise] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

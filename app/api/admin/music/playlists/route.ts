@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { auth } from '@clerk/nextjs/server';
@@ -10,9 +11,9 @@ export async function GET() {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.warn(`Admin ${admin.id} requested playlists`);
+    logger.warn(`Admin ${admin.id} requested playlists`);
   } catch (error) {
-    console.error('Admin auth failed for playlists GET:', error);
+    logger.error('Admin auth failed for playlist creation', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
@@ -27,9 +28,9 @@ export async function POST(req: Request) {
   try {
     const admin = await requireAdmin();
     // admin is { id: string } on success
-    console.warn(`Admin ${admin.id} creating playlist`);
+    logger.warn(`Admin ${admin.id} creating playlist`);
   } catch (error) {
-    console.error('Admin auth failed for playlist creation:', error);
+    logger.error('Playlist creation error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 

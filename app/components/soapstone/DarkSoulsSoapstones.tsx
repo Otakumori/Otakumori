@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import {
@@ -109,7 +110,7 @@ export default function DarkSoulsSoapstones({
         setSoapstones(positionedMessages);
       }
     } catch (error) {
-      console.warn('[DarkSoulsSoapstones] Failed to fetch soapstones:', error);
+      logger.warn('[DarkSoulsSoapstones] Failed to fetch soapstones:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     }
   }, [maxSoapstones, containerSize]);
 

@@ -3,6 +3,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -87,7 +88,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Order fetch error', error);
+    logger.error(
+      'Order fetch error',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import {
   type ApiResponse,
   createApiError,
@@ -44,7 +45,7 @@ class ApiClient {
 
       return data as ApiResponse<T>;
     } catch (error) {
-      console.error('API request failed:', error);
+      logger.error('API request failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return createApiError('INTERNAL_ERROR', 'Network error', requestId);
     }
   }

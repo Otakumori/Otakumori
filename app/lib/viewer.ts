@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
 
@@ -20,7 +21,7 @@ export async function getViewer(): Promise<Viewer> {
       nsfw: user.nsfwEnabled ?? true, // default true for signed-in
     };
   } catch (error) {
-    console.error('Error getting viewer:', error);
+    logger.error('Error getting viewer:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

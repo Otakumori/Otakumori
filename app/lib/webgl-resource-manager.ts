@@ -5,6 +5,8 @@
  * Ensures proper disposal of geometries, materials, and renderers.
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import * as THREE from 'three';
 
 export class WebGLResourceManager {
@@ -28,7 +30,7 @@ export class WebGLResourceManager {
    */
   createScene(id: string): THREE.Scene {
     if (this.scenes.has(id)) {
-      console.warn(`Scene ${id} already exists, disposing old scene`);
+      logger.warn(`Scene ${id} already exists, disposing old scene`);
       this.disposeScene(id);
     }
 
@@ -42,7 +44,7 @@ export class WebGLResourceManager {
    */
   createRenderer(id: string, options: THREE.WebGLRendererParameters = {}): THREE.WebGLRenderer {
     if (this.renderers.has(id)) {
-      console.warn(`Renderer ${id} already exists, disposing old renderer`);
+      logger.warn(`Renderer ${id} already exists, disposing old renderer`);
       this.disposeRenderer(id);
     }
 
@@ -62,7 +64,7 @@ export class WebGLResourceManager {
    */
   createCamera(id: string, type: 'perspective' | 'orthographic', options: any = {}): THREE.Camera {
     if (this.cameras.has(id)) {
-      console.warn(`Camera ${id} already exists, disposing old camera`);
+      logger.warn(`Camera ${id} already exists, disposing old camera`);
       this.disposeCamera(id);
     }
 

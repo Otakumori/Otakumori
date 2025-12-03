@@ -28,7 +28,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🃝',
+      avatar: '<span role="img" aria-label="emoji">�</span>�',
       role: 'Your Guide',
     },
     messages: [
@@ -47,7 +47,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🃝',
+      avatar: '<span role="img" aria-label="emoji">�</span>�',
       role: 'Your Guide',
     },
     messages: [
@@ -68,7 +68,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🃝',
+      avatar: '<span role="img" aria-label="emoji">�</span>�',
       role: 'Your Guide',
     },
     messages: [
@@ -89,7 +89,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     character: {
       name: 'Otaku-mori',
-      avatar: '🃝',
+      avatar: '<span role="img" aria-label="emoji">�</span>�',
       role: 'Your Guide',
     },
     messages: [

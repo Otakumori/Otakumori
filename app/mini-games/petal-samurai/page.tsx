@@ -5,6 +5,7 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import dynamic from 'next/dynamic';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -37,6 +38,13 @@ const SlicingGame = dynamic(() => import('./Game'), {
   ),
 });
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\petal-samurai\page.tsx',
+  });
+}
 export default function PetalSamuraiPage() {
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);

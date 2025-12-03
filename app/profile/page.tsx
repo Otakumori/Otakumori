@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import { getProfileData } from './_data/profile';
 import AchievementsPanel from '../components/profile/AchievementsPanel';
 import OneTapGamertag from '../components/profile/OneTapGamertag';
@@ -14,6 +15,13 @@ import CosmeticsTab from '../components/profile/CosmeticsTab';
 
 export const dynamic = 'force-dynamic';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Profile',
+    description: 'View user profile',
+    url: '/profile',
+  });
+}
 export default async function ProfilePage() {
   let profileData = null;
   let isAuthenticated = false;

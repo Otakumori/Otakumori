@@ -111,9 +111,9 @@ export async function POST(request: NextRequest) {
       data: { message: `User ${validatedData.action}ed successfully` },
     });
   } catch (error) {
-    logger.error('Failed to block/unblock user', {
+    logger.error('Failed to block/unblock user', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to block/unblock user' }, { status: 500 });
   }
 }

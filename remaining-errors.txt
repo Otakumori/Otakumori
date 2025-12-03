@@ -1,0 +1,100 @@
+﻿app/avatar/community-hub/components/CharacterCanvas.tsx(108,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/avatar/community-hub/components/CharacterCanvas.tsx(117,68): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/avatar/community-hub/components/UIControls.tsx(74,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/avatar/community-hub/components/UIControls.tsx(89,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/avatar/community-hub/components/UIControls.tsx(106,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/avatar/community-hub/lib/procedural-meshes.ts(482,72): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/blog/[slug]/page.tsx(40,62): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/blog/[slug]/page.tsx(160,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/character-editor/page.tsx(75,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/character-editor/page.tsx(98,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/community/_components/LeaderboardsTab.tsx(75,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/community/_components/LeaderboardsTab.tsx(83,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/achievements/AchievementProvider.tsx(116,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/ActivityFeed.tsx(62,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/analytics/AnalyticsDashboard.tsx(122,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/audio/RetroSoundVisualizer.tsx(61,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/AssetDownloader.tsx(19,64): error TS2559: Type 'string[]' has no properties in common with type 'LogCtx'.
+app/components/avatar/AssetDownloader.tsx(80,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/Avatar3D.tsx(174,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/Avatar3D.tsx(302,60): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/Avatar3D.tsx(316,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/Avatar3D.tsx(378,71): error TS2345: Argument of type '"color" | "texture" | "pattern"' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/Avatar3D.tsx(388,65): error TS2345: Argument of type 'string | Color' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/avatar/AvatarCard.tsx(51,42): error TS2353: Object literal may only specify known properties, and 'gender' does not exist in type 'LogCtx'.
+app/components/avatar/AvatarRenderer.tsx(54,53): error TS2559: Type 'Error' has no properties in common with type 'LogCtx'.
+app/components/avatar/AvatarRenderer.tsx(76,62): error TS2559: Type 'Error' has no properties in common with type 'LogCtx'.
+app/components/avatar/RandomAvatarGenerator.tsx(62,41): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/cart/CartProvider.tsx(47,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/cart/CartProvider.tsx(178,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/CommentsSection.tsx(45,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/CommentsSection.tsx(75,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/CommentsSection.tsx(102,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/CommentsSection.tsx(123,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/community/SoapstoneCommunity.tsx(75,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/community/SoapstoneCommunity.tsx(110,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/MessageManager.tsx(39,48): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/MessageManager.tsx(58,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/QuickActions.tsx(43,59): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/QuickActions.tsx(68,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/QuickActions.tsx(164,41): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/QuickActions.tsx(194,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/QuickActions.tsx(223,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/components/admin/QuickActions.tsx(257,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/DiagErrorBoundary.tsx(14,50): error TS2353: Object literal may only specify known properties, and 'error' does not exist in type 'LogCtx'.
+app/components/effects/DynamicLightingSystem.tsx(142,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/EnhancedLeaderboard.tsx(27,52): error TS2559: Type 'string' has no properties in common with type 'LogCtx'.
+app/components/EnhancedLeaderboard.tsx(51,42): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/ErrorTestButton.tsx(26,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/FloatingSoapstoneComments.tsx(31,7): error TS2353: Object literal may only specify known properties, and 'hasComments' does not exist in type 'LogCtx'.
+app/components/Footer.tsx(46,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/FriendsButton.tsx(31,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/FriendsList.tsx(37,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/FriendsOverlay.tsx(79,47): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/gamecube/GameCubeBootSequence.tsx(37,48): error TS2559: Type 'string' has no properties in common with type 'LogCtx'.
+app/components/GameCubeBoot.tsx(55,48): error TS2559: Type 'string' has no properties in common with type 'LogCtx'.
+app/components/GameCubeBoot.tsx(67,45): error TS2559: Type 'string' has no properties in common with type 'LogCtx'.
+app/components/games/AccessibilitySettings.tsx(79,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/games/AccessibilitySettings.tsx(341,59): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/home/ForYouSection.tsx(69,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/layout/Navbar.tsx(146,49): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/layout/Navbar.tsx(160,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/NotificationBell.tsx(40,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/NotificationBell.tsx(66,43): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/PartyHub.tsx(43,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/PartyHub.tsx(75,45): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/PerformanceMonitor.tsx(21,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/PetalGameImage.tsx(71,55): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/petals/PetalHUD.tsx(70,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/profile/Profile3DViewer.tsx(91,51): error TS2559: Type 'Error' has no properties in common with type 'LogCtx'.
+app/components/profile/Profile3DViewer.tsx(157,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/profile/ProfileAvatarCard.tsx(38,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/profile/ProfileStatsCard.tsx(37,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/profile/RewardsSummary.tsx(52,55): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/SafetySettings.tsx(39,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/SafetySettings.tsx(53,52): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/SafetySettings.tsx(76,55): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/SafetySettings.tsx(111,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/search/SearchAutocomplete.tsx(64,54): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/AdvancedShopCatalog.tsx(321,58): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/AdvancedShopCatalog.tsx(426,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/CheckoutContent.tsx(54,61): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/CheckoutContent.tsx(189,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/PetalBalanceDisplay.tsx(34,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/PetalDiscountBadge.tsx(41,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/ProductSoapstoneWall.tsx(64,50): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/ProductSoapstoneWall.tsx(103,44): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/ProductSoapstoneWall.tsx(141,41): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/shop/ShareButtons.tsx(45,39): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/ShopTeaser.tsx(67,48): error TS2559: Type 'number' has no properties in common with type 'LogCtx'.
+app/components/ShopTeaser.tsx(72,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/soapstone/DarkSoulsSoapstones.tsx(114,72): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/soapstone/SoapstoneMessageEnhanced.tsx(44,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/soapstone/SoapstoneMessageEnhanced.tsx(56,40): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/SoundSettings.tsx(39,57): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/components/Toast.tsx(26,27): error TS2559: Type 'string' has no properties in common with type 'LogCtx'.
+app/components/TreeBackground.tsx(69,71): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/contexts/NSFWContext.tsx(37,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/contexts/NSFWContext.tsx(55,69): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/creator/page.tsx(84,53): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.
+app/creator/page.tsx(125,46): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogCtx | undefined'.

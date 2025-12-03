@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useRef } from 'react';
 import { Search, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -60,7 +61,7 @@ export function SearchAutocomplete({
           }
         }
       } catch (error) {
-        console.error('Failed to fetch suggestions:', error);
+        logger.error('Failed to fetch suggestions:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }, 300); // Debounce 300ms
 

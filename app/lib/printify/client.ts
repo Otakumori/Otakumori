@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { env } from '@/env';
 import { PrintifyProducts, PrintifyError } from './schema';
 
@@ -60,7 +61,7 @@ export async function getProducts() {
     const json = await response.json();
     return PrintifyProducts.parse(json);
   } catch (error) {
-    console.error('Printify API error:', error);
+    logger.error('Printify API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -82,7 +83,7 @@ export async function getProductVariants(productId: string) {
 
     return await response.json();
   } catch (error) {
-    console.error('Printify variants API error:', error);
+    logger.error('Printify variants API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

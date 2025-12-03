@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { withAdminAuth } from '@/app/lib/auth/admin';
 import { db } from '@/app/lib/db';
@@ -33,7 +34,7 @@ async function handler(req: Request) {
       },
     });
   } catch (error) {
-    console.error('Error updating global NSFW setting:', error);
+    logger.error('NSFW global error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });
     }

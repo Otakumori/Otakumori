@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
@@ -34,7 +35,7 @@ export default function ProfileAvatarCard() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy profile link:', err);
+      logger.error('Failed to copy profile link:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 
@@ -46,7 +47,7 @@ export default function ProfileAvatarCard() {
           <div className="text-center">
             <div className="text-4xl mb-2">
               <span role="img" aria-label="User icon">
-                👤
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
             </div>
             <p className="text-sm text-zinc-400">No avatar yet</p>
@@ -78,7 +79,7 @@ export default function ProfileAvatarCard() {
           <div className="text-center">
             <div className="text-4xl mb-2">
               <span role="img" aria-label="Cherry blossom">
-                🌸
+                <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
               </span>
             </div>
             <p className="text-sm text-zinc-400">No avatar yet</p>

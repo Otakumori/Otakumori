@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+
 export interface EngineCallbacks {
   update: (deltaTime: number) => void;
   render: () => void;
@@ -42,7 +44,7 @@ export class Engine {
       this.callbacks.update(deltaTime);
       this.callbacks.render();
     } catch (error) {
-      console.error('Engine error:', error);
+      logger.error('Engine error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       this.stop();
       return;
     }

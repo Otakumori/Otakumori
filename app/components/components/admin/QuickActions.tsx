@@ -1,6 +1,7 @@
 'use client';
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useState } from 'react';
 // Removed supabase import - using API routes for admin actions
 import { motion } from 'framer-motion';
@@ -39,7 +40,7 @@ export default function QuickActions() {
         setMaintenanceStatus(data.maintenance);
       }
     } catch (error) {
-      console.error('Failed to check maintenance status:', error);
+      logger.error('Failed to check maintenance status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -64,7 +65,7 @@ export default function QuickActions() {
         throw new Error('Failed to toggle maintenance mode');
       }
     } catch (error) {
-      console.error('Error toggling maintenance mode:', error);
+      logger.error('Error toggling maintenance mode:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       alert('Failed to toggle maintenance mode. Please try again.');
     }
   };
@@ -124,7 +125,7 @@ export default function QuickActions() {
       description: maintenanceStatus
         ? 'Disable site maintenance mode'
         : 'Enable site maintenance mode',
-      icon: maintenanceStatus ? '🟢' : '',
+      icon: maintenanceStatus ? '<span role="img" aria-label="emoji">�</span>�' : '',
       color: maintenanceStatus
         ? 'bg-green-500/20 hover:bg-green-500/30'
         : 'bg-yellow-500/20 hover:bg-yellow-500/30',
@@ -160,7 +161,7 @@ export default function QuickActions() {
             throw new Error('Backup failed');
           }
         } catch (error) {
-          console.error('Backup error:', error);
+          logger.error('Backup error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           alert('Failed to initiate backup. Please try again.');
         } finally {
           setIsLoading(null);
@@ -190,7 +191,7 @@ export default function QuickActions() {
             throw new Error('Cache clear failed');
           }
         } catch (error) {
-          console.error('Cache clear error:', error);
+          logger.error('Cache clear error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           alert('Failed to clear cache. Please try again.');
         } finally {
           setIsLoading(null);
@@ -219,7 +220,7 @@ export default function QuickActions() {
             throw new Error('Health check failed');
           }
         } catch (error) {
-          console.error('Health check error:', error);
+          logger.error('Health check error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           alert('Failed to check system health. Please try again.');
         } finally {
           setIsLoading(null);
@@ -253,7 +254,7 @@ export default function QuickActions() {
             }
           }
         } catch (error) {
-          console.error('Notification error:', error);
+          logger.error('Notification error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           alert('Failed to send notification. Please try again.');
         } finally {
           setIsLoading(null);

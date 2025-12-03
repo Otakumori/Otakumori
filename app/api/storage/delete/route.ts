@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { del } from '@vercel/blob';
@@ -42,7 +43,12 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ ok: false, error: 'INVALID_PAYLOAD' }, { status: 400 });
     }
 
-    console.error('Storage delete error', error);
+    logger.error(
+      'Storage delete error',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'DELETE_ERROR' }, { status: 500 });
   }
 }

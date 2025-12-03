@@ -20,8 +20,8 @@ export default function CosmeticsTab() {
 
   // HUD skin display names
   const hudSkinNames: Record<HudSkinId, { name: string; description: string; icon: string }> = {
-    default: { name: 'Default HUD', description: 'Standard game interface', icon: '🎮' },
-    quake: { name: 'Quake-Style HUD', description: 'Retro arena shooter vibes', icon: '💀' },
+    default: { name: 'Default HUD', description: 'Standard game interface', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
+    quake: { name: 'Quake-Style HUD', description: 'Retro arena shooter vibes', icon: '<span role="img" aria-label="emoji">�</span>�' },
   };
 
   const equippedHud = hudSkinNames[hudSkin];
@@ -96,7 +96,7 @@ export default function CosmeticsTab() {
                     >
                       <div className="text-3xl mb-2">
                         <span role="img" aria-label="Sparkle">
-                          ✨
+                          <span role="img" aria-label="sparkles">✨</span>
                         </span>
                       </div>
                       <div className="text-sm text-white font-medium">{item.name}</div>
@@ -126,7 +126,7 @@ export default function CosmeticsTab() {
                     >
                       <div className="text-3xl mb-2">
                         <span role="img" aria-label="Sparkle">
-                          ✨
+                          <span role="img" aria-label="sparkles">✨</span>
                         </span>
                       </div>
                       <div className="text-sm text-white font-medium">{item.name}</div>

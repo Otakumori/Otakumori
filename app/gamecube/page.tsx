@@ -1,10 +1,18 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useCallback, useState, useEffect } from 'react';
 import GameCubeBootSequence from '@/app/components/GameCubeBoot';
 import GameCube3D from '@/components/BootCube3D';
 import { audio } from '@/app/lib/audio';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/gamecube',
+  });
+}
 export default function GameCubePage() {
   const [hasBooted, setHasBooted] = useState(false);
 

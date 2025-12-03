@@ -837,7 +837,7 @@ export default function ThighChaseGame({
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-red-900 to-black">
         <div className="text-center text-white">
-          <div className="text-6xl mb-6">‍️</div>
+          <div className="text-6xl mb-6">‍<span role="img" aria-label="emoji">️</span></div>
           <h2 className="text-3xl font-bold mb-4">Thigh Colosseum</h2>
           <p className="text-gray-300 mb-8 max-w-md">
             Enter the arena. Win rounds and advance the bracket.

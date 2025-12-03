@@ -5,6 +5,7 @@
  * database schema is in place.
  */
 
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -59,7 +60,7 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
     // Log request timing
     const logTiming = () => {
       const duration = Date.now() - startTime;
-      console.warn(`Achievement request completed in ${duration}ms`);
+      logger.warn(`Achievement request completed in ${duration}ms`);
     };
 
     if (request.method === 'POST') {
@@ -230,7 +231,12 @@ async function handler(request: NextRequest, { params }: { params: { userId: str
     return NextResponse.json({ ok: false, error: 'Method not allowed' }, { status: 405 });
   } catch (error) {
     const duration = Date.now() - startTime;
-    console.error('Achievement error after', duration, 'ms:', error);
+    logger.error(
+      'Achievement error after ms:',
+      undefined,
+      { duration },
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

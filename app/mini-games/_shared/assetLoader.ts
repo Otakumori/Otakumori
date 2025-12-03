@@ -7,6 +7,8 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { generateFallbackTexture } from './enhancedTextures';
 
 export interface AssetLoadOptions {
@@ -64,7 +66,7 @@ export async function loadImageWithFallback(
   }
 
   // Generate fallback texture
-  console.warn(`Failed to load image ${url}, generating fallback texture`);
+  logger.warn(`Failed to load image ${url}, generating fallback texture`);
   const fallbackCanvas = document.createElement('canvas');
   fallbackCanvas.width = 256;
   fallbackCanvas.height = 256;

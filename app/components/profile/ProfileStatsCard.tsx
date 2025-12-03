@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 
@@ -33,7 +34,7 @@ export default function ProfileStatsCard() {
           }
         }
       } catch (err) {
-        console.error('Failed to fetch petal summary:', err);
+        logger.error('Failed to fetch petal summary:', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       }
     }
 

@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -8,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Log avatar load request
-    console.warn('Avatar load requested from:', request.headers.get('user-agent'));
+    logger.warn('Avatar load requested from:', undefined, { userAgent: request.headers.get('user-agent') });
 
     // Check authentication
     const { userId } = await auth();
@@ -57,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Avatar load error:', error);
+    logger.error('Avatar load error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

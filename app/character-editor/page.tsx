@@ -1,5 +1,7 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useUser } from '@clerk/nextjs';
@@ -28,6 +30,13 @@ import {
 } from '@/app/lib/avatar/guest-storage';
 import { avatarPartManager } from '@/app/lib/3d/avatar-parts';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/character-editor',
+  });
+}
 export default function CharacterEditorPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
@@ -62,12 +71,12 @@ export default function CharacterEditorPage() {
         setSelectedGuestCharacter(guestChar);
         alert(`Character "${name}" saved! It will be available for 7 days.`);
       } catch (error) {
-        console.error('Failed to save guest character:', error);
+        logger.error('Failed to save guest character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         alert('Failed to save character. Please try again.');
       }
     } else {
       // For authenticated users, save to database
-      console.warn('Saving configuration to database:', config);
+      logger.warn('Saving configuration to database:', config);
       // TODO: Implement database save for authenticated users
       alert('Character saved! (Database save coming soon)');
     }
@@ -85,7 +94,7 @@ export default function CharacterEditorPage() {
       try {
         saveGuestCharacter(config, name);
       } catch (error) {
-        console.error('Failed to save guest character:', error);
+        logger.error('Failed to save guest character:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }
     // Navigate to mini-games page

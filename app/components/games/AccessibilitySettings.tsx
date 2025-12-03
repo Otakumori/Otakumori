@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -74,7 +75,7 @@ export default function AccessibilitySettings({
     try {
       localStorage.setItem('otm-game-accessibility', JSON.stringify(settings));
     } catch (error) {
-      console.warn('Failed to save accessibility settings:', error);
+      logger.warn('Failed to save accessibility settings:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
     }
   };
 
@@ -224,6 +225,7 @@ export default function AccessibilitySettings({
                       value={settings.volume}
                       onChange={(e) => updateSetting('volume', parseFloat(e.target.value))}
                       className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+                      aria-label="Game volume"
                     />
                   </div>
 
@@ -336,7 +338,7 @@ export function loadAccessibilitySettings(): GameAccessibilitySettings {
       return { ...defaultSettings, ...JSON.parse(saved) };
     }
   } catch (error) {
-    console.warn('Failed to load accessibility settings:', error);
+    logger.warn('Failed to load accessibility settings:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return defaultSettings;

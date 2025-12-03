@@ -1,5 +1,7 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { Button } from '../../../components/ui/button';
 import {
@@ -22,6 +24,13 @@ interface SyncStatus {
   eventId?: string;
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\printify\page.tsx',
+  });
+}
 export default function PrintifyAdminPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastSync, setLastSync] = useState<SyncStatus | null>(null);
@@ -44,7 +53,7 @@ export default function PrintifyAdminPage() {
         shopId: result.data?.shopId,
       });
     } catch (error) {
-      console.error('Connection test failed:', error);
+      logger.error('Connection test failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +76,7 @@ export default function PrintifyAdminPage() {
         timestamp: result.data?.timestamp,
       });
     } catch (error) {
-      console.error('Sync failed:', error);
+      logger.error('Sync failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       setLastSync({
         type: 'products',
         success: false,
@@ -96,7 +105,7 @@ export default function PrintifyAdminPage() {
         timestamp: result.data?.timestamp,
       });
     } catch (error) {
-      console.error('Manual sync failed:', error);
+      logger.error('Manual sync failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       setLastSync({
         type: 'manual',
         success: false,

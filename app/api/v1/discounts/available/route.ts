@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse, type NextRequest } from 'next/server';
 import { db } from '@/app/lib/db';
@@ -67,7 +68,7 @@ export async function GET(req: NextRequest) {
       data: { discounts: availableDiscounts },
     });
   } catch (error) {
-    console.error('Error fetching available discounts:', error);
+    logger.error('Error fetching available discounts:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { AvatarRenderer as R3FAvatarRenderer } from '../../adults/_components/AvatarRenderer.safe';
@@ -49,7 +50,7 @@ export function AvatarRenderer({
         return !!gl;
       } catch (e: unknown) {
         const error = e instanceof Error ? e : new Error(String(e));
-        console.error('WebGL support check failed:', error);
+        logger.error('WebGL support check failed:', undefined, undefined, error);
         return false;
       }
     };
@@ -71,7 +72,7 @@ export function AvatarRenderer({
 
   // Handle 3D rendering errors
   const handle3DError = (error: Error) => {
-    console.error('3D rendering failed, falling back to 2D:', error);
+    logger.error('3D rendering failed, falling back to 2D:', undefined, undefined, error);
     setHasError(true);
 
     if (fallbackTo2D) {
@@ -83,7 +84,7 @@ export function AvatarRenderer({
 
   // Handle successful 3D loading
   const handle3DLoad = () => {
-    console.warn('3D avatar loaded successfully');
+    logger.warn('3D avatar loaded successfully');
     setIsLoading(false);
     setHasError(false);
     onLoad?.();

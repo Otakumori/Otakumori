@@ -202,7 +202,7 @@ export default function AchievementFanfare({
                 }}
               >
                 <span role="img" aria-label="Sparkle effect">
-                  {'✨'}
+                  {'<span role="img" aria-label="sparkles">✨</span>'}
                 </span>
               </motion.div>
             ))}

@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   logger.request(req, 'POST /api/coupons/attach');
   try {
     const { userId } = await auth();
-    console.warn(`Attaching coupon to user: ${userId}`);
+    logger.warn(`Attaching coupon to user: ${userId}`);
     const body = await req.json().catch(() => null);
     const parsed = Body.safeParse(body);
     if (!parsed.success) return NextResponse.json(problem(400, 'Bad input'), { status: 400 });

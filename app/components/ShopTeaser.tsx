@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import GlassPanel from './GlassPanel';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -58,16 +59,16 @@ export default function ShopTeaser() {
 
             setProducts(transformedProducts);
           } else {
-            console.warn('No products array in response');
+            logger.warn('No products array in response');
             setProducts([]);
           }
         } else {
-          console.error('API response not ok:', response.status, response.statusText);
+          logger.error('API response not ok:', undefined, { status: response.status, statusText: response.statusText }, undefined);
           setError(`API Error: ${response.status}`);
           setProducts([]);
         }
       } catch (error) {
-        console.error('Failed to fetch products:', error);
+        logger.error('Failed to fetch products:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         setError('Failed to fetch products');
         setProducts([]);
       } finally {
@@ -156,10 +157,10 @@ export default function ShopTeaser() {
                         }
                       >
                         {(product as any).isLocked
-                          ? '⏳'
+                          ? '<span role="img" aria-label="hourglass">⏳</span>'
                           : (product as any).visible && (product as any).active
                             ? '✓'
-                            : '⚠'}
+                            : '<span role="img" aria-label="emoji">⚠</span>'}
                       </div>
                     )}
                   </div>

@@ -1,5 +1,6 @@
 
 // app/api/admin/printify-sync/route.ts  (admin-only)
+import { logger } from '@/app/lib/logger';
 import { requireAdminOrThrow } from '@/lib/adminGuard';
 import { db } from '@/lib/db';
 import { getPrintifyService } from '@/app/lib/printify/service';
@@ -19,11 +20,11 @@ async function syncPrintify() {
     const printifyService = getPrintifyService();
     // Get all products from Printify (getAllProducts returns array directly)
     const allProducts = await printifyService.getAllProducts();
-    console.warn(`Sync retrieved ${allProducts.length} products from Printify`);
+    logger.warn(`Sync retrieved ${allProducts.length} products from Printify`);
 
     // Filter out invalid/placeholder products before syncing
     const products = filterValidPrintifyProducts(allProducts);
-    console.warn(`After filtering: ${products.length} valid products to sync`);
+    logger.warn(`After filtering: ${products.length} valid products to sync`);
 
     let unlockedCount = 0;
     const unlockErrors: string[] = [];
@@ -110,10 +111,10 @@ async function syncPrintify() {
         try {
           await printifyService.publishingSucceeded(printifyProductId);
           unlockedCount++;
-          console.warn(`Unlocked product ${printifyProductId} (${printifyProduct.title})`);
+          logger.warn(`Unlocked product ${printifyProductId} (${printifyProduct.title})`);
         } catch (unlockError) {
           const errorMsg = `Failed to unlock product ${printifyProductId}: ${String(unlockError)}`;
-          console.error(errorMsg);
+          logger.error(errorMsg);
           unlockErrors.push(errorMsg);
         }
       }
@@ -128,7 +129,7 @@ async function syncPrintify() {
       errors: [], // result.errors,
     };
   } catch (error) {
-    console.error('Printify sync failed:', error);
+    logger.error('Printify sync failed', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

@@ -9,6 +9,8 @@
  * - Seasonal competitions
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -205,7 +207,7 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
             // });
           } catch (error: unknown) {
             const err = error instanceof Error ? error : new Error(String(error));
-            console.warn('Friend table not available, using user-only scope:', err.message);
+            logger.warn('Friend table not available, using user-only scope:', undefined, { value: err.message });
           }
           scopeFilter = {
             userId: { in: [user.id, ...friends.map((f: any) => f.friendId)] },
@@ -292,7 +294,12 @@ async function handler(request: NextRequest, { params }: { params: { gameId: str
 
     return NextResponse.json({ ok: false, error: 'Method not allowed' }, { status: 405 });
   } catch (error) {
-    console.error('Leaderboard error:', error);
+    logger.error(
+      'Leaderboard error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     await metricsCollector.track('leaderboard_error', {
       value: 1,
@@ -379,14 +386,14 @@ async function updateAchievements(
   metadata: any,
 ) {
   // Log achievement check for debugging
-  console.warn('Checking achievements for:', { userId, gameId, score, category, metadata });
+  logger.warn('Checking achievements for:', undefined, { userId, gameId, score, category, metadata });
 
   // Achievement logic would go here
   // This is a placeholder for the achievement system
 
   // Example: Check for high score achievements
   if (score > 1000) {
-    console.warn(`High score achievement candidate: ${score} in ${gameId}`);
+    logger.warn(`High score achievement candidate: ${score} in ${gameId}`);
   }
 }
 

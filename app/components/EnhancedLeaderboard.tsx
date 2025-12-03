@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
@@ -22,7 +23,7 @@ export default function EnhancedLeaderboard({
   const [period, setPeriod] = useState<'daily' | 'weekly' | 'all'>('daily');
 
   // Log current user for highlighting in leaderboard
-  console.warn('EnhancedLeaderboard current user:', user?.id || 'anonymous');
+  logger.warn('EnhancedLeaderboard current user:', undefined, { value: user?.id || 'anonymous' });
 
   useEffect(() => {
     loadLeaderboard();
@@ -43,10 +44,10 @@ export default function EnhancedLeaderboard({
       if (result.ok) {
         setLeaderboard(result.data);
       } else {
-        console.error('Failed to load leaderboard:', result.error);
+        logger.error('Failed to load leaderboard:', result.error);
       }
     } catch (error) {
-      console.error('Leaderboard error:', error);
+      logger.error('Leaderboard error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }

@@ -37,7 +37,7 @@ export function HeroShrine() {
           }}
         >
           <span role="img" aria-label="Cherry blossom petal">
-            🌸
+            <span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>
           </span>
         </div>
       ))}

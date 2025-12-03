@@ -4,6 +4,7 @@ export const runtime = 'nodejs'; // keep on Node runtime (not edge)
 export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
 export const maxDuration = 10; // optional guard
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { ensureDailyAssignments, userDayNY } from '@/app/lib/quests/server';
@@ -48,7 +49,12 @@ export async function GET() {
       currentDay: day,
     });
   } catch (error) {
-    console.error('Quest list error:', error);
+    logger.error(
+      'Quest list error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'internal' }, { status: 500 });
   }
 }

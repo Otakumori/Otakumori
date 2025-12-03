@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSoundSettings } from './useSoundSettings';
 
@@ -44,7 +45,7 @@ export const useAudio = ({ src, volume = 1, loop = false }: UseAudioProps) => {
   const play = useCallback(() => {
     if (audioRef.current && audioLoaded && !isMuted) {
       audioRef.current.play().catch((error) => {
-        console.error('Error playing audio:', error);
+        logger.error('Error playing audio:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       });
       setIsPlaying(true);
     }

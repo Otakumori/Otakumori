@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getEnabledGames, getGameThumbnailAsset } from '@/app/lib/games';
 
@@ -6,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    console.warn('Games list requested from:', request.headers.get('user-agent'));
+    logger.warn('Games list requested from:', undefined, { value: request.headers.get('user-agent') });
     // Get enabled games from the games registry
     const enabledGames = getEnabledGames();
 
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Games API error:', error);
+    logger.error('Games API error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

@@ -1,5 +1,6 @@
 
 export const runtime = 'nodejs';
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma';
 import { auth } from '@clerk/nextjs/server';
@@ -53,7 +54,7 @@ export async function POST(req: Request) {
     // optional: create CouponGrant if the item issues a coupon (not in this batch)
   });
 
-  console.warn('Shop purchase completed:', {
+  logger.warn('Shop purchase completed:', undefined, {
     userId: user.id,
     sku: item.sku,
     needRunes,

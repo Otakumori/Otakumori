@@ -1,3 +1,4 @@
+import { generateSEO } from '@/app/lib/seo';
 import type { Metadata } from 'next';
 // Use relative API path during SSR to avoid base-URL issues
 import StarfieldPurple from '../../components/StarfieldPurple';
@@ -31,6 +32,13 @@ async function getSoapstones() {
   }
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Soapstones',
+    description: 'Leave signs for fellow travelers',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\community\soapstones\page.tsx',
+  });
+}
 export default async function SoapstoneCommunityPage() {
   const soapstones = await getSoapstones();
 

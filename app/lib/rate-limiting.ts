@@ -1,3 +1,5 @@
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest } from 'next/server';
 import { redis } from './redis';
 
@@ -46,7 +48,7 @@ export async function checkRateLimit(
       message: current > rateLimitConfig.maxRequests ? rateLimitConfig.message : undefined,
     };
   } catch (error) {
-    console.error('Rate limiting error:', error);
+    logger.error('Rate limiting error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     // On Redis error, allow the request to proceed
     return {
       success: true,
@@ -88,7 +90,7 @@ export function withRateLimit<T extends any[]>(
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           userId = payload.sub || payload.userId;
-          console.warn('Rate limiting with authenticated user', { userId, role: payload.role });
+          logger.warn('Rate limiting with authenticated user', undefined, { userId, role: payload.role });
         } catch {
           // Invalid JWT format, fall back to IP
         }
@@ -137,7 +139,7 @@ export function withRateLimit<T extends any[]>(
 
       return response;
     } catch (error) {
-      console.error('Rate limiting wrapper error:', error);
+      logger.error('Rate limiting wrapper error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       // On error, proceed without rate limiting
       return handler(req, ...args);
     }
@@ -158,6 +160,6 @@ export async function clearRateLimit(key: string, identifier: string): Promise<v
       // Pattern tracking for admin dashboard
     }
   } catch (error) {
-    console.error('Error clearing rate limit:', error);
+    logger.error('Error clearing rate limit:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
   }
 }

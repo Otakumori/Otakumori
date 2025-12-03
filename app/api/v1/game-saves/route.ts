@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(response, { status: 200 });
       } catch (error: any) {
-        console.error('Error saving game:', error);
+        logger.error('Error saving game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         return NextResponse.json(
           createApiError('INTERNAL_ERROR', 'Failed to save game', requestId),
           { status: 500 },
@@ -135,7 +136,7 @@ export async function POST(req: NextRequest) {
 
     return rateLimitedHandler(req);
   } catch (error) {
-    console.error('Error in game save handler:', error);
+    logger.error('Error in game save handler:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(createApiError('INTERNAL_ERROR', 'Failed to save game', requestId), {
       status: 500,
     });
@@ -187,7 +188,7 @@ export async function GET(req: NextRequest) {
       ),
     );
   } catch (error) {
-    console.error('Error fetching game saves:', error);
+    logger.error('Error fetching game saves:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       createApiError('INTERNAL_ERROR', 'Failed to fetch game saves', requestId),
       { status: 500 },

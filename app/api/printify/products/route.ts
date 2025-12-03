@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     // Enhanced error handling for Printify API responses
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Printify API error: ${res.status} - ${errorText}`);
+      logger.error(`Printify API error: ${res.status} - ${errorText}`);
 
       // Don't expose sensitive details but log them for debugging
       return NextResponse.json(
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (err: any) {
-    console.error('Printify fetch failed:', err.message);
+    logger.error('Printify fetch failed:', undefined, { value: err.message }, undefined);
     return NextResponse.json(
       { ok: false, error: err?.message || 'Printify fetch failed' },
       { status: 502 },

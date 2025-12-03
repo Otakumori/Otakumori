@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import Script from 'next/script';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
@@ -41,14 +43,14 @@ export default function GoogleAnalytics() {
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
         onError={(error) => {
-          console.warn('Failed to load Google Analytics:', error);
+          logger.warn('Failed to load Google Analytics:', error);
         }}
       />
       <Script
         id="google-analytics"
         strategy="afterInteractive"
         onError={(error) => {
-          console.warn('Failed to initialize Google Analytics:', error);
+          logger.warn('Failed to initialize Google Analytics:', error);
         }}
         dangerouslySetInnerHTML={{
           __html: `

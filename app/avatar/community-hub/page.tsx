@@ -5,6 +5,7 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import React, { useState, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import type { CharacterConfig } from './lib/character-state';
@@ -27,6 +28,13 @@ const DynamicCanvas = dynamic(() => Promise.resolve(CharacterCanvas), {
   ),
 });
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\avatar\community-hub\page.tsx',
+  });
+}
 export default function AvatarCommunityHubPage() {
   const [config, setConfig] = useState<CharacterConfig>(createDefaultConfig());
   const sceneRef = useRef<THREE.Group | null>(null);

@@ -6,6 +6,8 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect, useCallback } from 'react';
 import type { HudSkinId } from './cosmeticsConfig';
 
@@ -24,7 +26,7 @@ function loadUnlockedIds(): string[] {
       return JSON.parse(stored) as string[];
     }
   } catch (error) {
-    console.warn('Failed to load unlocked cosmetics:', error);
+    logger.warn('Failed to load unlocked cosmetics:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return [];
@@ -39,7 +41,7 @@ function saveUnlockedIds(ids: string[]): void {
   try {
     localStorage.setItem(STORAGE_KEY_UNLOCKED, JSON.stringify(ids));
   } catch (error) {
-    console.warn('Failed to save unlocked cosmetics:', error);
+    logger.warn('Failed to save unlocked cosmetics:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 }
 
@@ -55,7 +57,7 @@ function loadHudSkin(): HudSkinId {
       return stored as HudSkinId;
     }
   } catch (error) {
-    console.warn('Failed to load HUD skin:', error);
+    logger.warn('Failed to load HUD skin:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 
   return 'default';
@@ -70,7 +72,7 @@ function saveHudSkin(skinId: HudSkinId): void {
   try {
     localStorage.setItem(STORAGE_KEY_HUD_SKIN, skinId);
   } catch (error) {
-    console.warn('Failed to save HUD skin:', error);
+    logger.warn('Failed to save HUD skin:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 }
 
@@ -180,7 +182,7 @@ export function useCosmetics() {
             body: JSON.stringify({ hudSkinId: skinId }),
           });
         } catch (error) {
-          console.error('Failed to sync HUD skin to backend:', error);
+          logger.error('Failed to sync HUD skin to backend:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           // Continue anyway - localStorage is updated
         }
       }

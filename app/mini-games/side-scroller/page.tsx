@@ -4,6 +4,8 @@
  * Side-scroller demo - 2.5D platformer with ECS
  */
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
@@ -25,6 +27,13 @@ import { resolveEquipmentForGame } from '@/app/lib/avatar/resolve-equipment';
 import { InputHints } from '@/app/components/games/InputHints';
 import { prefersReducedMotion } from '@/app/lib/device-profile';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\side-scroller\page.tsx',
+  });
+}
 export default function SideScrollerDemo() {
   const [isReady, setIsReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -68,7 +77,7 @@ export default function SideScrollerDemo() {
 
         setIsReady(true);
       } catch (error) {
-        console.error('Failed to initialize game:', error);
+        logger.error('Failed to initialize game:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     })();
   }, [world]);

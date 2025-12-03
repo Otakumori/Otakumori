@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { Users } from 'lucide-react';
 
@@ -30,7 +31,7 @@ export default function UsersPageClient() {
           }
         }
       } catch (err) {
-        console.error('Failed to load users:', err);
+        logger.error('Failed to load users', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoading(false);
       }
@@ -92,8 +93,8 @@ export default function UsersPageClient() {
           </div>
         </div>
         <div className="rounded-xl border border-white/10 bg-black/50 p-4">
-          <div className="text-sm text-neutral-400 mb-1">Total Lifetime Earned</div>
-          <div className="text-2xl font-bold text-cyan-400">
+  <div className="text-sm text-neutral-400 mb-1" > Total Lifetime Earned </div>
+    < div className ="text-2xl font-bold text-cyan-400">
             {users.reduce((sum, u) => sum + u.lifetimePetalsEarned, 0).toLocaleString()}
           </div>
         </div>
@@ -127,8 +128,8 @@ export default function UsersPageClient() {
                 filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3 text-sm text-neutral-300">{user.email}</td>
-                    <td className="px-4 py-3 text-sm text-neutral-300">{user.username}</td>
-                    <td className="px-4 py-3 text-sm text-neutral-300">
+                < td className = "px-4 py-3 text-sm text-neutral-300" > { user.username } </td>
+                < td className="px-4 py-3 text-sm text-neutral-300">
                       {user.displayName || <span className="text-neutral-500">—</span>}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-medium text-green-400">

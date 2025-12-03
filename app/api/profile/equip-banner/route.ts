@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { requireUserId } from '@/app/lib/auth';
@@ -25,7 +26,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('Error equipping banner:', error);
+    logger.error(
+      'Error equipping banner:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Failed to equip banner' }, { status: 500 });
   }
 }

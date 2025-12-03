@@ -109,7 +109,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });
     }
 
-    logger.error('Failed to fetch parties', { extra: { error } });
+    logger.error('Failed to fetch parties', undefined, { extra: { error } }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to fetch parties' }, { status: 500 });
   }
 }
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Invalid request' }, { status: 400 });
     }
 
-    logger.error('Failed to create party', { extra: { error } });
+    logger.error('Failed to create party', undefined, { extra: { error } }, undefined);
     return NextResponse.json({ ok: false, error: 'Failed to create party' }, { status: 500 });
   }
 }

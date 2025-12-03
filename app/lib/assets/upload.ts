@@ -8,6 +8,8 @@
  * NSFW assets (nsfw: true) → private access (proxy URLs)
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import fs from 'node:fs';
 import path from 'node:path';
 import { putBlobFile } from '@/app/lib/blob/client';
@@ -35,7 +37,7 @@ const ASSET_ROOT = path.join(process.cwd(), 'public/assets');
  * Exit with error message
  */
 function exitWith(message: string): never {
-  console.error(`❌ ${message}`);
+  logger.error(`❌ ${message}`);
   process.exit(1);
 }
 
@@ -98,7 +100,7 @@ function findAssetFile(entry: AssetEntry): string | null {
  */
 async function main() {
   // eslint-disable-next-line no-console
-  console.log('📤 Starting asset upload to Vercel Blob...\n');
+  logger.info('📤 Starting asset upload to Vercel Blob...\n');
 
   // Check registry exists
   if (!fs.existsSync(REGISTRY_PATH)) {
@@ -110,7 +112,7 @@ async function main() {
   const registry: AssetRegistry = JSON.parse(raw);
 
   // eslint-disable-next-line no-console
-  console.log(`📋 Loaded registry with ${Object.keys(registry.assets).length} assets\n`);
+  logger.info(`📋 Loaded registry with ${Object.keys(registry.assets).length} assets\n`);
 
   let uploadedPublic = 0;
   let uploadedPrivate = 0;
@@ -121,7 +123,7 @@ async function main() {
     // Skip if already uploaded to blob
     if (entry.host === 'vercel-blob' && entry.url) {
       // eslint-disable-next-line no-console
-      console.log(`⏭️  Skipping ${id} (already uploaded)`);
+      logger.info(`⏭️  Skipping ${id} (already uploaded)`);
       skipped++;
       continue;
     }
@@ -129,7 +131,7 @@ async function main() {
     // Find asset file
     const filePath = findAssetFile(entry);
     if (!filePath) {
-      console.warn(`⚠️  Missing file for asset: ${id} (skipping)`);
+      logger.warn(`⚠️  Missing file for asset: ${id} (skipping)`);
       skipped++;
       continue;
     }
@@ -148,7 +150,7 @@ async function main() {
 
       // Upload to Vercel Blob
       // eslint-disable-next-line no-console
-      console.log(`📤 Uploading ${access} asset: ${key}`);
+      logger.info(`📤 Uploading ${access} asset: ${key}`);
       const { url } = await putBlobFile({ key, data, contentType, access });
 
       // Update registry entry
@@ -163,7 +165,7 @@ async function main() {
       }
 
       // eslint-disable-next-line no-console
-      console.log(`✅ Uploaded: ${id}`);
+      logger.info(`✅ Uploaded: ${id}`);
     } catch (err: unknown) {
       const error = err as Error;
       if (error.message?.includes('Missing required env')) {
@@ -172,7 +174,7 @@ async function main() {
             'Vercel: Storage → Blob → Create Token → Read-Write.',
         );
       }
-      console.error(`❌ Failed to upload ${id}:`, error.message);
+      logger.error(`❌ Failed to upload ${id}:`, undefined, { message: error.message }, undefined);
       skipped++;
     }
   }
@@ -182,28 +184,28 @@ async function main() {
 
   // Print summary
   // eslint-disable-next-line no-console
-  console.log('\n' + '='.repeat(50));
+  logger.info('\n' + '='.repeat(50));
   // eslint-disable-next-line no-console
-  console.log('📊 Upload Summary:');
+  logger.info('📊 Upload Summary:');
   // eslint-disable-next-line no-console
-  console.log(`   Public assets:  ${uploadedPublic}`);
+  logger.info(`   Public assets:  ${uploadedPublic}`);
   // eslint-disable-next-line no-console
-  console.log(`   Private assets: ${uploadedPrivate}`);
+  logger.info(`   Private assets: ${uploadedPrivate}`);
   // eslint-disable-next-line no-console
-  console.log(`   Skipped:        ${skipped}`);
+  logger.info(`   Skipped:        ${skipped}`);
   // eslint-disable-next-line no-console
-  console.log(`   Total:          ${uploadedPublic + uploadedPrivate + skipped}`);
+  logger.info(`   Total:          ${uploadedPublic + uploadedPrivate + skipped}`);
   // eslint-disable-next-line no-console
-  console.log('='.repeat(50));
+  logger.info('='.repeat(50));
 
   // eslint-disable-next-line no-console
-  console.log(`\n✅ Registry updated: ${REGISTRY_PATH}\n`);
+  logger.info(`\n✅ Registry updated: ${REGISTRY_PATH}\n`);
 }
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((error) => {
-    console.error('❌ Upload failed:', error);
+    logger.error('❌ Upload failed:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     process.exit(1);
   });
 }

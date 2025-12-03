@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@clerk/nextjs/server';
@@ -34,7 +35,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       data: { order },
     });
   } catch (error) {
-    console.error('Error fetching order:', error);
+    logger.error(
+      'Error fetching order:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

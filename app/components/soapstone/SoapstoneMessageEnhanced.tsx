@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getCategoryInfo, type SoapstoneMessageEnhanced } from '@/app/lib/soapstone-enhancements';
@@ -40,7 +41,7 @@ export function SoapstoneMessageEnhanced({
         onAppraise?.(message.id);
       }
     } catch (error) {
-      console.error('Failed to appraise message:', error);
+      logger.error('Failed to appraise message:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -52,7 +53,7 @@ export function SoapstoneMessageEnhanced({
       setReplyText('');
       setIsReplying(false);
     } catch (error) {
-      console.error('Failed to reply:', error);
+      logger.error('Failed to reply:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

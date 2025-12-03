@@ -6,6 +6,8 @@
  * DO NOT modify these values without design system approval
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { env } from '@/env.mjs';
 
 // =============================================================================
@@ -478,7 +480,7 @@ export const CSS_VARS = {
 export const validateDesignToken = (_category: string, _token: string) => {
   if (env.NODE_ENV === 'development') {
     // Add validation logic for design tokens
-    console.warn('Design token validation not yet implemented');
+    logger.warn('Design token validation not yet implemented');
   }
 };
 

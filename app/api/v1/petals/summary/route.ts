@@ -9,6 +9,7 @@
  * - Achievement summary (count, petals from achievements)
  */
 
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
@@ -183,7 +184,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error fetching petal summary:', error);
+    logger.error('Error fetching petal summary:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

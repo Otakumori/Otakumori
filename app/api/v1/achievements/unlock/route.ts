@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -104,7 +105,11 @@ export async function POST(request: NextRequest) {
       });
     } catch (analyticsError) {
       // Don't fail achievement unlock if analytics fails
-      console.warn('Failed to track achievement unlock analytics:', analyticsError);
+      logger.warn(
+        'Failed to track achievement unlock analytics:',
+        undefined,
+        { error: analyticsError instanceof Error ? analyticsError.message : String(analyticsError) },
+      );
     }
 
     // Grant rewards
@@ -139,7 +144,12 @@ export async function POST(request: NextRequest) {
 
           if (!petalResult.success) {
             // Log but don't fail the achievement unlock
-            console.error('Failed to award achievement petals:', petalResult.error);
+            logger.error(
+              'Failed to award achievement petals:',
+              undefined,
+              { error: petalResult.error },
+              undefined,
+            );
           }
 
           rewardDetails = {
@@ -205,7 +215,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error unlocking achievement:', error);
+    logger.error(
+      'Error unlocking achievement:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });

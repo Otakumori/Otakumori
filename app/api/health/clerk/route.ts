@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
@@ -62,7 +63,12 @@ export async function GET(request: NextRequest) {
       requestId: `otm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     });
   } catch (error) {
-    console.error('Clerk health check failed:', error);
+    logger.error(
+      'Clerk health check failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     return NextResponse.json(
       {

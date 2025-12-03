@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -27,7 +28,7 @@ async function checkDailyQuestCap(userId: string): Promise<boolean> {
   // TODO: Implement Redis check when available
   // const count = await redis.get(cacheKey);
   // return count ? parseInt(count) < 10 : true;
-  console.warn('Daily quest cap check bypassed - Redis not configured', { cacheKey });
+  logger.warn('Daily quest cap check bypassed - Redis not configured', undefined, { cacheKey });
   return true; // Allow quests until Redis is configured
 }
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     const day = assignment.day ?? userDayNY();
     // Redis key for future cap tracking (currently using database fallback)
     const dailyCapKey = `petals:cap:${user.id}:${day}`;
-    console.warn(`Quest claim tracking key: ${dailyCapKey} (Redis disabled, using DB)`);
+    logger.warn(`Quest claim tracking key: ${dailyCapKey} (Redis disabled, using DB)`);
 
     let usedToday = 0;
     // Redis disabled due to config issues - using database fallback
@@ -165,7 +166,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Quest claim error', error);
+    logger.error(
+      'Quest claim error',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'internal' }, { status: 500 });
   }
 }

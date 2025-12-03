@@ -1,4 +1,6 @@
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -123,7 +125,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     // Log cron job execution for audit
-    console.warn('Cron job triggered from:', request.headers.get('user-agent'));
+    logger.warn('Cron job triggered from:', request.headers.get('user-agent'));
 
     // Validate environment variables
     validateEnv();

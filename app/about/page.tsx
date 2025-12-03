@@ -1,12 +1,20 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import type React from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../components/ui/GlassCard';
 import GlassButton from '../components/ui/GlassButton';
 import PetalLayer from '../components/PetalLayer';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/about',
+  });
+}
 export default function AboutMe() {
   return (
     <>

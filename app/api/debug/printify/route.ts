@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 
@@ -6,7 +7,9 @@ export const runtime = 'nodejs';
 export async function GET(request: NextRequest) {
   try {
     // Log debug request for audit
-    console.warn('Printify debug requested from:', request.headers.get('user-agent'));
+    logger.warn('Printify debug requested from:', undefined, {
+      userAgent: request.headers.get('user-agent'),
+    });
 
     // Check if environment variables are loaded
     const printifyApiKey = env.PRINTIFY_API_KEY;

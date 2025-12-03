@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -6,7 +7,12 @@ export async function GET() {
     // For now, return inactive status
     return NextResponse.json({ active: false });
   } catch (error) {
-    console.error('Error fetching global petals:', error);
+    logger.error(
+      'Error fetching global petals:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ active: false });
   }
 }

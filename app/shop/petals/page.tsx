@@ -1,5 +1,13 @@
+import { generateSEO } from '@/app/lib/seo';
 import { GachaPull } from '../../components/shop/GachaPull';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Shop',
+    description: 'Browse our anime and gaming merchandise',
+    url: '/shop/petals',
+  });
+}
 export default function PetalShopPage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-10">

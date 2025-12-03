@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect } from 'react';
 import Link from 'next/link';
 
@@ -17,7 +18,7 @@ export default function MiniGamesError({
   useEffect(() => {
     // Log error for debugging (only in dev or if Sentry is available)
     if (process.env.NODE_ENV === 'development') {
-      console.error('[MiniGamesError] Error boundary caught:', error);
+      logger.error('[MiniGamesError] Error boundary caught:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }, [error]);
 

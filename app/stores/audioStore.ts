@@ -3,6 +3,7 @@
  * Manages sound pools, spatial audio, and adaptive music layers
  */
 
+import { logger } from '@/app/lib/logger';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -141,7 +142,7 @@ export const useAudioStore = create<AudioStore>()(
             loadedBuffers: { ...state.loadedBuffers, [soundId]: audioBuffer },
           }));
         } catch (error) {
-          console.error(`Failed to load sound ${soundId}:`, error);
+          logger.error(`Failed to load sound ${soundId}:`, undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       },
 

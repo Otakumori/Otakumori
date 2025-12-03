@@ -8,6 +8,7 @@
  * - Performance optimized batch processing
  */
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAdvancedPrintifyService } from '@/app/lib/printify/advanced-service';
 import { auth } from '@clerk/nextjs/server';
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Inventory sync error:', error);
+    logger.error('Inventory sync error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -133,7 +134,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Inventory status error:', error);
+    logger.error('Inventory status error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       {

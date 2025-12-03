@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getSyncStats } from '@/lib/catalog/printifySync';
 import { requireAdmin } from '@/app/lib/auth/admin';
@@ -19,7 +20,7 @@ export async function GET(_request: NextRequest) {
       data: stats,
     });
   } catch (error) {
-    console.error('Failed to get sync status:', error);
+    logger.error('Failed to get sync status:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       {
         ok: false,

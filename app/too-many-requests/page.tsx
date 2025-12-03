@@ -1,9 +1,16 @@
-
-// import Link from 'next/link'; // Unused
+import { generateSEO } from '@/app/lib/seo';
+// Unused
 import { COPY } from '../lib/copy';
 import GlassButton from '../components/ui/GlassButton';
 import GlassCard from '../components/ui/GlassCard';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/too-many-requests',
+  });
+}
 export default function TooManyRequests() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-gray-50 to-pink-100 flex items-center justify-center p-4">

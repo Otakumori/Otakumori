@@ -131,7 +131,7 @@ export default function SlapTheOni({ onComplete, onFail, _duration }: GameProps)
             <div className="relative w-full h-full rounded-full border-4 border-red-500 bg-gradient-to-br from-red-600 to-red-900 shadow-2xl flex items-center justify-center">
               <div className="text-5xl animate-bounce">
                 <span role="img" aria-label="Oni demon">
-                  👹
+                  <span role="img" aria-label="emoji">�</span>�
                 </span>
               </div>
             </div>

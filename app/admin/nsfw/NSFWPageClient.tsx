@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
 
@@ -27,7 +28,7 @@ export default function NSFWPageClient() {
           }
         }
       } catch (err) {
-        console.error('Failed to load NSFW stats:', err);
+        logger.error('Failed to load NSFW settings', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
       } finally {
         setLoading(false);
       }
@@ -54,7 +55,7 @@ export default function NSFWPageClient() {
       }
     } catch (err) {
       setMsg('Failed to update global setting');
-      console.error('Error updating global NSFW setting:', err);
+      logger.error('Failed to save NSFW settings', undefined, undefined, err instanceof Error ? err : new Error(String(err)));
     }
   };
 

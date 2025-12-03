@@ -4,13 +4,15 @@ export const runtime = 'nodejs'; // keep on Node runtime (not edge)
 export const preferredRegion = 'iad1'; // optional: co-locate w/ your logs region
 export const maxDuration = 10; // optional guard
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    console.warn('Game achievements requested from:', request.headers.get('user-agent'));
+    logger.warn('Game achievements requested from:', undefined, { value: request.headers.get('user-agent') });
     // Verify authentication
     const { userId } = await auth();
     if (!userId) {
@@ -87,7 +89,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching achievements:', error);
+    logger.error('Error fetching achievements:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

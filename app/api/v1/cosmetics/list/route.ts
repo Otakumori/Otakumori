@@ -3,6 +3,7 @@
  * Filters by NSFW policy and returns items available for purchase
  */
 
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import {
@@ -66,7 +67,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching cosmetics:', error);
+    logger.error('Error fetching cosmetics:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

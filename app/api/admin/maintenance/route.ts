@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { env } from '@/env.mjs';
 // import { redis } from '../../../lib/redis';
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       message: isMaintenance ? 'Maintenance mode is active' : 'Site is operational',
     });
   } catch (error) {
-    console.error('Maintenance status check error:', error);
+    logger.error('Maintenance error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       message: maintenance ? 'Maintenance mode enabled' : 'Maintenance mode disabled',
     });
   } catch (error) {
-    console.error('Maintenance toggle error:', error);
+    logger.error('Maintenance error', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

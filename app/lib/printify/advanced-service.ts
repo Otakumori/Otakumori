@@ -10,6 +10,8 @@
  * - Webhook event handling
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { getPrintifyService, type PrintifyProduct } from './service';
 
 export interface ProductFilters {
@@ -441,7 +443,7 @@ export class AdvancedPrintifyService {
           await this.handleInventoryUpdated(event.data);
           break;
         default:
-          console.warn(`Unhandled webhook event type: ${event.type}`);
+          logger.warn(`Unhandled webhook event type: ${event.type}`);
       }
 
       // Clear relevant caches
@@ -616,26 +618,26 @@ export class AdvancedPrintifyService {
 
   private async handleOrderCreated(orderData: any): Promise<void> {
     // Handle new order webhook
-    console.warn('Order created:', { orderId: orderData?.id, status: orderData?.status });
+    logger.warn('Order created:', undefined, { orderId: orderData?.id, status: orderData?.status });
     // TODO: Update database with order status
   }
 
   private async handleOrderUpdated(orderData: any): Promise<void> {
     // Handle order update webhook
-    console.warn('Order updated:', { orderId: orderData?.id, status: orderData?.status });
+    logger.warn('Order updated:', undefined, { orderId: orderData?.id, status: orderData?.status });
     // TODO: Sync order status to database
   }
 
   private async handleProductUpdated(productData: any): Promise<void> {
     // Handle product update webhook
     this.clearCache(`product:${productData.id}`);
-    console.warn('Product updated:', { productId: productData?.id, title: productData?.title });
+    logger.warn('Product updated:', undefined, { productId: productData?.id, title: productData?.title });
   }
 
   private async handleInventoryUpdated(inventoryData: any): Promise<void> {
     // Handle inventory update webhook
     this.clearCache('inventory:all');
-    console.warn('Inventory updated:', {
+    logger.warn('Inventory updated:', undefined, {
       productId: inventoryData?.product_id,
       available: inventoryData?.available,
     });

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { prisma } from '@/app/lib/prisma';
@@ -50,7 +51,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, title: newTitle });
   } catch (err) {
-    console.error('Title award error:', err);
+    logger.error(
+      'Title award error:',
+      undefined,
+      undefined,
+      err instanceof Error ? err : new Error(String(err)),
+    );
     return NextResponse.json({ ok: false, error: 'AWARD_ERROR' }, { status: 500 });
   }
 }

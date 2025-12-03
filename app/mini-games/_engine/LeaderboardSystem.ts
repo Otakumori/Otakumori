@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 // Leaderboard Types
 export interface LeaderboardEntry {
   id: string;
@@ -457,7 +458,7 @@ export class LeaderboardSystem {
         });
       }
     } catch (error) {
-      console.error('Failed to import leaderboard data:', error);
+      logger.error('Failed to import leaderboard data:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   }
 

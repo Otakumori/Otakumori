@@ -5,6 +5,7 @@
  * Public endpoint (read-only, no auth required)
  */
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 
@@ -57,7 +58,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Error fetching global petal leaderboard:', error);
+    logger.error('Error fetching global petal leaderboard:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

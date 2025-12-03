@@ -1,5 +1,5 @@
+import { generateSEO } from '@/app/lib/seo';
 import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import AdvancedShopCatalog from '../components/shop/AdvancedShopCatalog';
 import { ShopGridSkeleton } from '../components/ui/Skeleton';
 
@@ -8,16 +8,14 @@ async function getLogger() {
   return logger;
 }
 
-import { generateSEO } from '../lib/seo';
 
-export const metadata: Metadata = generateSEO({
-  title: 'Shop',
-  description:
-    'Discover exclusive anime merchandise and gaming accessories with advanced search and filtering',
-  url: '/shop',
-  type: 'website',
-});
-
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Shop',
+    description: 'Browse our anime and gaming merchandise',
+    url: '/shop',
+  });
+}
 export default async function ShopPage({
   searchParams,
 }: {

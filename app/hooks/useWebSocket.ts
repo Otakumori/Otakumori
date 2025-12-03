@@ -5,6 +5,7 @@
  * and message queuing.
  */
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 export interface WebSocketMessage {
@@ -88,7 +89,7 @@ export function useWebSocket(options: UseWebSocketOptions) {
           const message: WebSocketMessage = JSON.parse(event.data);
           onMessage?.(message);
         } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
+          logger.error('Error parsing WebSocket message:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       };
 

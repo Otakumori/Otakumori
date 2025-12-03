@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { getAsset } from '../_shared/assets-resolver';
@@ -153,7 +154,7 @@ export default function Scene({ mapUrl: _mapUrl }: SceneProps) {
         await Promise.all(assetsToLoad);
         setLoading(false);
       } catch (error) {
-        console.error('Error loading assets:', error);
+        logger.error('Error loading assets:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         // Still allow game to start with placeholders
         setLoading(false);
       }

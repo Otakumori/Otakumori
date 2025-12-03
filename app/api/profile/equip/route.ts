@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
@@ -24,7 +25,12 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error equipping item:', error);
+    logger.error(
+      'Error equipping item:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,6 +3,8 @@
  * Manages avatar customization, NSFW settings, and context adaptations
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import * as THREE from 'three';
@@ -233,7 +235,7 @@ export const useAvatarStore = create<AvatarStore>()(
         if (preset) {
           set({ avatar: preset });
         } else {
-          console.warn(`Avatar preset "${presetId}" not found, using default`);
+          logger.warn(`Avatar preset "${presetId}" not found, using default`);
           set({ avatar: DEFAULT_AVATAR });
         }
       },

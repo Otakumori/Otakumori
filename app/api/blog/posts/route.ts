@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 
 async function getDb() {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
     const category = searchParams.get('category');
-    console.warn(`Blog posts requested for category: ${category || 'all'}`);
+    logger.warn(`Blog posts requested for category: ${category || 'all'}`);
     const published = searchParams.get('published') !== 'false'; // Default to true
 
     const where: any = {};
@@ -51,7 +52,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    logger.error(
+      'Error fetching blog posts:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

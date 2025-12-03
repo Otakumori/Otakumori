@@ -5,6 +5,7 @@
  * Vouchers are stored as CouponGrant records and can be used at checkout.
  */
 
+import { logger } from '@/app/lib/logger';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -198,7 +199,7 @@ export async function POST(req: NextRequest) {
       requestId,
     });
   } catch (error: any) {
-    console.error('[Voucher Purchase] Error:', error);
+    logger.error('[Voucher Purchase] Error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       { ok: false, error: 'INTERNAL_ERROR', message: error.message, requestId },

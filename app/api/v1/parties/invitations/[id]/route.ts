@@ -1,4 +1,5 @@
 
+import { newRequestId } from '@/app/lib/requestId';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -70,7 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     });
 
-    console.warn('Invitation updated:', {
+    logger.warn('Invitation updated:', undefined, {
       id: updatedInvitation.id,
       status: updatedInvitation.status,
     });
@@ -116,9 +117,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       data: { message: `Invitation ${validatedData.status} successfully` },
     });
   } catch (error) {
-    logger.error('Failed to respond to party invitation', {
+    logger.error('Failed to respond to party invitation', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to respond to party invitation' },
       { status: 500 },
@@ -158,9 +159,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       data: { message: 'Invitation deleted successfully' },
     });
   } catch (error) {
-    logger.error('Failed to delete party invitation', {
+    logger.error('Failed to delete party invitation', undefined, {
       extra: { error: error instanceof Error ? error.message : 'Unknown error' },
-    });
+    }, undefined);
     return NextResponse.json(
       { ok: false, error: 'Failed to delete party invitation' },
       { status: 500 },

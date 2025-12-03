@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -142,7 +143,7 @@ export default function Navbar() {
         setRealProducts(data.data.products);
       }
     } catch (error) {
-      console.error('Failed to fetch products:', error);
+      logger.error('Failed to fetch products:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setProductsLoaded(true);
     }
@@ -156,7 +157,7 @@ export default function Navbar() {
         setRealBlogPosts(data.data.posts);
       }
     } catch (error) {
-      console.error('Failed to fetch blog posts:', error);
+      logger.error('Failed to fetch blog posts:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setBlogLoaded(true);
     }

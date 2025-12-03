@@ -1,5 +1,6 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
@@ -53,7 +54,7 @@ export function RouteGuard({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#ff4fa3] mx-auto mb-4"></div>
-          <p>Loading...</p>
+          <Skeleton />
         </div>
       </div>
     );

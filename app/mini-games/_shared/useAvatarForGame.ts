@@ -1,5 +1,7 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@clerk/nextjs';
 
@@ -37,7 +39,7 @@ export function useAvatarForGame(enabled: boolean = true, gameMode?: string) {
           }
         }
       } catch (error) {
-        console.warn('Failed to load custom avatar:', error);
+        logger.warn('Failed to load custom avatar:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
       }
 
       // Fallback to default avatar based on game mode

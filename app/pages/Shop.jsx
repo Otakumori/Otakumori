@@ -1,4 +1,5 @@
 'use client';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -40,7 +41,7 @@ export default function Shop() {
         setProducts(data.products);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching products:', err);
+        logger.error('Error fetching products:', err);
       } finally {
         setLoading(false);
       }

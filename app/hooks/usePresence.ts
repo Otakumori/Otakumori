@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { type PresenceUpdate, type PresenceResponse } from '@/app/lib/contracts';
@@ -32,7 +33,7 @@ export function usePresence() {
           }
         }
       } catch (error) {
-        console.error('Presence heartbeat error:', error);
+        logger.error('Presence heartbeat error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [user],
@@ -57,7 +58,7 @@ export function usePresence() {
           }
         }
       } catch (error) {
-        console.error('Presence update error:', error);
+        logger.error('Presence update error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [user],

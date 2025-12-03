@@ -2,6 +2,8 @@
  * Asset loader - Runtime loading using registry
  */
 
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import type { AssetMeta, AssetSlot } from '@om/game-kit';
 import {
   loadRegistry as loadRegistryFromPackage,
@@ -70,7 +72,7 @@ export async function preloadAsset(url: string): Promise<void> {
     }
     // Asset is now in browser cache
   } catch (error) {
-    console.warn(`Failed to preload asset ${url}:`, error);
+    logger.warn(`Failed to preload asset ${url}:`, undefined, { error: error instanceof Error ? error : new Error(String(error)) });
   }
 }
 

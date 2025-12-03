@@ -23,12 +23,12 @@ export async function POST(req: NextRequest) {
   const signature = req.headers.get('stripe-signature');
 
   if (!signature) {
-    console.error('Missing Stripe signature header');
+    logger.error('Missing Stripe signature header');
     return new NextResponse('Missing signature', { status: 400 });
   }
 
   if (!env.STRIPE_WEBHOOK_SECRET) {
-    console.error('Missing STRIPE_WEBHOOK_SECRET environment variable');
+    logger.error('Missing STRIPE_WEBHOOK_SECRET environment variable');
     return new NextResponse('Webhook secret not configured', { status: 500 });
   }
 
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
       case 'payment_intent.succeeded':
         const paymentIntent = parseWebhookEvent(event, StripePaymentIntentSchema);
-        console.warn('Payment succeeded:', {
+        logger.warn('Payment succeeded:', undefined, {
           paymentIntentId: paymentIntent.id,
           amount: paymentIntent.amount,
           status: paymentIntent.status,
@@ -60,11 +60,16 @@ export async function POST(req: NextRequest) {
 
       case 'payment_intent.payment_failed':
         const failedPayment = parseWebhookEvent(event, StripePaymentIntentSchema);
-        console.error('Payment failed:', {
-          paymentIntentId: failedPayment.id,
-          status: failedPayment.status,
-          // last_payment_error is not in the type definition
-        });
+        logger.error(
+          'Payment failed:',
+          undefined,
+          {
+            paymentIntentId: failedPayment.id,
+            status: failedPayment.status,
+            // last_payment_error is not in the type definition
+          },
+          undefined,
+        );
         // Update order status to failed
         break;
 
@@ -74,7 +79,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error(
+      'Webhook error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof Error && error.message.includes('signature verification failed')) {
       return new NextResponse('Invalid signature', { status: 400 });
@@ -103,7 +113,7 @@ async function handleCheckoutCompleted(session: any) {
     });
 
     if (!order) {
-      console.error(`Order not found for Stripe session: ${session.id}`);
+      logger.error(`Order not found for Stripe session: ${session.id}`);
       return;
     }
 
@@ -140,13 +150,13 @@ async function handleCheckoutCompleted(session: any) {
           },
         });
       } else {
-        logger.error('Failed to award purchase bonus', {
+        logger.error('Failed to award purchase bonus', undefined, {
           extra: {
             orderId: order.id,
             userId: order.userId,
             error: petalResult.error,
           },
-        });
+        }, undefined);
       }
     }
 
@@ -157,7 +167,12 @@ async function handleCheckoutCompleted(session: any) {
       },
     });
   } catch (error) {
-    console.error('Error handling checkout completed:', error);
+    logger.error(
+      'Error handling checkout completed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     logger.error(
       'Webhook error processing checkout.session.completed',
       {
@@ -230,7 +245,12 @@ async function createPrintifyOrder(order: any) {
 
     return printifyOrder;
   } catch (error) {
-    console.error('Error creating Printify order:', error);
+    logger.error(
+      'Error creating Printify order:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     logger.error(
       'Printify order creation failed',
       {

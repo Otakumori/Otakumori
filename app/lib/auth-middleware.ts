@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getUserRole, type UserRole } from './authz';
@@ -106,7 +107,7 @@ export async function withAuth<T>(
         return NextResponse.json(result, { status: 400 });
       }
     } catch (error) {
-      console.error('Auth middleware error:', error);
+      logger.error('Auth middleware error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
       if (error instanceof Error) {
         if (error.message === 'UNAUTHORIZED') {
@@ -173,7 +174,7 @@ export async function hasPermission(userId: string, permission: Permission): Pro
 
     return hasAccess;
   } catch (error) {
-    console.error('Permission check error:', error);
+    logger.error('Permission check error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }
@@ -214,7 +215,7 @@ export async function withPermission<T>(
         return NextResponse.json(result, { status: 400 });
       }
     } catch (error) {
-      console.error('Permission middleware error:', error);
+      logger.error('Permission middleware error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       return NextResponse.json(
         {
           ok: false,

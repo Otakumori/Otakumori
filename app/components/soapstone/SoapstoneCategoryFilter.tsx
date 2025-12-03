@@ -30,7 +30,7 @@ export function SoapstoneCategoryFilter({
       {categories.map((category) => {
         const info =
           category === 'all'
-            ? { label: 'All', icon: '💬', color: 'text-white' }
+            ? { label: 'All', icon: '<span role="img" aria-label="emoji">�</span>�', color: 'text-white' }
             : getCategoryInfo(category);
 
         return (

@@ -12,7 +12,7 @@ export default function MemoryMatch({ gameDef }: MemoryMatchProps) {
       <div className="text-center">
         <div className="text-6xl mb-4">
           <span role="img" aria-label="Joker card">
-            🃝
+            <span role="img" aria-label="emoji">�</span>�
           </span>
         </div>
         <h3 className="text-xl font-semibold text-gray-700 mb-2">{gameDef.name}</h3>

@@ -4,6 +4,7 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: validatedResponse });
   } catch (error) {
-    console.error('Activity feed error:', error);
+    logger.error('Activity feed error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ ok: false, error: 'Invalid query parameters' }, { status: 400 });

@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    console.error('Follow error:', error);
+    logger.error('Follow error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });
@@ -159,7 +160,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ ok: true, data: response });
   } catch (error) {
-    console.error('Unfollow error:', error);
+    logger.error('Unfollow error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
 
     if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json({ ok: false, error: 'Invalid input data' }, { status: 400 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -41,7 +42,7 @@ export default function ProfileHeader() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch equipped state:', error);
+      logger.error('Failed to fetch equipped state:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -204,7 +205,7 @@ export default function ProfileHeader() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {equippedState?.frame && (
           <div className="text-center p-3 bg-neutral-800/30 rounded-lg border border-neutral-700">
-            <div className="text-2xl mb-2">️</div>
+            <div className="text-2xl mb-2"><span role="img" aria-label="emoji">️</span></div>
             <div className="text-xs font-medium text-white truncate">
               {equippedState.frame.name}
             </div>

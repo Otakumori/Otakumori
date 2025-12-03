@@ -1,5 +1,6 @@
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useEffect } from 'react';
 import * as THREE from 'three';
 
@@ -120,6 +121,13 @@ class MockEngine {
   }
 }
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/perf-headless',
+  });
+}
 export default function PerfHeadlessPage() {
   useEffect(() => {
     // Expose MockEngine on window for test access

@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 // import { COPY } from '../../lib/copy';
@@ -111,7 +112,7 @@ export default function Game({ skin, mode }: Props) {
             }),
           });
         } catch (error) {
-          console.error('Failed to submit score:', error);
+          logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
         }
       };
       submitScore();

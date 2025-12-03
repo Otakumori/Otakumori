@@ -1,6 +1,7 @@
 
 export const runtime = 'nodejs';
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/app/lib/db';
@@ -162,7 +163,9 @@ export async function POST(req: Request) {
         }
       } catch (error: unknown) {
         const err = error instanceof Error ? error : new Error(String(error));
-        console.warn('Achievement creation failed (may not exist yet):', err.message);
+        logger.warn('Achievement creation failed (may not exist yet):', undefined, {
+          message: err.message,
+        });
       }
     }
 
@@ -186,7 +189,9 @@ export async function POST(req: Request) {
           }
         } catch (error: unknown) {
           const err = error instanceof Error ? error : new Error(String(error));
-          console.warn('Milestone achievement creation failed (may not exist yet):', err.message);
+          logger.warn('Milestone achievement creation failed (may not exist yet):', undefined, {
+            message: err.message,
+          });
         }
       }
     }
@@ -204,7 +209,12 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    console.error('Petal click error:', error);
+    logger.error(
+      'Petal click error:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json(
       {
         ok: false,

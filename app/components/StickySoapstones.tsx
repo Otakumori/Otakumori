@@ -93,27 +93,31 @@ export default function StickySoapstones() {
           )}
         >
           <form onSubmit={handleSubmit} className="min-h-0">
-            <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/60 p-3">
+            <div className="rounded-xl border border-[var(--om-border-soft)] bg-[var(--om-bg-surface)] p-3">
+              <label htmlFor="soapstone-textarea" className="block text-[var(--om-text-ivory)] text-sm mb-2">
+                Compose a sign…
+              </label>
               <textarea
+                id="soapstone-textarea"
                 value={text}
                 onChange={(e) => setText(e.target.value.slice(0, 280))}
-                placeholder="Compose a sign…"
-                className="h-16 w-full resize-none rounded-xl bg-black/40 p-2 text-zinc-100 outline-none ring-1 ring-zinc-700 focus:ring-pink-500/60"
+                placeholder="Leave a message for fellow travelers..."
+                className="h-16 w-full resize-none rounded-xl bg-[var(--om-bg-root)] border border-[var(--om-border-soft)] p-2 text-[var(--om-text-ivory)] placeholder-[var(--om-text-ivory)]/50 outline-none focus:border-[var(--om-accent-pink)] focus:ring-2 focus:ring-[var(--om-accent-pink)]/30"
                 maxLength={280}
               />
-              <div className="mt-2 flex items-center justify-between text-xs text-zinc-400">
+              <div className="mt-2 flex items-center justify-between text-xs text-[var(--om-text-ivory)]/70">
                 <span>{280 - text.length} left</span>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="rounded-lg px-2.5 py-1 hover:text-zinc-200"
+                    className="rounded-lg px-2.5 py-1 text-[var(--om-text-ivory)]/70 hover:text-[var(--om-text-ivory)] transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-lg bg-pink-600 px-3 py-1.5 text-white transition hover:bg-pink-500 disabled:opacity-40"
+                    className="rounded-lg bg-[var(--om-bg-surface)] border border-[var(--om-border-strong)] px-3 py-1.5 text-[var(--om-text-ivory)] transition hover:bg-[var(--om-accent-pink)]/10 hover:border-[var(--om-accent-pink)] disabled:opacity-40 disabled:cursor-not-allowed"
                     disabled={!text.trim()}
                   >
                     Post

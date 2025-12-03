@@ -5,6 +5,7 @@
  * Only accessible to admin users (emails in ADMIN_EMAILS).
  */
 
+import { generateSEO } from '@/app/lib/seo';
 import { requireAdmin } from '@/app/lib/auth/admin';
 import { env } from '@/env';
 import AdminConsoleClient from './AdminConsoleClient';
@@ -14,6 +15,13 @@ import { Users, Flower, Palette, Ticket, Shield, BarChart3 } from 'lucide-react'
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/admin',
+  });
+}
 export default async function AdminPage() {
   // Check if Clerk is configured
   const isClerkConfigured = Boolean(env.CLERK_SECRET_KEY && env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);

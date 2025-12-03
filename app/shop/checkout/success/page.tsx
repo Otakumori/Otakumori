@@ -3,6 +3,7 @@
 // Force dynamic rendering to avoid static generation issues with context providers
 export const dynamic = 'force-dynamic';
 
+import { generateSEO } from '@/app/lib/seo';
 import { useEffect } from 'react';
 import { useCart } from '../../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,13 @@ import Link from 'next/link';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Shop',
+    description: 'Browse our anime and gaming merchandise',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\shop\checkout\success\page.tsx',
+  });
+}
 export default function CheckoutSuccessPage() {
   const { clearCart } = useCart();
 

@@ -1,7 +1,15 @@
 
+import { generateSEO } from '@/app/lib/seo';
 import SoapstoneComposer from '@/app/components/soapstone/Composer';
 import SoapstoneList from '@/app/components/soapstone/List';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Page',
+    description: 'Anime x gaming shop + play — petals, runes, rewards.',
+    url: '/soapstone',
+  });
+}
 export default function SoapstonePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">

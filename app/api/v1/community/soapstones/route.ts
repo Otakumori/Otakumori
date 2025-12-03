@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(paginatedSoapstones);
   } catch (error) {
-    console.error('Error fetching soapstones:', error);
+    logger.error('Error fetching soapstones:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json([], { status: 500 });
   }
 }
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(newSoapstone);
   } catch (error) {
-    console.error('Error creating soapstone:', error);
+    logger.error('Error creating soapstone:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Failed to create soapstone' }, { status: 500 });
   }
 }

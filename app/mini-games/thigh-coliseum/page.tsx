@@ -14,6 +14,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import GameShell from '../_shared/GameShell';
@@ -35,6 +37,13 @@ import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
+export function generateMetadata() {
+  return generateSEO({
+    title: 'Mini Games',
+    description: 'Play mini-games and earn rewards',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\thigh-coliseum\page.tsx',
+  });
+}
 export default function ThighColiseumPage() {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -145,7 +154,7 @@ export default function ThighColiseumPage() {
           }),
         });
       } catch (error) {
-        console.error('Failed to submit score:', error);
+        logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
     [stage, lives, earnPetals, hasAwardedPetals],

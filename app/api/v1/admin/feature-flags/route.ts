@@ -5,6 +5,7 @@
  * POST: Updates a feature flag setting
  */
 
+import { logger } from '@/app/lib/logger';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -81,7 +82,12 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error fetching admin feature flags:', error);
+    logger.error(
+      'Error fetching admin feature flags:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -122,7 +128,12 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error updating feature flag:', error);
+    logger.error(
+      'Error updating feature flag:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });
   }
 }

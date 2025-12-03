@@ -1,3 +1,4 @@
+import { logger } from '@/app/lib/logger';
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { Achievement } from './AchievementProvider';
@@ -17,7 +18,7 @@ export function AchievementProgress({ achievement }: AchievementProgressProps) {
 
   // Auto-unlock if progress reached target
   if (current >= target && !isUnlocked && achievement.id) {
-    console.warn('Achievement ready to unlock:', achievement.id);
+    logger.warn('Achievement ready to unlock:', undefined, { value: achievement.id });
     unlockAchievement(achievement.id);
   }
 

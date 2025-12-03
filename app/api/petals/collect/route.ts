@@ -1,4 +1,5 @@
 
+import { logger } from '@/app/lib/logger';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
@@ -81,7 +82,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Petals collection failed:', error);
+    logger.error(
+      'Petals collection failed:',
+      undefined,
+      undefined,
+      error instanceof Error ? error : new Error(String(error)),
+    );
 
     if (error instanceof z.ZodError) {
       return NextResponse.json({ ok: false, error: 'Invalid request data' }, { status: 400 });

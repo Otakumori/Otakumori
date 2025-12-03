@@ -1,5 +1,6 @@
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 
@@ -43,7 +44,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           setItems(parsedCart);
           updateTotals(parsedCart);
         } catch (error) {
-          console.error('Error parsing cart from localStorage:', error);
+          logger.error('Error parsing cart from localStorage:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
           localStorage.removeItem('cart');
         }
       }
@@ -54,7 +55,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isSignedIn && userId && items.length > 0) {
       syncCartToPrisma(userId, items).catch((error) => {
-        console.error('Failed to sync cart to Prisma:', error);
+        logger.error('Failed to sync cart to Prisma:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       });
     }
   }, [isSignedIn, userId, items.length]);
@@ -174,6 +175,6 @@ async function syncCartToPrisma(userId: string, cartItems: CartItem[]) {
     }
   } catch (error) {
     // Silently fail - cart will remain in localStorage
-    console.error('Cart sync error:', error);
+    logger.error('Cart sync error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
   }
 }

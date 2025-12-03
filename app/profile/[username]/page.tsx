@@ -1,6 +1,8 @@
 
 'use client';
 
+import { generateSEO } from '@/app/lib/seo';
+import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -10,6 +12,15 @@ import GlassButton from '../../components/ui/GlassButton';
 import CommentsSection from '../../components/CommentsSection';
 import { type ProfileView, type ProfileSection } from '@/app/lib/contracts';
 
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
+  
+  return generateSEO({
+    title: 'User Profile',
+    description: 'View user profile',
+    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\profile\:username\page.tsx',
+  });
+}
 export default function ProfilePage() {
   const { username } = useParams();
   const { user: currentUser } = useUser();
@@ -29,10 +40,10 @@ export default function ProfilePage() {
         setIsFollowing(result.data.isFollowing);
         setFollowerCount(result.data.followerCount);
       } else {
-        console.error('Failed to load profile:', result.error);
+        logger.error('Failed to load profile:', result.error);
       }
     } catch (error) {
-      console.error('Profile load error:', error);
+      logger.error('Profile load error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }
@@ -60,10 +71,10 @@ export default function ProfilePage() {
         setIsFollowing(result.data.isFollowing);
         setFollowerCount(result.data.followerCount);
       } else {
-        console.error('Follow action failed:', result.error);
+        logger.error('Follow action failed:', result.error);
       }
     } catch (error) {
-      console.error('Follow error:', error);
+      logger.error('Follow error:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

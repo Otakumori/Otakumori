@@ -2,6 +2,7 @@
 
 'use client';
 
+import { logger } from '@/app/lib/logger';
 import React, { useState, useEffect } from 'react';
 
 interface SoundSettings {
@@ -35,7 +36,7 @@ export const SoundSettings: React.FC = () => {
         const parsed = JSON.parse(savedSettings);
         setSettings((prev) => ({ ...prev, ...parsed }));
       } catch (error) {
-        console.error('Failed to parse sound settings:', error);
+        logger.error('Failed to parse sound settings:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     }
   }, []);
@@ -112,7 +113,7 @@ export const SoundSettings: React.FC = () => {
 
     audio.volume = volume;
     audio.play().catch((error) => {
-      console.error('Failed to play test sound:', error);
+      logger.error('Failed to play test sound:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     });
   };
 
@@ -181,6 +182,7 @@ export const SoundSettings: React.FC = () => {
               value={settings.masterVolume}
               onChange={(e) => handleVolumeChange('masterVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
+              aria-label="Master volume"
             />
           </div>
 
@@ -200,6 +202,7 @@ export const SoundSettings: React.FC = () => {
                   type="checkbox"
                   checked={settings.musicEnabled}
                   onChange={() => handleToggle('musicEnabled')}
+                  aria-label="Enable music"
                 />
                 <button
                   onClick={() => playTestSound('music')}
@@ -224,6 +227,7 @@ export const SoundSettings: React.FC = () => {
               value={settings.musicVolume}
               onChange={(e) => handleVolumeChange('musicVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
+              aria-label="Music volume"
             />
           </div>
 
@@ -243,6 +247,7 @@ export const SoundSettings: React.FC = () => {
                   type="checkbox"
                   checked={settings.sfxEnabled}
                   onChange={() => handleToggle('sfxEnabled')}
+                  aria-label="Enable sound effects"
                 />
                 <button
                   onClick={() => playTestSound('sfx')}
@@ -267,6 +272,7 @@ export const SoundSettings: React.FC = () => {
               value={settings.sfxVolume}
               onChange={(e) => handleVolumeChange('sfxVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
+              aria-label="Sound effects volume"
             />
           </div>
 
@@ -286,6 +292,7 @@ export const SoundSettings: React.FC = () => {
                   type="checkbox"
                   checked={settings.voiceEnabled}
                   onChange={() => handleToggle('voiceEnabled')}
+                  aria-label="Enable voice"
                 />
                 <button
                   onClick={() => playTestSound('voice')}
@@ -310,6 +317,7 @@ export const SoundSettings: React.FC = () => {
               value={settings.voiceVolume}
               onChange={(e) => handleVolumeChange('voiceVolume', parseInt(e.target.value))}
               style={{ width: '100%' }}
+              aria-label="Voice volume"
             />
           </div>
 

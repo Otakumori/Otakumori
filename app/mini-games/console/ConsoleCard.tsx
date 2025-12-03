@@ -1,5 +1,8 @@
 'use client';
 
+import { Skeleton } from '@/app/components/ui/Skeleton';
+import { logger } from '@/app/lib/logger';
+import { newRequestId } from '@/app/lib/requestId';
 import { audio } from '@/app/lib/audio';
 import { http } from '@/app/lib/http';
 import { getGameImageBySlug } from '@/app/lib/games';
@@ -75,7 +78,7 @@ export default function ConsoleCard({
           ['boot_whoosh', '/sfx/boot_whoosh.mp3'],
         ])
         .catch((error) => {
-          console.warn('Failed to preload audio files:', error);
+          logger.warn('Failed to preload audio files:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
         });
       setAudioOn(audioEnabled); // Track audio state
     }
@@ -152,7 +155,7 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          console.warn('Failed to play audio:', error);
+          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
         }
       }
       if (e.key === 'ArrowRight') {
@@ -167,7 +170,7 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          console.warn('Failed to play audio:', error);
+          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
         }
       }
       // Vertical rotation between front/top/bottom
@@ -183,7 +186,7 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          console.warn('Failed to play audio:', error);
+          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
         }
       }
       if (e.key === 'ArrowDown') {
@@ -198,7 +201,7 @@ export default function ConsoleCard({
             audio.play('gamecube_menu', { gain: 0.25 });
           }
         } catch (error) {
-          console.warn('Failed to play audio:', error);
+          logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
         }
       }
       if (e.key === 'Enter') {
@@ -385,10 +388,10 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                console.warn('Failed to play audio:', error);
+                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
               }
             } catch (error) {
-              console.warn('Failed to play audio:', error);
+              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
             }
           }}
           aria-label="Go to Mini-Games"
@@ -408,10 +411,10 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                console.warn('Failed to play audio:', error);
+                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
               }
             } catch (error) {
-              console.warn('Failed to play audio:', error);
+              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
             }
           }}
           aria-label="Go to Character and Community"
@@ -431,10 +434,10 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                console.warn('Failed to play audio:', error);
+                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
               }
             } catch (error) {
-              console.warn('Failed to play audio:', error);
+              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
             }
           }}
           aria-label="Go to Music and Extras"
@@ -454,10 +457,10 @@ export default function ConsoleCard({
                   audio.play('gamecube_menu', { gain: 0.25 });
                 }
               } catch (error) {
-                console.warn('Failed to play audio:', error);
+                logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
               }
             } catch (error) {
-              console.warn('Failed to play audio:', error);
+              logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
             }
           }}
           aria-label="Go to Trade Center"
@@ -502,7 +505,7 @@ export default function ConsoleCard({
                     }, 10);
                   }
                 } catch (error) {
-                  console.warn('Failed to play audio:', error);
+                  logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
                 }
                 router.push(`/mini-games/games/${g.slug}`);
               }}
@@ -520,7 +523,7 @@ export default function ConsoleCard({
                       }, 10);
                     }
                   } catch (error) {
-                    console.warn('Failed to play audio:', error);
+                    logger.warn('Failed to play audio:', undefined, { error: error instanceof Error ? error : new Error(String(error)) });
                   }
                   router.push(`/mini-games/games/${g.slug}`);
                 }
@@ -613,9 +616,7 @@ export default function ConsoleCard({
 
     if (loading) {
       return (
-        <div className="p-4 text-xs text-zinc-300" data-testid="music-face-loading">
-          Loading preferences…
-        </div>
+        <Skeleton />
       );
     }
 
@@ -1003,7 +1004,7 @@ export default function ConsoleCard({
         <div>Arrows/Stick: rotate • A/Enter: select • B/Esc: back</div>
         <div className="inline-flex items-center gap-2">
           <span className="material-symbols-outlined">view_in_ar</span>
-          <span className="emoji-noto">🃝</span>
+          <span className="emoji-noto"><span role="img" aria-label="emoji">�</span>�</span>
         </div>
       </div>
     </section>
@@ -1288,7 +1289,7 @@ function CommunityFace() {
         // Creating WebSocket connection
         ws = new WebSocket(url);
       } catch (e) {
-        console.error('WebSocket connection failed:', e);
+        logger.error('WebSocket connection failed:', undefined, undefined, e instanceof Error ? e : new Error(String(e)));
         setWsFailures((n) => n + 1);
         setWsDegraded(true);
         bc('ws.disconnect');
@@ -1582,7 +1583,7 @@ function CommunityFace() {
               });
             } catch {}
           } catch (e) {
-            console.error('Failed to send interaction request:', e);
+            logger.error('Failed to send interaction request:', undefined, undefined, e instanceof Error ? e : new Error(String(e)));
             setToasts((prev) => [
               ...prev,
               {
