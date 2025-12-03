@@ -36,25 +36,28 @@ export function SectionHeader({
   title,
   description,
   action,
-  titleColor = '#835D75',
+  titleColor,
   className,
   id,
 }: SectionHeaderProps) {
   return (
-    <header className={cn('mb-6', className)} id={id}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h2 className="text-2xl md:text-3xl font-bold" style={{ color: titleColor }}>
-            {title}
-          </h2>
+    <header className={cn('mb-8', className)} id={id}>
+      {/* Bordered Banner Style - matches new aesthetic */}
+      <div className="border border-[var(--om-accent-gold)] bg-transparent py-4 text-center mb-6">
+        <h2 className="text-2xl font-serif tracking-wide text-[var(--om-text-ivory)]">
+          {title}
+        </h2>
+      </div>
+      {(description || action) && (
+        <div className="flex items-start justify-between gap-4">
           {description && (
-            <p className="mt-2" style={{ color: titleColor, opacity: 0.7 }}>
+            <p className="flex-1 text-center text-[var(--om-text-secondary)]">
               {description}
             </p>
           )}
+          {action && <div className="flex-shrink-0">{action}</div>}
         </div>
-        {action && <div className="flex-shrink-0">{action}</div>}
-      </div>
+      )}
     </header>
   );
 }

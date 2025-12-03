@@ -3,7 +3,6 @@ import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
 import { paths } from '@/lib/paths';
-import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
 import { handleServerError } from '@/app/lib/server-error-handler';
 import { SectionHeader } from '@/app/components/home/SectionHeader';
@@ -123,7 +122,7 @@ export default async function BlogSection() {
               }
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
             >
-              <GlassCard className="flex h-full flex-col">
+              <div className="flex h-full flex-col bg-[var(--om-bg-surface)] backdrop-blur-sm border border-[var(--om-accent-gold)] rounded-lg overflow-hidden hover:border-[var(--om-accent-pink)] transition-colors">
                 {post.image && (
                   <div className="relative aspect-video overflow-hidden">
                     <Image
@@ -134,21 +133,21 @@ export default async function BlogSection() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/70 transition-opacity duration-300 group-hover:opacity-95" />
-                    <span className="absolute left-4 top-4 rounded-full bg-pink-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-pink-200 backdrop-blur">
+                    <span className="absolute left-4 top-4 rounded-full bg-[var(--om-accent-pink)]/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--om-text-ivory)] backdrop-blur border border-[var(--om-accent-gold)]">
                       {post.type === 'communityPost' ? 'Community' : 'Blog'}
                     </span>
                   </div>
                 )}
-                <GlassCardContent className="flex flex-1 flex-col justify-between">
+                <div className="flex flex-1 flex-col justify-between p-6">
                   <div>
-                    <h3 className="mb-3 font-semibold text-white transition-colors group-hover:text-pink-300">
+                    <h3 className="mb-3 font-semibold text-[var(--om-text-ivory)] transition-colors group-hover:text-[var(--om-accent-pink)]">
                       {post.title}
                     </h3>
                     {post.excerpt && (
-                      <p className="mb-4 line-clamp-3 text-sm text-white/70">{post.excerpt}</p>
+                      <p className="mb-4 line-clamp-3 text-sm text-[var(--om-text-secondary)]">{post.excerpt}</p>
                     )}
                   </div>
-                  <div className="flex flex-col gap-2 text-xs text-white/60 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-2 text-xs text-[var(--om-text-secondary)] sm:flex-row sm:items-center sm:justify-between">
                     <span>
                       {post.publishedAt
                         ? (() => {
@@ -171,15 +170,15 @@ export default async function BlogSection() {
                       {post.tags.slice(0, 3).map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full bg-pink-500/15 px-2 py-1 text-xs text-pink-200"
+                          className="rounded-full bg-[var(--om-accent-pink)]/15 border border-[var(--om-accent-gold)] px-2 py-1 text-xs text-[var(--om-text-ivory)]"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
                   )}
-                </GlassCardContent>
-              </GlassCard>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

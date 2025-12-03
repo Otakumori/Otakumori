@@ -183,8 +183,8 @@ function renderShopContent(shopData: ShopData) {
 
   return (
     <div className="mx-auto mt-12 max-w-6xl px-4">
-      {/* Shop Header */}
-      <div className="border border-[var(--om-border-strong)] py-3 text-center text-2xl font-serif tracking-wide text-[var(--om-text-ivory)] mb-8">
+      {/* Shop Header - Bordered Banner Style */}
+      <div className="border border-[var(--om-accent-gold)] bg-transparent py-4 text-center text-2xl font-serif tracking-wide text-[var(--om-text-ivory)] mb-8">
         Shop
       </div>
 
@@ -196,7 +196,7 @@ function renderShopContent(shopData: ShopData) {
               href={product.slug ? paths.product(product.slug) : paths.shop()}
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--om-accent-pink)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--om-bg-root)]"
             >
-              <div className="flex h-full flex-col bg-[var(--om-bg-surface)] border border-[var(--om-border-soft)] rounded-xl overflow-hidden">
+              <div className="flex h-full flex-col bg-[var(--om-bg-surface)] backdrop-blur-sm border border-[var(--om-accent-gold)] rounded-lg overflow-hidden hover:border-[var(--om-accent-pink)] transition-colors">
                 {product.image ? (
                   <div className="relative aspect-square overflow-hidden">
                     <Image

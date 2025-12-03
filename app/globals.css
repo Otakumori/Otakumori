@@ -1231,6 +1231,26 @@ body {
   background-color: var(--om-bg-root);
 }
 
+/* Grain texture overlay for mystical aesthetic */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+/* Tree gradient overlay for blending with content */
+.tree-gradient-overlay {
+  background: linear-gradient(to right, rgba(26,24,22,0) 0%, rgba(26,24,22,0) 40%, rgba(26,24,22,0.3) 70%, rgba(26,24,22,0.8) 100%);
+}
+
 /* Tree is now handled by the Canopy component */
 
 /* Mobile guardrails */
@@ -1520,15 +1540,17 @@ footer::after {
   --star: rgba(255, 255, 255, 0.9);
   --star-dim: rgba(255, 255, 255, 0.35);
 
-  /* Sakura Theme Colors - Dark Gray + Ivory + Sakura Pink */
-  --om-bg-root: #171819; /* dark charcoal gray base */
-  --om-bg-surface: #1f2021; /* surface cards/panels */
-  --om-border-soft: #4c433d; /* soft borders */
-  --om-border-strong: #d4c2a4; /* strong borders for frames */
-  --om-text-ivory: #f2e6d2; /* warm ivory text */
-  --om-accent-pink: #f3b7c2; /* primary sakura pink */
-  --om-accent-pink-2: #f4c1cb; /* secondary sakura pink */
-  --om-accent-pink-3: #eaa4b4; /* tertiary sakura pink */
+  /* Sakura Theme Colors - Dark Fantasy Mystical (Updated for new aesthetic) */
+  --om-bg-root: #1a1816; /* dark charcoal/black with warm undertone */
+  --om-bg-surface: rgba(30, 28, 26, 0.6); /* slightly lighter with transparency */
+  --om-border-soft: rgba(229, 224, 216, 0.15); /* beige/off-white at 15% */
+  --om-border-strong: rgba(229, 224, 216, 0.35); /* beige/gold borders at 35% */
+  --om-accent-gold: #d4c5a9; /* beige/gold for borders and accents */
+  --om-text-ivory: #e5e0d8; /* light beige/off-white text */
+  --om-text-secondary: #c4bfb7; /* muted beige for secondary text */
+  --om-accent-pink: #d4a5a5; /* muted rose/pink for blossoms */
+  --om-accent-pink-2: #c99999; /* secondary muted rose */
+  --om-accent-pink-3: #d8b0b0; /* tertiary muted rose */
 
   /* Primary Colors - Pink (using pink-600 for WCAG AA contrast with white text) */
   --color-primary: #db2777; /* pink-600: 4.60:1 contrast with white text (meets WCAG AA) */

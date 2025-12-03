@@ -100,15 +100,41 @@ export default async function HomePage() {
             </>
           )}
 
-          <div className="relative min-h-screen page-transition" style={{ zIndex: 10 }}>
+          {/* Fixed Cherry Tree Background - LEFT SIDE */}
+          <div 
+            className="fixed left-0 top-0 h-screen w-auto max-w-[50vw] pointer-events-none hidden md:block -z-[5]"
+            aria-hidden="true"
+          >
+            <div className="relative h-full w-auto">
+              <Image
+                src="/assets/images/cherry-tree.png"
+                alt=""
+                width={800}
+                height={1200}
+                priority
+                className="h-full max-h-screen w-auto object-contain object-left-top"
+              />
+              {/* Gradient overlay to blend with content */}
+              <div 
+                className="absolute inset-0 pointer-events-none tree-gradient-overlay"
+              />
+            </div>
+            {/* Petal system overlay - falling from tree */}
+            {isHomepageExperimentalEnabled && (
+              <SafeSection name="HomeHeroPetals" fallback={null}>
+                <HomeHeroPetals />
+              </SafeSection>
+            )}
+          </div>
+
+          <div className="relative min-h-screen page-transition z-10">
             {/* HERO - Always visible */}
             <section
               className="relative z-40 mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-20 md:pb-24 lg:pt-24 lg:pb-28"
-              style={{ zIndex: 10 }}
             >
-              <div className="grid gap-10 md:grid-cols-[minmax(0,0.40fr)_minmax(0,0.60fr)]">
-                {/* Left: Sakura Tree */}
-                <div className="relative h-72 md:h-[420px] lg:h-[480px] -ml-4 md:-ml-8">
+              <div className="flex flex-col md:flex-row md:justify-end gap-10">
+                {/* Mobile: Show tree inline */}
+                <div className="relative h-72 md:hidden -ml-4">
                   <Image
                     src="/assets/images/cherry-tree.png"
                     alt="Sakura tree overlooking Otakumori"
@@ -116,16 +142,10 @@ export default async function HomePage() {
                     priority
                     className="object-contain object-left pointer-events-none select-none"
                   />
-                  {/* Petal system overlay - only on hero tree area */}
-                  {isHomepageExperimentalEnabled && (
-                    <SafeSection name="HomeHeroPetals" fallback={null}>
-                      <HomeHeroPetals />
-                    </SafeSection>
-                  )}
                 </div>
 
-                {/* Right: Hero Content */}
-                <div className="flex flex-col justify-center gap-6">
+                {/* Hero Content - Right side on desktop */}
+                <div className="flex flex-col justify-center gap-6 md:max-w-xl md:ml-auto">
                   <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl tracking-wide text-[var(--om-text-ivory)]">
                     Welcome Home, Traveler.
                   </h1>
@@ -135,31 +155,31 @@ export default async function HomePage() {
                     {[1, 2, 3, 4].map((i) => (
                       <div
                         key={i}
-                        className="aspect-square border border-[var(--om-border-soft)] bg-[var(--om-bg-surface)] rounded-lg flex items-center justify-center"
-                        aria-label={`Rune symbol ${i}`}
+                        className="aspect-square border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm rounded-lg flex items-center justify-center hover:bg-[var(--om-accent-pink)]/10 transition-all cursor-pointer"
+                        aria-label={`Category ${i}`}
                       >
                         <span className="text-2xl text-[var(--om-text-ivory)] opacity-60">✦</span>
                       </div>
                     ))}
                   </div>
 
-                  {/* CTAs */}
-                  <div className="mt-6 flex flex-col sm:flex-row gap-4">
+                  {/* CTAs - Hidden for now, icons replace them */}
+                  <div className="hidden mt-6 flex-col sm:flex-row gap-4">
                     <Link
                       href="/shop"
-                      className="px-6 py-3 border border-[var(--om-border-strong)] bg-[var(--om-bg-surface)] text-[var(--om-text-ivory)] rounded-lg hover:bg-[var(--om-accent-pink)]/10 transition-colors text-center"
+                      className="px-6 py-3 border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm text-[var(--om-text-ivory)] rounded-lg hover:bg-[var(--om-accent-pink)]/10 transition-colors text-center"
                     >
                       Enter the Shop
                     </Link>
                     <Link
                       href="/mini-games"
-                      className="px-6 py-3 border border-[var(--om-border-strong)] bg-[var(--om-bg-surface)] text-[var(--om-text-ivory)] rounded-lg hover:bg-[var(--om-accent-pink)]/10 transition-colors text-center"
+                      className="px-6 py-3 border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm text-[var(--om-text-ivory)] rounded-lg hover:bg-[var(--om-accent-pink)]/10 transition-colors text-center"
                     >
                       Play Mini-Games
                     </Link>
                     <Link
                       href="/blog"
-                      className="px-6 py-3 border border-[var(--om-border-strong)] bg-[var(--om-bg-surface)] text-[var(--om-text-ivory)] rounded-lg hover:bg-[var(--om-accent-pink)]/10 transition-colors text-center"
+                      className="px-6 py-3 border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm text-[var(--om-text-ivory)] rounded-lg hover:bg-[var(--om-accent-pink)]/10 transition-colors text-center"
                     >
                       Read the Lore
                     </Link>

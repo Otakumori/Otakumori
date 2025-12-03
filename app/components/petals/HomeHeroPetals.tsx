@@ -30,11 +30,11 @@ interface Petal {
   color: string;
 }
 
-const PETAL_COLORS = ['#f3b7c2', '#f4c1cb', '#eaa4b4'];
-const PETAL_OPACITY_MIN = 0.55;
-const PETAL_OPACITY_MAX = 0.7;
-const LIFETIME_MIN = 6000; // 6 seconds
-const LIFETIME_MAX = 8000; // 8 seconds
+const PETAL_COLORS = ['#d4a5a5', '#c99999', '#d8b0b0']; // Muted rose matching tree
+const PETAL_OPACITY_MIN = 0.25; // Lighter opacity for subtle effect
+const PETAL_OPACITY_MAX = 0.45;
+const LIFETIME_MIN = 10000; // 10 seconds - slower, more natural
+const LIFETIME_MAX = 14000; // 14 seconds
 const FADE_OUT_START = 0.8; // Start fading at 80% of lifetime
 
 export default function HomeHeroPetals() {
@@ -96,18 +96,18 @@ export default function HomeHeroPetals() {
     const spawnX = isMobile ? 0.1 + Math.random() * 0.8 : Math.random() * 0.4;
     const spawnY = isMobile ? Math.random() * 0.4 : Math.random() * 0.35;
 
-    const desiredFallTime = 7000; // 7 seconds
+    const desiredFallTime = 12000; // 12 seconds - slower, more realistic
     const baseVY = height / desiredFallTime;
-    const vy = baseVY * (0.9 + Math.random() * 0.4); // 0.9-1.3x speed variation
+    const vy = baseVY * (0.7 + Math.random() * 0.3); // 0.7-1.0x - gentler variation
 
     return {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       x: width * spawnX,
       y: height * spawnY,
-      vx: (Math.random() - 0.5) * 0.2, // gentle horizontal drift
+      vx: (Math.random() - 0.5) * 0.15, // even gentler horizontal drift
       vy,
       rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.003, // slow rotation
+      rotationSpeed: (Math.random() - 0.5) * 0.002, // slower rotation
       size: 8 + Math.random() * 8, // 8-16px
       opacity: PETAL_OPACITY_MIN + Math.random() * (PETAL_OPACITY_MAX - PETAL_OPACITY_MIN),
       life: 1,
@@ -187,10 +187,10 @@ export default function HomeHeroPetals() {
 
       const maxPetals = getMaxPetals();
 
-      // Spawn new petals
+      // Spawn new petals - less frequently for subtle effect
       if (
         petalsRef.current.length < maxPetals &&
-        currentTime - lastSpawnTimeRef.current > 2000 // Spawn every 2 seconds
+        currentTime - lastSpawnTimeRef.current > 4000 // Spawn every 4 seconds
       ) {
         petalsRef.current.push(spawnPetal());
         lastSpawnTimeRef.current = currentTime;
@@ -203,11 +203,11 @@ export default function HomeHeroPetals() {
             petal.life -= dt * 0.002; // Faster fade when collected
             if (petal.life <= 0) return null;
           } else {
-            // Update position
-            const wind = Math.sin(petal.y / 60 + currentTime / 1000) * 0.15; // Gentle sway
-            petal.x += (petal.vx + wind) * dt;
-            petal.y += petal.vy * dt;
-            petal.rotation += petal.rotationSpeed * dt;
+            // Update position - more natural physics
+            const wind = Math.sin(petal.y / 100 + currentTime / 2000) * 0.1; // Slower, subtler sway
+            petal.x += (petal.vx + wind) * dt * 0.6; // Reduced horizontal movement
+            petal.y += petal.vy * dt; // Natural gravity-based fall
+            petal.rotation += petal.rotationSpeed * dt * 0.5; // Slower rotation
 
             // Update life (fade out in final 20%)
             const lifetime = LIFETIME_MIN + Math.random() * (LIFETIME_MAX - LIFETIME_MIN);
@@ -226,8 +226,8 @@ export default function HomeHeroPetals() {
         })
         .filter((p): p is Petal => p !== null);
 
-      // Maintain target count
-      while (petalsRef.current.length < maxPetals && currentTime - lastSpawnTimeRef.current > 1000) {
+      // Maintain target count - spawn less frequently
+      while (petalsRef.current.length < maxPetals && currentTime - lastSpawnTimeRef.current > 3000) {
         petalsRef.current.push(spawnPetal());
         lastSpawnTimeRef.current = currentTime;
       }
@@ -285,27 +285,20 @@ export default function HomeHeroPetals() {
     <>
       <div
         ref={containerRef}
-        className="absolute inset-0 pointer-events-auto"
-        style={{
-          // Desktop: left 0-45%, Mobile: full width but only top 40-50%
-          width: isMobile ? '100%' : '45%',
-          height: isMobile ? '50%' : '100%',
-          left: 0,
-          top: 0,
-        }}
+        className={`absolute inset-0 pointer-events-auto left-0 top-0 ${
+          isMobile ? 'w-full h-1/2' : 'w-[45%] h-full'
+        }`}
       >
         <canvas
           ref={canvasRef}
-          className="absolute inset-0"
-          style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+          className="absolute inset-0 pointer-events-auto cursor-pointer"
         />
       </div>
 
       {/* Tooltip - shows once on first collection */}
       {showTooltip && (
         <div
-          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-[var(--om-bg-surface)] border border-[var(--om-border-strong)] rounded-lg p-4 max-w-sm shadow-lg"
-          style={{ zIndex: 1000 }}
+          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[1000] bg-[var(--om-bg-surface)] border border-[var(--om-border-strong)] rounded-lg p-4 max-w-sm shadow-lg"
         >
           <p className="text-[var(--om-text-ivory)] text-sm mb-2">
             Click falling petals to collect them! They're currency you can use in the shop.

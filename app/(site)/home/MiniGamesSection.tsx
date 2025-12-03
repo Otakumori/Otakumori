@@ -3,7 +3,6 @@ import { safeFetch, isSuccess } from '@/lib/safeFetch';
 import Link from 'next/link';
 import { getEnabledGames, getGameDef, getGameThumbnailAsset } from '@/app/lib/games';
 import { paths } from '@/lib/paths';
-import { GlassCard, GlassCardContent } from '@/components/ui/glass-card';
 import { HeaderButton } from '@/components/ui/header-button';
 import { handleServerError } from '@/app/lib/server-error-handler';
 import { SectionHeader } from '@/app/components/home/SectionHeader';
@@ -141,28 +140,26 @@ export default async function MiniGamesSection() {
               href={paths.game(game.slug)}
               className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black transition-transform duration-200 hover:scale-[1.02]"
             >
-              <GlassCard className="flex h-full flex-col overflow-hidden">
-          <GlassCardContent className="flex-1 pt-6" >
+              <div className="flex h-full flex-col bg-[var(--om-bg-surface)] backdrop-blur-sm border border-[var(--om-accent-gold)] rounded-lg overflow-hidden p-6 hover:border-[var(--om-accent-pink)] transition-colors">
           <div className="flex flex-col gap-3" >
-          <h3 className="font-semibold text-white text-lg transition-colors group-hover:text-pink-300" >
+          <h3 className="font-semibold text-[var(--om-text-ivory)] text-lg transition-colors group-hover:text-[var(--om-accent-pink)]" >
                       {game.title}
                     </h3>
                     {game.category && (
-                      <span className="self-start rounded-full bg-pink-500/30 backdrop-blur-sm border border-pink-400/20 px-3 py-1 text-xs font-medium text-pink-100">
+                      <span className="self-start rounded-full bg-[var(--om-accent-pink)]/20 backdrop-blur-sm border border-[var(--om-accent-gold)] px-3 py-1 text-xs font-medium text-[var(--om-text-ivory)]">
                         {game.category}
                       </span>
                     )
     }
                     {
     game.description && (
-      <p className="text-sm text-white/70 line-clamp-3 leading-relaxed" >
+      <p className="text-sm text-[var(--om-text-secondary)] line-clamp-3 leading-relaxed" >
         { game.description }
         </p>
                     )
   }
   </div>
-    </GlassCardContent>
-              </GlassCard>
+              </div>
             </Link>
           ))}
         </div>
