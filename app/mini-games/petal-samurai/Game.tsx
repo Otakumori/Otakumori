@@ -34,6 +34,7 @@ import {
 } from '../_shared/vfx';
 import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
 import { createGlowEffect } from '../_shared/enhancedTextures';
+import Character3D, { type Character3DRef } from './Character3D';
 
 type Props = {
   mode: 'classic' | 'storm' | 'endless' | 'timed';

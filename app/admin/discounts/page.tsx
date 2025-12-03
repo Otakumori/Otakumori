@@ -1,7 +1,6 @@
 'use client';
 
 import { Skeleton } from '@/app/components/ui/Skeleton';
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '../../../components/admin/AdminNav';
@@ -31,12 +30,7 @@ interface DiscountReward {
   };
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\discounts\page.tsx',
-  });
+);
 }
 export default function AdminDiscountsPage() {
   const [rewards, setRewards] = useState<DiscountReward[]>([]);

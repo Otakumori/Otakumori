@@ -1,15 +1,9 @@
 
-import { generateSEO } from '@/app/lib/seo';
 import AdminReviewsClient from './review-client';
 
 export const dynamic = 'force-dynamic';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\reviews\page.tsx',
-  });
+);
 }
 export default function AdminReviewsPage() {
   return (

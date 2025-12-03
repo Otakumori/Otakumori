@@ -1,14 +1,8 @@
 
-import { generateSEO } from '@/app/lib/seo';
 import { isAdmin } from '@/app/lib/authz';
 import AdminSoapstones from './ui';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Soapstones',
-    description: 'Leave signs for fellow travelers',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\soapstones\page.tsx',
-  });
+);
 }
 export default async function AdminSoapstonesPage() {
   if (!(await isAdmin()))

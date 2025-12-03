@@ -1,17 +1,11 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/login',
-  });
+);
 }
 export default function LoginPage() {
   const { isLoaded, isSignedIn } = useUser();

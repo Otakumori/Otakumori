@@ -47,6 +47,7 @@
     ]
   },
   "scripts": {
+    "verify-env": "node scripts/verify-env.js",
     "dev": "next dev",
     "build:scripts": "tsc --project tsconfig.json --outDir dist --rootDir . lib/*.ts scripts/*.ts",
     "prebuild": "tsx scripts/pre-build-validation.ts",

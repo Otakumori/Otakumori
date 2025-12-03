@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
@@ -30,12 +29,7 @@ import {
 } from '@/app/lib/avatar/guest-storage';
 import { avatarPartManager } from '@/app/lib/3d/avatar-parts';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/character-editor',
-  });
+);
 }
 export default function CharacterEditorPage() {
   const { user, isLoaded } = useUser();

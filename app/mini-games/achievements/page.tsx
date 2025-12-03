@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -22,12 +21,7 @@ interface Achievement {
   unlockedAt?: Date;
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\achievements\page.tsx',
-  });
+);
 }
 export default function AchievementsPage() {
   const [_activeCategory, _setActiveCategory] = useState<

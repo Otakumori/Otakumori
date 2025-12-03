@@ -14,7 +14,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -40,12 +39,7 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\otaku-beat-em-up\page.tsx',
-  });
+);
 }
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);

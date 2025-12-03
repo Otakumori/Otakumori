@@ -1,18 +1,12 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Music, Play, Pause, SkipBack, SkipForward, Heart, List } from 'lucide-react';
 import Link from 'next/link';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\panel\music\page.tsx',
-  });
+);
 }
 export default function MusicPanel() {
   const { user: _user } = useUser();

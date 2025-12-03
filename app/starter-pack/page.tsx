@@ -1,15 +1,9 @@
 
 'use client';
-import { generateSEO } from '@/app/lib/seo';
 import { useState } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/starter-pack',
-  });
+);
 }
 export default function StarterPackPage() {
   const [email, setEmail] = useState('');

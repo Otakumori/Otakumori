@@ -5,7 +5,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import React, { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
@@ -24,12 +23,7 @@ const AvatarRenderer3D = dynamic(() => import('@/app/components/avatar/AvatarRen
   ),
 });
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\avatar\editor\page.tsx',
-  });
+);
 }
 export default function AvatarEditorPage() {
   return (

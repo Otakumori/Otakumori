@@ -3,7 +3,6 @@
 // Force dynamic rendering to avoid static generation issues with context providers
 export const dynamic = 'force-dynamic';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { useCart } from '../../components/cart/CartProvider';
@@ -39,12 +38,7 @@ interface CartItem {
   };
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Shop',
-    description: 'Browse our anime and gaming merchandise',
-    url: '/shop/checkout',
-  });
+);
 }
 export default function CheckoutPage() {
   const { items: cart, clearCart: _clearCart, total } = useCart();

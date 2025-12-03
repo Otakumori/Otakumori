@@ -1,6 +1,5 @@
 
 'use client';
-import { generateSEO } from '@/app/lib/seo';
 import { useEffect } from 'react';
 import CubeHub from '../mini-games/components/CubeHub';
 import AvatarPerch from './_scene/AvatarPerch';
@@ -11,12 +10,7 @@ import './_scene/hub.css';
 import { play } from '@/app/mini-games/_shared/audio-bus';
 import Link from 'next/link';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/hub',
-  });
+);
 }
 export default function HubPage() {
   const { face, isZooming, backToIdle } = useHub();

@@ -1,7 +1,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import PartyHub from '../components/PartyHub';
@@ -9,12 +8,7 @@ import GlassCard from '../components/ui/GlassCard';
 
 // Metadata is handled by layout.tsx for client components
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Parties',
-    description: 'Join parties and play together',
-    url: '/parties',
-  });
+);
 }
 export default function PartiesPage() {
   return (

@@ -1,15 +1,9 @@
 'use client';
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/cookies',
-  });
+);
 }
 export default function CookieSettings() {
   const [analytics, setAnalytics] = useState(false);

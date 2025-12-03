@@ -1,14 +1,8 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import ErrorTestButton from '../components/ErrorTestButton';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\debug\sentry\page.tsx',
-  });
+);
 }
 export default function SentryDebugPage() {
   return (

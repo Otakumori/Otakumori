@@ -6,7 +6,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -19,12 +18,7 @@ import {
 import { DISCOUNT_VOUCHER_TIERS } from '@/app/config/petalTuning';
 import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Shop',
-    description: 'Browse our anime and gaming merchandise',
-    url: '/petal-shop',
-  });
+);
 }
 export default function PetalShopPage() {
   const {

@@ -1,5 +1,4 @@
 'use client';
-import { generateSEO } from '@/app/lib/seo';
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '../../../components/admin/AdminNav';
 
@@ -15,12 +14,7 @@ type Item = {
   metadata?: any;
 };
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Shop',
-    description: 'Browse our anime and gaming merchandise',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\petal-shop\page.tsx',
-  });
+);
 }
 export default function AdminPetalShopPage() {
   const [items, setItems] = useState<Item[]>([]);

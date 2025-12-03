@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
@@ -25,12 +24,7 @@ interface WishlistItem {
   };
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/wishlist',
-  });
+);
 }
 export default function WishlistPage() {
   const { isSignedIn, userId } = useAuth();

@@ -14,7 +14,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { GAMES } from '@/components/arcade/registry';
@@ -38,12 +37,7 @@ import { useGameHud } from '../_shared/useGameHud';
 // eslint-disable-next-line unused-imports/no-unused-imports
 import { GameOverlay } from '../_shared/GameOverlay';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\blossomware\page.tsx',
-  });
+);
 }
 export default function BlossomwarePage() {
   // Avatar choice state

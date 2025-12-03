@@ -14,7 +14,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
 import { useState, useCallback, useRef } from 'react';
@@ -52,12 +51,7 @@ const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\puzzle-reveal\page.tsx',
-  });
+);
 }
 export default function PuzzleRevealPage() {
   const [mode, setMode] = useState<GameMode>('medium');

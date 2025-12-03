@@ -1,14 +1,8 @@
 'use client';
-import { generateSEO } from '@/app/lib/seo';
 import { useEffect, useState } from 'react';
 import { AdminLayout } from '../../../components/admin/AdminNav';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\settings\page.tsx',
-  });
+);
 }
 export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);

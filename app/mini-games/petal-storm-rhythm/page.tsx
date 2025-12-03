@@ -14,7 +14,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -90,12 +89,7 @@ const SAMPLE_TRACKS: Track[] = [
   },
 ];
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\petal-storm-rhythm\page.tsx',
-  });
+);
 }
 export default function PetalStormRhythm() {
   // Game configuration - difficulty tuning parameters (must be declared before state)

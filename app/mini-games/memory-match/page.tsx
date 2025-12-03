@@ -15,7 +15,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,12 +52,7 @@ interface Card {
   isMatched: boolean;
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\memory-match\page.tsx',
-  });
+);
 }
 export default function MemoryMatchGame() {
   const [cards, setCards] = useState<Card[]>([]);

@@ -1,16 +1,10 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/play',
-  });
+);
 }
 export default function PlayPage() {
   const { trackQuest } = useQuests();

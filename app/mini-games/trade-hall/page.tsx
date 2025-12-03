@@ -2,7 +2,6 @@
 // @ts-nocheck
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { COPY } from '../../lib/copy';
@@ -30,12 +29,7 @@ interface TradeOffer {
   createdAt: Date;
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Scarlet Bazaar',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\trade-hall\page.tsx',
-  });
+);
 }
 export default function TradeHallPage() {
   const [activeTab, setActiveTab] = useState<'inventory' | 'crafting' | 'trading' | 'market'>(

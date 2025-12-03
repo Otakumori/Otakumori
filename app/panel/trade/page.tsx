@@ -1,18 +1,12 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { ArrowLeftRight, Coins } from 'lucide-react';
 import Link from 'next/link';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Scarlet Bazaar',
-    description: 'Trade items in the Scarlet Bazaar',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\panel\trade\page.tsx',
-  });
+);
 }
 export default function TradeCenterPanel() {
   const { user } = useUser();

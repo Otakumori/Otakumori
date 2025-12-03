@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../../components/layout/Navbar';
@@ -8,12 +7,7 @@ import FooterDark from '../../components/FooterDark';
 import GlassPanel from '../../components/GlassPanel';
 
 // L-Room 404 Puzzle - Death Note inspired
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/games/404',
-  });
+);
 }
 export default function LRoom404Page() {
   const [currentPhase, setCurrentPhase] = useState<

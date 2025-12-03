@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
@@ -52,12 +51,7 @@ const DEFAULT_FLAGS: FeatureFlag[] = [
   },
 ];
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\flags\page.tsx',
-  });
+);
 }
 export default function AdminFlagsPage() {
   const { user, isLoaded } = useUser();

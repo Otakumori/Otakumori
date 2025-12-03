@@ -1,17 +1,11 @@
 'use client';
-import { generateSEO } from '@/app/lib/seo';
 import { useUser } from '@clerk/nextjs'; // Clerk client
 import { useEffect, useState } from 'react';
 import GameShell from '../_shared/GameShell';
 import BootScreen from '../../components/games/BootScreen';
 import Scene from './Scene';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\rhythm-beat-em-up\page.tsx',
-  });
+);
 }
 export default function Page() {
   const { isSignedIn } = useUser();

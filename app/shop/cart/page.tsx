@@ -3,7 +3,6 @@
 // Force dynamic rendering to avoid static generation issues with context providers
 export const dynamic = 'force-dynamic';
 
-import { generateSEO } from '@/app/lib/seo';
 import Image from 'next/image';
 import { useCart } from '../../components/cart/CartProvider';
 import { Button } from '@/components/ui/button';
@@ -24,12 +23,7 @@ interface CartItem {
   };
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Shop',
-    description: 'Browse our anime and gaming merchandise',
-    url: '/shop/cart',
-  });
+);
 }
 export default function CartPage() {
   const { items: cart, updateQuantity, removeItem: removeFromCart, total } = useCart();

@@ -1,17 +1,11 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import AvatarSystem from '../../components/avatar/AvatarSystem';
 import { type ProceduralCharacterConfig } from '@/lib/avatar/procedural-generator';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/avatar-editor',
-  });
+);
 }
 export default function AvatarEditorPage() {
   const [showAvatarSystem, setShowAvatarSystem] = useState(false);

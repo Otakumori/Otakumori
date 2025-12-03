@@ -1,15 +1,9 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/test-sentry',
-  });
+);
 }
 export default function TestSentryPage() {
   useEffect(() => {

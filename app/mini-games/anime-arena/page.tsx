@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
@@ -17,12 +16,7 @@ const AnimeArenaScene = dynamic(() => import('./Scene'), {
   ),
 });
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\anime-arena\page.tsx',
-  });
+);
 }
 export default function AnimeArenaPage() {
   return (

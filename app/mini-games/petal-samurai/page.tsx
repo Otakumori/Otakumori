@@ -5,7 +5,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import dynamic from 'next/dynamic';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -19,6 +18,12 @@ import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
 import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
+import dynamic from 'next/dynamic';
+
+// Dynamically import 3D character with no SSR
+const Character3D = dynamic(() => import('./Character3D'), {
+  ssr: false,
+});
 // Shared UI components - imported for QA validation (Game component handles its own UI)
 import { useGameHud } from '../_shared/useGameHud';
 // eslint-disable-next-line unused-imports/no-unused-imports
@@ -38,12 +43,7 @@ const SlicingGame = dynamic(() => import('./Game'), {
   ),
 });
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\petal-samurai\page.tsx',
-  });
+);
 }
 export default function PetalSamuraiPage() {
   // Avatar choice state
@@ -139,8 +139,17 @@ export default function PetalSamuraiPage() {
         </div>
       )}
 
-      {/* Avatar Display (FullBody Mode) - MAIN CHARACTER CENTER STAGE */}
-      {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+      {/* 3D Character with Physics - Reacts to gameplay */}
+      {!shouldShowChoice && (
+        <div className="absolute bottom-0 right-8 z-30 pointer-events-none">
+          <div className="relative w-80 h-96">
+            <Character3D className="w-full h-full" />
+          </div>
+        </div>
+      )}
+      
+      {/* Original Avatar Display (FullBody Mode) - fallback */}
+      {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && false && (
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
           <div className="relative w-96 h-96">
             <AvatarRenderer profile={avatarConfig} mode={representationConfig.mode} size="large" />

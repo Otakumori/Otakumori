@@ -14,7 +14,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -37,12 +36,7 @@ import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\dungeon-of-desire\page.tsx',
-  });
+);
 }
 export default function DungeonOfDesirePage() {
   const [score, setScore] = useState(0);

@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState } from 'react';
 import { Button } from '../../../components/ui/button';
@@ -18,12 +17,7 @@ interface SyncResults {
   printifyProducts: SyncResult;
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\admin\external-sync\page.tsx',
-  });
+);
 }
 export default function ExternalSyncPage() {
   const [isLoading, setIsLoading] = useState(false);

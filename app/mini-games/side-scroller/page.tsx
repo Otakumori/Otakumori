@@ -4,7 +4,6 @@
  * Side-scroller demo - 2.5D platformer with ECS
  */
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -27,12 +26,7 @@ import { resolveEquipmentForGame } from '@/app/lib/avatar/resolve-equipment';
 import { InputHints } from '@/app/components/games/InputHints';
 import { prefersReducedMotion } from '@/app/lib/device-profile';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\side-scroller\page.tsx',
-  });
+);
 }
 export default function SideScrollerDemo() {
   const [isReady, setIsReady] = useState(false);

@@ -14,7 +14,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import dynamic from 'next/dynamic';
 import { useState, useCallback } from 'react';
@@ -51,12 +50,7 @@ const InteractiveBuddyGame = dynamic(() => import('./InteractiveBuddyGame'), {
 
 type GameMode = 'sandbox' | 'stress-relief' | 'challenge';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\bubble-girl\page.tsx',
-  });
+);
 }
 export default function InteractiveBuddyPage() {
   const [mode, setMode] = useState<GameMode>('sandbox');

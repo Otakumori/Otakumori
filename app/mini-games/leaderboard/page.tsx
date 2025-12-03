@@ -1,7 +1,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { COPY } from '../../lib/copy';
@@ -9,12 +8,7 @@ import GlassButton from '../../components/ui/GlassButton';
 import GlassCard from '../../components/ui/GlassCard';
 import { type LeaderboardEntry } from '@/app/lib/economy/petalEconomy';
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\leaderboard\page.tsx',
-  });
+);
 }
 export default function LeaderboardPage() {
   const [activeGame, setActiveGame] = useState<string>('all');

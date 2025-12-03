@@ -1,6 +1,5 @@
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
@@ -38,12 +37,7 @@ import { HeaderButton } from '@/components/ui/header-button';
  * - Preset system
  * - Undo/Redo
  */
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/creator',
-  });
+);
 }
 export default function CreatorPage() {
   const router = useRouter();
