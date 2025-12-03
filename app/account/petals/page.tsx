@@ -1,7 +1,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
@@ -54,13 +53,6 @@ const CATEGORIES = [
   { id: 'DISCOUNT', name: 'Discount Vouchers', icon: '' },
 ];
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\account\petals\page.tsx',
-  });
-}
 export default function PetalStorePage() {
   const { user } = useUser();
   const [items, setItems] = useState<ShopItem[]>([]);

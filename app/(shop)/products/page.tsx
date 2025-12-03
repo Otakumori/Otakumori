@@ -1,7 +1,6 @@
 
 'use client';
 
-import { generateSEO } from '@/app/lib/seo';
 import { logger } from '@/app/lib/logger';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -140,13 +139,6 @@ function ProductsSkeleton() {
   );
 }
 
-export function generateMetadata() {
-  return generateSEO({
-    title: 'Shop',
-    description: 'Browse our anime and gaming merchandise',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\(shop)\products\page.tsx',
-  });
-}
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
