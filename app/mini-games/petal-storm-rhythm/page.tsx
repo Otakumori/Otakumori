@@ -23,12 +23,12 @@ import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 import { useGameHud } from '../_shared/useGameHud';
-import { usePetalEarn } from '../_shared/usePetalEarn';
 import {
   getGameVisualProfile,
   applyVisualProfile,
   getGameDisplayName,
 } from '../_shared/gameVisuals';
+import { useGameProgress } from '@/app/lib/games/progress';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
@@ -89,8 +89,6 @@ const SAMPLE_TRACKS: Track[] = [
   },
 ];
 
-);
-}
 export default function PetalStormRhythm() {
   // Game configuration - difficulty tuning parameters (must be declared before state)
   const GAME_CONFIG = {
@@ -125,6 +123,9 @@ export default function PetalStormRhythm() {
   const [multiplier, setMultiplier] = useState(1);
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const [achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
+  const [gameStartTime, setGameStartTime] = useState<number>(0);
 
   // Hit VFX state
   const [laneFlashes, setLaneFlashes] = useState<
@@ -159,6 +160,7 @@ export default function PetalStormRhythm() {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
+    // Transition to instructions after avatar choice
     setGameState('instructions');
   }, []);
 
@@ -171,7 +173,7 @@ export default function PetalStormRhythm() {
   const visualProfile = getGameVisualProfile('petal-storm-rhythm');
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-storm-rhythm');
-  const { earnPetals } = usePetalEarn();
+  const { recordResult } = useGameProgress();
 
   // Lane positions (4 lanes)
   const LANE_COUNT = GAME_CONFIG.LANE_COUNT;
@@ -190,32 +192,82 @@ export default function PetalStormRhythm() {
     const notes: Note[] = [];
     const noteInterval = 60000 / track.bpm; // ms per beat
     const totalBeats = Math.floor((track.duration * 1000) / noteInterval);
+    const preparationDelay = GAME_CONFIG.PREPARATION_DELAY;
 
-    for (let beat = 0; beat < totalBeats; beat++) {
-      // Generate notes based on difficulty
-      const shouldAddNote = Math.random() < getDifficulty(track.difficulty);
+    // For "Sakura Dreams" specifically, create a structured beat map
+    if (track.id === 'sakura-dreams') {
+      // Create a pattern that follows the music
+      // Strong beats (1, 3) get notes more often
+      // Weak beats (2, 4) get notes less often
+      const pattern = [
+        [0, 2, 4], // Beat 1: lanes 0, 2, 4
+        [1, 3],    // Beat 2: lanes 1, 3
+        [0, 1, 2, 3, 4], // Beat 3: all lanes
+        [2],       // Beat 4: lane 2
+      ];
 
-      if (shouldAddNote) {
-        const note: Note = {
-          id: `note_${beat}_${Math.random()}`,
-          lane: Math.floor(Math.random() * LANE_COUNT),
-          time: beat * noteInterval + 2000, // 2s delay for preparation
-          type: 'normal',
-        };
+      for (let beat = 0; beat < totalBeats; beat++) {
+        const beatInMeasure = beat % 4;
+        const patternLanes = pattern[beatInMeasure];
+        const difficultyMultiplier = getDifficulty(track.difficulty);
 
-        // Add special notes based on difficulty
-        if (track.difficulty === 'hard' || track.difficulty === 'expert') {
-          const random = Math.random();
-          if (random < 0.1) {
-            note.type = 'hold';
-            note.duration = noteInterval * 2; // 2 beat hold
-          } else if (random < 0.15) {
-            note.type = 'slide';
-            note.direction = Math.random() < 0.5 ? 'left' : 'right';
-          }
+        // On strong beats (0, 2), always add notes
+        // On weak beats (1, 3), add notes based on difficulty
+        if (beatInMeasure === 0 || beatInMeasure === 2 || Math.random() < difficultyMultiplier) {
+          // Add notes from the pattern
+          patternLanes.forEach((lane) => {
+            if (Math.random() < 0.7) { // 70% chance per lane in pattern
+              const note: Note = {
+                id: `note_${beat}_${lane}_${Math.random()}`,
+                lane,
+                time: beat * noteInterval + preparationDelay,
+                type: 'normal',
+              };
+              notes.push(note);
+            }
+          });
         }
 
-        notes.push(note);
+        // Every 8 beats, add a special pattern
+        if (beat % 8 === 7 && track.difficulty !== 'easy') {
+          // Add a chord (all lanes)
+          for (let lane = 0; lane < LANE_COUNT; lane++) {
+            notes.push({
+              id: `note_${beat}_chord_${lane}_${Math.random()}`,
+              lane,
+              time: beat * noteInterval + preparationDelay,
+              type: 'normal',
+            });
+          }
+        }
+      }
+    } else {
+      // For other tracks, use the original random generation
+      for (let beat = 0; beat < totalBeats; beat++) {
+        const shouldAddNote = Math.random() < getDifficulty(track.difficulty);
+
+        if (shouldAddNote) {
+          const note: Note = {
+            id: `note_${beat}_${Math.random()}`,
+            lane: Math.floor(Math.random() * LANE_COUNT),
+            time: beat * noteInterval + preparationDelay,
+            type: 'normal',
+          };
+
+          // Add special notes based on difficulty
+          if (track.difficulty === 'hard' || track.difficulty === 'expert') {
+            const random = Math.random();
+            if (random < 0.1) {
+              note.type = 'hold';
+              note.duration = noteInterval * 2; // 2 beat hold
+            } else if (random < 0.15) {
+              note.type = 'slide';
+              note.direction = Math.random() < 0.5 ? 'left' : 'right';
+            }
+          }
+
+          notes.push(note);
+        }
       }
     }
 
@@ -262,23 +314,42 @@ export default function PetalStormRhythm() {
     const comboBonus = maxCombo * 100;
     const accuracyBonus = Math.round(finalAccuracy * 10000);
     const healthBonus = health * 50;
-    const finalScore = score + comboBonus + accuracyBonus + healthBonus;
-    setFinalScore(finalScore);
+    const fullComboBonus = accuracy.miss === 0 && totalNotes > 0 ? 5000 : 0; // Full combo bonus
+    const finalScoreValue = score + comboBonus + accuracyBonus + healthBonus + fullComboBonus;
+    setFinalScore(finalScoreValue);
 
-    // Award completion petals using hook
-    const result = await earnPetals({
-      gameId: 'petal-storm-rhythm',
-      score: finalScore,
-      metadata: {
-        accuracy: finalAccuracy,
-        combo: maxCombo,
+    // Record game result using progress system
+    if (!hasAwardedPetals) {
+      setHasAwardedPetals(true);
+      
+      const durationMs = gameStartTime > 0 ? Date.now() - gameStartTime : selectedTrack.duration * 1000;
+      
+      const result = await recordResult({
+        gameId: 'petal-storm-rhythm',
+        score: finalScoreValue,
         difficulty: selectedTrack.difficulty,
-        track: selectedTrack.id,
-      },
-    });
+        durationMs,
+        didWin: true,
+        metadata: {
+          accuracy: finalAccuracy,
+          combo: maxCombo,
+          track: selectedTrack.id,
+          perfect: accuracy.perfect,
+          great: accuracy.great,
+          good: accuracy.good,
+          miss: accuracy.miss,
+          fullCombo: accuracy.miss === 0 && totalNotes > 0,
+        },
+      });
 
-    if (result.success) {
-      setPetalReward(result.earned);
+      if (result.success) {
+        if (result.petalReward) {
+          setPetalReward(result.petalReward.earned);
+        }
+        if (result.achievements && result.achievements.unlocked.length > 0) {
+          setAchievements(result.achievements.rewards);
+        }
+      }
     }
 
     // Submit to leaderboard
@@ -287,7 +358,7 @@ export default function PetalStormRhythm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          score: finalScore,
+          score: finalScoreValue,
           metadata: {
             accuracy: finalAccuracy,
             maxCombo,
@@ -299,15 +370,16 @@ export default function PetalStormRhythm() {
     } catch (error) {
       logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
-  }, [score, accuracy, maxCombo, health, selectedTrack]);
+  }, [score, accuracy, maxCombo, health, selectedTrack, recordResult, hasAwardedPetals, gameStartTime]);
 
   // Game loop
-  const gameLoop = useCallback(() => {
+  useEffect(() => {
     if (gameState !== 'playing') return;
 
-    const now = Date.now();
-    const elapsed = now - startTimeRef.current;
-    setCurrentTime(elapsed);
+    const loop = () => {
+      const now = Date.now();
+      const elapsed = now - startTimeRef.current;
+      setCurrentTime(elapsed);
 
     // Check for missed notes
     setNotes((prev) =>
@@ -331,14 +403,23 @@ export default function PetalStormRhythm() {
       return;
     }
 
-    // Check for completion
-    if (elapsed > selectedTrack.duration * 1000 + 2000) {
-      completeGame();
-      return;
-    }
+      // Check for completion
+      if (elapsed > selectedTrack.duration * 1000 + 2000) {
+        completeGame();
+        return;
+      }
 
-    gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState, health, selectedTrack.duration, endGame, completeGame]);
+      gameLoopRef.current = requestAnimationFrame(loop);
+    };
+
+    gameLoopRef.current = requestAnimationFrame(loop);
+
+    return () => {
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current);
+      }
+    };
+  }, [gameState, health, selectedTrack.duration, endGame, completeGame, currentTime, notes]);
 
   // Initialize game
   const startGame = useCallback(() => {
@@ -352,13 +433,16 @@ export default function PetalStormRhythm() {
     setHealth(GAME_CONFIG.INITIAL_HEALTH);
     setMultiplier(1);
     setPetalReward(null);
+    setHasAwardedPetals(false);
+    setAchievements([]);
 
-    // Don't set to 'playing' here - let handleStart do it
-    startTimeRef.current = Date.now();
+    // Set start time for game loop and tracking
+    const startTime = Date.now();
+    startTimeRef.current = startTime;
+    setGameStartTime(startTime);
 
-    // Start game loop
-    gameLoop();
-  }, [selectedTrack, gameLoop]);
+    // Start game loop - it will run when gameState is 'playing'
+  }, [selectedTrack, generateNotes]);
 
   // Handle note hit
   const hitNote = useCallback(
@@ -585,15 +669,17 @@ export default function PetalStormRhythm() {
   // Format score
   const formatScore = (num: number) => num.toLocaleString();
 
-  // Get visible notes
+  // Get visible notes - notes approaching the hit zone
   const visibleNotes = notes.filter((note) => {
-    const notePosition =
-      (currentTime - note.time + GAME_CONFIG.NOTE_TRAVEL_TIME) / GAME_CONFIG.NOTE_TRAVEL_TIME;
-    return notePosition >= -0.1 && notePosition <= 1.1 && !note.hit;
+    if (note.hit) return false;
+    const timeUntilHit = note.time - currentTime;
+    // Show notes that are within the travel time window
+    return timeUntilHit >= -500 && timeUntilHit <= GAME_CONFIG.NOTE_TRAVEL_TIME + 500;
   });
 
   const handleRestart = useCallback(() => {
     startGame();
+    setGameState('playing');
   }, [startGame]);
 
   const handleStart = useCallback(() => {
@@ -602,18 +688,24 @@ export default function PetalStormRhythm() {
       setShowAvatarChoice(true);
       return;
     }
-    startGame();
-    setGameState('playing');
-  }, [startGame, avatarUsage, avatarChoice]);
+    // Transition to instructions first, then start game
+    if (gameState === 'menu') {
+      setGameState('instructions');
+    } else if (gameState === 'instructions') {
+      startGame();
+      setGameState('playing');
+    }
+  }, [startGame, avatarUsage, avatarChoice, gameState]);
 
-  // Update startGame to check avatar choice
+  // Update startGame to check avatar choice and transition properly
   const handleStartGame = useCallback(() => {
     if (avatarUsage === 'avatar-or-preset' && avatarChoice === null && isAvatarsEnabled()) {
       setShowAvatarChoice(true);
     } else {
-      startGame();
+      // Transition from menu to instructions
+      setGameState('instructions');
     }
-  }, [startGame, avatarUsage, avatarChoice]);
+  }, [avatarUsage, avatarChoice]);
 
   const displayName = getGameDisplayName('petal-storm-rhythm');
 
@@ -647,8 +739,8 @@ export default function PetalStormRhythm() {
           </div>
         )}
 
-        {/* Avatar Display (Bust Mode) - MAIN CHARACTER CENTER STAGE */}
-        {!showAvatarChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+        {/* Avatar Display - Only show in menu/instructions, hide during gameplay */}
+        {!showAvatarChoice && gameState !== 'playing' && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
           <div className="flex justify-center mb-8">
             <div className="relative w-80 h-80">
               <AvatarRenderer
@@ -656,33 +748,20 @@ export default function PetalStormRhythm() {
                 mode={representationConfig.mode}
                 size="large"
               />
-              {/* Physics Avatar Overlay */}
-              {gameState === 'playing' && (
-                <div className="absolute top-0 right-0 w-32 h-40">
-                  <PhysicsAvatarCanvas
-                    ref={physicsAvatarRef}
-                    characterType="player"
-                    quality="high"
-                    width={128}
-                    height={160}
-                    className="rounded-lg"
-                  />
-                </div>
-              )}
             </div>
           </div>
         )}
-        {/* Physics Avatar Standalone (when no avatar config) */}
-        {!showAvatarChoice && (!isAvatarsEnabled() || !avatarConfig) && gameState === 'playing' && (
-          <div className="flex justify-center mb-8">
-            <div className="relative w-80 h-80 flex items-center justify-center">
+        {/* Physics Avatar - Small overlay in top-right during gameplay */}
+        {!showAvatarChoice && gameState === 'playing' && (
+          <div className="absolute top-20 right-4 z-30 pointer-events-none">
+            <div className="relative w-24 h-32">
               <PhysicsAvatarCanvas
                 ref={physicsAvatarRef}
                 characterType="player"
-                quality="high"
-                width={160}
-                height={200}
-                className="rounded-lg"
+                quality="medium"
+                width={96}
+                height={128}
+                className="rounded-lg opacity-80"
               />
             </div>
           </div>
@@ -818,9 +897,9 @@ export default function PetalStormRhythm() {
             )}
 
             {/* Game Area */}
-            <div className="flex-1 relative overflow-hidden">
+            <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-purple-900/50 to-black">
               {/* Lanes */}
-              <div className="h-full flex" style={{ perspective: '1000px' }}>
+              <div className="h-full flex relative" style={{ perspective: '1000px' }}>
                 {LANES.map((laneIndex) => {
                   const flash = laneFlashes[laneIndex];
                   const flashAge = flash ? Date.now() - flash.time : Infinity;
@@ -837,10 +916,9 @@ export default function PetalStormRhythm() {
                   return (
                     <div
                       key={laneIndex}
-                      className="flex-1 relative border-r border-slate-700/50 bg-gradient-to-b from-transparent to-slate-900/20"
+                      className="flex-1 relative border-r border-pink-500/30 bg-gradient-to-b from-transparent via-purple-900/10 to-slate-900/30"
                       style={{
-                        transform: `rotateX(5deg)`, // Slight perspective tilt
-                        transformStyle: 'preserve-3d',
+                        minHeight: '100%',
                       }}
                       onClick={() => hitNote(laneIndex)}
                       onKeyDown={(e) => e.key === 'Enter' && hitNote(laneIndex)}
@@ -876,8 +954,9 @@ export default function PetalStormRhythm() {
                         />
                       )}
 
-                      {/* Hit Zone */}
-                      <div className="absolute bottom-20 left-2 right-2 h-16 bg-pink-500/20 border-2 border-pink-400/50 rounded-lg" />
+                      {/* Hit Zone - clearly visible */}
+                      <div className="absolute bottom-20 left-0 right-0 h-16 bg-pink-500/30 border-t-4 border-b-4 border-pink-400/70 rounded-lg shadow-lg shadow-pink-500/50" />
+                      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-1 h-16 bg-pink-300/80" />
 
                       {/* Lane Label */}
                       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-pink-400 font-bold">
@@ -887,29 +966,42 @@ export default function PetalStormRhythm() {
                       {/* Notes */}
                       <AnimatePresence>
                         {visibleNotes
-                          .filter((note) => note.lane === laneIndex)
+                          .filter((note) => note.lane === laneIndex && !note.hit)
                           .map((note) => {
-                            const notePosition = (currentTime - note.time + 2000) / 2000;
-                            const top = `${(1 - notePosition) * 100}%`;
+                            // Calculate note position: 0 = top, 1 = hit line
+                            const timeUntilHit = note.time - currentTime;
+                            const notePosition = Math.max(0, Math.min(1, (GAME_CONFIG.NOTE_TRAVEL_TIME - timeUntilHit) / GAME_CONFIG.NOTE_TRAVEL_TIME));
+                            const topPercent = (1 - notePosition) * 100;
+
+                            // Only show notes that are approaching the hit zone
+                            if (timeUntilHit < -200 || timeUntilHit > GAME_CONFIG.NOTE_TRAVEL_TIME + 200) {
+                              return null;
+                            }
 
                             return (
                               <motion.div
                                 key={note.id}
                                 initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
+                                animate={{ 
+                                  scale: 1, 
+                                  opacity: Math.min(1, Math.max(0.3, notePosition)),
+                                }}
                                 exit={{ scale: 1.2, opacity: 0 }}
-                                className={`absolute left-2 right-2 h-12 rounded-lg border-2 flex items-center justify-center ${
+                                className={`absolute left-1 right-1 h-14 rounded-lg border-2 flex items-center justify-center shadow-lg ${
                                   note.type === 'normal'
-                                    ? 'bg-pink-500/80 border-pink-400'
+                                    ? 'bg-pink-500 border-pink-300 shadow-pink-500/50'
                                     : note.type === 'hold'
-                                      ? 'bg-purple-500/80 border-purple-400'
-                                      : 'bg-blue-500/80 border-blue-400'
+                                      ? 'bg-purple-500 border-purple-300 shadow-purple-500/50'
+                                      : 'bg-blue-500 border-blue-300 shadow-blue-500/50'
                                 }`}
-                                style={{ top }}
+                                style={{ 
+                                  bottom: `${Math.max(80, Math.min(100, 100 - topPercent))}%`,
+                                  zIndex: 10,
+                                }}
                               >
-                                {note.type === 'normal' && ''}
-                                {note.type === 'hold' && ''}
-                                {note.type === 'slide' && (note.direction === 'left' ? '←' : '→')}
+                                {note.type === 'normal' && <div className="w-3 h-3 bg-white rounded-full" />}
+                                {note.type === 'hold' && <div className="w-full h-1 bg-white rounded" />}
+                                {note.type === 'slide' && <div className="text-white font-bold">{note.direction === 'left' ? '←' : '→'}</div>}
                               </motion.div>
                             );
                           })}
@@ -964,7 +1056,11 @@ export default function PetalStormRhythm() {
           loseMessage="Your health reached zero. Try again!"
           score={finalScore}
           petalReward={petalReward}
-          onRestart={handleRestart}
+          achievements={achievements}
+          onRestart={() => {
+            handleRestart();
+            setGameState('playing');
+          }}
           onResume={handleStart}
         />
 

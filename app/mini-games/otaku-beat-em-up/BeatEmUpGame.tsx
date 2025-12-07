@@ -24,6 +24,8 @@ interface GameState {
   isGameOver: boolean;
   isPaused: boolean;
   beatAccuracy: number; // 0-100%
+  timeElapsed?: number; // For survival mode
+  startTime?: number; // For survival mode
 }
 
 interface Player {
@@ -75,6 +77,7 @@ interface Props {
   onHealthChange?: (health: number) => void;
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
+  onWaveChange?: (wave: number) => void;
 }
 
 export default function BeatEmUpGame({
@@ -83,6 +86,7 @@ export default function BeatEmUpGame({
   onHealthChange,
   onComboChange,
   onGameEnd,
+  onWaveChange,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -103,6 +107,8 @@ export default function BeatEmUpGame({
     isGameOver: false,
     isPaused: false,
     beatAccuracy: 100,
+    timeElapsed: 0,
+    startTime: 0,
   });
 
   const playerRef = useRef<Player>({
@@ -493,9 +499,66 @@ export default function BeatEmUpGame({
     enemiesRef.current.push(newEnemy);
   }, []);
 
+  // Mode-specific constants
+  const SURVIVAL_TIME_LIMIT = 180000; // 3 minutes in milliseconds
+  const STORY_MAX_WAVES = 10;
+
+  // Initialize game on mount
+  useEffect(() => {
+    if (!mode) return;
+
+    const startTime = Date.now();
+
+    // Reset game state
+    setGameState({
+      score: 0,
+      combo: 0,
+      multiplier: 1.0,
+      health: 100,
+      maxHealth: 100,
+      wave: 1,
+      isGameOver: false,
+      isPaused: false,
+      beatAccuracy: 100,
+      timeElapsed: 0,
+      startTime,
+    });
+
+    // Reset player
+    playerRef.current = {
+      x: 200,
+      y: 300,
+      vx: 0,
+      vy: 0,
+      facing: 'right',
+      state: 'idle',
+      animationFrame: 0,
+      attackCooldown: 0,
+      heavyAttackCooldown: 0,
+      blockCooldown: 0,
+      invulnerable: 0,
+      comboCount: 0,
+      beatMultiplier: 1.0,
+      comboChain: 0,
+    };
+
+    // Clear enemies
+    enemiesRef.current = [];
+    enemyRenderersRef.current.forEach((renderer) => renderer.dispose());
+    enemyRenderersRef.current.clear();
+
+    // Spawn initial wave
+    const initialEnemyCount = 3;
+    for (let i = 0; i < initialEnemyCount; i++) {
+      setTimeout(() => {
+        spawnEnemy('grunt');
+      }, i * 500);
+    }
+  }, [mode, spawnEnemy]);
+
   // Game update loop
   useEffect(() => {
-    if (!canvasRef.current || gameState.isGameOver || gameState.isPaused) return;
+    if (!canvasRef.current || !mode || gameState.isGameOver || gameState.isPaused) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -508,6 +571,22 @@ export default function BeatEmUpGame({
       const now = Date.now();
       const deltaTime = Math.min(0.033, (now - lastTime) / 1000);
       lastTime = now;
+
+      // Update time elapsed for survival mode
+      if (mode === 'survival' && gameState.startTime) {
+        const timeElapsed = now - gameState.startTime;
+        setGameState((prev) => ({ ...prev, timeElapsed }));
+
+        // Check survival time limit
+        if (timeElapsed >= SURVIVAL_TIME_LIMIT) {
+          // Survival mode: Win when time limit reached
+          setGameState((prev) => ({ ...prev, isGameOver: true }));
+          if (onGameEnd) {
+            onGameEnd(gameState.score, true); // didWin = true (survived the time limit)
+          }
+          return;
+        }
+      }
 
       // Update player
       const player = playerRef.current;
@@ -687,23 +766,41 @@ export default function BeatEmUpGame({
 
       // Wave progression - advance when all enemies defeated
       const aliveEnemies = enemiesRef.current.filter((e) => e.state !== 'dead');
-      if (aliveEnemies.length === 0 && enemySpawnTimer > 1000) {
+      const currentWave = gameState.wave;
+      
+      // Check for wave completion (only if we have enemies and they're all dead)
+      if (enemiesRef.current.length > 0 && aliveEnemies.length === 0 && enemySpawnTimer > 1000) {
         // Wave cleared! Advance to next wave
+        const nextWave = currentWave + 1;
+        
+        // Check mode-specific win conditions
+        if (mode === 'story' && nextWave > STORY_MAX_WAVES) {
+          // Story mode: Win after completing all waves
+          setGameState((prev) => ({ ...prev, isGameOver: true }));
+          if (onGameEnd) {
+            onGameEnd(gameState.score, true); // didWin = true
+          }
+          return;
+        }
+        
         setGameState((prev) => ({
           ...prev,
-          wave: prev.wave + 1,
+          wave: nextWave,
         }));
+        if (onWaveChange) {
+          onWaveChange(nextWave);
+        }
         enemySpawnTimer = 0;
 
         // Spawn wave enemies (more enemies per wave)
-        const waveEnemyCount = Math.min(3 + gameState.wave, 8);
+        const waveEnemyCount = Math.min(3 + nextWave, 8);
         const waveTypes: Enemy['type'][] = [];
 
         // Mix enemy types based on wave
         for (let i = 0; i < waveEnemyCount; i++) {
-          if (gameState.wave % 5 === 0 && i === waveEnemyCount - 1) {
+          if (nextWave % 5 === 0 && i === waveEnemyCount - 1) {
             waveTypes.push('boss'); // Boss every 5 waves
-          } else if (gameState.wave % 3 === 0 && Math.random() < 0.3) {
+          } else if (nextWave % 3 === 0 && Math.random() < 0.3) {
             waveTypes.push('brute');
           } else if (Math.random() < 0.4) {
             waveTypes.push('ninja');
@@ -720,21 +817,33 @@ export default function BeatEmUpGame({
         });
       }
 
-      // Spawn enemies during wave
+      // Spawn enemies during wave (only if we have enemies in the wave)
       enemySpawnTimer += deltaTime * 1000;
-      const maxEnemiesPerWave = Math.min(3 + gameState.wave, mode === 'survival' ? 10 : 8);
+      const maxEnemiesPerWave = Math.min(3 + currentWave, mode === 'survival' ? 10 : 8);
       const spawnInterval =
-        mode === 'survival' ? 2000 : ENEMY_SPAWN_INTERVAL / (1 + gameState.wave * 0.1); // Faster spawning as waves progress
+        mode === 'survival' ? 2000 : ENEMY_SPAWN_INTERVAL / (1 + currentWave * 0.1); // Faster spawning as waves progress
 
-      if (enemySpawnTimer > spawnInterval && aliveEnemies.length < maxEnemiesPerWave) {
+      // Only spawn if we have less than max and there are enemies in the current wave
+      if (enemySpawnTimer > spawnInterval && aliveEnemies.length < maxEnemiesPerWave && enemiesRef.current.length > 0) {
         const types: Enemy['type'][] =
-          gameState.wave >= 5
+          currentWave >= 5
             ? ['grunt', 'grunt', 'ninja', 'brute', 'brute']
-            : gameState.wave >= 3
+            : currentWave >= 3
               ? ['grunt', 'grunt', 'ninja', 'brute']
               : ['grunt', 'grunt', 'ninja'];
         const randomType = types[Math.floor(Math.random() * types.length)];
         spawnEnemy(randomType);
+        enemySpawnTimer = 0;
+      }
+      
+      // If no enemies exist and timer is ready, spawn initial wave
+      if (enemiesRef.current.length === 0 && enemySpawnTimer > 1000) {
+        const initialCount = 3;
+        for (let i = 0; i < initialCount; i++) {
+          setTimeout(() => {
+            spawnEnemy('grunt');
+          }, i * 300);
+        }
         enemySpawnTimer = 0;
       }
 
@@ -750,7 +859,7 @@ export default function BeatEmUpGame({
       // Render
       render(ctx);
 
-      // Check game over
+      // Check game over (health reached 0)
       if (gameState.health <= 0) {
         setGameState((prev) => ({ ...prev, isGameOver: true }));
         // Notify parent of game over
@@ -759,6 +868,10 @@ export default function BeatEmUpGame({
         }
         return;
       }
+      
+      // Arcade mode: Endless waves (no win condition, only lose on death)
+      // Story mode: Win after STORY_MAX_WAVES waves (checked above)
+      // Survival mode: Win after time limit (checked above)
 
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     };
@@ -1208,6 +1321,16 @@ export default function BeatEmUpGame({
           <div className="text-xs text-blue-300 mb-1">WAVE</div>
           <div className="text-lg font-bold text-blue-400">{gameState.wave}</div>
         </div>
+
+        {/* Survival Mode Timer */}
+        {mode === 'survival' && gameState.timeElapsed !== undefined && (
+          <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white border border-white/20">
+            <div className="text-xs text-yellow-300 mb-1">TIME</div>
+            <div className="text-lg font-bold text-yellow-400">
+              {Math.max(0, Math.floor((SURVIVAL_TIME_LIMIT - gameState.timeElapsed) / 1000))}s
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Pause Screen */}

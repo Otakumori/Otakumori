@@ -30,6 +30,7 @@ import {
   applyVisualProfile,
   getGameDisplayName,
 } from '../_shared/gameVisuals';
+import { recordGameResult, useGameProgress } from '@/app/lib/games/progress';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
@@ -39,8 +40,6 @@ import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
 type GameMode = 'story' | 'arcade' | 'survival';
 
-);
-}
 export default function RhythmBeatEmUpPage() {
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [score, setScore] = useState(0);
@@ -52,6 +51,8 @@ export default function RhythmBeatEmUpPage() {
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
   const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const [wavesCleared, setWavesCleared] = useState(0);
+  const [achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
 
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -75,6 +76,7 @@ export default function RhythmBeatEmUpPage() {
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('otaku-beat-em-up');
   const { balance: petalBalance } = usePetalBalance();
   const { earnPetals } = usePetalEarn();
+  const { recordResult } = useGameProgress();
 
   // Game configuration
   const GAME_CONFIG = {
@@ -91,28 +93,45 @@ export default function RhythmBeatEmUpPage() {
       setSelectedAvatar(avatar);
     }
     setShowAvatarChoice(false);
-  }, []);
+    // Transition to instructions after avatar choice
+    if (selectedMode) {
+      setGameState('instructions');
+    }
+  }, [selectedMode]);
 
   const handleGameEnd = useCallback(
     async (finalScoreValue: number, didWin: boolean) => {
       setFinalScore(finalScoreValue);
       setGameState(didWin ? 'win' : 'lose');
 
-      // Award petals using hook
-      if (!hasAwardedPetals) {
+      // Record game result using progress system
+      if (!hasAwardedPetals && selectedMode) {
         setHasAwardedPetals(true);
-        const result = await earnPetals({
+        
+        // Calculate duration (approximate - could be improved with actual start time tracking)
+        const durationMs = 60000; // Default 1 minute, could be tracked better
+        
+        const result = await recordResult({
           gameId: 'otaku-beat-em-up',
           score: finalScoreValue,
+          difficulty: selectedMode,
+          durationMs,
+          didWin,
           metadata: {
             mode: selectedMode,
-            didWin,
             combo,
+            wavesCleared: wavesCleared,
+            beatAccuracy: 100, // Could be tracked from game state
           },
         });
 
         if (result.success) {
-          setPetalReward(result.earned);
+          if (result.petalReward) {
+            setPetalReward(result.petalReward.earned);
+          }
+          if (result.achievements && result.achievements.unlocked.length > 0) {
+            setAchievements(result.achievements.rewards);
+          }
         }
       }
 
@@ -127,6 +146,7 @@ export default function RhythmBeatEmUpPage() {
               mode: selectedMode,
               didWin,
               combo,
+              wavesCleared,
             },
           }),
         });
@@ -134,7 +154,7 @@ export default function RhythmBeatEmUpPage() {
         logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
       }
     },
-    [selectedMode, combo, earnPetals, hasAwardedPetals],
+    [selectedMode, combo, wavesCleared, recordResult, hasAwardedPetals],
   );
 
   const displayName = getGameDisplayName('otaku-beat-em-up');
@@ -205,13 +225,16 @@ export default function RhythmBeatEmUpPage() {
                   ← Back to Mode Select
                 </button>
               </div>
-              <BeatEmUpGame
-                mode={selectedMode}
-                onScoreChange={setScore}
-                onHealthChange={setHealth}
-                onComboChange={setCombo}
-                onGameEnd={handleGameEnd}
-              />
+              {gameState === 'playing' && (
+                <BeatEmUpGame
+                  mode={selectedMode}
+                  onScoreChange={setScore}
+                  onHealthChange={setHealth}
+                  onComboChange={setCombo}
+                  onGameEnd={handleGameEnd}
+                  onWaveChange={setWavesCleared}
+                />
+              )}
             </div>
           </GameShell>
 
@@ -229,16 +252,28 @@ export default function RhythmBeatEmUpPage() {
             loseMessage="Health reached zero. Try again and stay on beat!"
             score={finalScore || score}
             petalReward={petalReward}
+            achievements={achievements}
             onRestart={() => {
               setSelectedMode(null);
               setGameState('instructions');
               setPetalReward(null);
               setHasAwardedPetals(false);
+              setWavesCleared(0);
+              setAchievements([]);
             }}
             onResume={() => {
-              setGameState('playing');
+              if (gameState === 'instructions') {
+                setGameState('playing');
+              } else if (gameState === 'paused') {
+                setGameState('playing');
+              }
               setPetalReward(null);
               setHasAwardedPetals(false);
+            }}
+            onPause={() => {
+              if (gameState === 'playing') {
+                setGameState('paused');
+              }
             }}
           />
         </div>
@@ -285,8 +320,10 @@ export default function RhythmBeatEmUpPage() {
                       isAvatarsEnabled()
                     ) {
                       setShowAvatarChoice(true);
+                      setSelectedMode('story');
                     } else {
                       setSelectedMode('story');
+                      setGameState('instructions');
                     }
                   }}
                   className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-pink-500/50 rounded-2xl p-6 text-white transition-all"
@@ -319,8 +356,10 @@ export default function RhythmBeatEmUpPage() {
                       isAvatarsEnabled()
                     ) {
                       setShowAvatarChoice(true);
+                      setSelectedMode('arcade');
                     } else {
                       setSelectedMode('arcade');
+                      setGameState('instructions');
                     }
                   }}
                   className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-purple-500/50 rounded-2xl p-6 text-white transition-all"
@@ -353,8 +392,10 @@ export default function RhythmBeatEmUpPage() {
                       isAvatarsEnabled()
                     ) {
                       setShowAvatarChoice(true);
+                      setSelectedMode('survival');
                     } else {
                       setSelectedMode('survival');
+                      setGameState('instructions');
                     }
                   }}
                   className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-red-500/50 rounded-2xl p-6 text-white transition-all"

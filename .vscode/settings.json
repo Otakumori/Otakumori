@@ -28,7 +28,9 @@
     "watchFile": "useFsEvents"
   },
   "typescript.tsserver.useSeparateSyntaxServer": true,
-  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.validate.enable": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
   "workbench.editor.enablePreview": true,
   "workbench.editor.limit.enabled": true,
