@@ -2,16 +2,11 @@
 import { generateSEO } from '@/app/lib/seo';
 import StorageManager from '@/components/account/StorageManager';
 
-export const metadata = {
-  title: 'Your Storage | Otaku-mori',
-  description: 'Upload and manage your files in your personal storage space.',
-};
-
 export function generateMetadata() {
   return generateSEO({
     title: 'Storage',
     description: 'Manage your storage',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\account\storage\page.tsx',
+    url: '/account/storage',
   });
 }
 export default function StoragePage() {

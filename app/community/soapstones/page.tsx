@@ -6,11 +6,6 @@ import Navbar from '../../components/layout/Navbar';
 import FooterDark from '../../components/FooterDark';
 import SoapstoneCommunity from '../../components/community/SoapstoneCommunity';
 
-export const metadata: Metadata = {
-  title: 'Soapstone Community — Otaku-mori',
-  description: 'Leave messages for other travelers in the digital abyss.',
-};
-
 // Force dynamic rendering to prevent timeout during static generation
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -32,11 +27,11 @@ async function getSoapstones() {
   }
 }
 
-export function generateMetadata() {
+export function generateMetadata(): Metadata {
   return generateSEO({
     title: 'Soapstones',
     description: 'Leave signs for fellow travelers',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\community\soapstones\page.tsx',
+    url: '/community/soapstones',
   });
 }
 export default async function SoapstoneCommunityPage() {

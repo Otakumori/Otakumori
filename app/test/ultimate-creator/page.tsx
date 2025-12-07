@@ -25,8 +25,20 @@ import { PHYSIQUE_PRESETS, HAIR_STYLES } from '../character-creator/types';
 
 const SaveModal = dynamic(() => import('../character-creator/SaveModal'), { ssr: false });
 
+// Extended config type that includes physics and convenience properties
+type ExtendedCharacterConfig = Partial<FullCharacterConfig> & {
+  // Physics properties (not in FullCharacterConfig but used by component)
+  jiggleIntensity?: number;
+  jiggleSpeed?: number;
+  physicsDamping?: number;
+  // Convenience aliases (mapped to nested properties)
+  mouthWidth?: number; // Maps to mouth.width
+  nipplesSize?: number; // Maps to nsfw.breasts.nippleSize
+  nipplesColor?: string; // Maps to nsfw.breasts.nippleColor
+};
+
 // Default config
-const DEFAULT_CONFIG: Partial<FullCharacterConfig> = {
+const DEFAULT_CONFIG: ExtendedCharacterConfig = {
   name: 'My Waifu',
   gender: 'female',
   physique: 'curvy',
@@ -116,6 +128,38 @@ const DEFAULT_CONFIG: Partial<FullCharacterConfig> = {
     cornerPosition: 0.0,
     philtrumDepth: 0.5,
   },
+  
+  // NSFW properties
+  nsfw: {
+    enabled: true,
+    genitals: {
+      type: 'vulva',
+      size: 1.0,
+      detail: 0.5,
+    },
+    breasts: {
+      nippleSize: 1.0,
+      nippleShape: 0.5,
+      nippleColor: '#f4a6b8',
+      areolaSize: 1.0,
+      areolaColor: '#f4a6b8',
+    },
+    pubicHair: {
+      style: 'none',
+      density: 0.0,
+      color: '#000000',
+    },
+  },
+  
+  // Physics properties (used by component for jiggle effects)
+  jiggleIntensity: 1.0,
+  jiggleSpeed: 1.0,
+  physicsDamping: 0.5,
+  
+  // Convenience aliases (for backward compatibility with component)
+  mouthWidth: 1.0,
+  nipplesSize: 1.0,
+  nipplesColor: '#f4a6b8',
 };
 
 // Slider component
