@@ -141,12 +141,35 @@ export default function InteractiveBuddyPage() {
       // Award petals using hook
       if (!hasAwardedPetals) {
         setHasAwardedPetals(true);
+        
+        // Calculate petal rewards based on various factors
+        let petalMultiplier = 1;
+        const timeSpent = finalScoreValue > 0 ? Math.floor(finalScoreValue / 100) : 0; // Rough estimate
+        const interactionStreak = Math.floor(finalScoreValue / 50); // Estimate from score
+        
+        // Bonus for time spent (1 petal per 30 seconds of interaction)
+        const timeBonus = Math.floor(timeSpent / 30);
+        
+        // Bonus for interaction streaks (1 petal per 10 streak)
+        const streakBonus = Math.floor(interactionStreak / 10);
+        
+        // Base reward
+        const baseReward = Math.floor(finalScoreValue / 100);
+        
+        // Total reward
+        const totalReward = Math.max(1, baseReward + timeBonus + streakBonus);
+        
         const result = await earnPetals({
           gameId: 'bubble-girl',
-          score: finalScoreValue,
+          score: totalReward * 10, // Convert to score for calculation
           metadata: {
             mode,
             didWin,
+            timeSpent,
+            interactionStreak,
+            baseReward,
+            timeBonus,
+            streakBonus,
           },
         });
 

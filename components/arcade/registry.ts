@@ -9,6 +9,7 @@ import NekoLapDance from './games/NekoLapDance';
 import BlowTheCartridge from './games/BlowTheCartridge';
 import ThighTrap from './games/ThighTrap';
 import ButtonMashersKiss from './games/ButtonMashersKiss';
+import TemporalPuzzle from './games/TemporalPuzzle';
 
 export const GAMES: EngineGame[] = [
   { id: 'slap-oni', label: 'Slap the Oni', durationSec: 4, component: SlapTheOni },
@@ -35,6 +36,12 @@ export const GAMES: EngineGame[] = [
     label: "Button Masher's Kiss",
     durationSec: 5,
     component: ButtonMashersKiss,
+  },
+  {
+    id: 'temporal-puzzle',
+    label: 'Temporal Puzzle',
+    durationSec: 60,
+    component: TemporalPuzzle,
   },
 ];
 

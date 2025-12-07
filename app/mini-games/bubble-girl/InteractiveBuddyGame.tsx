@@ -100,17 +100,29 @@ export default function InteractiveBuddyGame({
   });
 
   const [selectedTool, setSelectedTool] = useState<Tool>(TOOLS[0]);
+  const [interactionCaption, setInteractionCaption] = useState<string | null>(null);
 
   // Initialize physics engine
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
+    
+    // Ensure canvas has proper dimensions
+    const rect = canvas.getBoundingClientRect();
+    if (canvas.width !== 800 || canvas.height !== 600) {
+      canvas.width = 800;
+      canvas.height = 600;
+    }
+
     const engine = new PhysicsEngine(canvas, mode, characterVariant);
     engineRef.current = engine;
 
     const gameLoop = () => {
-      if (!gameState.isRunning) return;
+      if (!gameState.isRunning) {
+        animationRef.current = requestAnimationFrame(gameLoop);
+        return;
+      }
 
       engine.update(1 / 60);
       engine.render();
@@ -138,10 +150,11 @@ export default function InteractiveBuddyGame({
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
       engine.destroy();
     };
-  }, [mode, characterVariant]);
+  }, [mode, characterVariant, gameState.isRunning, onScoreChange]);
 
   // Handle canvas interactions
   const handleCanvasClick = useCallback(
@@ -163,7 +176,11 @@ export default function InteractiveBuddyGame({
       }
 
       // Use the selected tool
-      engineRef.current.useTool(selectedTool, x, y);
+      const caption = engineRef.current.useTool(selectedTool, x, y);
+      if (caption && typeof caption === 'string') {
+        setInteractionCaption(caption);
+        setTimeout(() => setInteractionCaption(null), 2000);
+      }
 
       // Deduct cost (except in sandbox mode)
       if (mode !== 'sandbox' && selectedTool.cost > 0) {
@@ -174,7 +191,7 @@ export default function InteractiveBuddyGame({
   );
 
   // Handle drag interactions
-  const handleCanvasDrag = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasMouseMove = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!engineRef.current || event.buttons !== 1) return;
 
     const canvas = canvasRef.current!;
@@ -186,6 +203,13 @@ export default function InteractiveBuddyGame({
     const y = (event.clientY - rect.top) * scaleY;
 
     engineRef.current.dragCharacter(x, y);
+  }, []);
+
+  // Handle mouse up to stop dragging
+  const handleCanvasMouseUp = useCallback(() => {
+    if (engineRef.current) {
+      engineRef.current.stopDragging();
+    }
   }, []);
 
   // Reset character
@@ -212,7 +236,9 @@ export default function InteractiveBuddyGame({
         height={600}
         className="w-full h-auto cursor-crosshair rounded-2xl border border-pink-500/20 shadow-2xl transition-all hover:border-pink-500/40 bg-gradient-to-br from-purple-900/20 to-pink-900/20"
         onClick={handleCanvasClick}
-        onMouseMove={handleCanvasDrag}
+        onMouseMove={handleCanvasMouseMove}
+        onMouseUp={handleCanvasMouseUp}
+        onMouseLeave={handleCanvasMouseUp}
         aria-label="Interactive Buddy game area - click or drag to interact with character"
       />
 
@@ -300,6 +326,20 @@ export default function InteractiveBuddyGame({
           </div>
         </div>
       </div>
+
+      {/* Interaction Caption */}
+      {interactionCaption && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
+        >
+          <div className="bg-black/90 backdrop-blur-lg px-6 py-3 rounded-xl border border-pink-500/50 shadow-lg">
+            <p className="text-white font-bold text-lg text-center">{interactionCaption}</p>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -336,6 +376,12 @@ class PhysicsEngine {
 
   // Physics character renderer
   private physicsRenderer: PhysicsCharacterRenderer | null = null;
+  
+  // Interaction captions
+  private interactionCaptions: Array<{ text: string; x: number; y: number; life: number }> = [];
+  
+  // Config for physics renderer
+  private config?: { enabled: boolean };
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -348,12 +394,17 @@ class PhysicsEngine {
     this.characterVariant = characterVariant;
     this.money = mode === 'sandbox' ? 10000 : 50;
 
-    // Initialize physics renderer
-    this.physicsRenderer = new PhysicsCharacterRenderer(
-      this.ctx,
-      characterVariant === 'girl' ? 'succubus' : 'player',
-      { quality: 'high', enabled: true },
-    );
+    // Initialize physics renderer (may fail, so we have fallback)
+    try {
+      this.physicsRenderer = new PhysicsCharacterRenderer(
+        this.ctx,
+        characterVariant === 'girl' ? 'succubus' : 'player',
+        { quality: 'high', enabled: false }, // Disable by default for stress-relief mode
+      );
+    } catch (error) {
+      console.warn('Physics renderer initialization failed, using simple rendering:', error);
+      this.physicsRenderer = null;
+    }
 
     // Initialize character
     this.character = {
@@ -404,6 +455,24 @@ class PhysicsEngine {
     torso.x += torso.vx * deltaTime * 60;
     torso.y += torso.vy * deltaTime * 60;
 
+    // Maintain connection between head and torso (simple constraint)
+    const headBottomY = head.y + head.height / 2;
+    const torsoTopY = torso.y - torso.height / 2;
+    const idealDistance = 20; // Ideal distance between head and torso
+    const currentDistance = Math.abs(headBottomY - torsoTopY);
+    
+    if (currentDistance > idealDistance * 1.5) {
+      // Pull them closer together
+      const pullForce = (currentDistance - idealDistance) * 0.1;
+      if (headBottomY < torsoTopY) {
+        head.vy += pullForce;
+        torso.vy -= pullForce * 0.5;
+      } else {
+        head.vy -= pullForce * 0.5;
+        torso.vy += pullForce;
+      }
+    }
+
     // Apply friction
     head.vx *= this.FRICTION;
     head.vy *= this.FRICTION;
@@ -447,6 +516,13 @@ class PhysicsEngine {
       particle.vy += 0.2; // Gravity for particles
       particle.life -= 0.02;
       return particle.life > 0;
+    });
+
+    // Update interaction captions
+    this.interactionCaptions = this.interactionCaptions.filter((caption) => {
+      caption.life -= deltaTime;
+      caption.y -= 20 * deltaTime; // Float upward
+      return caption.life > 0;
     });
 
     // Decay combo multiplier
@@ -520,22 +596,49 @@ class PhysicsEngine {
       this.ctx.restore();
     });
 
-    // Draw character with physics
-    if (this.physicsRenderer) {
-      const { torso } = this.character;
-      // Use physics renderer
-      this.physicsRenderer.render(torso.x, torso.y, 'right');
+    // Draw interaction captions
+    this.interactionCaptions.forEach((caption) => {
+      this.ctx.save();
+      this.ctx.globalAlpha = Math.min(1, caption.life);
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.strokeStyle = '#000000';
+      this.ctx.lineWidth = 3;
+      this.ctx.font = 'bold 16px sans-serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      
+      // Draw text with outline
+      this.ctx.strokeText(caption.text, caption.x, caption.y);
+      this.ctx.fillText(caption.text, caption.x, caption.y);
+      
+      this.ctx.restore();
+    });
 
-      // Draw health bars
-      this.drawHealthBar(torso.x, torso.y - 80, torso.width, torso.health, torso.maxHealth);
-    } else {
-      // Fallback to original rendering
-      this.drawCharacter();
+    // Always draw character - use simple rendering for reliability
+    this.drawCharacter();
+    
+    // Optionally overlay physics renderer if available and enabled
+    if (this.physicsRenderer && this.config?.enabled) {
+      try {
+        const { torso } = this.character;
+        this.physicsRenderer.render(torso.x, torso.y, 'right');
+      } catch (error) {
+        // Silently fall back to simple rendering if physics renderer fails
+        console.warn('Physics renderer failed, using fallback:', error);
+      }
     }
   }
 
   private drawCharacter(): void {
     const { head, torso } = this.character;
+
+    // Draw connection line between head and torso (simple ragdoll connection)
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    this.ctx.lineWidth = 2;
+    this.ctx.beginPath();
+    this.ctx.moveTo(head.x, head.y + head.height / 2);
+    this.ctx.lineTo(torso.x, torso.y - torso.height / 2);
+    this.ctx.stroke();
 
     // Draw torso (body)
     this.ctx.save();
@@ -557,16 +660,32 @@ class PhysicsEngine {
       bodyGradient.addColorStop(1, '#ec4899');
     }
 
-    // Draw body
+    // Draw body (use fillRect if roundRect not available)
     this.ctx.fillStyle = bodyGradient;
-    this.ctx.beginPath();
-    this.ctx.roundRect(-torso.width / 2, -torso.height / 2, torso.width, torso.height, 15);
-    this.ctx.fill();
+    if (this.ctx.roundRect) {
+      this.ctx.beginPath();
+      this.ctx.roundRect(-torso.width / 2, -torso.height / 2, torso.width, torso.height, 15);
+      this.ctx.fill();
+    } else {
+      // Fallback for browsers without roundRect
+      this.ctx.fillRect(-torso.width / 2, -torso.height / 2, torso.width, torso.height);
+    }
 
     // Outfit details
     this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     this.ctx.fillRect(-torso.width / 3, -torso.height / 3, 10, torso.height / 2);
     this.ctx.fillRect(torso.width / 3 - 10, -torso.height / 3, 10, torso.height / 2);
+
+    // Body outline
+    this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    this.ctx.lineWidth = 2;
+    if (this.ctx.roundRect) {
+      this.ctx.beginPath();
+      this.ctx.roundRect(-torso.width / 2, -torso.height / 2, torso.width, torso.height, 15);
+      this.ctx.stroke();
+    } else {
+      this.ctx.strokeRect(-torso.width / 2, -torso.height / 2, torso.width, torso.height);
+    }
 
     this.ctx.restore();
 
@@ -690,7 +809,7 @@ class PhysicsEngine {
     this.ctx.fill();
   }
 
-  useTool(tool: Tool, x: number, y: number): void {
+  useTool(tool: Tool, x: number, y: number): string | null {
     const { head, torso } = this.character;
 
     // Check which part was hit
@@ -698,27 +817,59 @@ class PhysicsEngine {
     const hitTorso = this.checkHit(torso, x, y);
     const hitPart = hitHead ? head : hitTorso ? torso : null;
 
-    if (!hitPart) return;
+    if (!hitPart) return null;
+
+    // Get caption text based on tool
+    const captionText = this.getToolCaption(tool, hitHead);
+    this.addCaption(captionText, hitPart.x, hitPart.y - 40);
+    
+    // Return caption for UI display
+    return captionText;
 
     // Apply damage/healing
     const damage = tool.damage || 0;
     hitPart.health = Math.max(0, Math.min(hitPart.maxHealth, hitPart.health - damage));
 
-    // Apply physics force
+    // Apply physics force based on tool type
     const dx = hitPart.x - x;
     const dy = hitPart.y - y;
     const distance = Math.sqrt(dx * dx + dy * dy) || 1;
-    const force = tool.type === 'destructive' ? 0.5 : 0.2;
+    
+    // Different force multipliers for different tool types
+    let force = 0.2;
+    if (tool.type === 'destructive') {
+      force = 0.5;
+    } else if (tool.type === 'healing') {
+      force = 0.1; // Gentle for healing
+    } else if (tool.id === 'wind') {
+      force = 0.8; // Strong push for wind
+    } else if (tool.id === 'poke' || tool.id === 'tickle') {
+      force = 0.15; // Gentle for fun tools
+    }
 
-    hitPart.vx += (dx / distance) * force * (damage || 5);
-    hitPart.vy += (dy / distance) * force * (damage || 5) - 2;
+    // Apply force
+    hitPart.vx += (dx / distance) * force * (Math.abs(damage) || 5);
+    hitPart.vy += (dy / distance) * force * (Math.abs(damage) || 5) - (tool.id === 'wind' ? 3 : 2);
     hitPart.angularVelocity += (Math.random() - 0.5) * 0.1;
+
+    // Special effects for specific tools
+    if (tool.id === 'wind') {
+      // Wind gust effect - apply force to both parts
+      head.vx += (Math.random() - 0.5) * 2;
+      head.vy -= 1;
+      torso.vx += (Math.random() - 0.5) * 2;
+      torso.vy -= 1;
+    } else if (tool.id === 'gravity') {
+      // Anti-gravity - reduce gravity effect temporarily
+      head.vy -= 3;
+      torso.vy -= 3;
+    }
 
     // Apply physics impact
     if (this.physicsRenderer) {
       const impactForce = {
-        x: (dx / distance) * force * (damage || 5) * 2,
-        y: ((dy / distance) * force * (damage || 5) - 2) * 2,
+        x: (dx / distance) * force * (Math.abs(damage) || 5) * 2,
+        y: ((dy / distance) * force * (Math.abs(damage) || 5) - 2) * 2,
       };
       const impactPart = hitHead ? 'chest' : 'hips';
       this.physicsRenderer.applyImpact(impactForce, impactPart);
@@ -734,7 +885,7 @@ class PhysicsEngine {
     this.lastHitTime = now;
 
     // Update score and money
-    const pointsEarned = Math.floor((tool.damage || 5) * this.comboMultiplier);
+    const pointsEarned = Math.floor((Math.abs(damage) || 5) * this.comboMultiplier);
     // Prevent score exploits - cap score increment per action
     const cappedPoints = Math.min(pointsEarned, 1000); // Max 1000 points per action
     this.score = Math.min(this.score + cappedPoints, 999999); // Cap total score at 999,999
@@ -752,6 +903,37 @@ class PhysicsEngine {
     } else {
       createGlowEffect(this.ctx, x, y, 20, '#ec4899', 0.3);
     }
+    
+    return captionText;
+  }
+
+  private getToolCaption(tool: Tool, isHead: boolean): string {
+    const captions: Record<string, string[]> = {
+      poke: ['*poke*', 'Hey!', 'Stop that!'],
+      tickle: ['Hehe!', '*giggles*', 'That tickles!', 'She giggles nervously.'],
+      compliment: ['Aww, thanks!', 'You\'re sweet!', '*blushes*'],
+      headpat: ['*purrs*', 'So nice...', 'Feels good!'],
+      slap: ['Ouch!', 'Hey!', '*flinches*'],
+      punch: ['Oof!', 'Too much!', '*stumbles*'],
+      bat: ['WHACK!', 'Ouch!', '*dizzy*'],
+      bomb: ['BOOM!', '*explosion*', 'Whoa!'],
+      laser: ['ZAP!', '*sparkles*', 'Shiny!'],
+      wind: ['*whoosh*', 'Windy!', '*floats*'],
+      gravity: ['*floats*', 'Wheee!', 'No gravity!'],
+      confetti: ['*celebrates*', 'Yay!', '*party*'],
+    };
+
+    const toolCaptions = captions[tool.id] || ['*interacts*'];
+    return toolCaptions[Math.floor(Math.random() * toolCaptions.length)];
+  }
+
+  private addCaption(text: string, x: number, y: number): void {
+    this.interactionCaptions.push({
+      text,
+      x,
+      y,
+      life: 2.0, // 2 seconds
+    });
   }
 
   private checkHit(part: CharacterPart, x: number, y: number): boolean {
@@ -806,10 +988,33 @@ class PhysicsEngine {
     }
 
     if (this.character.isDragging) {
-      head.x = x - this.character.dragOffsetX;
-      head.y = y - this.character.dragOffsetY;
+      const targetX = x - this.character.dragOffsetX;
+      const targetY = y - this.character.dragOffsetY;
+      
+      // Update both head and torso to maintain connection
+      const offsetX = targetX - head.x;
+      const offsetY = targetY - head.y;
+      
+      head.x = targetX;
+      head.y = targetY;
+      torso.x += offsetX * 0.5; // Torso follows with some lag
+      torso.y += offsetY * 0.5;
+      
+      // Reset velocities while dragging
       head.vx = 0;
       head.vy = 0;
+      torso.vx = 0;
+      torso.vy = 0;
+    }
+  }
+
+  stopDragging(): void {
+    if (this.character.isDragging) {
+      this.character.isDragging = false;
+      // Apply some velocity when released for physics effect
+      const { head } = this.character;
+      head.vx = (head.x - this.character.dragOffsetX) * 0.1;
+      head.vy = (head.y - this.character.dragOffsetY) * 0.1;
     }
   }
 
