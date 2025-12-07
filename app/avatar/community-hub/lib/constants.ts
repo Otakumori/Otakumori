@@ -68,6 +68,10 @@ export const FACE_PRESETS = [
   { id: 2, name: 'Cute' },
   { id: 3, name: 'Cool' },
   { id: 4, name: 'Mature' },
+  { id: 5, name: 'Soft' },
+  { id: 6, name: 'Sharp' },
+  { id: 7, name: 'Mischievous' },
+  { id: 8, name: 'Tired-but-Smug' },
 ] as const;
 
 export const CAMERA_POSITION: [number, number, number] = [0, 1.5, 3];

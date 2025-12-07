@@ -8,17 +8,20 @@ import { AvatarGallery } from './AvatarGallery';
 import { CommunitySettings } from './CommunitySettings';
 import { AdultContentGate } from './AdultContentGate';
 import { LeaderboardsTab } from './LeaderboardsTab';
+import { GuestModeBanner } from './GuestModeBanner';
+import { AvatarCreatorTab } from './AvatarCreatorTab';
 
-type ActiveTab = 'showcase' | 'gallery' | 'settings' | 'gated' | 'leaderboards';
+type ActiveTab = 'creator' | 'showcase' | 'gallery' | 'settings' | 'gated' | 'leaderboards';
 
 export function CommunityHub() {
   const { user } = useUser();
-  const [activeTab, setActiveTab] = useState<ActiveTab>('showcase');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('creator');
 
   // Check if user has adult verification
   const isAdultVerified = user?.publicMetadata?.adultVerified === true;
 
   const tabs = [
+    { id: 'creator' as const, label: 'Avatar Creator', icon: '🎨' },
     { id: 'showcase' as const, label: 'Avatar Showcase', icon: '' },
     { id: 'gallery' as const, label: 'Community Gallery', icon: '<span role="img" aria-label="emoji">️</span>' },
     { id: 'leaderboards' as const, label: 'Leaderboards', icon: '<span role="img" aria-label="emoji">�</span><span role="img" aria-label="emoji">�</span>' },
@@ -36,6 +39,9 @@ export function CommunityHub() {
             Share your avatars, explore the community, and connect with fellow travelers
           </p>
         </div>
+
+        {/* Guest Mode Banner */}
+        <GuestModeBanner />
 
         {/* Navigation Tabs */}
         <div className="flex space-x-1 mb-8 bg-white/10 rounded-lg p-1">
@@ -64,6 +70,7 @@ export function CommunityHub() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
+            {activeTab === 'creator' && <AvatarCreatorTab />}
             {activeTab === 'showcase' && <AvatarShowcase />}
             {activeTab === 'gallery' && <AvatarGallery />}
             {activeTab === 'leaderboards' && <LeaderboardsTab />}

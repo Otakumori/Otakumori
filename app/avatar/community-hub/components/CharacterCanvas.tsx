@@ -6,7 +6,7 @@
 
 import { logger } from '@/app/lib/logger';
 import React, { Suspense, useMemo, useRef, useEffect, memo } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import type { CharacterConfig } from '../lib/character-state';
@@ -155,6 +155,28 @@ const CharacterScene = memo(function CharacterScene({
     }
   }, [characterGroup, onSceneReady]);
 
+  // Idle animation: breathing and subtle swaying
+  useFrame((state) => {
+    if (sceneRef.current) {
+      const character = sceneRef.current.getObjectByName('Character');
+      if (character) {
+        const time = state.clock.elapsedTime;
+        
+        // Breathing effect - subtle scale on Y axis
+        const breathingScale = 1 + Math.sin(time * 1.5) * 0.01;
+        character.scale.y = breathingScale;
+        
+        // Subtle swaying - small rotation on Y axis
+        const swayAmount = Math.sin(time * 0.8) * 0.02;
+        character.rotation.y = swayAmount;
+        
+        // Subtle vertical bob
+        const bobAmount = Math.sin(time * 1.2) * 0.005;
+        character.position.y = bobAmount;
+      }
+    }
+  });
+
   return (
     <group ref={sceneRef}>
       <primitive object={characterGroup} />
@@ -227,9 +249,9 @@ export default function CharacterCanvas({
             far={1000}
           />
 
-          {/* Controls */}
+          {/* Controls - Left-drag rotate, scroll zoom, no pan, prevent flips */}
           <OrbitControls
-            enablePan={true}
+            enablePan={false}
             enableZoom={true}
             enableRotate={true}
             minDistance={1.5}
@@ -237,6 +259,8 @@ export default function CharacterCanvas({
             minPolarAngle={Math.PI / 6}
             maxPolarAngle={Math.PI - Math.PI / 6}
             target={CAMERA_TARGET}
+            dampingFactor={0.05}
+            enableDamping={true}
           />
 
           {/* Lighting */}

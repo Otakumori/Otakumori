@@ -191,6 +191,64 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
                 onChange={(color) => updateConfig({ skinTone: color })}
               />
 
+              {/* Body Presets */}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white/90">Body Preset</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => {
+                      // Slim preset: narrow width, low bust/hips
+                      updateConfig({
+                        physique: {
+                          ...config.physique,
+                          width: 0.3,
+                          bust: config.gender === 'female' ? 0.3 : config.physique.bust,
+                          waist: config.gender === 'female' ? 0.3 : config.physique.waist,
+                          hips: config.gender === 'female' ? 0.3 : config.physique.hips,
+                        },
+                      });
+                    }}
+                    className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-xs font-medium text-white/70 transition-colors hover:bg-white/10"
+                  >
+                    Slim
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Athletic preset: medium width, balanced proportions
+                      updateConfig({
+                        physique: {
+                          ...config.physique,
+                          width: 0.6,
+                          bust: config.gender === 'female' ? 0.5 : config.physique.bust,
+                          waist: config.gender === 'female' ? 0.4 : config.physique.waist,
+                          hips: config.gender === 'female' ? 0.5 : config.physique.hips,
+                        },
+                      });
+                    }}
+                    className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-xs font-medium text-white/70 transition-colors hover:bg-white/10"
+                  >
+                    Athletic
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Curvy preset: wider hips/bust, narrow waist (female) or balanced (male)
+                      updateConfig({
+                        physique: {
+                          ...config.physique,
+                          width: config.gender === 'female' ? 0.7 : 0.6,
+                          bust: config.gender === 'female' ? 0.8 : config.physique.bust,
+                          waist: config.gender === 'female' ? 0.3 : config.physique.waist,
+                          hips: config.gender === 'female' ? 0.9 : config.physique.hips,
+                        },
+                      });
+                    }}
+                    className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-xs font-medium text-white/70 transition-colors hover:bg-white/10"
+                  >
+                    Curvy
+                  </button>
+                </div>
+              </div>
+
               <SliderControl
                 label="Height"
                 value={config.physique.height}
@@ -211,10 +269,24 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
                 }
               />
 
+              <SliderControl
+                label="Shoulder Width"
+                value={config.physique.width * 0.8 + 0.2}
+                onChange={(value) => {
+                  // Adjust width proportionally when shoulder width changes
+                  const newWidth = (value - 0.2) / 0.8;
+                  updateConfig({
+                    physique: { ...config.physique, width: Math.max(0.1, Math.min(1, newWidth)) },
+                  });
+                }}
+                min={0.2}
+                max={1.0}
+              />
+
               {config.gender === 'female' && (
                 <>
                   <SliderControl
-                    label="Bust"
+                    label="Chest"
                     value={config.physique.bust}
                     onChange={(value) =>
                       updateConfig({
@@ -247,6 +319,7 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
 
           {/* Face Tab */}
           <Tabs.Content value="face" className="space-y-4">
+            {/* Face Presets */}
             <div>
               <label htmlFor="face-preset-select" className="mb-2 block text-sm font-medium text-white/90">Face Preset</label>
               <select
@@ -263,32 +336,67 @@ export default function UIControls({ config, onConfigChange, sceneRef }: UIContr
               </select>
             </div>
 
-            <div>
-              <label htmlFor="left-eye-color" className="mb-2 block text-sm font-medium text-white/90">Left Eye Color</label>
-              <ColorPicker
-                value={config.eyes.colorLeft}
-                onChange={(color) =>
+            {/* Eyes Section */}
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="text-sm font-semibold text-white/90">Eyes</h3>
+              
+              <SliderControl
+                label="Eye Size"
+                value={config.eyes.irisShape}
+                onChange={(value) =>
                   updateConfig({
-                    eyes: { ...config.eyes, colorLeft: color },
+                    eyes: { ...config.eyes, irisShape: value },
                   })
                 }
-                label=""
+                min={0.5}
+                max={1.5}
               />
+
+              <div>
+                <label htmlFor="left-eye-color" className="mb-2 block text-sm font-medium text-white/90">Left Eye Color</label>
+                <ColorPicker
+                  value={config.eyes.colorLeft}
+                  onChange={(color) =>
+                    updateConfig({
+                      eyes: { ...config.eyes, colorLeft: color },
+                    })
+                  }
+                  label=""
+                />
+              </div>
+
+              <div>
+                <label htmlFor="right-eye-color" className="mb-2 block text-sm font-medium text-white/90">
+                  Right Eye Color
+                </label>
+                <ColorPicker
+                  value={config.eyes.colorRight}
+                  onChange={(color) =>
+                    updateConfig({
+                      eyes: { ...config.eyes, colorRight: color },
+                    })
+                  }
+                  label=""
+                />
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="right-eye-color" className="mb-2 block text-sm font-medium text-white/90">
-                Right Eye Color
-              </label>
-              <ColorPicker
-                value={config.eyes.colorRight}
-                onChange={(color) =>
-                  updateConfig({
-                    eyes: { ...config.eyes, colorRight: color },
-                  })
-                }
-                label=""
-              />
+            {/* Brows Section */}
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="text-sm font-semibold text-white/90">Eyebrows</h3>
+              <p className="text-xs text-white/60">Adjust via Face Preset</p>
+            </div>
+
+            {/* Mouth Section */}
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="text-sm font-semibold text-white/90">Mouth</h3>
+              <p className="text-xs text-white/60">Adjust via Face Preset</p>
+            </div>
+
+            {/* Nose Section */}
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-3">
+              <h3 className="text-sm font-semibold text-white/90">Nose</h3>
+              <p className="text-xs text-white/60">Anime stylized - Adjust via Face Preset</p>
             </div>
           </Tabs.Content>
 
