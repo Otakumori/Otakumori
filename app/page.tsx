@@ -21,7 +21,7 @@ import SectionErrorBoundary from './components/home/SectionErrorBoundary';
 // TreeBackgroundWrapper ensures tree only renders on home page
 import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
 import EnhancedStarfieldBackground from './components/backgrounds/EnhancedStarfieldBackground';
-import HomeHeroPetals from './components/petals/HomeHeroPetals';
+import { SakuraPetalField } from './components/effects/SakuraPetalField';
 
 export const revalidate = 60;
 
@@ -88,7 +88,8 @@ export default async function HomePage() {
           {/* 
             Z-Index Layering (from back to front):
             -11: StarfieldBackground (deepest background, animated starfield)
-            -10: TreeBackground (cherry blossom tree image - disabled, using inline tree in hero)
+            -5: SakuraPetalField (unified petal animation with two depth layers)
+            0: Tree pillar (static art, left-justified)
             10+: Main content (above all backgrounds)
           */}
           {isHomepageExperimentalEnabled && (
@@ -100,34 +101,35 @@ export default async function HomePage() {
             </>
           )}
 
-          {/* Fixed Cherry Tree Background - LEFT SIDE */}
-          <div 
-            className="fixed left-0 top-0 h-screen w-auto max-w-[50vw] pointer-events-none hidden md:block -z-[5]"
+          {/* Unified sakura petal field - single canvas with two coordinated depth layers */}
+          {isHomepageExperimentalEnabled && (
+            <SafeSection name="SakuraPetalField" fallback={null}>
+              <SakuraPetalField petalCount={90} />
+            </SafeSection>
+          )}
+
+          {/* Fixed Cherry Tree Pillar - LEFT SIDE */}
+          {/* Full viewport height, fixed width, content scrolls beside it */}
+          <aside
+            className="hidden lg:block fixed inset-y-0 left-0 z-0 pointer-events-none w-[360px] xl:w-[420px]"
             aria-hidden="true"
           >
-            <div className="relative h-full w-auto">
+            <div className="relative w-full h-full">
               <Image
                 src="/assets/images/cherry-tree.png"
                 alt=""
-                width={800}
-                height={1200}
+                fill
                 priority
-                className="h-full max-h-screen w-auto object-contain object-left-top"
+                className="object-cover object-center"
+                sizes="(min-width: 1024px) 360px, (min-width: 1280px) 420px"
               />
               {/* Gradient overlay to blend with content */}
-              <div 
-                className="absolute inset-0 pointer-events-none tree-gradient-overlay"
-              />
+              <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-r from-[#080611] via-[#080611]/40 to-transparent pointer-events-none" />
             </div>
-            {/* Petal system overlay - falling from tree */}
-            {isHomepageExperimentalEnabled && (
-              <SafeSection name="HomeHeroPetals" fallback={null}>
-                <HomeHeroPetals />
-              </SafeSection>
-            )}
-          </div>
+          </aside>
 
-          <div className="relative min-h-screen page-transition z-10">
+          {/* Content column - scrolls beside tree pillar on desktop */}
+          <div className="relative min-h-screen page-transition z-10 lg:ml-[360px] xl:ml-[420px]">
             {/* HERO - Always visible */}
             <section
               className="relative z-40 mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-20 md:pb-24 lg:pt-24 lg:pb-28"
