@@ -12,6 +12,7 @@ interface SliderControlProps {
   description?: string;
   unit?: string;
   format?: 'percentage' | 'decimal' | 'integer';
+  }
 
 export function SliderControl({
   label,

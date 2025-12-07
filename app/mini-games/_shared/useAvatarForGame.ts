@@ -12,6 +12,7 @@ interface AvatarForGame {
   isCustom: boolean;
   fallbackConfig?: any;
   spriteUrl?: string;
+  }
 
 export function useAvatarForGame(enabled: boolean = true, gameMode?: string) {
   const { user } = useUser();

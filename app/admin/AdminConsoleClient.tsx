@@ -23,6 +23,7 @@ interface FeatureFlagDisplay {
   effectiveValue: boolean;
   source: 'default' | 'override';
   dbValue?: boolean | null;
+  }
 
 interface SystemStatus {
   name: string;

@@ -26,6 +26,7 @@ interface Enemy {
   attackCooldown: number;
   telegraphTime: number; // Time remaining in telegraph state
   state: 'idle' | 'telegraph' | 'attacking';
+  }
 
 interface Spell {
   id: number;
@@ -35,6 +36,7 @@ interface Spell {
   vy: number;
   damage: number;
   lifetime: number;
+  }
 
 interface Particle {
   id: number;
@@ -45,6 +47,7 @@ interface Particle {
   life: number;
   size: number;
   color: string;
+  }
 
 export default function DungeonGame({
   onScoreChange,

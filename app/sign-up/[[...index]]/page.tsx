@@ -1,20 +1,10 @@
 'use client';
 
 import { Skeleton } from '@/app/components/ui/Skeleton';
-import { generateSEO } from '@/app/lib/seo';
 import { SignUp } from '@clerk/nextjs';
 import { Suspense } from 'react';
 import PetalField from '@/app/components/effects/PetalField';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  
-  return generateSEO({
-    title: 'Page',
-    description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/sign-up/[[...index]]',
-  });
-}
 export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0b0d1a] via-[#0f1021] to-[#0b0b13] flex items-center justify-center p-4 relative overflow-hidden">

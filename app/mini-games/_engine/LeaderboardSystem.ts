@@ -16,6 +16,7 @@ export interface LeaderboardEntry {
   date: Date;
   metadata?: Record<string, any>;
   isCurrentUser?: boolean;
+  }
 
 export interface Leaderboard {
   id: string;
@@ -27,6 +28,7 @@ export interface Leaderboard {
   totalEntries: number;
   lastUpdated: Date;
   refreshInterval: number; // in milliseconds
+  }
 
 export interface LeaderboardFilter {
   gameId?: string;
@@ -34,6 +36,7 @@ export interface LeaderboardFilter {
   timeRange?: 'daily' | 'weekly' | 'monthly' | 'all_time';
   limit?: number;
   offset?: number;
+  }
 
 export interface LeaderboardStats {
   totalPlayers: number;

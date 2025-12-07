@@ -23,6 +23,7 @@ interface PrintifyProduct {
   visible: boolean;
   created_at: string;
   updated_at: string;
+  }
 
 interface PrintifyApiResponse {
   data: PrintifyProduct[];

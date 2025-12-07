@@ -12,6 +12,7 @@ interface AvatarCardProps {
   name?: string;
   isOnline?: boolean;
   onClick?: () => void;
+  }
 
 export function AvatarCard({
   config,

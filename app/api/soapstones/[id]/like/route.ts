@@ -4,8 +4,12 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { db as prisma } from '@/lib/db';
 import { auth } from '@clerk/nextjs/server';
+import { generateRequestId } from '@/app/lib/request-id';
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
+  // Extract request metadata
+  const requestId = req.headers.get('x-request-id') || generateRequestId();
+  
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ ok: false }, { status: 401 });
 
@@ -33,7 +37,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         },
       }),
     ]);
-    return NextResponse.json({ ok: true, liked: false });
+    return NextResponse.json({ ok: true, liked: false, requestId });
   } else {
     // Create new heart reaction
     await prisma.$transaction([
@@ -51,6 +55,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
         },
       }),
     ]);
-    return NextResponse.json({ ok: true, liked: true });
+    return NextResponse.json({ ok: true, liked: true, requestId });
   }
 }

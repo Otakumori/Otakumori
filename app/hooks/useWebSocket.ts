@@ -25,6 +25,7 @@ export interface UseWebSocketOptions {
   onConnect?: () => void;
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
+  }
 
 export function useWebSocket(options: UseWebSocketOptions) {
   const {

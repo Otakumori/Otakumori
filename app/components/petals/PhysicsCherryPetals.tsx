@@ -25,6 +25,7 @@ interface Petal {
   opacity: number;
   color: string;
   collected: boolean;
+  }
 
 interface PhysicsCherryPetalsProps {
   density?: number; // Petals per second (default: 2)

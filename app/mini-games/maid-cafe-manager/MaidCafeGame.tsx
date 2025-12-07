@@ -15,6 +15,7 @@ interface Customer {
   orderTime?: number;
   serveTime?: number;
   tips: number;
+  }
 
 interface MenuItem {
   id: string;
@@ -22,6 +23,7 @@ interface MenuItem {
   prepTime: number; // in seconds
   price: number;
   emoji: string;
+  }
 
 interface Table {
   id: number;
@@ -29,6 +31,7 @@ interface Table {
   y: number;
   occupied: boolean;
   needsCleaning: boolean;
+  }
 
 interface Order {
   id: number;
@@ -37,6 +40,7 @@ interface Order {
   status: 'preparing' | 'ready' | 'served';
   startTime: number;
   readyTime: number;
+  }
 
 export default function MaidCafeGame() {
   // Game state

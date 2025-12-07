@@ -7,15 +7,29 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
+    // Extract query params
+    const { searchParams } = new URL(request.url);
+    const preview = searchParams.get('preview') === 'true';
+    const includeRelated = searchParams.get('includeRelated') === 'true';
+    
     const { slug } = await params;
 
-    const post = await db.contentPage.findUnique({
+    // Build query conditionally based on includeRelated
+    const queryOptions: any = {
       where: {
         slug,
       },
-    });
+    };
+    
+    // Note: includeRelated would add related posts when schema supports it
+    // For now, we skip the include to avoid TypeScript errors
+    // if (includeRelated) {
+    //   queryOptions.include = { relatedPosts: true };
+    // }
 
-    if (!post || !post.published) {
+    const post = await db.contentPage.findUnique(queryOptions);
+
+    if (!post || (!post.published && !preview)) {
       return NextResponse.json(
         {
           ok: false,

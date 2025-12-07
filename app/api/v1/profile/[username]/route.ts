@@ -9,6 +9,11 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
   try {
+    // Extract query params
+    const { searchParams } = new URL(request.url);
+    const includeStats = searchParams.get('includeStats') === 'true';
+    const includeAchievements = searchParams.get('includeAchievements') === 'true';
+    
     const { userId } = await auth();
     const { username } = params;
 
@@ -28,6 +33,19 @@ export async function GET(request: NextRequest, { params }: { params: { username
         },
         ProfileTheme: true,
         Presence: true,
+        ...(includeStats && {
+          _count: { 
+            select: { 
+              LeaderboardScore: true, 
+              PetalTransaction: true,
+            } 
+          },
+        }),
+        ...(includeAchievements && {
+          UserAchievement: { 
+            include: { Achievement: true } 
+          },
+        }),
         _count: {
           select: {
             Follow_Follow_followeeIdToUser: true,

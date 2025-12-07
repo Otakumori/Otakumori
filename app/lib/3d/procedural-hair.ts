@@ -14,6 +14,7 @@ export interface HairParameters {
   bangs: boolean;
   highlights?: THREE.Color | string;
   highlightIntensity?: number; // 0 to 1
+}
 
 export const DEFAULT_HAIR_PARAMS: HairParameters = {
   style: 'medium',

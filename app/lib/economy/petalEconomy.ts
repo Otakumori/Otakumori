@@ -10,6 +10,7 @@ export interface PetalTransaction {
   description: string;
   timestamp: Date;
   metadata?: Record<string, any>;
+  }
 
 export interface DailyModifier {
   id: string;
@@ -19,6 +20,7 @@ export interface DailyModifier {
   startDate: Date;
   endDate: Date;
   active: boolean;
+  }
 
 export interface LeaderboardEntry {
   userId: string;
@@ -28,6 +30,7 @@ export interface LeaderboardEntry {
   mode?: string;
   timestamp: Date;
   rank: number;
+  }
 
 export interface PetalBalance {
   userId: string;
@@ -35,6 +38,7 @@ export interface PetalBalance {
   totalEarned: number;
   totalSpent: number;
   lastUpdated: Date;
+  }
 
 class PetalEconomy {
   private transactions: PetalTransaction[] = [];

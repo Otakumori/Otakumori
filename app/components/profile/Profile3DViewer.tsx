@@ -22,6 +22,7 @@ interface Profile3DViewerProps {
   className?: string;
   onLoad?: () => void;
   onError?: (error: Error) => void;
+  }
 
 interface Profile3DSceneProps {
   configuration: AvatarConfiguration;
@@ -31,6 +32,7 @@ interface Profile3DSceneProps {
   quality: 'low' | 'medium' | 'high' | 'ultra';
   onLoad?: () => void;
   onError?: (error: Error) => void;
+  }
 
 function Profile3DScene({
   configuration,

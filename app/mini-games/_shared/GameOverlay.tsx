@@ -15,8 +15,10 @@ export interface GameOverlayProps {
   loseMessage?: string;
   score?: number;
   petalReward?: number | null;
+  achievements?: Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }> | any;
   onRestart?: () => void;
   onResume?: () => void;
+  onPause?: () => void;
   className?: string;
 }
 
@@ -31,8 +33,10 @@ export function GameOverlay({
   loseMessage,
   score,
   petalReward,
+  achievements,
   onRestart,
   onResume,
+  onPause,
   className = '',
 }: GameOverlayProps) {
   const palette = getOtakumoriPalette('hub');
@@ -106,6 +110,31 @@ export function GameOverlay({
                 <p className="text-sm" style={{ color: palette.softPink }}>
                   Your petal balance has been updated
                 </p>
+              </div>
+            )}
+            {achievements && achievements.length > 0 && (
+              <div
+                className="mb-4 p-4 rounded-xl"
+                style={{
+                  backgroundColor: `${palette.accent}20`,
+                  border: `2px solid ${palette.accent}40`,
+                }}
+              >
+                <p className="text-lg font-semibold mb-2" style={{ color: palette.accent }}>
+                  Achievements Unlocked!
+                </p>
+                <ul className="text-left space-y-1">
+                  {achievements.map((achievement: any, index: number) => (
+                    <li key={index} className="text-sm" style={{ color: palette.softPink }}>
+                      • {achievement.name || achievement.code}
+                      {achievement.rewardAmount && (
+                        <span className="ml-2" style={{ color: palette.petals }}>
+                          (+{achievement.rewardAmount} {achievement.rewardType || 'petals'})
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
             <div className="flex gap-4">

@@ -26,6 +26,7 @@ interface AvatarState {
   eyeColor: string;
   outfit: 'dress' | 'nude';
   nsfw: boolean;
+  }
 
 const defaultState: AvatarState = {
   bodyColor: '#f7c6d9',

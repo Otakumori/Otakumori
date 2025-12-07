@@ -10,6 +10,7 @@ export interface UploadConfig {
   maxWidth?: number;
   maxHeight?: number;
   quality?: number;
+  }
 
 export const UPLOAD_CONFIGS = {
   avatar: {

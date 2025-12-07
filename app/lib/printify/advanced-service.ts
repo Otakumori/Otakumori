@@ -37,6 +37,7 @@ export interface ProductSearchOptions {
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
+  }
 
 export interface ProductSearchResult {
   products: PrintifyProduct[];
@@ -57,6 +58,7 @@ export interface InventoryStatus {
   isAvailable: boolean;
   stock?: number;
   lastUpdated: string;
+  }
 
 export interface RecommendationOptions {
   userId?: string;
@@ -64,6 +66,7 @@ export interface RecommendationOptions {
   category?: string;
   algorithm?: 'collaborative' | 'content_based' | 'hybrid' | 'trending';
   limit?: number;
+  }
 
 export interface OrderProcessingOptions {
   autoFulfill?: boolean;

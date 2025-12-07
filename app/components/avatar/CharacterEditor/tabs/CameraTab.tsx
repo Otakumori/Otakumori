@@ -13,6 +13,7 @@ interface CameraTabProps {
   cameraRotation: { x: number; y: number };
   setCameraRotation: (updater: (prev: { x: number; y: number }) => { x: number; y: number }) => void;
   resetCamera: () => void;
+  }
 
 export function CameraTab({
   currentCamera,

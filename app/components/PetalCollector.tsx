@@ -8,6 +8,7 @@ interface Petal {
   collected: boolean;
   type: 'normal' | 'golden' | 'special';
   points: number;
+  }
 
 interface PowerUp {
   id: number;

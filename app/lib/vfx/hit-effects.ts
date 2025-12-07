@@ -10,6 +10,7 @@ export interface HitEffect {
   y: number;
   value?: number;
   life: number; // 0-1
+  }
 
 export interface ScreenShakeConfig {
   intensity: number;

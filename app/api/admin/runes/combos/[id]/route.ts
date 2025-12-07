@@ -3,12 +3,27 @@ import { logger } from '@/app/lib/logger';
 import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
+import { generateRequestId } from '@/app/lib/request-id';
 
 export const runtime = 'nodejs';
 
 // DELETE: Delete a rune combo
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract request metadata for logging/audit
+    const idempotencyKey = request.headers.get('x-idempotency-key');
+    const requestId = request.headers.get('x-request-id') || generateRequestId();
+    const userAgent = request.headers.get('user-agent');
+    
+    logger.info('Rune combo deletion request', {
+      requestId,
+      extra: {
+        idempotencyKey,
+        userAgent,
+        comboId: params.id,
+      },
+    });
+    
     const { userId } = await auth();
 
     if (!userId) {

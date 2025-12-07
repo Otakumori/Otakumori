@@ -14,6 +14,7 @@ interface GalleryAvatar {
   tags: string[];
   isPublic: boolean;
   createdAt: string;
+  }
 
 export function AvatarGallery() {
   const [filter, setFilter] = useState<'all' | 'trending' | 'recent' | 'popular'>('all');

@@ -13,6 +13,7 @@ export interface SaveData {
   updatedAt: Date;
   data: Record<string, any>;
   metadata: SaveMetadata;
+  }
 
 export interface SaveMetadata {
   level: number;
@@ -21,6 +22,7 @@ export interface SaveMetadata {
   achievements: string[];
   settings: Record<string, any>;
   checksum: string;
+  }
 
 export interface SaveSlot {
   id: string;
@@ -35,6 +37,7 @@ export interface SaveSlot {
   isAutoSave: boolean;
   isCloudSave: boolean;
   size: number;
+  }
 
 export interface SaveSystemConfig {
   maxSlots: number;

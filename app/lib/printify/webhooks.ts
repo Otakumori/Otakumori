@@ -6,6 +6,7 @@ export interface PrintifyWebhook {
   topic: string;
   secret: string;
   created_at: string;
+  }
 
 export class PrintifyWebhookManager {
   private readonly baseUrl: string;

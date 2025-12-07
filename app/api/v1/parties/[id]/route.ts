@@ -175,6 +175,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract request body for confirmation
+    const body = await request.json().catch(() => ({}));
+    const confirm = body.confirm === true;
+    const reason = body.reason as string | undefined;
+    
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
@@ -197,11 +202,26 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       );
     }
 
+    // Require confirmation
+    if (!confirm) {
+      return NextResponse.json(
+        { ok: false, error: 'Confirmation required', requiresConfirmation: true },
+        { status: 400 }
+      );
+    }
+
     await db.party.delete({
       where: { id: params.id },
     });
 
-    logger.info('Party deleted', { extra: { partyId: params.id, leaderId: userId } });
+    // Log deletion with reason if provided
+    logger.info('Party deleted', { 
+      extra: { 
+        partyId: params.id, 
+        leaderId: userId,
+        reason: reason || undefined,
+      } 
+    });
 
     return NextResponse.json({
       ok: true,

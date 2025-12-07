@@ -1,5 +1,4 @@
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
@@ -8,6 +7,11 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract request body
+    const body = await request.json().catch(() => ({}));
+    const content = body.content as string;
+    const parentId = body.parentId as string | undefined;
+    
     const { getToken } = await auth();
     const token = await getToken({ template: 'otakumori-jwt' });
 
@@ -17,8 +21,12 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     const soapstoneId = params.id;
 
-    // Log reply for debugging
-    logger.warn('Soapstone reply requested for ID:', undefined, { value: soapstoneId });
+    // Log reply for debugging (use content and parentId if provided)
+    logger.warn('Soapstone reply requested for ID:', undefined, { 
+      value: soapstoneId,
+      hasContent: !!content,
+      hasParentId: !!parentId,
+    });
 
     // In production, this would:
     // 1. Find the soapstone by ID

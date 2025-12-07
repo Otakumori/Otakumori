@@ -17,6 +17,7 @@ interface SliderControlProps {
   step?: number;
   className?: string;
   showValue?: boolean;
+  }
 
 export default function SliderControl({
   label,

@@ -12,6 +12,7 @@ interface Petal {
   speed: number;
   opacity: number;
   drift: number;
+  }
 
 export default function CherryBlossomTree() {
   const [mounted, setMounted] = useState(false);

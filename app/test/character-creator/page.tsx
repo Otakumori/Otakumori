@@ -9,7 +9,7 @@
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
-import { Suspense, useRef, useState, useEffect } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AnimeToonMaterial } from '../shaders/AnimeToonShader';
@@ -306,7 +306,7 @@ export default function CharacterCreatorPage() {
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-purple-800 to-black">
-      <style jsx global>{`
+      <style>{`
         .slider-pink::-webkit-slider-thumb {
           appearance: none;
           width: 16px;

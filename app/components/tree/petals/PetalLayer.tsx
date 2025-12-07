@@ -14,6 +14,7 @@ interface Petal {
   from: { x: number; y: number };
   interactive?: boolean;
   collected?: boolean;
+  }
 
 const PETAL_LIMIT = { decor: 40, interactive: 12 };
 const PETAL_IMG = '/assets/images/petal.svg';

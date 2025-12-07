@@ -10,6 +10,7 @@ export interface LeaderboardEntry {
   score: number;
   avatar?: string;
   isCurrentUser?: boolean;
+  }
 
 interface LeaderboardProps {
   gameId?: string;

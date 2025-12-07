@@ -24,6 +24,7 @@ interface ShippingInfo {
   state: string;
   zipCode: string;
   country: string;
+  }
 
 interface CartItem {
   id: string;

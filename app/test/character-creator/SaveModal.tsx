@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 interface SaveModalProps {
   config: any;
   onClose: () => void;
+  }
 
 export default function SaveModal({ config, onClose }: SaveModalProps) {
   const { isSignedIn, user } = useUser();

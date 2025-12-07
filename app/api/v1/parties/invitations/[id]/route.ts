@@ -8,6 +8,9 @@ import { logger } from '@/app/lib/logger';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract request metadata
+    const requestId = request.headers.get('x-request-id') || newRequestId();
+    
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
@@ -115,6 +118,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({
       ok: true,
       data: { message: `Invitation ${validatedData.status} successfully` },
+      requestId,
     });
   } catch (error) {
     logger.error('Failed to respond to party invitation', undefined, {

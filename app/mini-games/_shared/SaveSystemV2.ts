@@ -49,6 +49,7 @@ export interface SaveSlotV2 {
   updatedAt: Date;
   syncStatus: 'local' | 'syncing' | 'synced' | 'conflict';
   backupUrl?: string;
+  }
 
 export interface SaveMetrics {
   totalSaves: number;
@@ -57,6 +58,7 @@ export interface SaveMetrics {
   corruptions: number;
   lastSync: Date | null;
   avgSaveSize: number;
+  }
 
 const CURRENT_SAVE_VERSION = 2;
 const MAX_SLOTS = 5; // Increased for better backup rotation

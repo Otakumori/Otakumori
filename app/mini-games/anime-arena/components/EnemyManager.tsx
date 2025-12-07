@@ -14,6 +14,7 @@ interface Enemy {
   velocity: THREE.Vector3;
   attackCooldown: number;
   state: 'idle' | 'chasing' | 'attacking' | 'dead';
+  }
 
 interface EnemyManagerProps {
   wave: number;
@@ -22,6 +23,7 @@ interface EnemyManagerProps {
   onPlayerDamage: (damage: number) => void;
   dimensionShiftActive: boolean;
   onWaveComplete: () => void;
+  }
 
 const EnemyManager = forwardRef<any, EnemyManagerProps>(
   (

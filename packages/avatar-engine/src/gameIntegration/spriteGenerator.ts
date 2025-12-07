@@ -140,10 +140,19 @@ export async function generateSpriteSheet(
   renderer.setPixelRatio(1); // Use 1:1 pixel ratio for sprites
   renderer.setClearColor(0x000000, 0); // Transparent background
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  // Note: outputEncoding/sRGBEncoding deprecated in THREE.js r152+, use colorSpace instead
+  // Legacy THREE.js API compatibility
+  if ('outputEncoding' in renderer && 'sRGBEncoding' in THREE) {
+     
+    (renderer as any).outputEncoding = (THREE as any).sRGBEncoding;
+  } else if ('colorSpace' in renderer) {
+     
+    (renderer as any).colorSpace = 'srgb';
+  }
 
   // Step 9: Set up animation mixer if animations are available
-  let mixer: THREE.AnimationMixer | null = null;
+  // Explicitly typed to avoid TypeScript narrowing to 'never'
+  let mixer: THREE.AnimationMixer | null = null as THREE.AnimationMixer | null;
   const clock = new THREE.Clock();
 
   // Try to find animations in the avatar group
@@ -178,8 +187,10 @@ export async function generateSpriteSheet(
       const duration = animationDurations[state] || 1000;
 
       // Reset animation mixer for this state
-      if (mixer) {
-        mixer.stopAllAction();
+      // Note: mixer is always null in current implementation, but kept for future use
+      const currentMixer = mixer;
+      if (currentMixer !== null) {
+        currentMixer.stopAllAction();
         // In full implementation, would set the appropriate animation action here
       }
 
@@ -189,8 +200,8 @@ export async function generateSpriteSheet(
         const animationTimeSeconds = (animationTime * duration) / 1000;
 
         // Update animation mixer if available
-        if (mixer) {
-          mixer.update(animationTimeSeconds);
+        if (currentMixer !== null) {
+          currentMixer.update(animationTimeSeconds);
         } else {
           // Apply static pose variations based on animation state
           applyStaticPose(finalGroup, state, animationTime);

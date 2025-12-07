@@ -11,6 +11,7 @@ export interface ToastProps {
   type?: ToastType;
   duration?: number;
   onClose: (id: string) => void;
+  }
 
 const icons = {
   success: CheckCircle,

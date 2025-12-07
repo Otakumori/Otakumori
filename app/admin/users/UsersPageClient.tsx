@@ -13,6 +13,7 @@ interface UserData {
   lifetimePetalsEarned: number;
   nsfwEnabled: boolean;
   createdAt: Date;
+  }
 
 export default function UsersPageClient() {
   const [users, setUsers] = useState<UserData[]>([]);

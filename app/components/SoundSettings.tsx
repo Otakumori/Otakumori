@@ -13,6 +13,7 @@ interface SoundSettings {
   musicEnabled: boolean;
   sfxEnabled: boolean;
   voiceEnabled: boolean;
+  }
 
 export const SoundSettings: React.FC = () => {
   const [settings, setSettings] = useState<SoundSettings>({

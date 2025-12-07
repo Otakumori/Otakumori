@@ -79,6 +79,7 @@ export interface MaterialSlot {
   customizable: boolean;
   colorable: boolean;
   patternable: boolean;
+  }
 
 export interface MorphTarget {
   name: string;
@@ -87,6 +88,7 @@ export interface MorphTarget {
   defaultValue: number;
   category: 'body' | 'face' | 'anatomy';
   adultContent: boolean;
+  }
 
 export interface AttachmentPoint {
   name: string;
@@ -94,6 +96,7 @@ export interface AttachmentPoint {
   rotation: THREE.Euler;
   scale: THREE.Vector3;
   parentBone?: string;
+  }
 
 export interface TattooLayer {
   id: string;
@@ -106,6 +109,7 @@ export interface TattooLayer {
   blendMode: 'normal' | 'multiply' | 'overlay' | 'screen';
   bodyPart: string;
   contentRating: ContentRating;
+  }
 
 export interface GlowEffect {
   id: string;
@@ -116,6 +120,7 @@ export interface GlowEffect {
   animation: 'none' | 'pulse' | 'flicker' | 'wave';
   speed: number;
   bodyPart: string;
+  }
 
 export interface ParticleEffect {
   id: string;
@@ -129,6 +134,7 @@ export interface ParticleEffect {
   emissionRate: number;
   bodyPart: string;
   contentRating: ContentRating;
+  }
 
 export interface TextureOverlay {
   id: string;

@@ -30,7 +30,7 @@ import {
   applyVisualProfile,
   getGameDisplayName,
 } from '../_shared/gameVisuals';
-import { recordGameResult, useGameProgress } from '@/app/lib/games/progress';
+import { useGameProgress } from '@/app/lib/games/progress';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
@@ -252,7 +252,6 @@ export default function RhythmBeatEmUpPage() {
             loseMessage="Health reached zero. Try again and stay on beat!"
             score={finalScore || score}
             petalReward={petalReward}
-            achievements={achievements}
             onRestart={() => {
               setSelectedMode(null);
               setGameState('instructions');

@@ -61,8 +61,9 @@ export const syncOnProductChange = inngest.createFunction(
   async ({ event, step }) => {
     return await step.run('sync-changed-product', async () => {
       try {
-        const { productId } = event.data;
-        const product = await getPrintifyService().getProduct(productId);
+        const { productId, product: providedProduct } = event.data;
+        // Use product if provided directly, otherwise fetch
+        const product = providedProduct || await getPrintifyService().getProduct(productId);
         await syncPrintifyCatalog([product]);
 
         return {

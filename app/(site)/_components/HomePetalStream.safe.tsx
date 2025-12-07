@@ -19,6 +19,7 @@ interface Petal {
   collectTime: number;
   targetX: number;
   targetY: number;
+  }
 
 interface HomePetalStreamProps {
   className?: string;
@@ -33,7 +34,7 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
   const programRef = useRef<WebGLProgram | null>(null);
   const petalsRef = useRef<Petal[]>([]);
   const collectedCountRef = useRef(0);
-  const _lastCollectTimeRef = useRef(0);
+  const lastCollectTimeRef = useRef(0);
   const walletPositionRef = useRef({ x: 0, y: 0 });
 
   const [isInitialized, setIsInitialized] = useState(false);
@@ -260,6 +261,15 @@ export default function HomePetalStream({ className = '', onBalanceUpdate }: Hom
   const handlePointerDown = useCallback(
     (e: PointerEvent) => {
       if (prefersReducedMotion.current || dailyCapReached) return;
+
+      // Rate limiting: prevent spam clicking
+      const now = Date.now();
+      const timeSinceLastCollect = now - lastCollectTimeRef.current;
+      if (timeSinceLastCollect < 1000) {
+        // 1 second cooldown between collects
+        return;
+      }
+      lastCollectTimeRef.current = now;
 
       const canvas = canvasRef.current;
       if (!canvas) return;

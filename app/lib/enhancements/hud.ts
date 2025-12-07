@@ -18,6 +18,7 @@ export interface HealthBarConfig {
   color: string;
   backgroundColor: string;
   animated: boolean;
+  }
 
 export interface TimerConfig {
   time: number; // seconds
@@ -25,6 +26,7 @@ export interface TimerConfig {
   urgencyThreshold: number; // seconds
   urgencyColor: string;
   normalColor: string;
+  }
 
 export interface ComboConfig {
   count: number;

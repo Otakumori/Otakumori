@@ -10,6 +10,7 @@ export interface GameSaveData {
   settings?: Record<string, any>;
   timestamp: number;
   saveVersion: number;
+  }
 
 export interface SaveSlot {
   slot: number;

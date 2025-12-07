@@ -14,6 +14,7 @@ export interface UserBehaviorProfile {
   gamesPlayed: string[];
   productsViewed: string[];
   postsRead: string[];
+  }
 
 export interface Recommendation {
   type: 'product' | 'game' | 'blog';

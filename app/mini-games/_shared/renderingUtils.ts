@@ -165,6 +165,7 @@ export interface Particle {
   color: string;
   rotation: number;
   rotationSpeed: number;
+  }
 
 export function createParticleSystem(
   count: number,

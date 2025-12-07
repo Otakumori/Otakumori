@@ -5,12 +5,11 @@
  * For now, this API validates requests and can trigger client-side generation
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { put } from '@vercel/blob';
-import { prisma } from '@/app/lib/prisma';
 import { logger } from '@/app/lib/logger';
-import { generateRequestId } from '@/app/lib/requestId';
+import { generateRequestId } from '@/app/lib/request-id';
 import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 import type {
   SpriteGenerationOptions,

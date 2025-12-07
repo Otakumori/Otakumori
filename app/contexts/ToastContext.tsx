@@ -11,6 +11,7 @@ interface ToastContextValue {
   info: (message: string, duration?: number) => string;
   warning: (message: string, duration?: number) => string;
   addToast: (message: string, type?: ToastType, duration?: number) => string;
+  }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 

@@ -15,6 +15,7 @@ export interface Particle {
     opacity: number;
     rotation: number;
     rotationSpeed: number;
+    }
 
 export type ParticleType = 'petal' | 'sparkle' | 'glow' | 'trail';
 
@@ -28,6 +29,7 @@ export interface ParticleConfig {
     color?: string;
     size?: number;
     lifetime?: number;
+    }
 
 export class ParticleSystem {
     private particles: Particle[] = [];

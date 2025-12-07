@@ -14,6 +14,7 @@ interface Order {
   status: string;
   createdAt: string;
   paidAt: string | null;
+  }
 
 interface MemoryCardDockProps {
   className?: string;

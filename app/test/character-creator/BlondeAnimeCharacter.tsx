@@ -11,6 +11,7 @@ import * as THREE from 'three';
 
 interface CharacterProps {
   config: any;
+  }
 
 export default function BlondeAnimeCharacter({ config }: CharacterProps) {
   const groupRef = useRef<THREE.Group>(null);

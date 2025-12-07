@@ -1,7 +1,7 @@
 
 'use client';
 
-import type React from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import GlassCard from '../components/ui/GlassCard';
 import GlassButton from '../components/ui/GlassButton';

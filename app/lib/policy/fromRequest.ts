@@ -9,6 +9,7 @@ export interface ContentPolicy {
   cookieValue: string | null;
   region: string | null;
   source: PolicySource;
+  }
 
 const NSFW_COOKIE = 'nsfw-preference';
 const LEGACY_COOKIE = 'om_age_ok';

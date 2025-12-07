@@ -25,6 +25,7 @@ interface GameAvatarRendererProps {
   className?: string;
   fallbackTo2D?: boolean;
   showFallbackSprite?: boolean;
+  }
 
 interface GameAvatarData {
   configuration: AvatarConfiguration;

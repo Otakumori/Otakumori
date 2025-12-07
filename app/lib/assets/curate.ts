@@ -17,6 +17,7 @@ interface AssetMeta {
   host: 'local' | 'cdn';
   hash: string;
   coverage: 'standard' | 'minimal' | 'full';
+  }
 
 interface AssetRegistry {
   version: number;

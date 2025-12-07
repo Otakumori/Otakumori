@@ -14,6 +14,7 @@ export interface ControlState {
   dimensionShift: boolean;
   mouseX: number;
   mouseY: number;
+  }
 
 export default class Controls {
   private keys: Set<string> = new Set();

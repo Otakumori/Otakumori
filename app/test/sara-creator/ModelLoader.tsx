@@ -12,6 +12,7 @@ import * as THREE from 'three';
 
 interface SaraModelProps {
   config: any;
+  }
 
 export default function SaraModel({ config }: SaraModelProps) {
   const groupRef = useRef<THREE.Group>(null);

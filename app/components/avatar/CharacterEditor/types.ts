@@ -9,6 +9,7 @@ export interface CameraPreset {
   position: [number, number, number];
   target: [number, number, number];
   fov: number;
+  }
 
 export interface PosePreset {
   id: string;
@@ -16,6 +17,7 @@ export interface PosePreset {
   animation: string;
   description: string;
   category: 'idle' | 'action' | 'emote' | 'dance' | 'nsfw';
+  }
 
 export interface BackgroundPreset {
   id: string;
@@ -23,6 +25,7 @@ export interface BackgroundPreset {
   type: 'color' | 'gradient' | 'environment' | 'studio';
   value: string;
   hdrUrl?: string;
+  }
 
 export interface CustomizationPanelProps {
   title: string;
@@ -39,6 +42,7 @@ export interface SliderControlProps {
   step?: number;
   onChange: (value: number) => void;
   format?: (value: number) => string;
+  }
 
 export interface ColorPickerProps {
   label: string;
@@ -55,6 +59,7 @@ export interface PartSelectorProps {
   searchQuery?: string;
   selectedCategory?: string;
   resolveParts?: (type: AvatarPartType) => ReturnType<typeof avatarPartManager.getPartsByType>;
+  }
 
 export interface CharacterEditorProps {
   initialConfiguration?: AvatarConfiguration;

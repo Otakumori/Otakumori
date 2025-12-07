@@ -12,6 +12,7 @@ interface LeaderboardEntry {
   avatarUrl: string | null;
   lifetimePetalsEarned: number;
   currentBalance: number;
+  }
 
 interface GameLeaderboardEntry {
   rank: number;
@@ -19,6 +20,7 @@ interface GameLeaderboardEntry {
   displayName: string;
   score: number;
   category: string;
+  }
 
 export function LeaderboardsTab() {
   const { user } = useUser();

@@ -1,5 +1,6 @@
 import { inngest } from './client';
 import { env } from '@/env';
+// Re-export Printify sync functions (used in re-export on line 277)
 import { syncPrintifyProducts, manualPrintifySync, syncOnProductChange } from './printify-sync';
 
 // ============================================================================
@@ -14,7 +15,20 @@ export const syncUserToSupabase = inngest.createFunction(
   },
   { event: 'clerk/user.created' },
   async ({ event, step }: { event: any; step: any }) => {
+    // Extract and log event data
+    const eventId = event.id;
+    const eventName = event.name;
+    const timestamp = event.timestamp || new Date().toISOString();
+    
     const user = event.data;
+    
+    // Log for monitoring
+    console.log('Inngest function triggered', {
+      eventId,
+      eventName,
+      timestamp,
+      userId: user?.id,
+    });
 
     return await step.run('sync-user-data', async () => {
       // This will be implemented in the actual function
@@ -44,7 +58,16 @@ export const updatePrintifyProducts = inngest.createFunction(
   },
   { event: 'printify/products.update' },
   async ({ event, step }: { event: any; step: any }) => {
+    // Extract and log event data
+    const eventId = event.id;
+    const eventName = event.name;
     const triggeredAt = event?.timestamp ?? new Date().toISOString();
+    
+    console.log('Printify products update triggered', {
+      eventId,
+      eventName,
+      triggeredAt,
+    });
 
     return await step.run('fetch-printify-products', async () => {
       // 'Fetching products from Printify'

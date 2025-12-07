@@ -45,6 +45,7 @@ interface Note {
   direction?: 'left' | 'right'; // For slide notes
   hit?: boolean;
   accuracy?: 'perfect' | 'great' | 'good' | 'miss';
+  }
 
 interface Track {
   id: string;
@@ -55,6 +56,7 @@ interface Track {
   difficulty: 'easy' | 'normal' | 'hard' | 'expert';
   notes: Note[];
   preview?: string;
+}
 
 const SAMPLE_TRACKS: Track[] = [
   {

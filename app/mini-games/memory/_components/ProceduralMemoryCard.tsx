@@ -18,6 +18,7 @@ interface ProceduralMemoryCardProps {
   onClick: () => void;
   disabled: boolean;
   theme?: 'sakura' | 'cyberpunk' | 'forest' | 'fire' | 'ice' | 'void';
+  }
 
 export default function ProceduralMemoryCard({
   isFlipped,

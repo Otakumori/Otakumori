@@ -20,6 +20,7 @@ export interface GameResultMetadata {
   difficulty?: string;
   mode?: string;
   [key: string]: unknown;
+  }
 
 export interface GameResult {
   gameId: string;
@@ -28,6 +29,7 @@ export interface GameResult {
   durationMs: number;
   didWin: boolean;
   metadata?: GameResultMetadata;
+  }
 
 export interface PetalRewardResult {
   earned: number;
@@ -35,6 +37,7 @@ export interface PetalRewardResult {
   lifetimePetalsEarned: number;
   isGuest: boolean;
   dailyCapReached?: boolean;
+  }
 
 export interface AchievementCheckResult {
   unlocked: string[]; // Achievement codes that were unlocked
@@ -44,6 +47,7 @@ export interface AchievementCheckResult {
     rewardType?: string;
     rewardAmount?: number;
   }>;
+  }
 
 export interface RecordGameResultResponse {
   success: boolean;

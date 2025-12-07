@@ -35,11 +35,13 @@ export interface GameEntryFlowProps {
   }) => void;
   onCancel?: () => void;
   showInstructions?: boolean;
+  }
 
 interface DifficultyOption {
   value: DifficultyLevel;
   label: string;
   description?: string;
+}
 
 const DEFAULT_DIFFICULTY_OPTIONS: Record<DifficultyLevel, DifficultyOption> = {
   easy: {

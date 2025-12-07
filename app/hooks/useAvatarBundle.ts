@@ -11,6 +11,7 @@ export interface AvatarBundle {
   texture: string;
   adultContent: boolean;
   enabled: boolean;
+  }
 
 export interface AvatarSettings {
   integrationEnabled: boolean;

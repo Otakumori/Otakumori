@@ -10,7 +10,6 @@
  */
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { auth } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -391,9 +390,13 @@ async function updateAchievements(
   // Achievement logic would go here
   // This is a placeholder for the achievement system
 
-  // Example: Check for high score achievements
-  if (score > 1000) {
+  // Use category in achievement checks
+  if (category === 'score' && score > 1000) {
     logger.warn(`High score achievement candidate: ${score} in ${gameId}`);
+  } else if (category === 'time' && score < 100) {
+    logger.warn(`Fast time achievement candidate: ${score}s in ${gameId}`);
+  } else if (category === 'achievements' && metadata?.achievementsUnlocked > 5) {
+    logger.warn(`Achievement master candidate: ${metadata.achievementsUnlocked} achievements in ${gameId}`);
   }
 }
 

@@ -13,6 +13,7 @@ interface Branch {
   angle: number;
   depth: number;
   isVisible: boolean;
+  }
 
 interface Blossom {
   id: string;
@@ -21,6 +22,7 @@ interface Blossom {
   size: number;
   opacity: number;
   isVisible: boolean;
+  }
 
 export default function GrowingTree() {
   const [mounted, setMounted] = useState(false);

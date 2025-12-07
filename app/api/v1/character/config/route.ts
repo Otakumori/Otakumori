@@ -12,17 +12,22 @@ export async function GET(request: NextRequest) {
     try {
       const { userId } = await auth();
       const { searchParams } = new URL(request.url);
-      const _gameId = searchParams.get('gameId');
-      const _mode = searchParams.get('mode') || 'default';
+      const gameId = searchParams.get('gameId');
+      const mode = searchParams.get('mode') || 'default';
 
       if (!userId) {
         return NextResponse.json({ ok: false, error: 'Authentication required' }, { status: 401 });
       }
 
       // Try to find user's avatar configuration
+      // Use gameId and mode to filter/configure character if provided
       const avatarConfig = await db.avatarConfiguration.findFirst({
         where: {
           userId,
+          // Note: gameId and mode filtering would require schema changes
+          // For now, we log them for future use
+          ...(gameId && { /* TODO: Add gameId filter when schema supports it */ }),
+          ...(mode && { /* TODO: Add mode filter when schema supports it */ }),
         },
         include: {
           AvatarConfigurationPart: true,

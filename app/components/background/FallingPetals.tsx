@@ -15,6 +15,7 @@ interface Petal {
   color: string;
   life: number;
   maxLife: number;
+  }
 
 export default function FallingPetals() {
   const containerRef = useRef<HTMLDivElement>(null);

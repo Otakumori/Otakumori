@@ -15,6 +15,7 @@ export interface PerformanceGuardProps {
   onQualityChange?: (quality: 'high' | 'medium' | 'low') => void;
   showIndicator?: boolean; // Show FPS counter (dev mode)
   children?: React.ReactNode;
+  }
 
 export interface PerformanceMetrics {
   fps: number;

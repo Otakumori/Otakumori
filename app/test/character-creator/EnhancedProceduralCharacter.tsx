@@ -30,6 +30,7 @@ function createBreastGeometry(size: number): THREE.BufferGeometry {
   
   geometry.computeVertexNormals();
   return geometry;
+}
 
 export default function EnhancedProceduralCharacter({ config }: CharacterProps) {
   const groupRef = useRef<THREE.Group>(null);

@@ -13,6 +13,7 @@ interface Product {
   image: string;
   price: number;
   available: boolean;
+  }
 
 interface ProductsResponse {
   ok: boolean;

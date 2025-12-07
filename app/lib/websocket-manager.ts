@@ -23,6 +23,7 @@ export interface WebSocketConnection {
   ws: WebSocket;
   lastPing: number;
   isAlive: boolean;
+  }
 
 export class WebSocketManager {
   private static instance: WebSocketManager;

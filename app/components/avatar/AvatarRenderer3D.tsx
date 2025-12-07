@@ -107,6 +107,7 @@ interface AvatarRenderer3DProps {
   enableControls?: boolean;
   autoRotate?: boolean;
   className?: string;
+  }
 
 export default function AvatarRenderer3D({
   width = '100%',

@@ -15,6 +15,7 @@ interface Obstacle {
   type: 'low' | 'high' | 'wide';
   speed: number;
   warningTime: number; // Time remaining for warning (0 = no warning, >0 = warning active)
+  }
 
 interface Powerup {
   id: number;
@@ -22,6 +23,7 @@ interface Powerup {
   y: number;
   type: 'speed' | 'shield' | 'points';
   collected: boolean;
+  }
 
 export default function ThighChaseGame({
   onScoreChange,

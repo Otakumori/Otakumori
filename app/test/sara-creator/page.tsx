@@ -51,6 +51,8 @@ function Slider({ label, value, onChange, min = 0, max = 2, step = 0.05, descrip
       />
       {description && <p className="text-xs text-white/50">{description}</p>}
     </div>
+  );
+}
 
 export default function SaraCreatorPage() {
   const [config, setConfig] = useState(() => {

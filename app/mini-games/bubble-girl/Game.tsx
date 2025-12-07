@@ -640,6 +640,15 @@ class Ragdoll {
       segment.reset(x, y, index);
     });
   }
+
+  // Return to base position
+  returnToBase() {
+    this.x = this.baseX;
+    this.y = this.baseY;
+    this.segments.forEach((segment, index) => {
+      segment.reset(this.baseX, this.baseY, index);
+    });
+  }
 }
 
 // Ragdoll segment class

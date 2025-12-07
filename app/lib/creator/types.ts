@@ -228,6 +228,7 @@ export interface SliderConfig {
   description?: string;
   linkedSliders?: string[]; // IDs of sliders that affect this one
   onChange: (value: number) => void;
+  }
 
 export interface PartCategory {
   id: string;
@@ -246,6 +247,7 @@ export interface AvatarPart {
   contentRating: 'sfw' | 'nsfw' | 'explicit';
   compatibleWith?: string[]; // Part IDs that are compatible
   conflictsWith?: string[]; // Part IDs that conflict
+  }
 
 export interface CameraPreset {
   id: string;
@@ -253,6 +255,7 @@ export interface CameraPreset {
   position: [number, number, number];
   target: [number, number, number];
   fov: number;
+  }
 
 export interface PosePreset {
   id: string;
@@ -260,6 +263,7 @@ export interface PosePreset {
   animation: string;
   description: string;
   category: 'idle' | 'action' | 'emote' | 'dance' | 'nsfw';
+  }
 
 export interface BackgroundPreset {
   id: string;

@@ -12,6 +12,7 @@ export interface CollectedPetal {
   x: number;
   y: number;
   timestamp: number;
+  }
 
 export interface PetalCollectionState {
   sessionTotal: number;

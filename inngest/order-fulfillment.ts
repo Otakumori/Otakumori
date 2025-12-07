@@ -290,17 +290,31 @@ export const sendOrderConfirmationEmail = inngest.createFunction(
   },
   { event: 'email/order-confirmation' },
   async ({ event, step }) => {
-    const { orderId, email, orderNumber, totalAmount, items } = event.data;
+    const { orderId, email, orderNumber, totalAmount, items, userId } = event.data;
 
     return await step.run('send-email', async () => {
       try {
+        // Fetch user data if userId provided
+        let userData = null;
+        if (userId) {
+          userData = await db.user.findUnique({
+            where: { id: userId },
+            select: { id: true, email: true, displayName: true, username: true },
+          });
+        }
+        
+        const recipientEmail = email || userData?.email || 'customer@example.com';
+        const recipientName = userData?.displayName || userData?.username || 'Customer';
+        
         // TODO: Integrate with email service (Resend, SendGrid, etc.)
         console.log('Sending order confirmation email:', {
-          to: email,
+          to: recipientEmail,
+          recipientName,
           orderId,
           orderNumber,
           totalAmount,
           itemCount: items.length,
+          userId,
         });
 
         // Placeholder for email service integration
@@ -338,13 +352,25 @@ export const sendPaymentFailedEmail = inngest.createFunction(
   },
   { event: 'email/payment-failed' },
   async ({ event, step }) => {
-    const { orderId, email, reason } = event.data;
+    const { orderId, email, userId, reason } = event.data;
 
     return await step.run('send-email', async () => {
       try {
+        // Fetch user data if userId provided
+        let userData = null;
+        if (userId) {
+          userData = await db.user.findUnique({
+            where: { id: userId },
+            select: { id: true, email: true, displayName: true },
+          });
+        }
+        
+        const recipientEmail = email || userData?.email || 'customer@example.com';
+        
         console.log('Sending payment failed email:', {
-          to: email,
+          to: recipientEmail,
           orderId,
+          userId,
           reason,
         });
 

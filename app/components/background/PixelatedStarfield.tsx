@@ -10,6 +10,7 @@ interface Star {
   opacity: number;
   color: string;
   twinklePhase: number;
+  }
 
 export default function PixelatedStarfield() {
   const canvasRef = useRef<HTMLCanvasElement>(null);

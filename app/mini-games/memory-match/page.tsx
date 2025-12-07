@@ -16,11 +16,10 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sessionTracker } from '@/lib/analytics/session-tracker';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
-import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
 import { useGameProgress } from '@/app/lib/games/progress';
@@ -32,9 +31,8 @@ import {
 } from '../_shared/gameVisuals';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
-import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
+import { type AvatarChoice } from '../_shared/AvatarPresetChoice';
 import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
-import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -66,6 +64,18 @@ export default function MemoryMatchGame() {
   const [streak, setStreak] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
   const sessionId = useRef<string | null>(null);
+
+  // Move these here (from lines 178-180):
+  const [petalReward, setPetalReward] = useState<number | null>(null);
+  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  // Add achievements state for session notifications (permanent unlocks stored via API)
+  const [achievements, setAchievements] = useState<Array<{ 
+    code: string; 
+    name: string; 
+    rewardType?: string; 
+    rewardAmount?: number 
+  }>>([]);
 
   // VFX state
   const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
@@ -148,6 +158,9 @@ export default function MemoryMatchGame() {
     setFinalScore(0);
     setPetalReward(null);
     setHasAwardedPetals(false);
+    // Clear session achievement notifications (for display only)
+    // Permanent achievements remain on user profile via recordResult API
+    setAchievements([]);
 
     // Start session tracking
     sessionTracker
@@ -176,10 +189,6 @@ export default function MemoryMatchGame() {
   }, [gameState]);
 
   // Auto-save removed for simplified implementation
-
-  const [petalReward, setPetalReward] = useState<number | null>(null);
-  const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
 
   // Register sound effects
   useEffect(() => {
@@ -229,6 +238,28 @@ export default function MemoryMatchGame() {
     });
   }, [registerSound]);
 
+  // Preload card images
+  useEffect(() => {
+    if (cards.length === 0) {
+      setImagesLoaded(false);
+      return;
+    }
+
+    const imageUrls = Array.from(new Set(cards.map(card => card.imageUrl)));
+    const imagePromises = imageUrls.map(url => {
+      return new Promise<void>((resolve) => {
+        const img = document.createElement('img');
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Continue even if some images fail
+        img.src = url;
+      });
+    });
+
+    Promise.all(imagePromises).then(() => {
+      setImagesLoaded(true);
+    });
+  }, [cards]);
+
   // Complete game
   const completeGame = useCallback(async () => {
     setGameState('win');
@@ -268,6 +299,19 @@ export default function MemoryMatchGame() {
 
       if (result.success && result.petalReward) {
         setPetalReward(result.petalReward.earned);
+        
+        // Capture newly unlocked achievements for session display
+        // Note: Achievements are permanently stored via recordResult API
+        // This state only tracks what was unlocked THIS session for display
+        if (result.achievements && result.achievements.unlocked) {
+          setAchievements(result.achievements.unlocked.map((ach: any) => ({
+            code: ach.code || ach.id,
+            name: ach.name || ach.title,
+            rewardType: ach.rewardType,
+            rewardAmount: ach.rewardAmount,
+          })));
+        }
+        
         // Play success sound
         playSound('memory-success');
       }

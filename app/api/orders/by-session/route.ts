@@ -16,6 +16,7 @@ interface RuneCombo {
   cosmeticBurst?: string;
   members: string[];
   isActive?: boolean;
+  }
 
 export async function GET(request: NextRequest) {
   try {

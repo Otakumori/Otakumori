@@ -13,6 +13,7 @@ interface WebVitalMetric {
   entries: any[];
   label?: string;
   attribution?: any;
+  }
 
 interface ExtendedMetric extends WebVitalMetric {
   label?: string;

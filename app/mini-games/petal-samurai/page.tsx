@@ -95,7 +95,7 @@ export default function PetalSamuraiPage() {
       </header>
 
       {/* Game */}
-      <SlicingGame mode="timed" difficulty={selectedDifficulty} />
+      <SlicingGame mode="timed" difficulty={selectedDifficulty === 'expert' ? 'hard' : selectedDifficulty} />
     </MiniGameFrame>
   );
 }

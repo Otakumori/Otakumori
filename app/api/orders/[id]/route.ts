@@ -11,6 +11,11 @@ const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract query params
+    const { searchParams } = new URL(req.url);
+    const includeItems = searchParams.get('includeItems') !== 'false';
+    const includeRunes = searchParams.get('includeRunes') === 'true';
+    
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
@@ -22,7 +27,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
         userId,
       },
       include: {
-        OrderItem: true,
+        OrderItem: includeItems,
+        ...(includeRunes && { 
+          UserRune: { 
+            include: { RuneDef: true } 
+          } 
+        }),
       },
     });
 

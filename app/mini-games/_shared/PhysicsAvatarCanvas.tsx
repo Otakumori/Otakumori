@@ -12,6 +12,7 @@ interface PhysicsAvatarCanvasProps {
   style?: React.CSSProperties;
   onImpact?: (force: { x: number; y: number }, part: string) => void;
   enabled?: boolean;
+  }
 
 export interface PhysicsAvatarCanvasRef {
   applyImpact: (force: { x: number; y: number }, part: string) => void;

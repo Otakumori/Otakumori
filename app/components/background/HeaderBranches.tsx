@@ -12,6 +12,8 @@ interface HeaderBranch {
   thickness: number;
   angle: number;
   isVisible: boolean;
+  metadata?: { itemName?: string; index?: number };
+  }
 
 export default function HeaderBranches() {
   const [mounted, setMounted] = useState(false);
@@ -73,6 +75,7 @@ export default function HeaderBranches() {
           thickness: 1 + Math.random(),
           angle: twigAngle,
           isVisible: true,
+          metadata: { itemName: item, index },
         });
       });
 

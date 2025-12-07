@@ -33,6 +33,7 @@ interface DiscountReward {
   minSpendCents?: number | null;
   validityDays: number;
   available: boolean;
+  }
 
 interface PetalStoreResponse {
   ok: boolean;

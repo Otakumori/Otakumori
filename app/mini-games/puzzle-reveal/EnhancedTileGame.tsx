@@ -28,6 +28,7 @@ interface Tile {
   particles: TileParticle[];
   revealProgress: number;
   comboMultiplier: number;
+  }
 
 interface TileParticle {
   x: number;
@@ -37,6 +38,7 @@ interface TileParticle {
   life: number;
   size: number;
   color: string;
+  }
 
 interface GameState {
   score: number;
@@ -47,6 +49,7 @@ interface GameState {
   timeElapsed: number;
   isComplete: boolean;
   isPaused: boolean;
+  }
 
 interface ArtPiece {
   url: string;

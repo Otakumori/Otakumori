@@ -13,6 +13,7 @@ interface Particle {
   rotation: number;
   rotationSpeed: number;
   color: string;
+  }
 
 interface PetalParticleBurstProps {
   trigger: number; // Increment this to trigger burst

@@ -51,6 +51,7 @@ interface PixelStar {
   opacity: number;
   twinklePhase: number;
   twinkleSpeed: number;
+  }
 
 interface ShootingStar {
   x: number;
@@ -61,6 +62,7 @@ interface ShootingStar {
   opacity: number;
   life: number; // 0-1, starts at 1, decreases to 0
   color: string; // Purple gradient color
+  }
 
 export default function EnhancedStarfieldBackground({
   density = 0.5,

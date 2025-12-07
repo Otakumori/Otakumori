@@ -4,6 +4,7 @@ export interface GameLoopOptions {
   onUpdate?: (deltaTime: number) => void;
   onRender?: (alpha: number) => void;
   onError?: (error: Error) => void;
+  }
 
 export interface GameLoopStats {
   fps: number;
@@ -12,6 +13,7 @@ export interface GameLoopStats {
   renderTime: number;
   frameCount: number;
   lastFrameTime: number;
+  }
 
 export class GameLoop {
   private isRunning = false;

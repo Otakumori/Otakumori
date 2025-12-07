@@ -10,6 +10,7 @@ interface GamesState {
   openPanel: (panel: HubPanel) => void;
   closePanel: () => void;
   resetHub: () => void;
+  }
 
 export const useGamesStore = create<GamesState>((set) => ({
   activePanel: null,

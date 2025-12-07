@@ -7,6 +7,11 @@ import { logger } from '@/app/lib/logger';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract query params
+    const { searchParams } = new URL(request.url);
+    const includeHistory = searchParams.get('includeHistory') === 'true';
+    const includeParticipants = searchParams.get('includeParticipants') === 'true';
+    
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
@@ -15,6 +20,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const session = await db.coopSession.findUnique({
       where: { id: params.id },
       include: {
+        ...(includeHistory && { SessionHistory: true }),
+        ...(includeParticipants && { CoopSessionParticipant: true }),
         Party: {
           select: {
             id: true,

@@ -11,6 +11,7 @@ interface PetalCollectionToastProps {
   petalType?: 'normal' | 'golden' | 'glitch' | 'blackLotus';
   position?: { x: number; y: number };
   onComplete?: () => void;
+  }
 
 const PETAL_NAMES = {
   normal: 'Cherry Petal',

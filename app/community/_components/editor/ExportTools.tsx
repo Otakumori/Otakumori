@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Camera, Video, Download } from 'lucide-react';
+import { Camera, Video } from 'lucide-react';
 import { logger } from '@/app/lib/logger';
 import type * as THREE from 'three';
 
@@ -66,12 +66,12 @@ export function ExportTools({ sceneRef, canvasRef }: ExportToolsProps) {
       };
 
       // Fallback to VP8 if VP9 not supported
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      if (options.mimeType && !MediaRecorder.isTypeSupported(options.mimeType)) {
         options.mimeType = 'video/webm;codecs=vp8';
       }
 
       // Fallback to default if VP8 not supported
-      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      if (options.mimeType && !MediaRecorder.isTypeSupported(options.mimeType)) {
         options.mimeType = 'video/webm';
       }
 

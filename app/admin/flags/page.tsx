@@ -13,6 +13,7 @@ interface FeatureFlag {
   description: string;
   enabled: boolean;
   category: FlagCategory;
+  }
 
 interface FlagsResponse {
   ok: boolean;

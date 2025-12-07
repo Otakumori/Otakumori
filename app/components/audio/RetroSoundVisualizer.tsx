@@ -18,6 +18,7 @@ interface ParticleProps {
   maxLife: number;
   color: string;
   size: number;
+  }
 
 interface RetroSoundVisualizerProps {
   width?: number;
@@ -233,11 +234,13 @@ export default function RetroSoundVisualizer({
   // Update particles
   const updateParticles = (ctx: CanvasRenderingContext2D, dataArray: Uint8Array) => {
     const avgVolume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+    const volumeMultiplier = Math.min(avgVolume / 128, 2); // Scale 0-2x
 
     particlesRef.current = particlesRef.current.filter((p) => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.1; // Gravity
+      p.x += p.vx * volumeMultiplier;
+      p.y += p.vy * volumeMultiplier;
+      p.vy += 0.1 * volumeMultiplier; // Scale gravity by volume
+      p.size = p.size * (1 + volumeMultiplier * 0.1); // Scale size by volume
       p.life -= 0.02;
 
       if (p.life > 0) {

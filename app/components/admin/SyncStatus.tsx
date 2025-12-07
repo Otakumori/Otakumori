@@ -9,6 +9,7 @@ interface SyncStats {
   staleProducts: number;
   lastSyncTime: string | null;
   isStale: boolean;
+  }
 
 export function SyncStatus() {
   const [stats, setStats] = useState<SyncStats | null>(null);

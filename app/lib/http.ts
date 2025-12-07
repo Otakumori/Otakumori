@@ -13,6 +13,7 @@ export interface HttpResponse<T = any> {
   error?: string;
   status: number;
   headers: Headers;
+  }
 
 export class HttpError extends Error {
   constructor(

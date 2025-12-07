@@ -15,7 +15,6 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import { newRequestId } from '@/app/lib/requestId';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
@@ -34,11 +33,10 @@ import {
 } from '../_shared/vfx';
 import { PhysicsCharacterRenderer } from '../_shared/PhysicsCharacterRenderer';
 import { createGlowEffect } from '../_shared/enhancedTextures';
-import Character3D, { type Character3DRef } from './Character3D';
 
 type Props = {
   mode: 'classic' | 'storm' | 'endless' | 'timed';
-  difficulty?: 'easy' | 'normal' | 'hard';
+  difficulty?: 'easy' | 'normal' | 'medium' | 'hard';
 };
 
 // Game configuration - difficulty tuning parameters
@@ -78,6 +76,7 @@ interface GameState {
   isGameOver: boolean;
   isStunned: boolean;
   stormMode: boolean;
+  }
 
 interface Petal {
   id: string;
@@ -91,6 +90,7 @@ interface Petal {
   spriteIndex: number; // Index in 4x3 sprite grid (0-11)
   vx: number; // Horizontal drift velocity
   vy: number; // Vertical velocity
+  }
 
 interface PowerUp {
   id: string;
@@ -99,6 +99,7 @@ interface PowerUp {
   type: 'slow_time' | 'combo_boost' | 'miss_forgive';
   duration: number;
   active: boolean;
+  }
 
 export default function Game({ mode, difficulty = 'normal' }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -558,13 +559,13 @@ class GameEngine {
   private spriteSheetLoaded: boolean = false;
   private physicsRenderer: PhysicsCharacterRenderer | null = null;
   private isGameStarted: boolean = false;
-  private difficulty: 'easy' | 'normal' | 'hard' = 'normal';
+  private difficulty: 'easy' | 'normal' | 'medium' | 'hard' = 'normal';
 
   constructor(
     canvas: HTMLCanvasElement,
     mode: string,
     visualProfile: ReturnType<typeof getGameVisualProfile>,
-    difficulty: 'easy' | 'normal' | 'hard' = 'normal',
+    difficulty: 'easy' | 'normal' | 'medium' | 'hard' = 'normal',
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
@@ -641,7 +642,7 @@ class GameEngine {
 
     // Apply difficulty multiplier
     const difficultyMultiplier =
-      this.difficulty === 'easy' ? 1.5 : this.difficulty === 'hard' ? 0.6 : 1.0;
+      this.difficulty === 'easy' ? 1.5 : this.difficulty === 'hard' ? 0.6 : this.difficulty === 'medium' ? 1.2 : 1.0;
     spawnRate *= difficultyMultiplier;
 
     // Difficulty curve: slower spawn at start

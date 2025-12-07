@@ -19,6 +19,7 @@ interface GameState {
   isGameOver: boolean;
   brushSize: number;
   brushType: 'normal' | 'wind' | 'precision';
+  }
 
 interface FogPixel {
   x: number;
@@ -334,9 +335,12 @@ class GameEngine {
   update(deltaTime: number) {
     this.timeLeft -= deltaTime;
 
-    // Recharge energy
-    if (this.energy < 100) {
-      this.energy = Math.min(100, this.energy + deltaTime * 10);
+    // Recharge energy with cooldown
+    const now = Date.now();
+    if (now - this.lastEnergyRecharge > 1000 && this.energy < 100) {
+      // Recharge 1 energy per second
+      this.energy = Math.min(100, this.energy + 1);
+      this.lastEnergyRecharge = now;
     }
 
     // Update fog regrowth

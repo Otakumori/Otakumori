@@ -18,6 +18,7 @@ interface MockEntity {
   vz: number;
   health: number;
   target: { x: number; y: number; z: number } | null;
+  }
 
 class MockEngine {
   entities: MockEntity[] = [];

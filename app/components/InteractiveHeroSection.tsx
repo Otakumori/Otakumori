@@ -44,6 +44,7 @@ interface PetalType {
   seasonal?: boolean;
   seasonalBurstOnly?: boolean;
   contextualOnly?: boolean;
+  }
 
 const PetalTypes: Record<PetalTypeKey, PetalType> = {
   normal: {
@@ -89,6 +90,7 @@ interface Petal {
   reward?: number;
   name?: string;
   img?: string;
+  }
 
 function getSeason() {
   const month = new Date().getMonth();

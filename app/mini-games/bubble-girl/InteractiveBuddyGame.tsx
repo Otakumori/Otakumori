@@ -21,6 +21,7 @@ interface Tool {
   cost: number;
   damage?: number;
   effect?: string;
+  }
 
 interface CharacterPart {
   x: number;
@@ -34,6 +35,7 @@ interface CharacterPart {
   mass: number;
   health: number;
   maxHealth: number;
+  }
 
 interface Particle {
   x: number;
@@ -44,6 +46,7 @@ interface Particle {
   size: number;
   color: string;
   type: 'spark' | 'heart' | 'star' | 'impact';
+  }
 
 interface GameState {
   score: number;
@@ -51,6 +54,7 @@ interface GameState {
   stressRelieved: number;
   comboMultiplier: number;
   isRunning: boolean;
+  }
 
 const TOOLS: Tool[] = [
   // Fun Tools
@@ -819,9 +823,6 @@ class PhysicsEngine {
     const captionText = this.getToolCaption(tool, hitHead);
     this.addCaption(captionText, hitPart.x, hitPart.y - 40);
     
-    // Return caption for UI display
-    return captionText;
-
     // Apply damage/healing
     const damage = tool.damage || 0;
     hitPart.health = Math.max(0, Math.min(hitPart.maxHealth, hitPart.health - damage));
@@ -862,7 +863,7 @@ class PhysicsEngine {
     }
 
     // Apply physics impact
-    if (this.physicsRenderer) {
+    if (this.physicsRenderer && hitPart) {
       const impactForce = {
         x: (dx / distance) * force * (Math.abs(damage) || 5) * 2,
         y: ((dy / distance) * force * (Math.abs(damage) || 5) - 2) * 2,
@@ -870,6 +871,9 @@ class PhysicsEngine {
       const impactPart = hitHead ? 'chest' : 'hips';
       this.physicsRenderer.applyImpact(impactForce, impactPart);
     }
+    
+    // Return caption for UI display
+    return captionText;
 
     // Update combo
     const now = Date.now();

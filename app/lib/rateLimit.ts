@@ -8,6 +8,7 @@ export interface RateLimitConfig {
   keyGenerator?: (req: NextRequest) => string; // Custom key generator
   skipSuccessfulRequests?: boolean; // Skip rate limiting for successful requests
   skipFailedRequests?: boolean; // Skip rate limiting for failed requests
+  }
 
 export interface RateLimitResult {
   success: boolean;
@@ -15,6 +16,7 @@ export interface RateLimitResult {
   remaining: number;
   reset: number;
   retryAfter?: number;
+  }
 
 class RateLimiter {
   private memoryStore = new Map<string, { count: number; resetTime: number }>();

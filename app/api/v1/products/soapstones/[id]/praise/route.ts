@@ -8,12 +8,23 @@ export const runtime = 'nodejs';
 // POST /api/v1/products/soapstones/[id]/praise - Praise a soapstone
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Extract optional message from body
+    const body = await req.json().catch(() => ({}));
+    const message = body.message as string | undefined;
+    
     const { userId: clerkId } = await auth();
     if (!clerkId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const soapstoneId = params.id;
+    
+    // Use message if provided (for future praise message feature)
+    if (message) {
+      logger.info('Praise with message', {
+        extra: { soapstoneId: params.id, messageLength: message.length },
+      });
+    }
 
     const user = await db.user.findUnique({
       where: { clerkId },

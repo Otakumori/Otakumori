@@ -73,6 +73,7 @@ export interface ColorGradingConfig {
   saturation: number;
   hue: number;
   gamma: number;
+  }
 
 export class AnimeLightingSystem {
   private scene: THREE.Scene;

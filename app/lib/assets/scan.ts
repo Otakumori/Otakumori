@@ -19,6 +19,7 @@ export interface ScannedAsset {
   hash: string;
   size: number;
   mtime: number;
+  }
 
 export interface ScanResults {
   scannedAt: string;

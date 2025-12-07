@@ -36,6 +36,7 @@ interface SakuraPetalBackgroundProps {
   spawnInterval?: number; // milliseconds
   hitRadius?: number; // pixels
   onCollect?: (petalId: string, x: number, y: number) => void;
+  }
 
 const DEFAULT_MAX_PETALS = 30;
 const DEFAULT_SPAWN_INTERVAL = 2000; // 2 seconds

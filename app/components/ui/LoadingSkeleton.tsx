@@ -9,6 +9,7 @@ interface SkeletonProps {
   width?: string | number;
   height?: string | number;
   lines?: number;
+  }
 
 const VARIANT_CLASSNAMES: Record<NonNullable<SkeletonProps['variant']>, string> = {
   text: 'h-4 rounded',

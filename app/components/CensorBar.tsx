@@ -6,6 +6,7 @@ interface CensorBarProps {
   height?: number;
   color?: string;
   text?: string;
+  }
 
 const CensorBar: React.FC<CensorBarProps> = ({
   variant = 'black',

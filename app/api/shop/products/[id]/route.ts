@@ -9,6 +9,11 @@ const PRINTIFY_API_KEY = env.PRINTIFY_API_KEY || '';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
+    // Extract query params
+    const url = new URL(request.url);
+    const includeVariants = url.searchParams.get('includeVariants') !== 'false';
+    const includeInventory = url.searchParams.get('includeInventory') === 'true';
+    
     // Fetch fresh product from Printify
     const response = await fetch(
       `${PRINTIFY_API_URL}/shops/${PRINTIFY_SHOP_ID}/products/${params.id}.json`,
@@ -27,18 +32,27 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const printifyProduct = await response.json();
 
     // Transform the product data
-    const transformedProduct = {
+    const transformedProduct: any = {
       id: printifyProduct.id,
       title: printifyProduct.title,
       description: printifyProduct.description,
       images: printifyProduct.images.map((img: any) => img.src),
-      variants: printifyProduct.variants.map((variant: any) => ({
+      tags: printifyProduct.tags,
+    };
+    
+    // Use includeVariants and includeInventory
+    if (includeVariants) {
+      transformedProduct.variants = printifyProduct.variants.map((variant: any) => ({
         id: variant.id,
         price: variant.price,
         title: variant.title,
-      })),
-      tags: printifyProduct.tags,
-    };
+      }));
+    }
+    
+    if (includeInventory) {
+      // TODO: Add inventory data when Printify inventory API is integrated
+      transformedProduct.inventory = { available: true };
+    }
 
     return NextResponse.json({ product: transformedProduct });
   } catch (error) {

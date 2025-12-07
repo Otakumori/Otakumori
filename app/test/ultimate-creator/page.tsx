@@ -41,26 +41,81 @@ const DEFAULT_CONFIG: Partial<FullCharacterConfig> = {
   },
   
   // Optimized for sexy blonde
-  breastSize: 1.4,
-  hipWidth: 1.3,
-  waistSize: 0.8,
-  skinTone: '#fde4d0',
-  skinGloss: 0.6,
-  showNudity: false,
-  
-  eyeSize: 1.2,
-  eyeSpacing: 1.0,
-  noseWidth: 1.0,
-  noseHeight: 1.0,
-  lipThickness: 1.0,
-  mouthWidth: 1.0,
-  
-  jiggleIntensity: 1.0,
-  jiggleSpeed: 1.0,
-  physicsDamping: 0.5,
-  
-  nipplesSize: 1.0,
-  nipplesColor: '#f4a6b8',
+  torso: {
+    chestWidth: 1.0,
+    chestDepth: 1.0,
+    abdomenDefinition: 0.5,
+    waistWidth: 0.8,
+    breastSize: 1.4,
+    breastShape: 0.5,
+    breastSeparation: 0.5,
+    breastSag: 0.2,
+    pectoralSize: 0.0,
+  },
+  hips: {
+    width: 1.3,
+    depth: 1.0,
+    shape: 0.7,
+  },
+  skin: {
+    tone: '#fde4d0',
+    smoothness: 0.9,
+    glossiness: 0.6,
+    pores: 0.1,
+    freckles: 0.0,
+    freckleColor: '#d4a574',
+    moles: 0,
+    beautyMarks: [],
+    acne: 0,
+    acneColor: '#ff6b6b',
+    flushedCheeks: 0.2,
+    flushedColor: '#ffb3ba',
+    tanLines: false,
+  },
+  face: {
+    shape: 'oval',
+    cheekbones: 0.5,
+    jawWidth: 0.5,
+    jawDepth: 0.5,
+    chinShape: 0.5,
+    chinProminence: 0.5,
+    foreheadHeight: 0.5,
+  },
+  eyes: {
+    preset: 'anime-sparkle',
+    size: 1.2,
+    spacing: 1.0,
+    depth: 0.5,
+    tilt: 0.0,
+    irisSize: 0.5,
+    pupilSize: 0.3,
+    irisColor: '#4a90e2',
+    scleraColor: '#ffffff',
+    pupilColor: '#000000',
+    highlightStyle: 'double',
+    highlightColor: '#ffffff',
+    highlightIntensity: 0.8,
+    eyelidShape: 0.5,
+    eyelashLength: 0.7,
+  },
+  nose: {
+    width: 1.0,
+    height: 1.0,
+    length: 1.0,
+    bridgeWidth: 0.5,
+    bridgeDepth: 0.5,
+    tipShape: 0.5,
+    nostrilSize: 0.5,
+    nostrilFlare: 0.5,
+  },
+  mouth: {
+    width: 1.0,
+    size: 1.0,
+    upperLipThickness: 1.0,
+    lowerLipThickness: 1.0,
+    cornerPosition: 0.0,
+    philtrumDepth: 0.5,
+  },
 };
 
 // Slider component
@@ -111,6 +166,8 @@ function PresetButton({ label, active, onClick }: any) {
     >
       {label}
     </button>
+  );
+}
 
 export default function UltimateCreatorPage() {
   const [config, setConfig] = useState<any>(() => {
