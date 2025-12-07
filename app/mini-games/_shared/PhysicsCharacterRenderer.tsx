@@ -7,9 +7,13 @@
  * - 90s anime aesthetics (large expressive eyes, eyelashes, multiple shine layers)
  * - Rim lighting and bloom effects
  * - Modern polish (smooth gradients, particle effects)
+ * - Custom sprite sheet support for avatar-based rendering
  */
 
 'use client';
+
+import type { SpriteSheet, AnimationState as SpriteAnimationState } from '@om/avatar-engine/gameIntegration/spriteGenerator';
+import type { SpriteAtlas, FrameMetadata } from '@om/avatar-engine/gameIntegration/spriteAtlas';
 
 // 2D Vector for canvas physics (adapted from THREE.Vector3)
 interface Vector2D {
@@ -176,6 +180,15 @@ export class PhysicsCharacterRenderer {
   protected baseY: number = 0;
   protected facing: 'left' | 'right' = 'right';
   protected scale: number = 1.0;
+
+  // Sprite sheet support
+  protected spriteSheet: SpriteSheet | null = null;
+  protected spriteAtlas: SpriteAtlas | null = null;
+  protected spriteImage: HTMLImageElement | null = null;
+  protected currentAnimationState: SpriteAnimationState = 'idle';
+  protected animationFrameIndex: number = 0;
+  protected animationTime: number = 0;
+  protected useCustomSprites: boolean = false;
 
   // Physics state
   protected lastVelocity: Vector2D = { x: 0, y: 0 };
@@ -527,11 +540,45 @@ export class PhysicsCharacterRenderer {
     });
   }
 
+  // Load custom sprite sheet
+  async loadSpriteSheet(spriteSheet: SpriteSheet, spriteAtlas: SpriteAtlas): Promise<void> {
+    this.spriteSheet = spriteSheet;
+    this.spriteAtlas = spriteAtlas;
+
+    // Load sprite atlas image
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        this.spriteImage = img;
+        this.useCustomSprites = true;
+        resolve();
+      };
+      img.onerror = (error) => {
+        console.warn('Failed to load sprite sheet image, falling back to default rendering:', error);
+        this.useCustomSprites = false;
+        reject(error);
+      };
+      img.src = spriteAtlas.imageData;
+    });
+  }
+
+  // Set animation state for sprite rendering
+  setAnimationState(state: SpriteAnimationState): void {
+    if (this.currentAnimationState !== state) {
+      this.currentAnimationState = state;
+      this.animationFrameIndex = 0;
+      this.animationTime = 0;
+    }
+  }
+
   // Render character
-  render(x: number, y: number, facing: 'left' | 'right' = 'right'): void {
+  render(x: number, y: number, facing: 'left' | 'right' = 'right', deltaTime: number = 0.016): void {
     this.baseX = x;
     this.baseY = y;
     this.facing = facing;
+
+    // Update animation time
+    this.animationTime += deltaTime;
 
     this.ctx.save();
     this.ctx.translate(x, y);
@@ -539,6 +586,88 @@ export class PhysicsCharacterRenderer {
       this.ctx.scale(-1, 1);
     }
 
+    // Use custom sprites if available
+    if (this.useCustomSprites && this.spriteImage && this.spriteAtlas) {
+      this.renderSpriteSheet();
+    } else {
+      // Fallback to default physics-based rendering
+      this.renderDefault();
+    }
+
+    this.ctx.restore();
+  }
+
+  // Render using sprite sheet
+  protected renderSpriteSheet(): void {
+    if (!this.spriteImage || !this.spriteAtlas || !this.spriteSheet) return;
+
+    // Get current frame metadata
+    const frameMetadata = this.getCurrentFrame();
+    if (!frameMetadata) {
+      // Fallback to default if frame not found
+      this.renderDefault();
+      return;
+    }
+
+    // Calculate frame position in atlas
+    const sourceX = frameMetadata.x;
+    const sourceY = frameMetadata.y;
+    const sourceWidth = frameMetadata.width;
+    const sourceHeight = frameMetadata.height;
+
+    // Calculate destination size (maintain aspect ratio)
+    const destWidth = sourceWidth * this.scale;
+    const destHeight = sourceHeight * this.scale;
+    const destX = -destWidth / 2;
+    const destY = -destHeight / 2;
+
+    // Draw sprite frame
+    this.ctx.drawImage(
+      this.spriteImage,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      destX,
+      destY,
+      destWidth,
+      destHeight,
+    );
+  }
+
+  // Get current frame metadata based on animation state and time
+  protected getCurrentFrame(): FrameMetadata | null {
+    if (!this.spriteAtlas || !this.spriteSheet) return null;
+
+    // Get all frames for current animation state and direction
+    const direction: 'left' | 'right' = this.facing;
+    const frames = this.spriteAtlas.frames.filter(
+      (frame) =>
+        frame.animationState === this.currentAnimationState && frame.direction === direction,
+    );
+
+    if (frames.length === 0) return null;
+
+    // Calculate frame index based on animation time
+    const animationDurations: Record<SpriteAnimationState, number> = {
+      idle: 2000,
+      walk: 1000,
+      run: 800,
+      jump: 1200,
+      attack: 600,
+      hurt: 500,
+      victory: 1500,
+    };
+
+    const duration = animationDurations[this.currentAnimationState] || 1000;
+    const frameTime = (this.animationTime * 1000) % duration;
+    const frameIndex = Math.floor((frameTime / duration) * frames.length) % frames.length;
+
+    return frames[frameIndex] || frames[0];
+  }
+
+  // Render default physics-based character (fallback)
+  protected renderDefault(): void {
     // Render body parts with physics
     if (this.chest) {
       this.renderPhysicsPart(this.chest, 'chest');
@@ -578,8 +707,6 @@ export class PhysicsCharacterRenderer {
     if (this.visualConfig.bloom) {
       this.renderBloom();
     }
-
-    this.ctx.restore();
   }
 
   // Render physics-enabled body part

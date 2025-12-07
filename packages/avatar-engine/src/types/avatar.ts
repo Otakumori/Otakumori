@@ -31,7 +31,15 @@ export interface ShadingConfig {
   outlineColor: string;
 }
 
-export type RepresentationMode = 'fullBody' | 'bust' | 'portrait' | 'chibi';
+export type RepresentationMode =
+  | 'fullBody'
+  | 'bust'
+  | 'portrait'
+  | 'chibi'
+  | 'handsOnly'
+  | 'firstPerson'
+  | 'stageFullBody'
+  | 'sideScroller';
 
 export interface AvatarRepresentationConfig {
   mode: RepresentationMode;

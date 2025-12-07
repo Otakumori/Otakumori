@@ -110,6 +110,78 @@ export function getRepresentationTransform(mode: RepresentationMode): Representa
         },
       };
 
+    case 'handsOnly':
+      // Top-down view showing only hands and forearms reaching into frame
+      return {
+        scale: [1.2, 1.2, 1.2],
+        cameraOffset: [0, 0.3, 1.5], // Top-down angle, closer to show hands
+        shadingTweaks: {
+          rimPower: 2.5,
+          rimColor: '#ffe0cc', // Warm rim for skin
+          toonSteps: 3,
+          smoothness: 0.1,
+          bloomIntensity: 0.4,
+          outlineWidth: 0.012,
+          outlineColor: '#000000',
+        },
+        cropBounds: {
+          min: [-0.5, -0.2, -0.5],
+          max: [0.5, 0.8, 0.5], // Only show hands/forearms
+        },
+      };
+
+    case 'firstPerson':
+      // First person view - arms/weapon only, camera at eye level
+      return {
+        scale: [1, 1, 1],
+        cameraOffset: [0, 1.6, 0], // Eye level, no forward offset (camera is at origin)
+        shadingTweaks: {
+          rimPower: 3.0,
+          rimColor: '#ffffff',
+          toonSteps: 4,
+          smoothness: 0.1,
+          bloomIntensity: 0.5,
+          outlineWidth: 0.015,
+          outlineColor: '#000000',
+        },
+        cropBounds: {
+          min: [-0.8, -0.5, -0.3], // Only show arms/weapon area
+          max: [0.8, 1.0, 1.0],
+        },
+      };
+
+    case 'stageFullBody':
+      // Full body on stage, elevated camera angle for performance view
+      return {
+        scale: [1, 1, 1],
+        cameraOffset: [0, 1.5, 4.0], // Elevated, further back to show full body
+        shadingTweaks: {
+          rimPower: 3.5,
+          rimColor: '#ffffff',
+          toonSteps: 4,
+          smoothness: 0.1,
+          bloomIntensity: 0.6, // More bloom for stage lighting
+          outlineWidth: 0.015,
+          outlineColor: '#000000',
+        },
+      };
+
+    case 'sideScroller':
+      // Side-scrolling view, orthographic camera setup
+      return {
+        scale: [1, 1, 1],
+        cameraOffset: [3, 1.5, 0], // Side view, character facing camera
+        shadingTweaks: {
+          rimPower: 3.0,
+          rimColor: '#ffffff',
+          toonSteps: 4,
+          smoothness: 0.1,
+          bloomIntensity: 0.5,
+          outlineWidth: 0.015,
+          outlineColor: '#000000',
+        },
+      };
+
     default:
       return getRepresentationTransform('fullBody');
   }
