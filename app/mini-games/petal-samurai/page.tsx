@@ -8,28 +8,11 @@
 import dynamic from 'next/dynamic';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
-import { AvatarRenderer } from '@om/avatar-engine/renderer';
-import { AvatarPresetChoice, type AvatarChoice } from '../_shared/AvatarPresetChoice';
-import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
-import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
-import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
-import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
-import { useCosmetics } from '@/app/lib/cosmetics/useCosmetics';
-import { QuakeAvatarHud } from '@/app/components/arcade/QuakeAvatarHud';
-import { usePetalBalance } from '@/app/hooks/usePetalBalance';
-import dynamic from 'next/dynamic';
-
-// Dynamically import 3D character with no SSR
-const Character3D = dynamic(() => import('./Character3D'), {
-  ssr: false,
-});
-// Shared UI components - imported for QA validation (Game component handles its own UI)
-import { useGameHud } from '../_shared/useGameHud';
-// eslint-disable-next-line unused-imports/no-unused-imports
-import { GameOverlay } from '../_shared/GameOverlay';
+import { GameEntryFlow, type DifficultyLevel } from '../_shared/GameEntryFlow';
 import { MiniGameFrame } from '../_shared/MiniGameFrame';
 import { getGameDisplayName } from '../_shared/gameVisuals';
+import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
+import type { AvatarConfiguration } from '@/app/lib/3d/avatar-parts';
 
 const SlicingGame = dynamic(() => import('./Game'), {
   ssr: false,
@@ -46,71 +29,56 @@ const SlicingGame = dynamic(() => import('./Game'), {
 );
 }
 export default function PetalSamuraiPage() {
-  // Avatar choice state
-  const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>('normal');
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarProfile | AvatarConfiguration | null>(
     null,
   );
-  const [showAvatarChoice, setShowAvatarChoice] = useState(true); // Show on mount if needed
-  const [showQuakeOverlay, setShowQuakeOverlay] = useState(false);
 
-  // Cosmetics hook for HUD skin
-  const { hudSkin, isHydrated } = useCosmetics();
+  const displayName = getGameDisplayName('petal-samurai');
 
-  // Get real petal balance for Quake HUD
-  const { balance: petalBalance } = usePetalBalance();
-
-  // Game HUD integration (game component handles its own HUD)
-  const { Component: _HudComponent } = useGameHud('petal-samurai');
-
-  // Restart handler - game component handles restart logic internally
-  const _handleRestart = useCallback(() => {
-    // Game component manages its own restart state
-  }, []);
-
-  // Avatar integration - use wrapper hook with choice
-  const avatarUsage = getGameAvatarUsage('petal-samurai');
-  const {
-    avatarConfig,
-    representationConfig,
-    isLoading: avatarLoading,
-  } = useGameAvatar('petal-samurai', {
-    forcePreset: avatarChoice === 'preset',
-    avatarProfile:
-      avatarChoice === 'creator' && selectedAvatar && 'head' in selectedAvatar
-        ? (selectedAvatar as AvatarProfile)
-        : null,
-    avatarConfiguration:
-      avatarChoice === 'creator' && selectedAvatar && 'baseModel' in selectedAvatar
-        ? (selectedAvatar as AvatarConfiguration)
-        : null,
-  });
-
-  // Handle avatar choice
-  const handleAvatarChoice = useCallback(
-    (choice: AvatarChoice, avatar?: AvatarProfile | AvatarConfiguration) => {
-      setAvatarChoice(choice);
-      if (choice === 'creator' && avatar) {
-        setSelectedAvatar(avatar);
-      } else if (choice === 'preset') {
-        setSelectedAvatar(null);
+  const handleGameStart = useCallback(
+    (options: {
+      difficulty: DifficultyLevel;
+      avatarChoice: 'preset' | 'creator' | null;
+      selectedAvatar?: AvatarProfile | AvatarConfiguration;
+    }) => {
+      setSelectedDifficulty(options.difficulty);
+      if (options.selectedAvatar) {
+        setSelectedAvatar(options.selectedAvatar);
       }
-      setShowAvatarChoice(false);
+      setGameStarted(true);
     },
     [],
   );
 
-  // Check if we should show choice on mount
-  const shouldShowChoice =
-    showAvatarChoice &&
-    avatarUsage === 'avatar-or-preset' &&
-    avatarChoice === null &&
-    isAvatarsEnabled();
-
-  // Show Quake overlay on win (for demo - in production, this would be triggered by game win event)
-  // TODO: Connect to actual game win state from CombatGame
-
-  const displayName = getGameDisplayName('petal-samurai');
+  if (!gameStarted) {
+    return (
+      <MiniGameFrame gameId="petal-samurai">
+        <GameEntryFlow
+          gameId="petal-samurai"
+          title={displayName}
+          description="Slice falling petals with precision. Chain slices for combo multipliers!"
+          instructions={[
+            'Drag/swipe to slice falling petals',
+            'Chain slices for combo multipliers',
+            'Avoid missing 3 petals',
+            'Survive 60 seconds',
+            'Gold petals are worth more points',
+            'Rare petals grant bonus combos',
+            'Avoid bad objects (nuts/seeds) - they break combos!',
+          ]}
+          difficultyLevels={['easy', 'normal', 'hard']}
+          defaultDifficulty="normal"
+          onStart={handleGameStart}
+          onCancel={() => {
+            // Navigate back to arcade
+            window.location.href = '/mini-games';
+          }}
+        />
+      </MiniGameFrame>
+    );
+  }
 
   return (
     <MiniGameFrame gameId="petal-samurai">
@@ -128,52 +96,8 @@ export default function PetalSamuraiPage() {
         </Link>
       </header>
 
-      {/* Avatar vs Preset Choice */}
-      {shouldShowChoice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <AvatarPresetChoice
-            gameId="petal-samurai"
-            onChoice={handleAvatarChoice}
-            onCancel={() => setShowAvatarChoice(false)}
-          />
-        </div>
-      )}
-
-      {/* 3D Character with Physics - Reacts to gameplay */}
-      {!shouldShowChoice && (
-        <div className="absolute bottom-0 right-8 z-30 pointer-events-none">
-          <div className="relative w-80 h-96">
-            <Character3D className="w-full h-full" />
-          </div>
-        </div>
-      )}
-      
-      {/* Original Avatar Display (FullBody Mode) - fallback */}
-      {!shouldShowChoice && isAvatarsEnabled() && avatarConfig && !avatarLoading && false && (
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
-          <div className="relative w-96 h-96">
-            <AvatarRenderer profile={avatarConfig} mode={representationConfig.mode} size="large" />
-          </div>
-        </div>
-      )}
-
       {/* Game */}
-      {!shouldShowChoice && <SlicingGame mode="timed" />}
-
-      {/* Quake HUD Overlay - shown on win if Quake skin is selected */}
-      {isHydrated && hudSkin === 'quake' && showQuakeOverlay && (
-        <QuakeAvatarHud
-          mode="overlay"
-          gameId="petal-samurai"
-          petals={petalBalance}
-          lastEvent={{
-            type: 'achievement',
-            label: 'Samurai Rising',
-            timestamp: Date.now(),
-          }}
-          onOverlayClose={() => setShowQuakeOverlay(false)}
-        />
-      )}
+      <SlicingGame mode="timed" difficulty={selectedDifficulty} />
     </MiniGameFrame>
   );
 }

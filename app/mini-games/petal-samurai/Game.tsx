@@ -21,7 +21,7 @@ import { motion } from 'framer-motion';
 import GameControls, { CONTROL_PRESETS } from '@/components/GameControls';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
-import { usePetalEarn } from '../_shared/usePetalEarn';
+import { useGameProgress } from '@/app/lib/games/progress';
 import { getGameVisualProfile, applyVisualProfile } from '../_shared/gameVisuals';
 import { usePetalBalance } from '@/app/hooks/usePetalBalance';
 import {
@@ -38,6 +38,7 @@ import Character3D, { type Character3DRef } from './Character3D';
 
 type Props = {
   mode: 'classic' | 'storm' | 'endless' | 'timed';
+  difficulty?: 'easy' | 'normal' | 'hard';
 };
 
 // Game configuration - difficulty tuning parameters
@@ -102,7 +103,7 @@ interface PowerUp {
   active: boolean;
 }
 
-export default function Game({ mode }: Props) {
+export default function Game({ mode, difficulty = 'normal' }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<GameEngine | null>(null);
   const [gameState, setGameState] = useState<GameState>({
@@ -131,14 +132,14 @@ export default function Game({ mode }: Props) {
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('petal-samurai');
   const { balance: petalBalance } = usePetalBalance();
-  const { earnPetals } = usePetalEarn();
+  const { recordResult } = useGameProgress();
 
   // Initialize game engine with visual profile
   useEffect(() => {
     if (!canvasRef.current || typeof window === 'undefined') return;
 
     const canvas = canvasRef.current;
-    const game = new GameEngine(canvas, mode, visualProfile);
+    const game = new GameEngine(canvas, mode, visualProfile, difficulty);
     gameRef.current = game;
 
     // Start game loop
@@ -180,28 +181,23 @@ export default function Game({ mode }: Props) {
           if (!hasAwardedPetals) {
             setHasAwardedPetals(true);
             const awardPetals = async () => {
-              // Calculate petal reward based on petals sliced, special petals, and penalties
-              const petalsSliced = game.getScore() / 10; // Base: 1 petal per 10 points
-              const specialPetalsBonus = game.getCombo() * 0.5; // Bonus for combos
-              const _badObjectsPenalty = 0; // Will be tracked separately if needed
-
-              const result = await earnPetals({
+              const result = await recordResult({
                 gameId: 'petal-samurai',
                 score: game.getScore(),
-                didWin, // Pass win/lose state for tuned rewards
+                difficulty: difficulty || 'normal',
+                durationMs: Math.floor(game.getTime() * 1000),
+                didWin,
                 metadata: {
                   combo: game.getCombo(),
                   multiplier: game.getMultiplier(),
                   misses: game.getMisses(),
                   mode,
                   stormMode: game.isStormMode(),
-                  petalsSliced: Math.floor(petalsSliced),
-                  specialPetalsBonus: Math.floor(specialPetalsBonus),
                 },
               });
 
-              if (result.success) {
-                setPetalReward(result.earned);
+              if (result.success && result.petalReward) {
+                setPetalReward(result.petalReward.earned);
               }
             };
             awardPetals();
@@ -220,7 +216,7 @@ export default function Game({ mode }: Props) {
       cancelAnimationFrame(animationId);
       game.destroy();
     };
-  }, [mode]);
+  }, [mode, difficulty, recordResult]);
 
   // Handle mouse/touch slash mechanics
   const slashPoints = useRef<{ x: number; y: number; time: number }[]>([]);
@@ -392,6 +388,10 @@ export default function Game({ mode }: Props) {
   const handleStart = useCallback(() => {
     setGameStateOverlay('playing');
     setGameState((prev) => ({ ...prev, isRunning: true }));
+    // Start the game engine
+    if (gameRef.current) {
+      gameRef.current.startGame();
+    }
   }, []);
 
   const handleRestart = useCallback(() => {
@@ -408,18 +408,22 @@ export default function Game({ mode }: Props) {
         autoHideDelay={8000}
       />
 
-      {/* Game Canvas */}
-      <canvas
-        ref={canvasRef}
-        width={800}
-        height={600}
-        className="w-full h-auto cursor-crosshair rounded-2xl border border-pink-500/20 shadow-2xl"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        aria-label="Petal Samurai game area - slash through petals to score"
-      />
+      {/* Game Canvas Container */}
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="max-w-4xl w-full">
+          <canvas
+            ref={canvasRef}
+            width={800}
+            height={600}
+            className="w-full h-auto cursor-crosshair rounded-2xl border-2 border-pink-500/30 shadow-2xl bg-black/20"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            aria-label="Petal Samurai game area - slash through petals to score"
+          />
+        </div>
+      </div>
 
       {/* Render petal particles */}
       {gameStateOverlay === 'playing' && petalParticles.length > 0 && (
@@ -556,16 +560,20 @@ class GameEngine {
   private spriteSheet: HTMLImageElement | null = null;
   private spriteSheetLoaded: boolean = false;
   private physicsRenderer: PhysicsCharacterRenderer | null = null;
+  private isGameStarted: boolean = false;
+  private difficulty: 'easy' | 'normal' | 'hard' = 'normal';
 
   constructor(
     canvas: HTMLCanvasElement,
     mode: string,
     visualProfile: ReturnType<typeof getGameVisualProfile>,
+    difficulty: 'easy' | 'normal' | 'hard' = 'normal',
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.mode = mode;
     this.visualProfile = visualProfile;
+    this.difficulty = difficulty;
 
     // Initialize physics renderer
     this.physicsRenderer = new PhysicsCharacterRenderer(this.ctx, 'player', {
@@ -607,6 +615,12 @@ class GameEngine {
   }
 
   update(deltaTime: number) {
+    // Don't update game logic until game is started
+    if (!this.isGameStarted) {
+      this.render(); // Still render background
+      return;
+    }
+
     this.gameTime += deltaTime;
 
     // Update stun timer
@@ -625,17 +639,19 @@ class GameEngine {
       this.stormMode = true;
     }
 
-    // Spawn petals with difficulty curve
-    // Start: slow spawn (0.8s), basic petals only
-    // Mid: increase spawn rate, introduce special petals
-    // Later: introduce bad objects (15% chance), faster arcs
+    // Spawn petals with difficulty-based spawn rates
     let spawnRate = this.stormMode ? GAME_CONFIG.STORM_SPAWN_RATE : GAME_CONFIG.NORMAL_SPAWN_RATE;
+
+    // Apply difficulty multiplier
+    const difficultyMultiplier =
+      this.difficulty === 'easy' ? 1.5 : this.difficulty === 'hard' ? 0.6 : 1.0;
+    spawnRate *= difficultyMultiplier;
 
     // Difficulty curve: slower spawn at start
     if (this.gameTime < 20) {
-      spawnRate = GAME_CONFIG.NORMAL_SPAWN_RATE * 1.5; // Slower at start
+      spawnRate *= 1.5; // Slower at start
     } else if (this.gameTime < 40) {
-      spawnRate = GAME_CONFIG.NORMAL_SPAWN_RATE * 1.2; // Gradually increase
+      spawnRate *= 1.2; // Gradually increase
     }
 
     if (this.gameTime - this.lastPetalSpawn > spawnRate) {
@@ -669,11 +685,11 @@ class GameEngine {
       petal.rotation += petal.vx * 0.05 + 0.1;
     });
 
-    // Remove off-screen petals and count as misses
+    // Remove off-screen petals and count as misses (only if game started)
     this.petals = this.petals.filter((petal) => {
       if (petal.y > this.canvas.height || petal.x < -50 || petal.x > this.canvas.width + 50) {
-        if (petal.type !== 'bad') {
-          // Only count misses for petals, not bad objects
+        if (petal.type !== 'bad' && this.isGameStarted) {
+          // Only count misses for petals, not bad objects, and only after game starts
           this.misses++;
           this.combo = 0;
           this.multiplier = GAME_CONFIG.COMBO_MULTIPLIER_BASE;
@@ -1532,6 +1548,12 @@ class GameEngine {
     this.ctx.stroke();
 
     this.ctx.restore();
+  }
+
+  startGame() {
+    this.isGameStarted = true;
+    this.gameTime = 0; // Reset game time when starting
+    this.lastPetalSpawn = 0; // Reset spawn timer
   }
 
   endGame() {

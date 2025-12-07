@@ -23,7 +23,8 @@ import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
 import { useGameHud } from '../_shared/useGameHud';
-import { usePetalEarn } from '../_shared/usePetalEarn';
+import { useGameProgress } from '@/app/lib/games/progress';
+import { useAudioStore } from '@/app/stores/audioStore';
 import {
   getGameVisualProfile,
   applyVisualProfile,
@@ -94,7 +95,8 @@ export default function MemoryMatchGame() {
   const { backgroundStyle } = applyVisualProfile(visualProfile);
   const { Component: HudComponent, isQuakeHud, props: hudProps } = useGameHud('memory-match');
   const { balance: petalBalance } = usePetalBalance();
-  const { earnPetals } = usePetalEarn();
+  const { recordResult } = useGameProgress();
+  const { playSound, registerSound } = useAudioStore();
 
   // Get Clerk user for avatar display
   const { user } = useUser();
@@ -179,6 +181,55 @@ export default function MemoryMatchGame() {
 
   const [petalReward, setPetalReward] = useState<number | null>(null);
   const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+
+  // Register sound effects
+  useEffect(() => {
+    registerSound({
+      id: 'memory-flip',
+      name: 'Card Flip',
+      url: '/sounds/games/memory/flip.mp3',
+      category: 'sfx',
+      pool: 'game',
+      volume: 0.5,
+      loop: false,
+      spatial: false,
+      preload: true,
+    });
+    registerSound({
+      id: 'memory-match',
+      name: 'Card Match',
+      url: '/sounds/games/memory/match.mp3',
+      category: 'sfx',
+      pool: 'game',
+      volume: 0.6,
+      loop: false,
+      spatial: false,
+      preload: true,
+    });
+    registerSound({
+      id: 'memory-success',
+      name: 'Game Complete',
+      url: '/sounds/games/memory/success.mp3',
+      category: 'sfx',
+      pool: 'game',
+      volume: 0.7,
+      loop: false,
+      spatial: false,
+      preload: true,
+    });
+    registerSound({
+      id: 'memory-mismatch',
+      name: 'Card Mismatch',
+      url: '/sounds/games/memory/mismatch.mp3',
+      category: 'sfx',
+      pool: 'game',
+      volume: 0.4,
+      loop: false,
+      spatial: false,
+      preload: true,
+    });
+  }, [registerSound]);
 
   // Complete game
   const completeGame = useCallback(async () => {
@@ -202,21 +253,25 @@ export default function MemoryMatchGame() {
     // Award petals using hook
     if (!hasAwardedPetals) {
       setHasAwardedPetals(true);
-      const result = await earnPetals({
+      const result = await recordResult({
         gameId: 'memory-match',
         score: calculatedScore,
+        difficulty,
+        durationMs: timeElapsed * 1000,
+        didWin: true,
         metadata: {
           timeElapsed,
           moves,
           accuracy,
-          difficulty,
           streak,
           pairs: settings.pairs,
         },
       });
 
-      if (result.success) {
-        setPetalReward(result.earned);
+      if (result.success && result.petalReward) {
+        setPetalReward(result.petalReward.earned);
+        // Play success sound
+        playSound('memory-success');
       }
     }
 
@@ -240,7 +295,7 @@ export default function MemoryMatchGame() {
     } catch (error) {
       logger.error('Failed to submit score:', undefined, undefined, error instanceof Error ? error : new Error(String(error)));
     }
-  }, [timeElapsed, moves, matches, streak, settings, difficulty, earnPetals, hasAwardedPetals]);
+  }, [timeElapsed, moves, matches, streak, settings, difficulty, recordResult, hasAwardedPetals, playSound]);
 
   // Handle card flip (with double-click prevention)
   const handleCardFlip = useCallback(
@@ -250,6 +305,9 @@ export default function MemoryMatchGame() {
       if (flippedCards.includes(cardId)) return; // Prevent double-click
       if (cards[cardId].isMatched) return; // Prevent clicking matched cards
       if (cards[cardId].isFlipped) return; // Additional double-click prevention
+
+      // Play flip sound
+      playSound('memory-flip');
 
       const newFlippedCards = [...flippedCards, cardId];
       setFlippedCards(newFlippedCards);
@@ -268,7 +326,10 @@ export default function MemoryMatchGame() {
         const secondCard = cards[secondId];
 
         if (firstCard.imageUrl === secondCard.imageUrl) {
-          // Match found! - Add to matched set for glow effect
+          // Match found! - Play match sound
+          playSound('memory-match');
+
+          // Add to matched set for glow effect
           setMatchedCardIds((prev) => new Set([...prev, firstId, secondId]));
 
           // Create petal burst VFX at card positions
@@ -309,7 +370,10 @@ export default function MemoryMatchGame() {
             setFlippedCards([]);
           }, GAME_CONFIG.MATCH_ANIMATION_DURATION);
         } else {
-          // No match - shake animation
+          // No match - play mismatch sound
+          playSound('memory-mismatch');
+
+          // Shake animation
           setShakingCardId(firstId);
           setTimeout(() => setShakingCardId(secondId), 50);
 
@@ -326,7 +390,7 @@ export default function MemoryMatchGame() {
         }
       }
     },
-    [gameState, flippedCards, cards, settings.pairs, completeGame],
+    [gameState, flippedCards, cards, settings.pairs, completeGame, playSound],
   );
 
   // Update petal particles
@@ -383,22 +447,22 @@ export default function MemoryMatchGame() {
     initializeGame();
   }, [initializeGame]);
 
-  // Handle avatar choice
-  const handleAvatarChoice = useCallback((choice: AvatarChoice, avatar?: AvatarProfile | any) => {
-    setAvatarChoice(choice);
-    if (choice === 'creator' && avatar) {
-      setSelectedAvatar(avatar);
-    }
-    setShowAvatarChoice(false);
-    // Show instructions after choice
-    setGameState('instructions');
-  }, []);
-
   // Start game handler (from instructions overlay)
   const handleStart = useCallback(() => {
     initializeGame(); // Initialize game state
-    setGameState('playing'); // Start playing after instructions
-  }, [initializeGame]);
+    // Wait for images to load before starting
+    const checkImages = setInterval(() => {
+      if (imagesLoaded) {
+        setGameState('playing'); // Start playing after images load
+        clearInterval(checkImages);
+      }
+    }, 100);
+    // Fallback timeout
+    setTimeout(() => {
+      clearInterval(checkImages);
+      setGameState('playing');
+    }, 3000);
+  }, [initializeGame, imagesLoaded]);
 
   const displayName = getGameDisplayName('memory-match');
 
@@ -409,20 +473,18 @@ export default function MemoryMatchGame() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-between mb-4">
-    <div className="flex-1 flex items-center" >
-      {/* Clerk User Avatar */ }
-  {
-    user?.imageUrl && (
-      <Image
-                    src={ user.imageUrl }
-    alt = { user.fullName || user.firstName || 'User Avatar' }
-    width = { 50}
-    height = { 50}
-    className = "rounded-full border-2 border-pink-400/50"
-      />
-                )
-  }
-  </div>
+              <div className="flex-1 flex items-center">
+                {/* Clerk User Avatar */}
+                {user?.imageUrl && (
+                  <Image
+                    src={user.imageUrl}
+                    alt={user.fullName || user.firstName || 'User Avatar'}
+                    width={50}
+                    height={50}
+                    className="rounded-full border-2 border-pink-400/50"
+                  />
+                )}
+              </div>
               <div className="flex-1 text-center">
                 <h1 className="text-4xl font-bold text-pink-400 mb-2">{displayName}</h1>
                 <p className="text-slate-300 italic">"Recall the faces bound by fate."</p>
@@ -438,77 +500,22 @@ export default function MemoryMatchGame() {
             </div>
           </div>
 
-          {/* Avatar Display (Portrait Mode) - MAIN CHARACTER CENTER STAGE */}
-          {isAvatarsEnabled() && avatarConfig && !avatarLoading && (
-            <div className="flex justify-center mb-8">
-              <div className="relative w-64 h-64">
-                <AvatarRenderer
-                  profile={avatarConfig}
-                  mode={representationConfig.mode}
-                  size="large"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Avatar vs Preset Choice */}
-          {showAvatarChoice && (
-            <AvatarPresetChoice
-              gameId="memory-match"
-              onChoice={handleAvatarChoice}
-              onCancel={() => setShowAvatarChoice(false)}
-            />
-          )}
-
-          {/* Difficulty Selection Menu */}
-          {gameState === 'menu' && !showAvatarChoice && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-slate-700"
-            >
-              <div className="text-center space-y-6">
-                <h2 className="text-2xl font-semibold text-white mb-4">Choose Difficulty</h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {(['easy', 'normal', 'hard'] as const).map((diff) => (
-                    <button
-                      key={diff}
-                      onClick={() => setDifficulty(diff)}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        difficulty === diff
-                          ? 'border-pink-400 bg-pink-400/20 text-pink-300'
-                          : 'border-slate-600 bg-slate-700/50 text-slate-300 hover:border-slate-500'
-                      }`}
-                    >
-                      <div className="font-semibold capitalize">{diff}</div>
-                      <div className="text-sm opacity-75">
-                        {difficultySettings[diff].pairs} pairs
-                      </div>
-                    </button>
-                  ))}
+          {/* Avatar Display (Portrait Mode) - Hidden during gameplay to avoid overlap */}
+          {isAvatarsEnabled() &&
+            avatarConfig &&
+            !avatarLoading &&
+            gameState !== 'playing' &&
+            gameState !== 'paused' && (
+              <div className="flex justify-center mb-8">
+                <div className="relative w-64 h-64">
+                  <AvatarRenderer
+                    profile={avatarConfig}
+                    mode={representationConfig.mode}
+                    size="large"
+                  />
                 </div>
-
-                <button
-                  onClick={() => {
-                    // Check if avatar choice is needed
-                    if (
-                      avatarUsage === 'avatar-or-preset' &&
-                      avatarChoice === null &&
-                      isAvatarsEnabled()
-                    ) {
-                      setShowAvatarChoice(true);
-                    } else {
-                      setGameState('instructions');
-                    }
-                  }}
-                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-pink-400 hover:to-purple-500 transition-all"
-                >
-                  Continue
-                </button>
               </div>
-            </motion.div>
-          )}
+            )}
 
           {/* Game UI */}
           {(gameState === 'playing' || gameState === 'paused') && (
@@ -520,15 +527,32 @@ export default function MemoryMatchGame() {
                 <HudComponent {...hudProps} score={finalScore} timer={timeElapsed} combo={streak} />
               )}
 
+              {/* Additional HUD Info */}
+              <div className="absolute top-4 left-4 flex gap-4 z-10">
+                <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white text-sm border border-pink-500/30">
+                  <div className="font-semibold text-pink-300">Time: {formatTime(timeElapsed)}</div>
+                </div>
+                <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white text-sm border border-pink-500/30">
+                  <div className="font-semibold text-pink-300">Moves: {moves}</div>
+                </div>
+                <div className="bg-black/60 backdrop-blur-sm px-4 py-2 rounded-lg text-white text-sm border border-pink-500/30">
+                  <div className="font-semibold text-pink-300">
+                    Matches: {matches}/{settings.pairs}
+                  </div>
+                </div>
+              </div>
+
               {/* Game Board */}
+              {!imagesLoaded && gameState === 'playing' && (
+                <div className="flex items-center justify-center min-h-[400px]">
+                  <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-pink-200">Loading cards...</p>
+                  </div>
+                </div>
+              )}
               <div
-                className={`grid gap-4 ${
-                  settings.pairs <= 6
-                    ? `grid-cols-${settings.gridCols || 4}`
-                    : settings.pairs <= 8
-                      ? `grid-cols-${settings.gridCols || 4} md:grid-cols-${settings.gridCols || 5}`
-                      : `grid-cols-${settings.gridCols || 4} md:grid-cols-${settings.gridCols || 5} lg:grid-cols-${settings.gridCols || 6}`
-                }`}
+                className={`grid gap-4 ${!imagesLoaded && gameState === 'playing' ? 'hidden' : ''}`}
                 style={{
                   gridTemplateColumns: `repeat(${settings.gridCols || 4}, minmax(0, 1fr))`,
                 }}
@@ -569,25 +593,22 @@ export default function MemoryMatchGame() {
                           }}
                         >
                           {/* Card Back */}
-  < div className = "absolute inset-0 backface-hidden rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20" >
-    <Image
+                          <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20">
+                            <Image
                               src="/assets/memory-cards/card-back.svg"
-alt = "Card back"
-fill
-className = "object-cover"
-sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
-  {/* Subtle texture overlay for depth */ }
-  < div className = "absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1)_0%,transparent_70%)] opacity-60" />
-    <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(139,92,246,0.05)_0%,transparent_50%)] opacity-40" />
+                              alt="Card back"
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                            {/* Subtle texture overlay for depth */}
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1)_0%,transparent_70%)] opacity-60" />
+                            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(139,92,246,0.05)_0%,transparent_50%)] opacity-40" />
                           </div>
                           {/* Card Front */}
                           <motion.div
-                            className={
-  `absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 overflow-hidden ${
-                              card.isMatched
-    ? 'border-green-400'
-    : 'border-slate-600'
+                            className={`absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 overflow-hidden ${
+                              card.isMatched ? 'border-green-400' : 'border-slate-600'
                             }`}
                             animate={
                               isMatched
@@ -602,13 +623,19 @@ sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 : {}
                             }
                           >
-  <Image
-                              src={ card.imageUrl }
-alt = "Card"
-fill
-className = "object-cover"
-sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-  />
+                            <Image
+                              src={card.imageUrl}
+                              alt="Card"
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              loading="eager"
+                              onError={(e) => {
+                                // Fallback if image fails to load
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                            />
                           </motion.div>
                         </motion.div>
                       </motion.div>
@@ -658,8 +685,10 @@ sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             winMessage={`Memory Master! You matched all ${settings.pairs} pairs in ${formatTime(timeElapsed)}!`}
             score={finalScore}
             petalReward={petalReward}
+            achievements={achievements}
             onRestart={handleRestart}
             onResume={handleStart}
+            onPause={() => setGameState('paused')}
           />
         </div>
 
