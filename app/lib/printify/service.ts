@@ -74,7 +74,6 @@ export interface PrintifyShippingAddress {
   zip: string;
   address1: string;
   address2?: string;
-}
 
 export interface PrintifyOrderData {
   external_id: string;
@@ -83,7 +82,6 @@ export interface PrintifyOrderData {
   shipping_method: number;
   send_shipping_notification: boolean;
   address_to: PrintifyShippingAddress;
-}
 
 export interface PrintifySyncResult {
   upserted: number;
@@ -91,7 +89,6 @@ export interface PrintifySyncResult {
   count: number;
   errors: string[];
   lastSync: string;
-}
 
 export class PrintifyService {
   private readonly baseUrl: string;

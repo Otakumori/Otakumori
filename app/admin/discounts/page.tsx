@@ -30,8 +30,6 @@ interface DiscountReward {
   };
 }
 
-);
-}
 export default function AdminDiscountsPage() {
   const [rewards, setRewards] = useState<DiscountReward[]>([]);
   const [loading, setLoading] = useState(true);

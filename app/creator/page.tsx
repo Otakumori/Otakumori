@@ -37,8 +37,6 @@ import { HeaderButton } from '@/components/ui/header-button';
  * - Preset system
  * - Undo/Redo
  */
-);
-}
 export default function CreatorPage() {
   const router = useRouter();
   const { user, isLoaded } = useUser();

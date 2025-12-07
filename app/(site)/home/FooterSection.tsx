@@ -22,7 +22,6 @@ interface ApiSoapstoneMessage {
   appraises?: number;
   createdAt: string;
   user?: ApiSoapstoneUser | null;
-}
 
 interface SoapstoneApiResponse {
   ok: boolean;

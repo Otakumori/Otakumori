@@ -42,8 +42,6 @@ interface EconomyStats {
   };
 }
 
-);
-}
 export default function AdminEconomyPage() {
   const [stats, setStats] = useState<EconomyStats | null>(null);
   const [loading, setLoading] = useState(true);

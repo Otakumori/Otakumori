@@ -16,7 +16,6 @@ export interface PerformanceSettings {
   maxParticles: number;
   enableFrustumCulling: boolean;
   enableOcclusionCulling: boolean;
-}
 
 export interface LODLevel {
   distance: number;
@@ -33,7 +32,6 @@ export interface PerformanceMetrics {
   textures: number;
   memoryUsage: number;
   gpuMemory: number;
-}
 
 export class PerformanceOptimizer {
   private settings: PerformanceSettings;

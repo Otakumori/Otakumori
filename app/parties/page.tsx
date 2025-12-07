@@ -8,8 +8,6 @@ import GlassCard from '../components/ui/GlassCard';
 
 // Metadata is handled by layout.tsx for client components
 
-);
-}
 export default function PartiesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">

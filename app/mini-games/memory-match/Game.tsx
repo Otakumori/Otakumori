@@ -21,7 +21,6 @@ interface GameState {
   isComplete: boolean;
   boardSize: number;
   runeSet: string;
-}
 
 interface Card {
   id: string;
@@ -29,7 +28,6 @@ interface Card {
   isFlipped: boolean;
   isMatched: boolean;
   position: number;
-}
 
 interface RuneSet {
   name: string;

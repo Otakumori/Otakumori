@@ -3,8 +3,6 @@ import AdminMusicClient from './page.client';
 
 export const dynamic = 'force-dynamic';
 
-);
-}
 export default function Page() {
   return (
     <main className="mx-auto max-w-4xl p-6">

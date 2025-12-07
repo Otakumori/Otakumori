@@ -32,7 +32,6 @@ interface PetalConfig {
   rotation: number; // degrees
   finalRotation: number; // degrees
   isClickable: boolean;
-}
 
 interface CherryPetalLayerProps {
   maxPetals?: number;

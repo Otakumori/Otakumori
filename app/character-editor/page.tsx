@@ -29,8 +29,6 @@ import {
 } from '@/app/lib/avatar/guest-storage';
 import { avatarPartManager } from '@/app/lib/3d/avatar-parts';
 
-);
-}
 export default function CharacterEditorPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();

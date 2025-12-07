@@ -3,8 +3,6 @@ import { logger } from '@/app/lib/logger';
 import { newRequestId } from '@/app/lib/requestId';
 import { useState, useEffect } from 'react';
 
-);
-}
 export default function CookieSettings() {
   const [analytics, setAnalytics] = useState(false);
   const [saved, setSaved] = useState(false);

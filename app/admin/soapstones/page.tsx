@@ -2,8 +2,6 @@
 import { isAdmin } from '@/app/lib/authz';
 import AdminSoapstones from './ui';
 
-);
-}
 export default async function AdminSoapstonesPage() {
   if (!(await isAdmin()))
     return (

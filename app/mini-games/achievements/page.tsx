@@ -21,8 +21,6 @@ interface Achievement {
   unlockedAt?: Date;
 }
 
-);
-}
 export default function AchievementsPage() {
   const [_activeCategory, _setActiveCategory] = useState<
     'all' | 'daily' | 'weekly' | 'skill' | 'collector' | 'social'

@@ -43,8 +43,6 @@ interface Order {
   items: OrderItem[];
 }
 
-);
-}
 export default function OrdersPage() {
   const { isSignedIn, userId } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);

@@ -10,7 +10,6 @@ export interface PerformanceMetrics {
   memoryUsage?: number; // MB
   drawCalls?: number;
   particleCount?: number;
-}
 
 export class PerformanceMonitor {
   private frameCount = 0;

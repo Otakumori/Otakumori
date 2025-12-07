@@ -14,7 +14,6 @@ interface Petal {
   delay: number;
   isActive: boolean;
   startTime: number;
-}
 
 interface PetalLayerProps {
   count?: number;

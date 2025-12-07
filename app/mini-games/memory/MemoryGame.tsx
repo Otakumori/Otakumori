@@ -14,7 +14,6 @@ interface Card {
   characterName: string;
   characterSet: 'kill-la-kill' | 'studio-ghibli';
   imagePath: string;
-}
 
 interface GameState {
   cards: Card[];

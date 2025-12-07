@@ -17,7 +17,6 @@ interface AvailableDiscount {
   expiresAt: string | null;
   minSpendCents: number | null;
   nsfwOnly: boolean;
-}
 
 export default function CheckoutContent() {
   const _router = useRouter();

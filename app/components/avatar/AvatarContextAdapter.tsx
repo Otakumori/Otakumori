@@ -24,7 +24,6 @@ interface ContextModifiers {
   scale: number;
   rotation: number;
   effects: string[];
-}
 
 const CONTEXT_MODIFIERS: Record<GameContext, ContextModifiers> = {
   default: {

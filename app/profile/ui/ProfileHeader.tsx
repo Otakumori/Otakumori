@@ -13,7 +13,6 @@ interface EquippedItem {
   rarity: 'Common' | 'Rare' | 'Legendary';
   imageUrl?: string;
   color?: string;
-}
 
 interface UserEquippedState {
   frame?: EquippedItem;

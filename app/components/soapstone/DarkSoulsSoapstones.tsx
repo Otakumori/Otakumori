@@ -18,7 +18,6 @@ interface SoapstoneMessage {
   appraises: number;
   createdAt: string;
   user?: ApiSoapstoneUser;
-}
 
 interface DarkSoulsSoapstonesProps {
   initialMessages?: SoapstoneMessage[];

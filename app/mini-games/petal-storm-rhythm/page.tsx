@@ -21,7 +21,6 @@ import Link from 'next/link';
 import { useGameAvatar } from '../_shared/useGameAvatarWithConfig';
 import { AvatarRenderer } from '@om/avatar-engine/renderer';
 import { GameOverlay } from '../_shared/GameOverlay';
-import { PhysicsAvatarCanvas, type PhysicsAvatarCanvasRef } from '../_shared/PhysicsAvatarCanvas';
 import { useGameHud } from '../_shared/useGameHud';
 import {
   getGameVisualProfile,
@@ -46,7 +45,6 @@ interface Note {
   direction?: 'left' | 'right'; // For slide notes
   hit?: boolean;
   accuracy?: 'perfect' | 'great' | 'good' | 'miss';
-}
 
 interface Track {
   id: string;
@@ -57,7 +55,6 @@ interface Track {
   difficulty: 'easy' | 'normal' | 'hard' | 'expert';
   notes: Note[];
   preview?: string;
-}
 
 const SAMPLE_TRACKS: Track[] = [
   {
@@ -124,7 +121,7 @@ export default function PetalStormRhythm() {
   const [finalScore, setFinalScore] = useState(0);
   const [petalReward, setPetalReward] = useState<number | null>(null);
   const [hasAwardedPetals, setHasAwardedPetals] = useState(false);
-  const [achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
+  const [_achievements, setAchievements] = useState<Array<{ code: string; name: string; rewardType?: string; rewardAmount?: number }>>([]);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
 
   // Hit VFX state
@@ -132,7 +129,6 @@ export default function PetalStormRhythm() {
     Record<number, { type: 'perfect' | 'great' | 'good' | 'miss'; time: number }>
   >({});
   const [petalParticles, setPetalParticles] = useState<PetalParticle[]>([]);
-  const physicsAvatarRef = useRef<PhysicsAvatarCanvasRef>(null);
 
   // Avatar choice state
   const [avatarChoice, setAvatarChoice] = useState<AvatarChoice | null>(null);
@@ -500,18 +496,6 @@ export default function PetalStormRhythm() {
         points = GAME_CONFIG.SCORE_MISS;
       }
 
-      // Apply physics impact based on accuracy
-      if (physicsAvatarRef.current) {
-        const impactForce =
-          accuracy === 'perfect'
-            ? { x: (Math.random() - 0.5) * 3, y: -4 - combo * 0.1 } // Strong upward impact for perfect
-            : accuracy === 'great'
-              ? { x: (Math.random() - 0.5) * 2, y: -3 }
-              : accuracy === 'good'
-                ? { x: (Math.random() - 0.5) * 1.5, y: -2 }
-                : { x: (Math.random() - 0.5) * 1, y: 1 }; // Slight downward for miss
-        physicsAvatarRef.current.applyImpact(impactForce, 'chest');
-      }
 
       // Trigger hit VFX
       setLaneFlashes((prev) => ({
@@ -739,7 +723,7 @@ export default function PetalStormRhythm() {
           </div>
         )}
 
-        {/* Avatar Display - Only show in menu/instructions, hide during gameplay */}
+        {/* Avatar Display - Only show in menu/instructions */}
         {!showAvatarChoice && gameState !== 'playing' && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
           <div className="flex justify-center mb-8">
             <div className="relative w-80 h-80">
@@ -747,21 +731,6 @@ export default function PetalStormRhythm() {
                 profile={avatarConfig}
                 mode={representationConfig.mode}
                 size="large"
-              />
-            </div>
-          </div>
-        )}
-        {/* Physics Avatar - Small overlay in top-right during gameplay */}
-        {!showAvatarChoice && gameState === 'playing' && (
-          <div className="absolute top-20 right-4 z-30 pointer-events-none">
-            <div className="relative w-24 h-32">
-              <PhysicsAvatarCanvas
-                ref={physicsAvatarRef}
-                characterType="player"
-                quality="medium"
-                width={96}
-                height={128}
-                className="rounded-lg opacity-80"
               />
             </div>
           </div>
@@ -898,8 +867,18 @@ export default function PetalStormRhythm() {
 
             {/* Game Area */}
             <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-purple-900/50 to-black">
+              {/* Full Body Character on Stage - Behind Lanes */}
+              {!showAvatarChoice && gameState === 'playing' && isAvatarsEnabled() && avatarConfig && !avatarLoading && (
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-0 pointer-events-none" style={{ width: '400px', height: '500px' }}>
+                  <AvatarRenderer
+                    profile={avatarConfig}
+                    mode="stageFullBody"
+                    size="large"
+                  />
+                </div>
+              )}
               {/* Lanes */}
-              <div className="h-full flex relative" style={{ perspective: '1000px' }}>
+              <div className="h-full flex relative z-10" style={{ perspective: '1000px' }}>
                 {LANES.map((laneIndex) => {
                   const flash = laneFlashes[laneIndex];
                   const flashAge = flash ? Date.now() - flash.time : Infinity;
@@ -1056,7 +1035,6 @@ export default function PetalStormRhythm() {
           loseMessage="Your health reached zero. Try again!"
           score={finalScore}
           petalReward={petalReward}
-          achievements={achievements}
           onRestart={() => {
             handleRestart();
             setGameState('playing');

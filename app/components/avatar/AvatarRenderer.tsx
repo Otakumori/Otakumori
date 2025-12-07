@@ -20,7 +20,6 @@ interface AvatarRendererProps {
   onLoad?: () => void;
   onError?: (error: Error) => void;
   avatarMode?: 'preset' | 'user' | 'auto'; // Avatar mode for fallback handling
-}
 
 export function AvatarRenderer({
   config,

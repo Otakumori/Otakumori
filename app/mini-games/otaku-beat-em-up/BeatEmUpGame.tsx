@@ -26,7 +26,6 @@ interface GameState {
   beatAccuracy: number; // 0-100%
   timeElapsed?: number; // For survival mode
   startTime?: number; // For survival mode
-}
 
 interface Player {
   x: number;
@@ -43,7 +42,6 @@ interface Player {
   comboCount: number;
   beatMultiplier: number;
   comboChain: number; // Chain of successful hits
-}
 
 interface Enemy {
   id: string;
@@ -69,7 +67,6 @@ interface BeatIndicator {
   opacity: number;
   size: number;
   perfect: boolean;
-}
 
 interface Props {
   mode: GameMode;
@@ -78,7 +75,6 @@ interface Props {
   onComboChange?: (combo: number) => void;
   onGameEnd?: (score: number, didWin: boolean) => void;
   onWaveChange?: (wave: number) => void;
-}
 
 export default function BeatEmUpGame({
   mode,

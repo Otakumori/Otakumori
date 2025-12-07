@@ -41,7 +41,6 @@ export interface PetalReward {
   reason: string;
   metadata?: Record<string, unknown>;
   source?: 'game' | 'achievement' | 'daily_bonus' | 'purchase_bonus' | 'other';
-}
 
 export interface PetalBalance {
   balance: number;

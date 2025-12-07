@@ -11,7 +11,6 @@ interface VoucherStats {
   expiredVouchers: number;
   totalDiscountValue: number;
   topUsers: Array<{ userId: string; username: string; voucherCount: number }>;
-}
 
 export default function VouchersPageClient() {
   const [stats, setStats] = useState<VoucherStats | null>(null);

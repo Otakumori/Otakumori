@@ -10,8 +10,6 @@ import './_scene/hub.css';
 import { play } from '@/app/mini-games/_shared/audio-bus';
 import Link from 'next/link';
 
-);
-}
 export default function HubPage() {
   const { face, isZooming, backToIdle } = useHub();
   useHubInput();

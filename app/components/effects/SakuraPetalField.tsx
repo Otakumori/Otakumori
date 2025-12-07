@@ -14,7 +14,6 @@ interface Petal {
   size: number;
   opacity: number;
   layer: PetalLayer;
-}
 
 interface SakuraPetalFieldProps {
   petalCount?: number;

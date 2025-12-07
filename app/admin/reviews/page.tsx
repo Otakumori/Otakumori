@@ -3,8 +3,6 @@ import AdminReviewsClient from './review-client';
 
 export const dynamic = 'force-dynamic';
 
-);
-}
 export default function AdminReviewsPage() {
   return (
     <main className="mx-auto max-w-5xl p-6">

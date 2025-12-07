@@ -35,7 +35,6 @@ export interface AchievementRequirement {
   operator: 'gte' | 'lte' | 'eq' | 'gt' | 'lt';
   gameId?: string;
   metadata?: Record<string, any>;
-}
 
 export interface AchievementReward {
   type: 'petals' | 'runes' | 'avatar' | 'title' | 'badge' | 'unlock' | 'custom';
@@ -49,7 +48,6 @@ export interface AchievementProgress {
   max: number;
   percentage: number;
   unlocked: boolean;
-}
 
 export interface AchievementStats {
   total: number;

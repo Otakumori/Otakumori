@@ -103,7 +103,6 @@ export interface DynamicLight {
   color: string;
   pulse?: boolean;
   pulseSpeed?: number;
-}
 
 export function createDynamicLight(
   x: number,

@@ -23,8 +23,6 @@ const AvatarRenderer3D = dynamic(() => import('@/app/components/avatar/AvatarRen
   ),
 });
 
-);
-}
 export default function AvatarEditorPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-black">

@@ -8,8 +8,6 @@ import GlassButton from '../../components/ui/GlassButton';
 import GlassCard from '../../components/ui/GlassCard';
 import { type LeaderboardEntry } from '@/app/lib/economy/petalEconomy';
 
-);
-}
 export default function LeaderboardPage() {
   const [activeGame, setActiveGame] = useState<string>('all');
   const [leaderboards, setLeaderboards] = useState<Map<string, LeaderboardEntry[]>>(new Map());

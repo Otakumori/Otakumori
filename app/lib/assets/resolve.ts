@@ -16,7 +16,6 @@ interface AssetMeta {
   host: string;
   hash: string;
   coverage?: string;
-}
 
 type AssetRegistry = typeof registry;
 

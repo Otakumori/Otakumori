@@ -16,8 +16,6 @@ const AnimeArenaScene = dynamic(() => import('./Scene'), {
   ),
 });
 
-);
-}
 export default function AnimeArenaPage() {
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-b from-purple-900 via-purple-800 to-black">

@@ -28,7 +28,6 @@ interface Petal {
   life: number; // 0-1, fades out in final 20%
   collected: boolean;
   color: string;
-}
 
 const PETAL_COLORS = ['#d4a5a5', '#c99999', '#d8b0b0']; // Muted rose matching tree
 const PETAL_OPACITY_MIN = 0.25; // Lighter opacity for subtle effect

@@ -20,7 +20,6 @@ interface Petal {
   rotation: number;
   opacity: number;
   color: string;
-}
 
 const MOOD_PRESETS = {
   calm: {

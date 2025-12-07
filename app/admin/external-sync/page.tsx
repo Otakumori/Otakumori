@@ -17,8 +17,6 @@ interface SyncResults {
   printifyProducts: SyncResult;
 }
 
-);
-}
 export default function ExternalSyncPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SyncResults | null>(null);

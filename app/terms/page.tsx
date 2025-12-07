@@ -13,8 +13,6 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
   </GlassCard>
 );
 
-);
-}
 export default function TermsOfService() {
   return (
     <main

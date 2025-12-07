@@ -12,7 +12,6 @@ export interface AssetConfigItem {
   flatten?: boolean;
   extractToGames?: boolean;
   gameSlug?: string;
-}
 
 export interface AssetRecord {
   id: string;
@@ -22,7 +21,6 @@ export interface AssetRecord {
   license?: string;
   bytes: number;
   sha256: string;
-}
 
 export type AssetMap = Record<string, AssetRecord>;
 

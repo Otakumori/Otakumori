@@ -18,7 +18,6 @@ interface MockEntity {
   vz: number;
   health: number;
   target: { x: number; y: number; z: number } | null;
-}
 
 class MockEngine {
   entities: MockEntity[] = [];
@@ -120,8 +119,6 @@ class MockEngine {
   }
 }
 
-);
-}
 export default function PerfHeadlessPage() {
   useEffect(() => {
     // Expose MockEngine on window for test access

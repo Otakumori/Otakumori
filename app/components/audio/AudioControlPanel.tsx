@@ -16,7 +16,6 @@ interface VolumeSliderProps {
   value: number;
   onChange: (value: number) => void;
   color?: string;
-}
 
 function VolumeSlider({ label, icon: Icon, value, onChange, color = 'pink' }: VolumeSliderProps) {
   return (

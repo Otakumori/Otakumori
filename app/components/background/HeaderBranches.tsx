@@ -12,7 +12,6 @@ interface HeaderBranch {
   thickness: number;
   angle: number;
   isVisible: boolean;
-}
 
 export default function HeaderBranches() {
   const [mounted, setMounted] = useState(false);

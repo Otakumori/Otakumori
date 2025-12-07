@@ -11,7 +11,6 @@ interface BranchProps {
   thickness: number;
   depth: number;
   maxDepth: number;
-}
 
 function Branch({ x, y, angle, length, thickness, depth, maxDepth }: BranchProps) {
   const endX = x + Math.cos(angle) * length;

@@ -22,7 +22,6 @@ interface AssetEntry {
   host?: string;
   hash: string;
   coverage?: string;
-}
 
 interface AssetRegistry {
   version: number;

@@ -14,7 +14,6 @@ interface AvatarViewerProps {
   autoRotate?: boolean;
   lighting?: 'studio' | 'dramatic' | 'soft' | 'anime' | 'intimate';
   quality?: 'low' | 'medium' | 'high' | 'ultra';
-}
 
 export default function AvatarViewer({
   configuration,

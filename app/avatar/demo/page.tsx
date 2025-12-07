@@ -7,8 +7,6 @@ import type { BodyParameters } from '@/app/lib/3d/procedural-body';
 import type { HairParameters } from '@/app/lib/3d/procedural-hair';
 import * as THREE from 'three';
 
-);
-}
 export default function AvatarDemoPage() {
   const [bodyParams, setBodyParams] = useState<BodyParameters>({
     height: 1.0,

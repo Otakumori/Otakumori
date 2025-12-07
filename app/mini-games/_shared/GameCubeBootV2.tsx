@@ -40,7 +40,6 @@ interface CubeState {
   rotation: number;
   scale: number;
   opacity: number;
-}
 
 export default function GameCubeBootV2({
   onBootComplete,

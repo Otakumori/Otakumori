@@ -27,8 +27,6 @@ const DynamicCanvas = dynamic(() => Promise.resolve(CharacterCanvas), {
   ),
 });
 
-);
-}
 export default function AvatarCommunityHubPage() {
   const [config, setConfig] = useState<CharacterConfig>(createDefaultConfig());
   const sceneRef = useRef<THREE.Group | null>(null);

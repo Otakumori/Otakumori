@@ -8,7 +8,6 @@ export interface AuthResult {
   user?: any;
   role?: string;
   error?: string;
-}
 
 export async function requireAuth(): Promise<AuthResult> {
   try {

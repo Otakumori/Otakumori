@@ -5,8 +5,6 @@ import { motion } from 'framer-motion';
 import AvatarSystem from '../../components/avatar/AvatarSystem';
 import { type ProceduralCharacterConfig } from '@/lib/avatar/procedural-generator';
 
-);
-}
 export default function AvatarEditorPage() {
   const [showAvatarSystem, setShowAvatarSystem] = useState(false);
   const [savedConfig, setSavedConfig] = useState<ProceduralCharacterConfig | null>(null);

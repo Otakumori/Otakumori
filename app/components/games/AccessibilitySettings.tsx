@@ -20,7 +20,6 @@ export interface GameAccessibilitySettings {
   fontSize: 'small' | 'medium' | 'large';
   colorBlindSupport: boolean;
   audioDescriptions: boolean;
-}
 
 const defaultSettings: GameAccessibilitySettings = {
   reducedMotion: false,

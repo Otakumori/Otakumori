@@ -12,7 +12,6 @@ export interface AssetEntry {
   tags?: string[];
   vibe?: string;
   avatar?: string;
-}
 
 export async function appendAsset(entry: AssetEntry) {
   let data: any = {};

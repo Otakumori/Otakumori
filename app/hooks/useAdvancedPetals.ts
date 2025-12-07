@@ -9,7 +9,6 @@ interface UseAdvancedPetalsOptions {
   enableMouseInteraction?: boolean;
   enableScrollWind?: boolean;
   spawnRate?: number;
-}
 
 export function useAdvancedPetals({
   maxPetals = 50,

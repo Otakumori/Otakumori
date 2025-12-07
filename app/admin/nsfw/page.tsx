@@ -5,8 +5,6 @@ import NSFWPageClient from './NSFWPageClient';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-);
-}
 export default async function AdminNSFWPage() {
   await requireAdmin();
 

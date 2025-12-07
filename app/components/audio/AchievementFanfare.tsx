@@ -18,7 +18,6 @@ interface AchievementFanfareProps {
   title: string;
   description?: string;
   onComplete: () => void;
-}
 
 const ACHIEVEMENT_CONFIG = {
   victory: {

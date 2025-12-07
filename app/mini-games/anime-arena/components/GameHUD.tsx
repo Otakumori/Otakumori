@@ -14,7 +14,6 @@ interface GameHUDProps {
   styleMeter: StyleMeter;
   onDimensionShift: () => void;
   onPause: () => void;
-}
 
 export default function GameHUD({
   health,

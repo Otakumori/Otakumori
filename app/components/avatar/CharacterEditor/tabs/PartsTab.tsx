@@ -13,7 +13,6 @@ interface PartsTabProps {
   selectedCategory: string;
   filteredParts: (partType: AvatarPartType) => ReturnType<typeof import('@/app/lib/3d/avatar-parts').avatarPartManager.getPartsByType>; // eslint-disable-line @typescript-eslint/consistent-type-imports
   onConfigurationChange?: (config: AvatarConfiguration) => void;
-}
 
 const ANIME_PRESETS = [
   {

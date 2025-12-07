@@ -7,7 +7,6 @@ interface AchievementFiltersProps {
   onToggleUnlocked: () => void;
   onToggleLocked: () => void;
   onToggleHidden: () => void;
-}
 
 const buttonClasses = (active: boolean) =>
   ['rounded px-3 py-1', active ? 'bg-pink-500 text-white' : 'bg-gray-200 text-gray-700'].join(' ');

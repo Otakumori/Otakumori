@@ -140,7 +140,6 @@ export interface QualitySettings {
   postProcessing: boolean;
   antialiasing: boolean;
   textureQuality: 'low' | 'medium' | 'high';
-}
 
 export const QUALITY_PRESETS: Record<'low' | 'medium' | 'high' | 'ultra', QualitySettings> = {
   low: {

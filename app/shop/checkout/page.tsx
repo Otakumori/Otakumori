@@ -24,7 +24,6 @@ interface ShippingInfo {
   state: string;
   zipCode: string;
   country: string;
-}
 
 interface CartItem {
   id: string;
@@ -38,8 +37,6 @@ interface CartItem {
   };
 }
 
-);
-}
 export default function CheckoutPage() {
   const { items: cart, clearCart: _clearCart, total } = useCart();
   const { isSignedIn, userId: _userId } = useAuth();

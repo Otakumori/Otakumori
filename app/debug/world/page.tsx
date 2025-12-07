@@ -66,8 +66,6 @@ const Avatar = dynamic(() => import('@/app/components/avatar/Avatar'), {
   ssr: false,
 });
 
-);
-}
 export default function DebugWorld() {
   return (
     <WorldProvider debug>

@@ -84,7 +84,6 @@ interface CharacterPreviewProps {
   handleTouchEnd: React.TouchEventHandler<HTMLDivElement>;
   handleWheel: React.WheelEventHandler<HTMLDivElement>;
   setShowComparison: (value: boolean) => void;
-}
 
 const CharacterPreview = memo(function CharacterPreview({
   configuration,

@@ -18,8 +18,6 @@ import {
 import { DISCOUNT_VOUCHER_TIERS } from '@/app/config/petalTuning';
 import { OmButton, OmCard, OmPanel, OmTag } from '@/app/components/ui/om';
 
-);
-}
 export default function PetalShopPage() {
   const {
     unlockedIds: _unlockedIds,

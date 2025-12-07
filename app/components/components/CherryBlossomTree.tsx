@@ -12,7 +12,6 @@ interface Petal {
   rotation: number;
   scale: number;
   collected: boolean;
-}
 
 export const CherryBlossomTree = () => {
   const [petals, setPetals] = useState<Petal[]>([]);

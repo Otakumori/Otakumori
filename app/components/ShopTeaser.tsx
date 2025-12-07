@@ -15,7 +15,6 @@ interface Product {
   price: number;
   available: boolean;
   slug: string;
-}
 
 export default function ShopTeaser() {
   const [products, setProducts] = useState<Product[]>([]);

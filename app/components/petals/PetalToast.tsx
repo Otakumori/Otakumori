@@ -25,7 +25,6 @@ interface PetalToastProps {
     | 'bottom-left';
   duration?: number; // milliseconds
   onComplete?: () => void;
-}
 
 export function PetalToast({
   amount,

@@ -9,7 +9,6 @@ export interface AssetManifest {
   assets: AssetEntry[];
   categories: AssetCategory[];
   metadata: AssetMetadata;
-}
 
 export interface AssetEntry {
   id: string;
@@ -44,7 +43,6 @@ export interface AssetCategory {
   color: string;
   parent?: string;
   assets: string[];
-}
 
 export interface AssetMetadata {
   totalAssets: number;
@@ -53,7 +51,6 @@ export interface AssetMetadata {
   compressionRatio: number;
   supportedFormats: string[];
   qualityLevels: string[];
-}
 
 export interface AssetValidation {
   isValid: boolean;
@@ -61,7 +58,6 @@ export interface AssetValidation {
   warnings: string[];
   checksum: string;
   lastValidated: string;
-}
 
 export interface AssetLoadingState {
   isLoaded: boolean;
@@ -70,7 +66,6 @@ export interface AssetLoadingState {
   error?: string;
   loadedAt?: string;
   loadTime?: number;
-}
 
 export interface AssetLoaderOptions {
   quality: 'low' | 'medium' | 'high' | 'ultra';
@@ -79,7 +74,6 @@ export interface AssetLoaderOptions {
   maxConcurrent: number;
   timeout: number;
   retryAttempts: number;
-}
 
 export class AssetManifestManager {
   private manifest: AssetManifest;

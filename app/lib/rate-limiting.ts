@@ -18,7 +18,6 @@ interface RateLimitResult {
   remaining: number;
   resetTime: number;
   message?: string;
-}
 
 export async function checkRateLimit(
   key: string,

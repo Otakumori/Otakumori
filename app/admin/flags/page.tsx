@@ -13,7 +13,6 @@ interface FeatureFlag {
   description: string;
   enabled: boolean;
   category: FlagCategory;
-}
 
 interface FlagsResponse {
   ok: boolean;
@@ -51,8 +50,6 @@ const DEFAULT_FLAGS: FeatureFlag[] = [
   },
 ];
 
-);
-}
 export default function AdminFlagsPage() {
   const { user, isLoaded } = useUser();
   const router = useRouter();

@@ -7,8 +7,6 @@ import FooterDark from '../../components/FooterDark';
 import GlassPanel from '../../components/GlassPanel';
 
 // L-Room 404 Puzzle - Death Note inspired
-);
-}
 export default function LRoom404Page() {
   const [currentPhase, setCurrentPhase] = useState<
     'timeline' | 'herring' | 'name' | 'complete' | 'fallback'

@@ -5,8 +5,6 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-);
-}
 export default function UnauthorizedPage() {
   const { isSignedIn, isAdmin } = useAuth();
   const router = useRouter();

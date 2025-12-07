@@ -78,7 +78,6 @@ interface GameState {
   isGameOver: boolean;
   isStunned: boolean;
   stormMode: boolean;
-}
 
 interface Petal {
   id: string;
@@ -92,7 +91,6 @@ interface Petal {
   spriteIndex: number; // Index in 4x3 sprite grid (0-11)
   vx: number; // Horizontal drift velocity
   vy: number; // Vertical velocity
-}
 
 interface PowerUp {
   id: string;
@@ -101,7 +99,6 @@ interface PowerUp {
   type: 'slow_time' | 'combo_boost' | 'miss_forgive';
   duration: number;
   active: boolean;
-}
 
 export default function Game({ mode, difficulty = 'normal' }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

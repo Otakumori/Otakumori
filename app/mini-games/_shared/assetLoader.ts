@@ -17,7 +17,6 @@ export interface AssetLoadOptions {
   fallbackColor2?: string;
   timeout?: number;
   retries?: number;
-}
 
 export interface LoadedAsset {
   url: string;

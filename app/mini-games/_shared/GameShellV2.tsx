@@ -53,7 +53,6 @@ interface GameState {
   currentLevel: number;
   startTime: number | null;
   playTime: number;
-}
 
 export default function GameShellV2({
   gameKey,

@@ -42,7 +42,6 @@ interface AuthModalContext {
   benefits?: string[];
   redirectUrl?: string;
   mode?: 'signin' | 'signup';
-}
 
 const AuthContext = createContext<AuthContext | null>(null);
 

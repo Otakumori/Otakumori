@@ -7,7 +7,6 @@ export interface HubGameCard {
   description: string;
   available: boolean;
   howToHtml?: string;
-}
 
 export interface HubFaceLabels {
   top: string;

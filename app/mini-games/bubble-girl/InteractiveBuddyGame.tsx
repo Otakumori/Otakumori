@@ -21,7 +21,6 @@ interface Tool {
   cost: number;
   damage?: number;
   effect?: string;
-}
 
 interface CharacterPart {
   x: number;
@@ -35,7 +34,6 @@ interface CharacterPart {
   mass: number;
   health: number;
   maxHealth: number;
-}
 
 interface Particle {
   x: number;
@@ -46,7 +44,6 @@ interface Particle {
   size: number;
   color: string;
   type: 'spark' | 'heart' | 'star' | 'impact';
-}
 
 interface GameState {
   score: number;
@@ -54,7 +51,6 @@ interface GameState {
   stressRelieved: number;
   comboMultiplier: number;
   isRunning: boolean;
-}
 
 const TOOLS: Tool[] = [
   // Fun Tools

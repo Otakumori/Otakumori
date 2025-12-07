@@ -11,7 +11,6 @@ export interface PerformanceMetrics {
   renderTime: number;
   frameDrops: number;
   timestamp: number;
-}
 
 export class PerformanceMonitor {
   private static instance: PerformanceMonitor;

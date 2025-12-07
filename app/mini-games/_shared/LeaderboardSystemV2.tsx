@@ -51,7 +51,6 @@ export interface LeaderboardFilters {
   region?: string;
   friends?: boolean;
   verified?: boolean;
-}
 
 export interface AchievementProgress {
   id: string;
@@ -63,7 +62,6 @@ export interface AchievementProgress {
   unlockedAt?: Date;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   points: number;
-}
 
 interface LeaderboardSystemV2Props {
   gameId: string;
@@ -72,7 +70,6 @@ interface LeaderboardSystemV2Props {
   onAchievementUnlock?: (achievement: AchievementProgress) => void;
   realTimeUpdates?: boolean;
   className?: string;
-}
 
 export default function LeaderboardSystemV2({
   gameId,

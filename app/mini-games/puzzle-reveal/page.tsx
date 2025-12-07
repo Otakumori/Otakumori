@@ -51,8 +51,6 @@ const EnhancedTileGame = dynamic(() => import('./EnhancedTileGame'), {
 
 type GameMode = 'easy' | 'medium' | 'hard' | 'expert';
 
-);
-}
 export default function PuzzleRevealPage() {
   const [mode, setMode] = useState<GameMode>('medium');
   const [key, setKey] = useState(0); // Force remount on mode change

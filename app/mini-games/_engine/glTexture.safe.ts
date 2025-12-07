@@ -4,7 +4,6 @@ export interface TextureOptions {
   wrapS?: number;
   wrapT?: number;
   generateMipmaps?: boolean;
-}
 
 export function createTexture(
   gl: WebGL2RenderingContext,

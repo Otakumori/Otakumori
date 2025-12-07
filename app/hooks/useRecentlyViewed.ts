@@ -12,7 +12,6 @@ export interface RecentlyViewedProduct {
   image: string;
   priceCents: number;
   viewedAt: number;
-}
 
 export function useRecentlyViewed() {
   const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedProduct[]>([]);

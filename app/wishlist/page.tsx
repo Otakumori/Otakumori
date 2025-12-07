@@ -24,8 +24,6 @@ interface WishlistItem {
   };
 }
 
-);
-}
 export default function WishlistPage() {
   const { isSignedIn, userId } = useAuth();
   const router = useRouter();

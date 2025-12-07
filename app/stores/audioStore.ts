@@ -20,7 +20,6 @@ export interface Sound {
   loop: boolean;
   spatial: boolean;
   preload: boolean;
-}
 
 export interface AudioSettings {
   masterVolume: number;
@@ -32,7 +31,6 @@ export interface AudioSettings {
   muted: boolean;
   spatialAudioEnabled: boolean;
   adaptiveMusicEnabled: boolean;
-}
 
 export interface PlayingSound {
   id: string;
@@ -42,7 +40,6 @@ export interface PlayingSound {
   pannerNode: PannerNode | null;
   startTime: number;
   loop: boolean;
-}
 
 interface AudioStore {
   // Audio Context

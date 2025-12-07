@@ -21,10 +21,7 @@ interface SyncStatus {
   error?: string;
   timestamp: string;
   eventId?: string;
-}
 
-);
-}
 export default function PrintifyAdminPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastSync, setLastSync] = useState<SyncStatus | null>(null);

@@ -14,8 +14,6 @@ type Item = {
   metadata?: any;
 };
 
-);
-}
 export default function AdminPetalShopPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);

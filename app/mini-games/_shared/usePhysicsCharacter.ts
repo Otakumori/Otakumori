@@ -25,7 +25,6 @@ export interface UsePhysicsCharacterOptions {
   visualConfig?: Partial<CharacterVisualConfig>;
   targetFPS?: number;
   autoDisableThreshold?: number; // FPS threshold to auto-disable physics
-}
 
 export interface PhysicsCharacterAPI {
   render: (x: number, y: number, facing?: 'left' | 'right') => void;

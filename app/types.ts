@@ -7,7 +7,6 @@ export interface Petal {
   delay: number;
   collected: boolean;
   isSpecial?: boolean;
-}
 
 export interface Product {
   id: string;
@@ -30,7 +29,6 @@ export interface BlogPost {
   image: string;
   createdAt: string;
   author: string;
-}
 
 export interface SocialLink {
   name: string;

@@ -15,7 +15,6 @@ export interface MicroInteractionConfig {
   glow?: string;
   sound?: string;
   haptic?: 'light' | 'medium' | 'heavy';
-}
 
 export class MicroInteractionSystem {
   private static instance: MicroInteractionSystem;

@@ -28,8 +28,6 @@ const DUMMY_POSITIONS: ReadonlyArray<[number, number, number]> = [
   [0, 0, -8],
 ];
 
-);
-}
 export default function Arena3DDemo() {
   const [isReady, setIsReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false);

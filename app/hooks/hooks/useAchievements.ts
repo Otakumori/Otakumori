@@ -9,7 +9,6 @@ interface Achievement {
   reward: string;
   unlocked: boolean;
   icon: string;
-}
 
 const ACHIEVEMENTS: Achievement[] = [
   {

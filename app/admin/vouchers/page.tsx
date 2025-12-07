@@ -5,8 +5,6 @@ import VouchersPageClient from './VouchersPageClient';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-);
-}
 export default async function AdminVouchersPage() {
   await requireAdmin();
 

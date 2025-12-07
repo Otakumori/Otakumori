@@ -28,7 +28,6 @@ export interface Achievement {
   progress?: number;
   target?: number;
   reward: AchievementReward;
-}
 
 export interface AchievementProgress {
   current: number;
@@ -52,7 +51,6 @@ export interface PetalTier {
   tier?: number;
   title?: string;
   perks?: string[];
-}
 
 export const PETAL_TIERS: PetalTier[] = [
   {

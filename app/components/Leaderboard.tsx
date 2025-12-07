@@ -10,7 +10,6 @@ interface LeaderboardEntry {
   achievements: number;
   level: number;
   isCurrentUser?: boolean;
-}
 
 export const Leaderboard: React.FC = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);

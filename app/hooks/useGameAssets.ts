@@ -33,7 +33,6 @@ interface UseGameAssetsResult {
   hasErrors: boolean;
   getAssetUrl: (assetName: string) => string | null;
   preloadAsset: (assetName: string) => Promise<void>;
-}
 
 const ASSET_CACHE: Record<string, GameAsset> = {};
 

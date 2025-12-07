@@ -9,7 +9,6 @@ export interface PrintifyUpload {
   mime_type: string;
   preview_url: string;
   upload_time: string;
-}
 
 export class PrintifyUploadService {
   private readonly baseUrl: string;

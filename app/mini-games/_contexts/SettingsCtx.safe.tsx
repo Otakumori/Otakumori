@@ -10,7 +10,6 @@ interface SettingsContextType {
   setMuted: (muted: boolean) => void;
   setTheme: (theme: 'dark' | 'light') => void;
   resetSettings: () => void;
-}
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 

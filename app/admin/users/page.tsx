@@ -5,8 +5,6 @@ import UsersPageClient from './UsersPageClient';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-);
-}
 export default async function AdminUsersPage() {
   await requireAdmin();
 

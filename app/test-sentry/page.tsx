@@ -3,8 +3,6 @@
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 
-);
-}
 export default function TestSentryPage() {
   useEffect(() => {
     // Trigger a client-side error immediately when the page loads

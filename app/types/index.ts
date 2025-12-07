@@ -9,7 +9,6 @@ export interface Petal {
   delay: number;
   collected: boolean;
   isSpecial?: boolean;
-}
 
 export interface Progress {
   personal: number;

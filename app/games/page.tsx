@@ -7,8 +7,6 @@ import Navbar from '../components/layout/Navbar';
 import FooterDark from '../components/FooterDark';
 import GlassPanel from '../components/GlassPanel';
 
-);
-}
 export default function GameCubePage() {
   const [bootComplete, setBootComplete] = useState(false);
   const [showBootSequence, setShowBootSequence] = useState(true);

@@ -36,8 +36,6 @@ import { getGameAvatarUsage } from '../_shared/miniGameConfigs';
 import { isAvatarsEnabled } from '@om/avatar-engine/config/flags';
 import type { AvatarProfile } from '@om/avatar-engine/types/avatar';
 
-);
-}
 export default function DungeonOfDesirePage() {
   const [score, setScore] = useState(0);
   const [health, setHealth] = useState(100);

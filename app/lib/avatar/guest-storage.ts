@@ -14,7 +14,6 @@ export interface GuestCharacter {
   createdAt: number;
   expiresAt: number;
   isTemporary: true;
-}
 
 const GUEST_CHARACTER_PREFIX = 'otm-guest-character-';
 const GUEST_CHARACTER_LIST_KEY = 'otm-guest-characters-list';

@@ -12,7 +12,6 @@ interface AdvancedPetalSystemProps {
   enableTrails?: boolean;
   className?: string;
   onPetalClick?: (petal: PhysicsPetal) => void;
-}
 
 export default function AdvancedPetalSystem({
   maxPetals = 100,

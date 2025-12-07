@@ -22,7 +22,6 @@ interface Player {
   height: number;
   health: number;
   maxHealth: number;
-}
 
 interface Enemy {
   id: string;

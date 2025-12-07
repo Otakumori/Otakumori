@@ -16,7 +16,6 @@ interface UseKeyboardShortcutsProps {
   showComparison: boolean;
   comparisonConfig: unknown;
   setShowComparison: (show: boolean) => void;
-}
 
 export function useKeyboardShortcuts({
   setActiveTab,

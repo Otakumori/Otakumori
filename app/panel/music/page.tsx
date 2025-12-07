@@ -6,8 +6,6 @@ import { useUser } from '@clerk/nextjs';
 import { Music, Play, Pause, SkipBack, SkipForward, Heart, List } from 'lucide-react';
 import Link from 'next/link';
 
-);
-}
 export default function MusicPanel() {
   const { user: _user } = useUser();
   const [loading, setLoading] = useState(true);

@@ -26,8 +26,6 @@ interface OrderResult {
   }>;
 }
 
-);
-}
 export default function ThankYouPage() {
   const searchParams = useSearchParams();
   const { isSignedIn } = useUser();

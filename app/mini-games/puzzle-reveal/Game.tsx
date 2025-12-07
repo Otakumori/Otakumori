@@ -19,7 +19,6 @@ interface GameState {
   isGameOver: boolean;
   brushSize: number;
   brushType: 'normal' | 'wind' | 'precision';
-}
 
 interface FogPixel {
   x: number;

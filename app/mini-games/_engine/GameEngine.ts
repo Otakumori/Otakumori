@@ -17,7 +17,6 @@ export interface GameConfig {
   toneMapping: boolean;
   physics: boolean;
   audio: boolean;
-}
 
 export interface GameState {
   isRunning: boolean;
@@ -27,7 +26,6 @@ export interface GameState {
   lives: number;
   time: number;
   deltaTime: number;
-}
 
 export interface GameInput {
   keys: Set<string>;
@@ -56,7 +54,6 @@ export interface GameEntity {
   isActive: boolean;
   update: (deltaTime: number, input: GameInput) => void;
   onCollision?: (other: GameEntity) => void;
-}
 
 export interface GameScene {
   name: string;
@@ -67,7 +64,6 @@ export interface GameScene {
   fog?: THREE.Fog;
   gravity: THREE.Vector3;
   bounds: THREE.Box3;
-}
 
 export interface GameAudio {
   listener: AudioListener;

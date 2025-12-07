@@ -3,8 +3,6 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-);
-}
 export default function AgeCheckPage() {
   const searchParams = useSearchParams();
   const router = useRouter();

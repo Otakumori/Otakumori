@@ -6,8 +6,6 @@ import { useUser } from '@clerk/nextjs';
 import { Trophy, Coins, Users } from 'lucide-react';
 import Link from 'next/link';
 
-);
-}
 export default function CommunityHubPanel() {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);

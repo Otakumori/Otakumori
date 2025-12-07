@@ -5,8 +5,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 
-);
-}
 export default function LoginPage() {
   const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();

@@ -26,8 +26,6 @@ const SlicingGame = dynamic(() => import('./Game'), {
   ),
 });
 
-);
-}
 export default function PetalSamuraiPage() {
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel>('normal');

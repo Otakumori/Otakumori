@@ -17,7 +17,6 @@ interface TradeItem {
   image: string;
   value: number;
   owned: number;
-}
 
 interface TradeOffer {
   id: string;
@@ -27,10 +26,7 @@ interface TradeOffer {
   requesting: TradeItem[];
   status: 'active' | 'completed' | 'cancelled';
   createdAt: Date;
-}
 
-);
-}
 export default function TradeHallPage() {
   const [activeTab, setActiveTab] = useState<'inventory' | 'crafting' | 'trading' | 'market'>(
     'inventory',

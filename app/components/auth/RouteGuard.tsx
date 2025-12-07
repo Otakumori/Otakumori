@@ -11,7 +11,6 @@ interface RouteGuardProps {
   requireAdmin?: boolean;
   fallback?: ReactNode;
   redirectTo?: string;
-}
 
 export function RouteGuard({
   children,

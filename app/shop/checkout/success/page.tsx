@@ -11,8 +11,6 @@ import Link from 'next/link';
 import { CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-);
-}
 export default function CheckoutSuccessPage() {
   const { clearCart } = useCart();
 

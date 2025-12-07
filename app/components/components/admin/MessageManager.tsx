@@ -11,7 +11,6 @@ interface Message {
   author: string;
   created_at: string;
   upvotes: number;
-}
 
 export default function MessageManager() {
   const [messages, setMessages] = useState<Message[]>([]);

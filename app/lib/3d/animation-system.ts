@@ -13,7 +13,6 @@ export interface AnimationState {
   loop: boolean;
   timeScale: number;
   fadeTime: number;
-}
 
 export interface AnimationTransition {
   from: string;
@@ -21,7 +20,6 @@ export interface AnimationTransition {
   condition?: () => boolean;
   fadeTime?: number;
   blendMode?: 'replace' | 'add' | 'crossfade';
-}
 
 export interface AnimationBlendTree {
   name: string;
@@ -39,7 +37,6 @@ export interface AnimationControllerOptions {
   crossfadeTime?: number;
   enableBlending?: boolean;
   maxBlendStates?: number;
-}
 
 export class AnimationController {
   private mixer: AnimationMixer;

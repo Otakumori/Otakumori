@@ -140,7 +140,6 @@ interface SettingToggleProps {
   checked: boolean;
   onChange: (value: boolean) => void;
   disabled?: boolean;
-}
 
 function SettingToggle({
   label,

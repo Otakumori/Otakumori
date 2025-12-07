@@ -16,8 +16,6 @@ interface MediaResponse {
   blobs?: BlobItem[];
 }
 
-);
-}
 export default function AdminMediaPage() {
   const [blobs, setBlobs] = useState<BlobItem[]>([]);
   const [loading, setLoading] = useState(false);

@@ -5,8 +5,6 @@ import GameShell from '../_shared/GameShell';
 import BootScreen from '../../components/games/BootScreen';
 import Scene from './Scene';
 
-);
-}
 export default function Page() {
   const { isSignedIn } = useUser();
   const [mapOverride, setMapOverride] = useState<string | null>(null);

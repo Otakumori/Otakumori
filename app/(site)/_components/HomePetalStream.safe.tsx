@@ -19,7 +19,6 @@ interface Petal {
   collectTime: number;
   targetX: number;
   targetY: number;
-}
 
 interface HomePetalStreamProps {
   className?: string;

@@ -11,7 +11,6 @@ interface SEOProps {
   type?: 'website' | 'article' | 'product';
   price?: number;
   currency?: string;
-}
 
 export function generateSEO({
   title,

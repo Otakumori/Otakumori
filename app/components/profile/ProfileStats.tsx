@@ -8,7 +8,6 @@ interface Achievement {
   icon: string;
   isErotic?: boolean;
   tooltip: string;
-}
 
 interface ProfileStatsProps {
   achievements?: Achievement[];
@@ -19,7 +18,6 @@ interface ProfileStatsProps {
   fragmentsCollected?: number;
   petalsTotal?: number;
   miniGames?: { name: string; value: number }[];
-}
 
 const sampleAchievements: Achievement[] = [
   {

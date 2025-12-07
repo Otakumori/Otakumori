@@ -26,8 +26,6 @@ import { resolveEquipmentForGame } from '@/app/lib/avatar/resolve-equipment';
 import { InputHints } from '@/app/components/games/InputHints';
 import { prefersReducedMotion } from '@/app/lib/device-profile';
 
-);
-}
 export default function SideScrollerDemo() {
   const [isReady, setIsReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false);

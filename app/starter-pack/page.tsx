@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
 
-);
-}
 export default function StarterPackPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);

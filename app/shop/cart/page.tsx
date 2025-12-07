@@ -23,8 +23,6 @@ interface CartItem {
   };
 }
 
-);
-}
 export default function CartPage() {
   const { items: cart, updateQuantity, removeItem: removeFromCart, total } = useCart();
 

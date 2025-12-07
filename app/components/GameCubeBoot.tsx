@@ -16,7 +16,6 @@ interface Petal {
   rotation: number;
   scale: number;
   color: string;
-}
 
 export default function GameCubeBoot({ onComplete, skipable = true }: GameCubeBootProps) {
   const [isVisible, setIsVisible] = useState(true);

@@ -8,7 +8,6 @@ interface Item {
   type: 'material' | 'crafted' | 'special';
   quantity: number;
   image: string;
-}
 
 interface Recipe {
   id: string;
@@ -17,7 +16,6 @@ interface Recipe {
   materials: { id: string; quantity: number }[];
   result: { id: string; quantity: number };
   unlocked: boolean;
-}
 
 export default function TradeCraft() {
   const [inventory, setInventory] = useState<Item[]>([

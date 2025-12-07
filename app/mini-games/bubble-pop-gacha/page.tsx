@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import GameShell from '../_shared/GameShell';
 
-);
-}
 export default function BubblePopGachaPage() {
   const [shards, setShards] = useState(0);
   const [perks, setPerks] = useState<string[]>([]);

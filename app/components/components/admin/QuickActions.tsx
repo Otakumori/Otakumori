@@ -14,7 +14,6 @@ interface QuickAction {
   icon: string;
   color: string;
   action: () => Promise<void>;
-}
 
 export default function QuickActions() {
   const [isLoading, setIsLoading] = useState<string | null>(null);

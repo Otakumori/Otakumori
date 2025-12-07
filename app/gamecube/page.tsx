@@ -5,8 +5,6 @@ import GameCubeBootSequence from '@/app/components/GameCubeBoot';
 import GameCube3D from '@/components/BootCube3D';
 import { audio } from '@/app/lib/audio';
 
-);
-}
 export default function GameCubePage() {
   const [hasBooted, setHasBooted] = useState(false);
 

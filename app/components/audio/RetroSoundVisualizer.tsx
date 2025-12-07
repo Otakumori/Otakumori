@@ -18,7 +18,6 @@ interface ParticleProps {
   maxLife: number;
   color: string;
   size: number;
-}
 
 interface RetroSoundVisualizerProps {
   width?: number;

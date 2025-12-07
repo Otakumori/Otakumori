@@ -14,7 +14,6 @@ interface Friend {
   game?: string;
   lastSeen?: Date;
   isFavorite?: boolean;
-}
 
 interface FriendRequest {
   id: string;

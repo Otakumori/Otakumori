@@ -6,8 +6,6 @@ import { useUser } from '@clerk/nextjs';
 import { ArrowLeftRight, Coins } from 'lucide-react';
 import Link from 'next/link';
 
-);
-}
 export default function TradeCenterPanel() {
   const { user } = useUser();
   const [loading, setLoading] = useState(true);

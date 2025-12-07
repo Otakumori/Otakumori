@@ -4,8 +4,6 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { useQuests } from '@/app/hooks/useQuests';
 
-);
-}
 export default function PlayPage() {
   const { trackQuest } = useQuests();
 

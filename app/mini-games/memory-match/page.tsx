@@ -53,8 +53,6 @@ interface Card {
   isMatched: boolean;
 }
 
-);
-}
 export default function MemoryMatchGame() {
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -500,22 +498,6 @@ export default function MemoryMatchGame() {
             </div>
           </div>
 
-          {/* Avatar Display (Portrait Mode) - Hidden during gameplay to avoid overlap */}
-          {isAvatarsEnabled() &&
-            avatarConfig &&
-            !avatarLoading &&
-            gameState !== 'playing' &&
-            gameState !== 'paused' && (
-              <div className="flex justify-center mb-8">
-                <div className="relative w-64 h-64">
-                  <AvatarRenderer
-                    profile={avatarConfig}
-                    mode={representationConfig.mode}
-                    size="large"
-                  />
-                </div>
-              </div>
-            )}
 
           {/* Game UI */}
           {(gameState === 'playing' || gameState === 'paused') && (
@@ -577,7 +559,7 @@ export default function MemoryMatchGame() {
                               }
                             : {}
                         }
-                        className="aspect-square cursor-pointer"
+                        className="aspect-square cursor-pointer group"
                         onClick={() => handleCardFlip(card.id)}
                       >
                         <motion.div
@@ -593,7 +575,7 @@ export default function MemoryMatchGame() {
                           }}
                         >
                           {/* Card Back */}
-                          <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20">
+                          <div className="absolute inset-0 backface-hidden rounded-xl overflow-hidden bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-purple-900/20 group-hover:outline group-hover:outline-2 group-hover:outline-pink-400/80 group-hover:outline-offset-2 transition-all duration-200">
                             <Image
                               src="/assets/memory-cards/card-back.svg"
                               alt="Card back"

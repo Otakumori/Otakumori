@@ -65,7 +65,6 @@ interface AvatarPartMesh {
   materials: THREE.Material[];
   morphTargets?: Record<string, number>;
   animationController?: AnimationController;
-}
 
 export default function Avatar3D({
   configuration,

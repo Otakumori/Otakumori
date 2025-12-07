@@ -37,7 +37,6 @@ export interface FaceParameters {
   mouthSize: number; // 0.7 to 1.3
   jawShape: 'soft' | 'angular' | 'round';
   cheekbones: number; // 0 to 1
-}
 
 export interface ProceduralAvatarConfig {
   enabled: boolean; // If false, use traditional part-based system

@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import GlassCard from '../components/ui/GlassCard';
 import GlassButton from '../components/ui/GlassButton';
 
-);
-}
 export default function PrivacyPage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">

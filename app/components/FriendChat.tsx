@@ -7,7 +7,6 @@ interface Message {
   content: string;
   timestamp: Date;
   isOwn: boolean;
-}
 
 interface Friend {
   id: string;
@@ -15,7 +14,6 @@ interface Friend {
   avatar: string;
   status: 'online' | 'offline' | 'away';
   lastSeen?: Date;
-}
 
 export const FriendChat: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([
