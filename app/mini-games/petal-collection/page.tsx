@@ -1,17 +1,11 @@
 import { generateSEO } from '@/app/lib/seo';
-import { type Metadata } from 'next';
 import GameShell from '../_shared/GameShell';
-
-export const metadata: Metadata = {
-  title: 'Petal Collection | Otaku-mori',
-  description: 'Collect falling petals and rack up combos.',
-};
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Mini Games',
-    description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\petal-collection\page.tsx',
+    title: 'Petal Collection',
+    description: 'Collect falling petals and rack up combos.',
+    url: '/mini-games/petal-collection',
   });
 }
 export default function PetalCollectionPage() {

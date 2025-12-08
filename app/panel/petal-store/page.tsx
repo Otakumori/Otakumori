@@ -4,9 +4,9 @@ import PetalStorePage from '@/app/account/petals/page';
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Page',
+    title: 'Petal Store',
     description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\panel\petal-store\page.tsx',
+    url: '/panel/petal-store',
   });
 }
 export default function PetalStorePanel() {

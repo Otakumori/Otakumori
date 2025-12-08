@@ -2,13 +2,11 @@ import { generateSEO } from '@/app/lib/seo';
 import GameShell from '../_shared/GameShell';
 import MaidCafeGame from './MaidCafeGame';
 
-export const metadata = { title: 'Maid Café Manager | Otaku-mori' };
-
 export function generateMetadata() {
   return generateSEO({
-    title: 'Mini Games',
+    title: 'Maid Café Manager',
     description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\maid-cafe-manager\page.tsx',
+    url: '/mini-games/maid-cafe-manager',
   });
 }
 export default function MaidCafeManagerPage() {

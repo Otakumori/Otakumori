@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Navbar from '../../components/layout/Navbar';
@@ -7,11 +6,6 @@ import FooterDark from '../../components/FooterDark';
 import PetalsDashboard from '../../components/profile/PetalsDashboard';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
-
-export const metadata: Metadata = {
-  title: 'Petals — Otaku-mori',
-  description: 'Track your petal collection and rewards.',
-};
 
 async function getPetalsData() {
   try {
@@ -42,9 +36,9 @@ async function getPetalsData() {
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Profile',
-    description: 'View user profile',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\profile\petals\page.tsx',
+    title: 'Petals',
+    description: 'Track your petal collection and rewards.',
+    url: '/profile/petals',
   });
 }
 export default async function PetalsPage() {

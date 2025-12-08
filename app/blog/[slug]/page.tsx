@@ -24,9 +24,11 @@ interface BlogData {
   post?: BlogPost;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
   try {
-    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${params.slug}`, {
+    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${slug}`, {
       allowLive: true,
     });
 
@@ -46,9 +48,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function BlogPost({ params }: { params: { slug: string } }) {
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  
   try {
-    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${params.slug}`, {
+    const result = await safeFetch<BlogData>(`/api/v1/content/blog/${slug}`, {
       allowLive: true,
     });
 

@@ -7,18 +7,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   
   return generateSEO({
-    title: 'Page',
+    title: 'Game',
     description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\games\:slug\page.tsx',
+    url: `/games/${slug}`,
   });
 }
-export default function GamePage({ params }: { params: { slug: string } }) {
-  const entry = getGame(params.slug);
+
+export default async function GamePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const entry = getGame(slug);
   if (!entry) return notFound();
   return (
     <div className="w-full h-[calc(100vh-4rem)] p-4">
       <iframe
-        title={params.slug}
+        title={slug}
         src={entry}
         className="w-full h-full rounded-2xl shadow"
         allowFullScreen

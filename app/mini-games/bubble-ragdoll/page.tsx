@@ -1,15 +1,12 @@
-
 import { generateSEO } from '@/app/lib/seo';
 import GameShell from '../_shared/GameShell';
 import Scene from './Scene';
 
-export const metadata = { title: 'Bubble Ragdoll' };
-
 export function generateMetadata() {
   return generateSEO({
-    title: 'Mini Games',
+    title: 'Bubble Ragdoll',
     description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\bubble-ragdoll\page.tsx',
+    url: '/mini-games/bubble-ragdoll',
   });
 }
 export default function Page() {

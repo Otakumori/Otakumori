@@ -1,16 +1,10 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Navbar from '../../components/layout/Navbar';
 import FooterDark from '../../components/FooterDark';
 import OrdersList from '../../components/profile/OrdersList';
 import { t } from '@/lib/microcopy';
-
-export const metadata: Metadata = {
-  title: 'Orders — Otaku-mori',
-  description: 'View your order history and track shipments.',
-};
 
 async function getOrders() {
   try {
@@ -34,9 +28,9 @@ async function getOrders() {
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Profile',
-    description: 'View user profile',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\profile\orders\page.tsx',
+    title: 'Orders',
+    description: 'View your order history and track shipments.',
+    url: '/profile/orders',
   });
 }
 export default async function OrdersPage() {

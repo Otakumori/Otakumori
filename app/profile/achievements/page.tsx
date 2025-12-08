@@ -1,5 +1,4 @@
 import { generateSEO } from '@/app/lib/seo';
-import type { Metadata } from 'next';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import Navbar from '../../components/layout/Navbar';
@@ -7,11 +6,6 @@ import FooterDark from '../../components/FooterDark';
 import AchievementsTabs from '../../components/profile/AchievementsTabs';
 import { t } from '@/lib/microcopy';
 import { env } from '@/env.mjs';
-
-export const metadata: Metadata = {
-  title: 'Achievements — Otaku-mori',
-  description: 'View your unlocked achievements and progress.',
-};
 
 async function getAchievements() {
   try {
@@ -32,9 +26,9 @@ async function getAchievements() {
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Profile',
-    description: 'View user profile',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\profile\achievements\page.tsx',
+    title: 'Achievements',
+    description: 'View your unlocked achievements and progress.',
+    url: '/profile/achievements',
   });
 }
 export default async function AchievementsPage() {

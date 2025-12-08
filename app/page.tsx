@@ -58,9 +58,9 @@ function SafeSection({
 
 export function generateMetadata() {
   return generateSEO({
-    title: 'Page',
+    title: 'Welcome Home, Traveler — Otaku-mori',
     description: 'Anime x gaming shop + play — petals, runes, rewards.',
-    url: '/page.tsx',
+    url: '/',
   });
 }
 export default async function HomePage() {

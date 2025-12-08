@@ -1,13 +1,11 @@
 import { generateSEO } from '@/app/lib/seo';
 import MemoryWrapper from './memory-wrapper';
 
-export const metadata = { title: 'Memory | Otaku-mori' };
-
 export function generateMetadata() {
   return generateSEO({
-    title: 'Mini Games',
+    title: 'Memory',
     description: 'Play mini-games and earn rewards',
-    url: '/C:\Users\ap190\Contacts\Desktop\Documents\GitHub\Otakumori\app\mini-games\memory\page.tsx',
+    url: '/mini-games/memory',
   });
 }
 export default function Page() {
