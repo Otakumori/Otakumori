@@ -182,14 +182,14 @@ function renderShopContent(shopData: ShopData) {
   const hasProducts = products.length > 0;
 
   return (
-    <div className="mx-auto mt-12 max-w-6xl px-4">
+    <div className="mx-auto mt-12 max-w-4xl px-4">
       {/* Shop Header - Bordered Banner Style */}
       <div className="border border-[var(--om-accent-gold)] bg-transparent py-4 text-center text-2xl font-serif tracking-wide text-[var(--om-text-ivory)] mb-8">
         Shop
       </div>
 
       {hasProducts ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => (
             <Link
               key={product.id}

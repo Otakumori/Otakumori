@@ -19,9 +19,9 @@ import BlogSection from '@/app/(site)/home/BlogSection';
 import SectionErrorBoundary from './components/home/SectionErrorBoundary';
 
 // TreeBackgroundWrapper ensures tree only renders on home page
-import TreeBackgroundWrapper from './components/TreeBackgroundWrapper';
 import EnhancedStarfieldBackground from './components/backgrounds/EnhancedStarfieldBackground';
 import { SakuraPetalField } from './components/effects/SakuraPetalField';
+import ScrollableTree from './components/background/ScrollableTree';
 
 export const revalidate = 60;
 
@@ -88,53 +88,32 @@ export default async function HomePage() {
           {/* 
             Z-Index Layering (from back to front):
             -11: StarfieldBackground (deepest background, animated starfield)
-            -5: SakuraPetalField (unified petal animation with two depth layers)
-            0: Tree pillar (static art, left-justified)
+            1: SakuraPetalField (unified petal animation - clickable but subtle)
+            1: ScrollableTree (tree pillar, same level as petals)
             10+: Main content (above all backgrounds)
           */}
-          {isHomepageExperimentalEnabled && (
-            <>
-              {/* Enhanced starfield background - deepest layer, behind everything */}
-              <SafeSection name="StarfieldBackground" fallback={null}>
-                <EnhancedStarfieldBackground density={0.5} speed={0.4} zIndex={-11} />
-              </SafeSection>
-            </>
-          )}
+          {/* Enhanced starfield background - deepest layer, behind everything */}
+          <SafeSection name="StarfieldBackground" fallback={null}>
+            <EnhancedStarfieldBackground density={0.5} speed={0.4} zIndex={-11} />
+          </SafeSection>
 
           {/* Unified sakura petal field - single canvas with two coordinated depth layers */}
-          {isHomepageExperimentalEnabled && (
-            <SafeSection name="SakuraPetalField" fallback={null}>
-              <SakuraPetalField petalCount={90} />
-            </SafeSection>
-          )}
+          {/* Petals at same level as tree (z-index: 1) - clickable but subtle */}
+          <SafeSection name="SakuraPetalField" fallback={null}>
+            <SakuraPetalField petalCount={45} zIndex={1} />
+          </SafeSection>
 
-          {/* Fixed Cherry Tree Pillar - LEFT SIDE */}
-          {/* Full viewport height, fixed width, content scrolls beside it */}
-          <aside
-            className="hidden lg:block fixed inset-y-0 left-0 z-0 pointer-events-none w-[360px] xl:w-[420px]"
-            aria-hidden="true"
-          >
-            <div className="relative w-full h-full">
-              <Image
-                src="/assets/images/cherry-tree.png"
-                alt=""
-                fill
-                priority
-                className="object-cover object-center"
-                sizes="(min-width: 1024px) 360px, (min-width: 1280px) 420px"
-              />
-              {/* Gradient overlay to blend with content */}
-              <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-r from-[#080611] via-[#080611]/40 to-transparent pointer-events-none" />
-            </div>
-          </aside>
+          {/* Scrollable Cherry Tree - Reveals as you scroll */}
+          <ScrollableTree />
 
           {/* Content column - scrolls beside tree pillar on desktop */}
-          <div className="relative min-h-screen page-transition z-10 lg:ml-[360px] xl:ml-[420px]">
+          {/* Margin adjusted to start where tree becomes visible (~500px from left edge) */}
+          <div className="relative min-h-screen page-transition z-10 lg:ml-[500px] xl:ml-[550px]">
             {/* HERO - Always visible */}
             <section
               className="relative z-40 mx-auto max-w-6xl px-4 pt-16 pb-20 md:pt-20 md:pb-24 lg:pt-24 lg:pb-28"
             >
-              <div className="flex flex-col md:flex-row md:justify-end gap-10">
+              <div className="flex flex-col md:flex-row gap-10">
                 {/* Mobile: Show tree inline */}
                 <div className="relative h-72 md:hidden -ml-4">
                   <Image
@@ -146,22 +125,54 @@ export default async function HomePage() {
                   />
                 </div>
 
-                {/* Hero Content - Right side on desktop */}
-                <div className="flex flex-col justify-center gap-6 md:max-w-xl md:ml-auto">
+                {/* Hero Content */}
+                <div className="flex flex-col justify-center gap-6 md:max-w-xl">
                   <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl tracking-wide text-[var(--om-text-ivory)]">
                     Welcome Home, Traveler.
                   </h1>
 
-                  {/* Rune Icons Grid */}
+                  {/* Rune Icons Grid - Interactive Lore/Navigation */}
                   <div className="mt-6 grid grid-cols-4 gap-4 max-w-md">
-                    {[1, 2, 3, 4].map((i) => (
-                      <div
+                    {[
+                      {
+                        icon: '✦',
+                        href: '/shop',
+                        label: 'Shop',
+                        lore: "The Merchant's Mark — Where treasures await those with petals to spend.",
+                      },
+                      {
+                        icon: '✧',
+                        href: '/mini-games',
+                        label: 'Games',
+                        lore: "The GameCube's Seal — Enter the realm of challenges and rewards.",
+                      },
+                      {
+                        icon: '✩',
+                        href: '/blog',
+                        label: 'Lore',
+                        lore: "The Scroll's Wisdom — Stories of travelers past and present.",
+                      },
+                      {
+                        icon: '✪',
+                        href: '/community',
+                        label: 'Community',
+                        lore: "The Soapstone's Call — Leave signs for fellow wanderers.",
+                      },
+                    ].map((rune, i) => (
+                      <Link
                         key={i}
-                        className="aspect-square border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm rounded-lg flex items-center justify-center hover:bg-[var(--om-accent-pink)]/10 transition-all cursor-pointer"
-                        aria-label={`Category ${i}`}
+                        href={rune.href}
+                        className="group aspect-square border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm rounded-lg flex flex-col items-center justify-center hover:bg-[var(--om-accent-pink)]/10 transition-all cursor-pointer relative"
+                        aria-label={rune.label}
                       >
-                        <span className="text-2xl text-[var(--om-text-ivory)] opacity-60">✦</span>
-                      </div>
+                        <span className="text-2xl text-[var(--om-text-ivory)] opacity-60 group-hover:opacity-100 transition-opacity">
+                          {rune.icon}
+                        </span>
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-black/90 backdrop-blur-sm border border-[var(--om-accent-gold)] rounded-lg text-xs text-[var(--om-text-ivory)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap max-w-[200px] text-center z-10">
+                          {rune.lore}
+                        </div>
+                      </Link>
                     ))}
                   </div>
 
@@ -193,7 +204,7 @@ export default async function HomePage() {
             {/* SHOP - Always visible (with fallback if disabled) */}
             {isShopEnabled ? (
               <section
-                className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+                className="relative z-40 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10"
                 aria-label="Shop section"
               >
                 <SectionErrorBoundary sectionName="shop">
@@ -202,7 +213,7 @@ export default async function HomePage() {
               </section>
             ) : (
               <section
-                className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+                className="relative z-40 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10"
                 aria-label="Shop section"
               >
                 <div className="text-center py-16">
@@ -215,7 +226,7 @@ export default async function HomePage() {
             {/* MINI-GAMES - Always visible (with fallback if disabled) */}
             {NEXT_PUBLIC_FEATURE_MINIGAMES === 'on' ? (
               <section
-                className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+                className="relative z-40 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10"
                 aria-label="Mini-games section"
               >
                 <SectionErrorBoundary sectionName="mini-games">
@@ -224,10 +235,10 @@ export default async function HomePage() {
               </section>
             ) : (
               <section
-                className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+                className="relative z-40 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10"
                 aria-label="Mini-games section"
               >
-                <div className="mx-auto w-full max-w-7xl px-4">
+                <div className="mx-auto w-full max-w-5xl px-4">
                   <MiniGameTeaser />
                 </div>
               </section>
@@ -238,7 +249,7 @@ export default async function HomePage() {
             NEXT_PUBLIC_FEATURE_BLOG === 'on' ||
             NEXT_PUBLIC_FEATURE_BLOG === 'true' ? (
               <section
-                className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+                className="relative z-40 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10"
                 aria-label="Blog section"
               >
                 <SectionErrorBoundary sectionName="blog">
@@ -247,10 +258,10 @@ export default async function HomePage() {
               </section>
             ) : (
               <section
-                className="relative z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10"
+                className="relative z-40 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10"
                 aria-label="Blog section"
               >
-                <div className="mx-auto w-full max-w-7xl px-4">
+                <div className="mx-auto w-full max-w-5xl px-4">
                   <BlogTeaser />
                 </div>
               </section>

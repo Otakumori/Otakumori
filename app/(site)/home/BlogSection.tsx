@@ -3,7 +3,6 @@ import { safeFetch, isSuccess, isBlocked } from '@/lib/safeFetch';
 import Link from 'next/link';
 import Image from 'next/image';
 import { paths } from '@/lib/paths';
-import { HeaderButton } from '@/components/ui/header-button';
 import { handleServerError } from '@/app/lib/server-error-handler';
 import { SectionHeader } from '@/app/components/home/SectionHeader';
 import { EmptyState } from '@/app/components/home/EmptyState';
@@ -193,7 +192,12 @@ export default async function BlogSection() {
 
       {posts.length > 0 && (
         <div className="text-center mt-8">
-          <HeaderButton href={paths.blogIndex()}>View All Posts</HeaderButton>
+          <Link
+            href={paths.blogIndex()}
+            className="inline-flex items-center justify-center rounded-lg border border-[var(--om-accent-gold)] bg-[var(--om-bg-surface)] backdrop-blur-sm px-6 py-3 text-sm font-medium text-[var(--om-text-ivory)] hover:bg-[var(--om-accent-pink)]/10 transition-all duration-300 hover:border-[var(--om-accent-pink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          >
+            View All Posts
+          </Link>
         </div>
       )}
     </div>

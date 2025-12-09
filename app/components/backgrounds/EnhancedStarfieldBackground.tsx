@@ -117,12 +117,19 @@ export default function EnhancedStarfieldBackground({
     let h = 0;
 
     const resizeCanvas = () => {
-      w = Math.floor(window.innerWidth * DPR);
-      h = Math.floor(window.innerHeight * DPR);
+      // Use full page dimensions, not just viewport
+      const pageWidth = window.innerWidth;
+      const pageHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+        window.innerHeight
+      );
+      w = Math.floor(pageWidth * DPR);
+      h = Math.floor(pageHeight * DPR);
       canvas.width = w;
       canvas.height = h;
-      canvas.style.width = window.innerWidth + 'px';
-      canvas.style.height = window.innerHeight + 'px';
+      canvas.style.width = pageWidth + 'px';
+      canvas.style.height = pageHeight + 'px';
     };
 
     resizeCanvas();
@@ -305,10 +312,19 @@ export default function EnhancedStarfieldBackground({
     };
 
     window.addEventListener('resize', handleResize);
+    
+    // Also update when document height changes (content loads, etc.)
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+    if (document.body) {
+      resizeObserver.observe(document.body);
+    }
 
     return () => {
       cancelAnimationFrame(animationFrame);
       window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
     };
   }, [density, speed, isVisible, prefersReducedMotion]);
 
@@ -316,8 +332,16 @@ export default function EnhancedStarfieldBackground({
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className={`fixed inset-0 h-screen w-screen pointer-events-none ${className}`}
-      style={{ zIndex }}
+      className={`fixed pointer-events-none ${className}`}
+      style={{ 
+        left: 0,
+        top: 0,
+        margin: 0,
+        padding: 0,
+        zIndex,
+        width: '100vw',
+        height: '100%', // Will be set dynamically by resizeCanvas
+      }}
     />
   );
 }
