@@ -1,7 +1,7 @@
 'use client';
 
 import { logger } from '@/app/lib/logger';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useToastContext } from '@/app/contexts/ToastContext';
 import { useAuthContext } from '@/app/contexts/AuthContext';
@@ -49,10 +49,34 @@ export default function Footer() {
     }
   };
 
+  // Hide footer during GameCube boot animation
+  const [hideFooter, setHideFooter] = useState(false);
+  
+  useEffect(() => {
+    const checkBootAnimation = () => {
+      const bootElement = document.querySelector('[data-gamecube-boot="true"]');
+      const shouldHide = !!bootElement;
+      setHideFooter(shouldHide);
+    };
+    
+    // Check initially
+    checkBootAnimation();
+    
+    // Watch for boot animation changes
+    const observer = new MutationObserver(checkBootAnimation);
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => observer.disconnect();
+  }, []);
+
+  if (hideFooter) {
+    return null;
+  }
+
   return (
     <footer
       className="relative backdrop-blur-lg border-t border-white/10"
-      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)', zIndex: 50 }}
+      style={{ backgroundColor: 'rgba(57, 5, 40, 0.8)', zIndex: 40 }}
     >
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {/* Compact Soapstone Input */}

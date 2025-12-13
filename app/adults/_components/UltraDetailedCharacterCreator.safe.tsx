@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AvatarRenderer } from '../../components/avatar/AvatarRenderer';
+import { AvatarRenderer } from './AvatarRenderer.safe';
+import { PresetSelector } from './PresetSelector.safe';
 import { PhysicsPresetSelector } from './PhysicsPresetSelector.safe';
 import { OutfitSelector } from './OutfitSelector.safe';
 import { HairCustomizer } from './HairCustomizer.safe';
@@ -15,7 +15,7 @@ import { MaterialEditor } from './MaterialEditor.safe';
 import { InteractionTester } from './InteractionTester.safe';
 
 // Types for the ultra-detailed character system
-interface UltraDetailedCharacterParams {
+export interface UltraDetailedCharacterParams {
   // Basic Info
   gender: 'male' | 'female';
   age: 'teen' | 'young-adult' | 'adult' | 'mature';
@@ -251,11 +251,143 @@ export function UltraDetailedCharacterCreator({
 }: UltraDetailedCharacterCreatorProps) {
   const { user } = useUser();
   const queryClient = useQueryClient();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // State management
+  const [showPresetSelector, setShowPresetSelector] = useState(!initialConfig);
   const [activeTab, setActiveTab] = useState<string>('basic');
-  const [characterConfig, setCharacterConfig] = useState<UltraDetailedCharacterParams>({
-    gender: 'female',
+  
+  
+  const [characterConfig, setCharacterConfig] = useState<UltraDetailedCharacterParams>(() => {
+    if (initialConfig) {
+      return {
+        gender: 'female',
+        age: 'young-adult',
+        body: {
+          height: 1.0,
+          weight: 1.0,
+          muscleMass: 0.5,
+          bodyFat: 0.5,
+          proportions: {
+            headSize: 1.0,
+            neckLength: 1.0,
+            shoulderWidth: 1.0,
+            chestSize: 1.0,
+            waistSize: 1.0,
+            hipWidth: 1.0,
+            armLength: 1.0,
+            legLength: 1.0,
+          },
+          genderFeatures: {},
+        },
+        face: {
+          faceShape: {
+            overall: 0.5,
+            jawline: 0.5,
+            cheekbones: 0.5,
+            chinShape: 0.5,
+          },
+          eyes: {
+            size: 1.0,
+            spacing: 1.0,
+            height: 1.0,
+            angle: 0.0,
+            color: '#4A5568',
+          },
+          nose: {
+            size: 1.0,
+            width: 1.0,
+            height: 1.0,
+            bridgeWidth: 1.0,
+            nostrilSize: 1.0,
+            tip: 0.5,
+          },
+          mouth: {
+            size: 1.0,
+            width: 1.0,
+            lipThickness: 1.0,
+            lipShape: 0.5,
+            cupidBow: 0.5,
+            angle: 0.0,
+          },
+          eyebrows: {
+            thickness: 1.0,
+            angle: 0.0,
+            spacing: 1.0,
+          },
+        },
+        hair: {
+          style: 'long-straight',
+          length: 1.0,
+          volume: 1.0,
+          texture: 0.5,
+          color: {
+            primary: '#8B4513',
+            secondary: '#8B4513',
+            gradient: false,
+          },
+          highlights: {
+            enabled: false,
+            color: '#ffffff',
+            intensity: 0.0,
+            pattern: 'streaks',
+          },
+        },
+        skin: {
+          tone: '#FFDBAC',
+          texture: 0.5,
+          blemishes: 0.0,
+          freckles: 0.0,
+          ageSpots: 0.0,
+          wrinkles: 0.0,
+          glossiness: 0.5,
+        },
+        outfit: {
+          top: null,
+          bottom: null,
+          shoes: null,
+          accessories: [],
+        },
+        physics: {
+          softBody: {
+            enable: false,
+            mass: 1.0,
+            stiffness: 0.5,
+            damping: 0.5,
+            maxDisplacement: 0.1,
+          },
+          clothSim: {
+            enable: false,
+            bendStiffness: 0.5,
+            stretchStiffness: 0.5,
+            damping: 0.5,
+            wind: 0.0,
+          },
+        },
+        materials: {
+          shader: 'AnimeToon',
+          parameters: {
+            glossStrength: 0.5,
+            rimStrength: 0.3,
+            colorA: '#ec4899',
+            colorB: '#8b5cf6',
+            rimColor: '#ffffff',
+            metallic: 0.0,
+            roughness: 0.5,
+          },
+          textures: {},
+        },
+        interactions: {
+          poses: ['idle', 'standing', 'sitting'],
+          emotes: ['happy', 'neutral', 'excited'],
+          cameraModes: ['default', 'close-up'],
+          fx: [],
+        },
+        ...initialConfig,
+        } as UltraDetailedCharacterParams;
+    }
+    return {
+      gender: 'female',
     age: 'young-adult',
     body: {
       height: 1.0,
@@ -396,7 +528,8 @@ export function UltraDetailedCharacterCreator({
       cameraModes: ['default', 'close-up'],
       fx: [],
     },
-    ...initialConfig,
+    ...(initialConfig || {}),
+    };
   });
 
   // Check user's gated preferences
@@ -592,6 +725,53 @@ export function UltraDetailedCharacterCreator({
     });
   }, []);
 
+  // Deep merge helper for nested objects
+  const deepMerge = useCallback((target: any, source: any): any => {
+    const output = { ...target };
+    if (isObject(target) && isObject(source)) {
+      Object.keys(source).forEach((key) => {
+        if (isObject(source[key])) {
+          if (!(key in target)) {
+            Object.assign(output, { [key]: source[key] });
+          } else {
+            output[key] = deepMerge(target[key], source[key]);
+          }
+        } else {
+          Object.assign(output, { [key]: source[key] });
+        }
+      });
+    }
+    return output;
+  }, []);
+
+  const isObject = (item: any): boolean => {
+    return item && typeof item === 'object' && !Array.isArray(item);
+  };
+
+  // Handle preset selection
+  const handlePresetSelect = useCallback((preset: any) => {
+    if (preset.configData) {
+      // Deep merge preset config with current defaults to ensure all nested objects are properly merged
+      const mergedConfig = deepMerge(characterConfig, preset.configData);
+      setCharacterConfig(mergedConfig as UltraDetailedCharacterParams);
+    }
+    setShowPresetSelector(false);
+  }, [characterConfig, deepMerge]);
+
+  const handleStartFromScratch = useCallback(() => {
+    setShowPresetSelector(false);
+  }, []);
+
+  // Show preset selector if no initial config
+  if (showPresetSelector) {
+    return (
+      <PresetSelector
+        onSelectPreset={handlePresetSelect}
+        onStartFromScratch={handleStartFromScratch}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-black">
       {/* Header */}
@@ -626,15 +806,17 @@ export function UltraDetailedCharacterCreator({
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Panel - Controls */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1">
             {/* Tab Navigation */}
-            <div className="bg-white/10 rounded-xl p-4">
+            <div className="bg-white/10 rounded-xl p-4 mb-6">
               <h2 className="text-white font-semibold mb-4">Customization Tabs</h2>
               <div className="grid grid-cols-2 gap-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => {
+                      setActiveTab(tab.id);
+                    }}
                     className={`p-3 rounded-lg text-left transition-colors ${
                       activeTab === tab.id
                         ? 'bg-pink-500/30 border border-pink-400/50'
@@ -649,16 +831,31 @@ export function UltraDetailedCharacterCreator({
               </div>
             </div>
 
-            {/* Active Tab Content */}
-            <div className="bg-white/10 rounded-xl p-4">
-              <AnimatePresence mode="wait">
+            {/* Active Tab Content - Fixed height with scrolling */}
+            <div 
+              ref={scrollContainerRef}
+              data-customizer-container
+              className="bg-white/10 rounded-xl p-4"
+              style={{ 
+                height: '600px',
+                maxHeight: '600px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(236, 72, 153, 0.5) transparent',
+                position: 'relative',
+                pointerEvents: 'auto',
+                touchAction: 'pan-y',
+              }}
+            >
+              <div>
                 {activeTab === 'basic' && (
-                  <motion.div
-                    key="basic"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="space-y-4"
+                  <div 
+                    key="basic" 
+                    className="space-y-4" 
+                    style={{ minHeight: 'fit-content' }}
+                    data-tab-content="basic"
                   >
                     <h3 className="text-white font-semibold">Basic Information</h3>
 
@@ -693,126 +890,90 @@ export function UltraDetailedCharacterCreator({
                         <option value="mature">Mature</option>
                       </select>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'body' && (
-                  <motion.div
-                    key="body"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
+                  <div 
+                    key="body" 
+                    style={{ minHeight: 'fit-content' }}
+                    data-tab-content="body"
                   >
                     <BodyCustomizer
                       config={characterConfig.body}
                       onChange={(bodyConfig: any) => updateConfig('body', bodyConfig)}
                       gender={characterConfig.gender}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'face' && (
-                  <motion.div
-                    key="face"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="face" style={{ minHeight: 'fit-content' }}>
                     <FaceCustomizer
                       config={characterConfig.face}
                       onChange={(faceConfig: any) => updateConfig('face', faceConfig)}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'hair' && (
-                  <motion.div
-                    key="hair"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="hair" style={{ minHeight: 'fit-content' }}>
                     <HairCustomizer
                       config={characterConfig.hair}
                       onChange={(hairConfig: any) => updateConfig('hair', hairConfig)}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'outfit' && (
-                  <motion.div
-                    key="outfit"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="outfit" style={{ minHeight: 'fit-content' }}>
                     <OutfitSelector
                       config={characterConfig.outfit}
                       onChange={(outfitConfig: any) => updateConfig('outfit', outfitConfig)}
                       gender={characterConfig.gender}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'physics' && (
-                  <motion.div
-                    key="physics"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="physics" style={{ minHeight: 'fit-content' }}>
                     <PhysicsPresetSelector
                       config={characterConfig.physics}
                       onChange={(physicsConfig: any) => updateConfig('physics', physicsConfig)}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'materials' && (
-                  <motion.div
-                    key="materials"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="materials" style={{ minHeight: 'fit-content' }}>
                     <MaterialEditor
                       config={characterConfig.materials}
                       onChange={(materialConfig: any) => updateConfig('materials', materialConfig)}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'interactions' && (
-                  <motion.div
-                    key="interactions"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="interactions" style={{ minHeight: 'fit-content' }}>
                     <InteractionTester
                       config={characterConfig.interactions}
                       onChange={(interactionConfig: any) =>
                         updateConfig('interactions', interactionConfig)
                       }
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {activeTab === 'nsfw' && canAccessNSFW && (
-                  <motion.div
-                    key="nsfw"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                  >
+                  <div key="nsfw" style={{ minHeight: 'fit-content' }}>
                     <NSFWCustomizer
                       config={characterConfig.nsfw}
                       onChange={(nsfwConfig: any) => updateConfig('nsfw', nsfwConfig)}
                       gender={characterConfig.gender}
                     />
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
+              </div>
             </div>
           </div>
 
@@ -825,10 +986,10 @@ export function UltraDetailedCharacterCreator({
                 <AvatarRenderer
                   config={characterConfig}
                   size="lg"
-                  interactions={true}
-                  physics={
-                    characterConfig.physics.softBody.enable ||
-                    characterConfig.physics.clothSim.enable
+                  showInteractions={true}
+                  physicsEnabled={
+                    characterConfig.physics?.softBody?.enable ||
+                    characterConfig.physics?.clothSim?.enable
                   }
                 />
               </div>

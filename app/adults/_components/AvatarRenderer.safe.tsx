@@ -3,6 +3,7 @@
 import { Suspense, useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
+import * as THREE from 'three';
 import { ACESFilmicToneMapping, Color, type Group, type Mesh } from 'three';
 
 import type { AvatarSize } from '@/app/lib/avatar-sizes';
@@ -15,8 +16,8 @@ interface AvatarRendererProps {
   className?: string;
 }
 
-// AnimeToon Material Component
-function AnimeToonMaterial({ config }: { config: any }) {
+// AnimeToon Material Component (unused currently; kept for future shader/material work)
+function _AnimeToonMaterial({ config }: { config: any }) {
   const materialRef = useRef<any>(undefined);
 
   useEffect(() => {
@@ -38,7 +39,10 @@ function AnimeToonMaterial({ config }: { config: any }) {
       emissive={config.materials?.parameters?.rimColor || '#FFD700'}
       emissiveIntensity={config.materials?.parameters?.rimStrength || 0.35}
       transparent
-      opacity={0.95}
+      opacity={1.0}
+      // Enhanced material properties for better quality
+      envMapIntensity={1.0}
+      flatShading={false}
     />
   );
 }
@@ -139,13 +143,152 @@ function CharacterMesh({ config }: { config: any }) {
     }
   });
 
-  return (
-    <mesh ref={meshRef}>
-      {/* Base humanoid geometry - this would be replaced with actual character mesh */}
-      <capsuleGeometry args={[0.5, 1.8, 8, 16]} />
-      <AnimeToonMaterial config={config} />
-    </mesh>
-  );
+  // Generate humanoid body mesh instead of capsule
+  const bodyGroupRef = useRef<Group>(null);
+  
+  useEffect(() => {
+    if (!bodyGroupRef.current) return;
+    
+    // Clear existing children
+    while (bodyGroupRef.current.children.length > 0) {
+      const child = bodyGroupRef.current.children[0];
+      bodyGroupRef.current.remove(child);
+      if ((child as unknown) instanceof THREE.Mesh) {
+        const mesh = child as unknown as THREE.Mesh;
+        mesh.geometry.dispose();
+        if (Array.isArray(mesh.material)) {
+          mesh.material.forEach((m: THREE.Material) => m.dispose());
+        } else {
+          mesh.material.dispose();
+        }
+      }
+    }
+    
+    const group = bodyGroupRef.current;
+    const height = config.body?.height || 1.0;
+    const _weight = config.body?.weight || 1.0;
+    const gender = config.gender || 'female';
+    
+    // Create material
+    const material = new THREE.MeshStandardMaterial({
+      color: new Color(config.materials?.parameters?.colorA || '#FF6B9D'),
+      metalness: config.materials?.parameters?.metallic || 0.1,
+      roughness: config.materials?.parameters?.roughness || 0.3,
+      emissive: new Color(config.materials?.parameters?.rimColor || '#FFD700'),
+      emissiveIntensity: config.materials?.parameters?.rimStrength || 0.35,
+      transparent: true,
+      opacity: 1.0,
+    });
+    
+    // Head - Sphere with proper proportions
+    const headSize = 0.18 * (config.body?.proportions?.headSize || 1.0);
+    const headGeometry = new THREE.SphereGeometry(headSize, 32, 32);
+    const headMesh = new THREE.Mesh(headGeometry, material.clone());
+    headMesh.position.set(0, 1.5 + height * 0.2, 0);
+    headMesh.name = 'Head';
+    group.add(headMesh);
+    
+    // Neck - Cylinder connecting head to torso
+    const neckLength = 0.12 * (config.body?.proportions?.neckLength || 1.0);
+    const neckGeometry = new THREE.CylinderGeometry(0.06, 0.08, neckLength, 16);
+    const neckMesh = new THREE.Mesh(neckGeometry, material.clone());
+    neckMesh.position.set(0, 1.4 + height * 0.15, 0);
+    neckMesh.name = 'Neck';
+    group.add(neckMesh);
+    
+    // Torso - Tapered cylinder (wider shoulders, narrower waist)
+    const shoulderWidth = 0.25 * (config.body?.proportions?.shoulderWidth || 1.0);
+    const waistSize = 0.18 * (config.body?.proportions?.waistSize || 1.0);
+    const chestSize = 0.22 * (config.body?.proportions?.chestSize || 1.0);
+    const torsoHeight = 0.5 + height * 0.15;
+    
+    // Create torso with proper tapering
+    const torsoGeometry = new THREE.CylinderGeometry(
+      waistSize,
+      shoulderWidth,
+      torsoHeight,
+      32
+    );
+    const torsoMesh = new THREE.Mesh(torsoGeometry, material.clone());
+    torsoMesh.position.set(0, 1.0 + height * 0.1, 0);
+    
+    // Gender-specific torso shaping
+    if (gender === 'female') {
+      const breastSize = config.body?.genderFeatures?.breastSize || 0.8;
+      // Add chest definition for female
+      torsoMesh.scale.set(1, 1, 0.85 + breastSize * 0.15);
+    } else {
+      // Broader chest for male
+      torsoMesh.scale.set(1, 1, 1.0 + chestSize * 0.1);
+    }
+    
+    torsoMesh.name = 'Torso';
+    group.add(torsoMesh);
+    
+    // Hips - Wider base for natural body shape
+    const hipWidth = 0.22 * (config.body?.proportions?.hipWidth || 1.0);
+    const hipGeometry = new THREE.CylinderGeometry(hipWidth, waistSize, 0.15, 32);
+    const hipMesh = new THREE.Mesh(hipGeometry, material.clone());
+    hipMesh.position.set(0, 0.75 + height * 0.05, 0);
+    hipMesh.name = 'Hips';
+    group.add(hipMesh);
+    
+    // Arms - Properly positioned and proportioned
+    const armLength = 0.4 * (config.body?.proportions?.armLength || 1.0);
+    const armRadius = 0.05;
+    
+    // Left arm
+    const leftArmGeometry = new THREE.CylinderGeometry(armRadius, armRadius * 0.9, armLength, 16);
+    const leftArmMesh = new THREE.Mesh(leftArmGeometry, material.clone());
+    leftArmMesh.position.set(-(shoulderWidth + armLength / 2), 1.0 + height * 0.1, 0);
+    leftArmMesh.rotation.z = Math.PI / 2;
+    leftArmMesh.name = 'LeftArm';
+    group.add(leftArmMesh);
+    
+    // Right arm
+    const rightArmGeometry = new THREE.CylinderGeometry(armRadius, armRadius * 0.9, armLength, 16);
+    const rightArmMesh = new THREE.Mesh(rightArmGeometry, material.clone());
+    rightArmMesh.position.set(shoulderWidth + armLength / 2, 1.0 + height * 0.1, 0);
+    rightArmMesh.rotation.z = -Math.PI / 2;
+    rightArmMesh.name = 'RightArm';
+    group.add(rightArmMesh);
+    
+    // Legs - Properly proportioned
+    const legLength = 0.6 * (config.body?.proportions?.legLength || 1.0);
+    const legRadius = 0.07;
+    const thighGap = gender === 'female' ? (config.body?.genderFeatures?.thighGap || 0.3) * 0.1 : 0.05;
+    
+    // Left leg
+    const leftLegGeometry = new THREE.CylinderGeometry(legRadius, legRadius * 0.85, legLength, 16);
+    const leftLegMesh = new THREE.Mesh(leftLegGeometry, material.clone());
+    leftLegMesh.position.set(-(hipWidth * 0.6 - thighGap), -legLength / 2 + height * 0.05, 0);
+    leftLegMesh.name = 'LeftLeg';
+    group.add(leftLegMesh);
+    
+    // Right leg
+    const rightLegGeometry = new THREE.CylinderGeometry(legRadius, legRadius * 0.85, legLength, 16);
+    const rightLegMesh = new THREE.Mesh(rightLegGeometry, material.clone());
+    rightLegMesh.position.set(hipWidth * 0.6 - thighGap, -legLength / 2 + height * 0.05, 0);
+    rightLegMesh.name = 'RightLeg';
+    group.add(rightLegMesh);
+    
+    return () => {
+      // Cleanup on unmount
+      group.traverse((child) => {
+        if ((child as unknown) instanceof THREE.Mesh) {
+          const mesh = child as unknown as THREE.Mesh;
+          mesh.geometry.dispose();
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach((m: THREE.Material) => m.dispose());
+          } else {
+            mesh.material.dispose();
+          }
+        }
+      });
+    };
+  }, [config]);
+  
+  return <group ref={bodyGroupRef} />;
 }
 
 // Hair Component
@@ -156,11 +299,14 @@ function HairComponent({ config }: { config: any }) {
     <group>
       {/* Hair geometry would be loaded here */}
       <mesh>
-        <sphereGeometry args={[0.6, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.7]} />
+        {/* Higher quality hair geometry */}
+        <sphereGeometry args={[0.6, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.7]} />
         <meshStandardMaterial
           color={config.hair.color?.primary || '#8B4513'}
-          metalness={0.1}
-          roughness={0.8}
+          metalness={0.15}
+          roughness={0.7}
+          emissive={config.hair.color?.primary || '#8B4513'}
+          emissiveIntensity={0.1}
         />
       </mesh>
     </group>
@@ -175,11 +321,14 @@ function OutfitComponent({ config }: { config: any }) {
     <group>
       {/* Outfit geometry would be loaded here */}
       <mesh>
-        <cylinderGeometry args={[0.6, 0.4, 1.2, 16]} />
+        {/* Higher quality outfit geometry */}
+        <cylinderGeometry args={[0.6, 0.4, 1.2, 32]} />
         <meshStandardMaterial
           color={config.outfit.primary?.color || '#FF6B9D'}
-          metalness={0.2}
-          roughness={0.7}
+          metalness={0.25}
+          roughness={0.6}
+          emissive={config.outfit.primary?.color || '#FF6B9D'}
+          emissiveIntensity={0.05}
         />
       </mesh>
     </group>
@@ -194,13 +343,21 @@ function AvatarScene({ config, physicsEnabled = true }: { config: any; physicsEn
     // Set up camera
     camera.position.set(0, 1.5, 3);
     camera.lookAt(0, 1.5, 0);
-  }, [camera]);
+  }, [camera, config, physicsEnabled]);
 
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={1} color="#ec4899" castShadow />
+      {/* Enhanced Lighting - Code Vein style anime lighting */}
+      <ambientLight intensity={0.5} color="#ffffff" />
+      {/* Key light - main illumination (anime style top-right) */}
+      <directionalLight position={[5, 8, 3]} intensity={1.5} color="#ffffff" castShadow />
+      {/* Fill light - soft fill from front-left */}
+      <directionalLight position={[-3, 2, 2]} intensity={0.6} color="#fff5e6" />
+      {/* Rim light - back lighting for anime edge glow */}
+      <directionalLight position={[0, 2, -5]} intensity={0.8} color="#ec4899" />
+      {/* Accent light - pink accent from side */}
+      <directionalLight position={[5, 3, 2]} intensity={0.4} color="#ec4899" />
+      {/* Purple accent light */}
       <directionalLight position={[-5, 5, 5]} intensity={0.5} color="#8b5cf6" />
 
       {/* Environment */}
@@ -280,7 +437,15 @@ export function AvatarRenderer({
           toneMapping: ACESFilmicToneMapping,
           alpha: true,
           powerPreference: 'high-performance',
+          stencil: false,
+          depth: true,
+          logarithmicDepthBuffer: false,
+          precision: 'highp',
+          preserveDrawingBuffer: false,
+          premultipliedAlpha: false,
         }}
+        dpr={[1, 2]} // Support high DPI displays
+        performance={{ min: 0.5 }} // Maintain 60fps
         className="rounded-lg"
       >
         <Suspense fallback={null}>

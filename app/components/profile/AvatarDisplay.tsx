@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
@@ -18,6 +18,77 @@ interface AvatarDisplayProps {
   className?: string;
 }
 
+// Wrapper component with error handling for AvatarRenderer
+function AvatarRendererWrapper({
+  config,
+  size,
+  showInteractions,
+  fallback,
+}: {
+  config: any;
+  size: AvatarSize;
+  showInteractions: boolean;
+  fallback: React.ReactNode;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const [_error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    // Reset error state when config changes
+    setHasError(false);
+    setError(null);
+  }, [config]);
+
+  if (hasError) {
+    return <>{fallback}</>;
+  }
+
+  try {
+    return (
+      <ErrorBoundary
+        fallback={fallback}
+        onError={(err) => {
+          setHasError(true);
+          setError(err);
+        }}
+      >
+        <AvatarRenderer config={config} size={size} showInteractions={showInteractions} />
+      </ErrorBoundary>
+    );
+  } catch (err) {
+    setHasError(true);
+    setError(err instanceof Error ? err : new Error(String(err)));
+    return <>{fallback}</>;
+  }
+}
+
+// Simple error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode; onError?: (error: Error) => void },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    void errorInfo;
+    this.props.onError?.(error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <>{this.props.fallback}</>;
+    }
+    return this.props.children;
+  }
+}
+
 export function AvatarDisplay({
   userId,
   size = 'md',
@@ -33,9 +104,13 @@ export function AvatarDisplay({
     queryKey: ['user-avatar', userId || user?.id],
     queryFn: async () => {
       const response = await fetch(`/api/v1/avatar/load`);
-      if (!response.ok) throw new Error('Failed to load avatar');
+      if (!response.ok) {
+        throw new Error('Failed to load avatar');
+      }
       const result = await response.json();
-      return result.data;
+      // Fix: API returns { data: { user: { avatarConfig: ... } } }, so we need to return the user object
+      const userData = result.data?.user || result.data;
+      return userData;
     },
     enabled: !!userId || !!user?.id,
   });
@@ -44,11 +119,30 @@ export function AvatarDisplay({
 
   const isOwnProfile = !userId || userId === user?.id;
 
+  // After fix: avatarData is already the user object (from result.data?.user), so avatarConfig is directly on avatarData
+  let avatarConfig = avatarData?.avatarConfig;
+  
+  // Handle case where avatarConfig might be a JSON string (defensive check)
+  if (typeof avatarConfig === 'string') {
+    try {
+      avatarConfig = JSON.parse(avatarConfig);
+    } catch (e) {
+      console.warn('[AvatarDisplay] Failed to parse avatarConfig string:', e);
+      avatarConfig = null;
+    }
+  }
+  
+  // Validate avatarConfig structure - ensure it's an object, not null/undefined/string
+  // Less strict validation - just check if it's a valid object, let AvatarRenderer handle format validation
+  const isValidConfig = avatarConfig && 
+    typeof avatarConfig === 'object' && 
+    !Array.isArray(avatarConfig);
+
   if (isLoading) {
     return <AvatarSkeleton size={size} className={className} />;
   }
 
-  if (!avatarData?.avatarConfig) {
+  if (!isValidConfig) {
     return (
       <div className={`${sizeClasses.container} ${className}`}>
         <AvatarFallback size={size} mode="user" className="w-full h-full" />
@@ -74,7 +168,11 @@ export function AvatarDisplay({
     >
       {/* 3D Avatar Renderer */}
       <div className="w-full h-full relative">
-        <AvatarRenderer config={avatarData.avatarConfig} size={size} showInteractions={true} />
+        {isValidConfig ? (
+          <AvatarRendererWrapper config={avatarConfig} size={size} showInteractions={true} fallback={<AvatarFallback size={size} mode="user" className="w-full h-full" />} />
+        ) : (
+          <AvatarFallback size={size} mode="user" className="w-full h-full" />
+        )}
 
         {/* Overlay for edit button */}
         {isOwnProfile && showEditButton && (

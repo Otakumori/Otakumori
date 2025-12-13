@@ -231,11 +231,26 @@ export default function GameAvatarRenderer({
         if (response.ok) {
           const data = await response.json();
           if (data.ok) {
+            // Transform parts array to object format expected by AvatarConfiguration
+            // API returns: parts: [{ partType: 'head', partId: 'head_001' }, ...]
+            // Expected: parts: { head: 'head_001', body: 'body_001' }
+            const transformedConfig = { ...data.data };
+            if (Array.isArray(transformedConfig.parts)) {
+              transformedConfig.parts = transformedConfig.parts.reduce((acc: Record<string, string>, part: any) => {
+                if (part.partType && part.partId) {
+                  acc[part.partType] = part.partId;
+                }
+                return acc;
+              }, {});
+            }
             return {
-              configuration: data.data,
-              isCustom: true,
+              configuration: transformedConfig,
+              isCustom: data.isCustom !== undefined ? data.isCustom : true,
+              fallbackSpriteUrl: data.fallbackSpriteUrl || '/assets/default-avatar.png',
             };
           }
+        } else {
+          // ignore
         }
 
         // Fallback to default character
@@ -277,6 +292,7 @@ export default function GameAvatarRenderer({
   });
 
   // Handle loading states
+
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center ${className}`}>
@@ -304,14 +320,28 @@ export default function GameAvatarRenderer({
   }
 
   // Choose rendering method based on support and preferences
-  const shouldUse3D = use3D && webglSupported && avatarData.configuration;
+  // Validate configuration structure
+  const isValidConfiguration = avatarData?.configuration && typeof avatarData.configuration === 'object' && !Array.isArray(avatarData.configuration);
+  const shouldUse3D = use3D && webglSupported && isValidConfiguration;
 
   if (shouldUse3D) {
     return (
       <div className={`relative ${className}`}>
         <Canvas
           camera={{ position: [0, 1.5, 3], fov: 50 }}
-          gl={{ antialias: true, alpha: true }}
+          gl={{ 
+            antialias: true, 
+            alpha: true,
+            powerPreference: 'high-performance',
+            stencil: false,
+            depth: true,
+            logarithmicDepthBuffer: false,
+            precision: 'highp',
+            preserveDrawingBuffer: false,
+            premultipliedAlpha: false,
+          }}
+          dpr={[1, 2]} // Support high DPI displays for crisp rendering
+          performance={{ min: 0.5 }} // Maintain smooth 60fps
           className="w-full h-full"
         >
           <Suspense fallback={null}>
